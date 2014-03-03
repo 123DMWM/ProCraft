@@ -326,7 +326,7 @@ namespace fCraft {
                 player.Message( firstLine.ToString() );
 
 
-                if (info.Name.Contains('@') && (player == Player.Console || player.Info == info))
+                if (info.Email != null && (player == Player.Console || player.Info == info))
                 {
                     // Show login information
                     player.Message("  <{0}> {1} logins since {2:d MMM yyyy}.",
