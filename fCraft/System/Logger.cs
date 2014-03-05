@@ -183,7 +183,7 @@ namespace fCraft {
 
             Log( LogType.SeriousError, "{0}: {1}", message, exception );
 
-            bool submitCrashReport = ConfigKey.SubmitCrashReports.Enabled();
+            bool submitCrashReport = false;//ConfigKey.SubmitCrashReports.Enabled();
             bool isCommon = CheckForCommonErrors( exception );
 
             try {
