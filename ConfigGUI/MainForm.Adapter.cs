@@ -127,6 +127,7 @@ namespace fCraft.ConfigGUI {
             }
 
             cHeartbeatUrl.Text = ConfigKey.HeartbeatUrl.GetString();
+            cKickHeartbeatUrl.Text = ConfigKey.KickHeartbeatUrl.GetString();
 
             cPublic.SelectedIndex = ConfigKey.IsPublic.Enabled() ? 0 : 1;
             nPort.Value = ConfigKey.Port.GetInt();
@@ -455,6 +456,7 @@ namespace fCraft.ConfigGUI {
 
 
             ConfigKey.HeartbeatUrl.TrySetValue(cHeartbeatUrl.Text);
+            ConfigKey.KickHeartbeatUrl.TrySetValue(cKickHeartbeatUrl.Text);
 
             
 

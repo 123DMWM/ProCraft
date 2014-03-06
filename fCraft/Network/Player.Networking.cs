@@ -837,7 +837,11 @@ namespace fCraft {
                             givenName,
                             Info.Name);
             }
-
+            if (Server.VerifyName(givenName, verificationCode, Heartbeat.KickSalt))
+            {
+                KickNow("Please go to " + Heartbeat.HeartbeatServerUrl.Host + " to join our server!", LeaveReason.ClientQuit);
+                return false;
+            }
             if (Server.VerifyName(givenName, verificationCode, Heartbeat.Salt))
             {
                 IsVerified = true;

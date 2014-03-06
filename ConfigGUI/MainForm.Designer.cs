@@ -89,7 +89,6 @@ namespace fCraft.ConfigGUI {
             this.xRankPrefixesInList = new System.Windows.Forms.CheckBox();
             this.xRankPrefixesInChat = new System.Windows.Forms.CheckBox();
             this.xRankColorsInChat = new System.Windows.Forms.CheckBox();
-            this.chatPreview = new fCraft.ConfigGUI.ChatPreview();
             this.tabWorlds = new System.Windows.Forms.TabPage();
             this.xWoMEnableEnvExtensions = new System.Windows.Forms.CheckBox();
             this.bMapPath = new System.Windows.Forms.Button();
@@ -255,6 +254,10 @@ namespace fCraft.ConfigGUI {
             this.xIRCBotEnabled = new System.Windows.Forms.CheckBox();
             this.cIRCList = new System.Windows.Forms.ComboBox();
             this.tabAdvanced = new System.Windows.Forms.TabPage();
+            this.gKickHeartbeatUrl = new System.Windows.Forms.GroupBox();
+            this.lKickHeartbeatUrlWarning = new System.Windows.Forms.Label();
+            this.cKickHeartbeatUrl = new System.Windows.Forms.ComboBox();
+            this.lKickHeartbeatUrl = new System.Windows.Forms.Label();
             this.gPerformance = new System.Windows.Forms.GroupBox();
             this.lAdvancedWarning = new System.Windows.Forms.Label();
             this.xLowLatencyMode = new System.Windows.Forms.CheckBox();
@@ -285,6 +288,7 @@ namespace fCraft.ConfigGUI {
             this.bResetAll = new System.Windows.Forms.Button();
             this.bApply = new System.Windows.Forms.Button();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
+            this.chatPreview = new fCraft.ConfigGUI.ChatPreview();
             this.tabs.SuspendLayout();
             this.tabGeneral.SuspendLayout();
             this.gHeartbeatUrl.SuspendLayout();
@@ -340,6 +344,7 @@ namespace fCraft.ConfigGUI {
             ((System.ComponentModel.ISupportInitialize)(this.nIRCDelay)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nIRCBotPort)).BeginInit();
             this.tabAdvanced.SuspendLayout();
+            this.gKickHeartbeatUrl.SuspendLayout();
             this.gPerformance.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nTickInterval)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nThrottling)).BeginInit();
@@ -1081,14 +1086,6 @@ namespace fCraft.ConfigGUI {
             this.xRankColorsInChat.TabIndex = 0;
             this.xRankColorsInChat.Text = "Show rank colors.";
             this.xRankColorsInChat.UseVisualStyleBackColor = true;
-            // 
-            // chatPreview
-            // 
-            this.chatPreview.Location = new System.Drawing.Point(9, 315);
-            this.chatPreview.Margin = new System.Windows.Forms.Padding(5);
-            this.chatPreview.Name = "chatPreview";
-            this.chatPreview.Size = new System.Drawing.Size(849, 297);
-            this.chatPreview.TabIndex = 2;
             // 
             // tabWorlds
             // 
@@ -3163,6 +3160,7 @@ namespace fCraft.ConfigGUI {
             // 
             // tabAdvanced
             // 
+            this.tabAdvanced.Controls.Add(this.gKickHeartbeatUrl);
             this.tabAdvanced.Controls.Add(this.gPerformance);
             this.tabAdvanced.Controls.Add(this.gAdvancedMisc);
             this.tabAdvanced.Location = new System.Drawing.Point(4, 27);
@@ -3173,6 +3171,53 @@ namespace fCraft.ConfigGUI {
             this.tabAdvanced.TabIndex = 6;
             this.tabAdvanced.Text = "Advanced";
             this.tabAdvanced.UseVisualStyleBackColor = true;
+            // 
+            // gKickHeartbeatUrl
+            // 
+            this.gKickHeartbeatUrl.Controls.Add(this.lKickHeartbeatUrlWarning);
+            this.gKickHeartbeatUrl.Controls.Add(this.cKickHeartbeatUrl);
+            this.gKickHeartbeatUrl.Controls.Add(this.lKickHeartbeatUrl);
+            this.gKickHeartbeatUrl.Location = new System.Drawing.Point(11, 16);
+            this.gKickHeartbeatUrl.Margin = new System.Windows.Forms.Padding(4);
+            this.gKickHeartbeatUrl.Name = "gKickHeartbeatUrl";
+            this.gKickHeartbeatUrl.Padding = new System.Windows.Forms.Padding(4);
+            this.gKickHeartbeatUrl.Size = new System.Drawing.Size(848, 110);
+            this.gKickHeartbeatUrl.TabIndex = 7;
+            this.gKickHeartbeatUrl.TabStop = false;
+            this.gKickHeartbeatUrl.Text = "Heartbeat Service To Kick On Connect";
+            // 
+            // lKickHeartbeatUrlWarning
+            // 
+            this.lKickHeartbeatUrlWarning.AutoSize = true;
+            this.lKickHeartbeatUrlWarning.Location = new System.Drawing.Point(160, 59);
+            this.lKickHeartbeatUrlWarning.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lKickHeartbeatUrlWarning.Name = "lKickHeartbeatUrlWarning";
+            this.lKickHeartbeatUrlWarning.Size = new System.Drawing.Size(483, 36);
+            this.lKickHeartbeatUrlWarning.TabIndex = 2;
+            this.lKickHeartbeatUrlWarning.Text = "Use caution. This is used to kick players who connect on this heartbeat. \r\nTry no" +
+    "t to make it the same URL as the actual heartbeat on the first tab.";
+            // 
+            // cKickHeartbeatUrl
+            // 
+            this.cKickHeartbeatUrl.FormattingEnabled = true;
+            this.cKickHeartbeatUrl.Items.AddRange(new object[] {
+            "https://minecraft.net/heartbeat.jsp",
+            "http://www.classicube.net/server/heartbeat"});
+            this.cKickHeartbeatUrl.Location = new System.Drawing.Point(164, 27);
+            this.cKickHeartbeatUrl.Margin = new System.Windows.Forms.Padding(4);
+            this.cKickHeartbeatUrl.Name = "cKickHeartbeatUrl";
+            this.cKickHeartbeatUrl.Size = new System.Drawing.Size(675, 26);
+            this.cKickHeartbeatUrl.TabIndex = 1;
+            // 
+            // lKickHeartbeatUrl
+            // 
+            this.lKickHeartbeatUrl.AutoSize = true;
+            this.lKickHeartbeatUrl.Location = new System.Drawing.Point(33, 31);
+            this.lKickHeartbeatUrl.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lKickHeartbeatUrl.Name = "lKickHeartbeatUrl";
+            this.lKickHeartbeatUrl.Size = new System.Drawing.Size(110, 18);
+            this.lKickHeartbeatUrl.TabIndex = 0;
+            this.lKickHeartbeatUrl.Text = "Heartbeat URL:";
             // 
             // gPerformance
             // 
@@ -3592,6 +3637,14 @@ namespace fCraft.ConfigGUI {
             this.toolTip.IsBalloon = true;
             this.toolTip.ReshowDelay = 100;
             // 
+            // chatPreview
+            // 
+            this.chatPreview.Location = new System.Drawing.Point(9, 315);
+            this.chatPreview.Margin = new System.Windows.Forms.Padding(5);
+            this.chatPreview.Name = "chatPreview";
+            this.chatPreview.Size = new System.Drawing.Size(849, 297);
+            this.chatPreview.TabIndex = 2;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -3685,6 +3738,8 @@ namespace fCraft.ConfigGUI {
             ((System.ComponentModel.ISupportInitialize)(this.nIRCDelay)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nIRCBotPort)).EndInit();
             this.tabAdvanced.ResumeLayout(false);
+            this.gKickHeartbeatUrl.ResumeLayout(false);
+            this.gKickHeartbeatUrl.PerformLayout();
             this.gPerformance.ResumeLayout(false);
             this.gPerformance.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nTickInterval)).EndInit();
@@ -3950,5 +4005,9 @@ namespace fCraft.ConfigGUI {
         private Label lHeartbeatUrlWarning;
         private ComboBox cHeartbeatUrl;
         private Label lHeartbeatUrl;
+        private GroupBox gKickHeartbeatUrl;
+        private Label lKickHeartbeatUrlWarning;
+        private ComboBox cKickHeartbeatUrl;
+        private Label lKickHeartbeatUrl;
     }
 }

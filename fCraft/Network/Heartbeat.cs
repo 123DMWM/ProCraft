@@ -22,6 +22,7 @@ namespace fCraft
         public static Uri Url { get; internal set; }
 
         internal static Uri HeartbeatServerUrl;
+        internal static Uri KickHeartbeatServerUrl;
         static readonly TimeSpan DelayDefault = TimeSpan.FromSeconds(20);
         static readonly TimeSpan TimeoutDefault = TimeSpan.FromSeconds(10);
 
@@ -36,6 +37,7 @@ namespace fCraft
         /// Known only to this server and to heartbeat server(s). </summary>
         [NotNull]
         public static string Salt { get; internal set; }
+        public static string KickSalt { get; internal set; }
 
 
         // Dns lookup, to make sure that IPv4 is preferred for heartbeats
@@ -82,6 +84,7 @@ namespace fCraft
             Delay = DelayDefault;
             Timeout = TimeoutDefault;
             Salt = Server.GetRandomString(32);
+            KickSalt = Server.GetRandomString(32);
             Server.ShutdownBegan += OnServerShutdown;
         }
 
@@ -108,6 +111,14 @@ namespace fCraft
             if (ConfigKey.HeartbeatEnabled.Enabled())
             {
                 SendHeartBeat();
+                if (KickHeartbeatServerUrl != HeartbeatServerUrl && !KickHeartbeatServerUrl.Equals(""))
+                {
+                    SendKickHeartBeat();
+                }
+                if (KickHeartbeatServerUrl == HeartbeatServerUrl)
+                {
+                    Logger.Log(LogType.Debug, "KickHeartbeatUrl and HeartbeatUrl are the same! Server wil not send kickheartbeat.");
+                }
             }
             else
             {
@@ -142,6 +153,17 @@ namespace fCraft
             heartBeatRequest = CreateRequest(data.CreateUri());
             var state = new HeartbeatRequestState(heartBeatRequest, data);
             heartBeatRequest.BeginGetResponse(ResponseCallback, state);
+        }
+        static void SendKickHeartBeat()
+        {
+            HeartbeatData data = new HeartbeatData(KickHeartbeatServerUrl);
+            if (!RaiseHeartbeatSendingEvent(data, KickHeartbeatServerUrl))
+            {
+                return;
+            }
+            heartBeatRequest = CreateRequest(data.CreateKickUri());
+            var state = new HeartbeatRequestState(heartBeatRequest, data);
+            heartBeatRequest.BeginGetResponse(ResponseKickCallback, state);
         }
 
 
@@ -226,6 +248,11 @@ namespace fCraft
             }
         }
 
+        // Called when the heartbeat server responds.
+        static void ResponseKickCallback([NotNull] IAsyncResult result)
+        {
+        }
+
         #region Events
 
         /// <summary> Occurs when a heartbeat is about to be sent (cancelable). </summary>
@@ -297,18 +324,24 @@ namespace fCraft
             Port = Server.Port;
             ProtocolVersion = Config.ProtocolVersion;
             Salt = Heartbeat.Salt;
+            KickSalt = Heartbeat.KickSalt;
             ServerName = ConfigKey.ServerName.GetString();
             CustomData = new Dictionary<string, string>();
             HeartbeatUri = heartbeatUri;
+            KickHeartbeatUri = heartbeatUri;
         }
 
         /// <summary> The heartbeat URI sent to minecraft.net in order to remain on the server list. </summary>
         [NotNull]
         public Uri HeartbeatUri { get; private set; }
+        [NotNull]
+        public Uri KickHeartbeatUri { get; private set; }
 
         /// <summary> Server salt used in name verification (hashing). </summary>
         [NotNull]
         public string Salt { get; set; }
+        [NotNull]
+        public string KickSalt { get; set; }
 
         /// <summary> Port that players should connect to in order to join this server. </summary>
         public int Port { get; set; }
@@ -346,6 +379,28 @@ namespace fCraft
                              Port,
                              ProtocolVersion,
                              Uri.EscapeDataString(Salt),
+                             Uri.EscapeDataString(ServerName));
+            foreach (var pair in CustomData)
+            {
+                sb.AppendFormat("&{0}={1}",
+                                 Uri.EscapeDataString(pair.Key),
+                                 Uri.EscapeDataString(pair.Value));
+            }
+            ub.Query = sb.ToString();
+            return ub.Uri;
+        }
+        [NotNull]
+        internal Uri CreateKickUri()
+        {
+            UriBuilder ub = new UriBuilder(KickHeartbeatUri);
+            StringBuilder sb = new StringBuilder();
+            sb.AppendFormat("public={0}&max={1}&users={2}&port={3}&version={4}&salt={5}&name={6}",
+                             IsPublic,
+                             MaxPlayers,
+                             PlayerCount,
+                             Port,
+                             ProtocolVersion,
+                             Uri.EscapeDataString(KickSalt),
                              Uri.EscapeDataString(ServerName));
             foreach (var pair in CustomData)
             {
