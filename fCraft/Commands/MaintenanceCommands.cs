@@ -26,44 +26,6 @@ namespace fCraft {
             CommandManager.RegisterCommand( CdInfoSwap );
             CommandManager.RegisterCommand( CdSave );
 
-#if DEBUG
-            CommandManager.RegisterCommand( new CommandDescriptor {
-                Name = "BUM",
-                IsHidden = true,
-                Category = CommandCategory.Maintenance | CommandCategory.Debug,
-                Help = "Bandwidth Use Mode statistics.",
-                Handler = delegate( Player player, CommandReader cmd ) {
-                    string newModeName = cmd.Next();
-                    if( newModeName == null ) {
-                        player.Message( "{0}: S: {1}  R: {2}  S/s: {3:0.0}  R/s: {4:0.0}",
-                                        player.BandwidthUseMode,
-                                        player.BytesSent,
-                                        player.BytesReceived,
-                                        player.BytesSentRate,
-                                        player.BytesReceivedRate );
-                    } else {
-                        var newMode = (BandwidthUseMode)Enum.Parse( typeof( BandwidthUseMode ), newModeName, true );
-                        player.BandwidthUseMode = newMode;
-                        player.Info.BandwidthUseMode = newMode;
-                    }
-                }
-            } );
-
-            CommandManager.RegisterCommand( new CommandDescriptor {
-                Name = "BDBDB",
-                IsHidden = true,
-                Category = CommandCategory.Maintenance | CommandCategory.Debug,
-                Help = "BlockDB Debug",
-                Handler = delegate( Player player, CommandReader cmd ) {
-                    if( player.World == null ) PlayerOpException.ThrowNoWorld( player );
-                    BlockDB db = player.World.BlockDB;
-                    using( db.GetReadLock() ) {
-                        player.Message( "BlockDB: CAP={0} SZ={1} FI={2}",
-                                        db.CacheCapacity, db.CacheSize, db.LastFlushedIndex );
-                    }
-                }
-            } );
-#endif
         }
         #region DumpStats
 
