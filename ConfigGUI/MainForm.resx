@@ -121,7 +121,7 @@
   <data name="pictureBox1.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAABlMAAAGkCAYAAACl59NWAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAJcEhZcwAADsAAAA7AAWrWiQkAAAAadEVYdFNvZnR3YXJlAFBhaW50Lk5FVCB2My41LjExR/NC
+        YQUAAAAJcEhZcwAADr8AAA6/ATgFUyQAAAAadEVYdFNvZnR3YXJlAFBhaW50Lk5FVCB2My41LjExR/NC
         NwAASnRJREFUeF7t3XvIbmvb1/W3LSJJmwtDpH1IIhVWSFIWhkj7kEQqrJBKKgyR9iGJVFghlVSIIe1D
         EqmwQiqpEEPahyRSYYVUUiGGtCWkqzGf+XvftdZcvznnvbnGNcZ5jM8Hvn8995pzHMd5jnnda81nzfVD
         AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
@@ -483,11 +483,6 @@ Set to 1 for default, which is (rawMessage.Length / 2)
 Set to 1 for default, which is (rawMessage.Length / 2)
 
 </value>
-  </data>
-  <data name="lCrashReportDisclaimer.Text" xml:space="preserve">
-    <value>Crash reports are created when serious unexpected errors occur. Being able to receive crash reports helps
-identify bugs and improve fCraft! The report consists of the error information, OS and runtime versions,
-a copy of config.xml, and last 25 lines of the log file. Reports are confidential and are never displayed publicly.</value>
   </data>
   <metadata name="$this.TrayHeight" type="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>28</value>

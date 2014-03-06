@@ -36,6 +36,10 @@ namespace fCraft.ConfigGUI {
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             this.tabs = new System.Windows.Forms.TabControl();
             this.tabGeneral = new System.Windows.Forms.TabPage();
+            this.gHeartbeatUrl = new System.Windows.Forms.GroupBox();
+            this.lHeartbeatUrlWarning = new System.Windows.Forms.Label();
+            this.cHeartbeatUrl = new System.Windows.Forms.ComboBox();
+            this.lHeartbeatUrl = new System.Windows.Forms.Label();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.gInformation = new System.Windows.Forms.GroupBox();
             this.bGreeting = new System.Windows.Forms.Button();
@@ -251,9 +255,6 @@ namespace fCraft.ConfigGUI {
             this.xIRCBotEnabled = new System.Windows.Forms.CheckBox();
             this.cIRCList = new System.Windows.Forms.ComboBox();
             this.tabAdvanced = new System.Windows.Forms.TabPage();
-            this.gCrashReport = new System.Windows.Forms.GroupBox();
-            this.lCrashReportDisclaimer = new System.Windows.Forms.Label();
-            this.xSubmitCrashReports = new System.Windows.Forms.CheckBox();
             this.gPerformance = new System.Windows.Forms.GroupBox();
             this.lAdvancedWarning = new System.Windows.Forms.Label();
             this.xLowLatencyMode = new System.Windows.Forms.CheckBox();
@@ -284,12 +285,9 @@ namespace fCraft.ConfigGUI {
             this.bResetAll = new System.Windows.Forms.Button();
             this.bApply = new System.Windows.Forms.Button();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.gHeartbeatUrl = new System.Windows.Forms.GroupBox();
-            this.lHeartbeatUrlWarning = new System.Windows.Forms.Label();
-            this.cHeartbeatUrl = new System.Windows.Forms.ComboBox();
-            this.lHeartbeatUrl = new System.Windows.Forms.Label();
             this.tabs.SuspendLayout();
             this.tabGeneral.SuspendLayout();
+            this.gHeartbeatUrl.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.gInformation.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nAnnouncements)).BeginInit();
@@ -342,14 +340,12 @@ namespace fCraft.ConfigGUI {
             ((System.ComponentModel.ISupportInitialize)(this.nIRCDelay)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nIRCBotPort)).BeginInit();
             this.tabAdvanced.SuspendLayout();
-            this.gCrashReport.SuspendLayout();
             this.gPerformance.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nTickInterval)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nThrottling)).BeginInit();
             this.gAdvancedMisc.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nMaxUndoStates)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nMaxUndo)).BeginInit();
-            this.gHeartbeatUrl.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabs
@@ -388,6 +384,53 @@ namespace fCraft.ConfigGUI {
             this.tabGeneral.TabIndex = 0;
             this.tabGeneral.Text = "General";
             this.tabGeneral.UseVisualStyleBackColor = true;
+            // 
+            // gHeartbeatUrl
+            // 
+            this.gHeartbeatUrl.Controls.Add(this.lHeartbeatUrlWarning);
+            this.gHeartbeatUrl.Controls.Add(this.cHeartbeatUrl);
+            this.gHeartbeatUrl.Controls.Add(this.lHeartbeatUrl);
+            this.gHeartbeatUrl.Location = new System.Drawing.Point(11, 304);
+            this.gHeartbeatUrl.Margin = new System.Windows.Forms.Padding(4);
+            this.gHeartbeatUrl.Name = "gHeartbeatUrl";
+            this.gHeartbeatUrl.Padding = new System.Windows.Forms.Padding(4);
+            this.gHeartbeatUrl.Size = new System.Drawing.Size(848, 110);
+            this.gHeartbeatUrl.TabIndex = 6;
+            this.gHeartbeatUrl.TabStop = false;
+            this.gHeartbeatUrl.Text = "Heartbeat Service Provider";
+            // 
+            // lHeartbeatUrlWarning
+            // 
+            this.lHeartbeatUrlWarning.AutoSize = true;
+            this.lHeartbeatUrlWarning.Location = new System.Drawing.Point(160, 59);
+            this.lHeartbeatUrlWarning.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lHeartbeatUrlWarning.Name = "lHeartbeatUrlWarning";
+            this.lHeartbeatUrlWarning.Size = new System.Drawing.Size(518, 36);
+            this.lHeartbeatUrlWarning.TabIndex = 2;
+            this.lHeartbeatUrlWarning.Text = "Use caution. Note that different providers may use different player databases.\r\nI" +
+    "t\'s recommended to wipe your PlayerDB completely after switching providers.";
+            // 
+            // cHeartbeatUrl
+            // 
+            this.cHeartbeatUrl.FormattingEnabled = true;
+            this.cHeartbeatUrl.Items.AddRange(new object[] {
+            "https://minecraft.net/heartbeat.jsp",
+            "http://www.classicube.net/server/heartbeat"});
+            this.cHeartbeatUrl.Location = new System.Drawing.Point(164, 27);
+            this.cHeartbeatUrl.Margin = new System.Windows.Forms.Padding(4);
+            this.cHeartbeatUrl.Name = "cHeartbeatUrl";
+            this.cHeartbeatUrl.Size = new System.Drawing.Size(675, 26);
+            this.cHeartbeatUrl.TabIndex = 1;
+            // 
+            // lHeartbeatUrl
+            // 
+            this.lHeartbeatUrl.AutoSize = true;
+            this.lHeartbeatUrl.Location = new System.Drawing.Point(33, 31);
+            this.lHeartbeatUrl.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lHeartbeatUrl.Name = "lHeartbeatUrl";
+            this.lHeartbeatUrl.Size = new System.Drawing.Size(110, 18);
+            this.lHeartbeatUrl.TabIndex = 0;
+            this.lHeartbeatUrl.Text = "Heartbeat URL:";
             // 
             // pictureBox1
             // 
@@ -3120,7 +3163,6 @@ namespace fCraft.ConfigGUI {
             // 
             // tabAdvanced
             // 
-            this.tabAdvanced.Controls.Add(this.gCrashReport);
             this.tabAdvanced.Controls.Add(this.gPerformance);
             this.tabAdvanced.Controls.Add(this.gAdvancedMisc);
             this.tabAdvanced.Location = new System.Drawing.Point(4, 27);
@@ -3131,44 +3173,6 @@ namespace fCraft.ConfigGUI {
             this.tabAdvanced.TabIndex = 6;
             this.tabAdvanced.Text = "Advanced";
             this.tabAdvanced.UseVisualStyleBackColor = true;
-            // 
-            // gCrashReport
-            // 
-            this.gCrashReport.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.gCrashReport.Controls.Add(this.lCrashReportDisclaimer);
-            this.gCrashReport.Controls.Add(this.xSubmitCrashReports);
-            this.gCrashReport.Location = new System.Drawing.Point(11, 16);
-            this.gCrashReport.Margin = new System.Windows.Forms.Padding(4);
-            this.gCrashReport.Name = "gCrashReport";
-            this.gCrashReport.Padding = new System.Windows.Forms.Padding(4);
-            this.gCrashReport.Size = new System.Drawing.Size(848, 122);
-            this.gCrashReport.TabIndex = 6;
-            this.gCrashReport.TabStop = false;
-            this.gCrashReport.Text = "Crash Reporting";
-            // 
-            // lCrashReportDisclaimer
-            // 
-            this.lCrashReportDisclaimer.AutoSize = true;
-            this.lCrashReportDisclaimer.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lCrashReportDisclaimer.Location = new System.Drawing.Point(56, 52);
-            this.lCrashReportDisclaimer.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.lCrashReportDisclaimer.Name = "lCrashReportDisclaimer";
-            this.lCrashReportDisclaimer.Size = new System.Drawing.Size(699, 51);
-            this.lCrashReportDisclaimer.TabIndex = 1;
-            this.lCrashReportDisclaimer.Text = resources.GetString("lCrashReportDisclaimer.Text");
-            // 
-            // xSubmitCrashReports
-            // 
-            this.xSubmitCrashReports.AutoSize = true;
-            this.xSubmitCrashReports.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.xSubmitCrashReports.Location = new System.Drawing.Point(8, 25);
-            this.xSubmitCrashReports.Margin = new System.Windows.Forms.Padding(4);
-            this.xSubmitCrashReports.Name = "xSubmitCrashReports";
-            this.xSubmitCrashReports.Size = new System.Drawing.Size(532, 22);
-            this.xSubmitCrashReports.TabIndex = 0;
-            this.xSubmitCrashReports.Text = "Automatically submit crash reports to fCraft developers (fCraft.net)";
-            this.xSubmitCrashReports.UseVisualStyleBackColor = true;
             // 
             // gPerformance
             // 
@@ -3588,53 +3592,6 @@ namespace fCraft.ConfigGUI {
             this.toolTip.IsBalloon = true;
             this.toolTip.ReshowDelay = 100;
             // 
-            // gHeartbeatUrl
-            // 
-            this.gHeartbeatUrl.Controls.Add(this.lHeartbeatUrlWarning);
-            this.gHeartbeatUrl.Controls.Add(this.cHeartbeatUrl);
-            this.gHeartbeatUrl.Controls.Add(this.lHeartbeatUrl);
-            this.gHeartbeatUrl.Location = new System.Drawing.Point(11, 304);
-            this.gHeartbeatUrl.Margin = new System.Windows.Forms.Padding(4);
-            this.gHeartbeatUrl.Name = "gHeartbeatUrl";
-            this.gHeartbeatUrl.Padding = new System.Windows.Forms.Padding(4);
-            this.gHeartbeatUrl.Size = new System.Drawing.Size(848, 110);
-            this.gHeartbeatUrl.TabIndex = 6;
-            this.gHeartbeatUrl.TabStop = false;
-            this.gHeartbeatUrl.Text = "Heartbeat Service Provider";
-            // 
-            // lHeartbeatUrlWarning
-            // 
-            this.lHeartbeatUrlWarning.AutoSize = true;
-            this.lHeartbeatUrlWarning.Location = new System.Drawing.Point(160, 59);
-            this.lHeartbeatUrlWarning.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.lHeartbeatUrlWarning.Name = "lHeartbeatUrlWarning";
-            this.lHeartbeatUrlWarning.Size = new System.Drawing.Size(518, 36);
-            this.lHeartbeatUrlWarning.TabIndex = 2;
-            this.lHeartbeatUrlWarning.Text = "Use caution. Note that different providers may use different player databases.\r\nI" +
-    "t\'s recommended to wipe your PlayerDB completely after switching providers.";
-            // 
-            // cHeartbeatUrl
-            // 
-            this.cHeartbeatUrl.FormattingEnabled = true;
-            this.cHeartbeatUrl.Items.AddRange(new object[] {
-            "https://minecraft.net/heartbeat.jsp",
-            "http://www.classicube.net/server/heartbeat"});
-            this.cHeartbeatUrl.Location = new System.Drawing.Point(164, 27);
-            this.cHeartbeatUrl.Margin = new System.Windows.Forms.Padding(4);
-            this.cHeartbeatUrl.Name = "cHeartbeatUrl";
-            this.cHeartbeatUrl.Size = new System.Drawing.Size(675, 26);
-            this.cHeartbeatUrl.TabIndex = 1;
-            // 
-            // lHeartbeatUrl
-            // 
-            this.lHeartbeatUrl.AutoSize = true;
-            this.lHeartbeatUrl.Location = new System.Drawing.Point(33, 31);
-            this.lHeartbeatUrl.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.lHeartbeatUrl.Name = "lHeartbeatUrl";
-            this.lHeartbeatUrl.Size = new System.Drawing.Size(110, 18);
-            this.lHeartbeatUrl.TabIndex = 0;
-            this.lHeartbeatUrl.Text = "Heartbeat URL:";
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -3654,6 +3611,8 @@ namespace fCraft.ConfigGUI {
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ConfigUI_FormClosing);
             this.tabs.ResumeLayout(false);
             this.tabGeneral.ResumeLayout(false);
+            this.gHeartbeatUrl.ResumeLayout(false);
+            this.gHeartbeatUrl.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.gInformation.ResumeLayout(false);
             this.gInformation.PerformLayout();
@@ -3726,8 +3685,6 @@ namespace fCraft.ConfigGUI {
             ((System.ComponentModel.ISupportInitialize)(this.nIRCDelay)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nIRCBotPort)).EndInit();
             this.tabAdvanced.ResumeLayout(false);
-            this.gCrashReport.ResumeLayout(false);
-            this.gCrashReport.PerformLayout();
             this.gPerformance.ResumeLayout(false);
             this.gPerformance.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nTickInterval)).EndInit();
@@ -3736,8 +3693,6 @@ namespace fCraft.ConfigGUI {
             this.gAdvancedMisc.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nMaxUndoStates)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nMaxUndo)).EndInit();
-            this.gHeartbeatUrl.ResumeLayout(false);
-            this.gHeartbeatUrl.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -3986,9 +3941,6 @@ namespace fCraft.ConfigGUI {
         private GroupBox gPerformance;
         private GroupBox gIRCColors;
         private CheckBox xIRCStripMinecraftColors;
-        private GroupBox gCrashReport;
-        private Label lCrashReportDisclaimer;
-        private CheckBox xSubmitCrashReports;
         private CheckBox xAntispamMessageCount;
         private CheckBox xAntispamMuteDuration;
         private CheckBox xUpperCharLimit;

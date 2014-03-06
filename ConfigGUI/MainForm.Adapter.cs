@@ -389,7 +389,6 @@ namespace fCraft.ConfigGUI {
 
             nThrottling.Value = ConfigKey.BlockUpdateThrottling.GetInt();
             xLowLatencyMode.Checked = ConfigKey.LowLatencyMode.Enabled();
-            xSubmitCrashReports.Checked = ConfigKey.SubmitCrashReports.Enabled();
 
             if( ConfigKey.MaxUndo.GetInt() > 0 ) {
                 xMaxUndo.Checked = true;
@@ -589,7 +588,6 @@ namespace fCraft.ConfigGUI {
             ConfigKey.IRCStripMinecraftColors.TrySetValue( xIRCStripMinecraftColors.Checked );
 
             // advanced
-            ConfigKey.SubmitCrashReports.TrySetValue( xSubmitCrashReports.Checked );
 
             ConfigKey.RelayAllBlockUpdates.TrySetValue( xRelayAllBlockUpdates.Checked );
             ConfigKey.NoPartialPositionUpdates.TrySetValue( xNoPartialPositionUpdates.Checked );

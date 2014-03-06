@@ -1991,6 +1991,8 @@ namespace fCraft {
         const int ChangeModelExtVersion = 1;
         const string EnvMapAppearanceExtName = "EnvMapAppearance";
         const int EnvMapAppearanceExtVersion = 1;
+        const string EnvWeatherTypeExtName = "EnvWeatherType";
+        const int EnvWeatherTypeExtVersion = 1;
         const string HeldBlockExtName = "HeldBlock";
         const int HeldBlockExtVersion = 1;
         const string ExtPlayerListExtName = "ExtPlayerList";
@@ -1999,8 +2001,8 @@ namespace fCraft {
         const int SelectionCuboidExtVersion = 1;
         const string MessageTypesExtName = "MessageTypes";
         const int MessageTypesExtVersion = 1;
-        const string EnvWeatherTypeExtName = "EnvWeatherType";
-        const int EnvWeatherTypeExtVersion = 1;
+        const string HackControlExtName = "HackControl";
+        const int HackControlExtVersion = 1;
 
         // Note: if more levels are added, change UsesCustomBlocks from bool to int
         public bool UsesCustomBlocks { get; set; }
@@ -2014,22 +2016,25 @@ namespace fCraft {
         public bool SupportsExtPlayerList { get; set; }
         public bool SupportsSelectionCuboid { get; set; }
         public bool SupportsMessageTypes { get; set; }
+        public bool SupportsHackControl { get; set; }
         string ClientName { get; set; }
 
         bool NegotiateProtocolExtension()
         {
             // write our ExtInfo and ExtEntry packets
-            writer.Write(Packet.MakeExtInfo("ProCraft", 10).Bytes);
+            writer.Write(Packet.MakeExtInfo("ProCraft", 12).Bytes);
             writer.Write(Packet.MakeExtEntry(CustomBlocksExtName, CustomBlocksExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(BlockPermissionsExtName, BlockPermissionsExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(ClickDistanceExtName, ClickDistanceExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(EnvColorsExtName, EnvColorsExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(ChangeModelExtName, ChangeModelExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(EnvMapAppearanceExtName, EnvMapAppearanceExtVersion).Bytes);
+            writer.Write(Packet.MakeExtEntry(EnvWeatherTypeExtName, EnvWeatherTypeExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(HeldBlockExtName, HeldBlockExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(ExtPlayerListExtName, ExtPlayerListExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(SelectionCuboidExtName, SelectionCuboidExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(MessageTypesExtName, MessageTypesExtVersion).Bytes);
+            writer.Write(Packet.MakeExtEntry(HackControlExtName, HackControlExtVersion).Bytes);
 
             // Expect ExtInfo reply from the client
             OpCode extInfoReply = reader.ReadOpCode();
@@ -2061,74 +2066,63 @@ namespace fCraft {
                 {
                     // Hooray, client supports custom blocks! We still need to check support level.
                     UsesCustomBlocks = true;
-                    //Logger.Log(LogType.Debug, "{0} true",extName);
                     clientExts.Add(extName + " " + extVersion);
                 }
                 if (extName == BlockPermissionsExtName && extVersion == BlockPermissionsExtVersion)
                 {
                     this.SupportsBlockPermissions = true;
-                    //Logger.Log(LogType.Debug, "{0} true", extName);
                     clientExts.Add(extName + " " + extVersion);
                 }
                 if (extName == ClickDistanceExtName && extVersion == ClickDistanceExtVersion)
                 {
                     this.SupportsClickDistance = true;
-                    //Logger.Log(LogType.Debug, "{0} true", extName);
                     clientExts.Add(extName + " " + extVersion);
                 }
                 if (extName == EnvColorsExtName && extVersion == EnvColorsExtVersion)
                 {
                     this.SupportsEnvColors = true;
-                    //Logger.Log(LogType.Debug, "{0} true", extName);
                     clientExts.Add(extName + " " + extVersion);
                 }
                 if (extName == ChangeModelExtName && extVersion == ChangeModelExtVersion)
                 {
                     this.SupportsChangeModel = true;
-                    //Logger.Log(LogType.Debug, "{0} true", extName);
                     clientExts.Add(extName + " " + extVersion);
                 }
                 if (extName == EnvMapAppearanceExtName && extVersion == EnvMapAppearanceExtVersion)
                 {
                     this.SupportsEnvMapAppearance = true;
-                    //Logger.Log(LogType.Debug, "{0} true", extName);
-                    clientExts.Add(extName + " " + extVersion);
-                }
-                if (extName == HeldBlockExtName && extVersion == HeldBlockExtVersion)
-                {
-                    this.SupportsHeldBlock = true;
-                    //Logger.Log(LogType.Debug, "{0} true", extName);
-                    clientExts.Add(extName + " " + extVersion);
-                }
-                if (extName == ExtPlayerListExtName && extVersion == ExtPlayerListExtVersion)
-                {
-                    this.SupportsExtPlayerList = true;
-                    //Logger.Log(LogType.Debug, "{0} true", extName);
-                    clientExts.Add(extName + " " + extVersion);
-                }
-                if (extName == SelectionCuboidExtName && extVersion == SelectionCuboidExtVersion)
-                {
-                    this.SupportsSelectionCuboid = true;
-                    //Logger.Log(LogType.Debug, "{0} true", extName);
-                    clientExts.Add(extName + " " + extVersion);
-                }
-                if (extName == MessageTypesExtName && extVersion == MessageTypesExtVersion)
-                {
-                    this.SupportsMessageTypes = true;
-                    //Logger.Log(LogType.Debug, "{0} true", extName);
                     clientExts.Add(extName + " " + extVersion);
                 }
                 if (extName == EnvWeatherTypeExtName && extVersion == EnvWeatherTypeExtVersion)
                 {
                     this.SupportsEnvWeatherType = true;
-                    //Logger.Log(LogType.Debug, "{0} true", extName);
                     clientExts.Add(extName + " " + extVersion);
                 }
-                /*else if (extName == TextHotKeyExtName && extVersion == TextHotKeyExtVersion)
+                if (extName == HeldBlockExtName && extVersion == HeldBlockExtVersion)
                 {
-                    SupportsTextHotKey = true;
+                    this.SupportsHeldBlock = true;
                     clientExts.Add(extName + " " + extVersion);
-                }*/
+                }
+                if (extName == ExtPlayerListExtName && extVersion == ExtPlayerListExtVersion)
+                {
+                    this.SupportsExtPlayerList = true;
+                    clientExts.Add(extName + " " + extVersion);
+                }
+                if (extName == SelectionCuboidExtName && extVersion == SelectionCuboidExtVersion)
+                {
+                    this.SupportsSelectionCuboid = true;
+                    clientExts.Add(extName + " " + extVersion);
+                }
+                if (extName == MessageTypesExtName && extVersion == MessageTypesExtVersion)
+                {
+                    this.SupportsMessageTypes = true;
+                    clientExts.Add(extName + " " + extVersion);
+                }
+                if (extName == HackControlExtName && extVersion == HackControlExtVersion)
+                {
+                    SupportsHackControl = true;
+                    clientExts.Add(extName + " " + extVersion);
+                }
             }
 
             // log client's capabilities

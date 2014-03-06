@@ -203,34 +203,8 @@ namespace fCraft {
         [NotNull]
         public IPAddress LastFailedLoginIP = IPAddress.None;
 
-        /// <summary> Whether this player is currently muted. </summary>
-        public bool IsTBanned
-        {
-            get
-            {
-                return DateTime.UtcNow < BannedUntil;
-            }
-        }
-
         /// <summary> Date until which the player is untempbanned. If the date is in the past, player is NOT tempbanned. </summary>
         public DateTime BannedUntil;
-
-        /// <summary> Name of the entity that most recently tempbanned this player. May be empty. </summary>
-        [CanBeNull]
-        public string TBannedBy;
-
-        [NotNull]
-        public string TBannedByClassy
-        {
-            get
-            {
-                return PlayerDB.FindExactClassyName(TBannedBy);
-            }
-        }
-
-        /// <summary> Reason given for the most recent tempban. May be empty. </summary>
-        [CanBeNull]
-        public string TBanReason;
 
         #endregion
 
@@ -374,6 +348,24 @@ namespace fCraft {
         public short ReachDistance;
 
         public short TempReachDistance;
+
+        /// <summary> Control whether player can fly using HackControl packet. </summary>
+        public bool AllowFlying = true;
+
+        /// <summary> Control whether player can use noclip using HackControl packet. </summary>
+        public bool AllowNoClip = true;
+
+        /// <summary> Control whether player can speedhack using HackControl packet. </summary>
+        public bool AllowSpeedhack = true;
+
+        /// <summary> Control whether player can use "r" to respawn using HackControl packet. </summary>
+        public bool AllowRespawn = true;
+
+        /// <summary> Control whether player can use third person view using HackControl packet. </summary>
+        public bool AllowThirdPerson = true;
+
+        /// <summary> Control player jump height using HackControl packet. </summary>
+        public short JumpHeight = 40;
 
         /// <summary> Whether when placing tnt explodes or not. </summary>
         public bool BlowTNT;
@@ -662,6 +654,45 @@ namespace fCraft {
             if (fields.Length > 62 && fields[62].Length > 0)
             {
                 info.Email = PlayerDB.Unescape(fields[62]);
+            }
+            if (fields.Length > 63)
+            {
+                if (!Boolean.TryParse(fields[63], out info.AllowFlying))
+                {
+                    info.AllowFlying = true;
+                }
+            }
+            if (fields.Length > 64)
+            {
+                if (!Boolean.TryParse(fields[64], out info.AllowNoClip))
+                {
+                    info.AllowNoClip = true;
+                }
+            }
+            if (fields.Length > 65)
+            {
+                if (!Boolean.TryParse(fields[65], out info.AllowSpeedhack))
+                {
+                    info.AllowSpeedhack = true;
+                }
+            }
+            if (fields.Length > 66)
+            {
+                if (!Boolean.TryParse(fields[66], out info.AllowRespawn))
+                {
+                    info.AllowRespawn = true;
+                }
+            }
+            if (fields.Length > 67)
+            {
+                if (!Boolean.TryParse(fields[67], out info.AllowThirdPerson))
+                {
+                    info.AllowThirdPerson = true;
+                }
+            }
+            if (fields.Length > 68)
+            {
+                short.TryParse(fields[68], out info.JumpHeight);
             }
 
             if( info.LastSeen < info.FirstLoginDate ) {
@@ -1131,10 +1162,27 @@ namespace fCraft {
             sb.Append(',');
 
             if (Email != null)
-            { sb.AppendEscaped(Email); } //62
+            { sb.Append(Email); } //62
             sb.Append(',');
 
-            sb.AppendEscaped(TBannedBy); // 63
+            #region HackControl
+            sb.Append(AllowFlying); // 63
+            sb.Append(',');
+
+            sb.Append(AllowNoClip); // 64
+            sb.Append(',');
+
+            sb.Append(AllowSpeedhack); // 65
+            sb.Append(',');
+
+            sb.Append(AllowRespawn); // 66
+            sb.Append(',');
+
+            sb.Append(AllowThirdPerson); // 67
+            sb.Append(',');
+
+            sb.Append(JumpHeight); // 68
+            #endregion
         }
 
         #endregion

@@ -438,14 +438,6 @@ with IRC bots falling behind on messages.",
 
         #region Advanced
 
-        [BoolKey( ConfigSection.Advanced, true,
-@"Crash reports are created when serious unexpected errors occur.
-Being able to receive crash reports helps identify bugs and improve fCraft!
-The report consists of the error information, OS and runtime versions,
-a copy of config.xml, and last 25 lines of the log file.
-Reports are confidential and are not displayed publicly." )]
-        SubmitCrashReports,
-
         [EnumKey( ConfigSection.Advanced, fCraft.UpdaterMode.Prompt,
 @"ProCraft can automatically update to latest stable versions.
 If enabled, the update check is done on-startup." )]

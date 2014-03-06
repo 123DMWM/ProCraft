@@ -160,10 +160,6 @@ namespace fCraft {
 
         #region Crash Handling
 
-        static readonly object CrashReportLock = new object(); // mutex to prevent simultaneous reports (messes up the timers/requests)
-        static DateTime lastCrashReport = DateTime.MinValue;
-        const int MinCrashReportInterval = 61; // minimum interval between submitting crash reports, in seconds
-
 
         /// <summary> Logs and reports a crash or an unhandled exception.
         /// Details are logged, and a crash report may be submitted to fCraft.net.
@@ -196,17 +192,6 @@ namespace fCraft {
 
             if( isCommon ) {
                 return;
-            }
-
-            lock( CrashReportLock ) {
-                // For compatibility with lighttpd server (that received crash reports)
-                ServicePointManager.Expect100Continue = false;
-
-                if( DateTime.UtcNow.Subtract( lastCrashReport ).TotalSeconds < MinCrashReportInterval ) {
-                    Log( LogType.Warning, "Logger.SubmitCrashReport: Could not submit crash report, reports too frequent." );
-                    return;
-                }
-                lastCrashReport = DateTime.UtcNow;
             }
         }
 
@@ -533,14 +518,12 @@ namespace fCraft.Events {
             Message = message;
             Location = location;
             Exception = exception;
-            SubmitCrashReport = submitCrashReport;
             IsCommonProblem = isCommonProblem;
             ShutdownImminent = shutdownImminent;
         }
         public string Message { get; private set; }
         public string Location { get; private set; }
         public Exception Exception { get; private set; }
-        public bool SubmitCrashReport { get; set; }
         public bool IsCommonProblem { get; private set; }
         public bool ShutdownImminent { get; private set; }
     }

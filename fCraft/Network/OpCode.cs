@@ -101,8 +101,11 @@ namespace fCraft
         /// <summary> This extension allows the server to specify custom terrain textures, and tweak appearance of map edges. </summary>
         EnvMapAppearance = 30,
 
-        /// <summary> This extension allows the server to specify custom terrain textures, and tweak appearance of map edges. </summary>
+        /// <summary> This extension allows the server to specify the weather. </summary>
         EnvWeatherType = 31,
+
+        /// <summary> This extension allows the server to specify whichi hacks the player can use. </summary>
+        HackControl = 32,
     }
 }
 

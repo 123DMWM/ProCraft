@@ -411,6 +411,19 @@ namespace fCraft {
             return packet;
         }
 
+        [Pure]
+        public static Packet HackControl(bool flying, bool noclip, bool speedhack, bool respawn, bool thirdperson, short jumpheight)
+        {
+            Packet packet = new Packet(OpCode.HackControl);
+            packet.Bytes[1] = (byte)(flying ? 1 : 0);
+            packet.Bytes[2] = (byte)(noclip ? 1 : 0);
+            packet.Bytes[3] = (byte)(speedhack ? 1 : 0);
+            packet.Bytes[4] = (byte)(respawn ? 1 : 0);
+            packet.Bytes[5] = (byte)(thirdperson ? 1 : 0);
+            ToNetOrder(jumpheight, packet.Bytes, 6);
+            return packet;
+        }
+
         #endregion
 
         static void ToNetOrder( short number, [NotNull] byte[] arr, int offset ) {
@@ -459,7 +472,8 @@ namespace fCraft {
             4, // SetBlockPermission
             66, // ChangeModel
             69, // EnvMapAppearance
-            2 // EnvSetWeatherType
+            2, // EnvSetWeatherType
+            8 // HackControl
         };
     }
 }

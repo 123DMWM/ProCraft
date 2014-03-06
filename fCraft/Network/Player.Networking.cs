@@ -648,7 +648,7 @@ namespace fCraft {
 
             }
 
-            else if( !Can( Permission.UseSpeedHack ) ) {
+            else if( !Can( Permission.UseSpeedHack ) && !Info.AllowSpeedhack) {
                 int distSquared = delta.X * delta.X + delta.Y * delta.Y + delta.Z * delta.Z;
                 // speedhack detection
                 if( DetectMovementPacketSpam() ) {
@@ -1474,6 +1474,13 @@ namespace fCraft {
                 if (WorldMap.World.ShadowColor != null) writer.Write(Packet.MakeEnvSetColor(3, WorldMap.World.ShadowColor).Bytes);
                 BytesSent += 8;
                 if (WorldMap.World.LightColor != null) writer.Write(Packet.MakeEnvSetColor(4, WorldMap.World.LightColor).Bytes);
+                BytesSent += 8;
+            }
+            #endregion
+            #region HackControls
+            if (this.SupportsHackControl)
+            {
+                writer.Write(Packet.HackControl(Info.AllowFlying, Info.AllowNoClip, Info.AllowSpeedhack, Info.AllowRespawn, Info.AllowThirdPerson, Info.JumpHeight).Bytes);
                 BytesSent += 8;
             }
             #endregion
