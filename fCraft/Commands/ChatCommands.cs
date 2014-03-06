@@ -93,6 +93,7 @@ namespace fCraft
         {
             Name = "useless",
             Aliases = new[] { "ul" },
+            Category = CommandCategory.New,
             NotRepeatable = true,
             DisableLogging = true,
             UsableByFrozenPlayers = true,
