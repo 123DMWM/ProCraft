@@ -1296,7 +1296,7 @@ namespace fCraft
                 }
             }
             int count = 1;
-            var all = Server.Players.Where(z => !z.Info.IsHidden).OrderBy(p => player.Info.TimeSinceLastLogin.ToMilliSeconds()).Reverse();
+            var all = Server.Players.Where(z => !z.Info.IsHidden).OrderBy(p => player.Info.TimeSinceLastLogin.ToMilliSeconds());
             if (cmd.HasNext && player.Can(Permission.ReadStaffChat))
             {
                 cmd.NextInt(out count);

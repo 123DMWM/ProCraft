@@ -3778,13 +3778,13 @@ namespace fCraft {
         {
             Name = "ctf",
             Category = CommandCategory.New,
-            Permissions = new Permission[] { Permission.ShutdownServer },
+            Permissions = new Permission[] { Permission.ReadStaffChat },
             IsConsoleSafe = false,
             IsHidden = true,
             Usage = "/ctf <start / stop / redspawn / bluespawn / redflag / blueflag / swapteam>",
-            Help = "Allows starting CTF / editing CTF properties. List of properties: " +
-                "BanReason, DisplayedName, KickReason, PreviousRank, RankChangeType, " +
-                "RankReason, TimesKicked, TotalTime, UnbanReason. For detailed help see &H/Help SetInfo <Property>",
+            Help = "Allows starting CTF / editing CTF properties. List of properties:\n" +
+                "Start, Stop, RedSpawn, BlueSpawn, RedFlag, BlueFlag, SwapTeam\n" +
+                "For detailed help see &H/Help CTF <Property>",
             HelpSections = new Dictionary<string, string>{
 				{ "start",     	    "&H/CTF start\n&S" +
 						"Starts a CTF game on the current world of the player." },
@@ -3964,6 +3964,13 @@ namespace fCraft {
                                     CTF.blueTeam.Remove(player);
                                     CTF.redTeam.Add(player);
                                 }
+                                if (player.IsHoldingFlag)
+                                {
+                                    world.Players.Message("&cFlag holder &1" + player.Name + " &cswitched to the &4Red&c team, thus dropping the flag for the &1Blue&c team!");
+                                    CTF.blueHasFlag = false;
+                                    player.IsHoldingFlag = false;
+                                    world.Map.QueueUpdate(new BlockUpdate(Player.Console, CTF.redFlag, Block.Red));
+                                }
                                 player.Team = "Red";
                                 player.TeleportTo(CTF.redSpawn);
                                 break;
@@ -3977,6 +3984,13 @@ namespace fCraft {
                                     {
                                         CTF.blueTeam.Remove(player);
                                         CTF.redTeam.Add(player);
+                                    }
+                                    if (player.IsHoldingFlag)
+                                    {
+                                        world.Players.Message("&cFlag holder &1" + player.Name + " &cswitched to the &4Red&c team, thus dropping the flag for the &1Blue&c team!");
+                                        CTF.blueHasFlag = false;
+                                        player.IsHoldingFlag = false;
+                                        world.Map.QueueUpdate(new BlockUpdate(Player.Console, CTF.redFlag, Block.Red));
                                     }
                                     player.Team = "Red";
                                     player.TeleportTo(CTF.redSpawn);
@@ -3999,6 +4013,13 @@ namespace fCraft {
                                     CTF.redTeam.Remove(player);
                                     CTF.blueTeam.Add(player);
                                 }
+                                if (player.IsHoldingFlag)
+                                {
+                                    world.Players.Message("&cFlag holder &4" + player.Name + " &cswitched to the &1Blue&c team, thus dropping the flag for the &4Red&c team!");
+                                    CTF.redHasFlag = false;
+                                    player.IsHoldingFlag = false;
+                                    world.Map.QueueUpdate(new BlockUpdate(Player.Console, CTF.blueFlag, Block.Blue));
+                                }
                                 player.Team = "Blue";
                                 player.TeleportTo(CTF.blueSpawn);
                                 break;
@@ -4012,6 +4033,13 @@ namespace fCraft {
                                     {
                                         CTF.redTeam.Remove(player);
                                         CTF.blueTeam.Add(player);
+                                    }
+                                    if (player.IsHoldingFlag)
+                                    {
+                                        world.Players.Message("&cFlag holder &4" + player.Name + " &cswitched to the &1Blue&c team, thus dropping the flag for the &4Red&c team!");
+                                        CTF.redHasFlag = false;
+                                        player.IsHoldingFlag = false;
+                                        world.Map.QueueUpdate(new BlockUpdate(Player.Console, CTF.blueFlag, Block.Blue));
                                     }
                                     player.Team = "Blue";
                                     player.TeleportTo(CTF.blueSpawn);

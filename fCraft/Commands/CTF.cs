@@ -235,17 +235,31 @@ namespace fCraft
                     }
 
                     //Only go here if someone should explode.
-                    if (matchFound)
+                    if (matchFound && p.Team != player.Team)
                     {
                         if (p.Team == "Blue")
                         {
-                            world.Players.Message(player.ClassyName + " &cexploded " + p.ClassyName);
+                            world.Players.Message("&4" + player.Name + " &cexploded &1" + p.Name);
                             p.TeleportTo(blueSpawn);
+                            if (p.IsHoldingFlag)
+                            {
+                                world.Players.Message("&1" + p.Name + " &cdropped the flag for the &1Blue&c team!");
+                                blueHasFlag = false;
+                                p.IsHoldingFlag = false;
+                                world.Map.QueueUpdate(new BlockUpdate(Player.Console, redFlag, Block.Red));
+                            }
                         }
                         else if (p.Team == "Red")
                         {
-                            world.Players.Message(player.ClassyName + " &cexploded " + p.ClassyName);
+                            world.Players.Message("&1" + player.Name + " &cexploded &4" + p.Name);
                             p.TeleportTo(redSpawn);
+                            if (p.IsHoldingFlag)
+                            {
+                                world.Players.Message("&4" + p.Name + " &cdropped the flag for the &4Red&c team!");
+                                redHasFlag = false;
+                                p.IsHoldingFlag = false;
+                                world.Map.QueueUpdate(new BlockUpdate(Player.Console, blueFlag, Block.Blue));
+                            }
                         }
                     }
                 }
@@ -421,15 +435,16 @@ namespace fCraft
                             {
 
                                 if (p.Team != player.Team)
-                                {
-                                    world.Players.Message(p.ClassyName + " &etagged " + player.ClassyName);
+                                {                                    
                                     if (player.Team == "Blue")
                                     {
+                                        world.Players.Message("&4" + p.Name + " &etagged &1" + player.Name);
                                         player.TeleportTo(blueSpawn);
-                                        if (blueHasFlag == true)
+                                        if (player.IsHoldingFlag)
                                         {
-                                            world.Players.Message(player.ClassyName + " &4dropped the flag for the blue team!");
+                                            world.Players.Message("&1" + player.Name + " &cdropped the flag for the &1Blue&c team!");
                                             blueHasFlag = false;
+                                            player.IsHoldingFlag = false;
                                             world.Map.QueueUpdate(new BlockUpdate(Player.Console, redFlag, Block.Red));
                                         }
                                         return true;
@@ -437,11 +452,13 @@ namespace fCraft
                                     }
                                     else if (player.Team == "Red")
                                     {
+                                        world.Players.Message("&1" + p.Name + " &etagged &4" + player.Name);
                                         player.TeleportTo(redSpawn);
-                                        if (redHasFlag == true)
+                                        if (player.IsHoldingFlag)
                                         {
-                                            world.Players.Message(player.ClassyName + " &4dropped the flag for the red team!");
+                                            world.Players.Message("&4" + player.Name + " &cdropped the flag for the &4Red&c team!");
                                             redHasFlag = false;
+                                            player.IsHoldingFlag = false;
                                             world.Map.QueueUpdate(new BlockUpdate(Player.Console, blueFlag, Block.Blue));
                                         }
                                         return true;
@@ -473,7 +490,6 @@ namespace fCraft
                 if (redScore > 4 || blueScore > 4)
                 {
                     scoreCounter();
-                    world.Players.Message("&SScores so far: &9Blues {0} &S- &CReds {1}", blueRoundsWon.ToString(), redRoundsWon.ToString());
                     redScore = 0;
                     blueScore = 0;
                     //Reset scores.
@@ -492,6 +508,13 @@ namespace fCraft
                         }
                     }
                 }
+                if (((redRoundsWon * 5) + redScore) > ((blueRoundsWon * 5) + blueScore)) {
+                    world.Players.Message("&SScores so far: &4Red &a{0}&4:&f{2} &c<-- &1Blue &a{1}&1:&f{3}", redRoundsWon, blueRoundsWon, redScore, blueScore);
+                } else if (((redRoundsWon * 5) + redScore) < ((blueRoundsWon * 5) + blueScore)) {
+                    world.Players.Message("&SScores so far: &4Red &a{0}&4:&f{2} &9--> &1Blue &a{1}&1:&f{3}", redRoundsWon, blueRoundsWon, redScore, blueScore);
+                } else {
+                    world.Players.Message("&SScores so far: &4Red &a{0}&4:&f{2} &d<=> &1Blue &a{1}&1:&f{3}", redRoundsWon, blueRoundsWon, redScore, blueScore);
+                }
             }
             catch (Exception ex)
             {
@@ -501,7 +524,7 @@ namespace fCraft
         }
 
         /// <summary> Occurs when someone placed a flag. Also, scores are raised here.</summary>
-        /// <param name="PlayerPlacingBlockEventArgs">Player who raised the event.</param>
+        /// <param name="sender">Player who raised the event.</param>
         /// <remarks> Lot of ifs. Look at reducing them later.</remarks>		
         private static void PlayerPlacing(object sender, PlayerPlacingBlockEventArgs e)
         {
@@ -553,7 +576,8 @@ namespace fCraft
                                 {
                                     e.Result = CanPlaceResult.Allowed;
                                     redHasFlag = true;
-                                    world.Players.Message(e.Player.ClassyName + " &egot the blue flag.");
+                                    e.Player.IsHoldingFlag = true;
+                                    world.Players.Message("&4" + e.Player.Name + " &egot the &1Blue&e flag.");
                                 }
                             }
                             #endregion
@@ -570,7 +594,8 @@ namespace fCraft
                                 {
                                     e.Result = CanPlaceResult.Allowed;
                                     blueHasFlag = true;
-                                    world.Players.Message(e.Player.ClassyName + " &egot the red flag.");
+                                    e.Player.IsHoldingFlag = true;
+                                    world.Players.Message("&1" + e.Player.Name + " &egot the &4Red flag.");
                                 }
                             }
                             #endregion
@@ -578,9 +603,9 @@ namespace fCraft
                             #region Blue Flag Brought To Red Base.
                             if (e.Coords == redFlag && e.Player.Team == "Red") //Revert if no flag.
                             {
-                                if (!redHasFlag)
+                                if (!e.Player.IsHoldingFlag)
                                 {
-                                    e.Player.Message("Your team doesn't have the blue flag.");
+                                    e.Player.Message("You don't have the &1Blue&s flag.");
                                     e.Result = CanPlaceResult.CTFDenied;
                                 }
                                 else
@@ -588,7 +613,8 @@ namespace fCraft
                                     world.Map.QueueUpdate(new BlockUpdate(Player.Console, blueFlag, Block.Blue));
                                     redScore++;
                                     redHasFlag = false;
-                                    world.Players.Message(e.Player.ClassyName + " &ereturned blue flag for red team.");
+                                    e.Player.IsHoldingFlag = false;
+                                    world.Players.Message("&4" + e.Player.Name + " &escored a point for &4Red&e team.");
                                     e.Result = CanPlaceResult.CTFDenied;
                                     Check();
                                 }
@@ -598,9 +624,9 @@ namespace fCraft
                             #region Red Flag Brought To Blue Base
                             if (e.Coords == blueFlag && e.Player.Team == "Blue") //Revert if no flag.
                             {
-                                if (!blueHasFlag)
+                                if (!e.Player.IsHoldingFlag)
                                 {
-                                    e.Player.Message("Your team doesn't have the flag.");
+                                    e.Player.Message("You don't have the flag.");
                                     e.Result = CanPlaceResult.CTFDenied;
                                 }
                                 else
@@ -608,7 +634,8 @@ namespace fCraft
                                     world.Map.QueueUpdate(new BlockUpdate(Player.Console, redFlag, Block.Red));//e.Player, redFlag, Block.Red));
                                     blueScore++;
                                     blueHasFlag = false;
-                                    world.Players.Message(e.Player.ClassyName + " &ereturned red flag for blue team.");
+                                    e.Player.IsHoldingFlag = false;
+                                    world.Players.Message("&1" + e.Player.Name + " &escored a point for the &1Blue&e team");
                                     e.Result = CanPlaceResult.CTFDenied;
                                     Check();
                                 }
@@ -725,7 +752,7 @@ namespace fCraft
         }
 
         /// <summary> Occurs when someone moved worlds.</summary>
-        /// <param name="PlayerJoinedWorldEventArgs">Player who raised the event.</param>
+        /// <param name="sender">Player who raised the event.</param>
         /// <remarks> Chooses or removes players from teams.</remarks>			
         public static void PlayerChangedWorld(object sender, PlayerJoinedWorldEventArgs e)
         {
@@ -766,12 +793,12 @@ namespace fCraft
             if (blueScore > redScore)
             {
                 blueRoundsWon++;
-                if (world != null) world.Players.Message("&SThe &9Blues&S won that round: &9{0} &S- &C{1}", blueScore, redScore);
+                if (world != null) world.Players.Message("&SThe &1Blue&S team won that round: &1{0} &S- &4{1}", blueScore, redScore);
             }
             if (redScore > blueScore)
             {
                 redRoundsWon++;
-                if (world != null) world.Players.Message("&SThe &CReds&S won that round: &9{0} &S- &C{1}", blueScore, redScore);
+                if (world != null) world.Players.Message("&SThe &4Red&S team won that round: &4{0} &S- &1{1}", redScore, blueScore);
             }
         }
 
@@ -787,25 +814,41 @@ namespace fCraft
                     if (blueTeam.Count > redTeam.Count)
                     {
                         redTeam.Add(player);
-                        player.Message("&SAdding you to the &CRed Team");
+                        player.Message("&SAdding you to the &4Red Team");
                         player.TeleportTo(redSpawn);
                         player.Position.R = (byte)100;
                         player.Team = "Red";
+                        player.IsPlayingCTF = true;
+                        if (player.SupportsHeldBlock)
+                        {
+                            player.Send(Packet.MakeHoldThis(Block.TNT, false));
+                            player.Send(Packet.MakeHoldThis(Block.TNT, true));
+                        }
                     }
                     else if (blueTeam.Count < redTeam.Count)
                     {
                         blueTeam.Add(player);
-                        player.Message("&SAdding you to the &9Blue Team");
+                        player.Message("&SAdding you to the &1Blue Team");
                         player.TeleportTo(blueSpawn);
                         player.Team = "Blue";
+                        player.IsPlayingCTF = true;
+                        if (player.SupportsHeldBlock)
+                        {
+                            player.Send(Packet.MakeHoldThis(Block.TNT, false));
+                        }
                     }
                     else
                     {
                         redTeam.Add(player);
-                        player.Message("&SAdding you to the &CRed Team");
+                        player.Message("&SAdding you to the &4Red Team");
                         player.TeleportTo(redSpawn);
                         player.Position.R = (byte)100;
                         player.Team = "Red";
+                        player.IsPlayingCTF = true;
+                        if (player.SupportsHeldBlock)
+                        {
+                            player.Send(Packet.MakeHoldThis(Block.TNT, false));
+                        }
                     }
                 }
             }
@@ -826,11 +869,35 @@ namespace fCraft
                 {
                     blueTeam.Remove(player);
                     player.Message("&SRemoving you from the game");
+                    player.IsPlayingCTF = false;
+                    if (player.IsHoldingFlag)
+                    {
+                        world.Players.Message("&cFlag holder &1" + player.Name + " &cquit CTF, thus dropping the flag for the &1Blue&c team!");
+                        blueHasFlag = false;
+                        player.IsHoldingFlag = false;
+                        world.Map.QueueUpdate(new BlockUpdate(Player.Console, redFlag, Block.Red));
+                    }
+                    if (player.SupportsHeldBlock)
+                    {
+                        player.Send(Packet.MakeHoldThis(Block.Stone, false));
+                    }
                 }
                 else if (redTeam.Contains(player))
                 {
                     redTeam.Remove(player);
                     player.Message("&SRemoving you from the game");
+                    player.IsPlayingCTF = false;
+                    if (player.IsHoldingFlag)
+                    {
+                        world.Players.Message("&cFlag holder &c" + player.Name + " &cquit CTF, thus dropping the flag for the &4Red&c team!");
+                        redHasFlag = false;
+                        player.IsHoldingFlag = false;
+                        world.Map.QueueUpdate(new BlockUpdate(Player.Console, blueFlag, Block.Blue));
+                    }
+                    if (player.SupportsHeldBlock)
+                    {
+                        player.Send(Packet.MakeHoldThis(Block.Stone, false));
+                    }
                 }
             }
             catch (Exception ex)
@@ -920,12 +987,23 @@ namespace fCraft
         {
             try
             {
-                if (world != null) world.Players.Message("&SThe game has ended! The scores are: \n&9Blue Team {0} &S- &CRed Team {1}", blueRoundsWon, redRoundsWon);
+                if (world != null) world.Players.Message("&SThe game has ended! The scores are: \n" + 
+                    "&4Red &7{0}&4:&f{2} &S- &1Blue &7{1}&1:&f{3}", redRoundsWon, blueRoundsWon, redScore, blueScore);
                 instances = 0;
                 Player.PlacingBlock -= PlayerPlacing;
                 Player.JoinedWorld -= PlayerChangedWorld;
                 Player.Moved -= PlayerMoved;
                 //Remove event handlers.
+                Player[] cache = world.Players;
+                foreach (Player p in cache)
+                {
+                    p.IsPlayingCTF = false;
+                    p.IsHoldingFlag = false;
+                    if (p.SupportsHeldBlock)
+                    {
+                        p.Send(Packet.MakeHoldThis(Block.Stone, false));
+                    }
+                }
                 blueTeam.Clear();
                 redTeam.Clear();
                 blueScore = 0;

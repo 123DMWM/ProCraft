@@ -381,8 +381,9 @@ namespace fCraft {
             // Check for incoming connections (every 250ms)
             checkConnectionsTask = Scheduler.NewTask( CheckConnections ).RunForever( CheckConnectionsInterval );
 
-            // Check for idles (every 30s)
-            checkIdlesTask = Scheduler.NewTask( CheckIdles ).RunForever( CheckIdlesInterval );
+            // Check for idles (every 1s)
+            checkIdlesTask = Scheduler.NewTask( CheckIdles ).RunForever( CheckIdlesInterval );// Check for idles (every 30s)
+            tabListTask = Scheduler.NewTask( TabList ).RunForever( CheckIdlesInterval );
 
             // Monitor CPU usage (every 30s)
             try {
@@ -850,6 +851,7 @@ namespace fCraft {
 
         // checks for idle players
         static SchedulerTask checkIdlesTask;
+        static SchedulerTask tabListTask;
         static TimeSpan checkIdlesInterval = TimeSpan.FromSeconds( 1 );
 
         /// <summary> Interval at which Server checks for idle players (to kick idlers). </summary>
@@ -859,6 +861,7 @@ namespace fCraft {
                 if( value.Ticks < 0 ) throw new ArgumentException( "CheckIdlesInterval may not be negative." );
                 checkIdlesInterval = value;
                 if( checkIdlesTask != null ) checkIdlesTask.Interval = checkIdlesInterval;
+                if( tabListTask != null ) tabListTask.Interval = checkIdlesInterval;
             }
         }
 
@@ -866,21 +869,92 @@ namespace fCraft {
         static void CheckIdles( SchedulerTask task ) {
         
             Player[] tempPlayerList = Players;
-            for( int i = 0; i < tempPlayerList.Length; i++ ) {
+            for (int i = 0; i < tempPlayerList.Length; i++)
+            {
                 Player player = tempPlayerList[i];
 
-                if (player.lastSolidPos != null && !player.Info.IsAFK && player.SupportsMessageTypes)
+                if (player.lastSolidPos != null && !player.Info.IsAFK && player.SupportsMessageTypes &&
+                    !player.IsPlayingCTF)
                 {
-                    double speed = (Math.Sqrt(player.Position.DistanceSquaredTo(player.lastSolidPos)) / 32);
-                    player.Send(Packet.Message((byte)13, String.Format("&eSpeed: &f{0:N2} &eBlocks/s", speed)));
-                    player.Send(Packet.Message(12, player.Position.ToBlockCoordsExt().ToString() + InfoCommands.GetCompassStringType(player.Position.R)));
+                    double speed = (Math.Sqrt(player.Position.DistanceSquaredTo(player.lastSolidPos))/32);
+                    player.Send(Packet.Message((byte) 13, String.Format("&eSpeed: &f{0:N2} &eBlocks/s", speed)));
+                    player.Send(Packet.Message(12,
+                        player.Position.ToBlockCoordsExt().ToString() +
+                        InfoCommands.GetCompassStringType(player.Position.R)));
+                }
+                if (player.IsPlayingCTF && player.SupportsMessageTypes)
+                {
+                    player.Send(Packet.Message(11, ""));
+                    if (((CTF.redRoundsWon*5) + CTF.redScore) > ((CTF.blueRoundsWon*5) + CTF.blueScore))
+                    {
+                        player.Send(Packet.Message(13,
+                            "&4Red &a" + CTF.redRoundsWon + "&4:&f" + CTF.redScore + " &c<-- &1Blue &a" +
+                            CTF.blueRoundsWon + "&1:&f" + CTF.blueScore));
+                    }
+                    else if (((CTF.redRoundsWon*5) + CTF.redScore) < ((CTF.blueRoundsWon*5) + CTF.blueScore))
+                    {
+                        player.Send(Packet.Message(13,
+                            "&4Red &a" + CTF.redRoundsWon + "&4:&f" + CTF.redScore + " &9--> &1Blue &a" +
+                            CTF.blueRoundsWon + "&1:&f" + CTF.blueScore));
+                    }
+                    else
+                    {
+                        player.Send(Packet.Message(13,
+                            "&4Red &a" + CTF.redRoundsWon + "&4:&f" + CTF.redScore + " &d<=> &1Blue &a" +
+                            CTF.blueRoundsWon + "&1:&f" + CTF.blueScore));
+                    }
+                    var flagholder = player.World.Players.Where(p => p.IsHoldingFlag);
+                    if (flagholder != null)
+                    {
+                        if (CTF.redHasFlag)
+                        {
+                            player.Send(Packet.Message(12,
+                                flagholder.Take(1)
+                                    .JoinToString((r => String.Format("&4{0} &ehas the &1Blue&e flag!", r.Name)))));
+                        }
+                        else if (CTF.blueHasFlag)
+                        {
+                            player.Send(Packet.Message(12,
+                                flagholder.Take(1)
+                                    .JoinToString((r => String.Format("&1{0} &ehas the &4Red&e flag!", r.Name)))));
+                        }
+                        else
+                        {
+                            player.Send(Packet.Message(12, "&eNo one has the flag!"));
+                        }
+
+                    }
+                    if (player.Team == "Red")
+                    {
+                        player.Send(Packet.Message(3, "&eTeam: &4Red"));
+                    }
+                    else if (player.Team == "Blue")
+                    {
+                        player.Send(Packet.Message(3, "&eTeam: &1Blue"));
+                    }
+                    else player.Send(Packet.Message(3, "&eTeam: &0None"));
+                }
+                if (player.IsPlayingCTF && player.SupportsEnvColors)
+                {
+                    if (((CTF.redRoundsWon*5) + CTF.redScore) > ((CTF.blueRoundsWon*5) + CTF.blueScore))
+                    {
+                        player.Send(Packet.MakeEnvSetColor(2, "AA0000"));
+                    }
+                    else if (((CTF.redRoundsWon*5) + CTF.redScore) < ((CTF.blueRoundsWon*5) + CTF.blueScore))
+                    {
+                        player.Send(Packet.MakeEnvSetColor(2, "0000AA"));
+                    }
+                    else
+                    {
+                        player.Send(Packet.MakeEnvSetColor(2, "AA00AA"));
+                    }
                 }
                 player.lastSolidPos = player.Position;
 
-                if( player.Info.Rank.IdleKickTimer <= 0 ) continue;
+                if (player.Info.Rank.IdleKickTimer <= 0) continue;
                 TimeSpan TimeLeft = new TimeSpan(0, player.Info.Rank.IdleKickTimer, 0) - player.IdBotTime;
 
-                if (player.IdBotTime.ToSeconds() % 300 == 0 && player.IdBotTime.ToSeconds() >= 300)
+                if (player.IdBotTime.ToSeconds()%300 == 0 && player.IdBotTime.ToSeconds() >= 300)
                 {
                     if (player.Info.IsAFK == false)
                     {
@@ -889,27 +963,67 @@ namespace fCraft {
                         Server.UpdateTabList();
                         player.Info.TempMob = player.Info.Mob;
                         player.Info.Mob = "chicken";
-                        player.Message("You have " + TimeLeft.ToMiniString() + " left before you get kicked for being AFK");
+                        player.Message("You have " + TimeLeft.ToMiniString() +
+                                       " left before you get kicked for being AFK");
                     }
                     else
                     {
                         player.Info.IsAFK = true;
                         Server.UpdateTabList();
-                        player.Message("You have " + TimeLeft.ToMiniString() + " left before you get kicked for being AFK");
+                        player.Message("You have " + TimeLeft.ToMiniString() +
+                                       " left before you get kicked for being AFK");
                     }
-                }              
-        
-                if( player.IdBotTime.Minutes >= player.Info.Rank.IdleKickTimer ) {
-                    Message( "{0}&S was kicked for being idle for {1} min",
-                             player.ClassyName,
-                             player.Info.Rank.IdleKickTimer );
+                }
+
+                if (player.IdBotTime.Minutes >= player.Info.Rank.IdleKickTimer)
+                {
+                    Message("{0}&S was kicked for being idle for {1} min",
+                        player.ClassyName,
+                        player.Info.Rank.IdleKickTimer);
                     string kickReason = "Idle for " + player.Info.Rank.IdleKickTimer + " minutes";
-                    player.Kick( Player.Console, kickReason, LeaveReason.IdleKick, false, true, false );
+                    player.Kick(Player.Console, kickReason, LeaveReason.IdleKick, false, true, false);
                     player.Info.TotalTime = player.Info.TotalTime - player.IdBotTime;
                     player.Info.IsAFK = false;
                     Server.UpdateTabList();
                     player.Info.Mob = player.Info.TempMob;
                     player.ResetIdBotTimer(); // to prevent kick from firing more than once
+                }
+            }
+        }
+
+        static void TabList(SchedulerTask task)
+        {
+
+            Player[] tempPlayerList = Players;
+            for (int i = 0; i < tempPlayerList.Length; i++)
+            {
+                Player player = tempPlayerList[i];
+                if (!player.SupportsExtPlayerList) continue;
+                var canBeSeen = Players.Where(a => player.CanSee(a)).ToArray();
+                var canBeSeenW = player.World.Players.Where(a => player.CanSee(a)).ToArray();
+                if (!player.IsPlayingCTF)
+                {
+                    foreach (Player p2 in canBeSeen)
+                    {
+                        player.Send(Packet.MakeExtAddPlayerName(p2.NameID, p2.Name, p2.ListName,
+                            p2.World.ClassyName + " &e(&f" + p2.World.CountVisiblePlayers(player) + "&e)", 0));
+                    }
+                }
+                else
+                {
+                    foreach (Player p2 in canBeSeenW)
+                    {
+                        if (p2.IsPlayingCTF && p2.Team == "Red")
+                        {
+                            player.Send(Packet.MakeExtAddPlayerName(p2.NameID, p2.Name, "&c" + p2.Name, "&eTeam &4Red",
+                                0));
+                        }
+                        else if (p2.IsPlayingCTF && p2.Team == "Blue")
+                        {
+                            player.Send(Packet.MakeExtAddPlayerName(p2.NameID, p2.Name, "&9" + p2.Name, "&eTeam &1Blue",
+                                0));
+                        }
+                    }
                 }
             }
         }
@@ -974,34 +1088,35 @@ namespace fCraft {
         */
 
 
-        //static void CheckIdles(SchedulerTask task)
-        //{
-        //
-        //    Player[] tempPlayerList = Players;
-        //    for (int i = 0; i < tempPlayerList.Length; i++)
-        //    {
-        //        Player player = tempPlayerList[i];
-        //        int fail;
-        //        if (player.IdBotTime.ToSeconds() % 5 == 0 && player.IdBotTime.ToSeconds() == 5 && int.TryParse(player.Info.Mob, out fail)) //&& player.isPlayingAsHider && player.isPlayingGame)
-        //        {
-        //            short x = (short)(player.Position.X / 32 * 32 + 16);
-        //            short y = (short)(player.Position.Y / 32 * 32 + 16);
-        //            short z = (short)(player.Position.Z / 32 * 32);
-        //            Vector3I Pos = new Vector3I(player.Position.X / 32, player.Position.Y / 32, (player.Position.Z - 32) / 32);
-        //            player.solidPosBlock = player.WorldMap.GetBlock(Pos);
-        //            player.WorldMap.SetBlock(Pos, player.inGameBlock);
-        //            BlockUpdate blockUpdate = new BlockUpdate(null, Pos, player.inGameBlock);
-        //            player.World.Map.QueueUpdate(blockUpdate);
-        //            player.Message("&7You are now a solid block ({0}) Don't walk around or you will be normal again.", player.inGameBlock);
-        //            player.isSolid = true;
-        //            player.Info.IsHidden = true;
-        //            player.lastSolidPos = Pos;
-        //            Player.RaisePlayerHideChangedEvent(player, true, true);
-        //        }                
-        //    }
-        //}
+                //static void CheckIdles(SchedulerTask task)
+                //{
+                //
+                //    Player[] tempPlayerList = Players;
+                //    for (int i = 0; i < tempPlayerList.Length; i++)
+                //    {
+                //        Player player = tempPlayerList[i];
+                //        int fail;
+                //        if (player.IdBotTime.ToSeconds() % 5 == 0 && player.IdBotTime.ToSeconds() == 5 && int.TryParse(player.Info.Mob, out fail)) //&& player.isPlayingAsHider && player.isPlayingGame)
+                //        {
+                //            short x = (short)(player.Position.X / 32 * 32 + 16);
+                //            short y = (short)(player.Position.Y / 32 * 32 + 16);
+                //            short z = (short)(player.Position.Z / 32 * 32);
+                //            Vector3I Pos = new Vector3I(player.Position.X / 32, player.Position.Y / 32, (player.Position.Z - 32) / 32);
+                //            player.solidPosBlock = player.WorldMap.GetBlock(Pos);
+                //            player.WorldMap.SetBlock(Pos, player.inGameBlock);
+                //            BlockUpdate blockUpdate = new BlockUpdate(null, Pos, player.inGameBlock);
+                //            player.World.Map.QueueUpdate(blockUpdate);
+                //            player.Message("&7You are now a solid block ({0}) Don't walk around or you will be normal again.", player.inGameBlock);
+                //            player.isSolid = true;
+                //            player.Info.IsHidden = true;
+                //            player.lastSolidPos = Pos;
+                //            Player.RaisePlayerHideChangedEvent(player, true, true);
+                //        }                
+                //    }
+                //}
 
-        static SchedulerTask gcTask;
+            static
+            SchedulerTask gcTask;
         static TimeSpan gcInterval = TimeSpan.FromSeconds( 60 );
 
         /// <summary> Interval at which Server checks whether forced garbage collection is needed. </summary>
@@ -1419,10 +1534,28 @@ namespace fCraft {
 
         internal static void UpdateTabList() {
             foreach (Player p1 in Players) {
-                if (p1.SupportsExtPlayerList) {
-                    var CanBeSeen = Server.Players.Where(i => p1.CanSee(i)).ToArray();
-                    foreach (Player p2 in CanBeSeen) {
-                        p1.Send(Packet.MakeExtAddPlayerName(p2.NameID, p2.Name, p2.ListName, p2.World.ClassyName + " &e(&f" + p2.World.CountVisiblePlayers(p1) + "&e)", 0));
+                if (!p1.SupportsExtPlayerList) continue;
+                var canBeSeen = Server.Players.Where(i => p1.CanSee(i)).ToArray();
+                var canBeSeenW = p1.World.Players.Where(i => p1.CanSee(i)).ToArray();
+                if (!p1.IsPlayingCTF)
+                {
+                    foreach (Player p2 in canBeSeen)
+                    {
+                        p1.Send(Packet.MakeExtAddPlayerName(p2.NameID, p2.Name, p2.ListName,
+                            p2.World.ClassyName + " &e(&f" + p2.World.CountVisiblePlayers(p1) + "&e)", 0));
+                    }
+                }
+                else
+                {
+                    foreach (Player p2 in canBeSeenW)
+                    {
+                        if (p2.IsPlayingCTF && p2.Team == "Red")
+                        {
+                            p1.Send(Packet.MakeExtAddPlayerName(p2.NameID, p2.Name, "&c" + p2.Name, "&eTeam &4Red", 0));
+                        } else if (p2.IsPlayingCTF && p2.Team == "Blue")
+                        {
+                            p1.Send(Packet.MakeExtAddPlayerName(p2.NameID, p2.Name, "&8" + p2.Name, "&eTeam &1Blue", 0));
+                        }
                     }
                 }
             }

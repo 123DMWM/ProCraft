@@ -222,6 +222,12 @@ namespace fCraft {
         /// <summary> What team the player is currently on. Either Red or Blue./ </summary>
         public string Team;
 
+        /// <summary> Whether or not the player is currently playing CTF </summary>
+        public bool IsPlayingCTF = false;
+
+        /// <summary> Whether or not the player is currently holding other teams flag </summary>
+        public bool IsHoldingFlag = false;
+
         /// <summary> Whether the client supports advanced WoM client functionality. </summary>
         public bool IsUsingWoM { get; private set; }
 
@@ -344,6 +350,10 @@ namespace fCraft {
                             MessageNow( "Unknown command \"{0}\". See &H/Commands", cmd.Name );
                             Logger.Log(LogType.UserCommand,
                                             "{0}[Not A CMD]: {1}", Name, rawMessage);
+                        }
+                        else if (IsPlayingCTF && (commandDescriptor.Permissions.Contains(Permission.Build) || commandDescriptor.Permissions.Contains(Permission.Draw) || commandDescriptor.Permissions.Contains(Permission.DrawAdvanced) || commandDescriptor.Permissions.Contains(Permission.CopyAndPaste) || commandDescriptor.Permissions.Contains(Permission.UndoOthersActions) || commandDescriptor.Permissions.Contains(Permission.UndoAll)))
+                        {
+                            MessageNow("&WYou cannot use this command while playing CTF");
                         }
                         else if (Info.IsFrozen && !commandDescriptor.UsableByFrozenPlayers)
                         {

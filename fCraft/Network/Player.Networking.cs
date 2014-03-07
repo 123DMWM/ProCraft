@@ -334,7 +334,7 @@ namespace fCraft {
                     if (this.Info.heldBlock != failsafe)
                     {
                         this.Info.heldBlock = failsafe;
-                        if (this.SupportsMessageTypes)
+                        if (this.SupportsMessageTypes && !this.IsPlayingCTF)
                         {
                             this.Message(11, "&eBlock:&f" + failsafe.ToString() + " &eID:&f" + failsafe.GetHashCode());                            
                         }
@@ -1584,7 +1584,7 @@ namespace fCraft {
             }
             if (this.SupportsMessageTypes)
             {
-                this.Message(3, "&eWorld: &f" + newWorld.ClassyName);
+                this.Message(2, "&eWorld: &f" + newWorld.ClassyName);
             }
             Server.UpdateTabList();
             Server.RequestGC();
