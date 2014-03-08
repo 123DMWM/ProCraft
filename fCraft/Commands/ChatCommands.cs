@@ -1313,15 +1313,16 @@ namespace fCraft
                 player.Message("Don't Blow their cover!");
                 return;
             }
+            string serverName = ConfigKey.ServerName.GetString();
             if (closest.Length == 1)
             {
-                message = "Welcome to --! ProBuild 24/7 FREEBUILD !--, " + closest.JoinToString(r => r.Name + "!");
+                message = "Welcome to " + serverName + ", " + closest.JoinToString(r => r.Name + "!");
                 player.ParseMessage(message, false);
                 player.Info.LastTimeGreeted = DateTime.Now;
             }
             else if (closest.Length > 1)
             {
-                message = "Welcome to --! ProBuild 24/7 FREEBUILD !--, " + closest.JoinToString(", ", r => r.Name) + "!";
+                message = "Welcome to " + serverName + ", " + closest.JoinToString(", ", r => r.Name) + "!";
                 player.ParseMessage(message, false);
                 player.Info.LastTimeGreeted = DateTime.Now;
             }
