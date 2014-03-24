@@ -346,43 +346,41 @@ namespace fCraft {
                         CommandReader cmd = new CommandReader( rawMessage );
                         CommandDescriptor commandDescriptor = CommandManager.GetDescriptor( cmd.Name, true );
 
-                        if( commandDescriptor == null ) {
-                            MessageNow( "Unknown command \"{0}\". See &H/Commands", cmd.Name );
-                            Logger.Log(LogType.UserCommand,
-                                            "{0}[Not A CMD]: {1}", Name, rawMessage);
+                    if (commandDescriptor == null) {
+                        MessageNow("Unknown command \"{0}\". See &H/Commands", cmd.Name);
+                        Logger.Log(LogType.UserCommand, "{0}[Not A CMD]: {1}", Name, rawMessage);
+                    } else if (IsPlayingCTF && commandDescriptor.Permissions != null &&
+                               (commandDescriptor.Permissions.Contains(Permission.Build) ||
+                                commandDescriptor.Permissions.Contains(Permission.Draw) ||
+                                commandDescriptor.Permissions.Contains(Permission.DrawAdvanced) ||
+                                commandDescriptor.Permissions.Contains(Permission.CopyAndPaste) ||
+                                commandDescriptor.Permissions.Contains(Permission.UndoOthersActions) ||
+                                commandDescriptor.Permissions.Contains(Permission.UndoAll))) {
+                        MessageNow("&WYou cannot use this command while playing CTF");
+                    } else if (Info.IsFrozen && !commandDescriptor.UsableByFrozenPlayers) {
+                        MessageNow("&WYou cannot use this command while frozen.");
+                        Logger.Log(LogType.UserCommand, "{0}[Frozen]: {1}", Name, rawMessage);
+                    } else {
+                        if (!commandDescriptor.DisableLogging) {
+                            Logger.Log(LogType.UserCommand, "{0}: {1}", Name, rawMessage);
                         }
-                        else if (IsPlayingCTF && (commandDescriptor.Permissions.Contains(Permission.Build) || commandDescriptor.Permissions.Contains(Permission.Draw) || commandDescriptor.Permissions.Contains(Permission.DrawAdvanced) || commandDescriptor.Permissions.Contains(Permission.CopyAndPaste) || commandDescriptor.Permissions.Contains(Permission.UndoOthersActions) || commandDescriptor.Permissions.Contains(Permission.UndoAll)))
-                        {
-                            MessageNow("&WYou cannot use this command while playing CTF");
+                        if (commandDescriptor.RepeatableSelection) {
+                            selectionRepeatCommand = cmd;
                         }
-                        else if (Info.IsFrozen && !commandDescriptor.UsableByFrozenPlayers)
-                        {
-                            MessageNow( "&WYou cannot use this command while frozen." );
-                            Logger.Log(LogType.UserCommand,
-                                            "{0}[Frozen]: {1}", Name, rawMessage);
-                        } else {
-                            if( !commandDescriptor.DisableLogging ) {
-                                Logger.Log( LogType.UserCommand,
-                                            "{0}: {1}", Name, rawMessage );
-                            }
-                            if( commandDescriptor.RepeatableSelection ) {
-                                selectionRepeatCommand = cmd;
-                            }
-                            SendToSpectators( cmd.RawMessage );
-                            if (this.Info.IsAFK == true && rawMessage.ToLower().StartsWith("/afk") == false)
-                            {
-                                this.Info.IsAFK = false;
-                                Server.UpdateTabList();
-                                Server.Players.CanSee(this).Message("&S{0} is no longer AFK", this.Name);
-                                this.Message("&SYou are no longer AFK");
-                                this.Info.Mob = this.Info.TempMob;
-                            }
-                            CommandManager.ParseCommand( this, cmd, fromConsole );                            
-                            if( !commandDescriptor.NotRepeatable ) {
-                                LastCommand = cmd;
-                            }
+                        SendToSpectators(cmd.RawMessage);
+                        if (this.Info.IsAFK == true && rawMessage.ToLower().StartsWith("/afk") == false) {
+                            this.Info.IsAFK = false;
+                            Server.UpdateTabList();
+                            Server.Players.CanSee(this).Message("&S{0} is no longer AFK", this.Name);
+                            this.Message("&SYou are no longer AFK");
+                            this.Info.Mob = this.Info.TempMob;
                         }
-                    } break;
+                        CommandManager.ParseCommand(this, cmd, fromConsole);
+                        if (!commandDescriptor.NotRepeatable) {
+                            LastCommand = cmd;
+                        }
+                    }
+                } break;
 
                 case RawMessageType.RepeatCommand: {
                         if( LastCommand == null ) {
