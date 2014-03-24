@@ -354,7 +354,7 @@ namespace fCraft {
                 }
                 if ((tempAttr = envEl.Attribute("level")) != null)
                 {
-                    if (!Int32.TryParse(tempAttr.Value, out world.EdgeLevel))
+                    if (!short.TryParse(tempAttr.Value, out world.EdgeLevel))
                     {
                         world.EdgeLevel = -1;
                         Logger.Log(LogType.Warning,

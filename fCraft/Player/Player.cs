@@ -2060,8 +2060,7 @@ namespace fCraft {
             // wait for client to send its ExtEntries
             bool sendCustomBlockPacket = false;
             List<string> clientExts = new List<string>();
-            for (int i = 0; i < expectedEntries; i++)
-            {
+            for (int i = 0; i < expectedEntries; i++) {
                 // Expect ExtEntry replies (0 or more)
                 OpCode extEntryReply = reader.ReadOpCode();
                 if (extEntryReply != OpCode.ExtEntry)
@@ -2170,11 +2169,9 @@ namespace fCraft {
         }
 
         // For non-extended players, use appropriate substitution
-        public Packet ProcessOutgoingSetBlock(Packet packet)
-        {
-            if (packet.Bytes[7] > (byte)Map.MaxLegalBlockType && !this.UsesCustomBlocks)
-            {
-                packet.Bytes[7] = (byte)Map.GetFallbackBlock((Block)packet.Bytes[7]);
+        public Packet ProcessOutgoingSetBlock(Packet packet) {
+            if (packet.Bytes[7] > (byte) Map.MaxLegalBlockType && !this.UsesCustomBlocks) {
+                packet.Bytes[7] = (byte) Map.GetFallbackBlock((Block) packet.Bytes[7]);
             }
             return packet;
         }

@@ -966,42 +966,29 @@ namespace fCraft {
             {
                 color = color.ToUpper().Remove(0, 1);
             }
-            foreach (Char c in color)
-            {
-                if (!IsValidHex(c))
-                {
-                    if (color.ToLower().Equals("on") || color.ToLower().Equals("true") || color.ToLower().Equals("yes"))
-                    {
-                        zone.ShowZone = true;
-                        if (zone.Color != null)
-                        {
-                            player.Message("Zone ({0}&s) will now show its bounderies", zone.ClassyName);
-                            player.World.Players.Send(Packet.MakeMakeSelection(zone.ZoneID, zone.Name, zone.Bounds, zone.Color, zone.Alpha));
-                        }
-                        else
-                        {
-                            player.Message("Please set color and alpha first");
-                        }
-                        return;
+            if (!IsValidHex(color)) {
+                if (color.ToLower().Equals("on") || color.ToLower().Equals("true") || color.ToLower().Equals("yes")) {
+                    zone.ShowZone = true;
+                    if (zone.Color != null) {
+                        player.Message("Zone ({0}&s) will now show its bounderies", zone.ClassyName);
+                        player.World.Players.Send(Packet.MakeMakeSelection(zone.ZoneID, zone.Name, zone.Bounds,
+                            zone.Color, zone.Alpha));
                     }
-                    else if (color.ToLower().Equals("off") || color.ToLower().Equals("false") || color.ToLower().Equals("no"))
-                    {
-                        zone.ShowZone = false;
-                        player.Message("Zone ({0}&s) will no longer show its bounderies", zone.ClassyName);
-                        player.World.Players.Send(Packet.MakeRemoveSelection(zone.ZoneID));
-                        return;
-                    }
-                    else
-                    {
-                        player.Message("Error: \"#{0}\" is not a valid HEX color code.", color);
-                        return;
-                    }
-                }
-                else
-                {
-                    zone.Color = color.ToUpper();
+                    return;
+                } else if (color.ToLower().Equals("off") || color.ToLower().Equals("false") || color.ToLower().Equals("no")) {
+                    zone.ShowZone = false;
+                    player.Message("Zone ({0}&s) will no longer show its bounderies", zone.ClassyName);
+                    player.World.Players.Send(Packet.MakeRemoveSelection(zone.ZoneID));
+                    return;
+                } else {
+                    player.Message("Error: \"#{0}\" is not a valid HEX color code.", color);
+                    return;
                 }
             }
+            else {
+                zone.Color = color.ToUpper();
+            }
+
             if (alp == null)
             {
                 player.Message("Error: Missing an Alpha integer");
@@ -1041,7 +1028,7 @@ namespace fCraft {
                 {
                     zone.ShowZone = false;
                 }                
-                player.Message("Zone ({0}&s) color set!", zone.Name);
+                player.Message("Zone ({0}&s) color set!", zone.ClassyName);
             }
             if (zone != null)
             {
@@ -1060,13 +1047,21 @@ namespace fCraft {
             }
         }
         #endregion
-        static bool IsValidHex(char c)
-        {
-            if (c == '0' || c == '1' || c == '2' || c == '3' || c == '4' || c == '5' || c == '6' || c == '7' || c == '8' || c == '9' || c == 'A' || c == 'B' || c == 'C' || c == 'D' || c == 'E' || c == 'F')
-            {
-                return true;
+        /// <summary> Ensures that the hex color has the correct length (1-6 characters)
+        /// and character set (alphanumeric chars allowed). </summary>
+        public static bool IsValidHex( string hex ) {
+            if( hex == null ) throw new ArgumentNullException( "hex" );
+            if (hex.StartsWith("#")) hex = hex.Remove(0, 1);
+            if( hex.Length < 1 || hex.Length > 6 ) return false;
+            for( int i = 0; i < hex.Length; i++ ) {
+                char ch = hex[i];
+                if( ch < '0' || ch > '9' && 
+                    ch < 'A' || ch > 'Z' && 
+                    ch < 'a' || ch > 'z' ) {
+                    return false;
+                }
             }
-            else return false;
+            return true;
         }        
     }
 }

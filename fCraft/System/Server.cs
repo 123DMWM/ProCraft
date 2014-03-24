@@ -1447,7 +1447,9 @@ namespace fCraft {
 
         public static string MakePlayerConnectedMessage( [NotNull] Player player, bool firstTime, [NotNull] World world ) {
             if( player == null ) throw new ArgumentNullException( "player" );
-            if( world == null ) throw new ArgumentNullException( "world" );
+            if (world == null)
+                throw new ArgumentNullException( "world" );
+            UpdateTabList();
             if( firstTime ) {
                 return String.Format("&sPlease welcome {0}&S to the server!\n" + 
                                      "&sThis is their first visit",
@@ -1475,8 +1477,6 @@ namespace fCraft {
                                       player.Info.TimesVisited,
                                       player.Info.TotalTime.TotalHours);
             }
-
-           UpdateTabList();
         }
 
         public static string MakePlayerDisconnectedMessage([NotNull] Player player)

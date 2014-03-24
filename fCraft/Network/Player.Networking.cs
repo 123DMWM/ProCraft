@@ -1387,13 +1387,10 @@ namespace fCraft {
             int mapBytesSent = 0;
             byte[] unGzipBlockData = map.Blocks.ToArray();
             int count = 0;
-            foreach (var get in unGzipBlockData)
-            {
-                if ((int)get > (int)Map.MaxLegalBlockType)
-                {
-                    if (UsesCustomBlocks != true)
-                    {
-                        unGzipBlockData[count] = (byte)Fallback.GetFallBack((Block)get);
+            foreach (var get in unGzipBlockData) {
+                if ((int) get > (int) Map.MaxLegalBlockType) {
+                    if (UsesCustomBlocks != true) {
+                        unGzipBlockData[count] = (byte) Fallback.GetFallBack((Block) get);
                     }
                 }
                 count++;
@@ -1404,27 +1401,22 @@ namespace fCraft {
                         blockData.Length, Name);
 
             // Transfer the map copy
-            while (mapBytesSent < blockData.Length)
-            {
+            while (mapBytesSent < blockData.Length) {
                 int chunkSize = blockData.Length - mapBytesSent;
-                if (chunkSize > 1024)
-                {
+                if (chunkSize > 1024) {
                     chunkSize = 1024;
-                }
-                else
-                {
+                } else {
                     // CRC fix for ManicDigger
-                    for (int i = 0; i < buffer.Length; i++)
-                    {
+                    for (int i = 0; i < buffer.Length; i++) {
                         buffer[i] = 0;
                     }
                 }
                 Array.Copy(blockData, mapBytesSent, buffer, 0, chunkSize);
-                byte progress = (byte)(100 * mapBytesSent / blockData.Length);
+                byte progress = (byte) (100*mapBytesSent/blockData.Length);
 
                 // write in chunks of 1024 bytes or less
                 writer.Write(OpCode.MapChunk);
-                writer.Write((short)chunkSize);
+                writer.Write((short) chunkSize);
                 writer.Write(buffer, 0, 1024);
                 writer.Write(progress);
                 BytesSent += 1028;
@@ -1456,7 +1448,7 @@ namespace fCraft {
             {
                 if (WorldMap.World.EdgeLevel != -1)
                 {
-                    writer.Write(Packet.MakeEnvSetMapAppearance(WorldMap.World.Texture, WorldMap.World.EdgeBlock, WorldMap.World.HorizonBlock, (short)WorldMap.World.EdgeLevel).Bytes);
+                    writer.Write(Packet.MakeEnvSetMapAppearance(WorldMap.World.Texture, WorldMap.World.EdgeBlock, WorldMap.World.HorizonBlock, WorldMap.World.EdgeLevel).Bytes);
                     BytesSent += 67;
                 }
                 else

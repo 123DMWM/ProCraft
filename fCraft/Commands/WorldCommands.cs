@@ -632,7 +632,7 @@ namespace fCraft {
                     Logger.Log( LogType.UserActivity,
                                 "Env: {0} {1} reset environment settings for world {2}",
                                 player.Info.Rank.Name, player.Name, world.Name );
-                    player.Message( "Reset enviroment settings for world {0}", world.ClassyName );
+                    player.Message( "Enviroment settings for world {0} &swere reset.", world.ClassyName );
                     WorldManager.SaveWorldList();
                 } else {
                     Logger.Log( LogType.UserActivity,
@@ -663,25 +663,18 @@ namespace fCraft {
                     }
                     else
                     {
-                        foreach (char c in valueText.ToUpper())
-                        {
-                            isValid = IsValidHex(c);
-                            if (!isValid)
-                            {
-                                player.Message("Env: \"#{0}\" is not a valid HEX color code.", valueText);
-                                return;
-                            }
-                        }
-                        if (valueText.Length > 6)
+                        isValid = IsValidHex(valueText);
+                        if (!isValid)
                         {
                             player.Message("Env: \"#{0}\" is not a valid HEX color code.", valueText);
                             return;
-                        }
-                        else
-                        {
+                        } else {
                             world.FogColor = valueText;
                             player.Message("Set fog color for {0}&S to #{1}", world.ClassyName, valueText);
                         }
+                    }
+                    if (player.SupportsEnvColors) {
+                        player.Send(Packet.MakeEnvSetColor(2, world.FogColor));
                     }
                     break;
 
@@ -694,25 +687,19 @@ namespace fCraft {
                     }
                     else
                     {
-                        foreach (char c in valueText.ToUpper())
-                        {
-                            isValid = IsValidHex(c);
-                            if (!isValid)
-                            {
-                                player.Message("Env: \"#{0}\" is not a valid HEX color code.", valueText);
-                                return;
-                            }
-                        }
-                        if (valueText.Length > 6)
+                        isValid = IsValidHex(valueText);
+                        if (!isValid)
                         {
                             player.Message("Env: \"#{0}\" is not a valid HEX color code.", valueText);
                             return;
-                        }
-                        else
-                        {
+                        } else {
                             world.CloudColor = valueText;
                             player.Message("Set cloud color for {0}&S to #{1}", world.ClassyName, valueText);
+
                         }
+                    }
+                    if (player.SupportsEnvColors) {
+                        player.Send(Packet.MakeEnvSetColor(1, world.CloudColor));
                     }
                     break;
 
@@ -724,25 +711,18 @@ namespace fCraft {
                     }
                     else
                     {
-                        foreach (char c in valueText.ToUpper())
-                        {
-                            isValid = IsValidHex(c);
-                            if (!isValid)
-                            {
-                                player.Message("Env: \"#{0}\" is not a valid HEX color code.", valueText);
-                                return;
-                            }
-                        }
-                        if (valueText.Length > 6)
+                        isValid = IsValidHex(valueText);
+                        if (!isValid)
                         {
                             player.Message("Env: \"#{0}\" is not a valid HEX color code.", valueText);
                             return;
-                        }
-                        else
-                        {
+                        } else {
                             world.SkyColor = valueText;
                             player.Message("Set sky color for {0}&S to #{1}", world.ClassyName, valueText);
                         }
+                    }
+                    if (player.SupportsEnvColors) {
+                        player.Send(Packet.MakeEnvSetColor(0, world.SkyColor));
                     }
                     break;
 
@@ -755,25 +735,18 @@ namespace fCraft {
                     }
                     else
                     {
-                        foreach (char c in valueText.ToUpper())
-                        {
-                            isValid = IsValidHex(c);
-                            if (!isValid)
-                            {
-                                player.Message("Env: \"#{0}\" is not a valid HEX color code.", valueText);
-                                return;
-                            }
-                        }
-                        if (valueText.Length > 6)
+                        isValid = IsValidHex(valueText);
+                        if (!isValid)
                         {
                             player.Message("Env: \"#{0}\" is not a valid HEX color code.", valueText);
                             return;
-                        }
-                        else
-                        {
+                        } else {
                             world.ShadowColor = valueText;
                             player.Message("Set shadow color for {0}&S to #{1}", world.ClassyName, valueText);
                         }
+                    }
+                    if (player.SupportsEnvColors) {
+                        player.Send(Packet.MakeEnvSetColor(3, world.ShadowColor));
                     }
                     break;
 
@@ -787,38 +760,31 @@ namespace fCraft {
                     }
                     else
                     {
-                        foreach (char c in valueText.ToUpper())
-                        {
-                            isValid = IsValidHex(c);
-                            if (!isValid)
-                            {
-                                player.Message("Env: \"#{0}\" is not a valid HEX color code.", valueText);
-                                return;
-                            }
-                        }
-                        if (valueText.Length > 6)
+                        isValid = IsValidHex(valueText);
+                        if (!isValid)
                         {
                             player.Message("Env: \"#{0}\" is not a valid HEX color code.", valueText);
                             return;
-                        }
-                        else
-                        {
+                        } else {
                             world.LightColor = valueText;
                             player.Message("Set sunlight color for {0}&S to #{1}", world.ClassyName, valueText);
                         }
                     }
+                    if (player.SupportsEnvColors) {
+                        player.Send(Packet.MakeEnvSetColor(4, world.LightColor));
+                    }
                     break;
 
                 case "level":
-                    int level;
+                    short level;
                     if (valueText.Equals("normal", StringComparison.OrdinalIgnoreCase) || valueText.Equals("reset", StringComparison.OrdinalIgnoreCase) || valueText.Equals("default", StringComparison.OrdinalIgnoreCase) || valueText.Equals("middle", StringComparison.OrdinalIgnoreCase) || valueText.Equals("center", StringComparison.OrdinalIgnoreCase))
                     {
                         player.Message("Reset water level for {0}&S to normal", world.ClassyName);
-                        world.EdgeLevel = world.map.Height/2;
+                        world.EdgeLevel = (short)(world.map.Height/2);
                     }
                     else
                     {
-                        if (!int.TryParse(valueText, out level))
+                        if (!short.TryParse(valueText, out level))
                         {
                             player.Message("Env: \"{0}\" is not a valid integer.", valueText);
                             return;
@@ -828,6 +794,9 @@ namespace fCraft {
                             world.EdgeLevel = level;
                             player.Message("Set water level for {0}&S to {1}", world.ClassyName, level);
                         }
+                    }
+                    if (player.SupportsEnvColors) {
+                        player.Send(Packet.MakeEnvSetMapAppearance(world.Texture, world.EdgeBlock, world.HorizonBlock, world.EdgeLevel));
                     }
                     break;
 
@@ -853,6 +822,9 @@ namespace fCraft {
                             world.HorizonBlock = block;
                             player.Message("Set water block for {0}&S to {1}", world.ClassyName, block);
                         }
+                    }
+                    if (player.SupportsEnvColors) {
+                        player.Send(Packet.MakeEnvSetMapAppearance(world.Texture, world.EdgeBlock, world.HorizonBlock, world.EdgeLevel));
                     }
                     break;
 
@@ -883,6 +855,9 @@ namespace fCraft {
                             player.Message("Set bedrock block for {0}&S to {1}", world.ClassyName, blockhorizon);
                         }
                     }
+                    if (player.SupportsEnvColors) {
+                        player.Send(Packet.MakeEnvSetMapAppearance(world.Texture, world.EdgeBlock, world.HorizonBlock, world.EdgeLevel));
+                    }
                     break;
 
                 case "tex":
@@ -907,6 +882,9 @@ namespace fCraft {
                         player.Message("Set texture for {0}&S to {1}", world.ClassyName, valueText);
                     }
                     world.Texture = valueText;
+                    if (player.SupportsEnvColors) {
+                        player.Send(Packet.MakeEnvSetMapAppearance(world.Texture, world.EdgeBlock, world.HorizonBlock, world.EdgeLevel));
+                    }
                     break;
 
                 default:
@@ -915,19 +893,26 @@ namespace fCraft {
             }
 
             WorldManager.SaveWorldList();
-            if (player.World == world)
-            {
+            if (player.World == world) {
                 player.Message("Env: Rejoin the world to see the changes.");
             }
         }
 
-        static bool IsValidHex(char c)
-        {
-            if (c == '0' || c == '1' || c == '2' || c == '3' || c == '4' || c == '5' || c == '6' || c == '7' || c == '8' || c == '9' || c == 'A' || c == 'B' || c == 'C' || c == 'D' || c == 'E' || c == 'F')
-            {
-                return true;
+        /// <summary> Ensures that the hex color has the correct length (1-6 characters)
+        /// and character set (alphanumeric chars allowed). </summary>
+        public static bool IsValidHex( [NotNull] string hex ) {
+            if( hex == null ) throw new ArgumentNullException( "hex" );
+            if (hex.StartsWith("#")) hex = hex.Remove(0, 1);
+            if( hex.Length < 1 || hex.Length > 6 ) return false;
+            for( int i = 0; i < hex.Length; i++ ) {
+                char ch = hex[i];
+                if( ch < '0' || ch > '9' && 
+                    ch < 'A' || ch > 'Z' && 
+                    ch < 'a' || ch > 'z' ) {
+                    return false;
+                }
             }
-            else return false;
+            return true;
         }
 
         #endregion

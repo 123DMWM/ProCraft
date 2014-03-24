@@ -355,7 +355,7 @@ namespace fCraft {
             ToNetOrder((short)(bounds.XMax + 1), packet.Bytes, 72);
             ToNetOrder((short)(bounds.ZMax + 1), packet.Bytes, 74);
             ToNetOrder((short)(bounds.YMax + 1), packet.Bytes, 76);
-            System.Drawing.Color col = System.Drawing.ColorTranslator.FromHtml("#" + color.ToUpper());
+            var col = System.Drawing.ColorTranslator.FromHtml("#" + color.ToUpper());
             ToNetOrder((short)col.R, packet.Bytes, 78);
             ToNetOrder((short)col.G, packet.Bytes, 80);
             ToNetOrder((short)col.B, packet.Bytes, 82);

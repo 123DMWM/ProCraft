@@ -74,18 +74,14 @@ namespace fCraft {
         }
 
 
-        public unsafe byte[] GetFallbackMap()
-        {
-            byte[] translatedBlocks = (byte[])Blocks.Clone();
+        public unsafe byte[] GetFallbackMap() {
+            byte[] translatedBlocks = (byte[]) Blocks.Clone();
             int volume = translatedBlocks.Length;
-            fixed (byte* ptr = translatedBlocks)
-            {
-                for (int i = 0; i < volume; i++)
-                {
+            fixed (byte* ptr = translatedBlocks) {
+                for (int i = 0; i < volume; i++) {
                     byte block = ptr[i];
-                    if (block > (byte)MaxLegalBlockType)
-                    {
-                        ptr[i] = (byte)FallbackBlocks[block];
+                    if (block > (byte) MaxLegalBlockType) {
+                        ptr[i] = (byte) FallbackBlocks[block];
                     }
                 }
             }
@@ -959,15 +955,11 @@ namespace fCraft {
 
         /// <summary> Gets a compressed (GZip) copy of the map (raw block data with signed, 32bit, big-endian block count prepended).
         /// If the map has not been modified since last GetCompressedCopy call, returns a cached copy. </summary>
-        public byte[] GetCompressedCopy(byte[] array)
-        {
-            byte[] currentCopy = null;
-            if (currentCopy == null)
-            {
-                using (MemoryStream ms = new MemoryStream())
-                {
-                    using (GZipStream compressor = new GZipStream(ms, CompressionMode.Compress))
-                    {
+        public byte[] GetCompressedCopy(byte[] array) {
+            byte[] currentCopy = compressedCopyCache;
+            if (currentCopy == null) {
+                using (MemoryStream ms = new MemoryStream()) {
+                    using (GZipStream compressor = new GZipStream(ms, CompressionMode.Compress)) {
                         // convert block count to big-endian
                         int convertedBlockCount = IPAddress.HostToNetworkOrder(array.Length);
                         // write block count to gzip stream
@@ -980,6 +972,7 @@ namespace fCraft {
             }
             return currentCopy;
         }
+
         volatile byte[] compressedCopyCache;
 
 

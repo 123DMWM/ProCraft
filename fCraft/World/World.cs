@@ -908,7 +908,7 @@ namespace fCraft {
         public string LightColor = null;
 
         /// <summary> Elevation of the "ocean" that surrounds maps. Set to -1 to use client default (halfway up the map). </summary>
-        public int EdgeLevel = -1;
+        public short EdgeLevel = -1;
 
         /// <summary> The block which will be displayed on the horizon. </summary>
         public Block HorizonBlock = Block.Water;
