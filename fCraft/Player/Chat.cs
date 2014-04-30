@@ -192,7 +192,12 @@ namespace fCraft {
                 for (int j = 0; j < v0.Length; j++)
                     v0[j] = v1[j];
             }
-            return (((float)v1[t.Length]) / ((float)(s.Length + t.Length) / 2));
+            float percent = (((float)v1[t.Length]) / ((float)(s.Length + t.Length) / 2));
+            if (percent < 0)
+                percent = 0;
+            if (percent > 1)
+                percent = 1;
+            return percent;
         }
 
         /// <summary> Sends an action message (/Me). </summary>

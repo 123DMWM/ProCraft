@@ -31,7 +31,6 @@ namespace fCraft
             CommandManager.RegisterCommand(CdQuit);
             CommandManager.RegisterCommand(CdMail);
             CommandManager.RegisterCommand(CdMailList);
-            CommandManager.RegisterCommand(CdIRTR);
             CommandManager.RegisterCommand(CdRBChat);
             CommandManager.RegisterCommand(CdGreeting);
             CommandManager.RegisterCommand(CdIRCStaff);
@@ -261,46 +260,6 @@ namespace fCraft
             byte.TryParse(cmd.Next(), out type);
             string message = cmd.NextAll();
             player.Send(Packet.Message(type, message));
-        }
-
-        #endregion
-        #region Done
-
-        static readonly CommandDescriptor CdIRTR = new CommandDescriptor
-        {
-            Name = "Done",
-            Category = CommandCategory.New,
-            Permissions = new[] { Permission.Chat },
-            IsHidden = true,
-            NotRepeatable = true,
-            UsableByFrozenPlayers = false,
-            Usage = "/Done",
-            Help = "Notifies the Admins that you have read the rules, while also sending you to the main map." +
-                   "Only usable on Tutorial world.",
-            Handler = IRTRHandler
-        };
-
-        static void IRTRHandler(Player player, CommandReader cmd)
-        {
-            if (player.Info.IsMuted)
-            {
-                player.MessageMuted();
-                return;
-            }
-
-            if (player.DetectChatSpam()) return;
-
-            if (player.World.Name.ToLower() == "tutorial" && player.LastSignClicked == "sign12" & player.Info.IsBanned != true)
-            {
-                Server.Players.Can(Permission.ReadStaffChat).Message(player.Name + " &sread the rules!");
-                player.Info.HasRTR = true;
-                player.Info.ReadIRC = true;
-                player.JoinWorld(WorldManager.MainWorld, WorldChangeReason.ManualJoin);
-            }
-            else
-            {
-                player.Message("&cYou cannot use that at this time.");
-            }
         }
 
         #endregion
@@ -1300,9 +1259,9 @@ namespace fCraft
                 first = "";
             if (second == null) 
                 second = "";
-            float diff = (1 - Chat.LDistance(first, second)) * 100;
-            player.Message("Similarity: &f" + diff +"&s%");
-            player.Message("&7{0} &s<=> &7{1}", first, second);
+            float percent = (1 - Chat.LDistance(first, second)) * 100;
+            player.Message( percent + "&s% similarity between:" );
+            player.Message( "  &7{0} &sand &7{1}", first, second );
         }
 
         #endregion

@@ -858,24 +858,10 @@ namespace fCraft {
             Handler = RanksHandler
         };
 
-        static void RanksHandler([NotNull] Player player, [NotNull] CommandReader cmd)
-        {
-            if (cmd.HasNext)
-            {
-                CdRanks.PrintUsage(player);
-                return;
-            }
+        private static void RanksHandler([NotNull] Player player, [NotNull] CommandReader cmd) {
             player.Message("Below is a list of ranks. For detail see &H{0}", CdRankInfo.Usage);
-            foreach (Rank rank in RankManager.Ranks)
-            {
-                if (rank.PlayerCount == 1)
-                {
-                    player.Message("&S    {0}  &s(&f{1} player&e)", rank.ClassyName, rank.PlayerCount);
-                }
-                else
-                {
-                    player.Message("&S    {0}  &s(&f{1} players&e)", rank.ClassyName, rank.PlayerCount);
-                }
+            foreach (Rank rank in RankManager.Ranks) {
+                player.Message("&S    {0}  &s(&f{1}&s)", rank.ClassyName, rank.PlayerCount);
             }
         }
 
@@ -1033,8 +1019,12 @@ namespace fCraft {
                         {
                             Array.Sort(infos, new PlayerInfoComparer(player));
                             IClassy[] itemsEnumerated = infos;
-                            string nameList = itemsEnumerated.Take(30).JoinToString(", ", p => p.ClassyName);
-                            player.Message("  {0}&e(&f{1}&e){2}: {3}", rank.ClassyName, rank.PlayerCount.ToString(), nameList, rank.Color);
+                            string nameList = itemsEnumerated.Take( 15 ).JoinToString( "&s, ", p => p.ClassyName );
+                            if (rank.PlayerCount > 15) {
+                                player.Message( " {0} &s(&f{1}&s): {2}{3} &s{4} more", rank.ClassyName, rank.PlayerCount, rank.Color, nameList, (rank.PlayerCount - 15) );
+                            } else {
+                                player.Message( " {0} &s(&f{1}&s): {2}{3}", rank.ClassyName, rank.PlayerCount, rank.Color, nameList );
+                            }
                         }
                     }
                 }
@@ -1050,7 +1040,11 @@ namespace fCraft {
                     Array.Sort(infos, new PlayerInfoComparer(player));
                     IClassy[] itemsEnumerated = infos;
                     string nameList = itemsEnumerated.Take(30).JoinToString(", ", p => p.ClassyName);
-                    player.Message("  {0}&e(&f{1}&e){2}: {3}", ranktarget.ClassyName, ranktarget.PlayerCount.ToString(), ranktarget.Color, nameList);
+                    if (ranktarget.PlayerCount > 15) {
+                        player.Message( " {0} &s(&f{1}&s): {2}{3} &s{4} more", ranktarget.ClassyName, ranktarget.PlayerCount, ranktarget.Color, nameList, (ranktarget.PlayerCount - 30) );
+                    } else {
+                        player.Message( " {0} &s(&f{1}&s): {2}{3}", ranktarget.ClassyName, ranktarget.PlayerCount, ranktarget.Color, nameList );
+                    }
                 }
             }
         }
@@ -1071,6 +1065,11 @@ namespace fCraft {
 
         static void RulesHandler( Player player, CommandReader cmd ) {
             string sectionName = cmd.Next();
+            if (!player.Info.HasRTR) {
+                Server.Players.Can( Permission.ReadStaffChat ).Message( player.ClassyName + " &sread the rules!" );
+                player.Info.HasRTR = true;
+                player.Info.ReadIRC = true;
+            }
 
             // if no section name is given
             if( sectionName == null ) {
@@ -1879,8 +1878,7 @@ namespace fCraft {
             Handler = TTHandler
         };
 
-        static void TTHandler(Player player, CommandReader cmd)
-        {
+        private static void TTHandler(Player player, CommandReader cmd) {
             string rank = cmd.Next();
             string stringer = cmd.Next();
             bool swi = false;
@@ -1889,55 +1887,53 @@ namespace fCraft {
             Rank ranklookup = null;
             offset = 0;
             age = TimeSpan.MaxValue;
-            if (rank == null && stringer == null)
-            {
+            if (rank == null && stringer == null) {
                 swi = true;
             }
-            if (rank != null)
-            {
-                if (RankManager.FindRank(rank) == null)
-                {
-                    if (!int.TryParse(rank, out offset))
-                    {
+            if (rank != null) {
+                if (RankManager.FindRank(rank) == null) {
+                    if (!int.TryParse(rank, out offset)) {
                         player.MessageNoRank(rank);
                         return;
-                    }
-                    else
-                    {
+                    } else {
                         swi = true;
                     }
-                }
-                else
-                {
+                } else {
                     ranklookup = RankManager.FindRank(rank);
                 }
-                if (stringer != null)
-                {
-                    if (!int.TryParse(stringer, out offset))
-                    {
+                if (stringer != null) {
+                    if (!int.TryParse(stringer, out offset)) {
                         offset = 0;
                     }
                 }
             }
 
-            var visiblePlayers = PlayerDB.PlayerInfoList.Where(p => p.TotalTime.TotalSeconds > 0 && p.BanStatus.Equals(BanStatus.NotBanned)).OrderBy(c => c.TotalTime).ToArray().Reverse();
-            if (swi == false) 
-            {
-                visiblePlayers = PlayerDB.PlayerInfoList.Where(p => p.TotalTime.TotalSeconds > 0 && p.Rank == ranklookup && p.BanStatus.Equals(BanStatus.NotBanned)).OrderBy(c => c.TotalTime).ToArray().Reverse();
+            var visiblePlayers =
+                PlayerDB.PlayerInfoList.Where(
+                    p => p.TotalTime.TotalSeconds > 0 && p.BanStatus.Equals(BanStatus.NotBanned))
+                    .OrderBy(c => c.TotalTime)
+                    .ToArray()
+                    .Reverse();
+            if (swi == false) {
+                visiblePlayers =
+                    PlayerDB.PlayerInfoList.Where(
+                        p =>
+                            p.TotalTime.TotalSeconds > 0 && p.Rank == ranklookup &&
+                            p.BanStatus.Equals(BanStatus.NotBanned)).OrderBy(c => c.TotalTime).ToArray().Reverse();
             }
-            if (offset >= visiblePlayers.Count())
-            {
+            if (offset >= visiblePlayers.Count()) {
                 offset = Math.Max(0, visiblePlayers.Count() - PlayersPerPage);
             }
             var playersPart = visiblePlayers.Skip(offset).Take(10).ToArray();
-            player.MessagePrefixed("&S   ", "&STop Players: {0}", playersPart.JoinToString((r => String.Format("&n{0}&S (Time: {1})", r.ClassyName, r.TotalTime.ToMiniString()))));
-            if (ranklookup == null)
-            {
-                player.Message("Showing players {0}-{1} (out of {2}).", offset + 1, offset + playersPart.Length, visiblePlayers.Count());
-            }
-            else
-            {
-                player.Message("Showing players in rank ({3}&s) {0}-{1} (out of {2}).", offset + 1, offset + playersPart.Length, visiblePlayers.Count(), ranklookup.ClassyName);
+            player.MessagePrefixed("&S   ", "&STop Players: {0}",
+                playersPart.JoinToString(
+                    (r => String.Format( "&n{0}&S (Time: {1:F2})", r.ClassyName, r.TotalTime.TotalHours )) ) );
+            if (ranklookup == null) {
+                player.Message("Showing players {0}-{1} (out of {2}).", offset + 1, offset + playersPart.Length,
+                    visiblePlayers.Count());
+            } else {
+                player.Message("Showing players in rank ({3}&s) {0}-{1} (out of {2}).", offset + 1,
+                    offset + playersPart.Length, visiblePlayers.Count(), ranklookup.ClassyName);
             }
         }
 
