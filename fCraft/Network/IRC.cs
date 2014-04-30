@@ -1135,50 +1135,42 @@ namespace fCraft
         }
 
 
-        static void ChatSentHandler([CanBeNull] object sender, [NotNull] ChatSentEventArgs args)
-        {
+        private static void ChatSentHandler([CanBeNull] object sender, [NotNull] ChatSentEventArgs args) {
             bool enabled = ConfigKey.IRCBotForwardFromServer.Enabled();
-            switch (args.MessageType)
-            {
+            switch (args.MessageType) {
                 case ChatMessageType.Global:
-                    if (enabled)
-                    {
-                        string IrC = null;
-                        if (args.Player.Info.ReadIRC == false)
-                        {
-                            if (args.Player != Player.Console)
-                            {
-                                IrC = "&7[Ignoring IRC]";
-                            }
-                        }
-                        string formattedMessage = String.Format("{0}{1}: {2}{3}",
-                                                                     args.Player.ClassyName,
-                                                                     ResetCode,
-                                                                     args.Message,
-                                                                     IrC);
-                        SendChannelMessage(formattedMessage);
+                    string worldName = "";
+                    if (args.Player.World != null) {
+                        worldName = String.Format( "&6[\u211C{0}&6]\u211C ", args.Player.World.ClassyName );
                     }
-                    else if (args.Message.StartsWith("#"))
-                    {
-                        string formattedMessage = String.Format("{0}{1}: {2}",
-                                                                 args.Player.ClassyName,
-                                                                 ResetCode,
-                                                                 args.Message.Substring(1));
+                    string ignoreIRC = "";
+                    if (args.Player.Info.ReadIRC == false) {
+                        if (args.Player != Player.Console) {
+                            ignoreIRC = "&7[Ignoring IRC]";
+                        }
+                    }
+                    if (enabled) {
+                        string formattedMessage = String.Format("{4}{0}{1}: {2}{3}", args.Player.ClassyName, ResetCode,
+                            args.Message, ignoreIRC, worldName);
+                        SendChannelMessage(formattedMessage);
+                    } else if (args.Message.StartsWith("#")) {
+                        string formattedMessage = String.Format("{4}{0}{1}: {2}{3}", args.Player.ClassyName, ResetCode,
+                            args.Message.Substring(1), ignoreIRC, worldName);
                         SendChannelMessage(formattedMessage);
                     }
                     break;
 
                 case ChatMessageType.Me:
-                    if (enabled)
-                    {
-                        SendChannelMessage("\u212C&6[&5Me&6][\u211C&5" + args.Player.Name + "\u212C&6] \u211C&0" + args.Message);
+                    if (enabled) {
+                        SendChannelMessage("\u212C&6[&5Me&6][\u211C&5" + args.Player.Name + "\u212C&6] \u211C&0" +
+                                           args.Message);
                     }
                     break;
-            
+
                 case ChatMessageType.Say:
-                    if (enabled)
-                    {
-                        SendChannelMessage("\u212C&6[&2Say&6][\u211C&2" + args.Player.Name + "\u212C&6] \u211C&0" + args.Message);
+                    if (enabled) {
+                        SendChannelMessage("\u212C&6[&2Say&6][\u211C&2" + args.Player.Name + "\u212C&6] \u211C&0" +
+                                           args.Message);
                     }
                     break;
             }

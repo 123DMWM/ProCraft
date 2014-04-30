@@ -207,66 +207,39 @@ namespace fCraft.ServerGUI {
                             initialcolor = '7';
                             break;
                     }
-                    foreach(string msgToAppend in fCraft.Color.LogColors(e.Message, initialcolor)) {
-                        logBox.AppendText(msgToAppend.Remove(0,2));
-                        logBox.Select( oldLength, msgToAppend.Length-2 );
-                        switch (msgToAppend.ToLower()[1])
-                        {
-                            case '0':
-                                logBox.SelectionColor = System.Drawing.Color.FromArgb(32, 32, 32);
-                                break;
+                    foreach (string msgToAppend in Color.LogColors(e.Message, initialcolor)) {
+                        logBox.AppendText(msgToAppend.Remove(0, 2));
+                        logBox.Select(oldLength, msgToAppend.Length - 2);
+                        switch (msgToAppend.ToLower()[1]) {
                             case '1':
-                                logBox.SelectionColor = System.Drawing.Color.FromArgb(0, 0, 170);
-                                break;
-                            case 'y':
-                            case 'r':
                             case '2':
-                                logBox.SelectionColor = System.Drawing.Color.FromArgb(0, 170, 0);
-                                break;
                             case '3':
-                                logBox.SelectionColor = System.Drawing.Color.FromArgb(0, 170, 170);
-                                break;
                             case '4':
-                                logBox.SelectionColor = System.Drawing.Color.FromArgb(170, 0, 0);
-                                break;
+                            case '5':
+                            case '6':
+                            case '7':
+                            case '8':
+                            case '9':
+                            case 'a':
+                            case 'b':
+                            case 'c':
+                            case 'd':
+                            case 'e':
+                            case 's':
+                            case 'y':
+                            case 'p':
+                            case 'r':
+                            case 'h':
+                            case 'w':
                             case 'm':
                             case 'i':
-                            case '5':
-                                logBox.SelectionColor = System.Drawing.Color.FromArgb(170, 0, 170);
+                                logBox.SelectionColor = System.Drawing.Color.FromName( Color.GetName( msgToAppend.ToLower()[1] ) );
                                 break;
-                            case '6':
-                                logBox.SelectionColor = System.Drawing.Color.FromArgb(255, 170, 0);
-                                break;
-                            case '7':
-                                logBox.SelectionColor = System.Drawing.Color.FromArgb(170, 170, 170);
-                                break;
-                            case '8':
-                                logBox.SelectionColor = System.Drawing.Color.FromArgb(85, 85, 85);
-                                break;
-                            case '9':
-                                logBox.SelectionColor = System.Drawing.Color.FromArgb(85, 85, 255);
-                                break;
-                            case 'h':
-                            case 'a':
-                                logBox.SelectionColor = System.Drawing.Color.FromArgb(85, 255, 85);
-                                break;
-                            case 'p':
-                            case 'b':
-                                logBox.SelectionColor = System.Drawing.Color.FromArgb(85, 255, 25);
-                                break;
-                            case 'w':
-                            case 'c':
-                                logBox.SelectionColor = System.Drawing.Color.FromArgb(255, 85, 85);
-                                break;
-                            case 'd':
-                                logBox.SelectionColor = System.Drawing.Color.FromArgb(255, 85, 255);
-                                break;
-                            case 's':
-                            case 'e':
-                                logBox.SelectionColor = System.Drawing.Color.FromArgb(255, 255, 85);
+                            case '0':
+                                logBox.SelectionColor = System.Drawing.Color.FromArgb(64, 64, 64);
                                 break;
                             default:
-                                logBox.SelectionColor = System.Drawing.Color.FromArgb(255, 255, 255);
+                                logBox.SelectionColor = System.Drawing.Color.White;
                                 break;
                         }
                         oldLength = logBox.Text.Length;

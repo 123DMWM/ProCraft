@@ -27,7 +27,6 @@ namespace fCraft
             CommandManager.RegisterCommand(CdSwears);
             CommandManager.RegisterCommand(CdIRC);
             CommandManager.RegisterCommand(CdQuit);
-            CommandManager.RegisterCommand(CdUseless);
             CommandManager.RegisterCommand(CdMail);
             CommandManager.RegisterCommand(CdMailList);
             CommandManager.RegisterCommand(CdIRTR);
@@ -83,63 +82,6 @@ namespace fCraft
             else
             {
                 player.MessageNoAccess(Permission.Say);
-            }
-        }
-
-        #endregion
-        #region Useless
-
-        static readonly CommandDescriptor CdUseless = new CommandDescriptor
-        {
-            Name = "useless",
-            Aliases = new[] { "ul" },
-            Category = CommandCategory.New,
-            NotRepeatable = true,
-            DisableLogging = true,
-            UsableByFrozenPlayers = true,
-            Permissions = new[] { Permission.Chat },
-            Usage = "/Useless",
-            Help = "Counts how many times you have used this command. Can only be used once per hour.",
-            Handler = UselessHandler
-        };
-
-        static void UselessHandler(Player player, CommandReader cmd)
-        {
-            if (player.Info.IsMuted)
-            {
-                player.MessageMuted();
-                return;
-            }
-
-            if (player.DetectChatSpam()) return;
-            double UselessTime = (DateTime.Now - player.Info.LastUsedUseless).TotalMinutes;
-            if (UselessTime < 60)
-            {
-                double LeftOverTime = Math.Round(60 - UselessTime);
-                if (LeftOverTime == 1)
-                {
-                    player.Message("&WYou can use /Useless again in 1 minute.");
-                    return;
-                }
-                else
-                {
-                    player.Message("&WYou can use /Useless again in " + LeftOverTime + " minutes");
-                    return;
-                }
-            }
-            if (player.Info.TimesUsedUseless < 1)
-            {
-                player.Info.TimesUsedUseless = (player.Info.TimesUsedUseless + 1);
-                Server.Message("&sThis is " + player.ClassyName + "&s's first time using Useless command");
-                player.Info.LastUsedUseless = DateTime.Now;
-                PlayerDB.Save();
-            }
-            else
-            {
-                player.Info.TimesUsedUseless = (player.Info.TimesUsedUseless + 1);
-                Chat.SendSay(player, Color.Sys + player.ClassyName + "&s has used the Useless command " + player.Info.TimesUsedUseless + " times");
-                player.Info.LastUsedUseless = DateTime.Now;
-                PlayerDB.Save();
             }
         }
 
@@ -347,13 +289,10 @@ namespace fCraft
 
             if (player.World.Name.ToLower() == "tutorial" && player.LastSignClicked == "sign12" & player.Info.IsBanned != true)
             {
-                PlayerInfo targetInfo;
-                targetInfo = PlayerDB.FindPlayerInfoExact(player.Name);
                 Server.Players.Can(Permission.ReadStaffChat).Message(player.Name + " &sread the rules!");
                 player.Info.HasRTR = true;
                 player.Info.ReadIRC = true;
                 player.JoinWorld(WorldManager.MainWorld, WorldChangeReason.ManualJoin);
-                return;
             }
             else
             {
@@ -448,7 +387,7 @@ namespace fCraft
             Name = "Ignore",
             Category = CommandCategory.Chat,
             IsConsoleSafe = true,
-            Usage = "/Ignore [PlayerName] or [IRC]",
+            Usage = "/Ignore [PlayerName] or IRC",
             Help = "Temporarily blocks the other player from messaging you. " +
                    "If no player name is given, lists all ignored players.",
             Handler = IgnoreHandler
@@ -475,7 +414,7 @@ namespace fCraft
                 }
                 return;
             }
-            if (name != null)
+            if (name != "")
             {
                 if (cmd.HasNext)
                 {
@@ -541,7 +480,7 @@ namespace fCraft
                 }
                 return;
             }
-            if (name != null)
+            if (name != "")
             {
                 if (cmd.HasNext)
                 {
@@ -693,39 +632,41 @@ namespace fCraft
             Handler = IRCHandler
         };
 
-        static void IRCHandler(Player player, CommandReader cmd)
-        {
+        private static void IRCHandler(Player player, CommandReader cmd) {
             string IRCFlag = cmd.Next();
-            if (IRCFlag != null)
-            {
-                if (IRCFlag.ToLower() == "on")
-                {
-                    player.Info.ReadIRC = true;
-                    player.Message("&sYou are now receiving IRC Messages. To disable, type &h/IRC Off&s.");
-                    string message = String.Format("\u212C&6Player {0}&6 is no longer Ignoring IRC", player.ClassyName);
-                    if (!player.Info.IsHidden)
-                    {
-                        IRC.SendChannelMessage(message);
+            if (IRCFlag != null) {
+                if (IRCFlag.ToLower() == "on" || IRCFlag.ToLower() == "true" || IRCFlag.ToLower() == "1" ||
+                    IRCFlag.ToLower() == "yes") {
+                    if (player.Info.ReadIRC == false) {
+                        player.Info.ReadIRC = true;
+                        player.Message("&sYou are now receiving IRC Messages. To disable, type &h/IRC Off&s.");
+                        string message = String.Format("\u212C&6Player {0}&6 is no longer Ignoring IRC",
+                            player.ClassyName);
+                        if (!player.Info.IsHidden) {
+                            IRC.SendChannelMessage(message);
+                        }
+                    } else {
+                        player.Message("&sYou are already receiving IRC messages.");
                     }
-                }
-                else if (IRCFlag.ToLower() == "off")
-                {
-                    player.Info.ReadIRC = false;
-                    player.Message("&sYou are no longer receiving IRC Messages. To enable, type &h/IRC On&s.");
-                    string message = String.Format("\u212C&6Player {0}&6 is now Ignoring IRC", player.ClassyName);
-                    if (!player.Info.IsHidden)
-                    {
-                        IRC.SendChannelMessage(message);
+                } else if (IRCFlag.ToLower() == "off" || IRCFlag.ToLower() == "false" || IRCFlag.ToLower() == "0" ||
+                    IRCFlag.ToLower() == "no") {
+                    if (player.Info.ReadIRC == true) {
+                        player.Info.ReadIRC = false;
+                        player.Message("&sYou are no longer receiving IRC Messages. To enable, type &h/IRC On&s.");
+                        string message = String.Format("\u212C&6Player {0}&6 is now Ignoring IRC", player.ClassyName);
+                        if (!player.Info.IsHidden) {
+                            IRC.SendChannelMessage(message);
+                        }
+                    } else {
+                        player.Message("&sYou are already not receiving IRC messages.");
                     }
-                }
-                else CdIRC.PrintUsage(player);
-            }
-            else
-            {
+                } else CdIRC.PrintUsage(player);
+            } else {
                 if (player.Info.ReadIRC) player.Message("&S  IRC Receive: &AON");
                 else player.Message("&S  IRC Receive: &COFF");
             }
         }
+
         #endregion
         #region Deafen
 
@@ -956,12 +897,12 @@ namespace fCraft
                     {
                         if (timer.Message.Equals(""))
                         {
-                            player.Message("  #{0} \"&7*CountDown*&e\" (started by {2}, {3} left)",
+                            player.Message("  #{0} \"&7*CountDown*&s\" (started by {2}, {3} left)",
                                             timer.ID, timer.Message, timer.StartedBy, timer.TimeLeft.ToMiniString());
                         }
                         else
                         {
-                            player.Message("  #{0} \"{1}&e\" (started by {2}, {3} left)",
+                            player.Message("  #{0} \"{1}&s\" (started by {2}, {3} left)",
                                             timer.ID, timer.Message, timer.StartedBy, timer.TimeLeft.ToMiniString());
                         }
                     }

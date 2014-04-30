@@ -983,24 +983,25 @@ namespace fCraft
 
         /// <summary> Stops the game of CTF.</summary>
         /// <remarks> Also wipes scores.</remarks>		
-        public static void Stop()
-        {
-            try
-            {
-                if (world != null) world.Players.Message("&SThe game has ended! The scores are: \n" + 
-                    "&4Red &7{0}&4:&f{2} &S- &1Blue &7{1}&1:&f{3}", redRoundsWon, blueRoundsWon, redScore, blueScore);
+        public static void Stop() {
+            try {
+                if (world != null)
+                    world.Players.Message(
+                        "&SThe game has ended! The scores are: \n" + "&4Red &7{0}&4:&f{2} &S- &1Blue &7{1}&1:&f{3}",
+                        redRoundsWon, blueRoundsWon, redScore, blueScore);
                 instances = 0;
                 Player.PlacingBlock -= PlayerPlacing;
                 Player.JoinedWorld -= PlayerChangedWorld;
                 Player.Moved -= PlayerMoved;
                 //Remove event handlers.
                 Player[] cache = world.Players;
-                foreach (Player p in cache)
-                {
+                foreach (Player p in cache) {
                     p.IsPlayingCTF = false;
                     p.IsHoldingFlag = false;
-                    if (p.SupportsHeldBlock)
-                    {
+                    if (p.SupportsMessageTypes) {
+                        p.Send(Packet.Message(3, " "));
+                    }
+                    if (p.SupportsHeldBlock) {
                         p.Send(Packet.MakeHoldThis(Block.Stone, false));
                     }
                 }
@@ -1012,9 +1013,7 @@ namespace fCraft
                 redRoundsWon = 0;
                 GameThread.Abort();
                 LavaThread.Abort();
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 Console.WriteLine("Error stopping CTF...");
                 Console.WriteLine("StopCTF: " + ex.Message);
             }

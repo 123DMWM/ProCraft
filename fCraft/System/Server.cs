@@ -866,86 +866,62 @@ namespace fCraft {
         }
 
 
-        static void CheckIdles( SchedulerTask task ) {
-        
+        private static void CheckIdles(SchedulerTask task) {
+
             Player[] tempPlayerList = Players;
-            for (int i = 0; i < tempPlayerList.Length; i++)
-            {
+            for (int i = 0; i < tempPlayerList.Length; i++) {
                 Player player = tempPlayerList[i];
 
                 if (player.lastSolidPos != null && !player.Info.IsAFK && player.SupportsMessageTypes &&
-                    !player.IsPlayingCTF)
-                {
+                    !player.IsPlayingCTF) {
                     double speed = (Math.Sqrt(player.Position.DistanceSquaredTo(player.lastSolidPos))/32);
                     player.Send(Packet.Message((byte) 13, String.Format("&eSpeed: &f{0:N2} &eBlocks/s", speed)));
                     player.Send(Packet.Message(12,
                         player.Position.ToBlockCoordsExt().ToString() +
                         InfoCommands.GetCompassStringType(player.Position.R)));
                 }
-                if (player.IsPlayingCTF && player.SupportsMessageTypes)
-                {
+                if (player.IsPlayingCTF && player.SupportsMessageTypes) {
                     player.Send(Packet.Message(11, ""));
-                    if (((CTF.redRoundsWon*5) + CTF.redScore) > ((CTF.blueRoundsWon*5) + CTF.blueScore))
-                    {
+                    if (((CTF.redRoundsWon*5) + CTF.redScore) > ((CTF.blueRoundsWon*5) + CTF.blueScore)) {
                         player.Send(Packet.Message(13,
                             "&4Red &a" + CTF.redRoundsWon + "&4:&f" + CTF.redScore + " &c<-- &1Blue &a" +
                             CTF.blueRoundsWon + "&1:&f" + CTF.blueScore));
-                    }
-                    else if (((CTF.redRoundsWon*5) + CTF.redScore) < ((CTF.blueRoundsWon*5) + CTF.blueScore))
-                    {
+                    } else if (((CTF.redRoundsWon*5) + CTF.redScore) < ((CTF.blueRoundsWon*5) + CTF.blueScore)) {
                         player.Send(Packet.Message(13,
                             "&4Red &a" + CTF.redRoundsWon + "&4:&f" + CTF.redScore + " &9--> &1Blue &a" +
                             CTF.blueRoundsWon + "&1:&f" + CTF.blueScore));
-                    }
-                    else
-                    {
+                    } else {
                         player.Send(Packet.Message(13,
                             "&4Red &a" + CTF.redRoundsWon + "&4:&f" + CTF.redScore + " &d<=> &1Blue &a" +
                             CTF.blueRoundsWon + "&1:&f" + CTF.blueScore));
                     }
                     var flagholder = player.World.Players.Where(p => p.IsHoldingFlag);
-                    if (flagholder != null)
-                    {
-                        if (CTF.redHasFlag)
-                        {
+                    if (flagholder != null) {
+                        if (CTF.redHasFlag) {
                             player.Send(Packet.Message(12,
                                 flagholder.Take(1)
                                     .JoinToString((r => String.Format("&4{0} &ehas the &1Blue&e flag!", r.Name)))));
-                        }
-                        else if (CTF.blueHasFlag)
-                        {
+                        } else if (CTF.blueHasFlag) {
                             player.Send(Packet.Message(12,
                                 flagholder.Take(1)
                                     .JoinToString((r => String.Format("&1{0} &ehas the &4Red&e flag!", r.Name)))));
-                        }
-                        else
-                        {
+                        } else {
                             player.Send(Packet.Message(12, "&eNo one has the flag!"));
                         }
 
                     }
-                    if (player.Team == "Red")
-                    {
+                    if (player.Team == "Red") {
                         player.Send(Packet.Message(3, "&eTeam: &4Red"));
-                    }
-                    else if (player.Team == "Blue")
-                    {
+                    } else if (player.Team == "Blue") {
                         player.Send(Packet.Message(3, "&eTeam: &1Blue"));
-                    }
-                    else player.Send(Packet.Message(3, "&eTeam: &0None"));
+                    } else player.Send(Packet.Message(3, "&eTeam: &0None"));
                 }
-                if (player.IsPlayingCTF && player.SupportsEnvColors)
-                {
-                    if (((CTF.redRoundsWon*5) + CTF.redScore) > ((CTF.blueRoundsWon*5) + CTF.blueScore))
-                    {
+                if (player.IsPlayingCTF && player.SupportsEnvColors) {
+                    if (((CTF.redRoundsWon*5) + CTF.redScore) > ((CTF.blueRoundsWon*5) + CTF.blueScore)) {
                         player.Send(Packet.MakeEnvSetColor(2, "AA0000"));
-                    }
-                    else if (((CTF.redRoundsWon*5) + CTF.redScore) < ((CTF.blueRoundsWon*5) + CTF.blueScore))
-                    {
+                    } else if (((CTF.redRoundsWon*5) + CTF.redScore) < ((CTF.blueRoundsWon*5) + CTF.blueScore)) {
                         player.Send(Packet.MakeEnvSetColor(2, "0000AA"));
-                    }
-                    else
-                    {
+                    } else {
                         player.Send(Packet.MakeEnvSetColor(2, "AA00AA"));
                     }
                 }
@@ -954,10 +930,8 @@ namespace fCraft {
                 if (player.Info.Rank.IdleKickTimer <= 0) continue;
                 TimeSpan TimeLeft = new TimeSpan(0, player.Info.Rank.IdleKickTimer, 0) - player.IdBotTime;
 
-                if (player.IdBotTime.ToSeconds()%300 == 0 && player.IdBotTime.ToSeconds() >= 300)
-                {
-                    if (player.Info.IsAFK == false)
-                    {
+                if (player.IdBotTime.ToSeconds()%300 == 0 && player.IdBotTime.ToSeconds() >= 300) {
+                    if (player.Info.IsAFK == false) {
                         Server.Players.CanSee(player).Message("&S{0} is now AFK (Auto)", player.Name);
                         player.Info.IsAFK = true;
                         Server.UpdateTabList();
@@ -965,9 +939,7 @@ namespace fCraft {
                         player.Info.Mob = "chicken";
                         player.Message("You have " + TimeLeft.ToMiniString() +
                                        " left before you get kicked for being AFK");
-                    }
-                    else
-                    {
+                    } else {
                         player.Info.IsAFK = true;
                         Server.UpdateTabList();
                         player.Message("You have " + TimeLeft.ToMiniString() +
@@ -975,10 +947,8 @@ namespace fCraft {
                     }
                 }
 
-                if (player.IdBotTime.Minutes >= player.Info.Rank.IdleKickTimer)
-                {
-                    Message("{0}&S was kicked for being idle for {1} min",
-                        player.ClassyName,
+                if (player.IdBotTime.Minutes >= player.Info.Rank.IdleKickTimer) {
+                    Message("{0}&S was kicked for being idle for {1} min", player.ClassyName,
                         player.Info.Rank.IdleKickTimer);
                     string kickReason = "Idle for " + player.Info.Rank.IdleKickTimer + " minutes";
                     player.Kick(Player.Console, kickReason, LeaveReason.IdleKick, false, true, false);
@@ -1177,7 +1147,6 @@ namespace fCraft {
                         sendtome.Message("&d" + Chat.ReplaceTextKeywords(Player.Console, line));
                     }
                 }
-                IRC.SendChannelMessage("&d" + Chat.ReplaceTextKeywords(Player.Console, line));
             }
         }
 

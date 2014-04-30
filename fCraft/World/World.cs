@@ -351,11 +351,6 @@ namespace fCraft {
                     Server.Players.CanSee(player)
                                       .Message("{0}&S joined {1}",
                                                 player.ClassyName, ClassyName);
-
-                    if (player.Info.IsHidden == false)
-                    {
-                        IRC.SendChannelMessage("\u212C&6Player " + player.ClassyName + "&6 joined world " + ClassyName);
-                    }
                 }
 
                 Logger.Log( LogType.UserActivity,

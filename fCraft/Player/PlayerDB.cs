@@ -873,7 +873,6 @@ namespace fCraft {
                     Swap( ref p1.UnbannedBy, ref p2.UnbannedBy );
                     Swap( ref p1.UnbanReason, ref p2.UnbanReason );
                     Swap( ref p1.TimesUsedBot, ref p2.TimesUsedBot );
-                    Swap( ref p1.TimesUsedUseless, ref p2.TimesUsedUseless );
                     Swap( ref p1.PromoCount, ref p2.PromoCount );
                     Swap( ref p1.DemoCount, ref p2.DemoCount );
                     Swap( ref p1.HasRTR, ref p2.HasRTR );

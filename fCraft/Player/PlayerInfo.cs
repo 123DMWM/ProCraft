@@ -91,7 +91,7 @@ namespace fCraft {
         public int PromoCount;
         public int DemoCount;
         public int TimesUsedBot;
-        public int TimesUsedUseless;
+        public int TimesUsedUseless = 0;
         //dummy
 
         /// <summary> Reason for leaving the server last time. </summary>
@@ -610,7 +610,7 @@ namespace fCraft {
             }
             if (fields.Length > 53)
             {
-                Int32.TryParse(fields[53], out info.TimesUsedUseless);
+                //Int32.TryParse(fields[53], out info.TimesUsedUseless);
             }
             if (fields.Length > 54)
             {

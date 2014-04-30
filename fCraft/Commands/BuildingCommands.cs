@@ -1987,7 +1987,7 @@ namespace fCraft {
 
             // no need to set player.drawingInProgress here because this is done on the user thread
             Logger.Log( LogType.UserActivity,
-                        "{0} {1} &sinitiated /Undo affecting {2} blocks (on world {3})",
+                        "Player {0} initiated /Undo affecting {1} blocks (on world {2})",
                         player.Name,
                         undoState.Buffer.Count,
                         playerWorld.Name );

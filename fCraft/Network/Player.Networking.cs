@@ -327,27 +327,19 @@ namespace fCraft {
             BytesReceived += 10;
             byte id = reader.ReadByte();
             Block failsafe;
-            if (this.SupportsHeldBlock)
-            {
-                if (Map.GetBlockByName(id.ToString(), false, out failsafe))
-                {
-                    if (this.Info.heldBlock != failsafe)
-                    {
-                        this.Info.heldBlock = failsafe;
-                        if (this.SupportsMessageTypes && !this.IsPlayingCTF)
-                        {
-                            this.Message(11, "&eBlock:&f" + failsafe.ToString() + " &eID:&f" + failsafe.GetHashCode());                            
+            if (SupportsHeldBlock) {
+                if (Map.GetBlockByName(id.ToString(), false, out failsafe)) {
+                    if (Info.heldBlock != failsafe) {
+                        Info.heldBlock = failsafe;
+                        if (SupportsMessageTypes && !IsPlayingCTF) {
+                            Message(11, "&eBlock:&f" + failsafe.ToString() + " &eID:&f" + failsafe.GetHashCode());
                         }
                     }
+                } else {
+                    Info.heldBlock = Block.Stone;
                 }
-                else
-                {
-                    this.Info.heldBlock = Block.Stone;
-                }
-            }
-            else
-            {
-                this.Info.heldBlock = Block.None;
+            } else {
+                Info.heldBlock = Block.None;
             }
             Position newPos = new Position {
                 X = reader.ReadInt16(),
