@@ -96,7 +96,7 @@ namespace fCraft {
                 if (BotTime > 10)
                 {
                     Server.Players.Message("&6Bot&f: You rank up by building something nice, preferably big. Then ask a staff member for a review.");
-                    IRC.SendChannelMessage("\u212C&6Bot\u211C&0: You rank up by building something nice, preferably big. Then ask a staff member for a review.");
+                    IRC.SendChannelMessage("\u212C&6Bot\u211C: You rank up by building something nice, preferably big. Then ask a staff member for a review.");
                     player.Info.LastTimeUsedBot = DateTime.Now;
                     player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
                 }
@@ -118,7 +118,7 @@ namespace fCraft {
                 if (BotTime > 10)
                 {
                     Server.Players.Message("&6Bot&f: The owner is &3Facepalmed&f.");
-                    IRC.SendChannelMessage("\u212C&6Bot\u211C&0: The owner is &3Facepalmed&0.");
+                    IRC.SendChannelMessage( "\u212C&6Bot\u211C: The owner is &3Facepalmed\u211C." );
                     player.Info.LastTimeUsedBot = DateTime.Now;
                     player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
                 }
@@ -147,8 +147,8 @@ namespace fCraft {
                 BotTime = (DateTime.Now - player.Info.LastTimeUsedBot).TotalSeconds;
                 if (BotTime > 10)
                 {
-                    Server.Players.Message("&6Bot&f: This server is: " + ConfigKey.ServerName.GetString());
-                    IRC.SendChannelMessage("\u212C&6Bot\u211C&0: This server is: " + ConfigKey.ServerName.GetString());
+                    Server.Players.Message("&6Bot&f: The server name is: " + ConfigKey.ServerName.GetString());
+                    IRC.SendChannelMessage("\u212C&6Bot\u211C: The server name is: " + ConfigKey.ServerName.GetString());
                     player.Info.LastTimeUsedBot = DateTime.Now;
                     player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
                 }
@@ -174,7 +174,7 @@ namespace fCraft {
                 if (BotTime > 10)
                 {
                     Server.Players.Message("&6Bot&f: You can build anywhere outside of spawn. Just not on another persons build unless they say you can. ");
-                    IRC.SendChannelMessage("\u212C&6Bot\u211C&0: You can build anywhere outside of spawn. Just not on another persons build unless they say you can. ");
+                    IRC.SendChannelMessage("\u212C&6Bot\u211C: You can build anywhere outside of spawn. Just not on another persons build unless they say you can. ");
                     player.Info.LastTimeUsedBot = DateTime.Now;
                     player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
                 }
@@ -199,14 +199,14 @@ namespace fCraft {
                         meh = player.Info.Rank.NextRankUp.NextRankUp;
                     }
                     Server.Players.Message("&6Bot&f: Your next rank is: " + meh.ClassyName);
-                    IRC.SendChannelMessage("\u212C&6Bot\u211C&0: Your next rank is: " + meh.ClassyName);
+                    IRC.SendChannelMessage("\u212C&6Bot\u211C: Your next rank is: " + meh.ClassyName);
                     player.Info.LastTimeUsedBot = DateTime.Now;
                     player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
                 }
                 else if (player.Info.Rank == RankManager.HighestRank)
                 {
                     Server.Players.Message("&6Bot&f: You are already the highest rank.");
-                    IRC.SendChannelMessage("\u212C&6Bot\u211C&0: You are already the highest rank.");
+                    IRC.SendChannelMessage("\u212C&6Bot\u211C: You are already the highest rank.");
                     player.Info.LastTimeUsedBot = DateTime.Now;
                     player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
                 }
@@ -446,7 +446,7 @@ namespace fCraft {
                                               ChatMessageType.Staff,
                                               recipientList);
 
-            IRC.SendChannelMessage("\u212C&1(IRC+Staff)\u211C&1" + player.Name + "&1: " + rawMessage);
+            IRC.SendChannelMessage("\u212C&P(IRC+Staff)\u211C&P" + player.Name + "&P: " + rawMessage);
 
             if (!SendInternal(e)) return false;
 
@@ -478,7 +478,7 @@ namespace fCraft {
                                               recipientList);
 
             if (!SendInternal(e)) return false;
-            IRC.SendChannelMessage("\u212C&1(IRC+Staff)\u211C&1(IRC)" + player + "&1: " + rawMessage);
+            IRC.SendChannelMessage("\u212C&P(IRC+Staff)\u211C&P(IRC)" + player + "&P: " + rawMessage);
 
             Logger.Log(LogType.GlobalChat,
                         "(IRC+staff)(IRC){0}: {1}",

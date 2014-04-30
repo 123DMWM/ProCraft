@@ -422,17 +422,17 @@ namespace fCraft {
 
                 }
                 Scheduler.NewTask(t => Server.Players.Message("&6Bot&f: 5")).RunManual(TimeSpan.FromSeconds(0));
-                Scheduler.NewTask(t => IRC.SendChannelMessage("\u212C&6Bot\u211C&0: 5")).RunManual(TimeSpan.FromSeconds(0));
+                Scheduler.NewTask(t => IRC.SendChannelMessage("\u212C&6Bot\u211C: 5")).RunManual(TimeSpan.FromSeconds(0));
                 Scheduler.NewTask(t => Server.Players.Message("&6Bot&f: 4")).RunOnce(TimeSpan.FromSeconds(1));
-                Scheduler.NewTask(t => IRC.SendChannelMessage("\u212C&6Bot\u211C&0: 4")).RunManual(TimeSpan.FromSeconds(1));
+                Scheduler.NewTask(t => IRC.SendChannelMessage("\u212C&6Bot\u211C: 4")).RunManual(TimeSpan.FromSeconds(1));
                 Scheduler.NewTask(t => Server.Players.Message("&6Bot&f: 3")).RunOnce(TimeSpan.FromSeconds(2));
-                Scheduler.NewTask(t => IRC.SendChannelMessage("\u212C&6Bot\u211C&0: 3")).RunManual(TimeSpan.FromSeconds(2));
+                Scheduler.NewTask(t => IRC.SendChannelMessage("\u212C&6Bot\u211C: 3")).RunManual(TimeSpan.FromSeconds(2));
                 Scheduler.NewTask(t => Server.Players.Message("&6Bot&f: 2")).RunOnce(TimeSpan.FromSeconds(3));
-                Scheduler.NewTask(t => IRC.SendChannelMessage("\u212C&6Bot\u211C&0: 2")).RunManual(TimeSpan.FromSeconds(3));
+                Scheduler.NewTask(t => IRC.SendChannelMessage("\u212C&6Bot\u211C: 2")).RunManual(TimeSpan.FromSeconds(3));
                 Scheduler.NewTask(t => Server.Players.Message("&6Bot&f: 1")).RunOnce(TimeSpan.FromSeconds(4));
-                Scheduler.NewTask(t => IRC.SendChannelMessage("\u212C&6Bot\u211C&0: 1")).RunManual(TimeSpan.FromSeconds(4));
+                Scheduler.NewTask(t => IRC.SendChannelMessage("\u212C&6Bot\u211C: 1")).RunManual(TimeSpan.FromSeconds(4));
                 Scheduler.NewTask(t => Server.Players.Message("&6Bot&f: Go!")).RunOnce(TimeSpan.FromSeconds(5));
-                Scheduler.NewTask(t => IRC.SendChannelMessage("\u212C&6Bot\u211C&0: Go!")).RunManual(TimeSpan.FromSeconds(5));
+                Scheduler.NewTask(t => IRC.SendChannelMessage("\u212C&6Bot\u211C: Go!")).RunManual(TimeSpan.FromSeconds(5));
                 player.Info.LastTimeUsedBot = DateTime.Now;
                 player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
             }
@@ -444,7 +444,7 @@ namespace fCraft {
 
                 }
                 Server.Players.Message("&6Bot&f: The name of this server is " + ConfigKey.ServerName.GetString() + ".");
-                IRC.SendChannelMessage("\u212C&6Bot\u211C&0: The name of this server is " + ConfigKey.ServerName.GetString() + ".");
+                IRC.SendChannelMessage("\u212C&6Bot\u211C: The name of this server is " + ConfigKey.ServerName.GetString() + ".");
                 player.Info.LastTimeUsedBot = DateTime.Now;
                 player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
             }
@@ -490,7 +490,7 @@ namespace fCraft {
                 }
                 string joker = jokeStrings[RandjokeString.Next(0, jokeStrings.Length)];
                 Server.Players.Message("&6Bot&f: " + joker);
-                IRC.SendChannelMessage("\u212C&6Bot\u211C&0: " + joker.Remove(0, 2));
+                IRC.SendChannelMessage("\u212C&6Bot\u211C: " + joker.Remove(0, 2));
                 player.Info.LastTimeUsedBot = DateTime.Now;
                 player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
             }
@@ -536,7 +536,7 @@ namespace fCraft {
                 }
                 string tipper = tipStrings[RandtipString.Next(0, tipStrings.Length)];
                 Server.Players.Message("&6Bot&f: " + tipper);
-                IRC.SendChannelMessage("\u212C&6Bot\u211C&0: " + tipper.Remove(0, 2));
+                IRC.SendChannelMessage("\u212C&6Bot\u211C: " + tipper.Remove(0, 2));
                 player.Info.LastTimeUsedBot = DateTime.Now;
                 player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
             }
@@ -552,7 +552,7 @@ namespace fCraft {
 
                     }
                     Server.Players.Message("&6Bot&f: " + player.ClassyName + "&f has spent a total of {0:F2}&f hours on this server.", time.TotalHours);
-                    IRC.SendChannelMessage("\u212C&6Bot\u211C&0: " + player.ClassyName + "&0 has spent a total of {0:F2}&0 hours on this server.", time.TotalHours);
+                    IRC.SendChannelMessage( "\u212C&6Bot\u211C: " + player.ClassyName + "\u211C has spent a total of {0:F2}\u211C hours on this server.", time.TotalHours );
                 }
                 else
                 {
@@ -562,7 +562,7 @@ namespace fCraft {
 
                     }
                     Server.Players.Message("&6Bot&f: " + player.ClassyName + "&f has played a total of {0:F2}&f minutes this session.", timenow.TotalMinutes);
-                    IRC.SendChannelMessage("\u212C&6Bot\u211C&0: " + player.ClassyName + "&0 has played a total of {0:F2}&0 minutes this session.", timenow.TotalMinutes);
+                    IRC.SendChannelMessage( "\u212C&6Bot\u211C: " + player.ClassyName + "\u211C has played a total of {0:F2}\u211C minutes this session.", timenow.TotalMinutes );
                 }
 
                 player.Info.LastTimeUsedBot = DateTime.Now;
@@ -577,8 +577,8 @@ namespace fCraft {
                         player.Message("&6Bot&f: This is your first time using &6Bot&e, I suggest you use \"/Help Bot\" to further understand how I work.");
 
                     }
-                    Server.Players.Message("&6Bot&f: " + player.ClassyName + " &fhas promoted " + player.Info.PromoCount.ToString() + " players.");
-                    IRC.SendChannelMessage("\u212C&6Bot\u211C&0: " + player.ClassyName + " &0has promoted " + player.Info.PromoCount.ToString() + " players.");
+                    Server.Players.Message("&6Bot&f: " + player.ClassyName + " &fhas promoted " + player.Info.PromoCount + " players.");
+                    IRC.SendChannelMessage( "\u212C&6Bot\u211C: " + player.ClassyName + " \u211Chas promoted " + player.Info.PromoCount + " players." );
                 }
                 else
                 {
@@ -588,7 +588,7 @@ namespace fCraft {
 
                     }
                     Server.Players.Message("&6Bot&f: " + player.ClassyName + " &fcannot promote players yet");
-                    IRC.SendChannelMessage("\u212C&6Bot\u211C&0: " + player.ClassyName + " &0cannot promote players yet");
+                    IRC.SendChannelMessage( "\u212C&6Bot\u211C: " + player.ClassyName + " \u211Ccannot promote players yet" );
                 }
                 player.Info.LastTimeUsedBot = DateTime.Now;
                 player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
@@ -602,8 +602,8 @@ namespace fCraft {
                         player.Message("&6Bot&f: This is your first time using &6Bot&e, I suggest you use \"/Help Bot\" to further understand how I work.");
 
                     }
-                    Server.Players.Message("&6Bot&f: " + player.ClassyName + " &fhas banned " + player.Info.TimesBannedOthers.ToString() + " players.");
-                    IRC.SendChannelMessage("\u212C&6Bot\u211C&0: " + player.ClassyName + " &0has banned " + player.Info.TimesBannedOthers.ToString() + " players.");
+                    Server.Players.Message("&6Bot&f: " + player.ClassyName + " &fhas banned " + player.Info.TimesBannedOthers + " players.");
+                    IRC.SendChannelMessage( "\u212C&6Bot\u211C: " + player.ClassyName + " \u211Chas banned " + player.Info.TimesBannedOthers + " players." );
                 }
                 else
                 {
@@ -613,7 +613,7 @@ namespace fCraft {
 
                     }
                     Server.Players.Message("&6Bot&f: " + player.ClassyName + " &fcannot ban yet");
-                    IRC.SendChannelMessage("\u212C&6Bot\u211C&0: " + player.ClassyName + " &0cannot ban yet");
+                    IRC.SendChannelMessage( "\u212C&6Bot\u211C: " + player.ClassyName + " \u211Ccannot ban yet" );
                 }
 
                 player.Info.LastTimeUsedBot = DateTime.Now;
@@ -628,8 +628,8 @@ namespace fCraft {
                         player.Message("&6Bot&f: This is your first time using &6Bot&e, I suggest you use \"/Help Bot\" to further understand how I work.");
 
                     }
-                    Server.Players.Message("&6Bot&f: " + player.ClassyName + " &fhas kicked " + player.Info.TimesKickedOthers.ToString() + " players.");
-                    IRC.SendChannelMessage("\u212C&6Bot\u211C&0: " + player.ClassyName + " &0has kicked " + player.Info.TimesKickedOthers.ToString() + " players.");
+                    Server.Players.Message("&6Bot&f: " + player.ClassyName + " &fhas kicked " + player.Info.TimesKickedOthers + " players.");
+                    IRC.SendChannelMessage( "\u212C&6Bot\u211C: " + player.ClassyName + " \u211Chas kicked " + player.Info.TimesKickedOthers + " players." );
                 }
                 else
                 {
@@ -639,7 +639,7 @@ namespace fCraft {
 
                     }
                     Server.Players.Message("&6Bot&f: " + player.ClassyName + " &fcannot kick yet");
-                    IRC.SendChannelMessage("\u212C&6Bot\u211C&0: " + player.ClassyName + " &0cannot kick yet");
+                    IRC.SendChannelMessage( "\u212C&6Bot\u211C: " + player.ClassyName + " \u211Ccannot kick yet" );
                 }
                 player.Info.LastTimeUsedBot = DateTime.Now;
                 player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
@@ -652,8 +652,8 @@ namespace fCraft {
                 }
                 Server.Players.Message("&6Bot&f: It is " + DateTime.Now.ToLongTimeString());
                 Server.Players.Message("&6Bot&f: On a " + DateTime.Now.ToLongDateString());
-                IRC.SendChannelMessage("\u212C&6Bot\u211C&0: It is " + DateTime.Now.ToLongTimeString());
-                IRC.SendChannelMessage("\u212C&6Bot\u211C&0: On a " + DateTime.Now.ToLongDateString());
+                IRC.SendChannelMessage("\u212C&6Bot\u211C: It is " + DateTime.Now.ToLongTimeString());
+                IRC.SendChannelMessage("\u212C&6Bot\u211C: On a " + DateTime.Now.ToLongDateString());
                 player.Info.LastTimeUsedBot = DateTime.Now;
                 player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
             }
@@ -666,7 +666,7 @@ namespace fCraft {
                         player.Message("&6Bot&f: This is your first time using &6Bot&e, I suggest you use \"/Help Bot\" to further understand how I work.");
                     }
                     Server.Players.Message("&6Bot&f: " + player.ClassyName + " &fhas built " + player.Info.BlocksBuilt + " blocks, deleted " + player.Info.BlocksDeleted + " and drew " + player.Info.BlocksDrawn + ".");
-                    IRC.SendChannelMessage("\u212C&6Bot\u211C&0: " + player.ClassyName + " &0has built " + player.Info.BlocksBuilt + " blocks, deleted " + player.Info.BlocksDeleted + " and drew " + player.Info.BlocksDrawn + ".");
+                    IRC.SendChannelMessage( "\u212C&6Bot\u211C: " + player.ClassyName + " \u211Chas built " + player.Info.BlocksBuilt + " blocks, deleted " + player.Info.BlocksDeleted + " and drew " + player.Info.BlocksDrawn + "." );
                 }
                 else
                 {
@@ -675,7 +675,7 @@ namespace fCraft {
                         player.Message("&6Bot&f: This is your first time using &6Bot&e, I suggest you use \"/Help Bot\" to further understand how I work.");
                     }
                     Server.Players.Message("&6Bot&f: " + player.ClassyName + " &fhas built " + player.Info.BlocksBuiltThisGame + " blocks and deleted " + player.Info.BlocksDeletedThisGame + " blocks this session.");
-                    IRC.SendChannelMessage("\u212C&6Bot\u211C&0: " + player.ClassyName + " &0has built " + player.Info.BlocksBuiltThisGame + " blocks and deleted " + player.Info.BlocksDeletedThisGame + " blocks this session.");
+                    IRC.SendChannelMessage( "\u212C&6Bot\u211C: " + player.ClassyName + " \u211Chas built " + player.Info.BlocksBuiltThisGame + " blocks and deleted " + player.Info.BlocksDeletedThisGame + " blocks this session." );
                 }
                 player.Info.LastTimeUsedBot = DateTime.Now;
                 player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
@@ -721,7 +721,7 @@ namespace fCraft {
                 }
                 string facter = factStrings[RandfactString.Next(0, factStrings.Length)];
                 Server.Players.Message("&6Bot&f: " + facter);
-                IRC.SendChannelMessage("\u212C&6Bot\u211C&0: " + facter.Remove(0, 2));
+                IRC.SendChannelMessage("\u212C&6Bot\u211C: " + facter.Remove(0, 2));
                 player.Info.LastTimeUsedBot = DateTime.Now;
                 player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
             }
@@ -1336,12 +1336,12 @@ namespace fCraft {
                     {
                         Server.Players.Message("&6Bot&f: Hey " + targetInfo.ClassyName + "&f!\n" +
                                                "&fCongrats on getting " + newRank.ClassyName + "&f!");
-                        IRC.SendChannelMessage("\u212C&6Bot\u211C&0: Hey " + targetInfo.ClassyName + "&0! Congrats on getting " + newRank.ClassyName + "&0!");
+                        IRC.SendChannelMessage( "\u212C&6Bot\u211C: Hey " + targetInfo.ClassyName + "\u211C! Congrats on getting " + newRank.ClassyName + "\u211C!" );
                     }
                     else if (!targetInfo.IsOnline || targetInfo.IsHidden)
                     {
-                        Server.Players.Message("&6Bot&f: Hey guys! Remember to congrat " + targetInfo.ClassyName + " &f for getting promoted to " + newRank.ClassyName + "&f!");
-                        IRC.SendChannelMessage("\u212C&6Bot\u211C&0: Hey guys! Remember to congrat " + targetInfo.ClassyName + " &0 for getting promoted to " + newRank.ClassyName + "&0!");
+                        Server.Players.Message("&6Bot&f: Hey guys! Remember to congrat " + targetInfo.ClassyName + " &fon getting promoted to " + newRank.ClassyName + "&f!");
+                        IRC.SendChannelMessage( "\u212C&6Bot\u211C: Hey guys! Remember to congrat " + targetInfo.ClassyName + " \u211Con getting promoted to " + newRank.ClassyName + "\u211C!" );
                     }
                 }
             }

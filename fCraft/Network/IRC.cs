@@ -368,11 +368,11 @@ namespace fCraft
                                             .ToArray();
                                             if (visiblePlayers.Count() > 0)
                                             {
-                                                IRC.SendChannelMessage("\u212C&6Players online: \u211C" + visiblePlayers.JoinToRealString());
+                                                SendChannelMessage("\u212C&SPlayers online: \u211C" + visiblePlayers.JoinToRealString());
                                             }
                                             else
                                             {
-                                                IRC.SendChannelMessage("\u212C&6There are no players online.");
+                                                SendChannelMessage("\u212C&SThere are no players online.");
                                             }
                                         }
                                         else if (rawMessage.ToLower() == "!cplayers")
@@ -383,11 +383,11 @@ namespace fCraft
                                             .ToArray();
                                             if (visiblePlayers.Count() > 0)
                                             {
-                                                IRC.SendChannelMessage("\u212C&6Players online: \u211C" + visiblePlayers.JoinToClassyString());
+                                                SendChannelMessage("\u212C&SPlayers online: \u211C" + visiblePlayers.JoinToClassyString());
                                             }
                                             else
                                             {
-                                                IRC.SendChannelMessage("\u212C&6There are no players online.");
+                                                SendChannelMessage("\u212C&SThere are no players online.");
                                             }
                                         }
                                         else if (rawMessage.ToLower().StartsWith("!st"))
@@ -431,7 +431,7 @@ namespace fCraft
                                                 if (target.Info.IsHidden == true)
                                                 {
                                                     // message was sent to a hidden player
-                                                    IRC.SendChannelMessage("\u212C&6No players found matching \"" + otherPlayerName + "\"");
+                                                    SendChannelMessage("\u212C&SNo players found matching \"" + otherPlayerName + "\"");
 
                                                 }
                                                 else
@@ -441,23 +441,23 @@ namespace fCraft
                                                     {
                                                         if (target.Info.IsHidden == false)
                                                         {
-                                                            IRC.SendChannelMessage("\u212C&WCannot PM " + target.ClassyName + "&W: they have IRC ignored.");
+                                                            SendChannelMessage("\u212C&WCannot PM " + target.ClassyName + "&W: they have IRC ignored.");
                                                         }
                                                     }
                                                     else if (target.IsDeaf)
                                                     {
-                                                        IRC.SendChannelMessage("\u212C&6Cannot PM " + target.ClassyName + "&6: they are currently deaf.");
+                                                        SendChannelMessage("\u212C&WCannot PM " + target.ClassyName + "&W: they are currently deaf.");
                                                     }
                                                     else
                                                     {
-                                                        IRC.SendChannelMessage("&1to " + target.Name + ": " + messageText);
+                                                        SendChannelMessage("&Pto " + target.Name + ": " + messageText);
                                                     }
                                                 }
 
                                             }
                                             else if (allPlayers.Length == 0)
                                             {
-                                                IRC.SendChannelMessage("\u212C&6No players found matching \"" + otherPlayerName + "\"");
+                                                SendChannelMessage("\u212C&SNo players found matching \"" + otherPlayerName + "\"");
 
                                             }
                                             else
@@ -467,11 +467,11 @@ namespace fCraft
                                                 int count = itemsEnumerated.Length;
                                                 if (count > 15)
                                                 {
-                                                    IRC.SendChannelMessage("\u212C&6More than " + count + " players matched: " + nameList);
+                                                    SendChannelMessage("\u212C&SMore than " + count + " players matched: " + nameList);
                                                 }
                                                 else
                                                 {
-                                                    IRC.SendChannelMessage("\u212C&6More than one player matched: " + nameList);
+                                                    SendChannelMessage("\u212C&SMore than one player matched: " + nameList);
                                                 }
                                             }
                                         }
@@ -1141,7 +1141,7 @@ namespace fCraft
                 case ChatMessageType.Global:
                     string worldName = "";
                     if (args.Player.World != null) {
-                        worldName = String.Format( "&6[\u211C{0}&6]\u211C ", args.Player.World.ClassyName );
+                        worldName = String.Format( "&S[\u211C{0}&S]\u211C ", args.Player.World.ClassyName );
                     }
                     string ignoreIRC = "";
                     if (args.Player.Info.ReadIRC == false) {
@@ -1162,14 +1162,14 @@ namespace fCraft
 
                 case ChatMessageType.Me:
                     if (enabled) {
-                        SendChannelMessage("\u212C&6[&5Me&6][\u211C&5" + args.Player.Name + "\u212C&6] \u211C&0" +
+                        SendChannelMessage("\u212C&S[&MMe&S][\u211C" + args.Player.Name + "\u212C&S] \u211C" +
                                            args.Message);
                     }
                     break;
 
                 case ChatMessageType.Say:
                     if (enabled) {
-                        SendChannelMessage("\u212C&6[&2Say&6][\u211C&2" + args.Player.Name + "\u212C&6] \u211C&0" +
+                        SendChannelMessage("\u212C&S[&YSay&S][\u211C" + args.Player.Name + "\u212C&S] \u211C" +
                                            args.Message);
                     }
                     break;
@@ -1182,7 +1182,7 @@ namespace fCraft
             if (e == null) throw new ArgumentNullException("e");
             if (ConfigKey.IRCBotAnnounceServerJoins.Enabled() && !e.Player.Info.IsHidden)
             {
-                string message = String.Format("{0}&6Player {1}&6 connected. On world {2}",
+                string message = String.Format("{0}&SPlayer {1}&S connected. On world {2}",
                                                 BoldCode,
                                                 e.Player.ClassyName,
                                                 e.Player.World.ClassyName);
@@ -1245,14 +1245,14 @@ namespace fCraft
         static void ShowPlayerDisconnectedMsg([NotNull] Player player, LeaveReason leaveReason)
         {
             if (player == null) throw new ArgumentNullException("player");
-            string message = String.Format("{0}&6Player {1}&6 left the server ({2})",
+            string message = String.Format("{0}&SPlayer {1}&S left the server ({2})",
                                             BoldCode,
                                             player.ClassyName,
                                             leaveReason);
 
             if (player.usedquit == true)
             {
-                message = String.Format("{0}&6Player {1}&6 left the server ({2})",
+                message = String.Format("{0}&SPlayer {1}&S left the server ({2})",
                                                BoldCode,
                                                player.ClassyName,
                                                player.quitmessage);
@@ -1268,7 +1268,7 @@ namespace fCraft
             if (action == null) throw new ArgumentNullException("action");
             if (target == null) throw new ArgumentNullException("target");
             if (!ConfigKey.IRCBotAnnounceServerEvents.Enabled()) return;
-            string message = String.Format("{0}&wPlayer {1}&W was {2} by {3}&W",
+            string message = String.Format("{0}&WPlayer {1}&W was {2} by {3}&W",
                                             BoldCode,
                                             target.ClassyName,
                                             action,

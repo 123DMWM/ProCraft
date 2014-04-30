@@ -402,7 +402,7 @@ namespace fCraft
                 {
                     player.Info.ReadIRC = false;
                     player.MessageNow("You are now ignoring &iIRC");
-                    string message = String.Format("\u212C&6Player {0}&6 is now Ignoring IRC", player.ClassyName);
+                    string message = String.Format("\u212C&SPlayer {0}&S is now Ignoring IRC", player.ClassyName);
                     if (!player.Info.IsHidden)
                     {
                         IRC.SendChannelMessage(message);
@@ -468,7 +468,7 @@ namespace fCraft
                 {
                     player.Info.ReadIRC = true;
                     player.MessageNow("You are no longer ignoring &iIRC");
-                    string message = String.Format("\u212C&6Player {0}&6 is no longer Ignoring IRC", player.ClassyName);
+                    string message = String.Format("\u212C&SPlayer {0}&S is no longer Ignoring IRC", player.ClassyName);
                     if (!player.Info.IsHidden)
                     {
                         IRC.SendChannelMessage(message);
@@ -608,12 +608,12 @@ namespace fCraft
                 if (num == 69)
                 {
                     Server.Players.Message("&6Bot&f: Tehe....69");
-                    IRC.SendChannelMessage("\u212C&6Bot\u211C&0: Tehe....69");
+                    IRC.SendChannelMessage("\u212C&6Bot\u211C: Tehe....69");
                 }
                 if (num == Server.CountPlayers(false))
                 {
                     Server.Players.Message("&6Bot&f: That's how many players are online :D");
-                    IRC.SendChannelMessage("\u212C&6Bot\u211C&0: That's how many players are online :D");
+                    IRC.SendChannelMessage("\u212C&6Bot\u211C: That's how many players are online :D");
                 }
             }
         }
@@ -640,7 +640,7 @@ namespace fCraft
                     if (player.Info.ReadIRC == false) {
                         player.Info.ReadIRC = true;
                         player.Message("&sYou are now receiving IRC Messages. To disable, type &h/IRC Off&s.");
-                        string message = String.Format("\u212C&6Player {0}&6 is no longer Ignoring IRC",
+                        string message = String.Format("\u212C&SPlayer {0}&S is no longer Ignoring IRC",
                             player.ClassyName);
                         if (!player.Info.IsHidden) {
                             IRC.SendChannelMessage(message);
@@ -653,7 +653,7 @@ namespace fCraft
                     if (player.Info.ReadIRC == true) {
                         player.Info.ReadIRC = false;
                         player.Message("&sYou are no longer receiving IRC Messages. To enable, type &h/IRC On&s.");
-                        string message = String.Format("\u212C&6Player {0}&6 is now Ignoring IRC", player.ClassyName);
+                        string message = String.Format("\u212C&SPlayer {0}&S is now Ignoring IRC", player.ClassyName);
                         if (!player.Info.IsHidden) {
                             IRC.SendChannelMessage(message);
                         }
@@ -928,16 +928,16 @@ namespace fCraft
                         string abortircMsg = "";
                         if (timer.Message.Equals(""))
                         {
-                            abortMsg = String.Format("&e{0}&e aborted a &7CountDown&e with {1} left",
+                            abortMsg = String.Format("&S{0}&S aborted a &7CountDown&S with {1} left",
                                                              player.ClassyName, timer.TimeLeft.ToMiniString());
-                            abortircMsg = String.Format("\u212C&6{0}&6 aborted a &7CountDown&6 with {1} left",
+                            abortircMsg = String.Format("\u212C&S{0}&S aborted a &7CountDown&S with {1} left",
                                                              player.ClassyName, timer.TimeLeft.ToMiniString());
                         }
                         else
                         {
-                            abortMsg = String.Format("&e{0}&e aborted a &7Timer&e with {1} left: &7{2}",
+                            abortMsg = String.Format("&S{0}&S aborted a &7Timer&S with {1} left: &7{2}",
                                                              player.ClassyName, timer.TimeLeft.ToMiniString(), timer.Message);
-                            abortircMsg = String.Format("\u212C&6{0}&6 aborted a &7Timer&6 with {1} left: \u211C&0{2}",
+                            abortircMsg = String.Format( "\u212C&S{0}&S aborted a &7Timer&S with {1} left: \u211C{2}",
                                                              player.ClassyName, timer.TimeLeft.ToMiniString(), timer.Message);
                         }
                         Server.Players.Message(abortMsg);
@@ -983,7 +983,7 @@ namespace fCraft
                 sayMessage = String.Format("&2[&7CountDown Started&2][&7{1}&2] &2-&7{0}",
                                             player.Name,
                                             duration.ToMiniString());
-                ircMessage = String.Format("\u212C&6[&7{1} CountDown Started&6] &6-&0{0}",
+                ircMessage = String.Format( "\u212C&2[&7{1} CountDown Started&2] -\u211C{0}",
                                             player.Name,
                                             duration.ToMiniString());
             }
@@ -993,7 +993,7 @@ namespace fCraft
                                             player.Name,
                                             duration.ToMiniString(),
                                             message);
-                ircMessage = String.Format("\u212C&6[&7{1} Timer Started&6][&7{0}&6] &0{2}",
+                ircMessage = String.Format( "\u212C&2[&7{1} Timer Started&2][&7{0}&2] \u211C{2}",
                                             player.Name,
                                             duration.ToMiniString(),
                                             message);

@@ -445,8 +445,8 @@ namespace fCraft {
 
                         if (otherPlayerName.ToLower() == "irc")
                         {
-                            IRC.SendChannelMessage("&1(PM)" + this.Name + ": " + messageText);
-                            this.Message("&b(PM)" + this.ClassyName + " &b-> IRC&b: " + messageText);
+                            IRC.SendChannelMessage("&P(PM)" + Name + ": " + messageText);
+                            Message("&P(PM)" + this.ClassyName + " &P-> IRC&P: " + messageText);
                             return;
                         }
                         // first, find ALL players (visible and hidden)

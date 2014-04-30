@@ -92,10 +92,10 @@ namespace fCraft {
             if( task.MaxRepeats == 1 ) {
                 if( String.IsNullOrEmpty( timer.Message ) ) {
                     Server.Players.Message("&2[&7CountDown Finished&2]");
-                    IRC.SendChannelMessage("\u212C&6[&7CountDown Finished&6]");
+                    IRC.SendChannelMessage("\u212C&S[&7CountDown Finished&S]");
                 } else {
                     Server.Players.Message("&2[&7Timer Finished&2] &7" + timer.Message);
-                    IRC.SendChannelMessage("\u212C&6[&7Timer Finished&6]\u211C&0 " + timer.Message);
+                    IRC.SendChannelMessage("\u212C&S[&7Timer Finished&S]\u211C " + timer.Message);
                 }
                 //Timer Ends Here.
                 timer.Stop( false );
@@ -116,10 +116,10 @@ namespace fCraft {
         void Announce( TimeSpan timeLeft ) {
             if( String.IsNullOrEmpty( Message ) ) {
                 Server.Players.Message("&2[&7CountDown&2][&7{0}&2]", timeLeft.ToMiniString());
-                IRC.SendChannelMessage("\u212C&6[&7CountDown&6][&7{0}&6]", timeLeft.ToMiniString());
+                IRC.SendChannelMessage("\u212C&S[&7CountDown&S][&7{0}&S]", timeLeft.ToMiniString());
             } else {
-                Server.Players.Message( String.Format("&2[&7Timer&2][&7{0}&2] &7{1} &2-&7{2}", timeLeft.ToMiniString(), Message, StartedBy));
-                IRC.SendChannelMessage("\u212C&6[&7Timer&6]" + String.Format("[&7{2}&6][&7{0}&6]\u211C&0 {1}", timeLeft.ToMiniString(), Message, StartedBy));
+                Server.Players.Message("&2[&7Timer&2][&7{0}&2] &7{1} &2-&7{2}", timeLeft.ToMiniString(), Message, StartedBy);
+                IRC.SendChannelMessage("\u212C&S[&7Timer&S][&7{2}&S][&7{0}&S]\u211C {1}", timeLeft.ToMiniString(), Message, StartedBy);
             }
         }
 
