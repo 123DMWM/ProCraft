@@ -81,19 +81,11 @@ namespace fCraft {
                 player.ParseMessage("/bot IgnoreMeThisIsJustAFailSafe!@# " + rawMessage.Remove(0, 4), false);
             }
             double BotTime;
-            if (rawMessage.ToLower().Equals("how do i rank up?")
-                || rawMessage.ToLower().Equals("how do i rank up")
-                || rawMessage.ToLower().Equals("how do i rank?")
-                || rawMessage.ToLower().Equals("how do i rank")
-                || rawMessage.ToLower().Equals("how to rank up?")
-                || rawMessage.ToLower().Equals("how to rank up")
-                || rawMessage.ToLower().Equals("how do rank up?")
-                || rawMessage.ToLower().Equals("how do rank up")
-                || rawMessage.ToLower().Equals("how rank up?")
-                || rawMessage.ToLower().Equals("how rank up"))
+            
+            if (LDistance(rawMessage.ToLower(), "how do i rank up?") <= 0.5)
             {
                 BotTime = (DateTime.Now - player.Info.LastTimeUsedBot).TotalSeconds;
-                if (BotTime > 10)
+                if (BotTime > 5)
                 {
                     Server.Players.Message("&6Bot&f: You rank up by building something nice, preferably big. Then ask a staff member for a review.");
                     IRC.SendChannelMessage("\u212C&6Bot\u211C: You rank up by building something nice, preferably big. Then ask a staff member for a review.");
@@ -101,51 +93,25 @@ namespace fCraft {
                     player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
                 }
             }
-            if (rawMessage.ToLower().Equals("who is the owner?")
-                || rawMessage.ToLower().Equals("who is the owner")
-                || rawMessage.ToLower().Equals("who is owner?")
-                || rawMessage.ToLower().Equals("who is owner")
-                || rawMessage.ToLower().Equals("who owner?")
-                || rawMessage.ToLower().Equals("who owner")
-                || rawMessage.ToLower().Equals("who the owner?")
-                || rawMessage.ToLower().Equals("who the owner")
-                || rawMessage.ToLower().Equals("who's the owner?")
-                || rawMessage.ToLower().Equals("who's the owner")
-                || rawMessage.ToLower().Equals("whos the owner?")
-                || rawMessage.ToLower().Equals("whos the owner"))
+            if (LDistance(rawMessage.ToLower(), "who is the owner?") <= 0.5)
             {
                 BotTime = (DateTime.Now - player.Info.LastTimeUsedBot).TotalSeconds;
-                if (BotTime > 10)
+                if (BotTime > 5)
                 {
-                    Server.Players.Message("&6Bot&f: The owner is &3Facepalmed&f.");
-                    IRC.SendChannelMessage( "\u212C&6Bot\u211C: The owner is &3Facepalmed\u211C." );
+                    var all = PlayerDB.PlayerInfoList.Where(w => w.Rank == RankManager.HighestRank).OrderBy( p => p.TimeSinceFirstLogin ).Reverse();
+                    var closest = all.Take( 1 ).ToArray();
+                    PlayerInfo test = closest[0];
+                    Server.Players.Message("&6Bot&f: The owner is {0}", test.ClassyName);
+                    IRC.SendChannelMessage( "\u212C&6Bot\u211C: The owner is {0}", test.ClassyName );
                     player.Info.LastTimeUsedBot = DateTime.Now;
                     player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
                 }
             }
-            if (rawMessage.ToLower().Equals("what server is this?")
-                || rawMessage.ToLower().Equals("what server is this")
-                || rawMessage.ToLower().Equals("what's this server called?")
-                || rawMessage.ToLower().Equals("what's this server called")
-                || rawMessage.ToLower().Equals("whats this server called?")
-                || rawMessage.ToLower().Equals("whats this server called")
-                || rawMessage.ToLower().Equals("what is this server called?")
-                || rawMessage.ToLower().Equals("what is this server called")
-                || rawMessage.ToLower().Equals("what's the name of the server?")
-                || rawMessage.ToLower().Equals("what's the name of the server")
-                || rawMessage.ToLower().Equals("whats the name of the server?")
-                || rawMessage.ToLower().Equals("whats the name of the server")
-                || rawMessage.ToLower().Equals("what is the name of this server?")
-                || rawMessage.ToLower().Equals("what is the name of this server")
-                || rawMessage.ToLower().Equals("what's the server name?")
-                || rawMessage.ToLower().Equals("what's the server name")
-                || rawMessage.ToLower().Equals("whats the server name?")
-                || rawMessage.ToLower().Equals("whats the server name")
-                || rawMessage.ToLower().Equals("what is the server name?")
-                || rawMessage.ToLower().Equals("what is the server name"))
+            if (LDistance( rawMessage.ToLower(), "what is this server called?" ) <= 0.5
+                || LDistance( rawMessage.ToLower(), "what is the name of this server?" ) <= 0.5)
             {
                 BotTime = (DateTime.Now - player.Info.LastTimeUsedBot).TotalSeconds;
-                if (BotTime > 10)
+                if (BotTime > 5)
                 {
                     Server.Players.Message("&6Bot&f: The server name is: " + ConfigKey.ServerName.GetString());
                     IRC.SendChannelMessage("\u212C&6Bot\u211C: The server name is: " + ConfigKey.ServerName.GetString());
@@ -153,25 +119,10 @@ namespace fCraft {
                     player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
                 }
             }
-            if (rawMessage.ToLower().Equals("where do i build?")
-                || rawMessage.ToLower().Equals("where do i build")
-                || rawMessage.ToLower().Equals("were do i build?")
-                || rawMessage.ToLower().Equals("were do i build")
-                || rawMessage.ToLower().Equals("where to build?")
-                || rawMessage.ToLower().Equals("where to build")
-                || rawMessage.ToLower().Equals("where do build?")
-                || rawMessage.ToLower().Equals("where do build")
-                || rawMessage.ToLower().Equals("were to build?")
-                || rawMessage.ToLower().Equals("were to build")
-                || rawMessage.ToLower().Equals("were do build?")
-                || rawMessage.ToLower().Equals("were do build")
-                || rawMessage.ToLower().Equals("where can i build?")
-                || rawMessage.ToLower().Equals("where can i build")
-                || rawMessage.ToLower().Equals("were can i build?")
-                || rawMessage.ToLower().Equals("were can i build"))
+            if (LDistance( rawMessage.ToLower(), "where can i build?" ) <= 0.5)
             {
                 BotTime = (DateTime.Now - player.Info.LastTimeUsedBot).TotalSeconds;
-                if (BotTime > 10)
+                if (BotTime > 5)
                 {
                     Server.Players.Message("&6Bot&f: You can build anywhere outside of spawn. Just not on another persons build unless they say you can. ");
                     IRC.SendChannelMessage("\u212C&6Bot\u211C: You can build anywhere outside of spawn. Just not on another persons build unless they say you can. ");
@@ -179,32 +130,19 @@ namespace fCraft {
                     player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
                 }
             }
-            if (rawMessage.ToLower().Equals("what is my next rank?")
-                || rawMessage.ToLower().Equals("what is my next rank")
-                || rawMessage.ToLower().Equals("wat is my next rank?")
-                || rawMessage.ToLower().Equals("wat is my next rank")
-                || rawMessage.ToLower().Equals("what is next rank?")
-                || rawMessage.ToLower().Equals("what is next rank")
-                || rawMessage.ToLower().Equals("wat is next rank?")
-                || rawMessage.ToLower().Equals("wat is next rank")
-                || rawMessage.ToLower().Equals("what rank is after this?")
-                || rawMessage.ToLower().Equals("what rank is after this"))
-            {
+            if (LDistance(rawMessage.ToLower(), "what is my next rank?") <= 0.5 ||
+                LDistance(rawMessage.ToLower(), "what rank is after this one?") <= 0.5) {
                 BotTime = (DateTime.Now - player.Info.LastTimeUsedBot).TotalSeconds;
                 Rank meh = player.Info.Rank.NextRankUp;
-                if (BotTime > 10 && player.Info.Rank != RankManager.HighestRank)
-                {
-                    if (meh.Name.ToLower().Equals("donor") || meh.Name.ToLower().Equals("hero"))
-                    {
+                if (BotTime > 5 && player.Info.Rank != RankManager.HighestRank) {
+                    if (meh.Name.ToLower().Equals("donor") || meh.Name.ToLower().Equals("hero")) {
                         meh = player.Info.Rank.NextRankUp.NextRankUp;
                     }
                     Server.Players.Message("&6Bot&f: Your next rank is: " + meh.ClassyName);
                     IRC.SendChannelMessage("\u212C&6Bot\u211C: Your next rank is: " + meh.ClassyName);
                     player.Info.LastTimeUsedBot = DateTime.Now;
                     player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
-                }
-                else if (player.Info.Rank == RankManager.HighestRank)
-                {
+                } else if (player.Info.Rank == RankManager.HighestRank) {
                     Server.Players.Message("&6Bot&f: You are already the highest rank.");
                     IRC.SendChannelMessage("\u212C&6Bot\u211C: You are already the highest rank.");
                     player.Info.LastTimeUsedBot = DateTime.Now;
@@ -217,6 +155,45 @@ namespace fCraft {
             return true;
         }
 
+        public static float LDistance( string s, string t ) {
+            // degenerate cases
+            if (s == t)
+                return 0;
+            if (s.Length == 0)
+                return 1;
+            if (t.Length == 0)
+                return 1;
+
+            // create two work vectors of integer distances
+            int[] v0 = new int[t.Length + 1];
+            int[] v1 = new int[t.Length + 1];
+
+            // initialize v0 (the previous row of distances)
+            // this row is A[0][i]: edit distance for an empty s
+            // the distance is just the number of characters to delete from t
+            for (int i = 0; i < v0.Length; i++)
+                v0[i] = i;
+
+            for (int i = 0; i < s.Length; i++) {
+                // calculate v1 (current row distances) from the previous row v0
+
+                // first element of v1 is A[i+1][0]
+                //   edit distance is delete (i+1) chars from s to match empty t
+                v1[0] = i + 1;
+
+                // use formula to fill in the rest of the row
+                for (int j = 0; j < t.Length; j++) {
+                    var cost = (s[i] == t[j]) ? 0 : 1;
+                    v1[j + 1] = Math.Min( v1[j] + 1, v0[j + 1] + 1 );
+                    v1[j + 1] = Math.Min( v1[j + 1], v0[j] + cost );
+                }
+
+                // copy v1 (current row) to v0 (previous row) for next iteration
+                for (int j = 0; j < v0.Length; j++)
+                    v0[j] = v1[j];
+            }
+            return (((float)v1[t.Length]) / ((float)(s.Length + t.Length) / 2));
+        }
 
         /// <summary> Sends an action message (/Me). </summary>
         /// <param name="player"> Player writing the message. </param>

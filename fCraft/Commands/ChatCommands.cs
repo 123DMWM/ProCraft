@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Configuration;
+using System.Runtime.ExceptionServices;
 using fCraft;
 
 namespace fCraft
@@ -34,6 +36,7 @@ namespace fCraft
             CommandManager.RegisterCommand(CdGreeting);
             CommandManager.RegisterCommand(CdIRCStaff);
             CommandManager.RegisterCommand(Cdchat);
+            CommandManager.RegisterCommand(CdLdis);
 
 
             Player.Moved += new EventHandler<Events.PlayerMovedEventArgs>(Player_IsBack);
@@ -1272,6 +1275,34 @@ namespace fCraft
                 player.Message("Error: LastPlayer == null");
             }
             return;
+        }
+
+        #endregion
+        #region difference
+
+        static readonly CommandDescriptor CdLdis = new CommandDescriptor {
+            Name = "Compare",
+            Aliases = new[] { "similarity", "similar", "sim" },
+            Category = CommandCategory.New,
+            Permissions = new[] { Permission.Chat },
+            IsConsoleSafe = true,
+            DisableLogging = true,
+            UsableByFrozenPlayers = true,
+            Usage = "/Compare [Word1] [Word2]",
+            Help = "Tells you how similar two words are as a percentage",
+            Handler = LdisHandler
+        };
+
+        static void LdisHandler( Player player, CommandReader cmd ) {
+            string first = cmd.Next();
+            string second = cmd.Next();
+            if (first == null) 
+                first = "";
+            if (second == null) 
+                second = "";
+            float diff = (1 - Chat.LDistance(first, second)) * 100;
+            player.Message("Similarity: &f" + diff +"&s%");
+            player.Message("&7{0} &s<=> &7{1}", first, second);
         }
 
         #endregion
