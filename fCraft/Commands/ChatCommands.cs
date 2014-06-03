@@ -1298,7 +1298,12 @@ namespace fCraft
                     return;
                 }
             }
-            player.Send(Packet.MakeSetTextHotKey(Label, Action, KeyCode, KeyMod));
+            if (player.SupportsTextHotKey) {
+                player.Send(Packet.MakeSetTextHotKey(Label, Action, KeyCode, KeyMod));
+            } else {
+                player.Message("You do not support TextHotKey");
+                return;
+            }
         }
 
         #endregion

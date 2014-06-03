@@ -2013,6 +2013,8 @@ namespace fCraft {
         const int HackControlExtVersion = 1;
         const string EmoteFixExtName = "EmoteFix";
         const int EmoteFixExtVersion = 1;
+        const string TextHotKeyExtName = "TextHotKey";
+        const int TextHotKeyExtVersion = 1;
 
         // Note: if more levels are added, change UsesCustomBlocks from bool to int
         public bool UsesCustomBlocks { get; set; }
@@ -2028,12 +2030,13 @@ namespace fCraft {
         public bool SupportsMessageTypes { get; set; }
         public bool SupportsHackControl { get; set; }
         public bool SupportsEmoteFix { get; set; }
+        public bool SupportsTextHotKey { get; set; }
         string ClientName { get; set; }
 
         bool NegotiateProtocolExtension()
         {
             // write our ExtInfo and ExtEntry packets
-            writer.Write(Packet.MakeExtInfo("ProCraft", 13).Bytes);
+            writer.Write(Packet.MakeExtInfo("ProCraft", 14).Bytes);
             writer.Write(Packet.MakeExtEntry(CustomBlocksExtName, CustomBlocksExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(BlockPermissionsExtName, BlockPermissionsExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(ClickDistanceExtName, ClickDistanceExtVersion).Bytes);
@@ -2047,6 +2050,7 @@ namespace fCraft {
             writer.Write(Packet.MakeExtEntry(MessageTypesExtName, MessageTypesExtVersion).Bytes);
             writer.Write( Packet.MakeExtEntry( HackControlExtName, HackControlExtVersion ).Bytes );
             writer.Write( Packet.MakeExtEntry( EmoteFixExtName, EmoteFixExtVersion ).Bytes );
+            writer.Write( Packet.MakeExtEntry( TextHotKeyExtName, TextHotKeyExtVersion ).Bytes );
 
             // Expect ExtInfo reply from the client
             OpCode extInfoReply = reader.ReadOpCode();
@@ -2125,6 +2129,10 @@ namespace fCraft {
                 if (extName == EmoteFixExtName && extVersion == EmoteFixExtVersion) {
                     SupportsEmoteFix = true;
                     clientExts.Add(extName + " " + extVersion);
+                }
+                if (extName == TextHotKeyExtName && extVersion == TextHotKeyExtVersion) {
+                    SupportsTextHotKey = true;
+                    clientExts.Add( extName + " " + extVersion );
                 }
             }
 
