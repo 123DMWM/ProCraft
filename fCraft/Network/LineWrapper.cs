@@ -37,7 +37,8 @@ namespace fCraft
         byte color,         // color that the next inserted character should be
              lastColor;     // used to detect duplicate color codes
 
-        byte type = 0;        // color that the next inserted character should be
+        byte type = 0;        // messagetype cpe spec
+        bool emoteFix = false;        // wether or not the client supports emotefix
 
         bool endsWithSymbol; // used to guarantee suffixes for symbols ("emotes")
 
@@ -62,32 +63,37 @@ namespace fCraft
         bool wrapEndsWithSymbol; // value of "endsWithSymbol" field at the wrapping point
 
 
-        LineWrapper([NotNull] string message)
-        {
-            if (message == null) throw new ArgumentNullException("message");
-            input = Encoding.ASCII.GetBytes(message);
+        LineWrapper( [NotNull] string message, bool emotefix ) {
+            if (message == null)
+                throw new ArgumentNullException( "message" );
+            input = Encoding.ASCII.GetBytes( message );
             prefix = DefaultPrefix;
+            emoteFix = emotefix;
             Reset();
         }
 
-        LineWrapper([NotNull] byte messageType, [NotNull] string message)
-        {
-            if (messageType == null) throw new ArgumentNullException("messageType");
-            if (message == null) throw new ArgumentNullException("message");
+        LineWrapper( [NotNull] byte messageType, [NotNull] string message, bool emotefix ) {
+            if (messageType == null)
+                throw new ArgumentNullException( "messageType" );
+            if (message == null)
+                throw new ArgumentNullException( "message" );
             type = messageType;
-            input = Encoding.ASCII.GetBytes(message);
+            input = Encoding.ASCII.GetBytes( message );
             prefix = DefaultPrefix;
+            emoteFix = emotefix;
             Reset();
         }
 
-
-        LineWrapper([NotNull] string prefixString, [NotNull] string message)
-        {
-            if (prefixString == null) throw new ArgumentNullException("prefixString");
-            prefix = Encoding.ASCII.GetBytes(prefixString);
-            if (prefix.Length > MaxPrefixSize) throw new ArgumentException("Prefix too long", "prefixString");
-            if (message == null) throw new ArgumentNullException("message");
-            input = Encoding.ASCII.GetBytes(message);
+        LineWrapper( [NotNull] string prefixString, [NotNull] string message, bool emotefix ) {
+            if (prefixString == null)
+                throw new ArgumentNullException( "prefixString" );
+            prefix = Encoding.ASCII.GetBytes( prefixString );
+            if (prefix.Length > MaxPrefixSize)
+                throw new ArgumentException( "Prefix too long", "prefixString" );
+            if (message == null)
+                throw new ArgumentNullException( "message" );
+            input = Encoding.ASCII.GetBytes( message );
+            emoteFix = emotefix;
             Reset();
         }
 
@@ -294,16 +300,9 @@ namespace fCraft
             {
                 output[i] = (byte)' ';
             }
-            if (endsWithSymbol)
+            if (endsWithSymbol && !emoteFix)
             {
-                if (ConfigKey.MoveEmoteDotToEndOfMessage.Enabled())
-                {
-                    output[65] = EmotePostfix;
-                }
-                else
-                {
-                    output[outputIndex] = EmotePostfix;
-                }
+                output[outputIndex] = EmotePostfix;
             }
 #if DEBUG_LINE_WRAPPER
             Console.WriteLine( "\"" + Encoding.ASCII.GetString( output, outputStart, outputIndex - outputStart ) + "\"" );
@@ -512,28 +511,23 @@ namespace fCraft
 
         #endregion
 
-
         /// <summary> Creates a new line wrapper for a given raw string. </summary>
         /// <exception cref="ArgumentNullException"> message is null. </exception>
-        public static IEnumerable<Packet> Wrap(string message)
-        {
-            return new LineWrapper(message);
+        public static IEnumerable<Packet> Wrap( string message, bool emotefix ) {
+            return new LineWrapper( message, emotefix );
         }
 
         /// <summary> Creates a new line wrapper for a given raw string. </summary>
         /// <exception cref="ArgumentNullException"> message is null. </exception>
-        public static IEnumerable<Packet> Wrap(byte messageType, string message)
-        {
-            return new LineWrapper(messageType, message);
+        public static IEnumerable<Packet> Wrap( byte messageType, string message, bool emotefix ) {
+            return new LineWrapper( messageType, message, emotefix );
         }
-
-
+        
         /// <summary> Creates a new line wrapper for a given raw string. </summary>
         /// <exception cref="ArgumentNullException"> prefix or message is null. </exception>
         /// <exception cref="ArgumentException"> prefix length exceeds maximum allowed value (48 characters). </exception>
-        public static IEnumerable<Packet> WrapPrefixed(string prefix, string message)
-        {
-            return new LineWrapper(prefix, message);
+        public static IEnumerable<Packet> WrapPrefixed( string prefix, string message, bool emotefix ) {
+            return new LineWrapper( prefix, message, emotefix );
         }
     }
 }

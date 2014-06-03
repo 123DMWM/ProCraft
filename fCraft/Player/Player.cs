@@ -616,11 +616,11 @@ namespace fCraft {
             if( this == Console ) {
                 Logger.LogToConsole( message );
             } else if( IsUsingWoM ) {
-                foreach( Packet p in LineWrapper.WrapPrefixed( WoMAlertPrefix, WoMAlertPrefix + Color.Sys + message ) ) {
+                foreach (Packet p in LineWrapper.WrapPrefixed( WoMAlertPrefix, WoMAlertPrefix + Color.Sys + message, SupportsEmoteFix )) {
                     Send( p );
                 }
             } else {
-                foreach( Packet p in LineWrapper.Wrap( Color.Sys + message ) ) {
+                foreach (Packet p in LineWrapper.Wrap( Color.Sys + message, SupportsEmoteFix )) {
                     Send( p );
                 }
             }
@@ -643,7 +643,7 @@ namespace fCraft {
             if( IsSuper ) {
                 Logger.LogToConsole( message );
             } else {
-                foreach( Packet p in LineWrapper.Wrap(Color.Sys + message ) ) {
+                foreach (Packet p in LineWrapper.Wrap( Color.Sys + message, SupportsEmoteFix )) {
                     Send( p );
                 }
             }
@@ -672,7 +672,7 @@ namespace fCraft {
             }
             else
             {
-                foreach (Packet p in LineWrapper.Wrap(messageType, message))
+                foreach (Packet p in LineWrapper.Wrap( messageType, message, SupportsEmoteFix ))
                 {
                     Send(p);
                 }
@@ -697,7 +697,7 @@ namespace fCraft {
             if( this == Console ) {
                 Logger.LogToConsole( message );
             } else {
-                foreach( Packet p in LineWrapper.WrapPrefixed( prefix, message ) ) {
+                foreach (Packet p in LineWrapper.WrapPrefixed( prefix, message, SupportsEmoteFix )) {
                     Send( p );
                 }
             }
@@ -718,7 +718,7 @@ namespace fCraft {
                 if( Thread.CurrentThread != ioThread ) {
                     throw new InvalidOperationException( "SendNow may only be called from player's own thread." );
                 }
-                foreach( Packet p in LineWrapper.Wrap( Color.Sys + message ) ) {
+                foreach (Packet p in LineWrapper.Wrap( Color.Sys + message, SupportsEmoteFix )) {
                     SendNow( p );
                 }
             }
@@ -740,7 +740,7 @@ namespace fCraft {
                 if( Thread.CurrentThread != ioThread ) {
                     throw new InvalidOperationException( "SendNow may only be called from player's own thread." );
                 }
-                foreach( Packet p in LineWrapper.WrapPrefixed( prefix, message ) ) {
+                foreach (Packet p in LineWrapper.WrapPrefixed( prefix, message, SupportsEmoteFix )) {
                     Send( p );
                 }
             }
@@ -2011,6 +2011,8 @@ namespace fCraft {
         const int MessageTypesExtVersion = 1;
         const string HackControlExtName = "HackControl";
         const int HackControlExtVersion = 1;
+        const string EmoteFixExtName = "EmoteFix";
+        const int EmoteFixExtVersion = 1;
 
         // Note: if more levels are added, change UsesCustomBlocks from bool to int
         public bool UsesCustomBlocks { get; set; }
@@ -2025,12 +2027,13 @@ namespace fCraft {
         public bool SupportsSelectionCuboid { get; set; }
         public bool SupportsMessageTypes { get; set; }
         public bool SupportsHackControl { get; set; }
+        public bool SupportsEmoteFix { get; set; }
         string ClientName { get; set; }
 
         bool NegotiateProtocolExtension()
         {
             // write our ExtInfo and ExtEntry packets
-            writer.Write(Packet.MakeExtInfo("ProCraft", 12).Bytes);
+            writer.Write(Packet.MakeExtInfo("ProCraft", 13).Bytes);
             writer.Write(Packet.MakeExtEntry(CustomBlocksExtName, CustomBlocksExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(BlockPermissionsExtName, BlockPermissionsExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(ClickDistanceExtName, ClickDistanceExtVersion).Bytes);
@@ -2042,7 +2045,8 @@ namespace fCraft {
             writer.Write(Packet.MakeExtEntry(ExtPlayerListExtName, ExtPlayerListExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(SelectionCuboidExtName, SelectionCuboidExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(MessageTypesExtName, MessageTypesExtVersion).Bytes);
-            writer.Write(Packet.MakeExtEntry(HackControlExtName, HackControlExtVersion).Bytes);
+            writer.Write( Packet.MakeExtEntry( HackControlExtName, HackControlExtVersion ).Bytes );
+            writer.Write( Packet.MakeExtEntry( EmoteFixExtName, EmoteFixExtVersion ).Bytes );
 
             // Expect ExtInfo reply from the client
             OpCode extInfoReply = reader.ReadOpCode();
@@ -2061,73 +2065,65 @@ namespace fCraft {
             for (int i = 0; i < expectedEntries; i++) {
                 // Expect ExtEntry replies (0 or more)
                 OpCode extEntryReply = reader.ReadOpCode();
-                if (extEntryReply != OpCode.ExtEntry)
-                {
-                    Logger.Log(LogType.Warning, "Player {0} from {1}: Unexpected ExtEntry reply ({2})", Name, IP, extInfoReply);
+                if (extEntryReply != OpCode.ExtEntry) {
+                    Logger.Log(LogType.Warning, "Player {0} from {1}: Unexpected ExtEntry reply ({2})", Name, IP,
+                        extInfoReply);
                     return false;
                 }
                 string extName = reader.ReadString();
                 int extVersion = reader.ReadInt32();
                 //Logger.Log(LogType.Debug, "Expected: {0} / Received: {1} {2} {3}", OpCode.ExtEntry, extEntryReply, extName, extVersion);
-                if (extName == CustomBlocksExtName && extVersion == CustomBlocksExtVersion)
-                {
+                if (extName == CustomBlocksExtName && extVersion == CustomBlocksExtVersion) {
                     // Hooray, client supports custom blocks! We still need to check support level.
                     UsesCustomBlocks = true;
                     clientExts.Add(extName + " " + extVersion);
                 }
-                if (extName == BlockPermissionsExtName && extVersion == BlockPermissionsExtVersion)
-                {
+                if (extName == BlockPermissionsExtName && extVersion == BlockPermissionsExtVersion) {
                     this.SupportsBlockPermissions = true;
                     clientExts.Add(extName + " " + extVersion);
                 }
-                if (extName == ClickDistanceExtName && extVersion == ClickDistanceExtVersion)
-                {
+                if (extName == ClickDistanceExtName && extVersion == ClickDistanceExtVersion) {
                     this.SupportsClickDistance = true;
                     clientExts.Add(extName + " " + extVersion);
                 }
-                if (extName == EnvColorsExtName && extVersion == EnvColorsExtVersion)
-                {
+                if (extName == EnvColorsExtName && extVersion == EnvColorsExtVersion) {
                     this.SupportsEnvColors = true;
                     clientExts.Add(extName + " " + extVersion);
                 }
-                if (extName == ChangeModelExtName && extVersion == ChangeModelExtVersion)
-                {
+                if (extName == ChangeModelExtName && extVersion == ChangeModelExtVersion) {
                     this.SupportsChangeModel = true;
                     clientExts.Add(extName + " " + extVersion);
                 }
-                if (extName == EnvMapAppearanceExtName && extVersion == EnvMapAppearanceExtVersion)
-                {
+                if (extName == EnvMapAppearanceExtName && extVersion == EnvMapAppearanceExtVersion) {
                     this.SupportsEnvMapAppearance = true;
                     clientExts.Add(extName + " " + extVersion);
                 }
-                if (extName == EnvWeatherTypeExtName && extVersion == EnvWeatherTypeExtVersion)
-                {
+                if (extName == EnvWeatherTypeExtName && extVersion == EnvWeatherTypeExtVersion) {
                     this.SupportsEnvWeatherType = true;
                     clientExts.Add(extName + " " + extVersion);
                 }
-                if (extName == HeldBlockExtName && extVersion == HeldBlockExtVersion)
-                {
+                if (extName == HeldBlockExtName && extVersion == HeldBlockExtVersion) {
                     this.SupportsHeldBlock = true;
                     clientExts.Add(extName + " " + extVersion);
                 }
-                if (extName == ExtPlayerListExtName && extVersion == ExtPlayerListExtVersion)
-                {
+                if (extName == ExtPlayerListExtName && extVersion == ExtPlayerListExtVersion) {
                     this.SupportsExtPlayerList = true;
                     clientExts.Add(extName + " " + extVersion);
                 }
-                if (extName == SelectionCuboidExtName && extVersion == SelectionCuboidExtVersion)
-                {
+                if (extName == SelectionCuboidExtName && extVersion == SelectionCuboidExtVersion) {
                     this.SupportsSelectionCuboid = true;
                     clientExts.Add(extName + " " + extVersion);
                 }
-                if (extName == MessageTypesExtName && extVersion == MessageTypesExtVersion)
-                {
+                if (extName == MessageTypesExtName && extVersion == MessageTypesExtVersion) {
                     this.SupportsMessageTypes = true;
                     clientExts.Add(extName + " " + extVersion);
                 }
-                if (extName == HackControlExtName && extVersion == HackControlExtVersion)
-                {
+                if (extName == HackControlExtName && extVersion == HackControlExtVersion) {
                     SupportsHackControl = true;
+                    clientExts.Add(extName + " " + extVersion);
+                }
+                if (extName == EmoteFixExtName && extVersion == EmoteFixExtVersion) {
+                    SupportsEmoteFix = true;
                     clientExts.Add(extName + " " + extVersion);
                 }
             }

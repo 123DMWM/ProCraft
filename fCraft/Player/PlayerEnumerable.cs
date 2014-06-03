@@ -490,9 +490,9 @@ namespace fCraft {
                 message = String.Format( message, formatArgs );
             }
             Player[] sourceArray = source.ToArray();
-            foreach( Packet packet in LineWrapper.Wrap( message ) ) {
-                foreach( Player player in sourceArray ) {
-                    player.Send( packet );
+            foreach (Player player in sourceArray) {
+                foreach (Packet packet in LineWrapper.Wrap(message, player.SupportsEmoteFix)) {
+                    player.Send(packet);
                     i++;
                 }
             }
@@ -519,10 +519,10 @@ namespace fCraft {
             }
             int i = 0;
             Player[] sourceArray = source.ToArray();
-            foreach( Packet packet in LineWrapper.Wrap( message ) ) {
-                foreach( Player player in sourceArray ) {
-                    if( player == except ) continue;
-                    player.Send( packet );
+            foreach (Player player in sourceArray) {
+                foreach (Packet packet in LineWrapper.Wrap(message, player.SupportsEmoteFix)) {
+                    if (player == except) continue;
+                    player.Send(packet);
                     i++;
                 }
             }
@@ -549,9 +549,9 @@ namespace fCraft {
             }
             int i = 0;
             Player[] sourceArray = source.ToArray();
-            foreach( Packet packet in LineWrapper.WrapPrefixed( prefix, message ) ) {
-                foreach( Player player in sourceArray ) {
-                    player.Send( packet );
+            foreach (Player player in sourceArray) {
+                foreach (Packet packet in LineWrapper.WrapPrefixed(prefix, message, player.SupportsEmoteFix)) {
+                    player.Send(packet);
                     i++;
                 }
             }

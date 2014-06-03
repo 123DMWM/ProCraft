@@ -1,6 +1,7 @@
 ﻿// Part of fCraft | Copyright 2009-2013 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt //Copyright (c) 2011-2013 Jon Baker, Glenn Marien and Lao Tszy <Jonty800@gmail.com> //Copyright (c) <2012-2014> <LeChosenOne, DingusBungus>
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Configuration;
 using System.Runtime.ExceptionServices;
@@ -36,6 +37,7 @@ namespace fCraft
             CommandManager.RegisterCommand(CdIRCStaff);
             CommandManager.RegisterCommand(Cdchat);
             CommandManager.RegisterCommand(CdLdis);
+            CommandManager.RegisterCommand(CdtextHotKey);
 
 
             Player.Moved += new EventHandler<Events.PlayerMovedEventArgs>(Player_IsBack);
@@ -1262,6 +1264,41 @@ namespace fCraft
             float percent = (1 - Chat.LDistance(first, second)) * 100;
             player.Message( percent + "&s% similarity between:" );
             player.Message( "  &7{0} &sand &7{1}", first, second );
+        }
+
+        #endregion
+        #region textHotKey
+
+        static readonly CommandDescriptor CdtextHotKey = new CommandDescriptor {
+            Name = "TextHotKey",
+            Aliases = new[] { "HotKey", "thk", "hk" },
+            Category = CommandCategory.New,
+            Permissions = new[] { Permission.Chat },
+            Usage = "/TextHotKey [Label] [Action] [KeyCode] [KeyMods]",
+            Help = "Sets up TextHotKeys. Use http://minecraftwiki.net/Key_Codes for keycodes",
+            Handler = textHotKeyHandler
+        };
+
+        private static void textHotKeyHandler(Player player, CommandReader cmd) {
+            if (cmd.Count < 3) {
+                CdtextHotKey.PrintUsage(player);
+                return;
+            }
+            string Label = cmd.Next();
+            string Action = cmd.Next();
+            int KeyCode;
+            if (!cmd.NextInt(out KeyCode)) {
+                player.Message("Error: Invalid Integer");
+                return;
+            }
+            byte KeyMod = 0;
+            if (cmd.HasNext) {
+                if (!Byte.TryParse(cmd.Next(), out KeyMod)) {
+                    player.Message("Error: Invalid Byte");
+                    return;
+                }
+            }
+            player.Send(Packet.MakeSetTextHotKey(Label, Action, KeyCode, KeyMod));
         }
 
         #endregion

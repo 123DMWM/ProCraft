@@ -549,10 +549,6 @@ but will reduce bandwidth use." )]
 @"Automatically restarts the server after a given number of seconds." )]
         RestartInterval,
 
-        [BoolKey(ConfigSection.Advanced,true,
-@"Moves the emote suffix from end-of-line to immediately after its usage.")]
-        MoveEmoteDotToEndOfMessage
-
         #endregion
     }
 }

@@ -189,7 +189,7 @@ namespace fCraft {
         public static Packet Message(byte type, string message)
         {
             Packet packet = new Packet(OpCode.Message);
-            packet.Bytes[1] = (byte)type;
+            packet.Bytes[1] = type;
             Encoding.ASCII.GetBytes(message.PadRight(64), 0, 64, packet.Bytes, 2);
             return packet;
         }

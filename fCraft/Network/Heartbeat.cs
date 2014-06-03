@@ -313,10 +313,8 @@ namespace fCraft
 
 
     /// <summary> Contains data that's sent to heartbeat servers. </summary>
-    public sealed class HeartbeatData
-    {
-        internal HeartbeatData([NotNull] Uri heartbeatUri)
-        {
+    public sealed class HeartbeatData {
+        internal HeartbeatData([NotNull] Uri heartbeatUri) {
             if (heartbeatUri == null) throw new ArgumentNullException("heartbeatUri");
             IsPublic = ConfigKey.IsPublic.Enabled();
             MaxPlayers = ConfigKey.MaxPlayers.GetInt();
@@ -334,12 +332,14 @@ namespace fCraft
         /// <summary> The heartbeat URI sent to minecraft.net in order to remain on the server list. </summary>
         [NotNull]
         public Uri HeartbeatUri { get; private set; }
+
         [NotNull]
         public Uri KickHeartbeatUri { get; private set; }
 
         /// <summary> Server salt used in name verification (hashing). </summary>
         [NotNull]
         public string Salt { get; set; }
+
         [NotNull]
         public string KickSalt { get; set; }
 
@@ -368,45 +368,42 @@ namespace fCraft
 
 
         [NotNull]
-        internal Uri CreateUri()
-        {
+        internal Uri CreateUri() {
             UriBuilder ub = new UriBuilder(HeartbeatUri);
             StringBuilder sb = new StringBuilder();
-            sb.AppendFormat("public={0}&max={1}&users={2}&port={3}&version={4}&salt={5}&name={6}",
-                             IsPublic,
-                             MaxPlayers,
-                             PlayerCount,
-                             Port,
-                             ProtocolVersion,
-                             Uri.EscapeDataString(Salt),
-                             Uri.EscapeDataString(ServerName));
-            foreach (var pair in CustomData)
-            {
-                sb.AppendFormat("&{0}={1}",
-                                 Uri.EscapeDataString(pair.Key),
-                                 Uri.EscapeDataString(pair.Value));
+            sb.AppendFormat("public={0}&max={1}&users={2}&port={3}&version={4}&salt={5}&name={6}&software=ProCraft", 
+                IsPublic,
+                MaxPlayers, 
+                PlayerCount, 
+                Port, 
+                ProtocolVersion, 
+                Uri.EscapeDataString(Salt),
+                Uri.EscapeDataString(ServerName));
+            foreach (var pair in CustomData) {
+                sb.AppendFormat("&{0}={1}", 
+                    Uri.EscapeDataString(pair.Key), 
+                    Uri.EscapeDataString(pair.Value));
             }
             ub.Query = sb.ToString();
             return ub.Uri;
         }
+
         [NotNull]
-        internal Uri CreateKickUri()
-        {
+        internal Uri CreateKickUri() {
             UriBuilder ub = new UriBuilder(KickHeartbeatUri);
             StringBuilder sb = new StringBuilder();
-            sb.AppendFormat("public={0}&max={1}&users={2}&port={3}&version={4}&salt={5}&name={6}",
-                             IsPublic,
-                             MaxPlayers,
-                             PlayerCount,
-                             Port,
-                             ProtocolVersion,
-                             Uri.EscapeDataString(KickSalt),
-                             Uri.EscapeDataString(ServerName));
-            foreach (var pair in CustomData)
-            {
-                sb.AppendFormat("&{0}={1}",
-                                 Uri.EscapeDataString(pair.Key),
-                                 Uri.EscapeDataString(pair.Value));
+            sb.AppendFormat("public={0}&max={1}&users={2}&port={3}&version={4}&salt={5}&name={6}&software=ProCraft", 
+                IsPublic, 
+                MaxPlayers,
+                PlayerCount, 
+                Port, 
+                ProtocolVersion, 
+                Uri.EscapeDataString(KickSalt), 
+                Uri.EscapeDataString(ServerName));
+            foreach (var pair in CustomData) {
+                sb.AppendFormat("&{0}={1}", 
+                    Uri.EscapeDataString(pair.Key), 
+                    Uri.EscapeDataString(pair.Value));
             }
             ub.Query = sb.ToString();
             return ub.Uri;
