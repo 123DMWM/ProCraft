@@ -3,24 +3,24 @@ using System;
 using JetBrains.Annotations;
 
 namespace fCraft.Drawing {
-    /// <summary> Constructs ReplaceBrushBrush. </summary>
-    public sealed class ReplaceBrushBrushFactory : IBrushFactory {
-        /// <summary> Singleton instance of the ReplaceBrushBrushFactory. </summary>
-        public static readonly ReplaceBrushBrushFactory Instance = new ReplaceBrushBrushFactory();
+    /// <summary> Constructs ReplaceNotBrushBrush. </summary>
+    public sealed class ReplaceNotBrushBrushFactory : IBrushFactory {
+        /// <summary> Singleton instance of the ReplaceNotBrushBrushFactory. </summary>
+        public static readonly ReplaceNotBrushBrushFactory Instance = new ReplaceNotBrushBrushFactory();
 
-        ReplaceBrushBrushFactory() {
-            Aliases = new[] { "rb" };
+        ReplaceNotBrushBrushFactory() {
+            Aliases = new[] { "rnb" };
         }
 
 
         public string Name {
-            get { return "ReplaceBrush"; }
+            get { return "ReplaceNotBrush"; }
         }
 
         public string[] Aliases { get; private set; }
 
-        const string HelpString = "ReplaceBrush brush: Replaces blocks of a given type with output of another brush. " +
-                                  "Usage: &H/Brush rb <Block> <BrushName>";
+        const string HelpString = "ReplaceNotBrush brush: Replaces all blocks except the given type with output of another brush. " +
+                                  "Usage: &H/Brush rnb <Block> <BrushName>";
 
         public string Help {
             get { return HelpString; }
@@ -35,7 +35,7 @@ namespace fCraft.Drawing {
                 throw new ArgumentNullException( "cmd" );
 
             if (!cmd.HasNext) {
-                player.Message( "ReplaceBrush usage: &H/Brush rb <Block> <BrushName>" );
+                player.Message( "ReplaceNotBrush usage: &H/Brush rnb <Block> <BrushName>" );
                 return null;
             }
 
@@ -45,7 +45,7 @@ namespace fCraft.Drawing {
 
             string brushName = cmd.Next();
             if (brushName == null || !CommandManager.IsValidCommandName( brushName )) {
-                player.Message( "ReplaceBrush usage: &H/Brush rb <Block> <BrushName>" );
+                player.Message( "ReplaceNotBrush usage: &H/Brush rnb <Block> <BrushName>" );
                 return null;
             }
             IBrushFactory brushFactory = BrushManager.GetBrushFactory( brushName );
@@ -60,25 +60,25 @@ namespace fCraft.Drawing {
                 return null;
             }
 
-            return new ReplaceBrushBrush( block, newBrush );
+            return new ReplaceNotBrushBrush( block, newBrush );
         }
     }
 
 
     /// <summary> Brush that replaces all blocks of the given type with output of a brush. </summary>
-    public sealed class ReplaceBrushBrush : IBrushInstance, IBrush {
+    public sealed class ReplaceNotBrushBrush : IBrushInstance, IBrush {
         public Block Block { get; private set; }
         public IBrush Replacement { get; private set; }
         public IBrushInstance ReplacementInstance { get; private set; }
 
 
-        public ReplaceBrushBrush( Block block, [NotNull] IBrush replacement ) {
+        public ReplaceNotBrushBrush( Block block, [NotNull] IBrush replacement ) {
             Block = block;
             Replacement = replacement;
         }
 
 
-        public ReplaceBrushBrush( [NotNull] ReplaceBrushBrush other ) {
+        public ReplaceNotBrushBrush( [NotNull] ReplaceNotBrushBrush other ) {
             if (other == null)
                 throw new ArgumentNullException( "other" );
             Block = other.Block;
@@ -90,7 +90,7 @@ namespace fCraft.Drawing {
         #region IBrush members
 
         public IBrushFactory Factory {
-            get { return ReplaceBrushBrushFactory.Instance; }
+            get { return ReplaceNotBrushBrushFactory.Instance; }
         }
 
 
@@ -120,7 +120,7 @@ namespace fCraft.Drawing {
 
                 string brushName = cmd.Next();
                 if (brushName == null || !CommandManager.IsValidCommandName( brushName )) {
-                    player.Message( "ReplaceBrush usage: &H/Brush rb <Block> <BrushName>" );
+                    player.Message( "ReplaceNotBrush usage: &H/Brush rnb <Block> <BrushName>" );
                     return null;
                 }
                 IBrushFactory brushFactory = BrushManager.GetBrushFactory( brushName );
@@ -142,7 +142,7 @@ namespace fCraft.Drawing {
             if (ReplacementInstance == null)
                 return null;
 
-            return new ReplaceBrushBrush( this );
+            return new ReplaceNotBrushBrush( this );
         }
 
         #endregion
@@ -180,9 +180,9 @@ namespace fCraft.Drawing {
                 throw new ArgumentNullException( "op" );
             Block block = op.Map.GetBlock( op.Coords );
             if (block == Block) {
-                return ReplacementInstance.NextBlock( op );
+                return Block.None;
             }
-            return Block.None;
+            return ReplacementInstance.NextBlock( op );
         }
 
 

@@ -12,7 +12,7 @@ namespace fCraft.Drawing {
         static readonly Dictionary<string, IBrushFactory> BrushFactories = new Dictionary<string, IBrushFactory>();
         static readonly Dictionary<string, IBrushFactory> BrushAliases = new Dictionary<string, IBrushFactory>();
 
-        static readonly CommandDescriptor CdBrush = new CommandDescriptor {
+        static public CommandDescriptor CdBrush = new CommandDescriptor {
             Name = "Brush",
             Category = CommandCategory.Building,
             Permissions = new[] { Permission.Draw, Permission.DrawAdvanced },
@@ -53,6 +53,7 @@ namespace fCraft.Drawing {
             RegisterBrush( ReplaceBrushFactory.Instance );
             RegisterBrush( ReplaceNotBrushFactory.Instance );
             RegisterBrush( ReplaceBrushBrushFactory.Instance );
+            RegisterBrush( ReplaceNotBrushBrushFactory.Instance );
         }
 
 

@@ -6,6 +6,8 @@ using System.Linq;
 using System.Net.Configuration;
 using System.Runtime.ExceptionServices;
 using fCraft;
+using fCraft.Drawing;
+using fCraft.Events;
 
 namespace fCraft
 {
@@ -38,6 +40,7 @@ namespace fCraft
             CommandManager.RegisterCommand(Cdchat);
             CommandManager.RegisterCommand(CdLdis);
             CommandManager.RegisterCommand(CdtextHotKey);
+            CommandManager.RegisterCommand(Cdbrushes);
 
 
             Player.Moved += new EventHandler<Events.PlayerMovedEventArgs>(Player_IsBack);
@@ -1273,28 +1276,30 @@ namespace fCraft
             Name = "TextHotKey",
             Aliases = new[] { "HotKey", "thk", "hk" },
             Category = CommandCategory.New,
-            Permissions = new[] { Permission.Chat },
+            Permissions = new[] { Permission.ReadStaffChat },
             Usage = "/TextHotKey [Label] [Action] [KeyCode] [KeyMods]",
             Help = "Sets up TextHotKeys. Use http://minecraftwiki.net/Key_Codes for keycodes",
             Handler = textHotKeyHandler
         };
 
         private static void textHotKeyHandler(Player player, CommandReader cmd) {
-            if (cmd.Count < 3) {
+            if (cmd.Count != 4) {
                 CdtextHotKey.PrintUsage(player);
                 return;
             }
             string Label = cmd.Next();
             string Action = cmd.Next();
+            string third = cmd.Next();
+            string fourth = cmd.Next();
             int KeyCode;
-            if (!cmd.NextInt(out KeyCode)) {
-                player.Message("Error: Invalid Integer");
+            if (!int.TryParse(third, out KeyCode)) {
+                player.Message("Error: Invalid Integer ({0})", third);
                 return;
             }
             byte KeyMod = 0;
             if (cmd.HasNext) {
-                if (!Byte.TryParse(cmd.Next(), out KeyMod)) {
-                    player.Message("Error: Invalid Byte");
+                if (!Byte.TryParse(fourth, out KeyMod)) {
+                    player.Message("Error: Invalid Byte ({0})", fourth);
                     return;
                 }
             }
@@ -1304,6 +1309,22 @@ namespace fCraft
                 player.Message("You do not support TextHotKey");
                 return;
             }
+        }
+
+        #endregion
+        #region brushes
+
+        static readonly CommandDescriptor Cdbrushes = new CommandDescriptor {
+            Name = "Brushes",
+            Category = CommandCategory.New,
+            Permissions = new[] { Permission.DrawAdvanced },
+            Usage = "/brushes",
+            Help = "Lists all available brushes",
+            Handler = brushesHandler
+        };
+
+        private static void brushesHandler( Player player, CommandReader cmd ) {
+            player.Message( BrushManager.CdBrush.Help.Replace( "Gets or sets the current brush. ", "" ) );
         }
 
         #endregion

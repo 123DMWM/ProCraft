@@ -1,4 +1,4 @@
-﻿// Part of fCraft | Copyright 2009-2013 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt //Copyright (c) 2011-2013 Jon Baker, Glenn Marien and Lao Tszy <Jonty800@gmail.com> //Copyright (c) <2012-2014> <LeChosenOne, DingusBungus>
+﻿// Part of fCraft | Copyright 2009-2013 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt //Copyright (c) 2011-2013 Jon Baker, Glenn Marien and Lao Tszy <Jonty800@gmail.com> //Copyright (c) <2012-2014> <LeChosenOne, DingusBungus> | Copyright 2014 123DMWM <shmo1joe2@gmail.com>
 using System;
 using System.IO;
 using System.Linq;
@@ -32,9 +32,11 @@ namespace fCraft {
             CommandManager.RegisterCommand( CdReplace );
             CommandManager.RegisterCommand( CdReplaceNot );
             CommandManager.RegisterCommand( CdReplaceBrush );
+            CommandManager.RegisterCommand( CdReplaceNotBrush );
             CdReplace.Help += GeneralDrawingHelp;
             CdReplaceNot.Help += GeneralDrawingHelp;
             CdReplaceBrush.Help += GeneralDrawingHelp;
+            CdReplaceNotBrush.Help += GeneralDrawingHelp;
             CommandManager.RegisterCommand( CdCopySlot );
             CommandManager.RegisterCommand( CdCopy );
             CommandManager.RegisterCommand( CdCut );
@@ -1762,6 +1764,26 @@ namespace fCraft {
             var replaceBrush = ReplaceBrushBrushFactory.Instance.MakeBrush( player, cmd );
             if( replaceBrush == null ) return;
             ReplaceHandlerInternal( replaceBrush, player, cmd );
+        }
+
+
+        static readonly CommandDescriptor CdReplaceNotBrush = new CommandDescriptor {
+            Name = "ReplaceNotBrush",
+            Aliases = new[] { "rnb" },
+            Category = CommandCategory.Building,
+            Permissions = new[] { Permission.Draw, Permission.DrawAdvanced },
+            RepeatableSelection = true,
+            Usage = "/ReplaceNotBrush Block BrushName [Params]",
+            Help = "Replaces all blocks except the specified type in an area with output of a given brush. " +
+                   "See &H/Help brush&S for a list of available brushes.",
+            Handler = ReplaceNotBrushHandler
+        };
+
+        static void ReplaceNotBrushHandler( Player player, CommandReader cmd ) {
+            var replaceNotBrush = ReplaceNotBrushBrushFactory.Instance.MakeBrush( player, cmd );
+            if (replaceNotBrush == null)
+                return;
+            ReplaceHandlerInternal( replaceNotBrush, player, cmd );
         }
         #endregion
         #region Undo / Redo
