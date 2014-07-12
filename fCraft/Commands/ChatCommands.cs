@@ -41,6 +41,7 @@ namespace fCraft
             CommandManager.RegisterCommand(CdLdis);
             CommandManager.RegisterCommand(CdtextHotKey);
             CommandManager.RegisterCommand(Cdbrushes);
+            CommandManager.RegisterCommand(CdGlobal);
 
 
             Player.Moved += new EventHandler<Events.PlayerMovedEventArgs>(Player_IsBack);
@@ -1325,6 +1326,113 @@ namespace fCraft
 
         private static void brushesHandler( Player player, CommandReader cmd ) {
             player.Message( BrushManager.CdBrush.Help.Replace( "Gets or sets the current brush. ", "" ) );
+        }
+
+        #endregion
+        #region GlobalChat
+        static readonly CommandDescriptor CdGlobal = new CommandDescriptor {
+            Name = "Global",
+            Category = CommandCategory.Chat,
+            Aliases = new[] { "gl" },
+            IsConsoleSafe = true,
+            Permissions = new[] { Permission.Chat },
+            Usage = "/Global [ <message here> / ignore / unignore / disconnect / connect / help]",
+            Help = "Sends a global message to other ProCraft servers",
+            Handler = GHandler
+        };
+
+        private static void GHandler(Player player, CommandReader cmd) {
+            string message = cmd.NextAll();
+            if (message == "connect") {
+                if (player.Can(Permission.ReadStaffChat)) {
+                    if (GlobalChat.GlobalThread.isConnected) {
+                        player.Message("&c{0}&c is already connected to the ProCraft Global Chat Network!",
+                            ConfigKey.ServerName.GetString());
+                        return;
+                    }
+                    GlobalChat.GlobalThread.GCReady = true;
+                    Server.Message(
+                        "&eAttempting to connect to ProCraft Global Chat Network. This may take up to two minutes.");
+                    GlobalChat.Init();
+                    GlobalChat.Start();
+                    return;
+                } else {
+                    player.Message("&eYou don't have the required permissions to do that!");
+                    return;
+                }
+            }
+            if (!GlobalChat.GlobalThread.GCReady) {
+                player.Message("&cGlobal Chat is not connected.");
+                return;
+            }
+
+            var SendList = Server.Players.Where(p => p.GlobalChatAllowed && !p.IsDeaf);
+
+            if (message == "disconnect") {
+                if (player.Can(Permission.ReadStaffChat)) {
+                    Server.Message("&e{0}&e disconnected {1}&e from the ProCraft Global Chat Network.",
+                        player.ClassyName, ConfigKey.ServerName.GetString());
+                    GlobalChat.GlobalThread.SendChannelMessage("&i" + ConfigKey.ServerName.GetString() +
+                                                               "&i has disconnected from the ProCraft Global Chat Network.");
+                    GlobalChat.GlobalThread global = new GlobalChat.GlobalThread();
+                    global.DisconnectThread();
+                    return;
+                } else {
+                    player.Message("&eYou don't have the required permissions to do that!");
+                    return;
+                }
+            }
+            if (message == "ignore") {
+                if (player.GlobalChatIgnore) {
+                    player.Message("You are already ignoring global chat!");
+                    return;
+                } else {
+                    player.Message(
+                        "&eYou are now ignoring global chat. To return to global chat, type /global unignore.");
+                    player.GlobalChatIgnore = true;
+                    return;
+                }
+            }
+            if (message == "unignore") {
+                if (player.GlobalChatIgnore) {
+                    player.Message("You are no longer ignoring global chat.");
+                    player.GlobalChatIgnore = false;
+                    return;
+                } else {
+                    player.Message("&cYou are not currently ignoring global chat!");
+                    return;
+                }
+            } else if (message == "help") {
+                player.Message("_ProCraft GlobalChat Network Help_\n" +
+                               "Ignore: Usage is '/global ignore'. Allows a user to ignore and stop using global chat. Type /global unignore to return to global chat. \n" +
+                               "Unignore: Usage is '/global unignore.' Allows a user to return to global chat. \n" +
+                               "Connect: For admins only. Usage is /global connect. Connects your server to the ProCraft GlobalChat Network. \n" +
+                               "Disconnect: For admins only. Usage is /global disconnect. Disconnects your server from the ProCraft GlobalChat Network. \n" +
+                               "Message: Usage is '/global <your message here>'. Will send your message to the rest of the servers connected to GlobalChat.");
+                return;
+            }
+
+            if (player.Info.IsMuted) {
+                player.MessageMuted();
+                return;
+            } else if (!player.GlobalChatAllowed) {
+                player.Message(
+                    "Global Chat Rules: By using global chat, you automatically agree to these terms and conditions. Failure to agree may result in a global chat kick or ban. \n" +
+                    "1) No Spamming or deliberate insulting. \n" +
+                    "2) No advertising of any server or other minecraft related/unrelated service or product. \n" +
+                    "3) No discussion of illegal or partially illegal tasks is permitted. \n" +
+                    "4) Connecting bots to the Global Chat Network is not permitted, unless approved by the ProCraft Team. \n" +
+                    "&aYou are now permitted to use /global on this server.");
+                player.GlobalChatAllowed = true;
+            } else if (message == "") {
+                player.Message("&eYou must enter a message!");
+                return;
+            } else if (player.GlobalChatAllowed) {
+                string rawMessage = player.ClassyName + Color.White + ": " + message;
+                message = player.ClassyName + Color.Black + ": " + message;
+                SendList.Message("&i[Global] " + rawMessage);
+                GlobalChat.GlobalThread.SendChannelMessage(Color.MinecraftToIrcColors(message));
+            }
         }
 
         #endregion

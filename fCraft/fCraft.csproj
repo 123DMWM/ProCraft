@@ -149,6 +149,7 @@
     <Compile Include="Drawing\DrawOps\WallsDrawOperation.cs" />
     <Compile Include="MapConversion\MapFCMv3.cs" />
     <Compile Include="Network\CpeConstants.cs" />
+    <Compile Include="Network\GlobalChat.cs" />
     <Compile Include="Player\Bot.cs" />
     <Compile Include="Player\ChatSwears.cs" />
     <Compile Include="Player\MailOwner.cs" />

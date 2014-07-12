@@ -867,6 +867,9 @@ namespace fCraft
             }
         }
 
+        // includes IRC color codes and non-printable ASCII
+        public static readonly Regex NonPrintableChars = new Regex( "\x03\\d{1,2}(,\\d{1,2})?|[\x00-\x1F\x7E-\xFF]", RegexOptions.Compiled );
+
 
         public static void Init()
         {
@@ -1499,7 +1502,7 @@ namespace fCraft
 
 
         [NotNull]
-        static IRCMessage MessageParser([NotNull] string rawLine, [NotNull] string actualBotNick)
+        public static IRCMessage MessageParser([NotNull] string rawLine, [NotNull] string actualBotNick)
         {
             if (rawLine == null) throw new ArgumentNullException("rawLine");
             if (actualBotNick == null) throw new ArgumentNullException("actualBotNick");

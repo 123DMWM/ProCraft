@@ -278,6 +278,10 @@ namespace fCraft {
             // Init IRC
             IRC.Init();
 
+            //enable global chat
+            GlobalChat.Init();
+            GlobalChat.Start();
+
             if( ConfigKey.AutoRankEnabled.Enabled() ) {
                 AutoRankManager.Init();
             }
