@@ -773,6 +773,7 @@ namespace fCraft {
                     GentlyKickSMPClients();
                     return false;
 
+                case 15:
                 case 254:
                     // ignore SMP pings
                     return false;

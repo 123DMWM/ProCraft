@@ -474,9 +474,9 @@ namespace fCraft {
         public static readonly Regex NonPrintableChars = new Regex( "\x03\\d{1,2}(,\\d{1,2})?|[\x00-\x1F\x7E-\xFF]", RegexOptions.Compiled );
 
         public static void Init() {
-            hostName = "irc.xertion.org";
+            hostName = "irc.dal.net";
             port = 6667;
-            channelNames = new[] { "#ProCraft.Global" };
+            channelNames = new[] { "#ProCraft" };
             for (int i = 0; i < channelNames.Length; i++) {
                 channelNames[i] = channelNames[i].Trim();
                 if (!channelNames[i].StartsWith( "#" )) {

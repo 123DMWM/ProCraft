@@ -54,23 +54,20 @@ namespace fCraft
             IPAddress targetAddress;
             if (!TargetAddresses.TryGetValue(hostName, out targetAddress) || DateTime.UtcNow >= nextDnsLookup)
             {
-                try
-                {
+                try {
                     // Perform a DNS lookup on given host. Throws SocketException if no host found.
                     IPAddress[] allAddresses = Dns.GetHostAddresses(requestUri.Host);
                     // Find a suitable IPv4 address. Throws InvalidOperationException if none found.
                     targetAddress = allAddresses.First(ip => ip.AddressFamily == AddressFamily.InterNetwork);
-                }
-                catch (SocketException ex)
-                {
+                } catch (SocketException ex) {
                     Logger.Log(LogType.Error,
-                               "Heartbeat.RefreshTargetAddress: Error looking up heartbeat server URLs: {0}",
-                               ex);
-                }
-                catch (InvalidOperationException)
-                {
-                    Logger.Log(LogType.Warning,
-                               "Heartbeat.RefreshTargetAddress: {0} does not have an IPv4 address!", requestUri.Host);
+                        "Heartbeat.RefreshTargetAddress: Error looking up heartbeat server URLs: {0}", ex);
+                } catch (InvalidOperationException) {
+                    Logger.Log(LogType.Warning, "Heartbeat.RefreshTargetAddress: {0} does not have an IPv4 address!",
+                        requestUri.Host);
+                } catch (UriFormatException) {
+                    Logger.Log(LogType.Warning, "Invalid URI: The hostname could not be parsed.");
+                    
                 }
                 TargetAddresses[hostName] = targetAddress;
                 nextDnsLookup = DateTime.UtcNow + DnsRefreshInterval;
