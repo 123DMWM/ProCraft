@@ -1549,21 +1549,12 @@ namespace fCraft {
 
 
             byte zid = 255;
-            byte remove = 255;
-            if (this.SupportsSelectionCuboid)
-            {
-                for (; remove > 1; )
-                {
-                    this.Send(Packet.MakeRemoveSelection(remove));
-                    remove--;
-                }
-                foreach (Zone z in WorldMap.Zones)
-                {
+            if (SupportsSelectionCuboid) {
+                foreach (Zone z in WorldMap.Zones) {
                     z.ZoneID = zid;
-                    zid--;
-                    if (z.ShowZone)
-                    {
-                        this.Send(Packet.MakeMakeSelection(z.ZoneID, z.Name, z.Bounds, z.Color, z.Alpha));
+                    if (z.ShowZone) {
+                        Send(Packet.MakeMakeSelection(z.ZoneID, z.Name, z.Bounds, z.Color, z.Alpha));
+                        zid--;
                     }
                 }
             }
