@@ -9,6 +9,8 @@ using System.Net;
 using System.Net.Cache;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Xml;
+using System.Xml.XPath;
 using fCraft.Drawing;
 using fCraft.Events;
 using JetBrains.Annotations;
@@ -1988,6 +1990,7 @@ namespace fCraft {
             LastActiveTime = DateTime.UtcNow;
         }
 
+        #region CPE
 
         const string CustomBlocksExtName = "CustomBlocks";
         const int CustomBlocksExtVersion = 1;
@@ -2180,6 +2183,48 @@ namespace fCraft {
             }
             return packet;
         }
+
+        #endregion
+
+        #region GEOIP
+
+        public static string getGeoip(string ip, bool country) {
+            if (ip.StartsWith("192.168") || ip.StartsWith("10.0") || ip.StartsWith("127.0"))
+                ip = Server.ExternalIP.ToString();
+            WebClient client = new WebClient();
+            Stream stream;
+            try {
+                stream = client.OpenRead("http://geo.liamstanley.io/xml/" + ip);
+            } catch {
+                try {
+                    stream = client.OpenRead("http://geoip.cf/xml/" + ip);
+                } catch {
+                    try {
+                        stream = client.OpenRead( "http://freegeoip.net/xml/" + ip );
+                    } catch {
+                        return "NULL";
+                    }
+                }
+            }
+            StreamReader reader = new StreamReader(stream);
+            String content = reader.ReadToEnd();
+
+            XmlReaderSettings set = new XmlReaderSettings();
+            set.ConformanceLevel = ConformanceLevel.Fragment;
+
+            XPathDocument doc = new XPathDocument(XmlReader.Create(new StringReader(content), set));
+
+            XPathNavigator nav = doc.CreateNavigator();
+            string geoip;
+            if (country) {
+                geoip = nav.SelectSingleNode("/Response/CountryName").ToString();
+            }else {
+                geoip = nav.SelectSingleNode( "/Response/RegionName" ).ToString();
+            }
+            return geoip;
+        }
+
+        #endregion
 
         #region Kick
 

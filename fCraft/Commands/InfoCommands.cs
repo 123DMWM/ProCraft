@@ -3127,6 +3127,8 @@ namespace fCraft {
                     player.Message("    &f{0}", info.LastWorldPos);
                     player.Message("    (Use &h/TPP X Y Z R L&s)", info.LastWorldPos);
                 }
+                player.Message( "  Country: " + Player.getGeoip( info.LastIP.ToString(), true ) );
+                player.Message( "  Region: " + Player.getGeoip( info.LastIP.ToString(), false ) );
             }
         }
 

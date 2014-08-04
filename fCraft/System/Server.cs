@@ -1425,31 +1425,23 @@ namespace fCraft {
             UpdateTabList();
             if( firstTime ) {
                 return String.Format("&sPlease welcome {0}&S to the server!\n" + 
-                                     "&sThis is their first visit",
-                                      player.ClassyName);
-            }
-            else if (player.Name == "Facepalmed")
-            {
-                return String.Format("&sHoly Testicular Cancer Batman!!!\n" + 
-                                     "&sThe great and holy owner, {0}, is joining!",
-                                      player.ClassyName);
-            }
-            else if (player.Info.Rank.Can(Permission.ReadStaffChat))
-            {
-                return String.Format("&sPlease welcome back staff member {0}&S to the server!\n" +
-                                     "&sThey joined {1} times for a total of {2:F1}h\n",
+                                     "&sThis is their first visit\n" +
+                                     "They are joining from {1}, {2}",
                                       player.ClassyName,
-                                      player.Info.TimesVisited,
-                                      player.Info.TotalTime.TotalHours);
-            }
-            else
-            {
+                                      Player.getGeoip(player.IP.ToString(), false),
+                                      Player.getGeoip(player.IP.ToString(), true));
+            } else {
                 return String.Format("&sPlease welcome back {0}&S to the server!\n" +
-                                     "&sThey joined {1} times for a total of {2:F1}h",
+                                     "&sThey joined {1} times for a total of {2:F1}h\n" +
+                                     "They are joining from {3}, {4}",
                                       player.ClassyName,
                                       player.Info.TimesVisited,
-                                      player.Info.TotalTime.TotalHours);
+                                      player.Info.TotalTime.TotalHours,
+                                      Player.getGeoip( player.IP.ToString(), false ),
+                                      Player.getGeoip( player.IP.ToString(), true ) );
             }
+
+
         }
 
         public static string MakePlayerDisconnectedMessage([NotNull] Player player)
