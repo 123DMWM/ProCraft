@@ -52,11 +52,15 @@ namespace fCraft
 
             string hostName = requestUri.Host.ToLowerInvariant();
             IPAddress targetAddress;
-            if (!TargetAddresses.TryGetValue(hostName, out targetAddress) || DateTime.UtcNow >= nextDnsLookup)
-            {
+            if (!TargetAddresses.TryGetValue(hostName, out targetAddress) || DateTime.UtcNow >= nextDnsLookup) {
+                IPAddress[] allAddresses = null;
                 try {
                     // Perform a DNS lookup on given host. Throws SocketException if no host found.
-                    IPAddress[] allAddresses = Dns.GetHostAddresses(requestUri.Host);
+                    try {
+                        allAddresses = Dns.GetHostAddresses(requestUri.Host);
+                    } catch {
+                        return null;
+                    }
                     // Find a suitable IPv4 address. Throws InvalidOperationException if none found.
                     targetAddress = allAddresses.First(ip => ip.AddressFamily == AddressFamily.InterNetwork);
                 } catch (SocketException ex) {
@@ -147,9 +151,15 @@ namespace fCraft
             {
                 return;
             }
-            heartBeatRequest = CreateRequest(data.CreateUri());
+            try {
+                heartBeatRequest = CreateRequest(data.CreateUri());
+                } catch (Exception UriFormatException) {
+                    Logger.Log(LogType.Debug, "No internet connection!");
+                    return;
+                }
             var state = new HeartbeatRequestState(heartBeatRequest, data);
             heartBeatRequest.BeginGetResponse(ResponseCallback, state);
+            
         }
         static void SendKickHeartBeat()
         {
@@ -158,26 +168,29 @@ namespace fCraft
             {
                 return;
             }
-            heartBeatRequest = CreateRequest(data.CreateKickUri());
+            try {
+                heartBeatRequest = CreateRequest(data.CreateKickUri());
+            } catch (Exception UriFormatException) {
+                return;
+            }
             var state = new HeartbeatRequestState(heartBeatRequest, data);
-            heartBeatRequest.BeginGetResponse(ResponseKickCallback, state);
+            {heartBeatRequest.BeginGetResponse(ResponseKickCallback, state);}
+            
         }
 
 
         // Creates an asynchronous HTTP request to the given URL
         [NotNull]
-        static HttpWebRequest CreateRequest([NotNull] Uri uri)
-        {
+        private static HttpWebRequest CreateRequest([NotNull] Uri uri) {
             if (uri == null) throw new ArgumentNullException("uri");
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
+            HttpWebRequest request = (HttpWebRequest) WebRequest.Create(uri);
             request.CachePolicy = Server.CachePolicy;
             request.Method = "GET";
-            request.ReadWriteTimeout = (int)Timeout.TotalMilliseconds;
+            request.ReadWriteTimeout = (int) Timeout.TotalMilliseconds;
             request.ServicePoint.BindIPEndPointDelegate = Server.BindIPEndPointCallback;
-            request.Timeout = (int)Timeout.TotalMilliseconds;
+            request.Timeout = (int) Timeout.TotalMilliseconds;
             request.UserAgent = Updater.UserAgent;
-            if (uri.Scheme == "http")
-            {
+            if (uri.Scheme == "http") {
                 request.Proxy = new WebProxy("http://" + RefreshTargetAddress(uri) + ":" + uri.Port);
             }
             return request;
