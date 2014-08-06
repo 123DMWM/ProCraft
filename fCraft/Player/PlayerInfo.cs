@@ -118,9 +118,9 @@ namespace fCraft {
             if (GeoIP != LastIP.ToString()) {
                 Scheduler.NewBackgroundTask(GeoipLoginCallback).RunOnce(this, TimeSpan.Zero);
             } else {
-                Server.Players.Message( "&aPlayer &f{0}&a comes from {1}, {2}", ClassyName, RegionName, CountryName );
-                IRC.SendChannelMessage( "&aPlayer &f{0}&a comes from {1}, {2}", ClassyName, RegionName, CountryName );
-                Logger.Log( LogType.UserActivity, "&f{0}&a comes from {1}, {2}", ClassyName, RegionName, CountryName );
+                Server.Players.Message( "&2Player &f{0}&2 comes from {1}, {2}", ClassyName, RegionName, CountryName );
+                IRC.SendChannelMessage( "&2Player &f{0}&2 comes from {1}, {2}", ClassyName, RegionName, CountryName );
+                Logger.Log( LogType.UserActivity, "&f{0}&2 comes from {1}, {2}", ClassyName, RegionName, CountryName );
             }
         }
 

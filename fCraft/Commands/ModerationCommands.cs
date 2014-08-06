@@ -1449,6 +1449,7 @@ namespace fCraft {
             {
                 if (ConfigKey.ShowConnectionMessages.Enabled())
                 {
+                    player.Info.GeoipLogin();
                     string msg = Server.MakePlayerConnectedMessage(player, false, playerWorld);
                     Server.Players.CantSee(player).Message(msg);
                 }
