@@ -9,6 +9,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.XPath;
+using ServiceStack.Text;
 using JetBrains.Annotations;
 namespace fCraft {
     /// <summary> Contains commands that don't do anything besides displaying some information or text.
@@ -54,6 +55,8 @@ namespace fCraft {
             CommandManager.RegisterCommand( Cdclp );
             CommandManager.RegisterCommand( CdGeoip );
             CommandManager.RegisterCommand( CdGeoipNp );
+            CommandManager.RegisterCommand( CdApiPlayer );
+            CommandManager.RegisterCommand( CdApiID );
 
         }
         #region Debug
@@ -3351,6 +3354,128 @@ namespace fCraft {
             player.Message( "  Longitude: &f" + nav.SelectSingleNode( "/Response/Longitude" ));
             player.Message( "  Metro Code: &f" + nav.SelectSingleNode( "/Response/MetroCode" ));
             player.Message( "  Area Code: &f" + nav.SelectSingleNode( "/Response/AreaCode" ));
+        }
+
+        #endregion
+        #region API Player
+
+        static readonly CommandDescriptor CdApiPlayer = new CommandDescriptor {
+            Name = "apiplayer",
+            Aliases = new[] { "apip"},
+            Category = CommandCategory.New,
+            IsConsoleSafe = true,
+            Usage = "/apip playername",
+            Help = "Prints the api information about a player using classicube api",
+            Handler = APIPInfoHandler
+        };
+
+        static void APIPInfoHandler( Player player, CommandReader cmd ) {
+            string name = cmd.Next();
+            WebClient webClient = new WebClient();
+            var result = JsonObject.Parse( webClient.DownloadString( "http://www.classicube.net/api/player/" + name ) );
+            string error;
+            result.TryGetValue("error", out error);
+            string flags1;
+            result.TryGetValue( "flags", out flags1 );
+            string flags2 = "Classicube User, ";
+            if (flags1.Contains( 'b' )) {
+                flags2 = flags2 + "Banned from forums, ";
+            }
+            if (flags1.Contains( 'a' )) {
+                flags2 = flags2 + "Forum Administrator, ";
+            }
+            if (flags1.Contains( 'm' )) {
+                flags2 = flags2 + "Forum Moderator, ";
+            }
+            if (flags1.Contains( 'd' )) {
+                flags2 = flags2 + "Classicube Devloper, ";
+            }
+            flags2 = flags2.Remove(flags2.Length - 2, 2);
+            string id;
+            result.TryGetValue( "id", out id);
+            string premium;
+            result.TryGetValue( "premium", out premium );
+            string registered1;
+            result.TryGetValue( "registered", out registered1 );
+            double registered2;
+            double.TryParse(registered1, out registered2);
+            var epoch = new DateTime( 1970, 1, 1, 0, 0, 0, DateTimeKind.Utc );
+            DateTime registered3 = epoch.AddSeconds( registered2 );
+            string username;
+            result.TryGetValue( "username", out username );
+
+            if (error.ToLower().Equals("user not found")) {
+                player.Message("User not found!");
+                return;
+            }
+
+            player.Message("API info about {0}", username);
+            player.Message( "  Flags: {0}", flags2 );
+            player.Message( "  ID: {0}", id );
+            player.Message( "  Premium*: {0}", premium );
+            player.Message( "  Registered: {0} at {1} UTC", registered3.ToLongDateString(), registered3.ToLongTimeString() );
+            player.Message( "* = Ignore for now " );
+        }
+
+        #endregion
+        #region API ID
+
+        static readonly CommandDescriptor CdApiID = new CommandDescriptor {
+            Name = "apiid",
+            Aliases = new[] { "apid" },
+            Category = CommandCategory.New,
+            IsConsoleSafe = true,
+            Usage = "/apid id",
+            Help = "Prints the api information about a player id using classicube api",
+            Handler = APIDInfoHandler
+        };
+
+        static void APIDInfoHandler( Player player, CommandReader cmd ) {
+            string name = cmd.Next();
+            WebClient webClient = new WebClient();
+            var result = JsonObject.Parse( webClient.DownloadString( "http://www.classicube.net/api/id/" + name ) );
+            string error;
+            result.TryGetValue( "error", out error );
+            string flags1;
+            result.TryGetValue( "flags", out flags1 );
+            string flags2 = "Classicube User, ";
+            if (flags1.Contains( 'b' )) {
+                flags2 = flags2 + "Banned from forums, ";
+            }
+            if (flags1.Contains( 'a' )) {
+                flags2 = flags2 + "Forum Administrator, ";
+            }
+            if (flags1.Contains( 'm' )) {
+                flags2 = flags2 + "Forum Moderator, ";
+            }
+            if (flags1.Contains( 'd' )) {
+                flags2 = flags2 + "Classicube Devloper, ";
+            }
+            flags2 = flags2.Remove( flags2.Length - 2, 2 );
+            string id;
+            result.TryGetValue( "id", out id );
+            string premium;
+            result.TryGetValue( "premium", out premium );
+            string registered1;
+            result.TryGetValue( "registered", out registered1 );
+            double registered2;
+            double.TryParse( registered1, out registered2 );
+            var epoch = new DateTime( 1970, 1, 1, 0, 0, 0, DateTimeKind.Utc );
+            DateTime registered3 = epoch.AddSeconds( registered2 );
+            string username;
+            result.TryGetValue( "username", out username );
+
+            if (error.ToLower().Equals( "user not found" )) {
+                player.Message( "User not found!" );
+                return;
+            }
+
+            player.Message( "API info about {0}", username );
+            player.Message( "  Flags: {0}", flags2 );
+            player.Message( "  ID: {0}", id );
+            player.Message( "  Premium*: {0}", premium );
+            player.Message( "  Registered: {0} at {1} UTC", registered3.ToLongDateString(), registered3.ToLongTimeString() );
+            player.Message( "* = Ignore for now " );
         }
 
         #endregion
