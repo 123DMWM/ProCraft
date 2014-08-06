@@ -1911,6 +1911,58 @@ namespace fCraft {
             }
         }
 
+        #region GEOIP
+
+        public static void GetGeoip( PlayerInfo info ) {
+            string ip = info.LastIP.ToString();
+            if (ip == info.GeoIP)
+                return;
+            if (info.LastIP.ToString().StartsWith( "192.168" ) || info.LastIP.ToString().StartsWith( "10.0" ) ||
+                info.LastIP.ToString().StartsWith( "127.0" ))
+                ip = Server.ExternalIP.ToString();
+            WebClient client = new WebClient();
+            Stream stream;
+            try {
+                stream = client.OpenRead( "http://geo.liamstanley.io/xml/" + ip );
+            } catch {
+                try {
+                    stream = client.OpenRead( "http://geoip.cf/xml/" + ip );
+                } catch {
+                    try {
+                        stream = client.OpenRead( "http://freegeoip.net/xml/" + ip );
+                    } catch {
+                        return;
+                    }
+                }
+            }
+            StreamReader reader = new StreamReader( stream );
+            String content = reader.ReadToEnd();
+
+            XmlReaderSettings set = new XmlReaderSettings();
+            set.ConformanceLevel = ConformanceLevel.Fragment;
+
+            XPathDocument doc = new XPathDocument( XmlReader.Create( new StringReader( content ), set ) );
+
+            XPathNavigator nav = doc.CreateNavigator();
+            string geoip;
+            info.GeoIP = nav.SelectSingleNode( "/Response/Ip" ).ToString();
+            info.CountryCode = nav.SelectSingleNode( "/Response/CountryCode" ).ToString();
+            info.CountryName = nav.SelectSingleNode( "/Response/CountryName" ).ToString();
+            info.RegionCode = nav.SelectSingleNode( "/Response/RegionCode" ).ToString();
+            info.RegionName = nav.SelectSingleNode( "/Response/RegionName" ).ToString();
+            info.City = nav.SelectSingleNode( "/Response/City" ).ToString();
+            info.ZipCode = nav.SelectSingleNode( "/Response/ZipCode" ).ToString();
+            info.Latitude = nav.SelectSingleNode( "/Response/Latitude" ).ToString();
+            info.Longitude = nav.SelectSingleNode( "/Response/Longitude" ).ToString();
+            info.MetroCode = nav.SelectSingleNode( "/Response/MetroCode" ).ToString();
+            info.AreaCode = nav.SelectSingleNode( "/Response/AreaCode" ).ToString();
+            Server.Players.Message( "&aPlayer &f{0}&a comes from {1}, {2}", info.ClassyName, info.RegionName, info.CountryName );
+            IRC.SendChannelMessage( "&aPlayer &f{0}&a comes from {1}, {2}", info.ClassyName, info.RegionName, info.CountryName );
+            Logger.Log( LogType.UserActivity, "&f{0}&a comes from {1}, {2}", info.ClassyName, info.RegionName, info.CountryName );
+        }
+
+        #endregion
+
         static readonly Regex
             EmailRegex = new Regex(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$", RegexOptions.Compiled),
             AccountRegex = new Regex(@"^[a-zA-Z0-9._]{2,16}$", RegexOptions.Compiled),
@@ -2186,45 +2238,7 @@ namespace fCraft {
 
         #endregion
 
-        #region GEOIP
 
-        public static string getGeoip(string ip, bool country) {
-            if (ip.StartsWith("192.168") || ip.StartsWith("10.0") || ip.StartsWith("127.0"))
-                ip = Server.ExternalIP.ToString();
-            WebClient client = new WebClient();
-            Stream stream;
-            try {
-                stream = client.OpenRead("http://geo.liamstanley.io/xml/" + ip);
-            } catch {
-                try {
-                    stream = client.OpenRead("http://geoip.cf/xml/" + ip);
-                } catch {
-                    try {
-                        stream = client.OpenRead( "http://freegeoip.net/xml/" + ip );
-                    } catch {
-                        return "NULL";
-                    }
-                }
-            }
-            StreamReader reader = new StreamReader(stream);
-            String content = reader.ReadToEnd();
-
-            XmlReaderSettings set = new XmlReaderSettings();
-            set.ConformanceLevel = ConformanceLevel.Fragment;
-
-            XPathDocument doc = new XPathDocument(XmlReader.Create(new StringReader(content), set));
-
-            XPathNavigator nav = doc.CreateNavigator();
-            string geoip;
-            if (country) {
-                geoip = nav.SelectSingleNode("/Response/CountryName").ToString();
-            }else {
-                geoip = nav.SelectSingleNode( "/Response/RegionName" ).ToString();
-            }
-            return geoip;
-        }
-
-        #endregion
 
         #region Kick
 

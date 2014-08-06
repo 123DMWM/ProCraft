@@ -1425,20 +1425,14 @@ namespace fCraft {
             UpdateTabList();
             if( firstTime ) {
                 return String.Format("&sPlease welcome {0}&S to the server!\n" + 
-                                     "&sThis is their first visit\n" +
-                                     "They are joining from {1}, {2}",
-                                      player.ClassyName,
-                                      Player.getGeoip(player.IP.ToString(), false),
-                                      Player.getGeoip(player.IP.ToString(), true));
+                                     "&sThis is their first visit",
+                                      player.ClassyName);
             } else {
                 return String.Format("&sPlease welcome back {0}&S to the server!\n" +
-                                     "&sThey joined {1} times for a total of {2:F1}h\n" +
-                                     "They are joining from {3}, {4}",
+                                     "&sThey joined {1} times for a total of {2:F1}h",
                                       player.ClassyName,
                                       player.Info.TimesVisited,
-                                      player.Info.TotalTime.TotalHours,
-                                      Player.getGeoip( player.IP.ToString(), false ),
-                                      Player.getGeoip( player.IP.ToString(), true ) );
+                                      player.Info.TotalTime.TotalHours );
             }
 
 

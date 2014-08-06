@@ -8,7 +8,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading;
 using fCraft.AutoRank;
 using fCraft.Drawing;
@@ -1089,6 +1088,7 @@ namespace fCraft {
             var canSee = Server.Players.CanSee(this).ToArray();
 
             // Announce join
+            Info.GeoipLogin();
             if (ConfigKey.ShowConnectionMessages.Enabled())
             {
                 string message = Server.MakePlayerConnectedMessage(this, firstTime, World);

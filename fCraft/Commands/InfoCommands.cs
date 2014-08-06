@@ -7,6 +7,8 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Xml;
+using System.Xml.XPath;
 using JetBrains.Annotations;
 namespace fCraft {
     /// <summary> Contains commands that don't do anything besides displaying some information or text.
@@ -50,6 +52,8 @@ namespace fCraft {
             CommandManager.RegisterCommand( CdLKR );
             CommandManager.RegisterCommand( CdSeen );
             CommandManager.RegisterCommand( Cdclp );
+            CommandManager.RegisterCommand( CdGeoip );
+            CommandManager.RegisterCommand( CdGeoipNp );
 
         }
         #region Debug
@@ -2961,20 +2965,20 @@ namespace fCraft {
             IsConsoleSafe = true,
             Usage = "/ExtraInfo [PlayerName or IP [Offset]]",
             Help = "Prints the extra information about a given player",
-            Handler = IPInfoHandler
+            Handler = ExtraInfoHandler
         };
 
-        static void IPInfoHandler( Player player, CommandReader cmd ) {
+        static void ExtraInfoHandler( Player player, CommandReader cmd ) {
             string name = cmd.Next();
             if( name == null ) {
                 // no name given, print own info
-                PrintPlayerGeoIP( player, player.Info );
+                PrintPlayerExtraInfo( player, player.Info );
                 return;
 
             } else if( name.Equals( player.Name, StringComparison.OrdinalIgnoreCase ) ) {
                 // own name given
                 player.LastUsedPlayerName = player.Name;
-                PrintPlayerGeoIP( player, player.Info );
+                PrintPlayerExtraInfo( player, player.Info );
                 return;
 
             } else if( !player.Can( Permission.ViewOthersInfo ) ) {
@@ -3063,7 +3067,7 @@ namespace fCraft {
             if( infos.Length == 1 ) {
                 // only one match found; print it right away
                 player.LastUsedPlayerName = infos[0].Name;
-                PrintPlayerGeoIP( player, infos[0] );
+                PrintPlayerExtraInfo( player, infos[0] );
 
             } else if( infos.Length > 1 ) {
                 // multiple matches found
@@ -3098,7 +3102,7 @@ namespace fCraft {
             }
         }
                
-        static void PrintPlayerGeoIP( [NotNull] Player player, [NotNull] PlayerInfo info ) {
+        static void PrintPlayerExtraInfo( [NotNull] Player player, [NotNull] PlayerInfo info ) {
             if( player == null ) throw new ArgumentNullException( "player" );
             if( info == null ) throw new ArgumentNullException( "info" );
             Player target = info.PlayerObject;
@@ -3127,9 +3131,274 @@ namespace fCraft {
                     player.Message("    &f{0}", info.LastWorldPos);
                     player.Message("    (Use &h/TPP X Y Z R L&s)", info.LastWorldPos);
                 }
-                player.Message( "  Country: " + Player.getGeoip( info.LastIP.ToString(), true ) );
-                player.Message( "  Region: " + Player.getGeoip( info.LastIP.ToString(), false ) );
             }
+        }
+
+        #endregion
+        #region GeoInfo
+
+        static readonly CommandDescriptor CdGeoip = new CommandDescriptor {
+            Name = "geoip",
+            Aliases = new[] { "geoinfo", "ipinfo", "geo", "ip" },
+            Category = CommandCategory.New,
+            IsConsoleSafe = true,
+            Usage = "/GeoInfo [PlayerName or IP [Offset]]",
+            Help = "Prints the extra information about a given player",
+            Handler = IPInfoHandler
+        };
+
+        static void IPInfoHandler( Player player, CommandReader cmd ) {
+            string name = cmd.Next();
+            if (name == null) {
+                // no name given, print own info
+                PrintPlayerGeoInfo( player, player.Info );
+                return;
+
+            } else if (name.Equals( player.Name, StringComparison.OrdinalIgnoreCase )) {
+                // own name given
+                player.LastUsedPlayerName = player.Name;
+                PrintPlayerGeoInfo( player, player.Info );
+                return;
+
+            } else if (!player.Can( Permission.ViewOthersInfo )) {
+                // someone else's name or IP given, permission required.
+                player.MessageNoAccess( Permission.ViewOthersInfo );
+                return;
+            }
+
+            // repeat last-typed name
+            if (name == "-") {
+                if (player.LastUsedPlayerName != null) {
+                    name = player.LastUsedPlayerName;
+                } else {
+                    player.Message( "Cannot repeat player name: you haven't used any names yet." );
+                    return;
+                }
+            }
+
+            PlayerInfo[] infos;
+            IPAddress ip;
+
+            if (name.Contains( "/" )) {
+                // IP range matching (CIDR notation)
+                string ipString = name.Substring( 0, name.IndexOf( '/' ) );
+                string rangeString = name.Substring( name.IndexOf( '/' ) + 1 );
+                byte range;
+                if (IPAddressUtil.IsIP( ipString ) && IPAddress.TryParse( ipString, out ip ) &&
+                    Byte.TryParse( rangeString, out range ) && range <= 32) {
+                    player.Message( "Searching {0}-{1}", ip.RangeMin( range ), ip.RangeMax( range ) );
+                    infos = PlayerDB.FindPlayersCidr( ip, range );
+                } else {
+                    player.Message( "Info: Invalid IP range format. Use CIDR notation." );
+                    return;
+                }
+
+            } else if (IPAddressUtil.IsIP( name ) && IPAddress.TryParse( name, out ip )) {
+                // find players by IP
+                infos = PlayerDB.FindPlayers( ip );
+
+            } else if (name.Equals( "*" )) {
+                infos = (PlayerInfo[])PlayerDB.PlayerInfoList.Clone();
+
+            } else if (name.Contains( "*" ) || name.Contains( "?" )) {
+                // find players by regex/wildcard
+                string regexString = "^" + RegexNonNameChars.Replace( name, "" ).Replace( "*", ".*" ).Replace( "?", "." ) + "$";
+                Regex regex = new Regex( regexString, RegexOptions.IgnoreCase | RegexOptions.Compiled );
+                infos = PlayerDB.FindPlayers( regex );
+
+            } else if (name.StartsWith( "@" )) {
+                string rankName = name.Substring( 1 );
+                Rank rank = RankManager.FindRank( rankName );
+                if (rank == null) {
+                    player.MessageNoRank( rankName );
+                    return;
+                } else {
+                    infos = PlayerDB.PlayerInfoList
+                                    .Where( info => info.Rank == rank )
+                                    .ToArray();
+                }
+
+            } else if (name.StartsWith( "!" )) {
+                // find online players by partial matches
+                name = name.Substring( 1 );
+                infos = Server.FindPlayers( player, name, SearchOptions.IncludeSelf )
+                              .Select( p => p.Info )
+                              .ToArray();
+            } else {
+                // find players by partial matching
+                PlayerInfo tempInfo;
+                if (!PlayerDB.FindPlayerInfo( name, out tempInfo )) {
+                    infos = PlayerDB.FindPlayers( name );
+                } else if (tempInfo == null) {
+                    player.MessageNoPlayer( name );
+                    return;
+                } else {
+                    infos = new[] { tempInfo };
+                }
+            }
+
+            Array.Sort( infos, new PlayerInfoComparer( player ) );
+
+            if (infos.Length == 1) {
+                // only one match found; print it right away
+                player.LastUsedPlayerName = infos[0].Name;
+                PrintPlayerGeoInfo( player, infos[0] );
+
+            } else if (infos.Length > 1) {
+                // multiple matches found
+                if (infos.Length <= PlayersPerPage) {
+                    // all fit to one page
+                    player.MessageManyMatches( "player", infos );
+
+                } else {
+                    // pagination
+                    int offset;
+                    if (!cmd.NextInt( out offset ))
+                        offset = 0;
+                    if (offset >= infos.Length) {
+                        offset = Math.Max( 0, infos.Length - PlayersPerPage );
+                    }
+                    PlayerInfo[] infosPart = infos.Skip( offset ).Take( PlayersPerPage ).ToArray();
+                    player.MessageManyMatches( "player", infosPart );
+                    if (offset + infosPart.Length < infos.Length) {
+                        // normal page
+                        player.Message( "Showing {0}-{1} (out of {2}). Next: &H/Info {3} {4}",
+                                        offset + 1, offset + infosPart.Length, infos.Length,
+                                        name, offset + infosPart.Length );
+                    } else {
+                        // last page
+                        player.Message( "Showing matches {0}-{1} (out of {2}).",
+                                        offset + 1, offset + infosPart.Length, infos.Length );
+                    }
+                }
+
+            } else {
+                // no matches found
+                player.MessageNoPlayer( name );
+            }
+        }
+
+        static void PrintPlayerGeoInfo( [NotNull] Player player, [NotNull] PlayerInfo info ) {
+            if (player == null)
+                throw new ArgumentNullException( "player" );
+            if (info == null)
+                throw new ArgumentNullException( "info" );
+            Player target = info.PlayerObject;
+
+            player.Message( "Geo Info about: {0} &s(&f{1}&s)", info.ClassyName, info.LastIP );
+            if (info.GeoIP != info.LastIP.ToString())
+                GetGeoip( info );
+            player.Message( "  Country: &f{1} &s(&f{0}&s)", info.CountryCode, info.CountryName );
+            player.Message( "  Region: &f{1} &s(&f{0}&s)", info.RegionCode, info.RegionName );
+            player.Message( "  City: &f" + info.City );
+            player.Message( "  ZipCode: &f" + info.ZipCode );
+            player.Message( "  Latitude: &f" + info.Latitude );
+            player.Message( "  Longitude: &f" + info.Longitude );
+            player.Message( "  Metro Code: &f" + info.MetroCode );
+            player.Message( "  Area Code: &f" + info.AreaCode );
+        }
+
+        #endregion
+        #region GeoInfoNonPlayer
+
+        static readonly CommandDescriptor CdGeoipNp = new CommandDescriptor {
+            Name = "geoipnonplayer",
+            Aliases = new[] { "geonpinfo", "ipnpinfo", "geonp", "ipnp" },
+            Category = CommandCategory.New,
+            IsConsoleSafe = true,
+            Usage = "/GeoNPInfo IP",
+            Help = "Prints the geoinfo about the specified IP address",
+            Handler = IPNPInfoHandler
+        };
+
+        static void IPNPInfoHandler( Player player, CommandReader cmd ) {
+            string ipString = cmd.Next();
+            IPAddress ip;
+            if (!(IPAddressUtil.IsIP( ipString ) && IPAddress.TryParse( ipString, out ip ))){
+                player.Message( "Info: Invalid IP range format. Use CIDR notation." );
+                return;
+            }
+            WebClient client = new WebClient();
+            Stream stream;
+            try {
+                stream = client.OpenRead( "http://geo.liamstanley.io/xml/" + ip );
+            } catch {
+                try {
+                    stream = client.OpenRead( "http://geoip.cf/xml/" + ip );
+                } catch {
+                    try {
+                        stream = client.OpenRead( "http://freegeoip.net/xml/" + ip );
+                    } catch {
+                        return;
+                    }
+                }
+            }
+            StreamReader reader = new StreamReader( stream );
+            String content = reader.ReadToEnd();
+
+            XmlReaderSettings set = new XmlReaderSettings();
+            set.ConformanceLevel = ConformanceLevel.Fragment;
+
+            XPathDocument doc = new XPathDocument( XmlReader.Create( new StringReader( content ), set ) );
+
+            XPathNavigator nav = doc.CreateNavigator();
+            player.Message( "Geo Info about: &f{0}", nav.SelectSingleNode( "/Response/Ip" ) );
+            player.Message( "  Country: &f{0} &s(&f{1}&s)", nav.SelectSingleNode( "/Response/CountryName" ), nav.SelectSingleNode( "/Response/CountryCode" ) );
+            player.Message( "  Region: &f{0} &s(&f{1}&s)",nav.SelectSingleNode( "/Response/RegionName" ), nav.SelectSingleNode( "/Response/RegionCode" ));
+            player.Message( "  City: &f" + nav.SelectSingleNode( "/Response/City" ));
+            player.Message( "  ZipCode: &f" + nav.SelectSingleNode( "/Response/ZipCode" ));
+            player.Message( "  Latitude: &f" + nav.SelectSingleNode( "/Response/Latitude" ));
+            player.Message( "  Longitude: &f" + nav.SelectSingleNode( "/Response/Longitude" ));
+            player.Message( "  Metro Code: &f" + nav.SelectSingleNode( "/Response/MetroCode" ));
+            player.Message( "  Area Code: &f" + nav.SelectSingleNode( "/Response/AreaCode" ));
+        }
+
+        #endregion
+        #region GEOIP
+
+        public static void GetGeoip( PlayerInfo info ) {
+            string ip = info.LastIP.ToString();
+            if (ip == info.GeoIP)
+                return;
+            if (info.LastIP.ToString().StartsWith( "192.168" ) || info.LastIP.ToString().StartsWith( "10.0" ) ||
+                info.LastIP.ToString().StartsWith( "127.0" ) || info.LastIP.ToString().StartsWith( "255.255" ))
+                ip = Server.ExternalIP.ToString();
+            WebClient client = new WebClient();
+            Stream stream;
+            try {
+                stream = client.OpenRead( "http://geo.liamstanley.io/xml/" + ip );
+            } catch {
+                try {
+                    stream = client.OpenRead( "http://geoip.cf/xml/" + ip );
+                } catch {
+                    try {
+                        stream = client.OpenRead( "http://freegeoip.net/xml/" + ip );
+                    } catch {
+                        return;
+                    }
+                }
+            }
+            StreamReader reader = new StreamReader( stream );
+            String content = reader.ReadToEnd();
+
+            XmlReaderSettings set = new XmlReaderSettings();
+            set.ConformanceLevel = ConformanceLevel.Fragment;
+
+            XPathDocument doc = new XPathDocument( XmlReader.Create( new StringReader( content ), set ) );
+
+            XPathNavigator nav = doc.CreateNavigator();
+            string geoip;
+            info.GeoIP = nav.SelectSingleNode( "/Response/Ip" ).ToString();
+            info.CountryCode = nav.SelectSingleNode( "/Response/CountryCode" ).ToString();
+            info.CountryName = nav.SelectSingleNode( "/Response/CountryName" ).ToString();
+            info.RegionCode = nav.SelectSingleNode( "/Response/RegionCode" ).ToString();
+            info.RegionName = nav.SelectSingleNode( "/Response/RegionName" ).ToString();
+            info.City = nav.SelectSingleNode( "/Response/City" ).ToString();
+            info.ZipCode = nav.SelectSingleNode( "/Response/ZipCode" ).ToString();
+            info.Latitude = nav.SelectSingleNode( "/Response/Latitude" ).ToString();
+            info.Longitude = nav.SelectSingleNode( "/Response/Longitude" ).ToString();
+            info.MetroCode = nav.SelectSingleNode( "/Response/MetroCode" ).ToString();
+            info.AreaCode = nav.SelectSingleNode( "/Response/AreaCode" ).ToString();
         }
 
         #endregion

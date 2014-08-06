@@ -1185,11 +1185,10 @@ namespace fCraft
             if (e == null) throw new ArgumentNullException("e");
             if (ConfigKey.IRCBotAnnounceServerJoins.Enabled() && !e.Player.Info.IsHidden)
             {
-                string message = String.Format("{0}&SPlayer {1}&S connected from {3}. On world {2}",
+                string message = String.Format("{0}&SPlayer {1}&S connected. On world {2}",
                                                 BoldCode,
                                                 e.Player.ClassyName,
-                                                e.Player.World.ClassyName, 
-                                                Player.getGeoip(e.Player.IP.ToString(), true));
+                                                e.Player.World.ClassyName);
                 SendChannelMessage(message);
             }
         }

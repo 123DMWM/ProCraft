@@ -102,7 +102,7 @@ namespace fCraft {
 
         /// <summary> Begins to asynchronously check player's account type. </summary>
         public void CheckAccountType() {
-            if( AccountType != AccountType.Paid ) {
+            if( AccountType != AccountType.Paid && ConfigKey.HeartbeatUrl.ToString().ToLower().Contains("minecraft.net")) {
                 Scheduler.NewBackgroundTask( CheckPaidStatusCallback ).RunOnce( this, TimeSpan.Zero );
             }
         }
@@ -111,6 +111,23 @@ namespace fCraft {
         static void CheckPaidStatusCallback( SchedulerTask task ) {
             PlayerInfo info = (PlayerInfo)task.UserState;
             info.AccountType = Player.CheckPaidStatus( info.Name );
+        }
+
+        /// <summary> Begins to asynchronously check player's account type. </summary>
+        public void GeoipLogin() {
+            if (GeoIP != LastIP.ToString()) {
+                Scheduler.NewBackgroundTask(GeoipLoginCallback).RunOnce(this, TimeSpan.Zero);
+            } else {
+                Server.Players.Message( "&aPlayer &f{0}&a comes from {1}, {2}", ClassyName, RegionName, CountryName );
+                IRC.SendChannelMessage( "&aPlayer &f{0}&a comes from {1}, {2}", ClassyName, RegionName, CountryName );
+                Logger.Log( LogType.UserActivity, "&f{0}&a comes from {1}, {2}", ClassyName, RegionName, CountryName );
+            }
+        }
+
+
+        static void GeoipLoginCallback( SchedulerTask task ) {
+            PlayerInfo info = (PlayerInfo)task.UserState;
+            Player.GetGeoip( info );
         }
 
 
@@ -392,6 +409,31 @@ namespace fCraft {
         /// For online players, current IP. </summary>
         [NotNull]
         public IPAddress LastIP;
+
+        #region Geoip
+        /// <summary> Players IP address during the last geoip lookup</summary>
+        public string GeoIP;
+        /// <summary> Players country code based on geoip</summary>
+        public string CountryCode;
+        /// <summary> Players country name based on geoip</summary>
+        public string CountryName;
+        /// <summary> Players region code based on geoip</summary>
+        public string RegionCode;
+        /// <summary> Players region name based on geoip</summary>
+        public string RegionName;
+        /// <summary> Players city based on geoip</summary>
+        public string City;
+        /// <summary> Players zipcode based on geoip</summary>
+        public string ZipCode;
+        /// <summary> Players latitude based on geoip</summary>
+        public string Latitude;
+        /// <summary> Players longitude based on geoip</summary>
+        public string Longitude;
+        /// <summary> Players metro code based on geoip</summary>
+        public string MetroCode;
+        /// <summary> Players area code based on geoip</summary>
+        public string AreaCode;
+        #endregion
 
 
         #region Constructors and Serialization
@@ -694,6 +736,29 @@ namespace fCraft {
             {
                 short.TryParse(fields[68], out info.JumpHeight);
             }
+
+            if (fields.Length > 69)
+                info.GeoIP = fields[69];
+            if (fields.Length > 70)
+                info.CountryCode = fields[70];
+            if (fields.Length > 71)
+                info.CountryName = fields[71];
+            if (fields.Length > 72)
+                info.RegionCode = fields[72];
+            if (fields.Length > 73)
+                info.RegionName = fields[73];
+            if (fields.Length > 74)
+                info.City = fields[74];
+            if (fields.Length > 75)
+                info.ZipCode = fields[75];
+            if (fields.Length > 76)
+                info.Latitude = fields[76];
+            if (fields.Length > 77)
+                info.Longitude = fields[77];
+            if (fields.Length > 78)
+                info.MetroCode = fields[78];
+            if (fields.Length > 79)
+                info.AreaCode = fields[79];
 
             if( info.LastSeen < info.FirstLoginDate ) {
                 info.LastSeen = info.FirstLoginDate;
@@ -1161,11 +1226,10 @@ namespace fCraft {
             sb.Append(ReachDistance); // 61
             sb.Append(',');
 
-            if (Email != null)
-            { sb.Append(Email); } //62
-            sb.Append(',');
+            if (Email != null) { sb.Append( Email ); } //62
+            sb.Append( ',' );
 
-            #region HackControl
+            #region HackControl //63-68
             sb.Append(AllowFlying); // 63
             sb.Append(',');
 
@@ -1181,8 +1245,31 @@ namespace fCraft {
             sb.Append(AllowThirdPerson); // 67
             sb.Append(',');
 
-            sb.Append(JumpHeight); // 68
+            sb.Append( JumpHeight ); // 68
+            sb.Append( ',' );
             #endregion
+
+            sb.Append( GeoIP ); // 69
+            sb.Append( ',' );
+            sb.Append( CountryCode ); // 70
+            sb.Append( ',' );
+            sb.Append( CountryName ); // 71
+            sb.Append( ',' );
+            sb.Append( RegionCode ); // 72
+            sb.Append( ',' );
+            sb.Append( RegionName ); // 73
+            sb.Append( ',' );
+            sb.Append( City ); // 74
+            sb.Append( ',' );
+            sb.Append( ZipCode ); // 75
+            sb.Append( ',' );
+            sb.Append( Latitude ); // 76
+            sb.Append( ',' );
+            sb.Append( Longitude ); // 77
+            sb.Append( ',' );
+            sb.Append( MetroCode ); // 78
+            sb.Append( ',' );
+            sb.Append( AreaCode ); // 79
         }
 
         #endregion
