@@ -1956,8 +1956,11 @@ namespace fCraft {
             info.Longitude = nav.SelectSingleNode( "/Response/Longitude" ).ToString();
             info.MetroCode = nav.SelectSingleNode( "/Response/MetroCode" ).ToString();
             info.AreaCode = nav.SelectSingleNode( "/Response/AreaCode" ).ToString();
-            Server.Players.Message( "&2Player &f{0}&2 comes from {1}, {2}", info.ClassyName, info.RegionName, info.CountryName );
-            IRC.SendChannelMessage( "&2Player &f{0}&2 comes from {1}, {2}", info.ClassyName, info.RegionName, info.CountryName );
+            Server.Players.CanSee(info.PlayerObject).Message( "&2Player &f{0}&2 comes from {1}, {2}", info.ClassyName, info.RegionName, info.CountryName );
+            if (!info.IsHidden) {
+                IRC.SendChannelMessage("&2Player &f{0}&2 comes from {1}, {2}", info.ClassyName, info.RegionName,
+                    info.CountryName);
+            }
             Logger.Log( LogType.UserActivity, "&f{0}&2 comes from {1}, {2}", info.ClassyName, info.RegionName, info.CountryName );
         }
 
