@@ -3283,8 +3283,8 @@ namespace fCraft {
                 throw new ArgumentNullException( "player" );
             if (info == null)
                 throw new ArgumentNullException( "info" );
-            Player target = info.PlayerObject;
 
+            if (!player.Can(Permission.ViewPlayerIPs)) { info = player.Info;}
             player.Message( "Geo Info about: {0} &s(&f{1}&s)", info.ClassyName, info.LastIP );
             if (info.GeoIP != info.LastIP.ToString())
                 GetGeoip( info );
