@@ -3317,6 +3317,10 @@ namespace fCraft {
         static void IPNPInfoHandler( Player player, CommandReader cmd ) {
             string ipString = cmd.Next();
             IPAddress ip;
+            if (ipString.Equals("")) {
+                player.Message(CdGeoipNp.Usage);
+                return;
+            }
             if (!(IPAddressUtil.IsIP( ipString ) && IPAddress.TryParse( ipString, out ip ))){
                 player.Message( "Info: Invalid IP range format. Use CIDR notation." );
                 return;
@@ -3371,6 +3375,10 @@ namespace fCraft {
 
         static void APIPInfoHandler( Player player, CommandReader cmd ) {
             string name = cmd.Next();
+            if (name.Equals("")) {
+                player.Message(CdApiPlayer.Usage);
+                return;
+            }
             WebClient webClient = new WebClient();
             var result = JsonObject.Parse( webClient.DownloadString( "http://www.classicube.net/api/player/" + name ) );
             string error;
@@ -3432,6 +3440,10 @@ namespace fCraft {
 
         static void APIDInfoHandler( Player player, CommandReader cmd ) {
             string name = cmd.Next();
+            if (name.Equals("")) {
+                player.Message(CdApiID.Usage);
+                return;
+            }
             WebClient webClient = new WebClient();
             var result = JsonObject.Parse( webClient.DownloadString( "http://www.classicube.net/api/id/" + name ) );
             string error;
