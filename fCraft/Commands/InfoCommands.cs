@@ -3373,44 +3373,47 @@ namespace fCraft {
             Handler = APIPInfoHandler
         };
 
-        static void APIPInfoHandler( Player player, CommandReader cmd ) {
+        private static void APIPInfoHandler(Player player, CommandReader cmd) {
             string name = cmd.Next();
             if (name.Equals("")) {
                 player.Message(CdApiPlayer.Usage);
                 return;
             }
             WebClient webClient = new WebClient();
-            var result = JsonObject.Parse( webClient.DownloadString( "http://www.classicube.net/api/player/" + name ) );
+            var result = JsonObject.Parse(webClient.DownloadString("http://www.classicube.net/api/player/" + name));
             string error;
             result.TryGetValue("error", out error);
             string flags1;
-            result.TryGetValue( "flags", out flags1 );
-            string flags2 = "Classicube User, ";
-            if (flags1.Contains( 'b' )) {
+            result.TryGetValue("flags", out flags1);
+            string flags2 = "ClassiCube User, ";
+            if (flags1.Contains('b')) {
                 flags2 = flags2 + "Banned from forums, ";
             }
-            if (flags1.Contains( 'a' )) {
+            if (flags1.Contains('a')) {
                 flags2 = flags2 + "Forum Administrator, ";
             }
-            if (flags1.Contains( 'm' )) {
+            if (flags1.Contains('m')) {
                 flags2 = flags2 + "Forum Moderator, ";
             }
-            if (flags1.Contains( 'd' )) {
-                flags2 = flags2 + "Classicube Devloper, ";
+            if (flags1.Contains('d')) {
+                flags2 = flags2 + "ClassiCube Devloper, ";
+            }
+            if (flags1.Contains('e')) {
+                flags2 = flags2 + "ClassiCube Blog Editor, ";
             }
             flags2 = flags2.Remove(flags2.Length - 2, 2);
             string id;
-            result.TryGetValue( "id", out id);
+            result.TryGetValue("id", out id);
             string premium;
-            result.TryGetValue( "premium", out premium );
+            result.TryGetValue("premium", out premium);
             string registered1;
-            result.TryGetValue( "registered", out registered1 );
+            result.TryGetValue("registered", out registered1);
             double registered2;
             double.TryParse(registered1, out registered2);
-            var epoch = new DateTime( 1970, 1, 1, 0, 0, 0, DateTimeKind.Utc );
-            DateTime registered3 = epoch.AddSeconds( registered2 );
+            var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            DateTime registered3 = epoch.AddSeconds(registered2);
             string username;
-            result.TryGetValue( "username", out username );
+            result.TryGetValue("username", out username);
 
             if (error.ToLower().Equals("user not found")) {
                 player.Message("User not found!");
@@ -3418,11 +3421,13 @@ namespace fCraft {
             }
 
             player.Message("API info about {0}", username);
-            player.Message( "  Flags: {0}", flags2 );
-            player.Message( "  ID: {0}", id );
-            player.Message( "  Premium*: {0}", premium );
-            player.Message( "  Registered: {0} at {1} UTC", registered3.ToLongDateString(), registered3.ToLongTimeString() );
-            player.Message( "* = Ignore for now " );
+            player.Message("  Flags: {0} {1}", flags2,
+                flags1.Replace("\n", "").Replace("\r", "").Replace("\"", "").Replace(" ", ""));
+            player.Message("  ID: {0}", id);
+            player.Message("  Premium*: {0}", premium);
+            player.Message("  Registered: {0} at {1} UTC", registered3.ToLongDateString(),
+                registered3.ToLongTimeString());
+            player.Message("* = Ignore for now ");
         }
 
         #endregion
@@ -3438,56 +3443,61 @@ namespace fCraft {
             Handler = APIDInfoHandler
         };
 
-        static void APIDInfoHandler( Player player, CommandReader cmd ) {
+        private static void APIDInfoHandler(Player player, CommandReader cmd) {
             string name = cmd.Next();
             if (name.Equals("")) {
                 player.Message(CdApiID.Usage);
                 return;
             }
             WebClient webClient = new WebClient();
-            var result = JsonObject.Parse( webClient.DownloadString( "http://www.classicube.net/api/id/" + name ) );
+            var result = JsonObject.Parse(webClient.DownloadString("http://www.classicube.net/api/id/" + name));
             string error;
-            result.TryGetValue( "error", out error );
+            result.TryGetValue("error", out error);
             string flags1;
-            result.TryGetValue( "flags", out flags1 );
-            string flags2 = "Classicube User, ";
-            if (flags1.Contains( 'b' )) {
+            result.TryGetValue("flags", out flags1);
+            string flags2 = "ClassiCube User, ";
+            if (flags1.Contains('b')) {
                 flags2 = flags2 + "Banned from forums, ";
             }
-            if (flags1.Contains( 'a' )) {
+            if (flags1.Contains('a')) {
                 flags2 = flags2 + "Forum Administrator, ";
             }
-            if (flags1.Contains( 'm' )) {
+            if (flags1.Contains('m')) {
                 flags2 = flags2 + "Forum Moderator, ";
             }
-            if (flags1.Contains( 'd' )) {
-                flags2 = flags2 + "Classicube Devloper, ";
+            if (flags1.Contains('d')) {
+                flags2 = flags2 + "ClassiCube Devloper, ";
             }
-            flags2 = flags2.Remove( flags2.Length - 2, 2 );
+            if (flags1.Contains('e')) {
+                flags2 = flags2 + "ClassiCube Blog Editor, ";
+            }
+            flags2 = flags2.Remove(flags2.Length - 2, 2);
             string id;
-            result.TryGetValue( "id", out id );
+            result.TryGetValue("id", out id);
             string premium;
-            result.TryGetValue( "premium", out premium );
+            result.TryGetValue("premium", out premium);
             string registered1;
-            result.TryGetValue( "registered", out registered1 );
+            result.TryGetValue("registered", out registered1);
             double registered2;
-            double.TryParse( registered1, out registered2 );
-            var epoch = new DateTime( 1970, 1, 1, 0, 0, 0, DateTimeKind.Utc );
-            DateTime registered3 = epoch.AddSeconds( registered2 );
+            double.TryParse(registered1, out registered2);
+            var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            DateTime registered3 = epoch.AddSeconds(registered2);
             string username;
-            result.TryGetValue( "username", out username );
+            result.TryGetValue("username", out username);
 
-            if (error.ToLower().Equals( "user not found" )) {
-                player.Message( "User not found!" );
+            if (error.ToLower().Equals("user not found")) {
+                player.Message("User not found!");
                 return;
             }
 
-            player.Message( "API info about {0}", username );
-            player.Message( "  Flags: {0}", flags2 );
-            player.Message( "  ID: {0}", id );
-            player.Message( "  Premium*: {0}", premium );
-            player.Message( "  Registered: {0} at {1} UTC", registered3.ToLongDateString(), registered3.ToLongTimeString() );
-            player.Message( "* = Ignore for now " );
+            player.Message("API info about {0}", username);
+            player.Message("  Flags: {0} {1}", flags2,
+                flags1.Replace("\n", "").Replace("\r", "").Replace("\"", "").Replace(" ", ""));
+            player.Message("  ID: {0}", id);
+            player.Message("  Premium*: {0}", premium);
+            player.Message("  Registered: {0} at {1} UTC", registered3.ToLongDateString(),
+                registered3.ToLongTimeString());
+            player.Message("* = Ignore for now ");
         }
 
         #endregion
