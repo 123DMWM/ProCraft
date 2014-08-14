@@ -1429,7 +1429,7 @@ namespace fCraft
                 return;
             } else if (player.GlobalChatAllowed) {
                 string rawMessage = player.ClassyName + Color.White + ": " + message;
-                message = player.ClassyName + Color.Black + ": " + message;
+                message = player.ClassyName + Color.IRCReset + ": " + message;
                 SendList.Message("&i[Global] " + rawMessage);
                 GlobalChat.GlobalThread.SendChannelMessage(Color.MinecraftToIrcColors(message));
             }
