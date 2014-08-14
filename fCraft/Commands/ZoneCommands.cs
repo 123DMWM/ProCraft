@@ -1036,8 +1036,6 @@ namespace fCraft {
                 {
                     if (p.SupportsSelectionCuboid)
                     {
-                        p.Send(Packet.MakeRemoveSelection(zone.ZoneID));
-
                         if (zone.ShowZone == true)
                         {
                             p.Send(Packet.MakeMakeSelection(zone.ZoneID, zone.Name, zone.Bounds, zone.Color, alpha));
