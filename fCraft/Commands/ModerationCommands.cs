@@ -710,13 +710,13 @@ namespace fCraft {
                 player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
             } else if (option == "wisdom") {
                 string[] wisdomStrings = {
-                    "it uses css to conenct to a html page",
-                    "Well 'crosshair' is a really general term",
-                    "Have you decided to make 800Craft work with ClassiCube yet?", "got somet to tell yah",
-                    "i am still gonna give u alot of credit", "not good at php java coding etc...",
-                    "only good with html and css :(", "i made html and css code from scratch and website",
-                    "i wrote from scratch", "could you not list the servers made with my software", "i made template",
-                    "but uses html formatting to script it", "i will use some other BETTER software then"
+                    "&fit uses css to conenct to a html page",
+                    "&fWell 'crosshair' is a really general term",
+                    "&fHave you decided to make 800Craft work with ClassiCube yet?", "&fgot somet to tell yah",
+                    "&fi am still gonna give u alot of credit", "&fnot good at php java coding etc...",
+                    "&fonly good with html and css :(", "&fi made html and css code from scratch and website",
+                    "&fi wrote from scratch", "&fcould you not list the servers made with my software", "&fi made template",
+                    "&fbut uses html formatting to script it", "&fi will use some other BETTER software then"
                 };
                 Random randWisdomString = new Random();
                 if (player.Info.TimesUsedBot == 0) {

@@ -639,7 +639,7 @@ namespace fCraft {
 
             }
 
-            else if( !Can( Permission.UseSpeedHack ) && !Info.AllowSpeedhack) {
+            else if( !Can( Permission.UseSpeedHack ) || !Info.AllowSpeedhack) {
                 int distSquared = delta.X * delta.X + delta.Y * delta.Y + delta.Z * delta.Z;
                 // speedhack detection
                 if( DetectMovementPacketSpam() ) {
