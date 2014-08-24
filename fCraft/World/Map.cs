@@ -579,16 +579,16 @@ namespace fCraft {
 
         #region Utilities
         /// <summary> Checks if a given map dimension (width, height, or length) is acceptable.
-        /// Values between 1 and 2048 are technically allowed. </summary>
+        /// Values between 1 and 2047 are technically allowed. </summary>
         public static bool IsValidDimension( int dimension ) {
-            return dimension >= 16 && dimension <= 2048;
+            return dimension >= 16 && dimension <= 1024;
         }
 
 
         /// <summary> Checks if a given map dimension (width, height, or length) is among the set of recommended values
-        /// Recommended values are: 16, 32, 64, 128, 256, 512, 1024, and 2048 </summary>
+        /// Recommended values are: 16, 32, 64, 128, 256, 512, 1024 </summary>
         public static bool IsRecommendedDimension( int dimension ) {
-            return dimension >= 16 && (dimension & (dimension - 1)) == 0 && dimension <= 2048;
+            return dimension >= 16 && (dimension & (dimension - 1)) == 0 && dimension <= 1024;
         }
 
 
