@@ -1031,7 +1031,7 @@ namespace fCraft {
 
             // Check map dimensions
             const string dimensionRecommendation = "Dimensions must be between 16 and 2047. " +
-                                                   "Recommended values: 16, 32, 64, 128, 256, 512, and 1024.";
+                                                   "Recommended values: 16, 32, 64, 128, 256, 512, 1024, and 2048.";
             if( !Map.IsValidDimension( mapWidth ) ) {
                 player.Message( "Cannot make map with width {0}. {1}", mapWidth, dimensionRecommendation );
                 return;
@@ -1051,7 +1051,7 @@ namespace fCraft {
             if( !cmd.IsConfirmed && (!Map.IsRecommendedDimension( mapWidth ) || !Map.IsRecommendedDimension( mapLength ) || mapHeight % 16 != 0) ) {
                 player.Message( "&WThe map will have non-standard dimensions. " +
                                 "You may see glitched blocks or visual artifacts. " +
-                                "The only recommended map dimensions are: 16, 32, 64, 128, 256, 512, and 1024." );
+                                "The only recommended map dimensions are: 16, 32, 64, 128, 256, 512, 1024, and 2048." );
             }
 
             // figure out full template name

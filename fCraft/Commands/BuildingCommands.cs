@@ -955,7 +955,7 @@ namespace fCraft {
                 return;
             }
 
-            if (height < 6 || height > 1024)
+            if (height < 6 || height > 2048)
             {
                 player.Message("Tree height must be 6 blocks or above");
                 return;
