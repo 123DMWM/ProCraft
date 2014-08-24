@@ -1284,14 +1284,15 @@ namespace fCraft
         };
 
         private static void textHotKeyHandler(Player player, CommandReader cmd) {
-            if (cmd.Count != 4) {
-                CdtextHotKey.PrintUsage(player);
-                return;
-            }
             string Label = cmd.Next();
             string Action = cmd.Next();
             string third = cmd.Next();
             string fourth = cmd.Next();
+            if (Label == null || Action == null || third == null || fourth == null) {
+                CdtextHotKey.PrintUsage(player);
+                return;
+            }
+
             int KeyCode;
             if (!int.TryParse(third, out KeyCode)) {
                 player.Message("Error: Invalid Integer ({0})", third);
@@ -1343,6 +1344,10 @@ namespace fCraft
 
         private static void GHandler(Player player, CommandReader cmd) {
             string message = cmd.NextAll();
+            if (message.Equals("")) {
+                CdGlobal.PrintUsage(player);
+                return;
+            }
             if (message == "connect") {
                 if (player.Can(Permission.ReadStaffChat)) {
                     if (GlobalChat.GlobalThread.isConnected) {

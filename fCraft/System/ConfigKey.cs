@@ -13,6 +13,12 @@ official server list (if server is public).",
             MinLength = 1, MaxLength = 64 )]
         ServerName,
 
+        [StringKey( ConfigSection.General, "<Owners MC Name>",
+@"The name of the server owner, as shown when someone says Who is
+the server owner? in chat",
+    MinLength = 1, MaxLength = 16 )]
+        ServerOwner,
+
 
         [StringKey( ConfigSection.General, "Welcome to the server!",
 @"MOTD (Message Of The Day) is a message shown to connecting players 

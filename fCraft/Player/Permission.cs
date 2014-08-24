@@ -83,9 +83,6 @@ namespace fCraft {
         /// accounts that used the IP. </summary>
         BanAll,
 
-        /// <summary> Ability to use the /totalban command. </summary>
-        TotalBan,
-
         /// <summary> Ability to promote players to a higher rank. </summary>
         Promote,
 

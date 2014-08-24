@@ -79,6 +79,9 @@ namespace fCraft {
         [CanBeNull]
         public World MainWorld { get; set; }
 
+        /// <summary> Whether this rank is a donor rank or not. </summary>
+        public bool IsDonor;
+
 
         #region Constructors
 
@@ -277,6 +280,17 @@ namespace fCraft {
                 HasReservedSlot = false;
             }
 
+            // Is Donor?. (assuming 'no' if not given)
+            if ((attr = el.Attribute( "isDonor" )) != null) {
+                if (!Boolean.TryParse( attr.Value, out IsDonor )) {
+                    Logger.Log( LogType.Warning,
+                                "Rank({0}): Could not parse value for isDonor. Assuming \"false\".", Name );
+                    IsDonor = false;
+                }
+            } else {
+                IsDonor = false;
+            }
+
 
             // Security circumvention. (assuming 'no' if not given)
             if( ( attr = el.Attribute( "allowSecurityCircumvention" ) ) != null ) {
@@ -391,6 +405,7 @@ namespace fCraft {
             if( MaxCaps > 0 ) rankTag.Add( new XAttribute( "MaxCaps", MaxCaps ) );
             if( IdleKickTimer > 0 ) rankTag.Add( new XAttribute( "idleKickAfter", IdleKickTimer ) );
             if( HasReservedSlot ) rankTag.Add( new XAttribute( "reserveSlot", HasReservedSlot ) );
+            if( IsDonor ) rankTag.Add( new XAttribute( "isDonor", IsDonor ) );
             if( AllowSecurityCircumvention ) rankTag.Add( new XAttribute( "allowSecurityCircumvention", AllowSecurityCircumvention ) );
             rankTag.Add( new XAttribute( "copySlots", CopySlots ) );
             rankTag.Add( new XAttribute( "fillLimit", FillLimit ) );

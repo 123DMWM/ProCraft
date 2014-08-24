@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using fCraft.Events;
 using JetBrains.Annotations;
 using System.IO;
+using Microsoft.SqlServer.Server;
 
 namespace fCraft {
     /// <summary> Helper class for handling player-generated chat. </summary>
@@ -82,7 +83,7 @@ namespace fCraft {
             }
             double BotTime;
             
-            if (LDistance(rawMessage.ToLower(), "how do i rank up?") <= 0.5)
+            if (LDistance(rawMessage.ToLower(), "how do i rank up?") <= 0.75)
             {
                 BotTime = (DateTime.Now - player.Info.LastTimeUsedBot).TotalSeconds;
                 if (BotTime > 5)
@@ -93,22 +94,24 @@ namespace fCraft {
                     player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
                 }
             }
-            if (LDistance(rawMessage.ToLower(), "who is the owner?") <= 0.5)
+            if (LDistance(rawMessage.ToLower(), "who is the owner?") <= 0.75)
             {
                 BotTime = (DateTime.Now - player.Info.LastTimeUsedBot).TotalSeconds;
-                if (BotTime > 5)
-                {
-                    var all = PlayerDB.PlayerInfoList.Where(w => w.Rank == RankManager.HighestRank).OrderBy( p => p.TimeSinceFirstLogin ).Reverse();
-                    var closest = all.Take( 1 ).ToArray();
-                    PlayerInfo test = closest[0];
-                    Server.Players.Message("&6Bot&f: The owner is {0}", test.ClassyName);
-                    IRC.SendChannelMessage( "\u212C&6Bot\u211C: The owner is {0}", test.ClassyName );
+                if (BotTime > 5) {
+                    PlayerInfo owner;
+                    if (PlayerDB.FindPlayerInfo(ConfigKey.ServerOwner.ToString(), out owner)) {
+                        Server.Players.Message( "&6Bot&f: The owner is {0}", owner.Name );
+                        IRC.SendChannelMessage( "\u212C&6Bot\u211C: The owner is {0}", owner.Name );
+                    } else {
+                        Server.Players.Message( "&6Bot&f: The owner is {0}", RankManager.HighestRank.Color + ConfigKey.ServerOwner );
+                        IRC.SendChannelMessage( "\u212C&6Bot\u211C: The owner is {0}", RankManager.HighestRank.Color + ConfigKey.ServerOwner );
+                    }
                     player.Info.LastTimeUsedBot = DateTime.Now;
                     player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
                 }
             }
-            if (LDistance( rawMessage.ToLower(), "what is this server called?" ) <= 0.5
-                || LDistance( rawMessage.ToLower(), "what is the name of this server?" ) <= 0.5)
+            if (LDistance( rawMessage.ToLower(), "what is this server called?" ) <= 0.75
+                || LDistance( rawMessage.ToLower(), "what is the name of this server?" ) <= 0.75)
             {
                 BotTime = (DateTime.Now - player.Info.LastTimeUsedBot).TotalSeconds;
                 if (BotTime > 5)
@@ -119,7 +122,7 @@ namespace fCraft {
                     player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
                 }
             }
-            if (LDistance( rawMessage.ToLower(), "where can i build?" ) <= 0.5)
+            if (LDistance( rawMessage.ToLower(), "where can i build?" ) <= 0.75)
             {
                 BotTime = (DateTime.Now - player.Info.LastTimeUsedBot).TotalSeconds;
                 if (BotTime > 5)
@@ -130,13 +133,15 @@ namespace fCraft {
                     player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
                 }
             }
-            if (LDistance(rawMessage.ToLower(), "what is my next rank?") <= 0.5 ||
-                LDistance(rawMessage.ToLower(), "what rank is after this one?") <= 0.5) {
+            if (LDistance(rawMessage.ToLower(), "what is my next rank?") <= 0.75 ||
+                LDistance(rawMessage.ToLower(), "what rank is after this one?") <= 0.75) {
                 BotTime = (DateTime.Now - player.Info.LastTimeUsedBot).TotalSeconds;
                 Rank meh = player.Info.Rank.NextRankUp;
                 if (BotTime > 5 && player.Info.Rank != RankManager.HighestRank) {
-                    if (meh.Name.ToLower().Equals("donor") || meh.Name.ToLower().Equals("hero")) {
-                        meh = player.Info.Rank.NextRankUp.NextRankUp;
+                tryagain:
+                    if (meh.IsDonor) {
+                        meh = meh.NextRankUp;
+                        goto tryagain;
                     }
                     Server.Players.Message("&6Bot&f: Your next rank is: " + meh.ClassyName);
                     IRC.SendChannelMessage("\u212C&6Bot\u211C: Your next rank is: " + meh.ClassyName);

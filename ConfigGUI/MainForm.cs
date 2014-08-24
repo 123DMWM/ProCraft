@@ -611,6 +611,7 @@ Your rank is {RANK}&S. Type &H/Help&S for help." );
             nCopyPasteSlots.Value = rank.CopySlots;
             nFillLimit.Value = rank.FillLimit;
             xAllowSecurityCircumvention.Checked = rank.AllowSecurityCircumvention;
+            xDonor.Checked = rank.IsDonor;
 
             foreach( ListViewItem item in vPermissions.Items ) {
                 item.Checked = rank.Permissions[item.Index];
@@ -691,6 +692,7 @@ Your rank is {RANK}&S. Type &H/Help&S for help." );
             xAllowSecurityCircumvention.Checked = false;
             nCopyPasteSlots.Value = 0;
             nFillLimit.Value = 32;
+            xDonor.Checked = false;
             foreach( ListViewItem item in vPermissions.Items ) {
                 item.Checked = false;
                 item.Font = vPermissions.Font;
@@ -945,6 +947,12 @@ Your rank is {RANK}&S. Type &H/Help&S for help." );
             nUpperCharLimit.Enabled = xUpperCharLimit.Checked;
         }
 
+        private void xDonor_CheckedChanged( object sender, EventArgs e ) {
+            if (selectedRank == null)
+                return;
+            selectedRank.IsDonor = xDonor.Checked;
+        }
+
         private void vPermissions_ItemChecked( object sender, ItemCheckedEventArgs e ) {
             bool check = e.Item.Checked;
             if( check ) {
@@ -996,12 +1004,9 @@ Your rank is {RANK}&S. Type &H/Help&S for help." );
                         vPermissions.Items[(int)Permission.BanIP].ForeColor = SystemColors.GrayText;
                         vPermissions.Items[(int)Permission.BanAll].Checked = false;
                         vPermissions.Items[(int)Permission.BanAll].ForeColor = SystemColors.GrayText;
-                        vPermissions.Items[(int)Permission.TotalBan].Checked = false;
-                        vPermissions.Items[(int)Permission.TotalBan].ForeColor = SystemColors.GrayText;
                     } else {
                         vPermissions.Items[(int)Permission.BanIP].ForeColor = SystemColors.ControlText;
                         vPermissions.Items[(int)Permission.BanAll].ForeColor = SystemColors.ControlText;
-                        vPermissions.Items[(int)Permission.TotalBan].ForeColor = SystemColors.ControlText;
                     }
                     break;
 
@@ -1009,12 +1014,9 @@ Your rank is {RANK}&S. Type &H/Help&S for help." );
                     if( check ) {
                         vPermissions.Items[(int)Permission.Ban].Checked = true;
                         vPermissions.Items[(int)Permission.BanAll].ForeColor = SystemColors.ControlText;
-                        vPermissions.Items[(int)Permission.TotalBan].ForeColor = SystemColors.ControlText;
                     } else {
                         vPermissions.Items[(int)Permission.BanAll].Checked = false;
                         vPermissions.Items[(int)Permission.BanAll].ForeColor = SystemColors.GrayText;
-                        vPermissions.Items[(int)Permission.TotalBan].Checked = false;
-                        vPermissions.Items[(int)Permission.TotalBan].ForeColor = SystemColors.GrayText;
                     }
                     break;
 
@@ -1022,19 +1024,6 @@ Your rank is {RANK}&S. Type &H/Help&S for help." );
                     if( check ) {
                         vPermissions.Items[(int)Permission.Ban].Checked = true;
                         vPermissions.Items[(int)Permission.BanIP].Checked = true;
-                        vPermissions.Items[(int)Permission.TotalBan].ForeColor = SystemColors.ControlText;
-                    } else {
-                        vPermissions.Items[(int)Permission.TotalBan].Checked = false;
-                        vPermissions.Items[(int)Permission.TotalBan].ForeColor = SystemColors.GrayText;
-                    }
-                    break;
-
-                case Permission.TotalBan:
-                    if (check)
-                    {
-                        vPermissions.Items[(int)Permission.Ban].Checked = true;
-                        vPermissions.Items[(int)Permission.BanIP].Checked = true;
-                        vPermissions.Items[(int)Permission.BanAll].Checked = true;
                     }
                     break;
 

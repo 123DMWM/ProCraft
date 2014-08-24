@@ -1036,7 +1036,6 @@ namespace fCraft {
             owner.Add( temp );
             owner.Add( new XElement( Permission.BanIP.ToString() ) );
             owner.Add( new XElement( Permission.BanAll.ToString() ) );
-            owner.Add( new XElement( Permission.TotalBan.ToString() ) );
 
             temp = new XElement( Permission.Promote.ToString() );
             temp.Add( new XAttribute( "max", "owner" ) );
@@ -1119,8 +1118,6 @@ namespace fCraft {
             temp.Add( new XAttribute( "max", "builder" ) );
             op.Add( temp );
             op.Add( new XElement( Permission.BanIP.ToString() ) );
-
-            op.Add(new XElement(Permission.TotalBan.ToString()));
 
             temp = new XElement( Permission.Promote.ToString() );
             temp.Add( new XAttribute( "max", "builder" ) );

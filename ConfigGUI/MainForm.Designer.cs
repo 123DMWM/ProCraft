@@ -288,7 +288,10 @@ namespace fCraft.ConfigGUI {
             this.bResetAll = new System.Windows.Forms.Button();
             this.bApply = new System.Windows.Forms.Button();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
+            this.tServerOwner = new System.Windows.Forms.TextBox();
+            this.lServerOwner = new System.Windows.Forms.Label();
             this.chatPreview = new fCraft.ConfigGUI.ChatPreview();
+            this.xDonor = new System.Windows.Forms.CheckBox();
             this.tabs.SuspendLayout();
             this.tabGeneral.SuspendLayout();
             this.gHeartbeatUrl.SuspendLayout();
@@ -552,6 +555,8 @@ namespace fCraft.ConfigGUI {
             // 
             // gBasic
             // 
+            this.gBasic.Controls.Add(this.tServerOwner);
+            this.gBasic.Controls.Add(this.lServerOwner);
             this.gBasic.Controls.Add(this.nMaxPlayersPerWorld);
             this.gBasic.Controls.Add(this.lMaxPlayersPerWorld);
             this.gBasic.Controls.Add(this.bPortCheck);
@@ -1356,11 +1361,11 @@ namespace fCraft.ConfigGUI {
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.gPermissionLimits.Controls.Add(this.permissionLimitBoxContainer);
-            this.gPermissionLimits.Location = new System.Drawing.Point(213, 402);
+            this.gPermissionLimits.Location = new System.Drawing.Point(213, 425);
             this.gPermissionLimits.Margin = new System.Windows.Forms.Padding(4);
             this.gPermissionLimits.Name = "gPermissionLimits";
             this.gPermissionLimits.Padding = new System.Windows.Forms.Padding(4);
-            this.gPermissionLimits.Size = new System.Drawing.Size(409, 186);
+            this.gPermissionLimits.Size = new System.Drawing.Size(409, 163);
             this.gPermissionLimits.TabIndex = 7;
             this.gPermissionLimits.TabStop = false;
             this.gPermissionLimits.Text = "Permission Limits";
@@ -1373,7 +1378,7 @@ namespace fCraft.ConfigGUI {
             this.permissionLimitBoxContainer.Location = new System.Drawing.Point(4, 21);
             this.permissionLimitBoxContainer.Margin = new System.Windows.Forms.Padding(0);
             this.permissionLimitBoxContainer.Name = "permissionLimitBoxContainer";
-            this.permissionLimitBoxContainer.Size = new System.Drawing.Size(401, 161);
+            this.permissionLimitBoxContainer.Size = new System.Drawing.Size(401, 138);
             this.permissionLimitBoxContainer.TabIndex = 0;
             this.permissionLimitBoxContainer.WrapContents = false;
             // 
@@ -1415,6 +1420,7 @@ namespace fCraft.ConfigGUI {
             // 
             this.gRankOptions.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.gRankOptions.Controls.Add(this.xDonor);
             this.gRankOptions.Controls.Add(this.xUpperCharLimit);
             this.gRankOptions.Controls.Add(this.nUpperCharLimit);
             this.gRankOptions.Controls.Add(this.lFillLimitUnits);
@@ -1446,7 +1452,7 @@ namespace fCraft.ConfigGUI {
             this.gRankOptions.Margin = new System.Windows.Forms.Padding(4);
             this.gRankOptions.Name = "gRankOptions";
             this.gRankOptions.Padding = new System.Windows.Forms.Padding(4);
-            this.gRankOptions.Size = new System.Drawing.Size(409, 378);
+            this.gRankOptions.Size = new System.Drawing.Size(409, 401);
             this.gRankOptions.TabIndex = 6;
             this.gRankOptions.TabStop = false;
             this.gRankOptions.Text = "Rank Options";
@@ -3637,6 +3643,28 @@ namespace fCraft.ConfigGUI {
             this.toolTip.IsBalloon = true;
             this.toolTip.ReshowDelay = 100;
             // 
+            // tServerOwner
+            // 
+            this.tServerOwner.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tServerOwner.HideSelection = false;
+            this.tServerOwner.Location = new System.Drawing.Point(163, 57);
+            this.tServerOwner.Margin = new System.Windows.Forms.Padding(4);
+            this.tServerOwner.MaxLength = 64;
+            this.tServerOwner.Name = "tServerOwner";
+            this.tServerOwner.Size = new System.Drawing.Size(675, 24);
+            this.tServerOwner.TabIndex = 20;
+            // 
+            // lServerOwner
+            // 
+            this.lServerOwner.AutoSize = true;
+            this.lServerOwner.Location = new System.Drawing.Point(52, 60);
+            this.lServerOwner.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lServerOwner.Name = "lServerOwner";
+            this.lServerOwner.Size = new System.Drawing.Size(96, 18);
+            this.lServerOwner.TabIndex = 19;
+            this.lServerOwner.Text = "Server owner";
+            // 
             // chatPreview
             // 
             this.chatPreview.Location = new System.Drawing.Point(9, 315);
@@ -3644,6 +3672,18 @@ namespace fCraft.ConfigGUI {
             this.chatPreview.Name = "chatPreview";
             this.chatPreview.Size = new System.Drawing.Size(849, 297);
             this.chatPreview.TabIndex = 2;
+            // 
+            // xDonor
+            // 
+            this.xDonor.AutoSize = true;
+            this.xDonor.Location = new System.Drawing.Point(16, 364);
+            this.xDonor.Margin = new System.Windows.Forms.Padding(4);
+            this.xDonor.Name = "xDonor";
+            this.xDonor.Size = new System.Drawing.Size(128, 22);
+            this.xDonor.TabIndex = 27;
+            this.xDonor.Text = "Is Donor rank?";
+            this.xDonor.UseVisualStyleBackColor = true;
+            this.xDonor.CheckedChanged += new System.EventHandler( this.xDonor_CheckedChanged );
             // 
             // MainForm
             // 
@@ -4009,5 +4049,8 @@ namespace fCraft.ConfigGUI {
         private Label lKickHeartbeatUrlWarning;
         private ComboBox cKickHeartbeatUrl;
         private Label lKickHeartbeatUrl;
+        private TextBox tServerOwner;
+        private Label lServerOwner;
+        private CheckBox xDonor;
     }
 }

@@ -32,8 +32,6 @@ namespace fCraft {
             CommandManager.RegisterCommand( CdWhere );
             CommandManager.RegisterCommand( CdHelp );
             CommandManager.RegisterCommand( CdCommands );
-            //CommandManager.RegisterCommand( CdCustom );
-            CommandManager.RegisterCommand( CdDonate );
             CommandManager.RegisterCommand( CdColors );
             CommandManager.RegisterCommand( CdEmotes );
             CommandManager.RegisterCommand( CdBum );
@@ -1188,127 +1186,6 @@ namespace fCraft {
                             ruleFile.FullName, ex );
                 player.Message( "&WError reading the rule file." );
             }
-        }
-
-        #endregion
-        #region Custom
-
-        static readonly CommandDescriptor CdCustom = new CommandDescriptor
-        {
-            Name = "Custom",
-            Category = CommandCategory.Custom,
-            IsConsoleSafe = true,
-            UsableByFrozenPlayers = true,
-            Help = "<DEPRECTED> Shows a list of all custom code on the server.",
-            Handler = CustomHandler
-        };
-
-        static void CustomHandler(Player player, CommandReader cmd)
-        {
-            player.Message("&SBelow is a list of custom commands used on the server.");
-            player.Message("&H    /Ranks&S - Shows only rank categories.");
-            player.Message("&H    /RanksDetailed&S - Shows ALL the ranks.");
-            player.Message("&H    /Rules&s - Modified to NOT show the categories.");
-            player.Message("&H    /Rules Admin&s - Shows the admin specific rules.");
-            player.Message("&H    /ListStaff&s - Lists current staff members online.");
-            player.Message("&H    /PlayersAdvanced&s - Shows players real names.");
-            player.Message("&H    /CTF&s - Play a game of Capture The Flag in CTF World.");
-            player.Message("&H    /RageQuit&s - Terminates your session in epic fashion.");
-            player.Message("&H    /IRC&s - Changes whether you can see IRC Messages.");
-            player.Message("&H    /StaffSay&s - Sends a /Say style message to staff only.");
-            player.Message("&H    /BanGrief&s - Bans a player for griefing.");
-            player.Message("&H    /BanSpam&s - Bans a player for spamming.");
-            player.Message("&H    /Review&s - Asks the Moderators for a build review.");
-        }
-
-        #endregion
-        #region Donate
-
-        static readonly CommandDescriptor CdDonate = new CommandDescriptor
-        {
-            Name = "HowToDonate",
-            Aliases = new[] { "Donate", "htd" },
-            Category = CommandCategory.New,
-            IsConsoleSafe = true,
-            UsableByFrozenPlayers = true,
-            Help = "Shows donator bonuses and how to do so!" +
-                   "Type in &f/donate howto &sfor more info",
-            Handler = DonateHandler
-        };
-
-        static void DonateHandler(Player player, CommandReader cmd)
-        {
-            string input = cmd.Next();
-            if (input == null)
-            {
-                player.Message("&sWe rely on donators to stay operational!.");
-                player.Message("&SOur Donors can enjoy many new commands that non-admins will never have.");
-                player.Message("&sIf you would like to see what our donor ranks have to offer, Type:");
-                player.Message("    &h/HTD Donor");
-                player.Message("    &sOr");
-                player.Message("    &h/HTD Hero");
-                player.Message("&sOr type &h/Donate howto &sto skip ahead.");
-                return;
-            }
-            else if (input.ToLower() == "howto")
-            {
-                player.Message("&sWe have 2 donator ranks:");
-                player.Message("&1Hero&s: Admins: Donate &2$10.00+");
-                player.Message("&1Hero&s: Non-Admins: Donate &2$50.00+");
-                player.Message("&9Donor&s: Donate &2$10.00+");
-                player.Message("");
-                player.Message("&sYou can donate via Paypal Here:");
-                player.Message("&1http://goo.gl/JJSBJY");
-                player.Message("&sIt's a safe link, we wouldn't try to stop you from donating");
-                player.Message("&sBut be warned, if you abuse your powers your rank will be revoked and you will not receive a refund of what you donated.");
-                return;
-            }
-            else if (input.ToLower() == "donor")
-            {
-                player.Message("&SOur Donors can enjoy these privileges:");
-                player.Message("&S  Ability to view other players information (See &h/help info&s)");
-                player.Message("&S  Ability to use &cC&eo&al&2o&3r&1s (See &h/Colors&s)");
-                player.Message("&S  Ability to &H/Kick&s other players.");
-                player.Message("&S  Ability to &H/Freeze&s other players.");
-                player.Message("&S  Ability to &H/Hide&S from other players.");
-                player.Message("&S  Ability to use &H/Copy &sand &H/Paste&s.");
-                player.Message("&S  Ability to see who built or deleted a block (See &h/help BInfo&s)");
-                player.Message("&S  Ability to undo a players actions (See &h/help UndoPlayer&s)");
-                player.Message("&S  Ability to teleport players to you with &h/Bring.");
-                player.Message("&S  Ability to use all &HCuboid &stype commands.");
-                player.Message("");
-                player.Message("&9  Still interested? Type &h/Donate howto &9for more info!");
-                player.Message("");
-                return;
-            }
-            else if (input.ToLower() == "hero")
-            {
-                player.Message("&SOur Heroes can enjoy these privileges:");
-                player.Message("&S  Everything Donor has (See &h/htd donor&s)");
-                player.Message("&S  Ability to use the &h/Say&s command.");
-                player.Message("&S  Ability to use timers (See &h/help timer&s)");
-                player.Message("&S  Ability to read /staff chat.");
-                player.Message("&S  Ability to &H/Ban&s other players.");
-                player.Message("&S  Ability to &H/Rank&S other players.");
-                player.Message("&S  Ability to &H/Mute&s other players..");
-                player.Message("&S  Ability to manage Zones (See &h/help zone&s)");
-                player.Message("");
-                player.Message("&9  Still interested? Type &h/Donate howto &9for more info!");
-                player.Message("");
-                return;
-            }
-            else
-            {
-                player.Message("&sWe rely on donators to stay operational!.");
-                player.Message("&SOur Donors can enjoy many new commands that non-admins will never have.");
-                player.Message("&sIf you would like to see what our donor ranks have to offer, Type:");
-                player.Message("    &h/HTD Donor");
-                player.Message("    &sOr");
-                player.Message("    &h/HTD Hero");
-                player.Message("&sOr type &h/Donate howto &sto skip ahead.");
-                return;
-            }
-                        
         }
 
         #endregion
@@ -3376,8 +3253,7 @@ namespace fCraft {
         private static void APIPInfoHandler(Player player, CommandReader cmd) {
             string name = cmd.Next();
             if (name.Equals("")) {
-                player.Message(CdApiPlayer.Usage);
-                return;
+                name.Equals(player.Name);
             }
             WebClient webClient = new WebClient();
             var result = JsonObject.Parse(webClient.DownloadString("http://www.classicube.net/api/player/" + name));
@@ -3444,13 +3320,13 @@ namespace fCraft {
         };
 
         private static void APIDInfoHandler(Player player, CommandReader cmd) {
-            string name = cmd.Next();
-            if (name.Equals("")) {
+            string id1 = cmd.Next();
+            if (id1.Equals("")) {
                 player.Message(CdApiID.Usage);
                 return;
             }
             WebClient webClient = new WebClient();
-            var result = JsonObject.Parse(webClient.DownloadString("http://www.classicube.net/api/id/" + name));
+            var result = JsonObject.Parse(webClient.DownloadString("http://www.classicube.net/api/id/" + id1));
             string error;
             result.TryGetValue("error", out error);
             string flags1;

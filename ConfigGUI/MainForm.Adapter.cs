@@ -113,6 +113,7 @@ namespace fCraft.ConfigGUI {
 
         void ApplyTabGeneral() {
             tServerName.Text = ConfigKey.ServerName.GetString();
+            tServerOwner.Text = ConfigKey.ServerOwner.GetString();
             
             nMaxPlayers.Value = ConfigKey.MaxPlayers.GetInt();
             CheckMaxPlayersPerWorldValue();
@@ -435,6 +436,7 @@ namespace fCraft.ConfigGUI {
         void SaveConfig() {
             // General
             ConfigKey.ServerName.TrySetValue( tServerName.Text );
+            ConfigKey.ServerOwner.TrySetValue( tServerOwner.Text );
             ConfigKey.MaxPlayers.TrySetValue( nMaxPlayers.Value );
             ConfigKey.MaxPlayersPerWorld.TrySetValue( nMaxPlayersPerWorld.Value );
             if( cDefaultRank.SelectedIndex == 0 ) {

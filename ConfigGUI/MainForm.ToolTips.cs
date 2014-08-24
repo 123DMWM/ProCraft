@@ -9,6 +9,9 @@ namespace fCraft.ConfigGUI {
 
             toolTip.SetToolTip( lServerName, ConfigKey.ServerName.GetDescription() );
             toolTip.SetToolTip( tServerName, ConfigKey.ServerName.GetDescription() );
+
+            toolTip.SetToolTip( lServerOwner, ConfigKey.ServerOwner.GetDescription() );
+            toolTip.SetToolTip( tServerOwner, ConfigKey.ServerOwner.GetDescription() );
                         
             toolTip.SetToolTip( lMaxPlayers, ConfigKey.MaxPlayers.GetDescription() );
             toolTip.SetToolTip( nMaxPlayers, ConfigKey.MaxPlayers.GetDescription() );
@@ -209,6 +212,9 @@ By default, players can only undo actions of players of same or lower rank." );
             toolTip.SetToolTip( xReserveSlot,
 @"Allows players of this rank to join the server
 even if it reached the maximum number of players." );
+
+            toolTip.SetToolTip( xDonor,
+@"Whether or not this rank is a Donor rank." );
 
             const string tipKickIdle = "Allows kicking players who have been inactive/AFK for some time.";
             toolTip.SetToolTip( xKickIdle, tipKickIdle );
@@ -470,12 +476,6 @@ Affected commands:
 @"Ability to change the servers DEFCON level.
 Affected commands:
     /Defcon";
-
-            vPermissions.Items[(int)Permission.TotalBan].ToolTipText =
-@"Ability to place fire/ice blocks. This also affects draw commands.
-Required permission: Build
-Affected commands:
-    /TotalBan";
 
             vPermissions.Items[(int)Permission.PlaceLava].ToolTipText =
 @"Ability to place lava blocks. This also affects draw commands.
