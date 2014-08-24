@@ -145,7 +145,7 @@ namespace fCraft {
         /// <param name="length"> Length (horizontal, Notch's Z). </param>
         /// <param name="height"> Height (vertical, Notch's Y). </param>
         /// <param name="initBlockArray"> If true, the Blocks array will be created. </param>
-        /// <exception cref="ArgumentOutOfRangeException"> If width/length/height are not between 16 and 2048. </exception>
+        /// <exception cref="ArgumentOutOfRangeException"> If width/length/height are not between 16 and 1024. </exception>
         public Map( World world, int width, int length, int height, bool initBlockArray ) {
             if( !IsValidDimension( width ) ) throw new ArgumentOutOfRangeException( "width", "Invalid map dimension." );
             if( !IsValidDimension( length ) ) throw new ArgumentOutOfRangeException( "length", "Invalid map dimension." );
