@@ -1732,7 +1732,7 @@ namespace fCraft.ConfigGUI {
             // 
             // tPrefix
             // 
-            this.tPrefix.Enabled = false;
+            this.tPrefix.Enabled = true;
             this.tPrefix.Location = new System.Drawing.Point(333, 25);
             this.tPrefix.Margin = new System.Windows.Forms.Padding(4);
             this.tPrefix.MaxLength = 16;

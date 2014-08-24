@@ -1630,9 +1630,6 @@ Your rank is {RANK}&S. Type &H/Help&S for help." );
         }
 
         private void xRankPrefixesInChat_CheckedChanged( object sender, EventArgs e ) {
-            usePrefixes = xRankPrefixesInChat.Checked;
-            tPrefix.Enabled = usePrefixes;
-            lPrefix.Enabled = usePrefixes;
             RebuildRankList();
         }
 

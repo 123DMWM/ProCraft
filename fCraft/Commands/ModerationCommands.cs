@@ -1,6 +1,7 @@
 ﻿// Part of fCraft | Copyright 2009-2013 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt //Copyright (c) 2011-2013 Jon Baker, Glenn Marien and Lao Tszy <Jonty800@gmail.com> //Copyright (c) <2012-2014> <LeChosenOne, DingusBungus> | Copyright 2014 123DMWM <shmo1joe2@gmail.com>
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using JetBrains.Annotations;
@@ -415,21 +416,33 @@ namespace fCraft {
 
                 }
                 Scheduler.NewTask(t => Server.Players.Message("&6Bot&f: 5")).RunManual(TimeSpan.FromSeconds(0));
+                Scheduler.NewTask(t => Logger.Log(LogType.UserActivity, "&6Bot&f: 5"))
+                    .RunManual(TimeSpan.FromSeconds(0));
                 Scheduler.NewTask(t => IRC.SendChannelMessage("\u212C&6Bot\u211C: 5"))
                     .RunManual(TimeSpan.FromSeconds(0));
                 Scheduler.NewTask(t => Server.Players.Message("&6Bot&f: 4")).RunOnce(TimeSpan.FromSeconds(1));
+                Scheduler.NewTask(t => Logger.Log(LogType.UserActivity, "&6Bot&f: 4"))
+                    .RunManual(TimeSpan.FromSeconds(1));
                 Scheduler.NewTask(t => IRC.SendChannelMessage("\u212C&6Bot\u211C: 4"))
                     .RunManual(TimeSpan.FromSeconds(1));
                 Scheduler.NewTask(t => Server.Players.Message("&6Bot&f: 3")).RunOnce(TimeSpan.FromSeconds(2));
+                Scheduler.NewTask(t => Logger.Log(LogType.UserActivity, "&6Bot&f: 3"))
+                    .RunManual(TimeSpan.FromSeconds(2));
                 Scheduler.NewTask(t => IRC.SendChannelMessage("\u212C&6Bot\u211C: 3"))
                     .RunManual(TimeSpan.FromSeconds(2));
                 Scheduler.NewTask(t => Server.Players.Message("&6Bot&f: 2")).RunOnce(TimeSpan.FromSeconds(3));
+                Scheduler.NewTask(t => Logger.Log(LogType.UserActivity, "&6Bot&f: 2"))
+                    .RunManual(TimeSpan.FromSeconds(3));
                 Scheduler.NewTask(t => IRC.SendChannelMessage("\u212C&6Bot\u211C: 2"))
                     .RunManual(TimeSpan.FromSeconds(3));
                 Scheduler.NewTask(t => Server.Players.Message("&6Bot&f: 1")).RunOnce(TimeSpan.FromSeconds(4));
+                Scheduler.NewTask(t => Logger.Log(LogType.UserActivity, "&6Bot&f: 1"))
+                    .RunManual(TimeSpan.FromSeconds(4));
                 Scheduler.NewTask(t => IRC.SendChannelMessage("\u212C&6Bot\u211C: 1"))
                     .RunManual(TimeSpan.FromSeconds(4));
                 Scheduler.NewTask(t => Server.Players.Message("&6Bot&f: Go!")).RunOnce(TimeSpan.FromSeconds(5));
+                Scheduler.NewTask(t => Logger.Log(LogType.UserActivity, "&6Bot&f: Go!"))
+                    .RunManual(TimeSpan.FromSeconds(5));
                 Scheduler.NewTask(t => IRC.SendChannelMessage("\u212C&6Bot\u211C: Go!"))
                     .RunManual(TimeSpan.FromSeconds(5));
                 player.Info.LastTimeUsedBot = DateTime.Now;
@@ -441,41 +454,23 @@ namespace fCraft {
 
                 }
                 Server.Players.Message("&6Bot&f: The name of this server is " + ConfigKey.ServerName.GetString() + ".");
+                Logger.Log(LogType.UserActivity,
+                    "&6Bot&f: The name of this server is " + ConfigKey.ServerName.GetString() + ".");
                 IRC.SendChannelMessage("\u212C&6Bot\u211C: The name of this server is " +
                                        ConfigKey.ServerName.GetString() + ".");
                 player.Info.LastTimeUsedBot = DateTime.Now;
                 player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
             } else if (option == "joke") {
-                string[] jokeStrings = {
-                    "&fWhat do you call a fat psychic? A four chin teller.",
-                    "&fIf con is the opposite of pro, it must mean Congress is the opposite of progress?",
-                    "&fWhat did the fish say when he swam into the wall? -- Damn",
-                    "&fWhat do you call a sheep with no legs? A cloud.",
-                    "&fHow do you make holy water? You boil the hell out of it.", "&fFat people are harder to kidnap.",
-                    "&fWhat's the best thing about being 100 y/o? -- No peer pressure",
-                    "&fFailure is not an option -- it comes bundled with Windows.",
-                    "&fYo moma is like HTML: Tiny head, huge body.", "&f1f u c4n r34d th1s u r34lly n33d t0 g37 l41d",
-                    "&fAs long as there are tests, there will be prayer in schools.",
-                    "&fFor Sale: Parachute. Only used once, never opened.",
-                    "&fWhen everything's coming your way, you're in the wrong lane.",
-                    "&fIf at first you don't succeed, destroy all evidence that you tried.",
-                    "&fThe last thing I want to do is hurt you. But it's still on the list.",
-                    "&fIf I agreed with you we'd both be wrong.",
-                    "&fEnergizer Bunny was arrested, charged with battery.",
-                    "&fI usually take steps to avoid elevators.", "&fSchrodinger's Cat: Wanted dead and alive.",
-                    "&fIf at first you don't succeed; call it version 1.0",
-                    "&fCONGRESS.SYS Corrupted: Re-boot Washington D.C (Y/n)?",
-                    "&fWe live in a society where pizza gets to your house before the police.",
-                    "&fLight travels faster than sound. This is why some people appear bright until you hear them speak.",
-                    "&fEvening news is where they begin with 'Good evening', and then proceed to tell you why it isn't.",
-                    "&fYou do not need a parachute to skydive. You only need a parachute to skydive twice.",
-                    "&fWhen in doubt, mumble.", "&fWar does not determine who is right – only who is left...",
-                    "&fI wondered why the frisbee was getting bigger - then it hit me.",
-                    "&fNever argue with a fool, they will lower you to their level, and then beat you with experience.",
-                    "&fThere are 3 kinds of people in the world: Those who can count and those who can't.",
-                    "&fNever hit a man with glasses. Hit him with a baseball bat instead.",
-                    "&fNostalgia isn't what it used to be."
-                };
+                FileInfo jokeList = new FileInfo("./Bot/Jokes.txt");
+                string[] jokeStrings;
+                if (jokeList.Exists) {
+                    jokeStrings = File.ReadAllLines("./Bot/Jokes.txt");
+                } else {
+                    Server.Players.Message("&6Bot&f: I cannot tell a joke at this time!");
+                    Logger.Log(LogType.UserActivity, "&6Bot&f: I cannot tell a joke at this time!");
+                    IRC.SendChannelMessage("\u212C&6Bot\u211C: I cannot tell a joke at this time!");
+                    return;
+                }
                 Random RandjokeString = new Random();
                 if (player.Info.TimesUsedBot == 0) {
                     player.Message(
@@ -484,43 +479,21 @@ namespace fCraft {
                 }
                 string joker = jokeStrings[RandjokeString.Next(0, jokeStrings.Length)];
                 Server.Players.Message("&6Bot&f: " + joker);
-                IRC.SendChannelMessage("\u212C&6Bot\u211C: " + joker.Remove(0, 2));
+                Logger.Log(LogType.UserActivity, "&6Bot&f: " + joker);
+                IRC.SendChannelMessage("\u212C&6Bot\u211C: " + joker);
                 player.Info.LastTimeUsedBot = DateTime.Now;
                 player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
             } else if (option == "protip") {
-                string[] tipStrings = {
-                    "&fStore cheese curls bag in freezer, the colder they are the better they taste.",
-                    "&fTake a screen-shot on the payment confirmation screen of every purchase you make online.",
-                    "&fUse an underscore in front of folder names and other sortable items on your computer to keep those at the top of the list.",
-                    "&fDon't use \"lol\" as a filler word.",
-                    "&fPress F2 to immediately rename a file, no more slow double clicks.",
-                    "&fTake one minute to record your phone's serial number. This may be the one identifying factor if your phone is ever stolen and reset.",
-                    "&fCreate a life binder and keep in it copies of things like your: medical records, SSN, birth photos, etc.",
-                    "&fWhen applying for a job online, save the job description in an email/pdf. You'll be able to prepare even if the post is removed.",
-                    "&fTry the microwave challenge: when microwaving see how much of the kitchen you can clean up.",
-                    "&fGive your shower walls a quick wipe-down after each shower and you'll never fight mildew and hard water stains again.",
-                    "&fOpen your dishwasher as soon as it has finished to allow additional water to evaporate (and get rid of water spots)",
-                    "&fHave a separate account on your laptop for performing presentations.",
-                    "&fWhen going on long roadtrips and don't want to pay for a motel? All Wal-Marts allow people to park over night without being kicked out.",
-                    "&fSprinkle cinnamon on the carpet. When you vacuum, the room will smell like cinnamon instead of your nasty vacuum.",
-                    "&fUse a window squeegee to remove pet hair from carpet.",
-                    "&fIf you see someone griefing, don't try to fix it, tell an admin we have commands that can fix it instantly with no work.",
-                    "&fWant a higher rank? Be nice, don't argue, try your best to get a better impression toward the admins.",
-                    "&fUse travel delay as opportunity to stop rather than get stressed. When the world stands still, let it.",
-                    "&fStop clinging and embrace change as a constant.",
-                    "&fTry and give people the benefit of the doubt if they snap at you. Might be something going on you don't know about.",
-                    "&fFriendship is a gift, not a possession.",
-                    "&fBefore you go to bed, write down only 3 things that you want to do the following day. This is how to prioritize.",
-                    "&fDo something relaxing before going to bed. No electronics.",
-                    "&fWhen in doubt, take a deep breath.", "&fDefine what's necessary; say no to the rest.",
-                    "&fExpect nothing. Welcome everything.",
-                    "&fGood things come to those who wait… greater things come to those who get off their ass and do anything to make it happen.",
-                    "&fEnds are not bad things, they just mean that something else is about to begin.",
-                    "&fBeat your alarm to wake up? Don't go back to bed, you will feel worse.",
-                    "&fOrgasms cure hiccups.",
-                    "&fTelemarketers aren't allowed to hang up first. The possibilities are endless.",
-                    "&fApples are 10 times more effective at keeping people awake than coffee."
-                };
+                FileInfo tipList = new FileInfo("./Bot/Protips.txt");
+                string[] tipStrings;
+                if (tipList.Exists) {
+                    tipStrings = File.ReadAllLines("./Bot/Protips.txt");
+                } else {
+                    Server.Players.Message("&6Bot&f: I cannot tell a protip at this time!");
+                    Logger.Log(LogType.UserActivity, "&6Bot&f: I cannot tell a protip at this time!");
+                    IRC.SendChannelMessage("\u212C&6Bot\u211C: I cannot tell a protip at this time!");
+                    return;
+                }
                 Random RandtipString = new Random();
                 if (player.Info.TimesUsedBot == 0) {
                     player.Message(
@@ -529,7 +502,8 @@ namespace fCraft {
                 }
                 string tipper = tipStrings[RandtipString.Next(0, tipStrings.Length)];
                 Server.Players.Message("&6Bot&f: " + tipper);
-                IRC.SendChannelMessage("\u212C&6Bot\u211C: " + tipper.Remove(0, 2));
+                Logger.Log(LogType.UserActivity, "&6Bot&f: " + tipper);
+                IRC.SendChannelMessage("\u212C&6Bot\u211C: " + tipper);
                 player.Info.LastTimeUsedBot = DateTime.Now;
                 player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
             } else if (option == "time") {
@@ -544,6 +518,9 @@ namespace fCraft {
                     Server.Players.Message(
                         "&6Bot&f: " + player.ClassyName + "&f has spent a total of {0:F2}&f hours on this server.",
                         time.TotalHours);
+                    Logger.Log(LogType.UserActivity,
+                        "&6Bot&f: " + player.ClassyName + "&f has spent a total of {0:F2}&f hours on this server.",
+                        time.TotalHours);
                     IRC.SendChannelMessage(
                         "\u212C&6Bot\u211C: " + player.ClassyName +
                         "\u211C has spent a total of {0:F2}\u211C hours on this server.", time.TotalHours);
@@ -556,6 +533,9 @@ namespace fCraft {
                     Server.Players.Message(
                         "&6Bot&f: " + player.ClassyName + "&f has played a total of {0:F2}&f minutes this session.",
                         timenow.TotalMinutes);
+                    Logger.Log(LogType.UserActivity,
+                        "&6Bot&f: " + player.ClassyName + "&f has played a total of {0:F2}&f minutes this session.",
+                        timenow.TotalMinutes);
                     IRC.SendChannelMessage(
                         "\u212C&6Bot\u211C: " + player.ClassyName +
                         "\u211C has played a total of {0:F2}\u211C minutes this session.", timenow.TotalMinutes);
@@ -564,7 +544,7 @@ namespace fCraft {
                 player.Info.LastTimeUsedBot = DateTime.Now;
                 player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
             } else if (option == "promos") {
-                if (player.Info.Rank.Permissions[(int) Permission.Promote] == true) {
+                if (player.Info.Rank.Can(Permission.Promote) || player.Info.PromoCount != 0) {
                     if (player.Info.TimesUsedBot == 0) {
                         player.Message(
                             "&6Bot&f: This is your first time using &6Bot&e, I suggest you use \"/Help Bot\" to further understand how I work.");
@@ -572,6 +552,8 @@ namespace fCraft {
                     }
                     Server.Players.Message("&6Bot&f: " + player.ClassyName + " &fhas promoted " + player.Info.PromoCount +
                                            " players.");
+                    Logger.Log(LogType.UserActivity,
+                        "&6Bot&f: " + player.ClassyName + " &fhas promoted " + player.Info.PromoCount + " players.");
                     IRC.SendChannelMessage("\u212C&6Bot\u211C: " + player.ClassyName + " \u211Chas promoted " +
                                            player.Info.PromoCount + " players.");
                 } else {
@@ -581,13 +563,14 @@ namespace fCraft {
 
                     }
                     Server.Players.Message("&6Bot&f: " + player.ClassyName + " &fcannot promote players yet");
+                    Logger.Log(LogType.UserActivity, "&6Bot&f: " + player.ClassyName + " &fcannot promote players yet");
                     IRC.SendChannelMessage("\u212C&6Bot\u211C: " + player.ClassyName +
                                            " \u211Ccannot promote players yet");
                 }
                 player.Info.LastTimeUsedBot = DateTime.Now;
                 player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
             } else if (option == "bans") {
-                if (player.Info.Rank.Permissions[(int) Permission.Ban] == true) {
+                if (player.Info.Rank.Can(Permission.Ban) || player.Info.TimesBannedOthers != 0) {
                     if (player.Info.TimesUsedBot == 0) {
                         player.Message(
                             "&6Bot&f: This is your first time using &6Bot&e, I suggest you use \"/Help Bot\" to further understand how I work.");
@@ -595,6 +578,8 @@ namespace fCraft {
                     }
                     Server.Players.Message("&6Bot&f: " + player.ClassyName + " &fhas banned " +
                                            player.Info.TimesBannedOthers + " players.");
+                    Logger.Log(LogType.UserActivity,
+                        "&6Bot&f: " + player.ClassyName + " &fhas banned " + player.Info.TimesBannedOthers + " players.");
                     IRC.SendChannelMessage("\u212C&6Bot\u211C: " + player.ClassyName + " \u211Chas banned " +
                                            player.Info.TimesBannedOthers + " players.");
                 } else {
@@ -604,13 +589,14 @@ namespace fCraft {
 
                     }
                     Server.Players.Message("&6Bot&f: " + player.ClassyName + " &fcannot ban yet");
+                    Logger.Log(LogType.UserActivity, "&6Bot&f: " + player.ClassyName + " &fcannot ban yet");
                     IRC.SendChannelMessage("\u212C&6Bot\u211C: " + player.ClassyName + " \u211Ccannot ban yet");
                 }
 
                 player.Info.LastTimeUsedBot = DateTime.Now;
                 player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
             } else if (option == "kicks") {
-                if (player.Info.Rank.Permissions[(int) Permission.Kick] == true) {
+                if (player.Info.Rank.Can(Permission.Kick) || player.Info.TimesKickedOthers != 0) {
                     if (player.Info.TimesUsedBot == 0) {
                         player.Message(
                             "&6Bot&f: This is your first time using &6Bot&e, I suggest you use \"/Help Bot\" to further understand how I work.");
@@ -618,6 +604,8 @@ namespace fCraft {
                     }
                     Server.Players.Message("&6Bot&f: " + player.ClassyName + " &fhas kicked " +
                                            player.Info.TimesKickedOthers + " players.");
+                    Logger.Log(LogType.UserActivity,
+                        "&6Bot&f: " + player.ClassyName + " &fhas kicked " + player.Info.TimesKickedOthers + " players.");
                     IRC.SendChannelMessage("\u212C&6Bot\u211C: " + player.ClassyName + " \u211Chas kicked " +
                                            player.Info.TimesKickedOthers + " players.");
                 } else {
@@ -627,6 +615,7 @@ namespace fCraft {
 
                     }
                     Server.Players.Message("&6Bot&f: " + player.ClassyName + " &fcannot kick yet");
+                    Logger.Log(LogType.UserActivity, "&6Bot&f: " + player.ClassyName + " &fcannot kick yet");
                     IRC.SendChannelMessage("\u212C&6Bot\u211C: " + player.ClassyName + " \u211Ccannot kick yet");
                 }
                 player.Info.LastTimeUsedBot = DateTime.Now;
@@ -638,6 +627,8 @@ namespace fCraft {
                 }
                 Server.Players.Message("&6Bot&f: It is " + DateTime.Now.ToLongTimeString());
                 Server.Players.Message("&6Bot&f: On a " + DateTime.Now.ToLongDateString());
+                Logger.Log(LogType.UserActivity, "&6Bot&f: It is " + DateTime.Now.ToLongTimeString());
+                Logger.Log(LogType.UserActivity, "&6Bot&f: On a " + DateTime.Now.ToLongDateString());
                 IRC.SendChannelMessage("\u212C&6Bot\u211C: It is " + DateTime.Now.ToLongTimeString());
                 IRC.SendChannelMessage("\u212C&6Bot\u211C: On a " + DateTime.Now.ToLongDateString());
                 player.Info.LastTimeUsedBot = DateTime.Now;
@@ -651,6 +642,9 @@ namespace fCraft {
                     Server.Players.Message("&6Bot&f: " + player.ClassyName + " &fhas built " + player.Info.BlocksBuilt +
                                            " blocks, deleted " + player.Info.BlocksDeleted + " and drew " +
                                            player.Info.BlocksDrawn + ".");
+                    Logger.Log(LogType.UserActivity,
+                        "&6Bot&f: " + player.ClassyName + " &fhas built " + player.Info.BlocksBuilt +
+                        " blocks, deleted " + player.Info.BlocksDeleted + " and drew " + player.Info.BlocksDrawn + ".");
                     IRC.SendChannelMessage("\u212C&6Bot\u211C: " + player.ClassyName + " \u211Chas built " +
                                            player.Info.BlocksBuilt + " blocks, deleted " + player.Info.BlocksDeleted +
                                            " and drew " + player.Info.BlocksDrawn + ".");
@@ -662,6 +656,9 @@ namespace fCraft {
                     Server.Players.Message("&6Bot&f: " + player.ClassyName + " &fhas built " +
                                            player.Info.BlocksBuiltThisGame + " blocks and deleted " +
                                            player.Info.BlocksDeletedThisGame + " blocks this session.");
+                    Logger.Log(LogType.UserActivity,
+                        "&6Bot&f: " + player.ClassyName + " &fhas built " + player.Info.BlocksBuiltThisGame +
+                        " blocks and deleted " + player.Info.BlocksDeletedThisGame + " blocks this session.");
                     IRC.SendChannelMessage("\u212C&6Bot\u211C: " + player.ClassyName + " \u211Chas built " +
                                            player.Info.BlocksBuiltThisGame + " blocks and deleted " +
                                            player.Info.BlocksDeletedThisGame + " blocks this session.");
@@ -669,34 +666,16 @@ namespace fCraft {
                 player.Info.LastTimeUsedBot = DateTime.Now;
                 player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
             } else if (option == "funfact") {
-                string[] factStrings = {
-                    "&fEvery time you lick a stamp, you're consuming 1/10 of a calorie.",
-                    "&fBanging your head against a wall uses 150 calories an hour",
-                    "&fThe average person falls asleep in seven minutes.",
-                    "&fYour stomach has to produce a new layer of mucus every two weeks otherwise it will digest itself.",
-                    "&fPolar bears are left handed.", "&fAn ostrich's eye is bigger than it's brain.",
-                    "&fBullet proof vests, fire escapes, windshield wipers, and laser printers were all invented by women.",
-                    "&fPearls melt in vinegar.", "&fCoca Cola was originally green.",
-                    "&fThe youngest Pope was 11 years old.",
-                    "&fA 'jiffy' is an actual unit of time: 1/100th of a second.",
-                    "&fVenus is the only planet that rotates clockwise.", "&fMost lipstick contains fish scales.",
-                    "&fWomen blink nearly twice as much as men.", "&fKetchup was sold in the 1830s as medicine.",
-                    "&fStewardesses' is the longest word that is typed with only the left hand.",
-                    "&fThe only 15 letter word that can be spelled without repeating a letter is \"uncopyrightable\".",
-                    "&fMaine is the only state in the USA that is one syllable.",
-                    "&fThe adult human brain weighs about 3 pounds (1,300-1,400 g).",
-                    "&fPirates of old spoke just like everyone else. The 'pirate accent' was invented for the 1950 Disney movie, Treasure Island.",
-                    "&fAlmonds are a member of the peach family.",
-                    "&fParaguay's flag is the only national flag where the front and the back are different.",
-                    "&fIn 1999, Furbies were banned by the Pentagon, based on the fear that the dolls would mimic top-secret discussions.",
-                    "&fA dime has 118 ridges around the edge.", "&fPeanuts are one of the ingredients of dynamite.",
-                    "&fTwo thirds of the world's eggplant is grown in New Jersey.",
-                    "&fNo piece of paper can be folded in half more than 7 times.",
-                    "&fAmerican Airlines saved $40,000 in 1987 by eliminating 1 olive from each salad served in first-class.",
-                    "&fIn 1998, more fast-food employees were murdered on the job than police officers.",
-                    "&fFortune cookies were actually invented in America, in 1918, by Charles Jung.",
-                    "&fTYPEWRITER is the longest word that can be made using the letters only on one row of the keyboard."
-                };
+                FileInfo factList = new FileInfo("./Bot/Funfacts.txt");
+                string[] factStrings;
+                if (factList.Exists) {
+                    factStrings = File.ReadAllLines("./Bot/Funfacts.txt");
+                } else {
+                    Server.Players.Message("&6Bot&f: I cannot tell a funfact at this time!");
+                    Logger.Log(LogType.UserActivity, "&6Bot&f: I cannot tell a funfact at this time!");
+                    IRC.SendChannelMessage("\u212C&6Bot\u211C: I cannot tell a funfact at this time!");
+                    return;
+                }
                 Random RandfactString = new Random();
                 if (player.Info.TimesUsedBot == 0) {
                     player.Message(
@@ -705,18 +684,19 @@ namespace fCraft {
                 }
                 string facter = factStrings[RandfactString.Next(0, factStrings.Length)];
                 Server.Players.Message("&6Bot&f: " + facter);
-                IRC.SendChannelMessage("\u212C&6Bot\u211C: " + facter.Remove(0, 2));
+                Logger.Log(LogType.UserActivity, "&6Bot&f: " + facter);
+                IRC.SendChannelMessage("\u212C&6Bot\u211C: " + facter);
                 player.Info.LastTimeUsedBot = DateTime.Now;
                 player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
             } else if (option == "wisdom") {
                 string[] wisdomStrings = {
-                    "&fit uses css to conenct to a html page",
-                    "&fWell 'crosshair' is a really general term",
-                    "&fHave you decided to make 800Craft work with ClassiCube yet?", "&fgot somet to tell yah",
-                    "&fi am still gonna give u alot of credit", "&fnot good at php java coding etc...",
-                    "&fonly good with html and css :(", "&fi made html and css code from scratch and website",
-                    "&fi wrote from scratch", "&fcould you not list the servers made with my software", "&fi made template",
-                    "&fbut uses html formatting to script it", "&fi will use some other BETTER software then"
+                    "it uses css to conenct to a html page",
+                    "Well 'crosshair' is a really general term",
+                    "Have you decided to make 800Craft work with ClassiCube yet?", "&fgot somet to tell yah",
+                    "i am still gonna give u alot of credit", "&fnot good at php java coding etc...",
+                    "only good with html and css :(", "&fi made html and css code from scratch and website",
+                    "i wrote from scratch", "&fcould you not list the servers made with my software", "i made template",
+                    "&fbut uses html formatting to script it", "i will use some other BETTER software then"
                 };
                 Random randWisdomString = new Random();
                 if (player.Info.TimesUsedBot == 0) {
@@ -726,12 +706,12 @@ namespace fCraft {
                 }
                 string facter = wisdomStrings[randWisdomString.Next(0, wisdomStrings.Length)];
                 Server.Players.Message("&6Bot&f: " + facter);
-                IRC.SendChannelMessage("\u212C&6Bot\u211C: " + facter.Remove(0, 2));
+                Logger.Log(LogType.UserActivity, "&6Bot&f: " + facter);
+                IRC.SendChannelMessage("\u212C&6Bot\u211C: " + facter);
                 player.Info.LastTimeUsedBot = DateTime.Now;
                 player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
             } else {
                 player.Message(CdBot.Help);
-                return;
             }
         }
 
