@@ -206,13 +206,10 @@ namespace fCraft {
         public string ListName {
             get {
                 string formattedName = Name;
-                if (this.Info.IsAFK)
-                {
-                    formattedName = Info.Rank.Color + Info.Rank.Prefix + Color.Yellow + "[AFK]" + Color.White + formattedName;
-                }
-                else
-                {
-                    formattedName = Info.Rank.Color + Info.Rank.Prefix + Color.White + formattedName;
+                if (!Info.Rank.Prefix.Equals( "" )) {
+                    formattedName = Info.Rank.Color + Info.Rank.Prefix + (Info.IsAFK ? "&e[AFK]" : "") + Color.White + formattedName;
+                } else {
+                    formattedName = (Info.IsAFK ? "&e[AFK]" : "") + Info.Rank.Color + formattedName;
                 }
                 return formattedName;
             }
