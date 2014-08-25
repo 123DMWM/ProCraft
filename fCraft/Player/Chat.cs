@@ -100,7 +100,7 @@ namespace fCraft {
                 BotTime = (DateTime.Now - player.Info.LastTimeUsedBot).TotalSeconds;
                 if (BotTime > 5) {
                     PlayerInfo owner;
-                    if (PlayerDB.FindPlayerInfo(ConfigKey.ServerOwner.GetString(), out owner)) {
+                    if (PlayerDB.FindPlayerInfo(ConfigKey.ServerOwner.GetString(), out owner) && owner != null) {
                         Server.Players.Message( "&6Bot&f: The owner is {0}", RankManager.HighestRank.Color + owner.Name );
                         Logger.Log( LogType.UserActivity, "&6Bot&f: The owner is {0}", RankManager.HighestRank.Color + owner.Name );
                         IRC.SendChannelMessage( "\u212C&6Bot\u211C: The owner is {0}", RankManager.HighestRank.Color + owner.Name );
