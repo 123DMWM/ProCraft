@@ -1032,6 +1032,8 @@ namespace fCraft {
         private static void DisPlace(Player player, CommandReader cmd)
         {
             Block block;
+            if (cmd.Count == 1)
+            return;
             cmd.NextBlock(player, false, out block);
             int dis;
             cmd.NextInt(out dis);
