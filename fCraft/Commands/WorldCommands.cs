@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading;
 using fCraft.Events;
 using System.Collections;
+using ServiceStack.Text;
 
 namespace fCraft {
     /// <summary> Contains commands related to world management. </summary>
@@ -45,7 +46,7 @@ namespace fCraft {
             CommandManager.RegisterCommand( CdCTF );
             CommandManager.RegisterCommand( CdWorldClear );
             CommandManager.RegisterCommand( Cdclickdistance );
-            CommandManager.RegisterCommand( Cdaddentity );
+            CommandManager.RegisterCommand( CdEntity );
             CommandManager.RegisterCommand( Cdtex );
             CommandManager.RegisterCommand( CdSuicide );
             CommandManager.RegisterCommand( Cdweather );
@@ -1085,8 +1086,7 @@ namespace fCraft {
                     Logger.Log( LogType.UserActivity,
                                 "Gen: Asked {0} to confirm replacing the map of world {1} (\"this map\"). Request Denied because of Security Precautions In Place.",
                                 player.Name, playerWorld.Name );
-                    player.Message(Color.Warning + "You CANNOT Replace a world with /GEN. This is disabled on the server as a precaution.&nTo replace a world, instead:&n1 /Gen to a filename.&n2 /Wload the filename to a new world.&n3Delete the original world.&n4Rename the new world to the old one.");
-                    //player.Confirm( cmd, "Replace THIS MAP with a generated one ({0})?", templateFullName );
+                    player.Confirm( cmd, "Replace THIS MAP with a generated one ({0})?", templateFullName );
                     return;
                 }
 
@@ -1510,135 +1510,175 @@ namespace fCraft {
         #endregion
         #region AddEntity
 
-        static readonly CommandDescriptor Cdaddentity = new CommandDescriptor
+
+        public static string[] validEntities = 
+            {
+                "chicken",
+                "creeper",
+                "croc",
+                "humanoid",
+                "humanoid.armor",
+                "human",
+                "pig",
+                "printer",
+                "sheep",
+                "sheep.fur",
+                "skeleton",
+                "spider",
+                "zombie"
+            };
+        static readonly CommandDescriptor CdEntity = new CommandDescriptor
         {
-            Name = "entity",
-            Aliases = new[] { "ent" },
-            Permissions = new[] { Permission.EditPlayerDB },
+            Name = "Entity",
+            Aliases = new[] { "AddEntity", "AddEnt", "Ent" },
+            Permissions = new[] { Permission.BringAll },
             Category = CommandCategory.New,
-            IsHidden = true,
-            Help = "Controls for visible entities",
+            IsConsoleSafe = false,
+            Usage = "/ent <create / remove / removeAll / model / list / bring>",
+            Help = "Commands for manipulating entities. For help and usage for the individual options, use /help ent <option>.",
             HelpSections = new Dictionary<string, string>{
-                { "add",            "&H/Ent Add <ID#> <Name> \n&S" +
-                                    "Adds an entity at your exact position, with the ID and name choosen" },
-                { "remove",         "&H/Ent Remove <ID#> \n&S" +
-                                    "Removes an entity with the givin ID#" },
-                { "reset",          "&H/Ent Reset \n&S" +
-                                    "Removes all entities on the current map" },
-                { "model",          "&H/Ent Model <ID#> <Model> \n&S" +
-                                    "Changes the visible model for the entity with the givin ID#. \n" +
-                                    "Available models: [&aAny Block Name or ID#&s], &aChicken&s, &aCreeper&s, &aCroc&s, &aHumanoid&s, &aPig&s, &aSheep&s, &aSkeleton&s, &aSpider&s, &aZombie" }
-                },
-            Usage = "&s/ent [Add | Remove | Reset | Model] <ID#> [Name | ModelName]\n" +
-                    "&sUse &h/Help ent [Option]",
-            Handler = addentityHandler
+                { "create", "&H/Ent create <entity name> <model>\n&S" +
+                                "Creates a new entity with the given name. Valid models are chicken, creeper, croc, human, pig, printer, sheep, skeleton, spider, zombie, or any block ID/Name." },
+                { "remove", "&H/Ent remove <entity name>\n&S" +
+                                "Removes the given entity." },
+                { "removeall", "&H/Ent removeAll\n&S" +
+                                "Removes all entities from the server."},  
+                { "model", "&H/Ent model <entity name> <model>\n&S" +
+                                "Changes the model of an entity to the given model. Valid models are chicken, creeper, croc, human, pig, printer, sheep, skeleton, spider, zombie, or any block ID/Name."},
+                { "list", "&H/Ent list\n&S" +
+                                "Prints out a list of all the entites on the server."},
+                 { "bring", "&H/Ent bring <entity name>\n&S" +
+                                "Brings the given entity to you."}
+            },
+            Handler = BotHandler,
         };
 
-        static void addentityHandler(Player player, CommandReader cmd)
-        {
-            string motion = cmd.Next().ToLower();
-            string arg2 = cmd.Next();
-            sbyte id;
-            string name = cmd.Next();
-            if (motion == null)
-            {
-                player.Message(Cdaddentity.Usage);
+        private static void BotHandler(Player player, CommandReader cmd) {
+            string option = cmd.Next();
+            if (string.IsNullOrEmpty(option)) {
+                CdEntity.PrintUsage(player);
                 return;
             }
-            if (!sbyte.TryParse(arg2, out id) && !motion.Equals("reset", StringComparison.OrdinalIgnoreCase))
-            {
-                player.Message("Error: ID invalid");
+
+            if (option.ToLower() == "list") {
+                player.Message("_Entities on {0}_", ConfigKey.ServerName.GetString());
+                foreach (Bot botCheck in World.Bots) {
+                    player.Message(botCheck.Name + " on " + botCheck.World.Name);
+                }
                 return;
             }
-            if (id < 0 || id > 128 - player.World.Players.Count())
-            {
-                player.Message("Error: That ID can not be used at this time. Try something else 0-{0}", (128 - player.World.Players.Count()));
+            if (option.ToLower() == "removeall") {
+                tryagain:
+                World.Bots.ForEach(b => b.removeBot(player));
+                if (World.Bots.Count != 0) {
+                    goto tryagain;
+                }
+                player.Message("All entities removed from the world.");
                 return;
             }
-            if (motion == "add")
-            {                
-                if (name.Equals(""))
-                {
-                    player.Message("Error: Name == Null");
+
+            //finally away from the special cases
+            string botName = cmd.Next();
+            if (string.IsNullOrEmpty(botName)) {
+                CdEntity.PrintUsage(player);
+                return;
+            }
+
+            Bot bot = new Bot();
+            if (option != "create" && option != "add") {
+                bot = World.FindBot(botName.ToLower());
+                if (bot == null) {
+                    player.Message(
+                        "Could not find {0}! Please make sure you spelled the entities name correctly. To view all the entities, type /ent list.",
+                        botName);
                     return;
                 }
-                foreach (Player onlineplayers in player.World.Players)
-                {
-                    onlineplayers.Send(Packet.MakeRemoveEntity(id));
-                    onlineplayers.Send(Packet.MakeAddEntity(id, name, player.Position));
-                    onlineplayers.Message("{0}&s Created entity \"{1}\" with ID#{2} at {3}", player.ClassyName, name, id, player.Position.ToBlockCoords());
-                }
             }
-            if (motion == "remove")
-            {
-                foreach (Player onlineplayers in player.World.Players)
-                {
-                    onlineplayers.Send(Packet.MakeRemoveEntity(id));
-                    onlineplayers.Message("{0}&s Removed entity with ID#{1}", player.ClassyName, id);
-                }
-            }
-            if (motion == "setmodel" || motion == "model")
-            {
-                int fail;
-                Block block;
-                if (!int.TryParse(name, out fail) 
-                    && !name.ToLower().Equals("chicken")
-                    && !name.ToLower().Equals("creeper")
-                    && !name.ToLower().Equals("croc")
-                    && !name.ToLower().Equals("crocodile")
-                    && !name.ToLower().Equals("humanoid")
-                    && !name.ToLower().Equals("humanoid.armor")
-                    && !name.ToLower().Equals("pig")
-                    && !name.ToLower().Equals("printer")
-                    && !name.ToLower().Equals("sheep")
-                    && !name.ToLower().Equals("sheep.fur")
-                    && !name.ToLower().Equals("skeleton")
-                    && !name.ToLower().Equals("spider")
-                    && !name.ToLower().Equals("nope")
-                    && !name.ToLower().Equals("zombie")
-                    && !name.ToLower().Equals("enderman"))
-                {
-                    if (Map.GetBlockByName(name.ToLower(), false, out block))
-                    {
-                        name = block.GetHashCode().ToString();
+            Block blockmodel;
+
+            switch (option.ToLower()) {
+                case "create":
+                case "add":
+                    string requestedModel = "humanoid";
+                    if (cmd.HasNext) {
+                        requestedModel = cmd.Next().ToLower();
                     }
-                    else
-                    {
-                        player.Message("Error: Model. See &h/Help Ent Model&s for available ones.");
+                    if (!validEntities.Contains(requestedModel)) {
+                        if (Map.GetBlockByName(requestedModel, false, out blockmodel)) {
+                            requestedModel = blockmodel.GetHashCode().ToString();
+                        } else {
+                            player.Message(
+                                "That wasn't a valid entity model! Valid models are chicken, creeper, croc, human, pig, printer, sheep, skeleton, spider, zombie, or any block ID/Name.");
+                            return;
+                        }
+                    }
+
+                    //if a botname has already been chosen, ask player for a new name
+                    var matchingNames = from b in World.Bots where b.Name.ToLower() == botName.ToLower() select b;
+
+                    if (matchingNames.Count() > 0) {
+                        player.Message("An entity with that name already exists! To view all entities, type /ent list.");
                         return;
                     }
-                }
-                if (name.ToLower().Equals("crocodile"))
-                {
-                    name = "croc";
-                }
-                if (name.ToLower().Equals("nope"))
-                {
-                    name = "spider";
-                }
-                foreach (Player onlineplayers in player.World.Players)
-                {
-                    if (onlineplayers.SupportsChangeModel)
-                    {
-                        onlineplayers.Send(Packet.MakeChangeModel((byte)id, name));
-                    }
-                    onlineplayers.Message("{0}&s Set the model for entity with ID#{1} to {2}", player.ClassyName, id, name);
+
+
+                    Bot botCreate = new Bot();
+                    botCreate.setBot(botName, player.World, player.Position, getNewID());
+                    botCreate.createBot();
+                    botCreate.changeBotModel(requestedModel);
+                    player.Message("Successfully created entity {0}&s with id:{1}.", botCreate.Name, botCreate.ID);
+                    break;
+                case "remove":
+                    player.Message("{0} was removed from the server.", bot.Name);
+                    bot.removeBot(player);
+                    break;
+                case "model":
+                    if (cmd.HasNext) {
+                        string model = cmd.Next().ToLower();
+                        if (string.IsNullOrEmpty(model)) {
+                            player.Message(
+                                "Usage is /Ent model <bot> <model>. Valid models are chicken, creeper, croc, human, pig, printer, sheep, skeleton, spider, zombie, or any block ID/Name.");
+                            break;
+                        }
+
+                        if (model == "human") {
+                            model = "humanoid";
+                        }
+                        if (!validEntities.Contains(model)) {
+                            if (Map.GetBlockByName(model, false, out blockmodel)) {
+                                model = blockmodel.GetHashCode().ToString();
+                            } else {
+                                player.Message(
+                                    "That wasn't a valid entity model! Valid models are chicken, creeper, croc, human, pig, printer, sheep, skeleton, spider, zombie, or any block ID/Name.");
+                                break;
+                            }
+                        }
+
+                        player.Message("Changed entity model to {0}.", model);
+                        bot.changeBotModel(model);
+                    } else
+                    player.Message(
+                        "Usage is /Ent model <bot> <model>. Valid models are chicken, creeper, croc, human, pig, printer, sheep, skeleton, spider, zombie, or any block ID/Name.");
+                    break;
+                case "bring":
+                    bot.teleportBot(player.Position);
+                    break;
+                default:
+                    CdEntity.PrintUsage(player);
+                    break;
+            }
+        }
+
+        public static sbyte getNewID() {
+            sbyte i = 1;
+            go:
+            foreach (Bot bot in World.Bots) {
+                if (bot.ID == i) {
+                    i++;
+                    goto go;
                 }
             }
-            if (motion == "reset")
-            {
-                for (int i = -128; i < 128 - player.World.Players.Count(); i++)
-                {
-                    foreach (Player onlineplayers in player.World.Players)
-                    {
-                        onlineplayers.Send(Packet.MakeRemoveEntity((sbyte)i));
-                    }
-                }
-                foreach (Player onlineplayers in player.World.Players)
-                {
-                    onlineplayers.Message("{0}&s Reset all entities on the map.", player.ClassyName);
-                }
-            }
+            return i;
         }
 
         #endregion
@@ -1662,7 +1702,6 @@ namespace fCraft {
             player.Message("(Including beautiful Gui and Font)");
             player.Message( "ClassiCube texturepacks: http://173.48.22.66/texturepacks/" );
             player.Message( "Made and converted by 123DMWM^" );
-            return;
         }
 
         #endregion

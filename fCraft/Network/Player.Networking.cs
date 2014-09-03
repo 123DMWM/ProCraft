@@ -1519,7 +1519,15 @@ namespace fCraft {
             }
 
             #endregion
-
+            foreach (Bot bot in World.Bots) {
+                Send(Packet.MakeRemoveEntity(bot.ID));
+                if (bot.World == World) {
+                    Send(Packet.MakeAddEntity(bot.ID, bot.Name, bot.Position));
+                    if (bot.Model != "humanoid" && SupportsChangeModel) {
+                        Send(Packet.MakeChangeModel((byte)bot.ID, bot.Model));
+                    }
+                }
+            }
             if (oldWorld == newWorld)
             {
                 Message("&sRejoined world {0}", newWorld.ClassyName);
@@ -1722,7 +1730,6 @@ namespace fCraft {
         // anti-speedhack vars: packet spam
         readonly Queue<DateTime> antiSpeedPacketLog = new Queue<DateTime>();
         DateTime antiSpeedLastNotification = DateTime.UtcNow;
-
 
         void ResetVisibleEntities() {
             foreach( var pos in entities.Values ) {

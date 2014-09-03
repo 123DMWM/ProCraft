@@ -84,6 +84,19 @@ namespace fCraft {
         [CanBeNull]
         public Array Signs { get; set; }
 
+        public static List<Bot> Bots = new List<Bot>();
+
+        /// <summary>
+        /// Find bot by name. Returns either the bot by exact name, or null.
+        /// </summary>
+        public static Bot FindBot(String name) {
+            var bot = Bots.Where(b => b.Name.ToLower() == name.ToLower()).ToArray();
+            if (bot.Count() != 0) {
+                return bot.First();
+            }
+            return null;
+        }
+
         // used to synchronize player joining/parting with map loading/saving
         internal readonly object SyncRoot = new object();
 
