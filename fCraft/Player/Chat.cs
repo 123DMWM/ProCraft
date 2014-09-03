@@ -79,7 +79,7 @@ namespace fCraft {
 
             if (rawMessage.StartsWith("Bot ", StringComparison.OrdinalIgnoreCase) && rawMessage.Length < 17)
             {
-                player.ParseMessage("/bot IgnoreMeThisIsJustAFailSafe!@# " + rawMessage.Remove(0, 4), false);
+                player.ParseMessage("/bot <CalledFromChat> " + rawMessage.Remove(0, 4), false);
             }
             double BotTime;
             

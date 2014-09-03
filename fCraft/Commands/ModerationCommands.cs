@@ -351,6 +351,7 @@ namespace fCraft {
                    "Type in &h/help bot [option] &sfor more information.\n" +
                    "&6Bot&s is our Automated response system, so please don't abuse it.",
             NotRepeatable = true,
+            IsConsoleSafe = true,
             HelpSections = new Dictionary<string, string>{
                 { "go",             "&sType: &f!Bot Go\n&S" +
                                     "Sets a 5 second timer to be used for games." +
@@ -393,8 +394,12 @@ namespace fCraft {
             String option = cmd.Next();
             String helper = cmd.Next();
             double BotTime = (DateTime.Now - player.Info.LastTimeUsedBot).TotalSeconds;
-            if (cmdchat != "IgnoreMeThisIsJustAFailSafe!@#") {
-                return;
+            if (cmdchat != "<CalledFromChat>") {
+                cmd.Rewind();
+                option = cmd.Next();
+                helper = cmd.Next();
+                Server.Players.Message("{0}&f: Bot {1} {2}", player.ClassyName, option, helper);
+                IRC.SendChannelMessage("&s[{3}&s] {0}\u211C: Bot {1} {2}", player.ClassyName, option, helper, player.World.ClassyName);
             }
             if (BotTime < 5) {
                 double LeftOverTime = Math.Round(5 - BotTime);
