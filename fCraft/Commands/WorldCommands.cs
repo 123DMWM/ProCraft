@@ -1660,7 +1660,8 @@ namespace fCraft {
                            "but we are only allowed to force the terrain onto you.");
             player.Message("So if you want the full experience that this HD Default 64x pack has to offer...");
             player.Message("(Including beautiful Gui and Font)");
-            player.Message("Download our ClassiCube compatible texture pack here: http://goo.gl/Qeqt7v");
+            player.Message( "ClassiCube texturepacks: http://173.48.22.66/texturepacks/" );
+            player.Message( "Made and converted by 123DMWM^" );
             return;
         }
 
