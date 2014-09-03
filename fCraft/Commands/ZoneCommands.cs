@@ -939,31 +939,25 @@ namespace fCraft {
             Handler = zshowHandler
         };
 
-        static void zshowHandler(Player player, CommandReader cmd)
-        {
+        private static void zshowHandler(Player player, CommandReader cmd) {
             string zonea = cmd.Next();
             string color = cmd.Next();
             string alp = cmd.Next();
             string bol = cmd.Next();
-            short alpha;            
+            short alpha;
             Zone zone = player.World.Map.Zones.Find(zonea);
-            if (zone == null)
-            {
+            if (zone == null) {
                 player.Message("Error: Zone not found");
                 return;
             }
-            if (color == null)
-            {
+            if (color == null) {
                 player.Message("Error: Missing a Hex Color code");
                 player.Message(CdZoneShow.Usage);
                 return;
-            }
-            else
-            {
+            } else {
                 color = color.ToUpper();
             }
-            if (color.StartsWith("#"))
-            {
+            if (color.StartsWith("#")) {
                 color = color.ToUpper().Remove(0, 1);
             }
             if (!IsValidHex(color)) {
@@ -971,6 +965,7 @@ namespace fCraft {
                     zone.ShowZone = true;
                     if (zone.Color != null) {
                         player.Message("Zone ({0}&s) will now show its bounderies", zone.ClassyName);
+                        player.World.Players.Send(Packet.MakeRemoveSelection(zone.ZoneID));
                         player.World.Players.Send(Packet.MakeMakeSelection(zone.ZoneID, zone.Name, zone.Bounds,
                             zone.Color, zone.Alpha));
                     }
@@ -984,66 +979,55 @@ namespace fCraft {
                     player.Message("Error: \"#{0}\" is not a valid HEX color code.", color);
                     return;
                 }
-            }
-            else {
+            } else {
                 zone.Color = color.ToUpper();
             }
 
-            if (alp == null)
-            {
+            if (alp == null) {
                 player.Message("Error: Missing an Alpha integer");
                 player.Message(CdZoneShow.Usage);
                 return;
             }
-            if (!short.TryParse(alp, out alpha))
-            {
+            if (!short.TryParse(alp, out alpha)) {
                 player.Message("Error: \"{0}\" is not a valid integer for Alpha.", alp);
                 return;
-            }
-            else
-            {
+            } else {
                 zone.Alpha = alpha;
             }
-            if (bol != null)
-            {
-                if (!bol.ToLower().Equals("on") && !bol.ToLower().Equals("off") && !bol.ToLower().Equals("true") && !bol.ToLower().Equals("false") && !bol.ToLower().Equals("0") && !bol.ToLower().Equals("1") && !bol.ToLower().Equals("yes") && !bol.ToLower().Equals("no"))
-                {
+            if (bol != null) {
+                if (!bol.ToLower().Equals("on") && !bol.ToLower().Equals("off") && !bol.ToLower().Equals("true") &&
+                    !bol.ToLower().Equals("false") && !bol.ToLower().Equals("0") && !bol.ToLower().Equals("1") &&
+                    !bol.ToLower().Equals("yes") && !bol.ToLower().Equals("no")) {
                     zone.ShowZone = false;
                     player.Message("({0}) is not a valid bool statement", bol);
-                }
-                else if (bol.ToLower().Equals("on") || bol.ToLower().Equals("true") || bol.ToLower().Equals("1") || bol.ToLower().Equals("yes"))
-                {
+                } else if (bol.ToLower().Equals("on") || bol.ToLower().Equals("true") || bol.ToLower().Equals("1") ||
+                           bol.ToLower().Equals("yes")) {
                     zone.ShowZone = true;
                     player.Message("Zone ({0}&s) color set! Bounderies: ON", zone.ClassyName);
-                }
-                else if (bol.ToLower().Equals("off") || bol.ToLower().Equals("false") || bol.ToLower().Equals("0") || bol.ToLower().Equals("no"))
-                {
+                } else if (bol.ToLower().Equals("off") || bol.ToLower().Equals("false") || bol.ToLower().Equals("0") ||
+                           bol.ToLower().Equals("no")) {
                     zone.ShowZone = false;
                     player.Message("Zone ({0}&s) color set! Bounderies: OFF", zone.ClassyName);
                 }
-            }
-            else
-            {
-                if (zone.ShowZone == null)
-                {
+            } else {
+                if (zone.ShowZone == null) {
                     zone.ShowZone = false;
-                }                
+                }
                 player.Message("Zone ({0}&s) color set!", zone.ClassyName);
             }
-            if (zone != null)
-            {
-                foreach (Player p in player.World.Players)
-                {
-                    if (p.SupportsSelectionCuboid)
-                    {
-                        if (zone.ShowZone == true)
-                        {
+            if (zone != null) {
+                foreach (Player p in player.World.Players) {
+                    if (p.SupportsSelectionCuboid) {
+                        if (zone.ShowZone == true) {
+
+                            player.World.Players.Send(Packet.MakeRemoveSelection(zone.ZoneID));
                             p.Send(Packet.MakeMakeSelection(zone.ZoneID, zone.Name, zone.Bounds, zone.Color, alpha));
                         }
                     }
                 }
             }
         }
+
         #endregion
         /// <summary> Ensures that the hex color has the correct length (1-6 characters)
         /// and character set (alphanumeric chars allowed). </summary>
@@ -1054,8 +1038,8 @@ namespace fCraft {
             for( int i = 0; i < hex.Length; i++ ) {
                 char ch = hex[i];
                 if( ch < '0' || ch > '9' && 
-                    ch < 'A' || ch > 'Z' && 
-                    ch < 'a' || ch > 'z' ) {
+                    ch < 'A' || ch > 'F' && 
+                    ch < 'a' || ch > 'f' ) {
                     return false;
                 }
             }
