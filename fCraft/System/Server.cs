@@ -599,6 +599,115 @@ namespace fCraft {
                 Player.Console.Message("Filter Loader Has Crashed: {0}", ex);
             }
             #endregion
+            #region BotFiles
+
+            if (!Directory.Exists("./Bot")) {
+                Directory.CreateDirectory("./Bot");
+            }
+            if (!File.Exists("Bot/Funfacts.txt")) {
+                string[] factStrings = {
+                        "Every time you lick a stamp, you're consuming 1/10 of a calorie.",
+                        "Banging your head against a wall uses 150 calories an hour",
+                        "The average person falls asleep in seven minutes.",
+                        "Your stomach has to produce a new layer of mucus every two weeks otherwise it will digest itself.",
+                        "Polar bears are left handed.", "An ostrich's eye is bigger than it's brain.",
+                        "Bullet proof vests, fire escapes, windshield wipers, and laser printers were all invented by women.",
+                        "Pearls melt in vinegar.", "Coca Cola was originally green.",
+                        "The youngest Pope was 11 years old.",
+                        "A 'jiffy' is an actual unit of time: 1/100th of a second.",
+                        "Venus is the only planet that rotates clockwise.", "Most lipstick contains fish scales.",
+                        "Women blink nearly twice as much as men.", "Ketchup was sold in the 1830s as medicine.",
+                        "Stewardesses' is the longest word that is typed with only the left hand.",
+                        "The only 15 letter word that can be spelled without repeating a letter is \"uncopyrightable\".",
+                        "Maine is the only state in the USA that is one syllable.",
+                        "The adult human brain weighs about 3 pounds (1,300-1,400 g).",
+                        "Pirates of old spoke just like everyone else. The 'pirate accent' was invented for the 1950 Disney movie, Treasure Island.",
+                        "Almonds are a member of the peach family.",
+                        "Paraguay's flag is the only national flag where the front and the back are different.",
+                        "In 1999, Furbies were banned by the Pentagon, based on the fear that the dolls would mimic top-secret discussions.",
+                        "A dime has 118 ridges around the edge.", "Peanuts are one of the ingredients of dynamite.",
+                        "Two thirds of the world's eggplant is grown in New Jersey.",
+                        "No piece of paper can be folded in half more than 7 times.",
+                        "American Airlines saved $40,000 in 1987 by eliminating 1 olive from each salad served in first-class.",
+                        "In 1998, more fast-food employees were murdered on the job than police officers.",
+                        "Fortune cookies were actually invented in America, in 1918, by Charles Jung.",
+                        "TYPEWRITER is the longest word that can be made using the letters only on one row of the keyboard."
+                    };
+                File.WriteAllLines("Bot/Funfacts.txt", factStrings);
+            }
+            if (!File.Exists("Bot/Jokes.txt")) {
+                string[] jokeStrings = {
+                        "What do you call a fat psychic? A four chin teller.",
+                        "If con is the opposite of pro, it must mean Congress is the opposite of progress?",
+                        "What did the fish say when he swam into the wall? -- Damn",
+                        "What do you call a sheep with no legs? A cloud.",
+                        "How do you make holy water? You boil the hell out of it.",
+                        "Fat people are harder to kidnap.",
+                        "What's the best thing about being 100 y/o? -- No peer pressure",
+                        "Failure is not an option -- it comes bundled with Windows.",
+                        "Yo moma is like HTML: Tiny head, huge body.",
+                        "1f u c4n r34d th1s u r34lly n33d t0 g37 l41d",
+                        "As long as there are tests, there will be prayer in schools.",
+                        "For Sale: Parachute. Only used once, never opened.",
+                        "When everything's coming your way, you're in the wrong lane.",
+                        "If at first you don't succeed, destroy all evidence that you tried.",
+                        "The last thing I want to do is hurt you. But it's still on the list.",
+                        "If I agreed with you we'd both be wrong.",
+                        "Energizer Bunny was arrested, charged with battery.",
+                        "I usually take steps to avoid elevators.", "Schrodinger's Cat: Wanted dead and alive.",
+                        "If at first you don't succeed; call it version 1.0",
+                        "CONGRESS.SYS Corrupted: Re-boot Washington D.C (Y/n)?",
+                        "We live in a society where pizza gets to your house before the police.",
+                        "Light travels faster than sound. This is why some people appear bright until you hear them speak.",
+                        "Evening news is where they begin with 'Good evening', and then proceed to tell you why it isn't.",
+                        "You do not need a parachute to skydive. You only need a parachute to skydive twice.",
+                        "When in doubt, mumble.", "War does not determine who is right – only who is left...",
+                        "I wondered why the frisbee was getting bigger - then it hit me.",
+                        "Never argue with a fool, they will lower you to their level, and then beat you with experience.",
+                        "There are 3 kinds of people in the world: Those who can count and those who can't.",
+                        "Never hit a man with glasses. Hit him with a baseball bat instead.",
+                        "Nostalgia isn't what it used to be."
+                    };
+                File.WriteAllLines("Bot/Jokes.txt", jokeStrings);
+            }
+            if (!File.Exists("Bot/Protips.txt")) {
+                string[] tipStrings = {
+                        "Store cheese curls bag in freezer, the colder they are the better they taste.",
+                        "Take a screen-shot on the payment confirmation screen of every purchase you make online.",
+                        "Use an underscore in front of folder names and other sortable items on your computer to keep those at the top of the list.",
+                        "Don't use \"lol\" as a filler word.",
+                        "Press F2 to immediately rename a file, no more slow double clicks.",
+                        "Take one minute to record your phone's serial number. This may be the one identifying factor if your phone is ever stolen and reset.",
+                        "Create a life binder and keep in it copies of things like your: medical records, SSN, birth photos, etc.",
+                        "When applying for a job online, save the job description in an email/pdf. You'll be able to prepare even if the post is removed.",
+                        "Try the microwave challenge: when microwaving see how much of the kitchen you can clean up.",
+                        "Give your shower walls a quick wipe-down after each shower and you'll never fight mildew and hard water stains again.",
+                        "Open your dishwasher as soon as it has finished to allow additional water to evaporate (and get rid of water spots)",
+                        "Have a separate account on your laptop for performing presentations.",
+                        "When going on long roadtrips and don't want to pay for a motel? All Wal-Marts allow people to park over night without being kicked out.",
+                        "Sprinkle cinnamon on the carpet. When you vacuum, the room will smell like cinnamon instead of your nasty vacuum.",
+                        "Use a window squeegee to remove pet hair from carpet.",
+                        "If you see someone griefing, don't try to fix it, tell an admin we have commands that can fix it instantly with no work.",
+                        "Want a higher rank? Be nice, don't argue, try your best to get a better impression toward the admins.",
+                        "Use travel delay as opportunity to stop rather than get stressed. When the world stands still, let it.",
+                        "Stop clinging and embrace change as a constant.",
+                        "Try and give people the benefit of the doubt if they snap at you. Might be something going on you don't know about.",
+                        "Friendship is a gift, not a possession.",
+                        "Before you go to bed, write down only 3 things that you want to do the following day. This is how to prioritize.",
+                        "Do something relaxing before going to bed. No electronics.",
+                        "When in doubt, take a deep breath.", "Define what's necessary; say no to the rest.",
+                        "Expect nothing. Welcome everything.",
+                        "Good things come to those who wait… greater things come to those who get off their ass and do anything to make it happen.",
+                        "Ends are not bad things, they just mean that something else is about to begin.",
+                        "Beat your alarm to wake up? Don't go back to bed, you will feel worse.",
+                        "Orgasms cure hiccups.",
+                        "Telemarketers aren't allowed to hang up first. The possibilities are endless.",
+                        "Apples are 10 times more effective at keeping people awake than coffee."
+                    };
+                File.WriteAllLines("Bot/Protips.txt", tipStrings);
+            }
+
+            #endregion
 
             // garbage collection (every 60s)
             gcTask = Scheduler.NewTask( DoGC ).RunForever( GCInterval, TimeSpan.FromSeconds( 45 ) );
