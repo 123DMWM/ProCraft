@@ -1884,6 +1884,7 @@ namespace fCraft {
             // no need to set player.drawingInProgress here because this is done on the user thread
             Logger.Log( LogType.UserActivity,
                         "{0} {1} &sinitiated /Redo affecting {2} blocks (on world {3})",
+                        player.Info.Rank.Name,
                         player.Name,
                         redoState.Buffer.Count,
                         playerWorld.Name );
