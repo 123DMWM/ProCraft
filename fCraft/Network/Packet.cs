@@ -424,6 +424,26 @@ namespace fCraft {
             return packet;
         }
 
+
+        [Pure]
+        public static Packet MakeExtAddEntity2(sbyte entityId, [NotNull] string inGameName, [NotNull] string skinName, Position spawnPosition) {
+            if (inGameName == null)
+                throw new ArgumentNullException("inGameName");
+            if (skinName == null)
+                throw new ArgumentNullException("skinName");
+            Packet packet = new Packet(OpCode.ExtAddEntity2);
+            //Logger.Log(LogType.Debug, "Send: MakeExtAddEntity2({0}, {1}, {2})", entityId, inGameName, skinName, spawnPosition.ToString());
+            packet.Bytes[1] = (byte)entityId;
+            Encoding.ASCII.GetBytes(inGameName.PadRight(64), 0, 64, packet.Bytes, 2);
+            Encoding.ASCII.GetBytes(skinName.PadRight(64), 0, 64, packet.Bytes, 66);
+            ToNetOrder(spawnPosition.X, packet.Bytes, 130);
+            ToNetOrder(spawnPosition.Z, packet.Bytes, 132);
+            ToNetOrder(spawnPosition.Y, packet.Bytes, 134);
+            packet.Bytes[137] = spawnPosition.R;
+            packet.Bytes[138] = spawnPosition.L;
+            return packet;
+        }
+
         #endregion
 
         static void ToNetOrder( short number, [NotNull] byte[] arr, int offset ) {
@@ -473,7 +493,8 @@ namespace fCraft {
             66, // ChangeModel
             69, // EnvMapAppearance
             2, // EnvSetWeatherType
-            8 // HackControl
+            8, // HackControl
+            138 // ExtAddEntity2
         };
     }
 }

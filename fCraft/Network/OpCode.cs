@@ -106,6 +106,9 @@ namespace fCraft
 
         /// <summary> This extension allows the server to specify whichi hacks the player can use. </summary>
         HackControl = 32,
+
+        /// <summary> Extended server packet. Adds or updates an entity (replaces AddEntity). </summary>
+        ExtAddEntity2 = 33,
     }
 }
 

@@ -1427,9 +1427,13 @@ namespace fCraft {
             writer.Write((short)map.Length);
             BytesSent += 7;
 
-
-            writer.Write(Packet.MakeAddEntity(Packet.SelfId, Info.Rank.Color + Name, map.Spawn).Bytes);
-            BytesSent += 74;
+            if (SupportsExtPlayerList2) {
+                writer.Write(Packet.MakeExtAddEntity2(Packet.SelfId, Info.Rank.Color + Name, Name, map.Spawn).Bytes);
+                BytesSent += 138;
+            } else {
+                writer.Write(Packet.MakeAddEntity(Packet.SelfId, Info.Rank.Color + Name, map.Spawn).Bytes);
+                BytesSent += 74;
+            }
             // Teleport player to the target location
             // This allows preserving spawn rotation/look, and allows
             // teleporting player to a specific location (e.g. /TP or /Bring)
@@ -1852,7 +1856,13 @@ namespace fCraft {
 #if DEBUG_MOVEMENT
                 Logger.Log( LogType.Debug, "AddEntity: {0} added {1} ({2})", Name, newEntity.Id, player.Name );
 #endif
-                SendNow(Packet.MakeAddEntity(newEntity.Id, player.Info.Rank.Color + player.Name, player.WorldMap.Spawn));
+                if (SupportsExtPlayerList2) {
+                    SendNow(Packet.MakeExtAddEntity2(newEntity.Id, player.Info.Rank.Color + player.Name, player.Name,
+                        player.WorldMap.Spawn));
+                    return newEntity;
+                }
+                SendNow(Packet.MakeAddEntity(newEntity.Id, player.Info.Rank.Color + player.Name,
+                    player.WorldMap.Spawn));
                 return newEntity;
             } else {
                 throw new InvalidOperationException( "Player.AddEntity: Ran out of entity IDs." );
@@ -1888,7 +1898,12 @@ namespace fCraft {
             Logger.Log( LogType.Debug, "ReAddEntity: {0} re-added {1} ({2})", Name, entity.Id, player.Name );
 #endif
             SendNow( Packet.MakeRemoveEntity( entity.Id ) );
-            SendNow(Packet.MakeAddEntity(entity.Id, player.Info.Rank.Color + player.Name, player.WorldMap.Spawn));
+            if (SupportsExtPlayerList2) {
+                SendNow(Packet.MakeExtAddEntity2(entity.Id, player.Info.Rank.Color + player.Name, player.Name,
+                    player.WorldMap.Spawn));
+            } else {
+                SendNow(Packet.MakeAddEntity(entity.Id, player.Info.Rank.Color + player.Name, player.WorldMap.Spawn));
+            }
         }
 
 

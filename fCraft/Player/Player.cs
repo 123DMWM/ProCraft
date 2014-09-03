@@ -2063,6 +2063,7 @@ namespace fCraft {
         const int HeldBlockExtVersion = 1;
         const string ExtPlayerListExtName = "ExtPlayerList";
         const int ExtPlayerListExtVersion = 1;
+        const int ExtPlayerList2ExtVersion = 2;
         const string SelectionCuboidExtName = "SelectionCuboid";
         const int SelectionCuboidExtVersion = 1;
         const string MessageTypesExtName = "MessageTypes";
@@ -2084,6 +2085,7 @@ namespace fCraft {
         public bool SupportsEnvWeatherType { get; set; }
         public bool SupportsHeldBlock { get; set; }
         public bool SupportsExtPlayerList { get; set; }
+        public bool SupportsExtPlayerList2 { get; set; }
         public bool SupportsSelectionCuboid { get; set; }
         public bool SupportsMessageTypes { get; set; }
         public bool SupportsHackControl { get; set; }
@@ -2094,7 +2096,7 @@ namespace fCraft {
         bool NegotiateProtocolExtension()
         {
             // write our ExtInfo and ExtEntry packets
-            writer.Write(Packet.MakeExtInfo("ProCraft", 14).Bytes);
+            writer.Write(Packet.MakeExtInfo("ProCraft", 15).Bytes);
             writer.Write(Packet.MakeExtEntry(CustomBlocksExtName, CustomBlocksExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(BlockPermissionsExtName, BlockPermissionsExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(ClickDistanceExtName, ClickDistanceExtVersion).Bytes);
@@ -2104,11 +2106,12 @@ namespace fCraft {
             writer.Write(Packet.MakeExtEntry(EnvWeatherTypeExtName, EnvWeatherTypeExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(HeldBlockExtName, HeldBlockExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(ExtPlayerListExtName, ExtPlayerListExtVersion).Bytes);
+            writer.Write(Packet.MakeExtEntry(ExtPlayerListExtName, ExtPlayerList2ExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(SelectionCuboidExtName, SelectionCuboidExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(MessageTypesExtName, MessageTypesExtVersion).Bytes);
-            writer.Write( Packet.MakeExtEntry( HackControlExtName, HackControlExtVersion ).Bytes );
-            writer.Write( Packet.MakeExtEntry( EmoteFixExtName, EmoteFixExtVersion ).Bytes );
-            writer.Write( Packet.MakeExtEntry( TextHotKeyExtName, TextHotKeyExtVersion ).Bytes );
+            writer.Write(Packet.MakeExtEntry(HackControlExtName, HackControlExtVersion).Bytes);
+            writer.Write(Packet.MakeExtEntry(EmoteFixExtName, EmoteFixExtVersion).Bytes);
+            writer.Write(Packet.MakeExtEntry(TextHotKeyExtName, TextHotKeyExtVersion).Bytes);
 
             // Expect ExtInfo reply from the client
             OpCode extInfoReply = reader.ReadOpCode();
@@ -2141,43 +2144,47 @@ namespace fCraft {
                     clientExts.Add(extName + " " + extVersion);
                 }
                 if (extName == BlockPermissionsExtName && extVersion == BlockPermissionsExtVersion) {
-                    this.SupportsBlockPermissions = true;
+                    SupportsBlockPermissions = true;
                     clientExts.Add(extName + " " + extVersion);
                 }
                 if (extName == ClickDistanceExtName && extVersion == ClickDistanceExtVersion) {
-                    this.SupportsClickDistance = true;
+                    SupportsClickDistance = true;
                     clientExts.Add(extName + " " + extVersion);
                 }
                 if (extName == EnvColorsExtName && extVersion == EnvColorsExtVersion) {
-                    this.SupportsEnvColors = true;
+                    SupportsEnvColors = true;
                     clientExts.Add(extName + " " + extVersion);
                 }
                 if (extName == ChangeModelExtName && extVersion == ChangeModelExtVersion) {
-                    this.SupportsChangeModel = true;
+                    SupportsChangeModel = true;
                     clientExts.Add(extName + " " + extVersion);
                 }
                 if (extName == EnvMapAppearanceExtName && extVersion == EnvMapAppearanceExtVersion) {
-                    this.SupportsEnvMapAppearance = true;
+                    SupportsEnvMapAppearance = true;
                     clientExts.Add(extName + " " + extVersion);
                 }
                 if (extName == EnvWeatherTypeExtName && extVersion == EnvWeatherTypeExtVersion) {
-                    this.SupportsEnvWeatherType = true;
+                    SupportsEnvWeatherType = true;
                     clientExts.Add(extName + " " + extVersion);
                 }
                 if (extName == HeldBlockExtName && extVersion == HeldBlockExtVersion) {
-                    this.SupportsHeldBlock = true;
+                    SupportsHeldBlock = true;
                     clientExts.Add(extName + " " + extVersion);
                 }
                 if (extName == ExtPlayerListExtName && extVersion == ExtPlayerListExtVersion) {
-                    this.SupportsExtPlayerList = true;
+                    SupportsExtPlayerList = true;
+                    clientExts.Add(extName + " " + extVersion);
+                }
+                if (extName == ExtPlayerListExtName && extVersion == ExtPlayerList2ExtVersion) {
+                    SupportsExtPlayerList2 = true;
                     clientExts.Add(extName + " " + extVersion);
                 }
                 if (extName == SelectionCuboidExtName && extVersion == SelectionCuboidExtVersion) {
-                    this.SupportsSelectionCuboid = true;
+                    SupportsSelectionCuboid = true;
                     clientExts.Add(extName + " " + extVersion);
                 }
                 if (extName == MessageTypesExtName && extVersion == MessageTypesExtVersion) {
-                    this.SupportsMessageTypes = true;
+                    SupportsMessageTypes = true;
                     clientExts.Add(extName + " " + extVersion);
                 }
                 if (extName == HackControlExtName && extVersion == HackControlExtVersion) {
