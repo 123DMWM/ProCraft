@@ -840,9 +840,9 @@ namespace fCraft {
                             PlayerDB.PlayerInfoList.Sum( p => p.MessagesWritten ),
                             PlayerDB.PlayerInfoList.Sum( p => p.TimesKickedOthers ),
                             PlayerDB.PlayerInfoList.Sum(p => p.TotalTime.TotalHours),
-                            PlayerDB.PlayerInfoList.Where(c => c.TotalTime.TotalHours >= 5).Average(p => p.TotalTime.TotalHours),
+                            PlayerDB.PlayerInfoList.Average(p => p.TotalTime.TotalHours),
                             PlayerDB.PlayerInfoList.Sum(p => p.TimesVisited),
-                            PlayerDB.PlayerInfoList.Where(c => c.TimesVisited >= 2).Average(p => p.TimesVisited));
+                            PlayerDB.PlayerInfoList.Average(p => p.TimesVisited));
 
             player.Message( "  There are {0} worlds available ({1} loaded, {2} hidden).",
                             WorldManager.Worlds.Length,
