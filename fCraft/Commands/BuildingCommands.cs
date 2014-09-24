@@ -26,6 +26,7 @@ namespace fCraft {
             CommandManager.RegisterCommand( CdTree );
             CommandManager.RegisterCommand( CdCancel );
             CommandManager.RegisterCommand( CdMark );
+            CommandManager.RegisterCommand( CdMarkAll );
             CommandManager.RegisterCommand( CdDoNotMark );
             CommandManager.RegisterCommand( CdUndo );
             CommandManager.RegisterCommand( CdRedo );
@@ -108,7 +109,7 @@ namespace fCraft {
             CommandManager.RegisterCommand( CdPlane );
             CommandManager.RegisterCommand( CdPlaneW );
             CommandManager.RegisterCommand( CdOverlay );
-            //CommandManager.RegisterCommand( Cdctest );
+            CommandManager.RegisterCommand(CdReplaceAll);
         }
 
         #region helpers
@@ -1729,6 +1730,47 @@ namespace fCraft {
             ReplaceHandlerInternal( replaceBrush, player, cmd );
         }
 
+        static void ReplaceAllHandlerInternal(IBrush factory, Player player, CommandReader cmd) {
+            CuboidDrawOperation op = new CuboidDrawOperation(player);
+            IBrushInstance brush = factory.MakeInstance(player, cmd, op);
+            if (brush == null)
+                return;
+            op.Brush = brush;
+
+            player.SelectionStart(2, DrawOperationCallback, op, Permission.Draw);
+            Map map = player.WorldMap;
+            Vector3I coordsMin;
+            Vector3I coordsMax;
+            coordsMin.X = 0;
+            coordsMin.Y = 0;
+            coordsMin.Z = 0;
+            coordsMax.X = map.Width - 1;
+            coordsMax.Y = map.Length - 1;
+            coordsMax.Z = map.Height - 1;
+            player.SelectionResetMarks();
+            player.SelectionAddMark(coordsMin, false, true);
+            player.SelectionAddMark(coordsMax, true, true);
+        }
+
+
+        static readonly CommandDescriptor CdReplaceAll = new CommandDescriptor {
+            Name = "ReplaceAll",
+            Aliases = new[] { "ra" },
+            Category = CommandCategory.Building,
+            Permissions = new[] { Permission.Draw },
+            RepeatableSelection = true,
+            Usage = "/Replace BlockToReplace [AnotherOne, ...] ReplacementBlock",
+            Help = "Replaces all blocks of specified type(s) on the map.",
+            Handler = ReplaceAllHandler
+        };
+
+        static void ReplaceAllHandler(Player player, CommandReader cmd) {
+            var replaceBrush = ReplaceBrushFactory.Instance.MakeBrush(player, cmd);
+            if (replaceBrush == null)
+                return;
+            ReplaceAllHandlerInternal(replaceBrush, player, cmd);
+        }
+
 
 
         static readonly CommandDescriptor CdReplaceNot = new CommandDescriptor {
@@ -2514,12 +2556,34 @@ namespace fCraft {
             coords.Z = Math.Min( map.Height - 1, Math.Max( 0, coords.Z ) );
 
             if( player.SelectionMarksExpected > 0 ) {
-                player.SelectionAddMark( coords, true );
+                player.SelectionAddMark( coords, true, false );
             } else {
                 player.MessageNow( "Cannot mark - no selection in progress." );
             }
         }
 
+        static readonly CommandDescriptor CdMarkAll = new CommandDescriptor {
+            Name = "MarkAll",
+            Aliases = new[] { "ma", },
+            Category = CommandCategory.Building,
+            Help = "When making a selection (for drawing or zoning) use this to mark the whole world.",
+            Handler = MarkAllHandler
+        };
+
+        private static void MarkAllHandler(Player player, CommandReader cmd) {
+            Map map = player.WorldMap;
+            Vector3I coordsMin;
+            Vector3I coordsMax;
+            coordsMin.X = 0;
+            coordsMin.Y = 0;
+            coordsMin.Z = 0;
+            coordsMax.X = map.Width - 1;
+            coordsMax.Y = map.Length - 1;
+            coordsMax.Z = map.Height - 1;
+            player.SelectionResetMarks();
+            player.SelectionAddMark(coordsMin, false, true);
+            player.SelectionAddMark(coordsMax, true, true);
+        }
 
         static readonly CommandDescriptor CdDoNotMark = new CommandDescriptor {
             Name = "DoNotMark",

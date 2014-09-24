@@ -1116,7 +1116,7 @@ namespace fCraft {
             // selection handling
             if( SelectionMarksExpected > 0 && !DisableClickToMark ) {
                 RevertBlockNow( coord );
-                SelectionAddMark( coord, true );
+                SelectionAddMark( coord, true, false );
                 return false;
             }
 
@@ -1656,7 +1656,7 @@ namespace fCraft {
         Permission[] selectionPermissions;
 
 
-        public void SelectionAddMark( Vector3I pos, bool executeCallbackIfNeeded ) {
+        public void SelectionAddMark( Vector3I pos, bool executeCallbackIfNeeded, bool markAll ) {
             if( !IsMakingSelection ) throw new InvalidOperationException( "No selection in progress." );
             selectionMarks.Enqueue( pos );
             if( SelectionMarkCount >= SelectionMarksExpected ) {
@@ -1666,8 +1666,10 @@ namespace fCraft {
                     Message( "Last block marked at {0}. Type &H/Mark&S or click any block to continue.", pos );
                 }
             } else {
-                Message( "Block #{0} marked at {1}. Place mark #{2}.",
-                         SelectionMarkCount, pos, SelectionMarkCount + 1 );
+                if (!markAll) {
+                    Message("Block #{0} marked at {1}. Place mark #{2}.", SelectionMarkCount, pos,
+                        SelectionMarkCount + 1);
+                }
             }
         }
 
@@ -2091,7 +2093,7 @@ namespace fCraft {
         public bool SupportsHackControl { get; set; }
         public bool SupportsEmoteFix { get; set; }
         public bool SupportsTextHotKey { get; set; }
-        string ClientName { get; set; }
+        public string ClientName { get; set; }
 
         bool NegotiateProtocolExtension()
         {
