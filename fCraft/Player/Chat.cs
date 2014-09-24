@@ -76,6 +76,7 @@ namespace fCraft {
 
             
             if( !SendInternal( e ) ) return false;
+            rawMessage = Color.StripColors(rawMessage);
 
             if (rawMessage.StartsWith("Bot ", StringComparison.OrdinalIgnoreCase) && rawMessage.Length < 17)
             {

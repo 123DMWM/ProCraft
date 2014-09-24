@@ -1591,151 +1591,154 @@ namespace fCraft {
             Handler = CommandsHandler
         };
 
-        static void CommandsHandler( Player player, CommandReader cmd ) {
+        private static void CommandsHandler(Player player, CommandReader cmd) {
             string param = cmd.Next();
             if (param == null) param = "NULL";
-            if (param.ToLower() == "building")
-            {
+            if (param.StartsWith("*") && param.EndsWith("*")) {
                 Array items = CommandManager.GetCommands(player.Info.Rank, false);
                 string output = "";
-                foreach(CommandDescriptor item in items) {
-                    if (item.Category == CommandCategory.Building)
-                    {
+                foreach (CommandDescriptor item in items) {
+                    if (item.Name.ToLower().Contains(param.ToLower().Trim('*'))) {
+                        output += item.MinRank.Color + item.Name + "&s, ";
+                    }
+                }
+                player.Message("&sCommands containing {0}:", param.Trim('*'));
+                if (output.EndsWith(", "))
+                    player.Message(output.Remove(output.Length - 2) + ".");
+                else
+                    player.Message("There are no commands containin with {0}", param.Trim('*'));
+            } else if (param.EndsWith("*")) {
+                Array items = CommandManager.GetCommands(player.Info.Rank, false);
+                string output = "";
+                foreach (CommandDescriptor item in items) {
+                    if (item.Name.ToLower().StartsWith(param.ToLower().Trim('*'))) {
+                        output += item.MinRank.Color + item.Name + "&s, ";
+                    }
+                }
+                player.Message("&sCommands starting with {0}:", param.Trim('*'));
+                if (output.EndsWith(", "))
+                    player.Message(output.Remove(output.Length - 2) + ".");
+                else
+                    player.Message("There are no commands starting with {0}", param.Trim('*'));
+            } else if (param.StartsWith("*")) {
+                Array items = CommandManager.GetCommands(player.Info.Rank, false);
+                string output = "";
+                foreach (CommandDescriptor item in items) {
+                    if (item.Name.ToLower().EndsWith(param.ToLower().Trim('*'))) {
+                        output += item.MinRank.Color + item.Name + "&s, ";
+                    }
+                }
+                player.Message("&sCommands ending with {0}:", param.Trim('*'));
+                if (output.EndsWith(", "))
+                    player.Message(output.Remove(output.Length - 2) + ".");
+                else
+                    player.Message("There are no commands ending with {0}", param.Trim('*'));
+            } else if (param.ToLower() == "building") {
+                Array items = CommandManager.GetCommands(player.Info.Rank, false);
+                string output = "";
+                foreach (CommandDescriptor item in items) {
+                    if (item.Category == CommandCategory.Building) {
                         output += item.MinRank.Color + item.Name + "&s, ";
                     }
                 }
                 player.Message("&sBuilding Commands:");
                 if (output.EndsWith(", ")) player.Message(output.Remove(output.Length - 2) + ".");
                 else player.Message("There are no commands in this category available to your rank.");
-            }
-            else if (param.ToLower() == "chat")
-            {
+            } else if (param.ToLower() == "chat") {
                 Array items = CommandManager.GetCommands(player.Info.Rank, false);
                 string output = "";
-                foreach (CommandDescriptor item in items)
-                {
-                    if (item.Category == CommandCategory.Chat)
-                    {
+                foreach (CommandDescriptor item in items) {
+                    if (item.Category == CommandCategory.Chat) {
                         output += item.MinRank.Color + item.Name + "&s, ";
                     }
                 }
                 player.Message("&sChat Commands:");
                 if (output.EndsWith(", ")) player.Message(output.Remove(output.Length - 2) + ".");
                 else player.Message("There are no commands in this category available to your rank.");
-            }
-            else if (param.ToLower() == "info")
-            {
+            } else if (param.ToLower() == "info") {
                 Array items = CommandManager.GetCommands(player.Info.Rank, false);
                 string output = "";
-                foreach (CommandDescriptor item in items)
-                {
-                    if (item.Category == CommandCategory.Info)
-                    {
+                foreach (CommandDescriptor item in items) {
+                    if (item.Category == CommandCategory.Info) {
                         output += item.MinRank.Color + item.Name + "&s, ";
                     }
                 }
                 player.Message("&sInfo Commands:");
                 if (output.EndsWith(", ")) player.Message(output.Remove(output.Length - 2) + ".");
                 else player.Message("There are no commands in this category available to your rank.");
-            }
-            else if (param.ToLower() == "maintenance")
-            {
+            } else if (param.ToLower() == "maintenance") {
                 Array items = CommandManager.GetCommands(player.Info.Rank, false);
                 string output = "";
-                foreach (CommandDescriptor item in items)
-                {
-                    if (item.Category == CommandCategory.Maintenance)
-                    {
+                foreach (CommandDescriptor item in items) {
+                    if (item.Category == CommandCategory.Maintenance) {
                         output += item.MinRank.Color + item.Name + "&s, ";
                     }
                 }
                 player.Message("&sMaintenance Commands:");
                 if (output.EndsWith(", ")) player.Message(output.Remove(output.Length - 2) + ".");
                 else player.Message("There are no commands in this category available to your rank.");
-            }
-            else if (param.ToLower() == "moderation" || param.ToLower() == "mod" || param.ToLower() == "administration" || param.ToLower() == "admin")
-            {
+            } else if (param.ToLower() == "moderation" || param.ToLower() == "mod" || param.ToLower() == "administration" ||
+                       param.ToLower() == "admin") {
                 Array items = CommandManager.GetCommands(player.Info.Rank, false);
                 string output = "";
-                foreach (CommandDescriptor item in items)
-                {
-                    if (item.Category == CommandCategory.Moderation)
-                    {
+                foreach (CommandDescriptor item in items) {
+                    if (item.Category == CommandCategory.Moderation) {
                         output += item.MinRank.Color + item.Name + "&s, ";
                     }
                 }
                 player.Message("&sModeration Commands:");
                 if (output.EndsWith(", ")) player.Message(output.Remove(output.Length - 2) + ".");
                 else player.Message("There are no commands in this category available to your rank.");
-            }
-            else if (param.ToLower() == "worldcontrol" || param.ToLower() == "world" || param.ToLower() == "zones")
-            {
+            } else if (param.ToLower() == "worldcontrol" || param.ToLower() == "world" || param.ToLower() == "zones") {
                 Array items = CommandManager.GetCommands(player.Info.Rank, false);
                 string output = "";
-                foreach (CommandDescriptor item in items)
-                {
-                    if (item.Category == CommandCategory.World || item.Category == CommandCategory.Zone)
-                    {
+                foreach (CommandDescriptor item in items) {
+                    if (item.Category == CommandCategory.World || item.Category == CommandCategory.Zone) {
                         output += item.MinRank.Color + item.Name + "&s, ";
                     }
                 }
                 player.Message("&sWorldControl Commands:");
                 if (output.EndsWith(", ")) player.Message(output.Remove(output.Length - 2) + ".");
                 else player.Message("There are no commands in this category available to your rank.");
-            }
-            else if (param.ToLower() == "new")
-            {
+            } else if (param.ToLower() == "new") {
                 Array items = CommandManager.GetCommands(player.Info.Rank, false);
                 string output = "";
-                foreach (CommandDescriptor item in items)
-                {
-                    if (item.Category == CommandCategory.New)
-                    {
+                foreach (CommandDescriptor item in items) {
+                    if (item.Category == CommandCategory.New) {
                         output += item.MinRank.Color + item.Name + "&s, ";
                     }
                 }
                 player.Message("&sNew Commands:");
                 if (output.EndsWith(", ")) player.Message(output.Remove(output.Length - 2) + ".");
                 else player.Message("There are no commands in this category available to your rank.");
-            }
-            else if (param.ToLower() == "all")
-            {
+            } else if (param.ToLower() == "all") {
                 Array items = CommandManager.GetCommands(player.Info.Rank, false);
                 string output = "";
-                foreach (CommandDescriptor item in items)
-                {
+                foreach (CommandDescriptor item in items) {
                     output += item.MinRank.Color + item.Name + "&s, ";
                 }
                 player.Message("&sAll Commands:");
                 if (output.EndsWith(", ")) player.Message(output.Remove(output.Length - 2) + ".");
                 else player.Message("There are no commands in this category available to your rank.");
-            }
-            else if (param.ToLower() == "alllong")
-            {
+            } else if (param.ToLower() == "alllong") {
                 Array items = CommandManager.GetCommands(false);
                 string output = "";
-                foreach (CommandDescriptor item in items)
-                {
+                foreach (CommandDescriptor item in items) {
                     output += item.MinRank.Color + item.Name + "&s, ";
                 }
                 player.Message("&sEvery Command:");
                 if (output.EndsWith(", ")) player.Message(output.Remove(output.Length - 2) + ".");
                 else player.Message("There are no commands in this category available to your rank.");
-            }
-            else if (param.ToLower() == "hidden")
-            {
+            } else if (param.ToLower() == "hidden") {
                 Array items = CommandManager.GetCommands(true);
                 string output = "";
-                foreach (CommandDescriptor item in items)
-                {
+                foreach (CommandDescriptor item in items) {
                     output += item.MinRank.Color + item.Name + "&s, ";
                 }
                 player.Message("&sAll hidden Commands:");
                 if (output.EndsWith(", ")) player.Message(output.Remove(output.Length - 2) + ".");
                 else player.Message("There are no commands in this category available to your rank.");
-            }
-            else
-            {
+            } else {
                 player.Message("&sCommand Categories:");
                 player.Message("&h    Building");
                 player.Message("&h    Chat");
@@ -2441,11 +2444,11 @@ namespace fCraft {
             var playersPart = visiblePlayers.Skip(offset).Take(10).ToArray();
             if (age != TimeSpan.MaxValue)
             {
-                player.MessagePrefixed("&S   ", "&SGriefers ({1}): {0}", playersPart.JoinToString((r => String.Format("&n{0}&S (D:B {1}:{2})(Diff: {3})", r.ClassyName, r.BlocksDeleted, r.BlocksBuilt, r.BlocksDeleted - r.BlocksBuilt))), age.ToMiniString());
+                player.MessagePrefixed("&S   ", "&SGriefers ({1}): {0}", playersPart.JoinToString((r => String.Format("&n{0}&S (B:D {2}:{1})(Diff: {3})", r.ClassyName, r.BlocksDeleted, r.BlocksBuilt, r.BlocksDeleted - r.BlocksBuilt))), age.ToMiniString());
             }
             else
             {             
-                player.MessagePrefixed("&S   ", "&SGriefers: {0}", playersPart.JoinToString((r => String.Format("&n{0}&S (D:B {1}:{2})(Diff: {3})", r.ClassyName, r.BlocksDeleted, r.BlocksBuilt, r.BlocksDeleted - r.BlocksBuilt))));
+                player.MessagePrefixed("&S   ", "&SGriefers: {0}", playersPart.JoinToString((r => String.Format("&n{0}&S (B:D {2}:{1})(Diff: {3})", r.ClassyName, r.BlocksDeleted, r.BlocksBuilt, r.BlocksDeleted - r.BlocksBuilt))));
             }
             if (ranklookup == null)
             {
@@ -2991,6 +2994,7 @@ namespace fCraft {
             player.Message("  Times used &6Bot&s: &f{0}&s", info.TimesUsedBot);
             player.Message("  Promoted: &f{0} &sDemoted: &f{1}", info.PromoCount, info.DemoCount);
             player.Message("  Reach Distance: &f{0} &sModel: &f{1}", info.ReachDistance, info.Mob);
+            player.Message("  Client Name: &f{0}", target.ClientName);
             if (target == null)
             {
                 player.Message("  Block they last held: &f{0}", info.heldBlock);
@@ -3194,7 +3198,7 @@ namespace fCraft {
         static void IPNPInfoHandler( Player player, CommandReader cmd ) {
             string ipString = cmd.Next();
             IPAddress ip;
-            if (ipString.Equals("")) {
+            if (ipString == null) {
                 player.Message(CdGeoipNp.Usage);
                 return;
             }
@@ -3252,8 +3256,8 @@ namespace fCraft {
 
         private static void APIPInfoHandler(Player player, CommandReader cmd) {
             string name = cmd.Next();
-            if (name.Equals("")) {
-                name.Equals(player.Name);
+            if (name == null) {
+                name = player.Name;
             }
             WebClient webClient = new WebClient();
             var result = JsonObject.Parse(webClient.DownloadString("http://www.classicube.net/api/player/" + name));
@@ -3321,12 +3325,13 @@ namespace fCraft {
 
         private static void APIDInfoHandler(Player player, CommandReader cmd) {
             string id1 = cmd.Next();
-            if (id1.Equals("")) {
+            int id2;
+            if (!int.TryParse(id1, out id2)) {
                 player.Message(CdApiID.Usage);
                 return;
             }
             WebClient webClient = new WebClient();
-            var result = JsonObject.Parse(webClient.DownloadString("http://www.classicube.net/api/id/" + id1));
+            var result = JsonObject.Parse(webClient.DownloadString("http://www.classicube.net/api/id/" + id2));
             string error;
             result.TryGetValue("error", out error);
             string flags1;

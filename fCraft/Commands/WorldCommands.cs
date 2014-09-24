@@ -2636,6 +2636,7 @@ namespace fCraft {
 
         static readonly CommandDescriptor CdWorldFlush = new CommandDescriptor {
             Name = "WFlush",
+            Aliases = new[] { "Flush" },
             Category = CommandCategory.World,
             IsConsoleSafe = true,
             Permissions = new[] { Permission.FlushWorlds },
