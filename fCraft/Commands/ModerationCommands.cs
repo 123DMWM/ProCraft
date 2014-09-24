@@ -330,14 +330,13 @@ namespace fCraft {
                 player.Message("This player is offline!");
                 return;
             }
-            if (sudocmd.StartsWith("/j ", StringComparison.OrdinalIgnoreCase) || sudocmd.StartsWith("/join ", StringComparison.OrdinalIgnoreCase) || sudocmd.StartsWith("/map ", StringComparison.OrdinalIgnoreCase))
-            {
-                player.Message("You cannot use world joining commands with /sudo");
-                return;
+            try {
+                p.PlayerObject.ParseMessage(sudocmd, false);
+                player.Message("Forced {0} to type in \"{1}\"", p.Name, sudocmd);
+            } catch {
+                    player.Message("Cannot use that command with /sudo");
             }
-            p.PlayerObject.ParseMessage(sudocmd, false);
-            player.Message("Forced {0} to type in \"{1}\"", p.Name, sudocmd);
-            
+
         }
         #endregion
         #region Bot
@@ -347,7 +346,7 @@ namespace fCraft {
             Category = CommandCategory.New,
             Permissions = new Permission[] { Permission.Chat },
             Usage = "Bot [Option]",
-            Help = "Bot options are &hGo&s, &hServer&s, &hJoke&s, &hTime&s, &hClock&s, &hPromos&s, &hBans&s, &hKicks&s, &hBlocks&s, &hProtip&s, and &hFunfact&s.\n" +
+            Help = "Bot options are &hGo&s, &hServer&s, &hJoke&s, &hTime&s, &hClock&s, &hPromos&s, &hBans&s, &hKicks&s, &hBlocks&s, &hProtip&s, &hFunfact&s, &hWisdom&s, and &hIdea&s.\n" +
                    "Type in &h/help bot [option] &sfor more information.\n" +
                    "&6Bot&s is our Automated response system, so please don't abuse it.",
             NotRepeatable = true,
@@ -381,8 +380,10 @@ namespace fCraft {
                                     "*May or may not change your life" },
                 { "funfact",        "&sType: &f!Bot Funfact\n&S" +
                                     "Displays a funfact."},
-                { "wisdom",        "&sType: &f!Bot Wisdom\n&S" +
-                                    "Displays some wisdom (Thanks to AndrewPH)"}
+                { "wisdom",         "&sType: &f!Bot Wisdom\n&S" +
+                                    "Displays some wisdom (Thanks to AndrewPH)"},
+                { "idea",           "&sType: &f!Bot Idea\n&S" +
+                                    "Displays a random building idea"}
                 
                 
             },
@@ -396,7 +397,7 @@ namespace fCraft {
             double BotTime = (DateTime.Now - player.Info.LastTimeUsedBot).TotalSeconds;
             if (cmdchat != "<CalledFromChat>") {
                 cmd.Rewind();
-                option = cmd.Next();
+                option = cmd.Next().ToLower();
                 helper = cmd.Next();
                 Server.Players.Message("{0}&f: Bot {1} {2}", player.ClassyName, option, helper);
                 IRC.SendChannelMessage("&s[{3}&s] {0}\u211C: Bot {1} {2}", player.ClassyName, option, helper, player.World.ClassyName);
@@ -414,7 +415,8 @@ namespace fCraft {
             if (option == null) {
                 player.Message(CdBot.Help);
                 return;
-            } else if (option == "go") {
+            }
+            if (option == "go") {
                 if (player.Info.TimesUsedBot == 0) {
                     player.Message(
                         "&6Bot&f: This is your first time using &6Bot&f, I suggest you use \"&h/Help Bot&f\" to further understand how I work.");
@@ -488,7 +490,39 @@ namespace fCraft {
                 IRC.SendChannelMessage("\u212C&6Bot\u211C: " + joker);
                 player.Info.LastTimeUsedBot = DateTime.Now;
                 player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
-            } else if (option == "protip") {
+            } else if (option.Equals("idea")) {
+                FileInfo adjectiveList = new FileInfo("./Bot/Adjectives.txt");
+                FileInfo nounList = new FileInfo("./Bot/Nouns.txt");
+                string[] adjectiveStrings;
+                string[] nounStrings;
+                if (adjectiveList.Exists && nounList.Exists) {
+                    adjectiveStrings = File.ReadAllLines("./Bot/Adjectives.txt");
+                    nounStrings = File.ReadAllLines("./Bot/Nouns.txt");
+                } else {
+                    Server.Players.Message("&6Bot&f: I cannot tell you a build idea at this time!");
+                    Logger.Log(LogType.UserActivity, "&6Bot&f: I cannot tell you a build idea at this time!");
+                    IRC.SendChannelMessage("\u212C&6Bot\u211C: I cannot tell you a build idea at this time!");
+                    return;
+                }
+                Random randAdjectiveString = new Random();
+                Random randNounString = new Random();
+                if (player.Info.TimesUsedBot == 0) {
+                    player.Message(
+                        "&6Bot&f: This is your first time using &6Bot&e, I suggest you use \"/Help Bot\" to further understand how I work.");
+                }
+                string adjective = adjectiveStrings[randAdjectiveString.Next(0, adjectiveStrings.Length)];
+                string noun = nounStrings[randNounString.Next(0, nounStrings.Length)];
+                string ana = "a";
+                if (adjective.StartsWith("a") || adjective.StartsWith("e") || adjective.StartsWith("i") ||
+                    adjective.StartsWith("o") || adjective.StartsWith("u")) {
+                    ana = "an";
+                }
+                Server.Players.Message("&6Bot&f: Build " + ana + " " + adjective + " " + noun);
+                Logger.Log(LogType.UserActivity, "&6Bot&f: Build " + ana + " " + adjective + " " + noun);
+                IRC.SendChannelMessage("\u212C&6Bot\u211C: Build " + ana + " " + adjective + " " + noun);
+                player.Info.LastTimeUsedBot = DateTime.Now;
+                player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
+            } else if (option.Equals("protip")) {
                 FileInfo tipList = new FileInfo("./Bot/Protips.txt");
                 string[] tipStrings;
                 if (tipList.Exists) {
@@ -1362,7 +1396,7 @@ namespace fCraft {
                 return;
             }
 
-            string silentString = cmd.Next();
+            string silentString = cmd.NextAll();
             bool silent = false;
             if (silentString != null)
             {
@@ -1384,7 +1418,11 @@ namespace fCraft {
 
             if (!silent && ConfigKey.ShowConnectionMessages.Enabled())
             {
-                Server.Players.CantSee(player).Message("{0}&s left the server.", player.ClassyName);
+                if (silentString.Equals("")) {
+                    Server.Players.CantSee(player).Message("{0}&s left the server.", player.ClassyName);
+                } else {
+                    Server.Players.CantSee(player).Message("{0}&s left the server. (/Quit {1})", player.ClassyName, silentString.Remove(38));
+                }
             }
 
             // for aware players: notify
@@ -1913,7 +1951,7 @@ namespace fCraft {
         static readonly CommandDescriptor CdTeleportP = new CommandDescriptor
         {
             Name = "TPP",
-            Aliases = new[] { "teleportprecise"},
+            Aliases = new[] { "teleportprecise", "tppos"},
             Category = CommandCategory.New,
             Permissions = new[] { Permission.Teleport },
             IsHidden = true,

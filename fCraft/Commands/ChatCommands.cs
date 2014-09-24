@@ -42,6 +42,7 @@ namespace fCraft
             CommandManager.RegisterCommand(CdtextHotKey);
             CommandManager.RegisterCommand(Cdbrushes);
             CommandManager.RegisterCommand(CdGlobal);
+            CommandManager.RegisterCommand(CdIdea);
 
 
             Player.Moved += new EventHandler<Events.PlayerMovedEventArgs>(Player_IsBack);
@@ -1188,60 +1189,38 @@ namespace fCraft
             Handler = greetHandler
         };
 
-        static void greetHandler(Player player, CommandReader cmd)
-        {
+        private static void greetHandler(Player player, CommandReader cmd) {
             string message;
             double GreetTime = (DateTime.Now - player.Info.LastTimeGreeted).TotalSeconds;
-            if (GreetTime < 10)
-            {
+            if (GreetTime < 10) {
                 double LeftOverTime = Math.Round(10 - GreetTime);
-                if (LeftOverTime == 1)
-                {
+                if (LeftOverTime == 1) {
                     player.Message("&WYou can use /Greet again in 1 second.");
                     return;
-                }
-                else
-                {
+                } else {
                     player.Message("&WYou can use /Greet again in " + LeftOverTime + " seconds");
                     return;
                 }
             }
-            int count = 1;
-            var all = Server.Players.Where(z => !z.Info.IsHidden).OrderBy(p => player.Info.TimeSinceLastLogin.ToMilliSeconds());
-            if (cmd.HasNext && player.Can(Permission.ReadStaffChat))
-            {
-                cmd.NextInt(out count);
-            }
-            var closest = all.Take(count).ToArray();
+            var all = Server.Players.OrderBy(p => player.Info.TimeSinceLastLogin.ToMilliSeconds());
+            var closest = all.Take(1).ToArray();
             Player test = closest[0];
-            if (test == player)
-            {
+            if (test == player) {
                 player.Message("You were the last player to join silly");
                 return;
             }
-            if (player.CanSee(test) && test.Info.IsHidden)
-            {
+            if (player.CanSee(test) && test.Info.IsHidden) {
                 player.Message("Don't Blow their cover!");
                 return;
             }
             string serverName = ConfigKey.ServerName.GetString();
-            if (closest.Length == 1)
-            {
+            if (closest.Length == 1) {
                 message = "Welcome to " + serverName + ", " + closest.JoinToString(r => r.Name + "!");
                 player.ParseMessage(message, false);
                 player.Info.LastTimeGreeted = DateTime.Now;
-            }
-            else if (closest.Length > 1)
-            {
-                message = "Welcome to " + serverName + ", " + closest.JoinToString(", ", r => r.Name) + "!";
-                player.ParseMessage(message, false);
-                player.Info.LastTimeGreeted = DateTime.Now;
-            }
-            else if (closest.Length == 0)
-            {
+            } else {
                 player.Message("Error: LastPlayer == null");
             }
-            return;
         }
 
         #endregion
@@ -1439,6 +1418,67 @@ namespace fCraft
                 message = player.ClassyName + Color.IRCReset + ": " + message;
                 SendList.Message("&i[Global] " + rawMessage);
                 GlobalChat.GlobalThread.SendChannelMessage(Color.MinecraftToIrcColors(message));
+            }
+        }
+
+        #endregion
+        #region Idea
+
+        static readonly CommandDescriptor CdIdea = new CommandDescriptor {
+            Name = "Idea",
+            Aliases = new[] { "buildideas", "ideas"  },
+            Category = CommandCategory.Chat,
+            Permissions = new[] { Permission.Chat },
+            IsConsoleSafe = true,
+            Help = "Gives random building idea",
+            Usage = "/Idea [number of ideas 1-10]",
+            Handler = IdeaHandler
+        };
+
+        static void IdeaHandler(Player player, CommandReader cmd) {
+            FileInfo adjectiveList = new FileInfo("./Bot/Adjectives.txt");
+            FileInfo nounList = new FileInfo("./Bot/Nouns.txt");
+            string[] adjectiveStrings;
+            string[] nounStrings;
+            if (adjectiveList.Exists && nounList.Exists) {
+                adjectiveStrings = File.ReadAllLines("./Bot/Adjectives.txt");
+                nounStrings = File.ReadAllLines("./Bot/Nouns.txt");
+            } else {
+                player.Message("&cError: No idea files! This should not happen! Yell at the host for deleting Adjectives.txt and Nouns.txt in the bot file.");
+                return;
+            }
+            Random randAdjectiveString = new Random();
+            Random randNounString = new Random();
+            string adjective;
+            string noun;
+            int amount;
+            string ana = "a";
+                
+            if (cmd.NextInt(out amount)) {
+                if (amount > 10)
+                    amount = 10;
+                if (amount < 1)
+                    amount = 1;
+                player.Message("{0} random building ideas", amount);
+                for (int i = 1; i <= amount;) {
+                    adjective = adjectiveStrings[randAdjectiveString.Next(0, adjectiveStrings.Length)];
+                    if (adjective.StartsWith("a") || adjective.StartsWith("e") || adjective.StartsWith("i") ||
+                        adjective.StartsWith("o") || adjective.StartsWith("u")) {
+                        ana = "an";
+                    }
+                    noun = nounStrings[randNounString.Next(0, nounStrings.Length)];
+                    player.Message("&sIdea #{0}&f: Build " + ana + " " + adjective + " " + noun, i);
+                    i++;
+                    ana = "a";
+                }
+            } else {
+                adjective = adjectiveStrings[randAdjectiveString.Next(0, adjectiveStrings.Length)];
+                if (adjective.StartsWith("a") || adjective.StartsWith("e") || adjective.StartsWith("i") ||
+                    adjective.StartsWith("o") || adjective.StartsWith("u")) {
+                    ana = "an";
+                }
+                noun = nounStrings[randNounString.Next(0, nounStrings.Length)];
+                player.Message("&sIdea&f: Build " + ana + " " + adjective + " " + noun);
             }
         }
 
