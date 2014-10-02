@@ -1218,6 +1218,8 @@ namespace fCraft {
                 }
             }
             Server.UpdateTabList();
+            System.Console.Beep();
+            System.Console.Beep();
             return true;
         }
 
@@ -1231,7 +1233,7 @@ namespace fCraft {
 
                 Logger.Log( LogType.Warning,
                             "Player.LoginSequence: Player \"{0}\" tried connecting with Minecraft Beta client from {1}. " +
-                            "ProCraft does not support Minecraft Beta. Said player is a retard.",
+                            "ProCraft does not support Minecraft Beta.",
                             smpPlayerName, IP );
 
                 // send SMP KICK packet
