@@ -43,6 +43,7 @@ namespace fCraft
             CommandManager.RegisterCommand(Cdbrushes);
             CommandManager.RegisterCommand(CdGlobal);
             CommandManager.RegisterCommand(CdIdea);
+            CommandManager.RegisterCommand(CdAction);
 
 
             Player.Moved += new EventHandler<Events.PlayerMovedEventArgs>(Player_IsBack);
@@ -1462,23 +1463,67 @@ namespace fCraft
                 player.Message("{0} random building ideas", amount);
                 for (int i = 1; i <= amount;) {
                     adjective = adjectiveStrings[randAdjectiveString.Next(0, adjectiveStrings.Length)];
+                    noun = nounStrings[randNounString.Next(0, nounStrings.Length)];
                     if (adjective.StartsWith("a") || adjective.StartsWith("e") || adjective.StartsWith("i") ||
                         adjective.StartsWith("o") || adjective.StartsWith("u")) {
                         ana = "an";
+                    } else if (noun.EndsWith("s")) {
+                        ana = "some";
                     }
-                    noun = nounStrings[randNounString.Next(0, nounStrings.Length)];
                     player.Message("&sIdea #{0}&f: Build " + ana + " " + adjective + " " + noun, i);
                     i++;
                     ana = "a";
                 }
             } else {
                 adjective = adjectiveStrings[randAdjectiveString.Next(0, adjectiveStrings.Length)];
+                noun = nounStrings[randNounString.Next(0, nounStrings.Length)];
                 if (adjective.StartsWith("a") || adjective.StartsWith("e") || adjective.StartsWith("i") ||
                     adjective.StartsWith("o") || adjective.StartsWith("u")) {
                     ana = "an";
+                } else if (noun.EndsWith("s")) {
+                    ana = "some";
                 }
-                noun = nounStrings[randNounString.Next(0, nounStrings.Length)];
                 player.Message("&sIdea&f: Build " + ana + " " + adjective + " " + noun);
+            }
+        }
+
+        #endregion
+        #region Me
+
+        static readonly CommandDescriptor CdAction = new CommandDescriptor {
+            Name = "Action",
+            Category = CommandCategory.Chat,
+            Permissions = new[] { Permission.Chat },
+            IsConsoleSafe = true,
+            NotRepeatable = true,
+            DisableLogging = true,
+            UsableByFrozenPlayers = true,
+            Usage = "/Action [Player] [Action]",
+            Help = "Displays you doing an action to a player. Example: \"/action Facepalmed high fived\" would show up as \"123DontMessWitMe has high fived Facepalmed",
+            Handler = ActionHandler
+        };
+
+        private static void ActionHandler(Player player, CommandReader cmd) {
+            if (player.Info.IsMuted) {
+                player.MessageMuted();
+                return;
+            }
+            if (player.DetectChatSpam())
+                return;
+            string searchplayer = cmd.Next();
+            string action = cmd.NextAll().Trim();
+            Player other = Server.FindPlayerOrPrintMatches(player, searchplayer, SearchOptions.Default);
+            if (other == player) {
+                player.Message("Cannot action yourself");
+                return;
+            }
+            if (!(cmd.Count <= 2) && cmd.IsConfirmed) {
+                Server.Players.Message("{0} &s{1} {2}", player.ClassyName, action, other.ClassyName);
+                return;
+            }
+            if (other != null) {
+                player.Confirm(cmd, "Your messege will show up as: {0} &s{1} {2}", player.ClassyName, action,
+                    other.ClassyName);
             }
         }
 

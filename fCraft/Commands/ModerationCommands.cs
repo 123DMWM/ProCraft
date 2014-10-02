@@ -516,6 +516,8 @@ namespace fCraft {
                 if (adjective.StartsWith("a") || adjective.StartsWith("e") || adjective.StartsWith("i") ||
                     adjective.StartsWith("o") || adjective.StartsWith("u")) {
                     ana = "an";
+                } else if (noun.EndsWith("s")) {
+                    ana = "some";
                 }
                 Server.Players.Message("&6Bot&f: Build " + ana + " " + adjective + " " + noun);
                 Logger.Log(LogType.UserActivity, "&6Bot&f: Build " + ana + " " + adjective + " " + noun);
