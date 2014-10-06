@@ -121,9 +121,6 @@ namespace fCraft {
         /// <summary> The Time that has passed since the last block change.</summary>
         public DateTime TimeLastBlockChange { get; set; }
 
-        /// <summary> The last time the player has used /suicide.</summary>
-        public DateTime LastUsedSuicide { get; set; }
-
         /// <summary> Has player been warned by the DEFCCON system? </summary>
         public bool Warned { get; set; }
         /// <summary> How Many Blocks player has placed this session. </summary>
