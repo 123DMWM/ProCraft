@@ -1390,7 +1390,7 @@ namespace fCraft {
             {
                 Server.Message("&s{0}&s took the easy way out", player.ClassyName);
                 player.TeleportTo(player.World.LoadMap().Spawn);
-                player.LastUsedSuicide = DateTime.Now;
+                player.Info.LastServerMessageDate = DateTime.Now;
                 return;
             }
             else
@@ -1398,7 +1398,7 @@ namespace fCraft {
                 Server.Message("&s{0}&s took the easy way out and left a note", player.ClassyName);
                 Server.Message("&s[&fNote&s] {0}", note);
                 player.TeleportTo(player.World.LoadMap().Spawn);
-                player.LastUsedSuicide = DateTime.Now;
+                player.Info.LastServerMessageDate = DateTime.Now;
                 return;
             }
         }

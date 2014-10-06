@@ -1204,7 +1204,7 @@ namespace fCraft {
             sb.Append(TimesUsedBot); //52
             sb.Append(',');
 
-            sb.Append(TimesUsedUseless); //53
+            sb.Append(""); //53
             sb.Append(',');
 
             sb.Append(HasRTR); //54
