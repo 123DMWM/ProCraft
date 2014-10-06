@@ -311,12 +311,10 @@ namespace fCraft
         }
 
 
-        bool Append(byte ch)
-        {
+        private bool Append(byte ch) {
             bool prependColor =
                 // color changed since last inserted character
-                lastColor != color ||
-                // no characters have been inserted, but color codes have been encountered
+                lastColor != color ||// no characters have been inserted, but color codes have been encountered
                 (color == DefaultColor && hadColor && outputIndex == outputStart);
 
             // calculate the number of characters to insert
@@ -324,10 +322,8 @@ namespace fCraft
             if (prependColor) bytesToInsert += 2;
 
             // calculating requirements for the next symbol
-            if (ch < ' ')
-            {
-                switch (ch)
-                {
+            if (ch < ' ' && !emoteFix) {
+                switch (ch) {
                     case 7:
                     case 25:
                         bytesToInsert += 3; // 2 spaces pad AND 1-char terminator
@@ -348,8 +344,7 @@ namespace fCraft
                 }
             }
 
-            if (outputIndex + bytesToInsert > PacketSize)
-            {
+            if (outputIndex + bytesToInsert > PacketSize) {
 #if DEBUG_LINE_WRAPPER
                 Console.WriteLine( "X ii={0} ({1}+{2}+{3}={4}) wl={5} wi={6} woi={7}",
                                    inputIndex,
@@ -360,9 +355,8 @@ namespace fCraft
             }
 
             // append color, if changed since last inserted character
-            if (prependColor)
-            {
-                output[outputIndex++] = (byte)'&';
+            if (prependColor) {
+                output[outputIndex++] = (byte) '&';
                 output[outputIndex++] = color;
                 lastColor = color;
             }
@@ -371,12 +365,10 @@ namespace fCraft
             int spacesToAppend = spaceCount;
 #endif
 
-            if (spaceCount > 0 && outputIndex > outputStart)
-            {
+            if (spaceCount > 0 && outputIndex > outputStart) {
                 // append spaces that accumulated since last word
-                while (spaceCount > 0)
-                {
-                    output[outputIndex++] = (byte)' ';
+                while (spaceCount > 0) {
+                    output[outputIndex++] = (byte) ' ';
                     spaceCount--;
                 }
                 wordLength = 0;
@@ -392,47 +384,48 @@ namespace fCraft
             output[outputIndex++] = ch;
 
             // padding for symbols
-            switch (ch)
-            {
-                case 9:
-                    output[outputIndex++] = (byte)' ';
-                    output[outputIndex++] = (byte)'.';
-                    endsWithSymbol = false;
-                    break;
-                case 12:
-                    output[outputIndex++] = (byte)' ';
-                    output[outputIndex++] = (byte)'`';
-                    endsWithSymbol = false;
-                    break;
-                case 18:
-                    output[outputIndex++] = (byte)' ';
-                    output[outputIndex++] = (byte)'.';
-                    endsWithSymbol = false;
-                    break;
-                case 19:
-                    output[outputIndex++] = (byte)' ';
-                    output[outputIndex++] = (byte)'!';
-                    endsWithSymbol = false;
-                    break;
-                case 22:
-                    output[outputIndex++] = (byte)'.';
-                    output[outputIndex++] = (byte)' ';
-                    endsWithSymbol = false;
-                    break;
-                case 24:
-                    output[outputIndex++] = (byte)'^';
-                    output[outputIndex++] = (byte)' ';
-                    endsWithSymbol = false;
-                    break;
-                case 7:
-                case 25:
-                    output[outputIndex++] = (byte)' ';
-                    output[outputIndex++] = (byte)' ';
-                    endsWithSymbol = true;
-                    break;
-                default:
-                    endsWithSymbol = (ch < ' ');
-                    break;
+            if (!emoteFix) {
+                switch (ch) {
+                    case 9:
+                        output[outputIndex++] = (byte) ' ';
+                        output[outputIndex++] = (byte) '.';
+                        endsWithSymbol = false;
+                        break;
+                    case 12:
+                        output[outputIndex++] = (byte) ' ';
+                        output[outputIndex++] = (byte) '`';
+                        endsWithSymbol = false;
+                        break;
+                    case 18:
+                        output[outputIndex++] = (byte) ' ';
+                        output[outputIndex++] = (byte) '.';
+                        endsWithSymbol = false;
+                        break;
+                    case 19:
+                        output[outputIndex++] = (byte) ' ';
+                        output[outputIndex++] = (byte) '!';
+                        endsWithSymbol = false;
+                        break;
+                    case 22:
+                        output[outputIndex++] = (byte) '.';
+                        output[outputIndex++] = (byte) ' ';
+                        endsWithSymbol = false;
+                        break;
+                    case 24:
+                        output[outputIndex++] = (byte) '^';
+                        output[outputIndex++] = (byte) ' ';
+                        endsWithSymbol = false;
+                        break;
+                    case 7:
+                    case 25:
+                        output[outputIndex++] = (byte) ' ';
+                        output[outputIndex++] = (byte) ' ';
+                        endsWithSymbol = true;
+                        break;
+                    default:
+                        endsWithSymbol = (ch < ' ');
+                        break;
+                }
             }
             return true;
         }
