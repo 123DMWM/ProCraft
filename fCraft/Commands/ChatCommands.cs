@@ -238,10 +238,12 @@ namespace fCraft
             }
 
             if (player.DetectChatSpam()) return;
-            
-            {
+            var staff = Server.Players.Where(p => p.Info.Rank.Can(Permission.ReadStaffChat));
+            if (staff != null && staff.Any()) {
                 player.Message("&SYour review request has been sent to the Moderators. They will be with you shortly");
                 Chat.SendStaffSay(player, "&SPlayer " + player.ClassyName + " &Srequests a building review.");
+            } else {
+                player.Message("&SThere are no staff on! Sorry!");
             }
         }
 
@@ -545,6 +547,10 @@ namespace fCraft
                 player.MessageMuted();
                 return;
             }
+            if (player.Info.TimeSinceLastServerMessage.TotalSeconds < 5) {
+                player.Info.getLeftOverTime(5, cmd);
+                return;
+            }
 
             if (player.DetectChatSpam()) return;
 
@@ -573,6 +579,7 @@ namespace fCraft
                             player.ClassyName, Color.Silver, num, min, max);            
             player.Message("{0}You rolled {1} ({2}...{3})",
                             Color.Silver, num, min, max);
+            player.Info.LastServerMessageDate = DateTime.Now;
             if (min == 1 && max == 100)
             {
                 if (num == 69)
@@ -1182,8 +1189,8 @@ namespace fCraft
 
         static readonly CommandDescriptor CdGreeting = new CommandDescriptor
         {
-            Name = "Greeting",
-            Aliases = new[] { "greet", "welcome" },
+            Name = "Greet",
+            Aliases = new[] { "greeting", "welcome" },
             Permissions = new[] { Permission.Chat },
             Category = CommandCategory.New,
             Help = "Sends a message welcoming the last player to join the server.",
@@ -1192,33 +1199,25 @@ namespace fCraft
 
         private static void greetHandler(Player player, CommandReader cmd) {
             string message;
-            double GreetTime = (DateTime.Now - player.Info.LastTimeGreeted).TotalSeconds;
-            if (GreetTime < 10) {
-                double LeftOverTime = Math.Round(10 - GreetTime);
-                if (LeftOverTime == 1) {
-                    player.Message("&WYou can use /Greet again in 1 second.");
-                    return;
-                } else {
-                    player.Message("&WYou can use /Greet again in " + LeftOverTime + " seconds");
-                    return;
-                }
+            if (player.Info.TimeSinceLastServerMessage.TotalSeconds < 5) {
+                player.Info.getLeftOverTime(5, cmd);
+                return;
             }
-            var all = Server.Players.OrderBy(p => player.Info.TimeSinceLastLogin.ToMilliSeconds());
-            var closest = all.Take(1).ToArray();
-            Player test = closest[0];
-            if (test == player) {
+            var all = Server.Players.OrderBy(p => player.Info.TimeSinceLastLogin);
+            Player last = all.First();
+            if (last == player) {
                 player.Message("You were the last player to join silly");
                 return;
             }
-            if (player.CanSee(test) && test.Info.IsHidden) {
+            if (player.CanSee(last) && last.Info.IsHidden) {
                 player.Message("Don't Blow their cover!");
                 return;
             }
             string serverName = ConfigKey.ServerName.GetString();
-            if (closest.Length == 1) {
-                message = "Welcome to " + serverName + ", " + closest.JoinToString(r => r.Name + "!");
+            if (all.Any()) {
+                message = "Welcome to " + serverName + ", " + last.Name + "!";
                 player.ParseMessage(message, false);
-                player.Info.LastTimeGreeted = DateTime.Now;
+                player.Info.LastServerMessageDate = DateTime.Now;
             } else {
                 player.Message("Error: LastPlayer == null");
             }
@@ -1454,6 +1453,10 @@ namespace fCraft
             string noun;
             int amount;
             string ana = "a";
+            if (player.Info.TimeSinceLastServerMessage.TotalSeconds < 5) {
+                player.Info.getLeftOverTime(5, cmd);
+                return;
+            }
                 
             if (cmd.NextInt(out amount)) {
                 if (amount > 10)
@@ -1485,6 +1488,7 @@ namespace fCraft
                 }
                 player.Message("&sIdea&f: Build " + ana + " " + adjective + " " + noun);
             }
+            player.Info.LastServerMessageDate = DateTime.Now;
         }
 
         #endregion

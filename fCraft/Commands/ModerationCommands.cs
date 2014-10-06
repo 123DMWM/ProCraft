@@ -394,7 +394,6 @@ namespace fCraft {
             String cmdchat = cmd.Next();
             String option = cmd.Next();
             String helper = cmd.Next();
-            double BotTime = (DateTime.Now - player.Info.LastTimeUsedBot).TotalSeconds;
             if (cmdchat != "<CalledFromChat>") {
                 cmd.Rewind();
                 option = cmd.Next().ToLower();
@@ -402,15 +401,9 @@ namespace fCraft {
                 Server.Players.Message("{0}&f: Bot {1} {2}", player.ClassyName, option, helper);
                 IRC.SendChannelMessage("&s[{3}&s] {0}\u211C: Bot {1} {2}", player.ClassyName, option, helper, player.World.ClassyName);
             }
-            if (BotTime < 5) {
-                double LeftOverTime = Math.Round(5 - BotTime);
-                if (LeftOverTime == 1) {
-                    player.Message("&WYou can use /Bot again in 1 second.");
-                    return;
-                } else {
-                    player.Message("&WYou can use /Bot again in " + LeftOverTime + " seconds");
-                    return;
-                }
+            if (player.Info.TimeSinceLastServerMessage.TotalSeconds < 5) {
+                player.Info.getLeftOverTime(5, cmd);
+                return;
             }
             if (option == null) {
                 player.Message(CdBot.Help);
@@ -452,7 +445,7 @@ namespace fCraft {
                     .RunManual(TimeSpan.FromSeconds(5));
                 Scheduler.NewTask(t => IRC.SendChannelMessage("\u212C&6Bot\u211C: Go!"))
                     .RunManual(TimeSpan.FromSeconds(5));
-                player.Info.LastTimeUsedBot = DateTime.Now;
+                player.Info.LastServerMessageDate = DateTime.Now;
                 player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
             } else if (option == "server") {
                 if (player.Info.TimesUsedBot == 0) {
@@ -465,7 +458,7 @@ namespace fCraft {
                     "&6Bot&f: The name of this server is " + ConfigKey.ServerName.GetString() + ".");
                 IRC.SendChannelMessage("\u212C&6Bot\u211C: The name of this server is " +
                                        ConfigKey.ServerName.GetString() + ".");
-                player.Info.LastTimeUsedBot = DateTime.Now;
+                player.Info.LastServerMessageDate = DateTime.Now;
                 player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
             } else if (option == "joke") {
                 FileInfo jokeList = new FileInfo("./Bot/Jokes.txt");
@@ -488,7 +481,7 @@ namespace fCraft {
                 Server.Players.Message("&6Bot&f: " + joker);
                 Logger.Log(LogType.UserActivity, "&6Bot&f: " + joker);
                 IRC.SendChannelMessage("\u212C&6Bot\u211C: " + joker);
-                player.Info.LastTimeUsedBot = DateTime.Now;
+                player.Info.LastServerMessageDate = DateTime.Now;
                 player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
             } else if (option.Equals("idea")) {
                 FileInfo adjectiveList = new FileInfo("./Bot/Adjectives.txt");
@@ -522,7 +515,7 @@ namespace fCraft {
                 Server.Players.Message("&6Bot&f: Build " + ana + " " + adjective + " " + noun);
                 Logger.Log(LogType.UserActivity, "&6Bot&f: Build " + ana + " " + adjective + " " + noun);
                 IRC.SendChannelMessage("\u212C&6Bot\u211C: Build " + ana + " " + adjective + " " + noun);
-                player.Info.LastTimeUsedBot = DateTime.Now;
+                player.Info.LastServerMessageDate = DateTime.Now;
                 player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
             } else if (option.Equals("protip")) {
                 FileInfo tipList = new FileInfo("./Bot/Protips.txt");
@@ -545,7 +538,7 @@ namespace fCraft {
                 Server.Players.Message("&6Bot&f: " + tipper);
                 Logger.Log(LogType.UserActivity, "&6Bot&f: " + tipper);
                 IRC.SendChannelMessage("\u212C&6Bot\u211C: " + tipper);
-                player.Info.LastTimeUsedBot = DateTime.Now;
+                player.Info.LastServerMessageDate = DateTime.Now;
                 player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
             } else if (option == "time") {
                 TimeSpan time = player.Info.TotalTime;
@@ -582,7 +575,7 @@ namespace fCraft {
                         "\u211C has played a total of {0:F2}\u211C minutes this session.", timenow.TotalMinutes);
                 }
 
-                player.Info.LastTimeUsedBot = DateTime.Now;
+                player.Info.LastServerMessageDate = DateTime.Now;
                 player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
             } else if (option == "promos") {
                 if (player.Info.Rank.Can(Permission.Promote) || player.Info.PromoCount != 0) {
@@ -608,7 +601,7 @@ namespace fCraft {
                     IRC.SendChannelMessage("\u212C&6Bot\u211C: " + player.ClassyName +
                                            " \u211Ccannot promote players yet");
                 }
-                player.Info.LastTimeUsedBot = DateTime.Now;
+                player.Info.LastServerMessageDate = DateTime.Now;
                 player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
             } else if (option == "bans") {
                 if (player.Info.Rank.Can(Permission.Ban) || player.Info.TimesBannedOthers != 0) {
@@ -634,7 +627,7 @@ namespace fCraft {
                     IRC.SendChannelMessage("\u212C&6Bot\u211C: " + player.ClassyName + " \u211Ccannot ban yet");
                 }
 
-                player.Info.LastTimeUsedBot = DateTime.Now;
+                player.Info.LastServerMessageDate = DateTime.Now;
                 player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
             } else if (option == "kicks") {
                 if (player.Info.Rank.Can(Permission.Kick) || player.Info.TimesKickedOthers != 0) {
@@ -659,7 +652,7 @@ namespace fCraft {
                     Logger.Log(LogType.UserActivity, "&6Bot&f: " + player.ClassyName + " &fcannot kick yet");
                     IRC.SendChannelMessage("\u212C&6Bot\u211C: " + player.ClassyName + " \u211Ccannot kick yet");
                 }
-                player.Info.LastTimeUsedBot = DateTime.Now;
+                player.Info.LastServerMessageDate = DateTime.Now;
                 player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
             } else if (option == "clock") {
                 if (player.Info.TimesUsedBot == 0) {
@@ -672,7 +665,7 @@ namespace fCraft {
                 Logger.Log(LogType.UserActivity, "&6Bot&f: On a " + DateTime.Now.ToLongDateString());
                 IRC.SendChannelMessage("\u212C&6Bot\u211C: It is " + DateTime.Now.ToLongTimeString());
                 IRC.SendChannelMessage("\u212C&6Bot\u211C: On a " + DateTime.Now.ToLongDateString());
-                player.Info.LastTimeUsedBot = DateTime.Now;
+                player.Info.LastServerMessageDate = DateTime.Now;
                 player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
             } else if (option == "blocks") {
                 if (helper == "total") {
@@ -704,7 +697,7 @@ namespace fCraft {
                                            player.Info.BlocksBuiltThisGame + " blocks and deleted " +
                                            player.Info.BlocksDeletedThisGame + " blocks this session.");
                 }
-                player.Info.LastTimeUsedBot = DateTime.Now;
+                player.Info.LastServerMessageDate = DateTime.Now;
                 player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
             } else if (option == "funfact") {
                 FileInfo factList = new FileInfo("./Bot/Funfacts.txt");
@@ -727,7 +720,7 @@ namespace fCraft {
                 Server.Players.Message("&6Bot&f: " + facter);
                 Logger.Log(LogType.UserActivity, "&6Bot&f: " + facter);
                 IRC.SendChannelMessage("\u212C&6Bot\u211C: " + facter);
-                player.Info.LastTimeUsedBot = DateTime.Now;
+                player.Info.LastServerMessageDate = DateTime.Now;
                 player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
             } else if (option == "wisdom") {
                 string[] wisdomStrings = {
@@ -749,7 +742,7 @@ namespace fCraft {
                 Server.Players.Message("&6Bot&f: " + facter);
                 Logger.Log(LogType.UserActivity, "&6Bot&f: " + facter);
                 IRC.SendChannelMessage("\u212C&6Bot\u211C: " + facter);
-                player.Info.LastTimeUsedBot = DateTime.Now;
+                player.Info.LastServerMessageDate = DateTime.Now;
                 player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
             } else {
                 player.Message(CdBot.Help);

@@ -1377,10 +1377,8 @@ namespace fCraft {
         {
             string note = cmd.NextAll();
             if (player.World == null) PlayerOpException.ThrowNoWorld(player);
-            if ((DateTime.Now - player.LastUsedSuicide).TotalMinutes < 10)
-            {
-                player.Message("Please try again in {0} minutes if you want to have a message appear.", 10 - (DateTime.Now - player.LastUsedSuicide).Minutes);
-                player.TeleportTo(player.World.LoadMap().Spawn);
+            if (player.Info.TimeSinceLastServerMessage.TotalSeconds < 10) {
+                player.Info.getLeftOverTime(10, cmd);
                 return;
             }
             if (note.Length > 64)

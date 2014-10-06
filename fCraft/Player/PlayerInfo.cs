@@ -48,12 +48,16 @@ namespace fCraft {
         [CanBeNull]
         public string Email;
 
+        public DateTime LastServerMessageDate;
 
-        public DateTime LastTimeUsedBot;
-
-        public DateTime LastTimeGreeted;
-
-        public DateTime LastUsedUseless;
+        public void getLeftOverTime(Double maxTime, CommandReader cmd) {
+            double timeLeft = maxTime - Math.Round(TimeSinceLastServerMessage.TotalSeconds);
+            if (timeLeft == 1) {
+                PlayerObject.Message("&WYou can use /" + cmd.Name + "again in 1 second.");
+                return;
+            }
+            PlayerObject.Message("&WYou can use /" + cmd.Name + " again in " + timeLeft + " seconds");
+        }
 
         /// <summary> Player's unique numeric ID. Issued on first join. </summary>
         public int ID;
@@ -91,7 +95,6 @@ namespace fCraft {
         public int PromoCount;
         public int DemoCount;
         public int TimesUsedBot;
-        public int TimesUsedUseless = 0;
         //dummy
 
         /// <summary> Reason for leaving the server last time. </summary>
@@ -1433,6 +1436,10 @@ namespace fCraft {
 
         public TimeSpan TimeMutedLeft {
             get { return MutedUntil.Subtract( DateTime.UtcNow ); }
+        }
+        
+        public TimeSpan TimeSinceLastServerMessage {
+            get { return DateTime.Now.Subtract(LastServerMessageDate); }
         }
 
         #endregion
