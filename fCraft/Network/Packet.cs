@@ -432,15 +432,15 @@ namespace fCraft {
             if (skinName == null)
                 throw new ArgumentNullException("skinName");
             Packet packet = new Packet(OpCode.ExtAddEntity2);
-            //Logger.Log(LogType.Debug, "Send: MakeExtAddEntity2({0}, {1}, {2})", entityId, inGameName, skinName, spawnPosition.ToString());
-            packet.Bytes[1] = (byte)entityId;
+            //Logger.Log(LogType.Debug, "Send: MakeExtAddEntity2({0}, {1}, {2}, {3})", (byte)((byte)(entityId) - 128), inGameName, skinName, spawnPosition.ToString());
+            packet.Bytes[1] = (byte) entityId;
             Encoding.ASCII.GetBytes(inGameName.PadRight(64), 0, 64, packet.Bytes, 2);
             Encoding.ASCII.GetBytes(skinName.PadRight(64), 0, 64, packet.Bytes, 66);
             ToNetOrder(spawnPosition.X, packet.Bytes, 130);
             ToNetOrder(spawnPosition.Z, packet.Bytes, 132);
             ToNetOrder(spawnPosition.Y, packet.Bytes, 134);
-            packet.Bytes[137] = spawnPosition.R;
-            packet.Bytes[138] = spawnPosition.L;
+            packet.Bytes[136] = spawnPosition.R;
+            packet.Bytes[137] = spawnPosition.L;
             return packet;
         }
 
