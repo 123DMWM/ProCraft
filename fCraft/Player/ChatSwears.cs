@@ -32,14 +32,17 @@ namespace fCraft {
        
         ChatSwears( string swear, string replacement ) {
             ID = Interlocked.Increment( ref swearCounter );
-            Swear = swear;
+            Swear = swear.ToLower();
             Replacement = replacement;
+            if (Replacement != null) {
+                Replacement = Replacement.ToLower();
+            }
             IsRunning = true;
             AddSwearToList( this );
             try
             {
                 if (!(Directory.Exists("./Filters"))) Directory.CreateDirectory("./Filters");
-                string[] output = { "Replace: " + Swear.ToLower(), "With: " + Replacement.ToLower() };
+                string[] output = { "Replace: " + Swear, "With: " + Replacement };
                 File.WriteAllLines("./Filters/" + ID + "_" + Swear + ".txt", output);
             }
             catch (Exception ex)
