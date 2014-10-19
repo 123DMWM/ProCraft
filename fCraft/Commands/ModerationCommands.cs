@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using JetBrains.Annotations;
+using ServiceStack.Text;
 
 namespace fCraft {
     /// <summary> Most commands for server moderation - kick, ban, rank change, etc - are here. </summary>
@@ -394,6 +395,7 @@ namespace fCraft {
             String cmdchat = cmd.Next();
             String option = cmd.Next();
             String helper = cmd.Next();
+            if (option != null) option = option.ToLower();
             if (cmdchat != "<CalledFromChat>") {
                 cmd.Rewind();
                 option = cmd.Next().ToLower();
@@ -1416,7 +1418,13 @@ namespace fCraft {
                 if (silentString.Equals("")) {
                     Server.Players.CantSee(player).Message("{0}&s left the server.", player.ClassyName);
                 } else {
-                    Server.Players.CantSee(player).Message("{0}&s left the server. (/Quit {1})", player.ClassyName, silentString.Remove(38));
+                    if (silentString.Length >= 38) {
+                        Server.Players.CantSee(player)
+                            .Message("{0}&s left the server. (/Quit {1})", player.ClassyName, silentString.Remove(38));
+                    } else {
+                        Server.Players.CantSee(player)
+                            .Message("{0}&s left the server. (/Quit {1})", player.ClassyName, silentString);
+                    }
                 }
             }
 
