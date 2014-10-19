@@ -1186,7 +1186,7 @@ namespace fCraft {
                 Message("Type &H/Rank {0} {1}&S in konsole to promote yourself",
                          Name, RankManager.HighestRank.Name);
             }
-
+            
             MaxCopySlots = Info.Rank.CopySlots;
 
             HasFullyConnected = true;
@@ -1458,18 +1458,33 @@ namespace fCraft {
             }
             #endregion
             #region EnvColors
-            if (this.SupportsEnvColors)
+            if (SupportsEnvColors)
             {
-                if (WorldMap.World.SkyColor != null) writer.Write(Packet.MakeEnvSetColor(0, WorldMap.World.SkyColor).Bytes);
+                writer.Write(Packet.MakeEnvSetColor(0, WorldMap.World.SkyColor).Bytes);
                 BytesSent += 8;
-                if (WorldMap.World.CloudColor != null) writer.Write(Packet.MakeEnvSetColor(1, WorldMap.World.CloudColor).Bytes);
+                writer.Write(Packet.MakeEnvSetColor(1, WorldMap.World.CloudColor).Bytes);
                 BytesSent += 8;
-                if (WorldMap.World.FogColor != null) writer.Write(Packet.MakeEnvSetColor(2, WorldMap.World.FogColor).Bytes);
+                writer.Write(Packet.MakeEnvSetColor(2, WorldMap.World.FogColor).Bytes);
                 BytesSent += 8;
-                if (WorldMap.World.ShadowColor != null) writer.Write(Packet.MakeEnvSetColor(3, WorldMap.World.ShadowColor).Bytes);
+                writer.Write(Packet.MakeEnvSetColor(3, WorldMap.World.ShadowColor).Bytes);
                 BytesSent += 8;
-                if (WorldMap.World.LightColor != null) writer.Write(Packet.MakeEnvSetColor(4, WorldMap.World.LightColor).Bytes);
+                writer.Write(Packet.MakeEnvSetColor(4, WorldMap.World.LightColor).Bytes);
                 BytesSent += 8;
+            }
+            if (SupportsEnvColors && World != null && World.SkyLightEmulator) {
+                string hex;
+                if (Server.SkyColorHex.TryGetValue(Server.ColorTime, out hex)) {
+                    writer.Write(Packet.MakeEnvSetColor(0, hex).Bytes);
+                    BytesSent += 8;
+                }
+                if (Server.CloudAndFogColorHex.TryGetValue(Server.ColorTime, out hex)) {
+                    if (WorldMap.World.CloudColor != null)
+                        writer.Write(Packet.MakeEnvSetColor(1, hex).Bytes);
+                    BytesSent += 8;
+                    if (WorldMap.World.FogColor != null)
+                        writer.Write(Packet.MakeEnvSetColor(2, hex).Bytes);
+                    BytesSent += 8;
+                }
             }
             #endregion
             #region HackControls

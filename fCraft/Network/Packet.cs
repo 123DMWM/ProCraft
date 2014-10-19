@@ -332,10 +332,16 @@ namespace fCraft {
         {
             Packet packet = new Packet( OpCode.EnvSetColor );
             packet.Bytes[1] = (byte)variable;
-            System.Drawing.Color col = System.Drawing.ColorTranslator.FromHtml("#" + color.ToUpper());
-            ToNetOrder((short)col.R, packet.Bytes, 2);
-            ToNetOrder((short)col.G, packet.Bytes, 4);
-            ToNetOrder((short)col.B, packet.Bytes, 6);
+            if (color != null) {
+                System.Drawing.Color col = System.Drawing.ColorTranslator.FromHtml("#" + color.ToUpper());
+                ToNetOrder((short) col.R, packet.Bytes, 2);
+                ToNetOrder((short) col.G, packet.Bytes, 4);
+                ToNetOrder((short) col.B, packet.Bytes, 6);
+            } else {
+                ToNetOrder((short)-1, packet.Bytes, 2);
+                ToNetOrder((short)-1, packet.Bytes, 4);
+                ToNetOrder((short)-1, packet.Bytes, 6);
+            }
             return packet;
         }
 

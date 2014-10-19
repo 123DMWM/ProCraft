@@ -51,6 +51,7 @@ namespace fCraft {
             CommandManager.RegisterCommand( CdSuicide );
             CommandManager.RegisterCommand( Cdweather );
             CommandManager.RegisterCommand( CdReJoin );
+            CommandManager.RegisterCommand( CdSLE );
         }
         #region BlockDB
 
@@ -4084,6 +4085,65 @@ namespace fCraft {
                     break;
             }
 
+        }
+        #endregion
+        #region SkyLightEmulator
+        static readonly CommandDescriptor CdSLE = new CommandDescriptor {
+            Name = "SkyLightEmulator",
+            Aliases = new[] { "SLE" },
+            Category = CommandCategory.Building,
+            Permissions = new[] { Permission.ManageWorlds },
+            Help =
+                "Toggles whether or not to emulate sky color based on time in a world",
+            Usage = "/SLE [World] [on/off]",
+            Handler = SLEHandler
+        };
+
+        static void SLEHandler([NotNull] Player player, [NotNull] CommandReader cmd) {
+            string worldtest = cmd.Next();
+            World world;
+            if (worldtest != null && !worldtest.Equals("0") && !worldtest.Equals("1") && !worldtest.Equals("on") && !worldtest.Equals("off") && !worldtest.Equals("true") && !worldtest.Equals("false")) {
+                world = WorldManager.FindWorldOrPrintMatches(player, worldtest);
+            } else {
+                world = player.World;
+                cmd.Rewind();
+            }
+            if (world == null) { return; }
+            bool turnSkyOn = !world.SkyLightEmulator;
+            if (cmd.HasNext && !cmd.NextOnOff(out turnSkyOn)) {
+                if (world != null) {
+                    turnSkyOn = !world.SkyLightEmulator;
+                }
+            }
+            if (turnSkyOn != world.SkyLightEmulator) {
+                if (turnSkyOn) {
+                    world.SkyLightEmulator = true;
+                    player.Message(
+                        "&sSkylight Emulator for world {0}&s: &2ON&e. Sky will now change color to emulate time.",
+                        world.ClassyName);
+                    foreach (Player p in world.Players.Where(p => p.SupportsEnvColors)) {
+                        string hex;
+                        if (Server.SkyColorHex.TryGetValue(Server.ColorTime, out hex)) {
+                            p.Send(Packet.MakeEnvSetColor(0, hex));
+                        }
+                        if (Server.CloudAndFogColorHex.TryGetValue(Server.ColorTime, out hex)) {
+                            p.Send(Packet.MakeEnvSetColor(1, hex));
+                            p.Send(Packet.MakeEnvSetColor(2, hex));
+                        }
+                        p.Message("SkyLight Emulator is now enabled!");
+                    }
+                } else {
+                    world.SkyLightEmulator = false;
+                    player.Message("&sSkylight Emulator for world {0}&s: &4OFF&e.", world.ClassyName);
+                    foreach (Player p in world.Players.Where(p => p.SupportsEnvColors && p.World != null)) {
+                        p.Send(Packet.MakeEnvSetColor(0, p.World.SkyColor));
+                        p.Send(Packet.MakeEnvSetColor(1, p.World.CloudColor));
+                        p.Send(Packet.MakeEnvSetColor(2, p.World.FogColor));
+                        p.Message("SkyLight Emulator is now disabled!");
+
+                    }
+                }
+            }
         }
         #endregion
     }

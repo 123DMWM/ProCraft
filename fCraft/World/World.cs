@@ -86,6 +86,11 @@ namespace fCraft {
 
         public static List<Bot> Bots = new List<Bot>();
 
+
+
+        /// <summary> Whether or not to emulate sky colors. </summary>
+        public bool SkyLightEmulator = false;
+
         /// <summary>
         /// Find bot by name. Returns either the bot by exact name, or null.
         /// </summary>
