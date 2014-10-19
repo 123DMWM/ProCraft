@@ -29,6 +29,10 @@ namespace RandomMaze
         private Maze _maze;
         private int _count = 0;
 
+        public override int ExpectedMarks {
+            get { return 2; }
+        }
+
         public override string Name
         {
             get { return "MazeCuboid"; }

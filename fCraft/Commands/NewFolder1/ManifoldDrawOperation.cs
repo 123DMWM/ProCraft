@@ -39,6 +39,10 @@ namespace fCraft
 {
 	public class ManifoldDrawOperation : DrawOperation
 	{
+
+        public override int ExpectedMarks {
+            get { return 2; }
+        }
 		private Scaler _scaler;
 		private Expression[] _expressions;
 		private double[][] _paramIterations;

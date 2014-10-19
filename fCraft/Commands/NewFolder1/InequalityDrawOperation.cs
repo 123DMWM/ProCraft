@@ -43,6 +43,10 @@ namespace fCraft
 		private Scaler _scaler;
 		private int _count;
 
+        public override int ExpectedMarks {
+            get { return 2; }
+        }
+
 		public InequalityDrawOperation(Player player, CommandReader cmd)
 			: base(player)
 		{

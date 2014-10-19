@@ -177,6 +177,16 @@ namespace fCraft.Drawing
         }
         static BlockPalette lightPalette;
 
+        [NotNull]
+        public static BlockPalette Light2 {
+            get {
+                if (lightPalette2 == null) {
+                    lightPalette2 = DefineLight2();
+                }
+                return lightPalette2;
+            }
+        }
+        static BlockPalette lightPalette2;
 
         [NotNull]
         public static BlockPalette Dark
@@ -191,6 +201,17 @@ namespace fCraft.Drawing
             }
         }
         static BlockPalette darkPalette;
+
+        [NotNull]
+        public static BlockPalette Dark2 {
+            get {
+                if (darkPalette2 == null) {
+                    darkPalette2 = DefineDark2();
+                }
+                return darkPalette2;
+            }
+        }
+        static BlockPalette darkPalette2;
 
 
         [NotNull]
@@ -207,6 +228,16 @@ namespace fCraft.Drawing
         }
         static BlockPalette layeredPalette;
 
+        [NotNull]
+        public static BlockPalette Layered2 {
+            get {
+                if (layeredPalette2 == null) {
+                    layeredPalette2 = DefineLayered2();
+                }
+                return layeredPalette2;
+            }
+        }
+        static BlockPalette layeredPalette2;
 
         [NotNull]
         public static BlockPalette Gray
@@ -269,23 +300,29 @@ namespace fCraft.Drawing
 
 
         [NotNull]
-        public static BlockPalette GetPalette(StandardBlockPalettes palette)
+        public static BlockPalette GetPalette(StandardBlockPalette palette)
         {
             switch (palette)
             {
-                case StandardBlockPalettes.Light:
+                case StandardBlockPalette.Light:
                     return Light;
-                case StandardBlockPalettes.Dark:
+                case StandardBlockPalette.Light2:
+                    return Light2;
+                case StandardBlockPalette.Dark:
                     return Dark;
-                case StandardBlockPalettes.Layered:
+                case StandardBlockPalette.Dark2:
+                    return Dark2;
+                case StandardBlockPalette.Layered:
                     return Layered;
-                case StandardBlockPalettes.Gray:
+                case StandardBlockPalette.Layered2:
+                    return Layered2;
+                case StandardBlockPalette.Gray:
                     return Gray;
-                case StandardBlockPalettes.DarkGray:
+                case StandardBlockPalette.DarkGray:
                     return DarkGray;
-                case StandardBlockPalettes.LayeredGray:
+                case StandardBlockPalette.LayeredGray:
                     return LayeredGray;
-                case StandardBlockPalettes.BW:
+                case StandardBlockPalette.BW:
                     return BW;
                 default:
                     throw new ArgumentOutOfRangeException("palette");
@@ -297,6 +334,32 @@ namespace fCraft.Drawing
         static BlockPalette DefineLight()
         {
             return new BlockPalette("Light", 1) {
+                { RgbColor.FromArgb(109, 80, 57), new[] { Block.Dirt } },
+                { RgbColor.FromArgb(176, 170, 130), new[] { Block.Sand } },
+                { RgbColor.FromArgb(111, 104, 104), new[] { Block.Gravel } },
+                { RgbColor.FromArgb(179, 44, 44), new[] { Block.Red } },
+                { RgbColor.FromArgb(179, 111, 44), new[] { Block.Orange } },
+                { RgbColor.FromArgb(179, 179, 44), new[] { Block.Yellow } },
+                { RgbColor.FromArgb(109, 179, 44), new[] { Block.Lime } },
+                { RgbColor.FromArgb(44, 179, 44), new[] { Block.Green } },
+                { RgbColor.FromArgb(44, 179, 111), new[] { Block.Teal } },
+                { RgbColor.FromArgb(44, 179, 179), new[] { Block.Aqua } },
+                { RgbColor.FromArgb(86, 132, 179), new[] { Block.Cyan } },
+                { RgbColor.FromArgb(99, 99, 180), new[] { Block.Blue } },
+                { RgbColor.FromArgb(111, 44, 180), new[] { Block.Indigo } },
+                { RgbColor.FromArgb(141, 62, 179), new[] { Block.Violet } },
+                { RgbColor.FromArgb(180, 44, 180), new[] { Block.Magenta } },
+                { RgbColor.FromArgb(179, 44, 111), new[] { Block.Pink } },
+                { RgbColor.FromArgb(64, 64, 64), new[] { Block.Black } },
+                { RgbColor.FromArgb(118, 118, 118), new[] { Block.Gray } },
+                { RgbColor.FromArgb(179, 179, 179), new[] { Block.White } },
+                { RgbColor.FromArgb(21, 19, 29), new[] { Block.Obsidian } }
+            };
+        }
+
+        [NotNull]
+        static BlockPalette DefineLight2() {
+            return new BlockPalette("Light2", 1) {
                 {RgbColor.FromArgb( 124, 124, 124 ), new[] {Block.Stone}},//
                 {RgbColor.FromArgb( 125, 89, 61 ), new[] {Block.Dirt}},//
                 {RgbColor.FromArgb( 97, 97, 97 ), new[] {Block.Admincrete}},//
@@ -341,6 +404,32 @@ namespace fCraft.Drawing
         static BlockPalette DefineDark()
         {
             return new BlockPalette("Dark", 1) {
+                { RgbColor.FromArgb(67, 50, 37), new[] { Block.Dirt } },
+                { RgbColor.FromArgb(108, 104, 80), new[] { Block.Sand } },
+                { RgbColor.FromArgb(68, 64, 64), new[] { Block.Gravel } },
+                { RgbColor.FromArgb(109, 28, 28), new[] { Block.Red } },
+                { RgbColor.FromArgb(110, 70, 31), new[] { Block.Orange } },
+                { RgbColor.FromArgb(109, 109, 29), new[] { Block.Yellow } },
+                { RgbColor.FromArgb(68, 109, 29), new[] { Block.Lime } },
+                { RgbColor.FromArgb(28, 109, 31), new[] { Block.Green } },
+                { RgbColor.FromArgb(28, 109, 69), new[] { Block.Teal } },
+                { RgbColor.FromArgb(28, 109, 108), new[] { Block.Aqua } },
+                { RgbColor.FromArgb(53, 81, 109), new[] { Block.Cyan } },
+                { RgbColor.FromArgb(61, 61, 109), new[] { Block.Blue } },
+                { RgbColor.FromArgb(68, 28, 109), new[] { Block.Indigo } },
+                { RgbColor.FromArgb(87, 40, 110), new[] { Block.Violet } },
+                { RgbColor.FromArgb(109, 28, 110), new[] { Block.Magenta } },
+                { RgbColor.FromArgb(109, 29, 69), new[] { Block.Pink } },
+                { RgbColor.FromArgb(41, 41, 41), new[] { Block.Black } },
+                { RgbColor.FromArgb(72, 72, 72), new[] { Block.Gray } },
+                { RgbColor.FromArgb(109, 109, 109), new[] { Block.White } },
+                { RgbColor.FromArgb(15, 14, 20), new[] { Block.Obsidian } }
+            };
+        }
+
+        [NotNull]
+        static BlockPalette DefineDark2() {
+            return new BlockPalette("Dark2", 1) {
                 {RgbColor.FromArgb( 74, 74, 74 ), new[] {Block.Stone}},//
                 {RgbColor.FromArgb( 75, 53, 37 ), new[] {Block.Dirt}},//
                 {RgbColor.FromArgb( 58, 58, 58 ), new[] {Block.Admincrete}},//
@@ -391,6 +480,22 @@ namespace fCraft.Drawing
             }
             foreach (var pair in Dark.palette)
             {
+                palette.Add(pair.Key, new[] { pair.Value[0], Block.Air });
+            }
+            palette.Add(RgbColor.FromArgb(61, 74, 167), new[] { Block.White, Block.StillWater });
+            palette.Add(RgbColor.FromArgb(47, 59, 152), new[] { Block.Gray, Block.StillWater });
+            palette.Add(RgbColor.FromArgb(34, 47, 140), new[] { Block.Black, Block.StillWater });
+            palette.Add(RgbColor.FromArgb(22, 38, 131), new[] { Block.Obsidian, Block.StillWater });
+            return palette;
+        }
+
+        [NotNull]
+        static BlockPalette DefineLayered2() {
+            BlockPalette palette = new BlockPalette("Layered2", 2);
+            foreach (var pair in Light2.palette) {
+                palette.Add(pair.Key, new[] { Block.None, pair.Value[0] });
+            }
+            foreach (var pair in Dark2.palette) {
                 palette.Add(pair.Key, new[] { pair.Value[0], Block.Air });
             }
             palette.Add(RgbColor.FromArgb(61, 74, 167), new[] { Block.White, Block.StillWater });
@@ -459,11 +564,14 @@ namespace fCraft.Drawing
     }
 
 
-    public enum StandardBlockPalettes
+    public enum StandardBlockPalette
     {
         Light,   // 1-layer standard blocks, lit
+        Light2,   // 1-layer standard+CPE blocks, lit
         Dark,    // 1-layer standard blocks, shadowed
+        Dark2,    // 1-layer standard+CPE blocks, shadowed
         Layered, // 2-layer standard blocks
+        Layered2, // 2-layer standard+CPE blocks
         Gray,       // 1-layer gray blocks, lit
         DarkGray,   // 2-layer gray blocks, shadowed
         LayeredGray,    // 2-layer gray blocks

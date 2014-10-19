@@ -124,6 +124,7 @@
     <Compile Include="Drawing\Brushes\BWRainbowBrush.cs" />
     <Compile Include="Drawing\Brushes\CheckeredBrush.cs" />
     <Compile Include="Drawing\Brushes\CloudyBrush.cs" />
+    <Compile Include="Drawing\Brushes\PasteBrush.cs" />
     <Compile Include="Drawing\Brushes\ReplaceNotBrushBrush.cs" />
     <Compile Include="Drawing\Brushes\StripeBrush.cs" />
     <Compile Include="Drawing\Brushes\NormalBrush.cs" />
@@ -147,6 +148,7 @@
     <Compile Include="Drawing\DrawOps\PlaneWireframeDrawOperation.cs" />
     <Compile Include="Drawing\DrawOps\SnapDrawOperation.cs" />
     <Compile Include="Drawing\DrawOps\WallsDrawOperation.cs" />
+    <Compile Include="Drawing\IBrushFactory.cs" />
     <Compile Include="MapConversion\MapFCMv3.cs" />
     <Compile Include="Network\CpeConstants.cs" />
     <Compile Include="Network\GlobalChat.cs" />

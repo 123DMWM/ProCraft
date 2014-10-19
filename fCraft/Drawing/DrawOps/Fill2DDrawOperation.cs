@@ -28,12 +28,12 @@ namespace fCraft.Drawing
                 {
                     return String.Format("{0}({1})",
                                           Name,
-                                          Brush.InstanceDescription);
+                                          Brush.Description);
                 }
                 else
                 {
                     return String.Format("{0}({1} @{2} -> {3})",
-                                          Name, SourceBlock, Axis, Brush.InstanceDescription);
+                                          Name, SourceBlock, Axis, Brush.Description);
                 }
             }
         }

@@ -43,6 +43,10 @@ namespace fCraft
 
 		}
 
+        public override int ExpectedMarks {
+            get { return 2; }
+        }
+
 		protected override void DrawFasePrepare(int min1, int max1, int min2, int max2)
 		{
 
@@ -80,6 +84,10 @@ namespace fCraft
 		{
 
 		}
+
+        public override int ExpectedMarks {
+            get { return 2; }
+        }
 
 		protected override void DrawFasePrepare(int min1, int max1, int min2, int max2)
 		{
@@ -121,6 +129,10 @@ namespace fCraft
 		{
 
 		}
+
+        public override int ExpectedMarks {
+            get { return 2; }
+        }
 
 		protected override void DrawFasePrepare(int min1, int max1, int min2, int max2)
 		{

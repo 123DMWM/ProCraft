@@ -763,8 +763,8 @@ namespace fCraft {
                 }
 
                 // reset brush to normal, if not allowed to draw advanced
-                if( !target.Can( Permission.DrawAdvanced ) ) {
-                    target.Brush = NormalBrushFactory.Instance;
+                if (!target.Can(Permission.DrawAdvanced)) {
+                    target.BrushReset();
                 }
 
                 // unhide, if needed
@@ -787,7 +787,7 @@ namespace fCraft {
                 }
 
                 // ensure copy slot consistency
-                target.InitCopySlots();
+                target.MaxCopySlots = target.Info.Rank.CopySlots;
 
                 // inform the player of the rank change
                 target.Message( "You were {0} to {1}&S by {2}",

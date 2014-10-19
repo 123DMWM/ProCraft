@@ -38,6 +38,10 @@ namespace fCraft.Drawing {
             get { return "Walls"; }
         }
 
+        public override int ExpectedMarks {
+            get { return 2; }
+        }
+
         public override string Description {
             get { return Name; }
         }
@@ -96,8 +100,8 @@ namespace fCraft.Drawing {
                 }
             }
 
-            if ( fillInner ) {
-                UseAlternateBlock = true;
+            if (fillInner) {
+                AlternateBlockIndex = 1;
                 for ( int x = Bounds.XMin + 1; x < Bounds.XMax; x++ ) {
                     for ( int y = Bounds.YMin + 1; y < Bounds.YMax; y++ ) {
                         for ( int z = Bounds.ZMin; z < Bounds.ZMax + 1; z++ ) {

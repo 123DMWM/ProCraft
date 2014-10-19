@@ -1610,12 +1610,63 @@ namespace fCraft {
 
         #endregion
 
-
         #region Drawing, Selection
 
-        [NotNull]
-        public IBrush Brush { get; set; }
+        /// <summary> Sets the player's BrushFactory.
+        /// This also resets LastUsedBrush. </summary>
+        public void BrushSet([NotNull] IBrushFactory brushFactory) {
+            if (brushFactory == null)
+                throw new ArgumentNullException("brushFactory");
+            BrushFactory = brushFactory;
+            LastUsedBrush = brushFactory.MakeDefault();
+        }
 
+
+        /// <summary> Resets BrushFactory to "Normal". Also resets LastUsedBrush. </summary>
+        public void BrushReset() {
+            BrushSet(NormalBrushFactory.Instance);
+        }
+
+
+        [CanBeNull]
+        public IBrush ConfigureBrush([NotNull] CommandReader cmd) {
+            if (cmd == null)
+                throw new ArgumentNullException("cmd");
+            // try to create instance of player's currently selected brush
+            // all command parameters are passed to the brush
+            if (cmd.HasNext || LastUsedBrush == null) {
+                IBrush newBrush = BrushFactory.MakeBrush(this, cmd);
+                // MakeBrush returns null if there were problems with syntax, abort
+                if (newBrush == null)
+                    return null;
+                LastUsedBrush = newBrush;
+            }
+            return LastUsedBrush.Clone();
+        }
+
+
+        /// <summary> Currently-selected brush factory. </summary>
+        [NotNull]
+        public IBrushFactory BrushFactory { get; private set; }
+
+        /// <summary> Draw brush currently used by the player. Defaults to NormalBrush. May not be null. </summary>
+        [CanBeNull]
+        public IBrush LastUsedBrush { get; private set; }
+
+        /// <summary> Returns the description of the last-used brush (if available)
+        ///  or the name of the currently-selected brush factory. </summary>
+        [NotNull]
+        public string BrushDescription {
+            get {
+                if (LastUsedBrush != null) {
+                    return LastUsedBrush.Description;
+                } else {
+                    return BrushFactory.Name;
+                }
+            }
+        }
+
+        /// <summary> Last DrawOperation executed by this player this session. May be null (if nothing has been executed yet). </summary>
         [CanBeNull]
         public DrawOperation LastDrawOp { get; set; }
 
@@ -1653,68 +1704,107 @@ namespace fCraft {
         Permission[] selectionPermissions;
 
 
-        public void SelectionAddMark( Vector3I pos, bool executeCallbackIfNeeded, bool markAll ) {
-            if( !IsMakingSelection ) throw new InvalidOperationException( "No selection in progress." );
-            selectionMarks.Enqueue( pos );
-            if( SelectionMarkCount >= SelectionMarksExpected ) {
-                if( executeCallbackIfNeeded ) {
+        /// <summary> Adds a mark to the current selection. </summary>
+        /// <param name="coord"> Coordinate of the new mark. </param>
+        /// <param name="announce"> Whether to message this player about the mark. </param>
+        /// <param name="executeCallbackIfNeeded"> Whether to execute the selection callback right away,
+        /// if required number of marks is reached. </param>
+        /// <returns> Whether selection callback has been executed. </returns>
+        /// <exception cref="InvalidOperationException"> No selection is in progress. </exception>
+        public bool SelectionAddMark(Vector3I coord, bool announce, bool executeCallbackIfNeeded) {
+            if (!IsMakingSelection)
+                throw new InvalidOperationException("No selection in progress.");
+            selectionMarks.Enqueue(coord);
+            if (SelectionMarkCount >= SelectionMarksExpected) {
+                if (executeCallbackIfNeeded) {
                     SelectionExecute();
-                } else {
-                    Message( "Last block marked at {0}. Type &H/Mark&S or click any block to continue.", pos );
+                    return true;
+                } else if (announce) {
+                    Message("Last block marked at {0}. Type &H/Mark&S or click any block to continue.", coord);
                 }
-            } else {
-                if (!markAll) {
-                    Message("Block #{0} marked at {1}. Place mark #{2}.", SelectionMarkCount, pos,
+            } else if (announce) {
+                Message("Block #{0} marked at {1}. Place mark #{2}.",
+                        SelectionMarkCount,
+                        coord,
                         SelectionMarkCount + 1);
-                }
             }
+            return false;
         }
 
 
-        public void SelectionExecute() {
-            if( !IsMakingSelection || selectionCallback == null ) {
-                throw new InvalidOperationException( "No selection in progress." );
+        /// <summary> Try to execute the current selection.
+        /// If player fails the permission check, player receives "insufficient permissions" message,
+        /// and the callback is never invoked. </summary>
+        /// <returns> Whether selection callback has been executed. </returns>
+        /// <exception cref="InvalidOperationException"> No selection is in progress OR too few marks given. </exception>
+        public bool SelectionExecute() {
+            if (!IsMakingSelection || selectionCallback == null) {
+                throw new InvalidOperationException("No selection in progress.");
+            }
+            if (SelectionMarkCount < SelectionMarksExpected) {
+                string exMsg = String.Format("Not enough marks (expected {0}, got {1})",
+                                             SelectionMarksExpected,
+                                             SelectionMarkCount);
+                throw new InvalidOperationException(exMsg);
             }
             SelectionMarksExpected = 0;
             // check if player still has the permissions required to complete the selection.
-            if( selectionPermissions == null || Can( selectionPermissions )) {
-                selectionCallback( this, selectionMarks.ToArray(), selectionArgs );
-                if( IsRepeatingSelection && selectionRepeatCommand != null ) {
+            if (selectionPermissions == null || Can(selectionPermissions)) {
+                selectionCallback(this, selectionMarks.ToArray(), selectionArgs);
+                if (IsRepeatingSelection && selectionRepeatCommand != null) {
                     selectionRepeatCommand.Rewind();
-                    CommandManager.ParseCommand( this, selectionRepeatCommand, this == Console );
+                    CommandManager.ParseCommand(this, selectionRepeatCommand, this == Console);
                 }
-                selectionMarks.Clear();
+                SelectionResetMarks();
+                return true;
             } else {
                 // More complex permission checks can be done in the callback function itself.
-                Message( "&WYou are no longer allowed to complete this action." );
-                MessageNoAccess( selectionPermissions );
+                Message("&WYou are no longer allowed to complete this action.");
+                MessageNoAccess(selectionPermissions);
+                return false;
             }
         }
 
 
-        public void SelectionStart( int marksExpected,
-                                    [NotNull] SelectionCallback callback,
-                                    [CanBeNull] object args,
-                                    [CanBeNull] params Permission[] requiredPermissions ) {
-            if( callback == null ) throw new ArgumentNullException( "callback" );
+        /// <summary> Initiates a new selection. Clears any previous selection. </summary>
+        /// <param name="marksExpected"> Expected number of marks. Must be 1 or more. </param>
+        /// <param name="callback"> Callback to invoke when player makes the requested number of marks. 
+        /// Callback will be executed player's thread. </param>
+        /// <param name="args"> Optional argument to pass to the callback. May be null. </param>
+        /// <param name="requiredPermissions"> Optional array of permissions to check when selection completes.
+        /// If player fails the permission check, player receives "insufficient permissions" message,
+        /// and the callback is never invoked. </param>
+        /// <exception cref="ArgumentOutOfRangeException"> marksExpected is less than 1 </exception>
+        /// <exception cref="ArgumentNullException"> callback is null </exception>
+        public void SelectionStart(int marksExpected,
+                                   [NotNull] SelectionCallback callback,
+                                   [CanBeNull] object args,
+                                   [CanBeNull] params Permission[] requiredPermissions) {
+            if (marksExpected < 1)
+                throw new ArgumentOutOfRangeException("marksExpected");
+            if (callback == null)
+                throw new ArgumentNullException("callback");
+            SelectionResetMarks();
             selectionArgs = args;
             SelectionMarksExpected = marksExpected;
-            selectionMarks.Clear();
             selectionCallback = callback;
             selectionPermissions = requiredPermissions;
-            if( DisableClickToMark ) {
-                Message( "&8Reminder: Click-to-mark is disabled." );
+            if (DisableClickToMark) {
+                Message("&8Reminder: Click-to-mark is disabled.");
             }
         }
 
 
+        /// <summary> Resets any marks for the current selection.
+        /// Does not cancel the selection process (use SelectionCancel for that). </summary>
         public void SelectionResetMarks() {
             selectionMarks.Clear();
         }
 
 
+        /// <summary> Cancels any in-progress selection. </summary>
         public void SelectionCancel() {
-            selectionMarks.Clear();
+            SelectionResetMarks();
             SelectionMarksExpected = 0;
             selectionCallback = null;
             selectionArgs = null;
@@ -1723,38 +1813,91 @@ namespace fCraft {
 
         #endregion
 
-
         #region Copy/Paste
 
-        CopyState[] copyInformation;
-        public CopyState[] CopyInformation {
-            get { return copyInformation; }
+        /// <summary> Returns a list of all CopyStates, indexed by slot.
+        /// Is null briefly while player connects, until player.Info is assigned. </summary>
+        [NotNull]
+        public CopyState[] CopyStates {
+            get { return copyStates; }
         }
 
-        int copySlot;
+        CopyState[] copyStates;
+
+        /// <summary> Gets or sets the currently selected copy slot number. Should be between 0 and (MaxCopySlots-1).
+        /// Note that fCraft adds 1 to CopySlot number when presenting it to players.
+        /// So 0th slot is shown as "1st" by /CopySlot and related commands; 1st is shown as "2nd", etc. </summary>
         public int CopySlot {
             get { return copySlot; }
             set {
-                if( value < 0 || value > Info.Rank.CopySlots ) {
-                    throw new ArgumentOutOfRangeException( "value" );
+                if (value < 0 || value >= MaxCopySlots) {
+                    throw new ArgumentOutOfRangeException("value");
                 }
                 copySlot = value;
             }
         }
 
-        internal void InitCopySlots() {
-            Array.Resize( ref copyInformation, Info.Rank.CopySlots );
-            CopySlot = Math.Min( CopySlot, Info.Rank.CopySlots - 1 );
+        int copySlot;
+
+        /// <summary> Gets or sets the maximum number of copy slots allocated to this player.
+        /// Should be non-negative. CopyStates are preserved when increasing the maximum.
+        /// When decreasing the value, any CopyStates in slots that fall outside the new maximum are lost. </summary>
+        public int MaxCopySlots {
+            get { return copyStates.Length; }
+            set {
+                if (value < 0)
+                    throw new ArgumentOutOfRangeException("value");
+                Array.Resize(ref copyStates, value);
+                CopySlot = Math.Min(CopySlot, value - 1);
+            }
         }
 
+
+        /// <summary> Gets CopyState for currently-selected slot. May be null. </summary>
+        /// <returns> CopyState or null, depending on whether anything has been copied into the currently-selected slot. </returns>
         [CanBeNull]
-        public CopyState GetCopyInformation() {
-            return CopyInformation[copySlot];
+        public CopyState GetCopyState() {
+            return GetCopyState(copySlot);
         }
 
-        public void SetCopyInformation( [CanBeNull] CopyState info ) {
-            if( info != null ) info.Slot = copySlot;
-            CopyInformation[copySlot] = info;
+
+        /// <summary> Gets CopyState for the given slot. May be null. </summary>
+        /// <param name="slot"> Slot number. Should be between 0 and (MaxCopySlots-1). </param>
+        /// <returns> CopyState or null, depending on whether anything has been copied into the given slot. </returns>
+        /// <exception cref="ArgumentOutOfRangeException"> slot is not between 0 and (MaxCopySlots-1). </exception>
+        [CanBeNull]
+        public CopyState GetCopyState(int slot) {
+            if (slot < 0 || slot >= MaxCopySlots) {
+                throw new ArgumentOutOfRangeException("slot");
+            }
+            return copyStates[slot];
+        }
+
+
+        /// <summary> Stores given CopyState at the currently-selected slot. </summary>
+        /// <param name="state"> New content for the current slot. May be a CopyState object, or null. </param>
+        /// <returns> Previous contents of the current slot. May be null. </returns>
+        [CanBeNull]
+        public CopyState SetCopyState([CanBeNull] CopyState state) {
+            return SetCopyState(state, copySlot);
+        }
+
+
+        /// <summary> Stores given CopyState at the given slot. </summary>
+        /// <param name="state"> New content for the given slot. May be a CopyState object, or null. </param>
+        /// <param name="slot"> Slot number. Should be between 0 and (MaxCopySlots-1). </param>
+        /// <returns> Previous contents of the current slot. May be null. </returns>
+        /// <exception cref="ArgumentOutOfRangeException"> slot is not between 0 and (MaxCopySlots-1). </exception>
+        [CanBeNull]
+        public CopyState SetCopyState([CanBeNull] CopyState state, int slot) {
+            if (slot < 0 || slot >= MaxCopySlots) {
+                throw new ArgumentOutOfRangeException("slot");
+            }
+            if (state != null)
+                state.Slot = slot;
+            CopyState old = copyStates[slot];
+            copyStates[slot] = state;
+            return old;
         }
 
         #endregion
@@ -1914,21 +2057,17 @@ namespace fCraft {
             if (ip == info.GeoIP)
                 return;
             if (info.LastIP.ToString().StartsWith( "192.168" ) || info.LastIP.ToString().StartsWith( "10.0" ) ||
-                info.LastIP.ToString().StartsWith( "127.0" ))
+                info.LastIP.ToString().StartsWith("127.0") || info.LastIP.ToString().StartsWith("255.255"))
                 ip = Server.ExternalIP.ToString();
             WebClient client = new WebClient();
             Stream stream;
             try {
-                stream = client.OpenRead( "http://geo.liamstanley.io/xml/" + ip );
+                stream = client.OpenRead("http://geo.liamstanley.io/xml/" + ip);
             } catch {
                 try {
-                    stream = client.OpenRead( "http://geoip.cf/xml/" + ip );
+                    stream = client.OpenRead("http://freegeoip.net/xml/" + ip);
                 } catch {
-                    try {
-                        stream = client.OpenRead( "http://freegeoip.net/xml/" + ip );
-                    } catch {
-                        return;
-                    }
+                    return;
                 }
             }
             StreamReader reader = new StreamReader( stream );

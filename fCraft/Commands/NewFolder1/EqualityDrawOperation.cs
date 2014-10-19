@@ -42,6 +42,9 @@ namespace fCraft
 		private Expression _expression;
 		private Scaler _scaler;
 		private int _count;
+        public override int ExpectedMarks {
+            get { return 2; }
+        }
 		public EqualityDrawOperation(Player player, CommandReader cmd)
 			: base(player)
 		{

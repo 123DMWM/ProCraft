@@ -78,7 +78,7 @@ namespace fCraft {
             client.SendTimeout = SocketTimeout;
             client.ReceiveTimeout = SocketTimeout;
 
-            Brush = NormalBrushFactory.Instance;
+            BrushReset();
             Metadata = new MetadataCollection<object>();
 
             try {
@@ -1187,7 +1187,7 @@ namespace fCraft {
                          Name, RankManager.HighestRank.Name);
             }
 
-            InitCopySlots();
+            MaxCopySlots = Info.Rank.CopySlots;
 
             HasFullyConnected = true;
             State = SessionState.Online;
