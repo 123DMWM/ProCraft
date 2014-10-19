@@ -2994,7 +2994,11 @@ namespace fCraft {
             player.Message("  Times used &6Bot&s: &f{0}&s", info.TimesUsedBot);
             player.Message("  Promoted: &f{0} &sDemoted: &f{1}", info.PromoCount, info.DemoCount);
             player.Message("  Reach Distance: &f{0} &sModel: &f{1}", info.ReachDistance, info.Mob);
-            player.Message("  Client Name: &f{0}", target.ClientName);
+            if (info.IsOnline) {
+                if (target.ClientName != null) {
+                    player.Message("  Client Name: &f{0}", target.ClientName);
+                }
+            }
             if (target == null)
             {
                 player.Message("  Block they last held: &f{0}", info.heldBlock);
@@ -3209,16 +3213,12 @@ namespace fCraft {
             WebClient client = new WebClient();
             Stream stream;
             try {
-                stream = client.OpenRead( "http://geo.liamstanley.io/xml/" + ip );
+                stream = client.OpenRead("http://geo.liamstanley.io/xml/" + ip);
             } catch {
                 try {
-                    stream = client.OpenRead( "http://geoip.cf/xml/" + ip );
+                    stream = client.OpenRead("http://freegeoip.net/xml/" + ip);
                 } catch {
-                    try {
-                        stream = client.OpenRead( "http://freegeoip.net/xml/" + ip );
-                    } catch {
-                        return;
-                    }
+                    return;
                 }
             }
             StreamReader reader = new StreamReader( stream );
@@ -3394,16 +3394,12 @@ namespace fCraft {
             WebClient client = new WebClient();
             Stream stream;
             try {
-                stream = client.OpenRead( "http://geo.liamstanley.io/xml/" + ip );
+                stream = client.OpenRead("http://geo.liamstanley.io/xml/" + ip);
             } catch {
                 try {
-                    stream = client.OpenRead( "http://geoip.cf/xml/" + ip );
+                    stream = client.OpenRead("http://freegeoip.net/xml/" + ip);
                 } catch {
-                    try {
-                        stream = client.OpenRead( "http://freegeoip.net/xml/" + ip );
-                    } catch {
-                        return;
-                    }
+                    return;
                 }
             }
             StreamReader reader = new StreamReader( stream );
