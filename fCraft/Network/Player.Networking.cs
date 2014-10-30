@@ -236,6 +236,10 @@ namespace fCraft {
                                 ProcessSetBlockPacket();
                                 break;
 
+                            case OpCode.PlayerClick:
+                                ProcessPlayerClickPacket();
+                                break;
+
                             case OpCode.Ping:
                                 BytesReceived++;
                                 continue;
@@ -732,6 +736,19 @@ namespace fCraft {
                     Info.LastWorldPos = this.Position.ToString();
                 }
             }
+        }
+
+        void ProcessPlayerClickPacket() {
+            BytesReceived += 15;
+            byte button = reader.ReadByte();
+            byte action = reader.ReadByte();
+            short pitch = reader.ReadInt16();
+            short yaw = reader.ReadInt16();
+            byte targetEntityID = reader.ReadByte();
+            short targetBlockX = reader.ReadInt16();
+            short targetBlockY = reader.ReadInt16();
+            short targetBlockZ = reader.ReadInt16();
+            byte targetBlockFace = reader.ReadByte();
         }
 
 

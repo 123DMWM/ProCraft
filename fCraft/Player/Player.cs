@@ -2212,6 +2212,8 @@ namespace fCraft {
         const int EmoteFixExtVersion = 1;
         const string TextHotKeyExtName = "TextHotKey";
         const int TextHotKeyExtVersion = 1;
+        const string PlayerClickExtName = "PlayerClick";
+        const int PlayerClickExtVersion = 1;
 
         // Note: if more levels are added, change UsesCustomBlocks from bool to int
         public bool UsesCustomBlocks { get; set; }
@@ -2229,12 +2231,13 @@ namespace fCraft {
         public bool SupportsHackControl { get; set; }
         public bool SupportsEmoteFix { get; set; }
         public bool SupportsTextHotKey { get; set; }
+        public bool SupportsPlayerClick { get; set; }
         public string ClientName { get; set; }
 
         bool NegotiateProtocolExtension()
         {
             // write our ExtInfo and ExtEntry packets
-            writer.Write(Packet.MakeExtInfo("ProCraft", 15).Bytes);
+            writer.Write(Packet.MakeExtInfo("ProCraft", 16).Bytes);
             writer.Write(Packet.MakeExtEntry(CustomBlocksExtName, CustomBlocksExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(BlockPermissionsExtName, BlockPermissionsExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(ClickDistanceExtName, ClickDistanceExtVersion).Bytes);
@@ -2250,6 +2253,7 @@ namespace fCraft {
             writer.Write(Packet.MakeExtEntry(HackControlExtName, HackControlExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(EmoteFixExtName, EmoteFixExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(TextHotKeyExtName, TextHotKeyExtVersion).Bytes);
+            writer.Write(Packet.MakeExtEntry(PlayerClickExtName, PlayerClickExtVersion).Bytes);
 
             // Expect ExtInfo reply from the client
             OpCode extInfoReply = reader.ReadOpCode();
@@ -2336,6 +2340,10 @@ namespace fCraft {
                 if (extName == TextHotKeyExtName && extVersion == TextHotKeyExtVersion) {
                     SupportsTextHotKey = true;
                     clientExts.Add( extName + " " + extVersion );
+                }
+                if (extName == PlayerClickExtName && extVersion == PlayerClickExtVersion) {
+                    SupportsPlayerClick = true;
+                    clientExts.Add(extName + " " + extVersion);
                 }
             }
 

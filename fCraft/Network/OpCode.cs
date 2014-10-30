@@ -109,6 +109,9 @@ namespace fCraft
 
         /// <summary> Extended server packet. Adds or updates an entity (replaces AddEntity). </summary>
         ExtAddEntity2 = 33,
+
+        /// <summary> Client tells the server when it pressed a mouse button. </summary>
+        PlayerClick = 34,
     }
 }
 
