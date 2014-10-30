@@ -1593,14 +1593,10 @@ namespace fCraft {
 
             RaisePlayerJoinedWorldEvent(this, oldWorld, reason);
 
-
-            byte zid = 255;
             if (SupportsSelectionCuboid) {
                 foreach (Zone z in WorldMap.Zones) {
-                    z.ZoneID = zid;
                     if (z.ShowZone) {
                         Send(Packet.MakeMakeSelection(z.ZoneID, z.Name, z.Bounds, z.Color, z.Alpha));
-                        zid--;
                     }
                 }
             }

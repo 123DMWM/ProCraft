@@ -173,6 +173,12 @@ namespace fCraft {
                     Map = MapGenerator.GenerateFlatgrass( 128, 128, 64 );
                 }
 
+                byte zid = 255;
+                foreach (Zone z in map.Zones) {
+                    z.ZoneID = zid;
+                    zid--;
+                }
+
                 return Map;
             }
         }
