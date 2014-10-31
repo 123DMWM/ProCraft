@@ -1766,7 +1766,7 @@ namespace fCraft {
             coordsMax.Y = map.Length - 1;
             coordsMax.Z = map.Height - 1;
             player.SelectionResetMarks();
-            player.SelectionAddMark(coordsMin, false, true);
+            player.SelectionAddMark(coordsMin, false, false);
             player.SelectionAddMark(coordsMax, true, true);
         }
 
@@ -2567,7 +2567,7 @@ namespace fCraft {
             coords.Z = Math.Min( map.Height - 1, Math.Max( 0, coords.Z ) );
 
             if( player.SelectionMarksExpected > 0 ) {
-                player.SelectionAddMark( coords, true, false );
+                player.SelectionAddMark( coords, true, true );
             } else {
                 player.MessageNow( "Cannot mark - no selection in progress." );
             }
@@ -2592,7 +2592,7 @@ namespace fCraft {
             coordsMax.Y = map.Length - 1;
             coordsMax.Z = map.Height - 1;
             player.SelectionResetMarks();
-            player.SelectionAddMark(coordsMin, false, true);
+            player.SelectionAddMark(coordsMin, false, false);
             player.SelectionAddMark(coordsMax, true, true);
         }
 

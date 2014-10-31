@@ -1113,7 +1113,7 @@ namespace fCraft {
             // selection handling
             if( SelectionMarksExpected > 0 && !DisableClickToMark ) {
                 RevertBlockNow( coord );
-                SelectionAddMark( coord, true, false );
+                SelectionAddMark( coord, true, true );
                 return false;
             }
 

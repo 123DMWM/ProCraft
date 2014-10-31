@@ -1,7 +1,9 @@
 ﻿// Part of fCraft | Copyright 2009-2013 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt //Copyright (c) 2011-2013 Jon Baker, Glenn Marien and Lao Tszy <Jonty800@gmail.com> //Copyright (c) <2012-2014> <LeChosenOne, DingusBungus> | Copyright 2014 123DMWM <shmo1joe2@gmail.com>
 using System;
 using System.IO;
+using System.Linq;
 using fCraft.MapConversion;
+using JetBrains.Annotations;
 
 namespace fCraft {
     /// <summary> Contains commands related to zone management. </summary>
@@ -664,27 +666,33 @@ namespace fCraft {
             Handler = ZoneMarkHandler
         };
 
-        static void ZoneMarkHandler( Player player, CommandReader cmd ) {
-            if( player.SelectionMarksExpected == 0 ) {
-                player.MessageNow( "Cannot use ZMark - no selection in progress." );
-            } else if( player.SelectionMarksExpected == 2 ) {
-                string zoneName = cmd.Next();
-                if( zoneName == null ) {
-                    CdZoneMark.PrintUsage( player );
-                    return;
-                }
 
-                Zone zone = player.WorldMap.Zones.Find( zoneName );
-                if( zone == null ) {
-                    player.MessageNoZone( zoneName );
-                    return;
-                }
+        static void ZoneMarkHandler([NotNull] Player player, [NotNull] CommandReader cmd) {
+            switch (player.SelectionMarksExpected) {
+                case 0:
+                    player.MessageNow("Cannot use ZMark - no selection in progress.");
+                    break;
+                case 2: {
+                        string zoneName = cmd.Next();
+                        if (zoneName == null) {
+                            CdZoneMark.PrintUsage(player);
+                            return;
+                        }
 
-                player.SelectionResetMarks();
-                player.SelectionAddMark( zone.Bounds.MinVertex, false, false );
-                player.SelectionAddMark( zone.Bounds.MaxVertex, true, false );
-            } else {
-                player.MessageNow( "ZMark can only be used for 2-block selection." );
+                        Zone zone = player.WorldMap.Zones.Find(zoneName);
+                        if (zone == null) {
+                            player.MessageNoZone(zoneName);
+                            return;
+                        }
+
+                        player.SelectionResetMarks();
+                        player.SelectionAddMark(zone.Bounds.MinVertex, false, false);
+                        player.SelectionAddMark(zone.Bounds.MaxVertex, false, true);
+                    }
+                    break;
+                default:
+                    player.MessageNow("ZMark can only be used with 2-block/2-click selections.");
+                    break;
             }
         }
 
@@ -728,7 +736,6 @@ namespace fCraft {
                                 player.Info.Rank.Name, player.ClassyName, player.World.ClassyName );
                 return;
             }
-
             ZoneCollection zones = player.WorldMap.Zones;
             Zone zone = zones.Find( zoneName );
             if (zone.Name.ToLower().StartsWith("deny_") || zone.Name.ToLower().StartsWith("respawn_") || zone.Name.ToLower().StartsWith("message_") || zone.Name.ToLower().StartsWith("death_") || zone.Name.ToLower().StartsWith("checkpoint_"))
@@ -759,6 +766,9 @@ namespace fCraft {
                 }
 
                 if( zones.Remove( zone.Name ) ) {
+                        foreach (Player p in player.World.Players.Where(a => a.SupportsSelectionCuboid)) {
+                            p.Send(Packet.MakeRemoveSelection(zone.ZoneID));
+                    }
                     Logger.Log( LogType.UserActivity,
                                 "{0} {1} &sremoved zone {2} from world {3}",
                                 player.Info.Rank.Name, player.Name, zone.Name, player.World.Name );
@@ -1018,9 +1028,7 @@ namespace fCraft {
             if (zone != null) {
                 foreach (Player p in player.World.Players) {
                     if (p.SupportsSelectionCuboid) {
-                        if (zone.ShowZone == true) {
-
-                            player.World.Players.Send(Packet.MakeRemoveSelection(zone.ZoneID));
+                        if (zone.ShowZone) {
                             p.Send(Packet.MakeMakeSelection(zone.ZoneID, zone.Name, zone.Bounds, zone.Color, alpha));
                         }
                     }
