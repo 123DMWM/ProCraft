@@ -178,6 +178,7 @@ namespace fCraft {
                     z.ZoneID = zid;
                     zid--;
                 }
+                EdgeLevel = (short)(map.Height / 2);
 
                 return Map;
             }

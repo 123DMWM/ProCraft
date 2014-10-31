@@ -356,7 +356,7 @@ namespace fCraft {
                 {
                     if (!short.TryParse(tempAttr.Value, out world.EdgeLevel))
                     {
-                        world.EdgeLevel = -1;
+                        world.EdgeLevel = (short)(world.map.Height / 2);
                         Logger.Log(LogType.Warning,
                                     "WorldManager: Could not parse \"level\" attribute of Environment settings for world \"{0}\", assuming default (normal).",
                                     worldName);
