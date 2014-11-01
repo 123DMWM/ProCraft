@@ -1949,11 +1949,15 @@ namespace fCraft {
         };
 
         static void WeatherHandler(Player player, CommandReader cmd)
-        {            
+        {
+            if (cmd.Count == 1) {
+                player.Message(Cdweather.Usage);
+                return;
+            }
             string name = cmd.Next();
             PlayerInfo p = PlayerDB.FindPlayerInfoOrPrintMatches(player, name, SearchOptions.IncludeSelf);
-            if (p == null)
-            {
+            if (p == null) {
+                player.Message(Cdweather.Usage);
                 return;
             }
             int weather;
@@ -1969,7 +1973,7 @@ namespace fCraft {
             }
             if (p != player.Info)
             {
-                if (p.IsOnline == true)
+                if (p.IsOnline)
                 {
                     if (p.PlayerObject.SupportsEnvWeatherType)
                     {
