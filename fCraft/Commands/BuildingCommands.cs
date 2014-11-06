@@ -2538,9 +2538,13 @@ namespace fCraft {
             coordsMax.X = map.Width - 1;
             coordsMax.Y = map.Length - 1;
             coordsMax.Z = map.Height - 1;
-            player.SelectionResetMarks();
-            player.SelectionAddMark(coordsMin, false, false);
-            player.SelectionAddMark(coordsMax, true, true);
+            if (player.IsMakingSelection) {
+                player.SelectionResetMarks();
+                player.SelectionAddMark(coordsMin, false, false);
+                player.SelectionAddMark(coordsMax, true, true);
+            } else {
+                player.Message("No selection in progress");
+            }
         }
 
         static readonly CommandDescriptor CdDoNotMark = new CommandDescriptor {
