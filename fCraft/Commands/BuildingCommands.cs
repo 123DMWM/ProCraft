@@ -110,6 +110,7 @@ namespace fCraft {
             CommandManager.RegisterCommand( CdPlaneW );
             CommandManager.RegisterCommand( CdOverlay );
             CommandManager.RegisterCommand(CdReplaceAll);
+            CommandManager.RegisterCommand(CdSnake);
         }
 
         #region helpers
@@ -1657,55 +1658,6 @@ namespace fCraft {
         }
 
         #endregion
-        #region drawoneblock
-        static void DrawOneBlock( [NotNull] Player player, [NotNull] Map map, Block drawBlock, Vector3I coord,
-                                  BlockChangeContext context, ref int blocks, ref int blocksDenied, UndoState undoState ) {
-            if( player == null ) throw new ArgumentNullException( "player" );
-
-            if( !map.InBounds( coord ) ) return;
-            Block block = map.GetBlock( coord );
-            if( block == drawBlock ) return;
-
-            if( player.CanPlace( map, coord, drawBlock, context ) != CanPlaceResult.Allowed ) {
-                blocksDenied++;
-                return;
-            }
-
-            map.QueueUpdate( new BlockUpdate( null, coord, drawBlock ) );
-            Player.RaisePlayerPlacedBlockEvent( player, map, coord, block, drawBlock, context );
-
-            if( !undoState.IsTooLargeToUndo ) {
-                if( !undoState.Add( coord, block ) ) {
-                    player.MessageNow( "NOTE: This draw command is too massive to undo." );
-                    player.LastDrawOp = null;
-                }
-            }
-            blocks++;
-        }
-
-
-        static void DrawingFinished( [NotNull] Player player, string verb, int blocks, int blocksDenied ) {
-            if( player == null ) throw new ArgumentNullException( "player" );
-            if( blocks == 0 ) {
-                if( blocksDenied > 0 ) {
-                    player.MessageNow( "No blocks could be {0} due to permission issues.", verb.ToLower() );
-                } else {
-                    player.MessageNow( "No blocks were {0}.", verb.ToLower() );
-                }
-            } else {
-                if( blocksDenied > 0 ) {
-                    player.MessageNow( "{0} {1} blocks ({2} blocks skipped due to permission issues)... " +
-                                       "The map is now being updated.", verb, blocks, blocksDenied );
-                } else {
-                    player.MessageNow( "{0} {1} blocks... The map is now being updated.", verb, blocks );
-                }
-            }
-            if( blocks > 0 ) {
-                player.Info.ProcessDrawCommand( blocks );
-                Server.RequestGC();
-            }
-        }
-        #endregion
         #region Replace
 
         static void ReplaceHandlerInternal([NotNull] IBrushFactory factory, [NotNull] Player player,
@@ -1742,8 +1694,6 @@ namespace fCraft {
         };
 
         static void ReplaceHandler( Player player, CommandReader cmd ) {
-            var replaceBrush = ReplaceBrushFactory.Instance.MakeBrush( player, cmd );
-            if( replaceBrush == null ) return;
             ReplaceHandlerInternal(ReplaceBrushFactory.Instance, player, cmd);
         }
 
@@ -1774,7 +1724,7 @@ namespace fCraft {
         static readonly CommandDescriptor CdReplaceAll = new CommandDescriptor {
             Name = "ReplaceAll",
             Aliases = new[] { "ra" },
-            Category = CommandCategory.Building,
+            Category = CommandCategory.New,
             Permissions = new[] { Permission.Draw },
             RepeatableSelection = true,
             Usage = "/Replace BlockToReplace [AnotherOne, ...] ReplacementBlock",
@@ -1783,9 +1733,6 @@ namespace fCraft {
         };
 
         static void ReplaceAllHandler(Player player, CommandReader cmd) {
-            var replaceBrush = ReplaceBrushFactory.Instance.MakeBrush(player, cmd);
-            if (replaceBrush == null)
-                return;
             ReplaceAllHandlerInternal(ReplaceBrushFactory.Instance, player, cmd);
         }
 
@@ -1828,7 +1775,7 @@ namespace fCraft {
         static readonly CommandDescriptor CdReplaceNotBrush = new CommandDescriptor {
             Name = "ReplaceNotBrush",
             Aliases = new[] { "rnb" },
-            Category = CommandCategory.Building,
+            Category = CommandCategory.New,
             Permissions = new[] { Permission.Draw, Permission.DrawAdvanced },
             RepeatableSelection = true,
             Usage = "/ReplaceNotBrush Block BrushName [Params]",
@@ -2576,7 +2523,7 @@ namespace fCraft {
         static readonly CommandDescriptor CdMarkAll = new CommandDescriptor {
             Name = "MarkAll",
             Aliases = new[] { "ma", },
-            Category = CommandCategory.Building,
+            Category = CommandCategory.New,
             Help = "When making a selection (for drawing or zoning) use this to mark the whole world.",
             Handler = MarkAllHandler
         };
@@ -3200,6 +3147,131 @@ namespace fCraft {
             return;
         }
 
+        #endregion
+        #region snake
+        private static readonly CommandDescriptor CdSnake = new CommandDescriptor {
+            Name = "Snake",
+            Category = CommandCategory.New,
+            Permissions = new[] { Permission.DrawAdvanced },
+            RepeatableSelection = true,
+            Usage = "/Snake (Length) [Block]",
+            Help = "Builds a randomixed snake at a desired length with the specified block.",
+            UsableByFrozenPlayers = false,
+            Handler = SnakeHandler
+        };
+
+        private static void SnakeHandler(Player player, CommandReader cmd) {
+            string slength = cmd.Next();
+            int length;
+            if (slength == null) {
+                player.Message(CdSnake.Usage);
+                return;
+            }
+            if (!int.TryParse(slength, out length)) {
+                player.Message("Invalid Integer: ({0})", slength);
+                return;
+            }
+            string sblock = cmd.Next();
+            Block newBlock;
+            if (sblock == null) {
+                if (player.LastUsedBlockType != Block.None) {
+                    player.Message("No block specified, Using last used block ({0})", player.LastUsedBlockType.ToString());
+                    newBlock = player.LastUsedBlockType;
+                } else {
+                    player.Message("&WCannot deduce desired block. Click a block or type out the block name.");
+                    return;
+                }
+            } else {
+                if (!Map.GetBlockByName(sblock, false, out newBlock)) {
+                    if (player.LastUsedBlockType != Block.None) {
+                        player.Message("No block specified, Using last used block ({0})", player.LastUsedBlockType.ToString());
+                        newBlock = player.LastUsedBlockType;
+                    } else {
+                        player.Message("&WCannot deduce desired block. Click a block or type out the block name.");
+                        return;
+                    }
+                }
+            }
+            Random dir = new Random();
+            Vector3I posStart = new Vector3I(player.Position.X / 32, player.Position.Y / 32, player.Position.Z / 32);
+
+            if (player.World != null && player.World.Map != null) {
+                int blocksDrawn = 0, blocksSkipped = 0;
+                UndoState undoState = player.DrawBegin(null);
+                for (int i = 1; i <= length; i++) {
+                    Vector3I posx = new Vector3I(posStart.X + dir.Next(0, 2) * 2 - 1, posStart.Y, posStart.Z);
+                    Vector3I posy = new Vector3I(posStart.X, posStart.Y + dir.Next(0, 2) * 2 - 1, posStart.Z);
+                    Vector3I posz = new Vector3I(posStart.X, posStart.Y, posStart.Z + dir.Next(0, 2) * 2 - 1);
+                    posStart = new Vector3I(posx.X, posy.Y, posz.Z);
+                    DrawOneBlock(player, player.World.Map, newBlock, posx,
+                          BlockChangeContext.Drawn,
+                          ref blocksDrawn, ref blocksSkipped, undoState);
+                    DrawOneBlock(player, player.World.Map, newBlock, posy,
+                          BlockChangeContext.Drawn,
+                          ref blocksDrawn, ref blocksSkipped, undoState);
+                    DrawOneBlock(player, player.World.Map, newBlock, posz,
+                          BlockChangeContext.Drawn,
+                          ref blocksDrawn, ref blocksSkipped, undoState);
+                }
+                DrawingFinished(player, "Placed", blocksDrawn, blocksSkipped);
+            }
+        }
+        #endregion
+        #region drawoneblock
+        static void DrawOneBlock([NotNull] Player player, [NotNull] Map map, Block drawBlock, Vector3I coord,
+                                 BlockChangeContext context, ref int blocks, ref int blocksDenied, UndoState undoState) {
+            if (player == null)
+                throw new ArgumentNullException("player");
+
+            if (!map.InBounds(coord)) {
+                return;
+            }
+            Block block = map.GetBlock(coord);
+            if (block == drawBlock) {
+                return;
+            }
+
+            if (player.CanPlace(map, coord, drawBlock, context) != CanPlaceResult.Allowed) {
+                blocksDenied++;
+                return;
+
+            }
+
+            map.QueueUpdate(new BlockUpdate(null, coord, drawBlock));
+            Player.RaisePlayerPlacedBlockEvent(player, map, coord, block, drawBlock, context);
+
+            if (!undoState.IsTooLargeToUndo) {
+                if (!undoState.Add(coord, block)) {
+                    player.MessageNow("NOTE: This draw command is too massive to undo.");
+                    player.LastDrawOp = null;
+                }
+            }
+            blocks++;
+        }
+
+
+        static void DrawingFinished([NotNull] Player player, string verb, int blocks, int blocksDenied) {
+            if (player == null)
+                throw new ArgumentNullException("player");
+            if (blocks == 0) {
+                if (blocksDenied > 0) {
+                    player.MessageNow("No blocks could be {0} due to permission issues.", verb.ToLower());
+                } else {
+                    player.MessageNow("No blocks were {0}.", verb.ToLower());
+                }
+            } else {
+                if (blocksDenied > 0) {
+                    player.MessageNow("{0} {1} blocks ({2} blocks skipped due to permission issues)... " +
+                                       "The map is now being updated.", verb, blocks, blocksDenied);
+                } else {
+                    player.MessageNow("{0} {1} blocks... The map is now being updated.", verb, blocks);
+                }
+            }
+            if (blocks > 0) {
+                player.Info.ProcessDrawCommand(blocks);
+                Server.RequestGC();
+            }
+        }
         #endregion
     }
 }

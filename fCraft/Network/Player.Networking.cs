@@ -1460,32 +1460,27 @@ namespace fCraft {
             BytesSent += 10;
 
             #region EnvSetMapAppearance
-            if (this.SupportsEnvMapAppearance)
-            {
-                if (WorldMap.World.EdgeLevel != -1)
-                {
-                    writer.Write(Packet.MakeEnvSetMapAppearance(WorldMap.World.Texture, WorldMap.World.EdgeBlock, WorldMap.World.HorizonBlock, WorldMap.World.EdgeLevel).Bytes);
-                    BytesSent += 67;
-                }
-                else
-                {
-                    writer.Write(Packet.MakeEnvSetMapAppearance(WorldMap.World.Texture, WorldMap.World.EdgeBlock, WorldMap.World.HorizonBlock, (short)(WorldMap.Height / 2)).Bytes);
-                    BytesSent += 67;
-                }
+
+            if (SupportsEnvMapAppearance) {
+                writer.Write(
+                    Packet.MakeEnvSetMapAppearance(World.Texture, World.EdgeBlock, World.HorizonBlock,
+                        (short) ((World.EdgeLevel == -1) ? World.EdgeLevel : (WorldMap.Height/2))).Bytes);
+                BytesSent += 67;
             }
+
             #endregion
             #region EnvColors
             if (SupportsEnvColors)
             {
-                writer.Write(Packet.MakeEnvSetColor(0, WorldMap.World.SkyColor).Bytes);
+                writer.Write(Packet.MakeEnvSetColor(0, World.SkyColor).Bytes);
                 BytesSent += 8;
-                writer.Write(Packet.MakeEnvSetColor(1, WorldMap.World.CloudColor).Bytes);
+                writer.Write(Packet.MakeEnvSetColor(1, World.CloudColor).Bytes);
                 BytesSent += 8;
-                writer.Write(Packet.MakeEnvSetColor(2, WorldMap.World.FogColor).Bytes);
+                writer.Write(Packet.MakeEnvSetColor(2, World.FogColor).Bytes);
                 BytesSent += 8;
-                writer.Write(Packet.MakeEnvSetColor(3, WorldMap.World.ShadowColor).Bytes);
+                writer.Write(Packet.MakeEnvSetColor(3, World.ShadowColor).Bytes);
                 BytesSent += 8;
-                writer.Write(Packet.MakeEnvSetColor(4, WorldMap.World.LightColor).Bytes);
+                writer.Write(Packet.MakeEnvSetColor(4, World.LightColor).Bytes);
                 BytesSent += 8;
             }
             if (SupportsEnvColors && World != null && World.SkyLightEmulator) {
@@ -1495,60 +1490,56 @@ namespace fCraft {
                     BytesSent += 8;
                 }
                 if (Server.CloudAndFogColorHex.TryGetValue(Server.ColorTime, out hex)) {
-                    if (WorldMap.World.CloudColor != null)
+                    if (World.CloudColor != null)
                         writer.Write(Packet.MakeEnvSetColor(1, hex).Bytes);
                     BytesSent += 8;
-                    if (WorldMap.World.FogColor != null)
+                    if (World.FogColor != null)
                         writer.Write(Packet.MakeEnvSetColor(2, hex).Bytes);
                     BytesSent += 8;
                 }
             }
             #endregion
             #region HackControls
-            if (this.SupportsHackControl)
+            if (SupportsHackControl)
             {
                 writer.Write(Packet.HackControl(Info.AllowFlying, Info.AllowNoClip, Info.AllowSpeedhack, Info.AllowRespawn, Info.AllowThirdPerson, Info.JumpHeight).Bytes);
                 BytesSent += 8;
             }
             #endregion
             #region Reach Distance
-            if (this.SupportsClickDistance)
-            {
-                if (newWorld.Name.ToLower() == "maze" && newWorld.Name.ToLower() != "spleef")
-                {
-                    if (this.Info.TempReachDistance != 0 && this.Info.ReachDistance != 0)
-                    {
-                        this.Send(Packet.MakeSetClickDistance(0));
-                        this.Info.TempReachDistance = 0;
+
+            if (SupportsClickDistance) {
+                if (newWorld.Name.ToLower() == "maze" && newWorld.Name.ToLower() != "spleef") {
+                    if (Info.TempReachDistance != 0 && Info.ReachDistance != 0) {
+                        Send(Packet.MakeSetClickDistance(0));
+                        Info.TempReachDistance = 0;
                     }
-                }
-                else
-                {
-                    if (this.Info.TempReachDistance != this.Info.ReachDistance)
-                    {
-                        this.Send(Packet.MakeSetClickDistance(this.Info.ReachDistance));
-                        this.Info.TempReachDistance = this.Info.ReachDistance;
+                } else {
+                    if (Info.TempReachDistance != Info.ReachDistance) {
+                        Send(Packet.MakeSetClickDistance(Info.ReachDistance));
+                        Info.TempReachDistance = Info.ReachDistance;
                     }
                 }
             }
+
             #endregion
             #region Block Permissions
 
-            if (this.SupportsBlockPermissions) {
-                if (!this.Can(Permission.PlaceAdmincrete)) {
-                    this.Send(Packet.MakeSetBlockPermission(Block.Admincrete, false, false));
+            if (SupportsBlockPermissions) {
+                if (!Can(Permission.PlaceAdmincrete)) {
+                    Send(Packet.MakeSetBlockPermission(Block.Admincrete, false, false));
                 }
-                if (!this.Can(Permission.PlaceWater)) {
-                    this.Send(Packet.MakeSetBlockPermission(Block.Water, false, true));
-                    this.Send(Packet.MakeSetBlockPermission(Block.StillWater, false, true));
+                if (!Can(Permission.PlaceWater)) {
+                    Send(Packet.MakeSetBlockPermission(Block.Water, false, true));
+                    Send(Packet.MakeSetBlockPermission(Block.StillWater, false, true));
                 }
-                if (!this.Can(Permission.PlaceLava)) {
-                    this.Send(Packet.MakeSetBlockPermission(Block.Lava, false, true));
-                    this.Send(Packet.MakeSetBlockPermission(Block.StillLava, false, true));
+                if (!Can(Permission.PlaceLava)) {
+                    Send(Packet.MakeSetBlockPermission(Block.Lava, false, true));
+                    Send(Packet.MakeSetBlockPermission(Block.StillLava, false, true));
                 }
-                if (!this.Can(Permission.PlaceGrass))
+                if (!Can(Permission.PlaceGrass))
                 {
-                    this.Send(Packet.MakeSetBlockPermission(Block.Grass, false, true));
+                    Send(Packet.MakeSetBlockPermission(Block.Grass, false, true));
                 }
             }
 

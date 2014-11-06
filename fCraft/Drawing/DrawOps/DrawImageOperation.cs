@@ -309,6 +309,7 @@ namespace fCraft.Drawing {
 
         public override int DrawBatch(int maxBlocksToDraw) {
             int blocksDone = 0;
+            //byte sid = 255;
             for (; imageX <= maxX; imageX++) {
                 for (; imageY <= maxY; imageY++) {
                     // find matching palette entry
@@ -321,6 +322,18 @@ namespace fCraft.Drawing {
                         Coords.Y = (imageX - minX) * coordMultiplierY + coordOffsets.Y + layerVector.Y * layer;
                         if (DrawOneBlock()) {
                             blocksDone++;
+                            /*BoundingBox placetobuild = new BoundingBox(Coords.X, Coords.Y, Coords.Z, Coords.X, Coords.Y, Coords.Z);                    
+                            string rtn = "" + color.R.ToString("X2") + color.G.ToString("X2") + color.B.ToString("X2");
+                            Block newBlock = Player.WorldMap.GetBlock(placetobuild.XMin, placetobuild.YMin, placetobuild.ZMin);
+                            if (newBlock != Block.Air)
+                            {
+                                Player.Send(Packet.MakeMakeSelection(sid, "DrawImage" + sid, placetobuild, rtn, 255));
+                                if (sid == 0) {
+                                    sid = 255;
+                                } else {
+                                    sid--;
+                                }
+                            }*/ 
                             if (blocksDone >= maxBlocksToDraw) {
                                 layer++;
                                 return blocksDone;

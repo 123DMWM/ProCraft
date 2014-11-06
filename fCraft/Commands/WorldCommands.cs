@@ -576,7 +576,7 @@ namespace fCraft {
                                 "Use \"normal\" instead of a number to reset to default (bedrock)." },
                 { "texture",    "&H/Env <WorldName> texture <Texture .PNG Url>\n&S" +
                                 "Changes the texture for all visible blocks on a map. "+
-                                "Use \"normal\" instead of a number to reset to default (http://i.imgur.com/httEvfx.png)." }
+                                "Use \"normal\" instead of a number to reset to default (http://108.49.194.95/terrain/64xDefaultTerrain.png)." }
             },
             Usage = "/Env <WorldName> <Variable>",
             IsConsoleSafe = true,
@@ -616,7 +616,7 @@ namespace fCraft {
                 player.Message( "  Water block: {1}  Bedrock block: {0}",
                                 world.EdgeBlock, world.HorizonBlock );
                 player.Message("  Texture: {0}",
-                                world.Texture == "http://i.imgur.com/httEvfx.png" ? "normal" : world.Texture);
+                                world.Texture == "http://108.49.194.95/terrain/64xDefaultTerrain.png" ? "normal" : world.Texture);
                 if( !player.IsUsingWoM ) {
                     player.Message( "  You need ClassiCube client to see the changes." );
                 }
@@ -633,7 +633,7 @@ namespace fCraft {
                     world.EdgeLevel = -1;
                     world.EdgeBlock = Block.Admincrete;
                     world.HorizonBlock = Block.Water;
-                    world.Texture = "http://i.imgur.com/httEvfx.png";
+                    world.Texture = "http://108.49.194.95/terrain/64xDefaultTerrain.png";
                     Logger.Log( LogType.UserActivity,
                                 "Env: {0} {1} reset environment settings for world {2}",
                                 player.Info.Rank.Name, player.Name, world.Name );
@@ -867,10 +867,10 @@ namespace fCraft {
 
                 case "tex":
                 case "texture":
-                    if (valueText == "http://i.imgur.com/httEvfx.png" || valueText == "normal")
+                    if (valueText == "http://108.49.194.95/terrain/64xDefaultTerrain.png" || valueText == "normal")
                     {
                         player.Message("Reset texture for {0}&S to normal", world.ClassyName);
-                        valueText = "http://i.imgur.com/httEvfx.png";
+                        valueText = "http://108.49.194.95/terrain/64xDefaultTerrain.png";
                     }
                     if (!valueText.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
                     {
@@ -1702,7 +1702,7 @@ namespace fCraft {
                            "but we are only allowed to force the terrain onto you.");
             player.Message("So if you want the full experience that this HD Default 64x pack has to offer...");
             player.Message("(Including beautiful Gui and Font)");
-            player.Message( "ClassiCube texturepacks: http://173.48.22.66/texturepacks/" );
+            player.Message("ClassiCube texturepacks: http://108.49.194.95/texturepacks/");
             player.Message( "Made and converted by 123DMWM^" );
         }
 
@@ -4098,7 +4098,7 @@ namespace fCraft {
         static readonly CommandDescriptor CdSLE = new CommandDescriptor {
             Name = "SkyLightEmulator",
             Aliases = new[] { "SLE" },
-            Category = CommandCategory.Building,
+            Category = CommandCategory.New,
             Permissions = new[] { Permission.ManageWorlds },
             Help =
                 "Toggles whether or not to emulate sky color based on time in a world",

@@ -1198,28 +1198,23 @@ namespace fCraft
         };
 
         private static void greetHandler(Player player, CommandReader cmd) {
-            string message;
             if (player.Info.TimeSinceLastServerMessage.TotalSeconds < 5) {
                 player.Info.getLeftOverTime(5, cmd);
                 return;
             }
-            var all = Server.Players.OrderBy(p => player.Info.TimeSinceLastLogin);
+            var all = Server.Players.Where(p => !p.Info.IsHidden).OrderBy(p => p.Info.TimeSinceLastLogin.ToMilliSeconds());
             Player last = all.First();
+
             if (last == player) {
                 player.Message("You were the last player to join silly");
                 return;
             }
-            if (player.CanSee(last) && last.Info.IsHidden) {
-                player.Message("Don't Blow their cover!");
-                return;
-            }
-            string serverName = ConfigKey.ServerName.GetString();
             if (all.Any()) {
-                message = "Welcome to " + serverName + ", " + last.Name + "!";
+                string message = "Welcome to " + ConfigKey.ServerName.GetString() + ", " + last.Name + "!";
                 player.ParseMessage(message, false);
                 player.Info.LastServerMessageDate = DateTime.Now;
             } else {
-                player.Message("Error: LastPlayer == null");
+                player.Message("Error: No one else on!");
             }
         }
 
@@ -1314,7 +1309,7 @@ namespace fCraft
         #region GlobalChat
         static readonly CommandDescriptor CdGlobal = new CommandDescriptor {
             Name = "Global",
-            Category = CommandCategory.Chat,
+            Category = CommandCategory.New,
             Aliases = new[] { "gl" },
             IsConsoleSafe = true,
             Permissions = new[] { Permission.Chat },
@@ -1427,7 +1422,7 @@ namespace fCraft
         static readonly CommandDescriptor CdIdea = new CommandDescriptor {
             Name = "Idea",
             Aliases = new[] { "buildideas", "ideas"  },
-            Category = CommandCategory.Chat,
+            Category = CommandCategory.New,
             Permissions = new[] { Permission.Chat },
             IsConsoleSafe = true,
             Help = "Gives random building idea",
@@ -1435,16 +1430,15 @@ namespace fCraft
             Handler = IdeaHandler
         };
 
-        static void IdeaHandler(Player player, CommandReader cmd) {
-            FileInfo adjectiveList = new FileInfo("./Bot/Adjectives.txt");
-            FileInfo nounList = new FileInfo("./Bot/Nouns.txt");
+        private static void IdeaHandler(Player player, CommandReader cmd) {
             string[] adjectiveStrings;
             string[] nounStrings;
-            if (adjectiveList.Exists && nounList.Exists) {
+            if (File.Exists("./Bot/Adjectives.txt") && File.Exists("./Bot/Nouns.txt")) {
                 adjectiveStrings = File.ReadAllLines("./Bot/Adjectives.txt");
                 nounStrings = File.ReadAllLines("./Bot/Nouns.txt");
             } else {
-                player.Message("&cError: No idea files! This should not happen! Yell at the host for deleting Adjectives.txt and Nouns.txt in the bot file.");
+                player.Message(
+                    "&cError: No idea files! This should not happen! Yell at the host for deleting Adjectives.txt and Nouns.txt in the bot file.");
                 return;
             }
             Random randAdjectiveString = new Random();
@@ -1457,7 +1451,7 @@ namespace fCraft
                 player.Info.getLeftOverTime(5, cmd);
                 return;
             }
-                
+
             if (cmd.NextInt(out amount)) {
                 if (amount > 10)
                     amount = 10;
@@ -1492,11 +1486,11 @@ namespace fCraft
         }
 
         #endregion
-        #region Me
+        #region Action
 
         static readonly CommandDescriptor CdAction = new CommandDescriptor {
             Name = "Action",
-            Category = CommandCategory.Chat,
+            Category = CommandCategory.New,
             Permissions = new[] { Permission.Chat },
             IsConsoleSafe = true,
             NotRepeatable = true,
