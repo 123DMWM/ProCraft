@@ -363,13 +363,12 @@ namespace fCraft {
         //
         //public byte EntityID;
 
-        public string Mob;
-
-        public string TempMob = "Humanoid";
+        public string oldMob = "Humanoid";
+        public string Mob = "Humanoid";
+        public string oldskinName;
+        public string skinName;
         
-        public short ReachDistance;
-
-        public short TempReachDistance;
+        public short ReachDistance = 160;
 
         /// <summary> Control whether player can fly using HackControl packet. </summary>
         public bool AllowFlying = true;

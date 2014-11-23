@@ -429,6 +429,26 @@ namespace fCraft {
                 bytesLeft -= readPass;
             }
         }
+
+        // Write at most 512 MiB at a time.
+        const int MaxWriteChunk = 512 * 1024 * 1024;
+        /// <summary> Writes contents of given byte array to a stream, in chunks of at most 512 MiB. 
+        /// Works around an overflow in BufferedStream.Write(byte[]) that happens on 1 GiB+ writes. </summary>
+        /// <param name="source"> Byte array to read from. Must not be null. </param>
+        /// <param name="destination"> Stream to write to. Must not be null. </param>
+        /// <exception cref="ArgumentNullException"> source or destination is null. </exception>
+        public static void WriteAll([NotNull] byte[] source, [NotNull] Stream destination) {
+            if (source == null)
+                throw new ArgumentNullException("source");
+            if (destination == null)
+                throw new ArgumentNullException("destination");
+            int written = 0;
+            while (written < source.Length) {
+                int toWrite = Math.Min(MaxWriteChunk, source.Length - written);
+                destination.Write(source, written, toWrite);
+                written += toWrite;
+            }
+        }
     }
 
 
@@ -451,6 +471,60 @@ namespace fCraft {
                 output = default( TEnum );
                 return false;
             }
+        }
+
+        /// <summary> Tries to parse a given value as an enumeration, with partial-name completion.
+        /// If there is an exact name match, exact numeric match, or a single partial name match, completion succeeds.
+        /// If there are no matches, multiple partial matches, or if value was an empty string, completion fails.
+        /// Even if value is numeric, this method still ensures that given number is among the enumerated constants.
+        /// This differs in behavior from Enum.Parse, which accepts any valid numeric string (that fits into enumeration's base type). </summary>
+        /// <typeparam name="TEnum"> Enumeration type. </typeparam>
+        /// <param name="value"> Raw string value to parse. </param>
+        /// <param name="output"> Parsed enumeration to output. Set to default(TEnum) on failure. </param>
+        /// <param name="ignoreCase"> Whether parsing should be case-insensitive. </param>
+        /// <returns> Whether parsing/completion succeeded. </returns>
+        /// <exception cref="ArgumentNullException"> value is null. </exception>
+        public static bool TryComplete<TEnum>([NotNull] string value, out TEnum output, bool ignoreCase) {
+            if (value == null)
+                throw new ArgumentNullException("value");
+            output = default(TEnum);
+
+            // first, try to find an exact match
+            try {
+                output = (TEnum)Enum.Parse(typeof(TEnum), value, ignoreCase);
+                if (Enum.IsDefined(typeof(TEnum), output)) {
+                    return true;
+                }
+            } catch (ArgumentException) {
+                // No exact match found. Proceed unless value was an empty string.
+                if (value.Length == 0)
+                    return false;
+            } catch (OverflowException) {
+                // Value was a numeric string, beyond enum's scope.
+                return false;
+            }
+
+            // Try name completion
+            bool matchFound = false;
+            StringComparison comparison = (ignoreCase
+                                               ? StringComparison.OrdinalIgnoreCase
+                                               : StringComparison.Ordinal);
+            foreach (string name in Enum.GetNames(typeof(TEnum))) {
+                if (name.StartsWith(value, comparison)) {
+                    if (matchFound) {
+                        // Multiple matches found. Fail.
+                        output = default(TEnum);
+                        return false;
+                    } else {
+                        // First (and hopefully only) partial match found.
+                        output = (TEnum)Enum.Parse(typeof(TEnum), name);
+                        matchFound = true;
+                    }
+                }
+            }
+
+            // Either 0 or 1 match found.
+            return matchFound;
         }
     }
 }

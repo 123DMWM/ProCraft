@@ -943,7 +943,7 @@ namespace fCraft {
             Name = "ZoneSelection",
             Aliases = new[] { "zselection", "zbox", "zshow", "zs" },
             Permissions = new[] { Permission.ManageZones },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Zone,
             Help = "Lets you configure zone selections.",
             Usage = "/ZShow [Zone Name] [Color or On/Off] [Alpha] [On/Off]",
             Handler = zshowHandler

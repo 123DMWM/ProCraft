@@ -333,7 +333,6 @@ namespace fCraft {
                             Server.UpdateTabList();
                             Server.Players.CanSee(this).Message("&S{0} is no longer AFK", this.Name);
                             this.Message("&SYou are no longer AFK");
-                            this.Info.Mob = this.Info.TempMob;
                         }
                     } break;
 
@@ -372,7 +371,6 @@ namespace fCraft {
                             Server.UpdateTabList();
                             Server.Players.CanSee(this).Message("&S{0} is no longer AFK", this.Name);
                             this.Message("&SYou are no longer AFK");
-                            this.Info.Mob = this.Info.TempMob;
                         }
                         CommandManager.ParseCommand(this, cmd, fromConsole);
                         if (!commandDescriptor.NotRepeatable) {
@@ -403,7 +401,6 @@ namespace fCraft {
                                 Server.UpdateTabList();
                                 Server.Players.CanSee(this).Message("&S{0} is no longer AFK", this.Name);
                                 this.Message("&SYou are no longer AFK");
-                                this.Info.Mob = this.Info.TempMob;
                             }
                         }
                     } break;
@@ -567,7 +564,6 @@ namespace fCraft {
                             Server.UpdateTabList();
                             Server.Players.CanSee(this).Message("&S{0} is no longer AFK", this.Name);
                             this.Message("&SYou are no longer AFK");
-                            this.Info.Mob = this.Info.TempMob;
                         }
                     }
                     break;
@@ -1126,6 +1122,9 @@ namespace fCraft {
             {
                 // stair stacking
                 canPlaceResult = CanPlace(map, coordBelow, Block.Cobblestone, context);
+            } else if (type == Block.Fire && coord.Z > 0 && map.GetBlock(coordBelow) == Block.TNT && Can(Permission.Draw)) {
+                // tnt exploding
+                canPlaceResult = CanPlace(map, coordBelow, Block.Magma, context);
             }
             else
             {
@@ -1162,7 +1161,7 @@ namespace fCraft {
                         RevertBlockNow(coord);
                         break;
                     }
-                    else if (type == Block.Snow && coord.Z > 0 && map.GetBlock(coordBelow) == Block.Snow)
+                    if (type == Block.Snow && coord.Z > 0 && map.GetBlock(coordBelow) == Block.Snow)
                     {
                         // Handle Snow Stacking --> Ice
                         RevertBlockNow(coord);
@@ -1177,6 +1176,12 @@ namespace fCraft {
                         coord = coordBelow;
                         type = Block.DoubleSlab;
 
+                    }
+                    if (type == Block.Fire && coord.Z > 0 && map.GetBlock(coordBelow) == Block.TNT && Can(Permission.Draw)) {
+                        RevertBlockNow(coord);
+                        coord = coordBelow;
+                        type = Block.Air;
+                        Explode(coord);
                     }
                     if (type == Block.CobbleSlab && coord.Z > 0 && map.GetBlock(coordBelow) == Block.CobbleSlab)
                     {
@@ -1312,6 +1317,15 @@ namespace fCraft {
         /// Used to undo player's attempted block placement/deletion. </summary>
         public void RevertBlock( Vector3I coords ) {
             SendLowPriority( Packet.MakeSetBlock( coords, WorldMap.GetBlock( coords ) ) );
+        }
+
+        public void Explode(Vector3I coord) {
+            var op = new SphereDrawOperation(this);
+            op.Brush = new NormalBrush(new Block[] {Block.Air});
+            op.Prepare(new Vector3I[] {coord, new Vector3I(coord.X, coord.Y, (coord.Z + 2))});
+            op.AnnounceCompletion = false;
+            op.Context = BlockChangeContext.Exploded;
+            op.Begin();
         }
 
 

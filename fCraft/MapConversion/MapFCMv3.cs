@@ -9,6 +9,7 @@ namespace fCraft.MapConversion {
     /// <summary> fCraft map format converter, for format version #3 (2011).
     /// Soon to be obsoleted by FCMv4. </summary>
     public sealed class MapFCMv3 : IMapImporter, IMapExporter {
+        const int MaxWriteChunk = 512 * 1024 * 1024;
         private const int Identifier = 0x0FC2AF40;
         private const byte Revision = 13;
 
@@ -228,10 +229,14 @@ namespace fCraft.MapConversion {
                 using( DeflateStream ds = new DeflateStream( mapStream, CompressionMode.Compress, true ) ) {
                     using( BufferedStream bs = new BufferedStream( ds ) ) {
                         // write metadata
-                        metaCount = WriteMetadata( bs, mapToSave );
-                        offset = mapStream.Position; // inaccurate, but who cares
-                        bs.Write( blocksCache, 0, blocksCache.Length );
-                        compressedLength = (int)( mapStream.Position - offset );
+                        metaCount = WriteMetadata(bs, mapToSave);
+                        bs.Flush();
+                        offset = mapStream.Position;
+
+                        BufferUtil.WriteAll(blocksCache, bs);
+
+                        bs.Flush();
+                        compressedLength = (int)(mapStream.Position - offset);
                     }
                 }
 

@@ -52,6 +52,7 @@ namespace fCraft {
             CommandManager.RegisterCommand( CdJORW );
             CommandManager.RegisterCommand( CdMaxCaps );
             CommandManager.RegisterCommand( CdHackControl );
+            CommandManager.RegisterCommand( CdChangeSkin );
 
         }
         #region Calculator
@@ -60,7 +61,7 @@ namespace fCraft {
         {
             Name = "Calculator",
             Aliases = new[] { "Calc" },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Info,
             Permissions = new Permission[] { Permission.Chat },
             IsConsoleSafe = true,
             Usage = "/Calculator [number] [+, -, *, /, sqrt, sqr] [(for +,-,*, or /)number]",
@@ -223,88 +224,130 @@ namespace fCraft {
         }
         #endregion
         #region ChangeModel
+        public static string[] validEntities = 
+            {
+                "chicken",
+                "creeper",
+                "croc",
+                "humanoid",
+                "humanoid.armor",
+                "human",
+                "pig",
+                "printer",
+                "sheep",
+                "sheep.fur",
+                "skeleton",
+                "spider",
+                "zombie"
+            };
         static readonly CommandDescriptor CdChangeModel = new CommandDescriptor
         {
             Name = "Model",
-            Category = CommandCategory.New,
+            Aliases = new[] { "ChangeModel", "cm" },
+            Category = CommandCategory.New | CommandCategory.Moderation,
             Permissions = new[] { Permission.EditPlayerDB },
-            Usage = "/Model [Player] [Model]",
+            Usage = "/Model [Player] [Model] [SkinName]",
             IsConsoleSafe = true,
-            Help = "Change the Model of [Player]!\n" +
+            Help = "Change the Model or Skin of [Player]!\n" +
             "Valid models: &e [Any Block Name or ID#], Chicken, Creeper, Croc, Humanoid, Pig, Printer, Sheep, Skeleton, Spider, Zombie!",
             Handler = ModelHandler
         };
 
-        static void ModelHandler(Player player, CommandReader cmd)
-        {
-            if (!cmd.HasNext)
-            {
+        private static void ModelHandler(Player player, CommandReader cmd) {
+            if (!cmd.HasNext) {
                 CdChangeModel.PrintUsage(player);
                 return;
             }
-            string ply = cmd.Next();            
-            if (!cmd.HasNext)
-            {
+            string namePart = cmd.Next();
+            if (!cmd.HasNext) {
                 CdChangeModel.PrintUsage(player);
                 return;
             }
-            string nick = cmd.NextAll();            
-            PlayerInfo p = PlayerDB.FindPlayerInfoOrPrintMatches(player, ply, SearchOptions.IncludeSelf);
-            if (p == null)
-            {
+            string model = cmd.Next();
+            string skinString = cmd.Next();
+            PlayerInfo p = PlayerDB.FindPlayerInfoOrPrintMatches(player, namePart, SearchOptions.IncludeSelf);
+            if (p == null || !p.IsOnline) {
+                player.Message("Player not found or offline!");
                 return;
             }
-            int fail;
-            Block block;
-            if (!int.TryParse(nick, out fail)
-                && !nick.ToLower().Equals("chicken")
-                && !nick.ToLower().Equals("creeper")
-                && !nick.ToLower().Equals("croc")
-                && !nick.ToLower().Equals("crocodile")
-                && !nick.ToLower().Equals("humanoid")
-                && !nick.ToLower().Equals("pig")
-                && !nick.ToLower().Equals("printer")
-                && !nick.ToLower().Equals("sheep")
-                && !nick.ToLower().Equals("skeleton")
-                && !nick.ToLower().Equals("spider")
-                && !nick.ToLower().Equals("nope")
-                && !nick.ToLower().Equals("zombie"))
-            {
-                if (Map.GetBlockByName(nick.ToLower(), false, out block))
-                {
-                    nick = block.GetHashCode().ToString();
-                }
-                else
-                {
-                    player.Confirm(cmd, "Model not valid, see &h/Help Model&s. Or use default \"Humanoid\" instead?");
+            if (!validEntities.Contains(model)) {
+                Block block;
+                if (Map.GetBlockByName(model, false, out block)) {
+                    model = block.GetHashCode().ToString();
+                } else {
+                    player.Message("Model not valid, see &h/Help Model&s. Using default \"Humanoid\" instead.");
                 }
             }
-            if (nick.ToLower().Equals("crocodile"))
-            {
-                nick = "croc";
+            if (model.ToLower().Equals("crocodile")) {
+                model = "croc";
             }
-            if (nick.ToLower().Equals("nope"))
-            {
-                nick = "spider";
+            if (model.ToLower().Equals("nope")) {
+                model = "spider";
             }
-            if (p.Mob.ToLower() == nick.ToLower())
-            {
-                player.Message("{0}'s model is already set to {1}", p.Name, nick);
+            if (p.Mob.ToLower() == model.ToLower() && skinString == null) {
+                player.Message("&f{0}&s's model is already set to &f{1}", p.Name, model);
                 return;
             }
-            if (p.IsOnline)
-            {
-                p.PlayerObject.Message("&e{0} &echanged your model from {1} &eto {2}", player.Name, p.Mob, nick);
+            if (p.IsOnline) {
+                p.PlayerObject.Message("&f{0}&shanged your model from &f{1} &sto &f{2} {3}", (p.PlayerObject == player ? "&sC" : player.Name + " &sc"), p.Mob, model,
+                    (skinString != null ? "&swith skin: &f" + skinString : null));
             }
-            player.Message("&eChanged model of {0} &efrom {1} &eto {2}", p.Name, p.Mob, nick);
-            p.Mob = nick;
+            if (p.PlayerObject != player) {
+                player.Message("&sChanged model of &f{0} &sfrom &f{1} &sto &f{2} {3}", p.Name, p.Mob, model,
+                    (skinString != null ? "&swith skin: &f" + skinString : null));
+            }
+            p.oldMob = p.Mob;
+            p.Mob = model;
+            p.skinName = (skinString ?? p.skinName);
         }
+
+        static readonly CommandDescriptor CdChangeSkin = new CommandDescriptor {
+            Name = "Skin",
+            Aliases = new[] { "ChageSkin", "chs" },
+            Category = CommandCategory.New | CommandCategory.Moderation,
+            Permissions = new[] { Permission.EditPlayerDB },
+            Usage = "/Model [Player] [SkinName]",
+            IsConsoleSafe = true,
+            Help = "Change the Skin of [Player]!",
+            Handler = SkinHandler
+        };
+
+        private static void SkinHandler(Player player, CommandReader cmd) {
+            if (!cmd.HasNext) {
+                CdChangeSkin.PrintUsage(player);
+                return;
+            }
+            string namePart = cmd.Next();
+            if (!cmd.HasNext) {
+                CdChangeModel.PrintUsage(player);
+                return;
+            }
+            string skinString = cmd.Next();
+            PlayerInfo p = PlayerDB.FindPlayerInfoOrPrintMatches(player, namePart, SearchOptions.IncludeSelf);
+            if (p == null || !p.IsOnline) {
+                player.Message("Player not found or offline!");
+                return;
+            }
+            if (p.skinName == skinString) {
+                player.Message("&f{0}&s's skin is already set to &f{1}", p.Name, skinString);
+                return;
+            }
+            if (p.IsOnline) {
+                p.PlayerObject.Message("&f{0}&shanged your skin from &f{1} &sto &f{2}", (p.PlayerObject == player ? "&sC" : player.Name + " &sc"), p.oldskinName, skinString);
+            }
+            if (p.PlayerObject != player) {
+                player.Message("&sChanged skin of &f{0} &sfrom &f{1} &sto &f{2}", p.Name, p.oldskinName, skinString);
+            }
+            p.oldskinName = p.skinName;
+            p.skinName = skinString;
+        }
+
         #endregion
         #region Sudo
         static readonly CommandDescriptor CdSudo = new CommandDescriptor
         {
             Name = "Sudo",
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Moderation | CommandCategory.Chat,
             Permissions = new[] { Permission.EditPlayerDB },
             Usage = "/Sudo [Player] [What to type in]",
             IsConsoleSafe = true,
@@ -344,7 +387,7 @@ namespace fCraft {
         static readonly CommandDescriptor CdBot = new CommandDescriptor
         {
             Name = "Bot",
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Chat,
             Permissions = new Permission[] { Permission.Chat },
             Usage = "Bot [Option]",
             Help = "Bot options are &hGo&s, &hServer&s, &hJoke&s, &hTime&s, &hClock&s, &hPromos&s, &hBans&s, &hKicks&s, &hBlocks&s, &hProtip&s, &hFunfact&s, &hWisdom&s, and &hIdea&s.\n" +
@@ -1434,7 +1477,7 @@ namespace fCraft {
             Player.RaisePlayerHideChangedEvent(player, true, silent);
             foreach (Player p1 in Server.Players)
             {
-                if (p1.SupportsExtPlayerList)
+                if (p1.SupportsExtPlayerList || p1.SupportsExtPlayerList2)
                 {
                     p1.Send(Packet.MakeExtRemovePlayerName(player.NameID));
                 }
@@ -1495,7 +1538,7 @@ namespace fCraft {
             Player.RaisePlayerHideChangedEvent(player, false, silent);
             foreach (Player p1 in Server.Players)
             {
-                if (p1.SupportsExtPlayerList)
+                if (p1.SupportsExtPlayerList || p1.SupportsExtPlayerList2)
                 {
                     p1.Send(Packet.MakeExtRemovePlayerName(player.NameID));
                 }
@@ -1654,7 +1697,7 @@ namespace fCraft {
         static readonly CommandDescriptor CdTPDeny = new CommandDescriptor
         {
             Name = "TPDeny",
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Moderation,
             Aliases = new[] { "tpd", "teleportdeny", "tptoggle" },
             Permissions = new[] { Permission.ReadStaffChat },
             Usage = "/TPDeny On/Off",
@@ -1720,7 +1763,7 @@ namespace fCraft {
         static readonly CommandDescriptor CdTeleport = new CommandDescriptor {
             Name = "TP",
             Aliases = new[] { "teleport", "to" },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Moderation,
             Permissions = new[] { Permission.Teleport },
             Usage = "/TP PlayerName&S or &H/TP X Y Z [R L]&s or &h/TP Random",
             Help = "Teleports you to a specified player's location. " +
@@ -1955,7 +1998,7 @@ namespace fCraft {
         {
             Name = "TPP",
             Aliases = new[] { "teleportprecise", "tppos"},
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Moderation,
             Permissions = new[] { Permission.Teleport },
             IsHidden = true,
             Usage = "/TPP X Y Z [R L]",
@@ -2025,7 +2068,7 @@ namespace fCraft {
         static readonly CommandDescriptor CdJORW = new CommandDescriptor
         {
             Name = "JoinOnRankWorld",
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Moderation,
             Aliases = new[] { "jorw", "joinonrank", "jor"},
             Usage = "/JoinOnRank On/Off ",
             Help = "Determines if you spawn on your designated rank world or not.",
@@ -2097,7 +2140,7 @@ namespace fCraft {
             Name = "MaxCaps",
             Aliases = new[] { "caps" },
             Permissions = new[] { Permission.Chat },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Moderation | CommandCategory.Chat,
             Help = "Changes/Displays the max amount of uppercase letters a rank can use in a message.",
             Usage = "/MaxCaps <Rank> <Amount>",
             Handler = MaxCapsHandler
@@ -2741,7 +2784,7 @@ namespace fCraft {
         {
             Name = "HackControl",
             Aliases = new[] { "hacks", "hax" },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Moderation,
             Permissions = new[] { Permission.Chat},
             Usage = "/Hacks [Player] [Hack] [jumpheight(if needed)]",
             IsConsoleSafe = true,

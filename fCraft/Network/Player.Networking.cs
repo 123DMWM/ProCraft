@@ -15,6 +15,7 @@ using fCraft.Events;
 using fCraft.MapConversion;
 using JetBrains.Annotations;
 using System.Collections.Concurrent;
+using ServiceStack.Text;
 
 namespace fCraft {
     /// <summary> Represents a connection to a Minecraft client. Handles low-level interactions (e.g. networking). </summary>
@@ -1447,7 +1448,7 @@ namespace fCraft {
             BytesSent += 7;
 
             if (SupportsExtPlayerList2) {
-                writer.Write(Packet.MakeExtAddEntity2(Packet.SelfId, Info.Rank.Color + Name, Name, map.Spawn).Bytes);
+                writer.Write(Packet.MakeExtAddEntity2(Packet.SelfId, Info.Rank.Color + Name, (Info.skinName ?? Name), map.Spawn).Bytes);
                 BytesSent += 138;
             } else {
                 writer.Write(Packet.MakeAddEntity(Packet.SelfId, Info.Rank.Color + Name, map.Spawn).Bytes);
@@ -1509,17 +1510,7 @@ namespace fCraft {
             #region Reach Distance
 
             if (SupportsClickDistance) {
-                if (newWorld.Name.ToLower() == "maze" && newWorld.Name.ToLower() != "spleef") {
-                    if (Info.TempReachDistance != 0 && Info.ReachDistance != 0) {
-                        Send(Packet.MakeSetClickDistance(0));
-                        Info.TempReachDistance = 0;
-                    }
-                } else {
-                    if (Info.TempReachDistance != Info.ReachDistance) {
-                        Send(Packet.MakeSetClickDistance(Info.ReachDistance));
-                        Info.TempReachDistance = Info.ReachDistance;
-                    }
-                }
+                Send(Packet.MakeSetClickDistance((World.maxReach < Info.ReachDistance && !Can(Permission.ReadStaffChat) ) ? World.maxReach : Info.ReachDistance));
             }
 
             #endregion
@@ -1544,13 +1535,16 @@ namespace fCraft {
             }
 
             #endregion
-            foreach (Bot bot in World.Bots) {
+
+            foreach (Bot bot in World.Bots.Where(b => b.World == World)) {
                 Send(Packet.MakeRemoveEntity(bot.ID));
-                if (bot.World == World) {
+                if (SupportsExtPlayerList2) {
+                    Send(Packet.MakeExtAddEntity2(bot.ID, bot.Name, (bot.SkinName ?? bot.Name), bot.Position));
+                } else {
                     Send(Packet.MakeAddEntity(bot.ID, bot.Name, bot.Position));
-                    if (bot.Model != "humanoid" && SupportsChangeModel) {
-                        Send(Packet.MakeChangeModel((byte)bot.ID, bot.Model));
-                    }
+                }
+                if (bot.Model != "humanoid" && SupportsChangeModel) {
+                    Send(Packet.MakeChangeModel((byte) bot.ID, bot.Model));
                 }
             }
             if (oldWorld == newWorld)
@@ -1811,10 +1805,31 @@ namespace fCraft {
             // check every player on the current world
             Player[] worldPlayerList = World.Players;
             Position pos = Position;
+            if (!Info.oldMob.ToLower().Equals(Info.Mob.ToLower()) && SupportsChangeModel) {
+                Send(Packet.MakeChangeModel(255, !Info.IsAFK ? Info.Mob : "Chicken"));
+                Info.oldMob = Info.Mob;
+            }
+            if (Info.oldskinName != Info.skinName && SupportsExtPlayerList2) {
+                Send(Packet.MakeExtAddEntity2(-1, Name, Info.skinName ?? Name, WorldMap.Spawn));
+                Send(Packet.MakeSelfTeleport(Position));
+                Info.oldskinName = Info.skinName;
+            }
+            foreach (Bot bot in World.Bots.Where(b => b.World == World)) {
+                if (!bot.oldModel.ToLower().Equals(bot.Model.ToLower()) && SupportsChangeModel) {
+                    Send(Packet.MakeChangeModel((byte)bot.ID, bot.Model));
+                    bot.oldModel = bot.Model;
+                }
+                if (bot.oldSkinName != bot.SkinName && SupportsExtPlayerList2) {
+                    Send(Packet.MakeRemoveEntity(bot.ID));
+                    Send(Packet.MakeExtAddEntity2(bot.ID, bot.Name, bot.SkinName ?? bot.Name, bot.Position));
+                    Send(Packet.MakeChangeModel((byte)bot.ID, bot.Model));
+                    bot.oldSkinName = bot.SkinName;
+                }
+                
+            }
             for( int i = 0; i < worldPlayerList.Length; i++ ) {
                 Player otherPlayer = worldPlayerList[i];
                 if(otherPlayer == this) {
-                    if (this.SupportsChangeModel) this.Send(Packet.MakeChangeModel(255, this.Info.Mob)); 
                     continue; 
                 }
                 if(!CanSee(otherPlayer)) continue;
@@ -1829,9 +1844,10 @@ namespace fCraft {
                 } else {
                     entity = AddEntity( otherPlayer );
                 }
-                if (this.SupportsChangeModel)
-                {
-                    this.Send(Packet.MakeChangeModel((byte)entity.Id, otherPlayer.Info.Mob));
+                if (SupportsChangeModel && otherPlayer.Info.oldMob != otherPlayer.Info.Mob) {
+                    Logger.Log(LogType.Debug, "{0} != {1}", otherPlayer.Info.oldMob, otherPlayer.Info.Mob);
+                    Send(Packet.MakeChangeModel((byte)entity.Id, !otherPlayer.Info.IsAFK ? otherPlayer.Info.Mob : "Chicken"));
+                    otherPlayer.Info.oldMob = otherPlayer.Info.Mob;
                 }
 
                 // Re-add player if their rank changed (to maintain correct name colors/prefix)
@@ -1885,7 +1901,7 @@ namespace fCraft {
                 Logger.Log( LogType.Debug, "AddEntity: {0} added {1} ({2})", Name, newEntity.Id, player.Name );
 #endif
                 if (SupportsExtPlayerList2) {
-                    SendNow(Packet.MakeExtAddEntity2(newEntity.Id, player.Info.Rank.Color + player.Name, player.Name,
+                    SendNow(Packet.MakeExtAddEntity2(newEntity.Id, player.Info.Rank.Color + player.Name, (player.Info.skinName ?? player.Name),
                         player.WorldMap.Spawn));
                     return newEntity;
                 }
@@ -1927,7 +1943,7 @@ namespace fCraft {
 #endif
             SendNow( Packet.MakeRemoveEntity( entity.Id ) );
             if (SupportsExtPlayerList2) {
-                SendNow(Packet.MakeExtAddEntity2(entity.Id, player.Info.Rank.Color + player.Name, player.Name,
+                SendNow(Packet.MakeExtAddEntity2(entity.Id, player.Info.Rank.Color + player.Name, (player.Info.skinName ?? player.Name),
                     player.WorldMap.Spawn));
             } else {
                 SendNow(Packet.MakeAddEntity(entity.Id, player.Info.Rank.Color + player.Name, player.WorldMap.Spawn));

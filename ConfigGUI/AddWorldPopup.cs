@@ -691,7 +691,12 @@ Could not load more information:
                     Refresh();
 
                     string newFileName = World.FullFileName;
-                    Map.Save( newFileName );
+                    using (LogRecorder logRec = new LogRecorder(true, LogType.Error, LogType.SeriousError)) {
+                        Map.Save(newFileName);
+                        if (logRec.HasMessages) {
+                            MessageBox.Show(logRec.MessageString);
+                        }
+                    }
                     string oldFileName = Path.Combine( Paths.MapPath, originalWorldName + ".fcm" );
 
                     if( originalWorldName != null && originalWorldName != World.Name && File.Exists( oldFileName ) ) {

@@ -63,7 +63,7 @@ namespace fCraft {
         {
                 Name = "BUM",
                 IsHidden = true,
-                Category = CommandCategory.New,
+                Category = CommandCategory.New | CommandCategory.Info,
                 Permissions = new[] { Permission.Chat },
                 Help = "Bandwidth Use Mode statistics.",
                 Handler = BumHandler
@@ -102,7 +102,7 @@ namespace fCraft {
         {
                 Name = "BDBDB",
                 IsHidden = true,
-                Category = CommandCategory.New,
+                Category = CommandCategory.New | CommandCategory.Info,
                 Permissions = new[] { Permission.ViewOthersInfo },
                 Help = "BlockDB Debug",
                 Handler = BDBDBHandler
@@ -121,7 +121,7 @@ namespace fCraft {
         static CommandDescriptor cdTaskDebug = new CommandDescriptor
         {
             Name = "TaskDebug",
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Info,
             Permissions = new[] { Permission.ShutdownServer },
             IsConsoleSafe = true,
             IsHidden = true,
@@ -876,7 +876,7 @@ namespace fCraft {
         {
             Name = "WhoIs",
             Aliases = new[] { "realname" },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Info,
             Permissions = new[] { Permission.ViewOthersInfo },
             IsConsoleSafe = true,
             UsableByFrozenPlayers = true,
@@ -938,7 +938,7 @@ namespace fCraft {
         static readonly CommandDescriptor CdOnlineStaff = new CommandDescriptor
         {
             Name = "OnlineStaff",
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Info,
             IsConsoleSafe = true,
             UsableByFrozenPlayers = true,
             Help = "Shows a list of currently online staff members.",
@@ -986,7 +986,7 @@ namespace fCraft {
         static readonly CommandDescriptor CdListStaff = new CommandDescriptor
         {
             Name = "ListStaff",
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Info,
             IsConsoleSafe = true,
             UsableByFrozenPlayers = true,
             Help = "Shows a list of ALL staff members.",
@@ -1336,7 +1336,7 @@ namespace fCraft {
         static readonly CommandDescriptor CdPlayersAdvanced = new CommandDescriptor
         {
             Name = "list",
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Info,
             IsConsoleSafe = true,
             Usage = "/list [WorldName] [Offset]",
             Help = "Lists all players real names on the server (in all worlds). " +
@@ -1593,152 +1593,10 @@ namespace fCraft {
 
         private static void CommandsHandler(Player player, CommandReader cmd) {
             string param = cmd.Next();
-            if (param == null) param = "NULL";
-            if (param.StartsWith("*") && param.EndsWith("*")) {
-                Array items = CommandManager.GetCommands(player.Info.Rank, false);
-                string output = "";
-                foreach (CommandDescriptor item in items) {
-                    if (item.Name.ToLower().Contains(param.ToLower().Trim('*'))) {
-                        output += item.MinRank.Color + item.Name + "&s, ";
-                    }
-                }
-                player.Message("&sCommands containing {0}:", param.Trim('*'));
-                if (output.EndsWith(", "))
-                    player.Message(output.Remove(output.Length - 2) + ".");
-                else
-                    player.Message("There are no commands containin with {0}", param.Trim('*'));
-            } else if (param.EndsWith("*")) {
-                Array items = CommandManager.GetCommands(player.Info.Rank, false);
-                string output = "";
-                foreach (CommandDescriptor item in items) {
-                    if (item.Name.ToLower().StartsWith(param.ToLower().Trim('*'))) {
-                        output += item.MinRank.Color + item.Name + "&s, ";
-                    }
-                }
-                player.Message("&sCommands starting with {0}:", param.Trim('*'));
-                if (output.EndsWith(", "))
-                    player.Message(output.Remove(output.Length - 2) + ".");
-                else
-                    player.Message("There are no commands starting with {0}", param.Trim('*'));
-            } else if (param.StartsWith("*")) {
-                Array items = CommandManager.GetCommands(player.Info.Rank, false);
-                string output = "";
-                foreach (CommandDescriptor item in items) {
-                    if (item.Name.ToLower().EndsWith(param.ToLower().Trim('*'))) {
-                        output += item.MinRank.Color + item.Name + "&s, ";
-                    }
-                }
-                player.Message("&sCommands ending with {0}:", param.Trim('*'));
-                if (output.EndsWith(", "))
-                    player.Message(output.Remove(output.Length - 2) + ".");
-                else
-                    player.Message("There are no commands ending with {0}", param.Trim('*'));
-            } else if (param.ToLower() == "building") {
-                Array items = CommandManager.GetCommands(player.Info.Rank, false);
-                string output = "";
-                foreach (CommandDescriptor item in items) {
-                    if (item.Category == CommandCategory.Building) {
-                        output += item.MinRank.Color + item.Name + "&s, ";
-                    }
-                }
-                player.Message("&sBuilding Commands:");
-                if (output.EndsWith(", ")) player.Message(output.Remove(output.Length - 2) + ".");
-                else player.Message("There are no commands in this category available to your rank.");
-            } else if (param.ToLower() == "chat") {
-                Array items = CommandManager.GetCommands(player.Info.Rank, false);
-                string output = "";
-                foreach (CommandDescriptor item in items) {
-                    if (item.Category == CommandCategory.Chat) {
-                        output += item.MinRank.Color + item.Name + "&s, ";
-                    }
-                }
-                player.Message("&sChat Commands:");
-                if (output.EndsWith(", ")) player.Message(output.Remove(output.Length - 2) + ".");
-                else player.Message("There are no commands in this category available to your rank.");
-            } else if (param.ToLower() == "info") {
-                Array items = CommandManager.GetCommands(player.Info.Rank, false);
-                string output = "";
-                foreach (CommandDescriptor item in items) {
-                    if (item.Category == CommandCategory.Info) {
-                        output += item.MinRank.Color + item.Name + "&s, ";
-                    }
-                }
-                player.Message("&sInfo Commands:");
-                if (output.EndsWith(", ")) player.Message(output.Remove(output.Length - 2) + ".");
-                else player.Message("There are no commands in this category available to your rank.");
-            } else if (param.ToLower() == "maintenance") {
-                Array items = CommandManager.GetCommands(player.Info.Rank, false);
-                string output = "";
-                foreach (CommandDescriptor item in items) {
-                    if (item.Category == CommandCategory.Maintenance) {
-                        output += item.MinRank.Color + item.Name + "&s, ";
-                    }
-                }
-                player.Message("&sMaintenance Commands:");
-                if (output.EndsWith(", ")) player.Message(output.Remove(output.Length - 2) + ".");
-                else player.Message("There are no commands in this category available to your rank.");
-            } else if (param.ToLower() == "moderation" || param.ToLower() == "mod" || param.ToLower() == "administration" ||
-                       param.ToLower() == "admin") {
-                Array items = CommandManager.GetCommands(player.Info.Rank, false);
-                string output = "";
-                foreach (CommandDescriptor item in items) {
-                    if (item.Category == CommandCategory.Moderation) {
-                        output += item.MinRank.Color + item.Name + "&s, ";
-                    }
-                }
-                player.Message("&sModeration Commands:");
-                if (output.EndsWith(", ")) player.Message(output.Remove(output.Length - 2) + ".");
-                else player.Message("There are no commands in this category available to your rank.");
-            } else if (param.ToLower() == "worldcontrol" || param.ToLower() == "world" || param.ToLower() == "zones") {
-                Array items = CommandManager.GetCommands(player.Info.Rank, false);
-                string output = "";
-                foreach (CommandDescriptor item in items) {
-                    if (item.Category == CommandCategory.World || item.Category == CommandCategory.Zone) {
-                        output += item.MinRank.Color + item.Name + "&s, ";
-                    }
-                }
-                player.Message("&sWorldControl Commands:");
-                if (output.EndsWith(", ")) player.Message(output.Remove(output.Length - 2) + ".");
-                else player.Message("There are no commands in this category available to your rank.");
-            } else if (param.ToLower() == "new") {
-                Array items = CommandManager.GetCommands(player.Info.Rank, false);
-                string output = "";
-                foreach (CommandDescriptor item in items) {
-                    if (item.Category == CommandCategory.New) {
-                        output += item.MinRank.Color + item.Name + "&s, ";
-                    }
-                }
-                player.Message("&sNew Commands:");
-                if (output.EndsWith(", ")) player.Message(output.Remove(output.Length - 2) + ".");
-                else player.Message("There are no commands in this category available to your rank.");
-            } else if (param.ToLower() == "all") {
-                Array items = CommandManager.GetCommands(player.Info.Rank, false);
-                string output = "";
-                foreach (CommandDescriptor item in items) {
-                    output += item.MinRank.Color + item.Name + "&s, ";
-                }
-                player.Message("&sAll Commands:");
-                if (output.EndsWith(", ")) player.Message(output.Remove(output.Length - 2) + ".");
-                else player.Message("There are no commands in this category available to your rank.");
-            } else if (param.ToLower() == "alllong") {
-                Array items = CommandManager.GetCommands(false);
-                string output = "";
-                foreach (CommandDescriptor item in items) {
-                    output += item.MinRank.Color + item.Name + "&s, ";
-                }
-                player.Message("&sEvery Command:");
-                if (output.EndsWith(", ")) player.Message(output.Remove(output.Length - 2) + ".");
-                else player.Message("There are no commands in this category available to your rank.");
-            } else if (param.ToLower() == "hidden") {
-                Array items = CommandManager.GetCommands(true);
-                string output = "";
-                foreach (CommandDescriptor item in items) {
-                    output += item.MinRank.Color + item.Name + "&s, ";
-                }
-                player.Message("&sAll hidden Commands:");
-                if (output.EndsWith(", ")) player.Message(output.Remove(output.Length - 2) + ".");
-                else player.Message("There are no commands in this category available to your rank.");
-            } else {
+            CommandDescriptor[] cd;
+            CommandCategory category;
+            string prefix;
+            if (param == null) {
                 player.Message("&sCommand Categories:");
                 player.Message("&h    Building");
                 player.Message("&h    Chat");
@@ -1748,7 +1606,75 @@ namespace fCraft {
                 player.Message("&h    WorldControl");
                 player.Message("&h    New");
                 player.Message("&h    All");
+                return;
             }
+            if (param.StartsWith("*") && param.EndsWith("*")) {
+                Array items = CommandManager.GetCommands(player.Info.Rank, false);
+                string output = "";
+                foreach (CommandDescriptor item in items) {
+                    if (item.Name.ToLower().StartsWith(param.ToLower().Trim('*'))) {
+                        output += item.MinRank.Color + item.Name + "&s, ";
+                    }
+                }
+                player.Message("&sCommands starting with \"{0}\":", param.Trim('*'));
+                if (output.EndsWith(", "))
+                    player.Message(output.Remove(output.Length - 2) + ".");
+                else
+                    player.Message("There are no commands starting with \"{0}\"", param.Trim('*'));
+                return;
+            }
+            if (param.EndsWith("*")) {
+                Array items = CommandManager.GetCommands(player.Info.Rank, false);
+                string output = "";
+                foreach (CommandDescriptor item in items) {
+                    if (item.Name.ToLower().StartsWith(param.ToLower().Trim('*'))) {
+                        output += item.MinRank.Color + item.Name + "&s, ";
+                    }
+                }
+                player.Message("&sCommands starting with \"{0}\":", param.Trim('*'));
+                if (output.EndsWith(", "))
+                    player.Message(output.Remove(output.Length - 2) + ".");
+                else
+                    player.Message("There are no commands starting with \"{0}\"", param.Trim('*'));
+                return;
+            }
+            if (param.StartsWith("*")) {
+                Array items = CommandManager.GetCommands(player.Info.Rank, false);
+                string output = "";
+                foreach (CommandDescriptor item in items) {
+                    if (item.Name.ToLower().EndsWith(param.ToLower().Trim('*'))) {
+                        output += item.MinRank.Color + item.Name + "&s, ";
+                    }
+                }
+                player.Message("&sCommands ending with \"{0}\":", param.Trim('*'));
+                if (output.EndsWith(", "))
+                    player.Message(output.Remove(output.Length - 2) + ".");
+                else
+                    player.Message("There are no commands ending with \"{0}\"", param.Trim('*'));
+            }
+            if (param.StartsWith("@")) {
+                string rankName = param.Substring(1);
+                Rank rank = RankManager.FindRank(rankName);
+                if (rank == null) {
+                    player.MessageNoRank(rankName);
+                    return;
+                }
+                prefix = String.Format("Commands available to {0}&S", rank.ClassyName);
+                cd = CommandManager.GetCommands(rank, false);
+            } else if (param.Equals("all", StringComparison.OrdinalIgnoreCase)) {
+                prefix = "All commands";
+                cd = CommandManager.GetCommands();
+            } else if (param.Equals("hidden", StringComparison.OrdinalIgnoreCase)) {
+                prefix = "Hidden commands";
+                cd = CommandManager.GetCommands(true);
+            } else if (EnumUtil.TryComplete(param, out category, true)) {
+                prefix = String.Format("{0} commands", category);
+                cd = CommandManager.GetCommands(category, false);
+            } else {
+                CdCommands.PrintUsage(player);
+                return;
+            }
+            player.MessagePrefixed("&S  ", "{0}: {1}", prefix, cd.JoinToClassyString());
         }
 
         #endregion
@@ -1758,7 +1684,7 @@ namespace fCraft {
         {
             Name = "TopTime",
             Aliases = new[] { "tt" },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Info,
             IsConsoleSafe = true,
             Usage = "/TopTime [Rank] [Offset]",
             Help = "Lists all players in order of their total time played",
@@ -1831,7 +1757,7 @@ namespace fCraft {
         {
             Name = "TopRankReason",
             Aliases = new[] { "trr" },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Info,
             Permissions = new[] { Permission.ViewOthersInfo },
             IsConsoleSafe = true,
             Usage = "/Trr [Rank] [Offset]",
@@ -1908,7 +1834,7 @@ namespace fCraft {
         {
             Name = "TopBanReason",
             Aliases = new[] { "tbr" },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Info,
             Permissions = new[] { Permission.ViewOthersInfo },
             IsConsoleSafe = true,
             Usage = "/Tbr [Rank] [Offset]",
@@ -1985,7 +1911,7 @@ namespace fCraft {
         {
             Name = "TopUnBanReason",
             Aliases = new[] { "tubr" },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Info,
             Permissions = new[] { Permission.ViewOthersInfo },
             IsConsoleSafe = true,
             Usage = "/Tubr [Rank] [Offset]",
@@ -2062,7 +1988,7 @@ namespace fCraft {
         {
             Name = "TopKickReason",
             Aliases = new[] { "tkr" },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Info,
             Permissions = new[] { Permission.ViewOthersInfo },
             IsConsoleSafe = true,
             Usage = "/Tkr [Rank] [Offset]",
@@ -2139,7 +2065,7 @@ namespace fCraft {
         {
             Name = "TopPromoters",
             Aliases = new[] { "toppros", "topp" },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Info,
             IsConsoleSafe = true,
             Usage = "/TopPromoters [Rank] [Offset]",
             Help = "Lists all players in order of how many players they promoted",
@@ -2215,7 +2141,7 @@ namespace fCraft {
         {
             Name = "TopDemoters",
             Aliases = new[] { "topdemos", "td" },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Info,
             IsConsoleSafe = true,
             Usage = "/TopDemoters [Rank] [Offset]",
             Help = "Lists all players in order of how pany players they have demoted",
@@ -2291,7 +2217,7 @@ namespace fCraft {
         {
             Name = "ListRank",
             Aliases = new[] { "lr", "listrankplayers", "lrp", "listr" },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Info,
             IsConsoleSafe = true,
             Usage = "/Listr [Rank] [Offset]",
             Help = "Lists all players of a certain rank",
@@ -2331,7 +2257,7 @@ namespace fCraft {
         {
             Name = "PreviousRank",
             Aliases = new[] { "pr", "Listpreviousrank", "lpr", "listpr" },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Info,
             IsConsoleSafe = true,
             Usage = "/Lprp [Rank] [Offset]",
             Help = "Lists all players who previously had that certain rank.",
@@ -2372,7 +2298,7 @@ namespace fCraft {
             Name = "GriefCheck",
             Aliases = new[] { "gc" },
             Permissions = new[] { Permission.Ban },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Info,
             IsConsoleSafe = true,
             Usage = "/GriefCheck [Rank] [TimeSpan] [Offset]",
             Help = "Lists all players that have a negative build:delete ratio and have not yet been banned.",
@@ -2468,7 +2394,7 @@ namespace fCraft {
             Name = "BuildCheck",
             Aliases = new[] { "bc" },
             Permissions = new[] { Permission.Ban },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Info,
             IsConsoleSafe = true,
             Usage = "/BuildCheck [Rank] [Offset]",
             Help = "Lists all players in order of their build:delete ratio.",
@@ -2551,7 +2477,7 @@ namespace fCraft {
         {
             Name = "Colors",
             Aliases = new[] { "color" },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Info,
             IsConsoleSafe = true,
             UsableByFrozenPlayers = true,
             Usage = "/Colors [Color]",
@@ -2844,7 +2770,7 @@ namespace fCraft {
         static readonly CommandDescriptor CdIPInfo = new CommandDescriptor {
             Name = "ExtraInfo",
             Aliases = new[] { "info2", "ei", "i2" },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Info,
             IsConsoleSafe = true,
             Usage = "/ExtraInfo [PlayerName or IP [Offset]]",
             Help = "Prints the extra information about a given player",
@@ -3028,7 +2954,7 @@ namespace fCraft {
         static readonly CommandDescriptor CdGeoip = new CommandDescriptor {
             Name = "geoip",
             Aliases = new[] { "geoinfo", "ipinfo", "geo", "ip" },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Info,
             IsConsoleSafe = true,
             Usage = "/GeoInfo [PlayerName or IP [Offset]]",
             Help = "Prints the extra information about a given player",
@@ -3192,7 +3118,7 @@ namespace fCraft {
         static readonly CommandDescriptor CdGeoipNp = new CommandDescriptor {
             Name = "geoipnonplayer",
             Aliases = new[] { "geonpinfo", "ipnpinfo", "geonp", "ipnp" },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Info,
             IsConsoleSafe = true,
             Usage = "/GeoNPInfo IP",
             Help = "Prints the geoinfo about the specified IP address",
@@ -3247,7 +3173,7 @@ namespace fCraft {
         static readonly CommandDescriptor CdApiPlayer = new CommandDescriptor {
             Name = "apiplayer",
             Aliases = new[] { "apip"},
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Info,
             IsConsoleSafe = true,
             Usage = "/apip playername",
             Help = "Prints the api information about a player using classicube api",
@@ -3316,7 +3242,7 @@ namespace fCraft {
         static readonly CommandDescriptor CdApiID = new CommandDescriptor {
             Name = "apiid",
             Aliases = new[] { "apid" },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Info,
             IsConsoleSafe = true,
             Usage = "/apid id",
             Help = "Prints the api information about a player id using classicube api",
@@ -3432,7 +3358,7 @@ namespace fCraft {
         {
             Name = "Seen",
             Aliases = new[] { "whowas" },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Info,
             IsConsoleSafe = true,
             Usage = "/Seen [PlayerName or IP [Offset]]",
             Help = "Prints the extra information about a given player",
@@ -3642,7 +3568,7 @@ namespace fCraft {
             Name = "ClosestPlayer",
             Aliases = new[] { "clp" },
             Permissions = new[] { Permission.Chat },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Info,
             Help = "Tells you who is closest to you, and how many blocks away they are.",
             Handler = clpHandler
         };

@@ -178,6 +178,7 @@ namespace fCraft {
         /// <summary> Creates a new RemoveEntity (0x0C) packet. </summary>
         /// <param name="id"> Entity ID. </param>
         public static Packet MakeRemoveEntity( sbyte id ) {
+            Logger.Log(LogType.Debug, "Send: MakeRemoveEntity({0})", id);
             Packet packet = new Packet( OpCode.RemoveEntity );
             packet.Bytes[1] = (byte)id;
             return packet;
@@ -388,7 +389,7 @@ namespace fCraft {
         }
 
         [Pure]
-        public static Packet MakeChangeModel( byte entityId, [NotNull] string modelName ) {
+        public static Packet MakeChangeModel( byte entityId, [NotNull] string modelName) {
             if( modelName == null ) throw new ArgumentNullException( "modelName" );
             //Logger.Log(LogType.Debug, "Send: MakeChangeModel({0}, {1})", entityId, modelName);
             Packet packet = new Packet( OpCode.ChangeModel );
@@ -438,7 +439,7 @@ namespace fCraft {
             if (skinName == null)
                 throw new ArgumentNullException("skinName");
             Packet packet = new Packet(OpCode.ExtAddEntity2);
-            //Logger.Log(LogType.Debug, "Send: MakeExtAddEntity2({0}, {1}, {2}, {3})", (byte)((byte)(entityId) - 128), inGameName, skinName, spawnPosition.ToString());
+            Logger.Log(LogType.Debug, "Send: MakeExtAddEntity2({0}, {1}, {2}, {3})", (byte)((byte)(entityId) - 128), inGameName, skinName, spawnPosition.ToString());
             packet.Bytes[1] = (byte) entityId;
             Encoding.ASCII.GetBytes(inGameName.PadRight(64), 0, 64, packet.Bytes, 2);
             Encoding.ASCII.GetBytes(skinName.PadRight(64), 0, 64, packet.Bytes, 66);

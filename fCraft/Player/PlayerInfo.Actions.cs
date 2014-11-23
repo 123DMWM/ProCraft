@@ -789,6 +789,10 @@ namespace fCraft {
                 // ensure copy slot consistency
                 target.MaxCopySlots = target.Info.Rank.CopySlots;
 
+                if (target.SupportsClickDistance) {
+                    target.Send(Packet.MakeSetClickDistance((target.World.maxReach < ReachDistance && !Can(Permission.ReadStaffChat)) ? target.World.maxReach : ReachDistance));
+                }
+
                 // inform the player of the rank change
                 target.Message( "You were {0} to {1}&S by {2}",
                                 verbed,

@@ -248,118 +248,105 @@ namespace fCraft {
 
             // load environment settings
             XElement envEl = el.Element(EnvironmentXmlTagName);
-            if (envEl != null)
-            {
-                if ((tempAttr = envEl.Attribute("cloud")) != null)
-                {
-                    try
-                    {
+            if (envEl != null) {
+                if ((tempAttr = envEl.Attribute("cloud")) != null) {
+                    try {
                         world.CloudColor = tempAttr.Value;
-                    }
-                    catch
-                    {
+                    } catch {
                         world.CloudColor = null;
                         Logger.Log(LogType.Warning,
-                                    "WorldManager: Could not parse \"cloud\" attribute of Environment settings for world \"{0}\", assuming default (normal).",
-                                    worldName);
+                            "WorldManager: Could not parse \"cloud\" attribute of Environment settings for world \"{0}\", assuming default (normal).",
+                            worldName);
                     }
                 }
-                if ((tempAttr = envEl.Attribute("fog")) != null)
-                {
-                    try
-                    {
+                if ((tempAttr = envEl.Attribute("fog")) != null) {
+                    try {
                         world.FogColor = tempAttr.Value;
-                    }
-                    catch
-                    {
+                    } catch {
                         world.FogColor = null;
                         Logger.Log(LogType.Warning,
-                                    "WorldManager: Could not parse \"fog\" attribute of Environment settings for world \"{0}\", assuming default (normal).",
-                                    worldName);
+                            "WorldManager: Could not parse \"fog\" attribute of Environment settings for world \"{0}\", assuming default (normal).",
+                            worldName);
                     }
                 }
-                if ((tempAttr = envEl.Attribute("sky")) != null)
-                {
-                    try
-                    {
+                if ((tempAttr = envEl.Attribute("sky")) != null) {
+                    try {
                         world.SkyColor = tempAttr.Value;
-                    }
-                    catch
-                    {
+                    } catch {
                         world.SkyColor = null;
                         Logger.Log(LogType.Warning,
-                                    "WorldManager: Could not parse \"sky\" attribute of Environment settings for world \"{0}\", assuming default (normal).",
-                                    worldName);
+                            "WorldManager: Could not parse \"sky\" attribute of Environment settings for world \"{0}\", assuming default (normal).",
+                            worldName);
                     }
                 }
-                if ((tempAttr = envEl.Attribute("shadow")) != null)
-                {
-                    try
-                    {
+                if ((tempAttr = envEl.Attribute("shadow")) != null) {
+                    try {
                         world.ShadowColor = tempAttr.Value;
-                    }
-                    catch
-                    {
+                    } catch {
                         world.ShadowColor = null;
                         Logger.Log(LogType.Warning,
-                                    "WorldManager: Could not parse \"shadow\" attribute of Environment settings for world \"{0}\", assuming default (normal).",
-                                    worldName);
+                            "WorldManager: Could not parse \"shadow\" attribute of Environment settings for world \"{0}\", assuming default (normal).",
+                            worldName);
                     }
                 }
-                if ((tempAttr = envEl.Attribute("light")) != null)
-                {
-                    try
-                    {
+                if ((tempAttr = envEl.Attribute("light")) != null) {
+                    try {
                         world.LightColor = tempAttr.Value;
-                    }
-                    catch
-                    {
+                    } catch {
                         world.LightColor = null;
                         Logger.Log(LogType.Warning,
-                                    "WorldManager: Could not parse \"light\" attribute of Environment settings for world \"{0}\", assuming default (normal).",
-                                    worldName);
+                            "WorldManager: Could not parse \"light\" attribute of Environment settings for world \"{0}\", assuming default (normal).",
+                            worldName);
                     }
                 }
-                if ((tempAttr = envEl.Attribute("water")) != null)
-                {
+                if ((tempAttr = envEl.Attribute("water")) != null) {
                     Block block;
-                    try
-                    {
+                    try {
                         Map.GetBlockByName(tempAttr.Value, false, out block);
                         world.HorizonBlock = block;
-                    }
-                    catch
-                    {
+                    } catch {
                         world.HorizonBlock = Block.Water;
                         Logger.Log(LogType.Warning,
-                                    "WorldManager: Could not parse \"Water\" attribute of Environment settings for world \"{0}\", assuming default (water).",
-                                    worldName);
+                            "WorldManager: Could not parse \"Water\" attribute of Environment settings for world \"{0}\", assuming default (water).",
+                            worldName);
                     }
                 }
-                if ((tempAttr = envEl.Attribute("bedrock")) != null)
-                {
+                if ((tempAttr = envEl.Attribute("bedrock")) != null) {
                     Block block;
-                    try
-                    {
+                    try {
                         Map.GetBlockByName(tempAttr.Value, false, out block);
                         world.EdgeBlock = block;
-                    }
-                    catch
-                    {
+                    } catch {
                         world.EdgeBlock = Block.Admincrete;
                         Logger.Log(LogType.Warning,
-                                    "WorldManager: Could not parse \"bedrock\" attribute of Environment settings for world \"{0}\", assuming default (admincrete).",
-                                    worldName);
+                            "WorldManager: Could not parse \"bedrock\" attribute of Environment settings for world \"{0}\", assuming default (admincrete).",
+                            worldName);
                     }
                 }
-                if ((tempAttr = envEl.Attribute("level")) != null)
-                {
-                    if (!short.TryParse(tempAttr.Value, out world.EdgeLevel))
-                    {
-                        world.EdgeLevel = (short)(world.map.Height / 2);
+                if ((tempAttr = envEl.Attribute("level")) != null) {
+                    if (!short.TryParse(tempAttr.Value, out world.EdgeLevel)) {
+                        world.EdgeLevel = (short) (world.map.Height/2);
                         Logger.Log(LogType.Warning,
-                                    "WorldManager: Could not parse \"level\" attribute of Environment settings for world \"{0}\", assuming default (normal).",
-                                    worldName);
+                            "WorldManager: Could not parse \"level\" attribute of Environment settings for world \"{0}\", assuming default (normal).",
+                            worldName);
+                    }
+                }
+                if ((tempAttr = envEl.Attribute("terrain")) != null) {
+                    try {
+                        world.Texture = tempAttr.Value;
+                    } catch {
+                        world.Texture = "http://108.49.194.95/terrain/64xDefaultTerrain.png";
+                        Logger.Log(LogType.Warning,
+                            "WorldManager: Could not parse \"texture\" attribute of Environment settings for world \"{0}\", assuming default (normal).",
+                            worldName);
+                    }
+                }
+                if ((tempAttr = envEl.Attribute("maxreach")) != null) {
+                    if (!short.TryParse(tempAttr.Value, out world.maxReach)) {
+                        world.EdgeLevel = 160;
+                        Logger.Log(LogType.Warning,
+                            "WorldManager: Could not parse \"maxreach\" attribute of Environment settings for world \"{0}\", assuming default (normal 160).",
+                            worldName);
                     }
                 }
             }
@@ -633,6 +620,8 @@ namespace fCraft {
                     elEnv.Add(new XAttribute("level", world.EdgeLevel));
                     if (world.HorizonBlock != Block.Water) elEnv.Add(new XAttribute("water", world.HorizonBlock));
                     if (world.EdgeBlock != Block.Admincrete) elEnv.Add(new XAttribute("bedrock", world.EdgeBlock));
+                    if (world.Texture != null) elEnv.Add(new XAttribute("terrain", world.Texture));
+                    elEnv.Add(new XAttribute("maxreach", world.maxReach));
                     if( elEnv.HasAttributes ) {
                         temp.Add( elEnv );
                     }

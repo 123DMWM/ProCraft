@@ -490,7 +490,7 @@ namespace fCraft {
         #region Save
         static readonly CommandDescriptor CdSave = new CommandDescriptor {
             Name = "Save",
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Maintenance,
             IsConsoleSafe = true,
             Help = "Saves all possible databases",
             Permissions = new[] { Permission.EditPlayerDB },
@@ -978,7 +978,7 @@ namespace fCraft {
         #region Nick
         static readonly CommandDescriptor CdNick = new CommandDescriptor {
             Name = "Nick",
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Maintenance,
             Permissions = new[] { Permission.EditPlayerDB },
             IsConsoleSafe = true,
             Help = "Quick changes your displayed name.",
@@ -1039,7 +1039,7 @@ namespace fCraft {
         static readonly CommandDescriptor CdDEFCON = new CommandDescriptor
         {
             Name = "SetDefcon",
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Maintenance,
             Permissions = new[] { Permission.ChangeDefconLevel },
             IsConsoleSafe = true,
             Help = "&4WIP!!! &hChanges the servers defence condition, which affects how it detects grief and spam.",
@@ -1161,7 +1161,7 @@ namespace fCraft {
         static readonly CommandDescriptor CdDEFCONLVL = new CommandDescriptor {
             Name = "Defcon",
             Aliases = new[] { "defconlvl", "dl" },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Maintenance,
             IsHidden = true,
             IsConsoleSafe = true,
             Help = "Tells you what the servers DEFCON level currently is",

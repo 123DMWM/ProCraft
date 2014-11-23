@@ -135,7 +135,7 @@ namespace fCraft {
         {
             Name = "Func",
             Aliases = new string[] { "fu" },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Building,
             Permissions = new Permission[] { Permission.DrawAdvanced },
             RepeatableSelection = true,
             Help =
@@ -150,7 +150,7 @@ namespace fCraft {
         {
             Name = "FuncSurf",
             Aliases = new string[] { "fus" },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Building,
             Permissions = new Permission[] { Permission.DrawAdvanced },
             RepeatableSelection = true,
             Help =
@@ -165,7 +165,7 @@ namespace fCraft {
         {
             Name = "FuncFill",
             Aliases = new string[] { "fuf" },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Building,
             Permissions = new Permission[] { Permission.DrawAdvanced },
             RepeatableSelection = true,
             Help =
@@ -181,7 +181,7 @@ namespace fCraft {
         {
             Name = "Ineq",
             Aliases = new string[] { "ie" },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Building,
             Permissions = new Permission[] { Permission.DrawAdvanced },
             RepeatableSelection = true,
             Help =
@@ -197,7 +197,7 @@ namespace fCraft {
         {
             Name = "Eq",
             Aliases = new string[] { },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Building,
             Permissions = new Permission[] { Permission.DrawAdvanced },
             RepeatableSelection = true,
             Help =
@@ -213,7 +213,7 @@ namespace fCraft {
         {
             Name = "SetCoordParm",
             Aliases = new string[] { "SetCP", "scp" },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Building,
             Permissions = new Permission[] { Permission.DrawAdvanced },
             RepeatableSelection = true,
             Help =
@@ -229,7 +229,7 @@ namespace fCraft {
         {
             Name = "SetParamIter",
             Aliases = new string[] { "SetPI", "spi" },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Building,
             Permissions = new Permission[] { Permission.DrawAdvanced },
             RepeatableSelection = true,
             Help =
@@ -245,7 +245,7 @@ namespace fCraft {
         {
             Name = "StartParmDraw",
             Aliases = new string[] { "StartPD", "spd" },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Building,
             Permissions = new Permission[] { Permission.DrawAdvanced },
             RepeatableSelection = true,
             Help =
@@ -259,7 +259,7 @@ namespace fCraft {
         {
             Name = "ClearParmDraw",
             Aliases = new string[] { "ClearPD", "cpd" },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Building,
             Permissions = new Permission[] { Permission.DrawAdvanced },
             RepeatableSelection = true,
             Help =
@@ -607,7 +607,7 @@ namespace fCraft {
         {
             Name = "SetFont",
             Aliases = new[] { "FontSet", "Font", "Sf" },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Building,
             Permissions = new Permission[] { Permission.Draw },
             IsConsoleSafe = false,
             Help = "Sets the properties for /Write, such as: font and size",
@@ -726,7 +726,7 @@ namespace fCraft {
         {
             Name = "Draw2D",
             Aliases = new[] { "D2d" },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Building,
             Permissions = new Permission[] { Permission.DrawAdvanced },
             RepeatableSelection = true,
             Help = "/Draw2D, then select a shape (Polygon, spiral, star). You can then choose a size in blocks " +
@@ -849,7 +849,7 @@ namespace fCraft {
         {
             Name = "Write",
             Aliases = new[] { "Text", "Wt" },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Building,
             Permissions = new Permission[] { Permission.Draw },
             RepeatableSelection = true,
             IsConsoleSafe = false,
@@ -932,7 +932,7 @@ namespace fCraft {
         static readonly CommandDescriptor CdTree = new CommandDescriptor
         {
             Name = "Tree",
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Building,
             Permissions = new[] { Permission.Draw },
             Usage = "/Tree Shape Height",
             Help = "Plants a tree of given shape and height. Available shapes: Normal, Bamboo and Palm. Cone, Round, Rainforest, Mangrove",
@@ -1007,7 +1007,7 @@ namespace fCraft {
             Name = "Walls",
             IsConsoleSafe = false,
             RepeatableSelection = true,
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Building,
             IsHidden = false,
             Permissions = new[] { Permission.Draw },
             Help = "Fills a rectangular area of walls",
@@ -1024,7 +1024,7 @@ namespace fCraft {
         {
             Name = "Place",
             Aliases = new[] { "distanceplace", "displace", "dp" },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Building,
             Permissions = new[] { Permission.Draw },
             Usage = "/Place [block] [distance away]",
             Help = "Places a block a certain distance away from where you are, in the direction you are looking",
@@ -1166,7 +1166,7 @@ namespace fCraft {
         {
             Name = "Center",
             Aliases = new[] { "Centre" },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Building,
             Permissions = new[] { Permission.Build },
             RepeatableSelection = true,
             Usage = "/Center",
@@ -1453,7 +1453,7 @@ namespace fCraft {
         static readonly CommandDescriptor CdGrass = new CommandDescriptor
         {
             Name = "Grass",
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Building,
             Aliases = new[] { "g" },
             Permissions = new[] { Permission.Build },
             Usage = "/Grass On/Off",
@@ -1724,7 +1724,7 @@ namespace fCraft {
         static readonly CommandDescriptor CdReplaceAll = new CommandDescriptor {
             Name = "ReplaceAll",
             Aliases = new[] { "ra" },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Building,
             Permissions = new[] { Permission.Draw },
             RepeatableSelection = true,
             Usage = "/Replace BlockToReplace [AnotherOne, ...] ReplacementBlock",
@@ -1775,7 +1775,7 @@ namespace fCraft {
         static readonly CommandDescriptor CdReplaceNotBrush = new CommandDescriptor {
             Name = "ReplaceNotBrush",
             Aliases = new[] { "rnb" },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Building,
             Permissions = new[] { Permission.Draw, Permission.DrawAdvanced },
             RepeatableSelection = true,
             Usage = "/ReplaceNotBrush Block BrushName [Params]",
@@ -2523,7 +2523,7 @@ namespace fCraft {
         static readonly CommandDescriptor CdMarkAll = new CommandDescriptor {
             Name = "MarkAll",
             Aliases = new[] { "ma", },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Building,
             Help = "When making a selection (for drawing or zoning) use this to mark the whole world.",
             Handler = MarkAllHandler
         };
@@ -3000,7 +3000,7 @@ namespace fCraft {
         {
             Name = "MazeCuboid",
             Aliases = new string[] { "Mc", "Mz", "Maze" },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Building,
             Permissions = new Permission[] { Permission.DrawAdvanced },
             RepeatableSelection = true,
             Help =
@@ -3030,7 +3030,7 @@ namespace fCraft {
         {
             Name = "DrawImage",
             Aliases = new[] { "Drawimg", "Imgdraw", "ImgPrint", "DI" },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Building,
             Permissions = new[] { Permission.DrawAdvanced },
             Usage = "/DrawImage SomeWebsite.com/picture.png [Palette]",
             Help = "Downloads and draws an image, using minecraft blocks. " +
@@ -3117,7 +3117,7 @@ namespace fCraft {
         {
             Name = "ctest",
             Permissions = new[] { Permission.Chat },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Building,
             Help = "Tells you information about our custom texture pack.",
             Handler = textureHandler
         };
@@ -3155,7 +3155,7 @@ namespace fCraft {
         #region snake
         private static readonly CommandDescriptor CdSnake = new CommandDescriptor {
             Name = "Snake",
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Building,
             Permissions = new[] { Permission.DrawAdvanced },
             RepeatableSelection = true,
             Usage = "/Snake (Length) [Block]",

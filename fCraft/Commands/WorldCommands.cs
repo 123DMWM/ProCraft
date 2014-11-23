@@ -52,6 +52,7 @@ namespace fCraft {
             CommandManager.RegisterCommand( Cdweather );
             CommandManager.RegisterCommand( CdReJoin );
             CommandManager.RegisterCommand( CdSLE );
+            CommandManager.RegisterCommand( CdMRD );
         }
         #region BlockDB
 
@@ -544,7 +545,7 @@ namespace fCraft {
 
         static readonly CommandDescriptor CdEnv = new CommandDescriptor {
             Name = "Env",
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.World,
             Permissions = new[] { Permission.ManageWorlds },
             Help = "Prints or changes the environmental variables for a given world. " +
                    "Variables are: clouds, fog, sky, level, edge. " +
@@ -1370,7 +1371,7 @@ namespace fCraft {
         static readonly CommandDescriptor CdSuicide = new CommandDescriptor
         {
             Name = "Suicide",
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.World | CommandCategory.Chat,
             Aliases = new[] { "Kill", "DoABackFlip", "ThanksObama", "ErraBodyDoTheFlop" },
             Help = "Tells the world of your sad ending. Now with the ability to add a note!",
             Usage = "/Suicide <Note>",
@@ -1415,7 +1416,7 @@ namespace fCraft {
             Name = "ReachDistance",
             Aliases = new[] { "Reach", "rd" },
             Permissions = new[] { Permission.EditPlayerDB },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.World,
             Help = "Changes player reach distance. Every 32 is one block. Default: 160",
             Usage = "/reach [Player] [distance or reset]",
             Handler = ClickDistanceHandler
@@ -1534,12 +1535,12 @@ namespace fCraft {
             Name = "Entity",
             Aliases = new[] { "AddEntity", "AddEnt", "Ent" },
             Permissions = new[] { Permission.BringAll },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.World,
             IsConsoleSafe = false,
             Usage = "/ent <create / remove / removeAll / model / list / bring>",
             Help = "Commands for manipulating entities. For help and usage for the individual options, use /help ent <option>.",
             HelpSections = new Dictionary<string, string>{
-                { "create", "&H/Ent create <entity name> <model>\n&S" +
+                { "create", "&H/Ent create <entity name> <model> <skin>\n&S" +
                                 "Creates a new entity with the given name. Valid models are chicken, creeper, croc, human, pig, printer, sheep, skeleton, spider, zombie, or any block ID/Name." },
                 { "remove", "&H/Ent remove <entity name>\n&S" +
                                 "Removes the given entity." },
@@ -1623,12 +1624,12 @@ namespace fCraft {
                         return;
                     }
 
-
+                    string skinString1 = cmd.Next();
                     Bot botCreate = new Bot();
-                    botCreate.setBot(botName, player.World, player.Position, getNewID());
+                    botCreate.setBot(botName, skinString1, player.World, player.Position, getNewID());
                     botCreate.createBot();
-                    botCreate.changeBotModel(requestedModel);
-                    player.Message("Successfully created entity {0}&s with id:{1}.", botCreate.Name, botCreate.ID);
+                    botCreate.changeBotModel(requestedModel, skinString1);
+                    player.Message("Successfully created entity {0}&s with id:{1} and skin {2}.", botCreate.Name, botCreate.ID, skinString1 ?? bot.Name);
                     break;
                 case "remove":
                     player.Message("{0} was removed from the server.", bot.Name);
@@ -1637,6 +1638,7 @@ namespace fCraft {
                 case "model":
                     if (cmd.HasNext) {
                         string model = cmd.Next().ToLower();
+                        string skinString2 = cmd.Next();
                         if (string.IsNullOrEmpty(model)) {
                             player.Message(
                                 "Usage is /Ent model <bot> <model>. Valid models are chicken, creeper, croc, human, pig, printer, sheep, skeleton, spider, zombie, or any block ID/Name.");
@@ -1656,14 +1658,19 @@ namespace fCraft {
                             }
                         }
 
-                        player.Message("Changed entity model to {0}.", model);
-                        bot.changeBotModel(model);
+                        player.Message("Changed entity model to {0} with skin {1}.", model, skinString2 ?? bot.SkinName);
+                        bot.changeBotModel(model, skinString2 ?? bot.SkinName);
                     } else
                     player.Message(
                         "Usage is /Ent model <bot> <model>. Valid models are chicken, creeper, croc, human, pig, printer, sheep, skeleton, spider, zombie, or any block ID/Name.");
                     break;
                 case "bring":
                     bot.teleportBot(player.Position);
+                    break;
+                case "skin":
+                    string skinString3 = cmd.Next();
+                    player.Message("Changed entity skin to {0}.", skinString3 ?? bot.Name);
+                    bot.changeBotSkin(skinString3);
                     break;
                 default:
                     CdEntity.PrintUsage(player);
@@ -1691,7 +1698,7 @@ namespace fCraft {
             Name = "texture",
             Aliases = new[] { "texturepack", "tex" },
             Permissions = new[] { Permission.Chat },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Chat,
             Help = "Tells you information about our custom texture pack.",
             Handler = textureHandler
         };
@@ -1714,7 +1721,7 @@ namespace fCraft {
             Name = "rejoin",
             Aliases = new[] { "rj" },
             Permissions = new[] { Permission.Chat },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.World,
             Help = "Forces you to rejoin the world. Some commands require this if certain things change.",
             Handler = rejoinHandler
         };
@@ -1942,7 +1949,7 @@ namespace fCraft {
         {
             Name = "weather",
             Permissions = new[] { Permission.EditPlayerDB },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.World,
             Help = "Changes player weather ingame",
             Usage = "/weather [Player] [weather]",
             Handler = WeatherHandler
@@ -2995,7 +3002,7 @@ namespace fCraft {
         {
             Name = "WorldClear",
             Aliases = new[] { "wclear" },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.World,
             Permissions = new[] { Permission.ManageWorlds },
             Usage = "/WClear",
             Help = "Used to clear a map",
@@ -3449,7 +3456,7 @@ namespace fCraft {
         {
             Name = "WorldClearSave",
             Aliases = new[] { "wcs" },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.World,
             Permissions = new[] { Permission.ManageWorlds },
             Usage = "/WCS",
             Help = "Saves a map copy to be used with /WClear",
@@ -3809,7 +3816,7 @@ namespace fCraft {
         static readonly CommandDescriptor CdCTF = new CommandDescriptor
         {
             Name = "ctf",
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.World,
             Permissions = new Permission[] { Permission.ReadStaffChat },
             IsConsoleSafe = false,
             IsHidden = true,
@@ -4098,7 +4105,7 @@ namespace fCraft {
         static readonly CommandDescriptor CdSLE = new CommandDescriptor {
             Name = "SkyLightEmulator",
             Aliases = new[] { "SLE" },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.World,
             Permissions = new[] { Permission.ManageWorlds },
             Help =
                 "Toggles whether or not to emulate sky color based on time in a world",
@@ -4152,6 +4159,48 @@ namespace fCraft {
                 }
             }
         }
+        #endregion
+
+        #region MaxReachDistance
+        static readonly CommandDescriptor CdMRD = new CommandDescriptor {
+            Name = "MaxReachDistance",
+            Aliases = new[] { "MaxReach", "MRD" },
+            Category = CommandCategory.New | CommandCategory.World,
+            Permissions = new[] { Permission.ManageWorlds },
+            Help ="Changes the max reachdistance for a world",
+            Usage = "/MRD [Distance] (world)",
+            Handler = MRDHandler
+        };
+
+        private static void MRDHandler([NotNull] Player player, [NotNull] CommandReader cmd) {
+            string disString = cmd.Next();
+            if (disString == null) {
+                player.Message(CdMRD.Usage);
+                return;
+            }
+            string worldString = cmd.Next();
+            short distance = 160;
+            World world = player.World;
+            if (!short.TryParse(disString, out distance)) {
+                if (disString.ToLower().Equals("normal") || disString.ToLower().Equals("reset") ||
+                    disString.ToLower().Equals("default")) {
+                    distance = 160;
+                } else {
+                    player.Message("Invalid distance!");
+                    return;
+                }
+            }
+            if (worldString != null) {
+                world = WorldManager.FindWorldOrPrintMatches(player, worldString);
+                if (world == null) {
+                    return;
+                }
+            }
+            player.Message("&sSet max reach distance for world &f{0}&s to &f{1} &s(&f{2}&s blocks)", world.ClassyName, distance, distance / 32);
+            world.maxReach = distance;
+
+        }
+
         #endregion
     }
 }

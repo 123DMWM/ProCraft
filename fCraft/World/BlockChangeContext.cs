@@ -37,5 +37,8 @@ namespace fCraft {
 
         /// <summary> Redone self using /redo. </summary>
         Redone = 512,
+
+        /// <summary> Exploded using tnt. </summary>
+        Exploded = 1024,
     }
 }

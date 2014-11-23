@@ -33,6 +33,12 @@ namespace fCraft {
         public String Name;
 
         /// <summary>
+        /// Name of the bot. 
+        /// </summary>
+        public String SkinName;
+        public String oldSkinName;
+
+        /// <summary>
         /// Current world the bot is on.
         /// </summary>
         public World World;
@@ -50,6 +56,7 @@ namespace fCraft {
         /// <summary>
         /// Current model of the bot
         /// </summary>
+        public string oldModel = "humanoid";
         public string Model = "humanoid";
 
 
@@ -58,8 +65,9 @@ namespace fCraft {
         /// <summary>
         /// Sets a bot, as well as the bot values. Must be called before any other bot classes.
         /// </summary>
-        public void setBot(String botName, World botWorld, Position pos, sbyte entityID) {
+        public void setBot(String botName, String skinName, World botWorld, Position pos, sbyte entityID) {
             Name = botName;
+            SkinName =  (skinName ?? SkinName);
             World = botWorld;
             Position = pos;
             ID = entityID;
@@ -71,8 +79,15 @@ namespace fCraft {
         /// Creates only the bot entity, not the bot data. Bot data is created from setBot.
         /// </summary>
         public void createBot() {
-            World.Players.Send(Packet.MakeAddEntity(ID, Name,
-                new Position(Position.X, Position.Y, Position.Z, Position.R, Position.L)));
+            foreach (Player sendTo in World.Players) {
+                if (sendTo.SupportsExtPlayerList2) {
+                    sendTo.Send(Packet.MakeExtAddEntity2(ID, Name, (SkinName ?? Name),
+                        new Position(Position.X, Position.Y, Position.Z, Position.R, Position.L)));
+                } else {
+                    sendTo.Send(Packet.MakeAddEntity(ID, Name,
+                        new Position(Position.X, Position.Y, Position.Z, Position.R, Position.L)));
+                }
+            }
         }
 
         /// <summary>
@@ -80,6 +95,7 @@ namespace fCraft {
         /// </summary>
         public void teleportBot(Position p) {
             World.Players.Send(Packet.MakeTeleport(ID, p));
+            Position = p;
         }
 
         /// <summary>
@@ -94,7 +110,7 @@ namespace fCraft {
         /// <summary>
         /// Changes the model of the bot
         /// </summary>
-        public void changeBotModel(String botModel) {
+        public void changeBotModel(String botModel, String skinName) {
             Block blockModel;
             if (!WorldCommands.validEntities.Contains(botModel)) {
                 if (Map.GetBlockByName(botModel, false, out blockModel)) {
@@ -106,6 +122,14 @@ namespace fCraft {
 
             World.Players.Send(Packet.MakeChangeModel((byte) ID, botModel));
             Model = botModel;
+            SkinName = skinName;
+        }
+
+        /// <summary>
+        /// Changes the skin of the bot
+        /// </summary>
+        public void changeBotSkin(String skinName) {
+            SkinName = skinName;
         }
 
         #endregion

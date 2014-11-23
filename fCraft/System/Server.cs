@@ -1319,8 +1319,6 @@ namespace fCraft {
                         Server.Players.CanSee(player).Message("&S{0} is now AFK (Auto)", player.Name);
                         player.Info.IsAFK = true;
                         Server.UpdateTabList();
-                        player.Info.TempMob = player.Info.Mob;
-                        player.Info.Mob = "chicken";
                         player.Message("You have " + TimeLeft.ToMiniString() +
                                        " left before you get kicked for being AFK");
                     } else {
@@ -1339,7 +1337,6 @@ namespace fCraft {
                     player.Info.TotalTime = player.Info.TotalTime - player.IdBotTime;
                     player.Info.IsAFK = false;
                     Server.UpdateTabList();
-                    player.Info.Mob = player.Info.TempMob;
                     player.ResetIdBotTimer(); // to prevent kick from firing more than once
                 }
             }
@@ -1352,7 +1349,7 @@ namespace fCraft {
             for (int i = 0; i < tempPlayerList.Length; i++)
             {
                 Player player = tempPlayerList[i];
-                if (!player.SupportsExtPlayerList) continue;
+                if (!player.SupportsExtPlayerList && !player.SupportsExtPlayerList2) continue;
                 var canBeSeen = Players.Where(a => player.CanSee(a)).ToArray();
                 var canBeSeenW = player.World.Players.Where(a => player.CanSee(a)).ToArray();
                 if (!player.IsPlayingCTF)
@@ -1874,16 +1871,15 @@ namespace fCraft {
                 if( player.World != null ) {
                     player.World.ReleasePlayer( player );
                 }
-                foreach (Player p1 in Server.Players)
+                foreach (Player p1 in Players)
                 {
-                    if (p1.SupportsExtPlayerList)
+                    if (p1.SupportsExtPlayerList || p1.SupportsExtPlayerList2)
                     {
                         p1.Send(Packet.MakeExtRemovePlayerName(player.NameID));
                     }
                 }
                 PlayerIndex.Remove( player );
                 player.Info.IsAFK = false;
-                player.Info.Mob = player.Info.TempMob;
                 UpdatePlayerList();
                 UpdateTabList();
             }
@@ -1892,7 +1888,7 @@ namespace fCraft {
 
         internal static void UpdateTabList() {
             foreach (Player p1 in Players) {
-                if (!p1.SupportsExtPlayerList) continue;
+                if (!p1.SupportsExtPlayerList && !p1.SupportsExtPlayerList2) continue;
                 var canBeSeen = Server.Players.Where(i => p1.CanSee(i)).ToArray();
                 var canBeSeenW = p1.World.Players.Where(i => p1.CanSee(i)).ToArray();
                 if (!p1.IsPlayingCTF)

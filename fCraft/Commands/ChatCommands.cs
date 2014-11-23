@@ -172,7 +172,7 @@ namespace fCraft
         {
             Name = "StaffSay",
             Aliases = new[] { "sts" },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Chat,
             IsConsoleSafe = true,
             NotRepeatable = true,
             DisableLogging = true,
@@ -219,7 +219,7 @@ namespace fCraft
         {
             Name = "Review",
             Aliases = new[] { "rvw" },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Chat,
             Permissions = new[] { Permission.Chat },
             NotRepeatable = true,
             DisableLogging = true,
@@ -253,7 +253,7 @@ namespace fCraft
         static readonly CommandDescriptor Cdchat = new CommandDescriptor
         {
             Name = "chat",
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Chat,
             Permissions = new[] { Permission.ShutdownServer},
             NotRepeatable = true,
             DisableLogging = true,
@@ -288,7 +288,6 @@ namespace fCraft
                 {
                     Server.Players.CanSee(e.Player).Message("&S{0} is no longer AFK", e.Player.Name);
                     e.Player.Message("&SYou are no longer AFK");
-                    e.Player.Info.Mob = e.Player.Info.TempMob;
                     e.Player.Info.IsAFK = false;
                     Server.UpdateTabList();
                     e.Player.ResetIdBotTimer();
@@ -300,7 +299,7 @@ namespace fCraft
         static readonly CommandDescriptor CdAFK = new CommandDescriptor
         {
             Name = "AFK",
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Chat,
             Aliases = new[] { "away" },
             Usage = "/afk [optional message]",
             Help = "Shows an AFK message.",
@@ -320,7 +319,6 @@ namespace fCraft
                 Server.Players.CanSee(player).Message("&S{0} is no longer AFK", player.Name);
                 Server.UpdateTabList();
                 player.Message("&SYou are no longer AFK");
-                p.Mob = p.TempMob;
                 player.Info.IsAFK = false;
                 Server.UpdateTabList();
                 player.ResetIdBotTimer();
@@ -331,8 +329,6 @@ namespace fCraft
                     {
                         Server.Players.CanSee(player).Message("&S{0} is now AFK ({1})", player.Name, msg);
                         player.Message("&SYou are now AFK ({0})", msg);
-                        p.TempMob = p.Mob;
-                        p.Mob = "chicken";
                         player.Info.IsAFK = true;
                         Server.UpdateTabList();
                     }
@@ -344,8 +340,6 @@ namespace fCraft
                 {
                     Server.Players.CanSee(player).Message("&S{0} is now AFK", player.Name);
                     player.Message("&SYou are now AFK");
-                    p.TempMob = p.Mob;
-                    p.Mob = "chicken";
                     player.Info.IsAFK = true;
                     Server.UpdateTabList();
                 }     
@@ -603,7 +597,7 @@ namespace fCraft
         static readonly CommandDescriptor CdIRC = new CommandDescriptor
         {
             Name = "IRC",
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Chat,
             Permissions = new[] { Permission.Chat },
             IsConsoleSafe = true,
             Help = "Turns IRC On or Off.",
@@ -714,7 +708,7 @@ namespace fCraft
         {
             Name = "Mail",
             Aliases = new[] { "MailOwners" },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Chat,
             Usage = "/Mail <Message>",
             Help = "Used to leave a message only the Highest Rank can read.\n" +
                    "Things to talk about: \n"+
@@ -763,7 +757,7 @@ namespace fCraft
             Aliases = new[] { "lm" },
             Permissions = new[] { Permission.ShutdownServer },
             IsConsoleSafe = true,
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Chat,
             Usage = "/ListMail",
             Help = "Use this command to list/remove reports from players",
 
@@ -989,7 +983,7 @@ namespace fCraft
             Name = "filters",
             Aliases = new[] { "filterlist", "fl" },
             IsConsoleSafe = true,
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Chat,
             Usage = "/filters",
             Help = "Lists all words that are replaced with their replacment word.",
             Handler = SwearsHandler
@@ -1090,7 +1084,7 @@ namespace fCraft
         {
             Name = "Quit",
             Aliases = new[] { "quitmessage", "quitmsg", "qm" },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Chat,
             IsConsoleSafe = false,
             Permissions = new[] { Permission.Chat },
             Usage = "/Quitmsg [message]",
@@ -1123,7 +1117,7 @@ namespace fCraft
         static readonly CommandDescriptor CdRBChat = new CommandDescriptor
         {
             Name = "RainbowChat",
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Chat,
             Aliases = new[] { "rainbowch", "rbchat", "rbch", "rc" },
             Permissions = new[] { Permission.UseColorCodes },
             IsConsoleSafe = true,
@@ -1192,7 +1186,7 @@ namespace fCraft
             Name = "Greet",
             Aliases = new[] { "greeting", "welcome" },
             Permissions = new[] { Permission.Chat },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Chat,
             Help = "Sends a message welcoming the last player to join the server.",
             Handler = greetHandler
         };
@@ -1224,7 +1218,7 @@ namespace fCraft
         static readonly CommandDescriptor CdLdis = new CommandDescriptor {
             Name = "Compare",
             Aliases = new[] { "similarity", "similar", "sim" },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Chat,
             Permissions = new[] { Permission.Chat },
             IsConsoleSafe = true,
             DisableLogging = true,
@@ -1252,7 +1246,7 @@ namespace fCraft
         static readonly CommandDescriptor CdtextHotKey = new CommandDescriptor {
             Name = "TextHotKey",
             Aliases = new[] { "HotKey", "thk", "hk" },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Chat,
             Permissions = new[] { Permission.ReadStaffChat },
             Usage = "/TextHotKey [Label] [Action] [KeyCode] [KeyMods]",
             Help = "Sets up TextHotKeys. Use http://minecraftwiki.net/Key_Codes for keycodes",
@@ -1294,7 +1288,7 @@ namespace fCraft
 
         static readonly CommandDescriptor Cdbrushes = new CommandDescriptor {
             Name = "Brushes",
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Chat,
             Permissions = new[] { Permission.DrawAdvanced },
             Usage = "/brushes",
             Help = "Lists all available brushes",
@@ -1309,7 +1303,7 @@ namespace fCraft
         #region GlobalChat
         static readonly CommandDescriptor CdGlobal = new CommandDescriptor {
             Name = "Global",
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Chat,
             Aliases = new[] { "gl" },
             IsConsoleSafe = true,
             Permissions = new[] { Permission.Chat },
@@ -1422,7 +1416,7 @@ namespace fCraft
         static readonly CommandDescriptor CdIdea = new CommandDescriptor {
             Name = "Idea",
             Aliases = new[] { "buildideas", "ideas"  },
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Chat,
             Permissions = new[] { Permission.Chat },
             IsConsoleSafe = true,
             Help = "Gives random building idea",
@@ -1490,7 +1484,7 @@ namespace fCraft
 
         static readonly CommandDescriptor CdAction = new CommandDescriptor {
             Name = "Action",
-            Category = CommandCategory.New,
+            Category = CommandCategory.New | CommandCategory.Chat,
             Permissions = new[] { Permission.Chat },
             IsConsoleSafe = true,
             NotRepeatable = true,
