@@ -265,9 +265,17 @@ namespace fCraft {
             }
             string model = cmd.Next();
             string skinString = cmd.Next();
+            PlayerInfo[] p2 = PlayerDB.FindPlayers(namePart);
             PlayerInfo p = PlayerDB.FindPlayerInfoOrPrintMatches(player, namePart, SearchOptions.IncludeSelf);
-            if (p == null || !p.IsOnline) {
-                player.Message("Player not found or offline!");
+            if (p2.Length > 1) {
+                return;
+            }
+            if (p == null) {
+                player.Message("Player not found!");
+                return;
+            }
+            if (!p.IsOnline) {
+                player.Message("Player is offline!");
                 return;
             }
             if (!validEntities.Contains(model)) {
@@ -298,7 +306,10 @@ namespace fCraft {
             }
             p.oldMob = p.Mob;
             p.Mob = model;
-            p.skinName = (skinString ?? p.skinName);
+            if (skinString != null) {
+                p.oldskinName = p.skinName;
+                p.skinName = skinString;
+            }
         }
 
         static readonly CommandDescriptor CdChangeSkin = new CommandDescriptor {

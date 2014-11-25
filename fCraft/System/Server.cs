@@ -1316,17 +1316,14 @@ namespace fCraft {
 
                 if (player.IdBotTime.ToSeconds()%300 == 0 && player.IdBotTime.ToSeconds() >= 300) {
                     if (player.Info.IsAFK == false) {
-                        Server.Players.CanSee(player).Message("&S{0} is now AFK (Auto)", player.Name);
+                        Players.CanSee(player).Message("&S{0} is now AFK (Auto)", player.Name);
                         player.Info.IsAFK = true;
-                        Server.UpdateTabList();
-                        player.Message("You have " + TimeLeft.ToMiniString() +
-                                       " left before you get kicked for being AFK");
-                    } else {
-                        player.Info.IsAFK = true;
-                        Server.UpdateTabList();
-                        player.Message("You have " + TimeLeft.ToMiniString() +
-                                       " left before you get kicked for being AFK");
+                        player.Info.oldafkMob = player.Info.afkMob;
+                        player.Info.afkMob = "chicken";
+
                     }
+                    UpdateTabList();
+                    player.Message("You have " + TimeLeft.ToMiniString() + " left before being kicked for idleing");
                 }
 
                 if (player.IdBotTime.Minutes >= player.Info.Rank.IdleKickTimer) {
@@ -1336,7 +1333,9 @@ namespace fCraft {
                     player.Kick(Player.Console, kickReason, LeaveReason.IdleKick, false, true, false);
                     player.Info.TotalTime = player.Info.TotalTime - player.IdBotTime;
                     player.Info.IsAFK = false;
-                    Server.UpdateTabList();
+                    player.Info.oldafkMob = player.Info.afkMob;
+                    player.Info.afkMob = player.Info.Mob;
+                    UpdateTabList();
                     player.ResetIdBotTimer(); // to prevent kick from firing more than once
                 }
             }
@@ -1889,7 +1888,7 @@ namespace fCraft {
         internal static void UpdateTabList() {
             foreach (Player p1 in Players) {
                 if (!p1.SupportsExtPlayerList && !p1.SupportsExtPlayerList2) continue;
-                var canBeSeen = Server.Players.Where(i => p1.CanSee(i)).ToArray();
+                var canBeSeen = Players.Where(i => p1.CanSee(i)).ToArray();
                 var canBeSeenW = p1.World.Players.Where(i => p1.CanSee(i)).ToArray();
                 if (!p1.IsPlayingCTF)
                 {

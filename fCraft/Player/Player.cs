@@ -284,6 +284,15 @@ namespace fCraft {
                 return;
             }
 
+            if (!rawMessage.ToLower().StartsWith("/afk") && Info.IsAFK) {
+                Server.Players.CanSee(this).Message("&S{0} is no longer AFK", this.Name);
+                Message("&SYou are no longer AFK");
+                Info.IsAFK = false;
+                Info.oldafkMob = Info.afkMob;
+                Info.afkMob = Info.Mob;
+                Server.UpdateTabList();
+            }
+
             if( partialMessage != null ) {
                 rawMessage = partialMessage + rawMessage;
                 partialMessage = null;
@@ -327,13 +336,6 @@ namespace fCraft {
                         }
 
                         Chat.SendGlobal( this, rawMessage );
-                        if (this.Info.IsAFK == true)
-                        {
-                            this.Info.IsAFK = false;
-                            Server.UpdateTabList();
-                            Server.Players.CanSee(this).Message("&S{0} is no longer AFK", this.Name);
-                            this.Message("&SYou are no longer AFK");
-                        }
                     } break;
 
 
@@ -366,12 +368,6 @@ namespace fCraft {
                             selectionRepeatCommand = cmd;
                         }
                         SendToSpectators(cmd.RawMessage);
-                        if (this.Info.IsAFK == true && rawMessage.ToLower().StartsWith("/afk") == false) {
-                            this.Info.IsAFK = false;
-                            Server.UpdateTabList();
-                            Server.Players.CanSee(this).Message("&S{0} is no longer AFK", this.Name);
-                            this.Message("&SYou are no longer AFK");
-                        }
                         CommandManager.ParseCommand(this, cmd, fromConsole);
                         if (!commandDescriptor.NotRepeatable) {
                             LastCommand = cmd;
@@ -395,13 +391,6 @@ namespace fCraft {
                             Message( "Repeat: {0}", LastCommand.RawMessage );
                             SendToSpectators( LastCommand.RawMessage );
                             CommandManager.ParseCommand( this, LastCommand, fromConsole );
-                            if (this.Info.IsAFK == true && LastCommand.RawMessage.ToLower().StartsWith("/afk") == false)
-                            {
-                                this.Info.IsAFK = false;
-                                Server.UpdateTabList();
-                                Server.Players.CanSee(this).Message("&S{0} is no longer AFK", this.Name);
-                                this.Message("&SYou are no longer AFK");
-                            }
                         }
                     } break;
 
@@ -557,13 +546,6 @@ namespace fCraft {
                         else
                         {
                             MessageNow("There is no command to confirm.");
-                        }
-                        if (this.Info.IsAFK == true)
-                        {
-                            this.Info.IsAFK = false;
-                            Server.UpdateTabList();
-                            Server.Players.CanSee(this).Message("&S{0} is no longer AFK", this.Name);
-                            this.Message("&SYou are no longer AFK");
                         }
                     }
                     break;
@@ -2076,35 +2058,58 @@ namespace fCraft {
             WebClient client = new WebClient();
             Stream stream;
             try {
-                stream = client.OpenRead("http://geo.liamstanley.io/xml/" + ip);
+                stream = client.OpenRead("http://freegeoip.net/xml/" + ip);
+                stream.ReadTimeout = (int) new TimeSpan(0, 0, 0, 5).ToMilliSeconds();
+                StreamReader reader = new StreamReader(stream);
+                String content = reader.ReadToEnd();
+
+                XmlReaderSettings set = new XmlReaderSettings();
+                set.ConformanceLevel = ConformanceLevel.Fragment;
+
+                XPathDocument doc = new XPathDocument(XmlReader.Create(new StringReader(content), set));
+
+                XPathNavigator nav = doc.CreateNavigator();
+                string geoip;
+                info.GeoIP = nav.SelectSingleNode("/Response/IP").ToString();
+                info.CountryCode = nav.SelectSingleNode("/Response/CountryCode").ToString();
+                info.CountryName = nav.SelectSingleNode("/Response/CountryName").ToString();
+                info.RegionCode = nav.SelectSingleNode("/Response/RegionCode").ToString();
+                info.RegionName = nav.SelectSingleNode("/Response/RegionName").ToString();
+                info.City = nav.SelectSingleNode("/Response/City").ToString();
+                info.ZipCode = nav.SelectSingleNode("/Response/ZipCode").ToString();
+                info.TimeZone = nav.SelectSingleNode("/Response/TimeZone").ToString();
+                info.Latitude = nav.SelectSingleNode("/Response/Latitude").ToString();
+                info.Longitude = nav.SelectSingleNode("/Response/Longitude").ToString();
+                info.MetroCode = nav.SelectSingleNode("/Response/MetroCode").ToString();
             } catch {
                 try {
-                    stream = client.OpenRead("http://freegeoip.net/xml/" + ip);
+                    stream = client.OpenRead("http://geo.liamstanley.io/xml/" + ip);
+                    stream.ReadTimeout = (int) new TimeSpan(0, 0, 0, 5).ToMilliSeconds();
+                    StreamReader reader = new StreamReader(stream);
+                    String content = reader.ReadToEnd();
+
+                    XmlReaderSettings set = new XmlReaderSettings();
+                    set.ConformanceLevel = ConformanceLevel.Fragment;
+
+                    XPathDocument doc = new XPathDocument(XmlReader.Create(new StringReader(content), set));
+
+                    XPathNavigator nav = doc.CreateNavigator();
+                    string geoip;
+                    info.GeoIP = nav.SelectSingleNode("/Response/Ip").ToString();
+                    info.CountryCode = nav.SelectSingleNode("/Response/CountryCode").ToString();
+                    info.CountryName = nav.SelectSingleNode("/Response/CountryName").ToString();
+                    info.RegionCode = nav.SelectSingleNode("/Response/RegionCode").ToString();
+                    info.RegionName = nav.SelectSingleNode("/Response/RegionName").ToString();
+                    info.City = nav.SelectSingleNode("/Response/City").ToString();
+                    info.ZipCode = nav.SelectSingleNode("/Response/ZipCode").ToString();
+                    info.Latitude = nav.SelectSingleNode("/Response/Latitude").ToString();
+                    info.Longitude = nav.SelectSingleNode("/Response/Longitude").ToString();
+                    info.MetroCode = nav.SelectSingleNode("/Response/MetroCode").ToString();
+                    info.AreaCode = nav.SelectSingleNode("/Response/AreaCode").ToString();
                 } catch {
                     return;
                 }
             }
-            StreamReader reader = new StreamReader( stream );
-            String content = reader.ReadToEnd();
-
-            XmlReaderSettings set = new XmlReaderSettings();
-            set.ConformanceLevel = ConformanceLevel.Fragment;
-
-            XPathDocument doc = new XPathDocument( XmlReader.Create( new StringReader( content ), set ) );
-
-            XPathNavigator nav = doc.CreateNavigator();
-            string geoip;
-            info.GeoIP = nav.SelectSingleNode( "/Response/Ip" ).ToString();
-            info.CountryCode = nav.SelectSingleNode( "/Response/CountryCode" ).ToString();
-            info.CountryName = nav.SelectSingleNode( "/Response/CountryName" ).ToString();
-            info.RegionCode = nav.SelectSingleNode( "/Response/RegionCode" ).ToString();
-            info.RegionName = nav.SelectSingleNode( "/Response/RegionName" ).ToString();
-            info.City = nav.SelectSingleNode( "/Response/City" ).ToString();
-            info.ZipCode = nav.SelectSingleNode( "/Response/ZipCode" ).ToString();
-            info.Latitude = nav.SelectSingleNode( "/Response/Latitude" ).ToString();
-            info.Longitude = nav.SelectSingleNode( "/Response/Longitude" ).ToString();
-            info.MetroCode = nav.SelectSingleNode( "/Response/MetroCode" ).ToString();
-            info.AreaCode = nav.SelectSingleNode( "/Response/AreaCode" ).ToString();
             Server.Players.CanSee(info.PlayerObject).Message( "&2Player &f{0}&2 comes from {1}, {2}", info.ClassyName, info.RegionName, info.CountryName );
             if (!info.IsHidden) {
                 IRC.SendChannelMessage("&2Player &f{0}&2 comes from {1}, {2}", info.ClassyName, info.RegionName,

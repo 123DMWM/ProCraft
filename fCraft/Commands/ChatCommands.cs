@@ -8,6 +8,7 @@ using System.Runtime.ExceptionServices;
 using fCraft;
 using fCraft.Drawing;
 using fCraft.Events;
+using Microsoft.Win32;
 
 namespace fCraft
 {
@@ -275,74 +276,51 @@ namespace fCraft
         #endregion
         #region AFK
 
-        public static void Player_IsBack(object sender, Events.PlayerMovedEventArgs e)
-        {
-            if (e.Player.Info.IsAFK)
-            {
-                // We need to have block positions, so we divide by 32
-                Vector3I oldPos = new Vector3I(e.OldPosition.X / 32, e.OldPosition.Y / 32, e.OldPosition.Z / 32);
-                Vector3I newPos = new Vector3I(e.NewPosition.X / 32, e.NewPosition.Y / 32, e.NewPosition.Z / 32);
+        public static void Player_IsBack(object sender, Events.PlayerMovedEventArgs e) {
+            // We need to have block positions, so we divide by 32
+            Vector3I oldPos = new Vector3I(e.OldPosition.X/32, e.OldPosition.Y/32, e.OldPosition.Z/32);
+            Vector3I newPos = new Vector3I(e.NewPosition.X/32, e.NewPosition.Y/32, e.NewPosition.Z/32);
 
-                // Check if the player actually moved and not just rotated
-                if ((oldPos.X != newPos.X) || (oldPos.Y != newPos.Y) || (oldPos.Z != newPos.Z))
-                {
+            // Check if the player actually moved and not just rotated
+            if ((oldPos.X != newPos.X) || (oldPos.Y != newPos.Y) || (oldPos.Z != newPos.Z)) {
+                if (e.Player.Info.IsAFK) {
                     Server.Players.CanSee(e.Player).Message("&S{0} is no longer AFK", e.Player.Name);
                     e.Player.Message("&SYou are no longer AFK");
                     e.Player.Info.IsAFK = false;
-                    Server.UpdateTabList();
-                    e.Player.ResetIdBotTimer();
+                    e.Player.Info.oldafkMob = e.Player.Info.afkMob;
+                    e.Player.Info.afkMob = e.Player.Info.Mob;
                 }
+                Server.UpdateTabList();
+                e.Player.ResetIdBotTimer();
             }
-            //InfoCommands.NearestPlayerTo(e.Player);
         }
 
         static readonly CommandDescriptor CdAFK = new CommandDescriptor
         {
             Name = "AFK",
             Category = CommandCategory.New | CommandCategory.Chat,
-            Aliases = new[] { "away" },
+            Aliases = new[] { "away", "awayfromkeyboard" },
             Usage = "/afk [optional message]",
             Help = "Shows an AFK message.",
             Handler = AFKHandler
         };
 
-        static void AFKHandler(Player player, CommandReader cmd)
-        {
-            string msg = cmd.NextAll().Trim();
-            PlayerInfo p = PlayerDB.FindPlayerInfoOrPrintMatches(player, player.Name, SearchOptions.IncludeSelf);
-            if (player.Info.IsMuted)
-            {
+        private static void AFKHandler(Player player, CommandReader cmd) {
+            string msg = cmd.NextAll();
+            if (player.Info.IsMuted) {
                 player.MessageMuted();
                 return;
             }
-            if (player.Info.IsAFK) {
-                Server.Players.CanSee(player).Message("&S{0} is no longer AFK", player.Name);
-                Server.UpdateTabList();
-                player.Message("&SYou are no longer AFK");
-                player.Info.IsAFK = false;
-                Server.UpdateTabList();
-                player.ResetIdBotTimer();
-            }
-            else
-                if (msg.Length > 0)
-                    if (msg.Length <= 32)
-                    {
-                        Server.Players.CanSee(player).Message("&S{0} is now AFK ({1})", player.Name, msg);
-                        player.Message("&SYou are now AFK ({0})", msg);
-                        player.Info.IsAFK = true;
-                        Server.UpdateTabList();
-                    }
-                    else
-                    {
-                        player.Message("Message cannot be more than 32 spaces. Yours was: " + cmd.NextAll().Length);
-                    }
-                else
-                {
-                    Server.Players.CanSee(player).Message("&S{0} is now AFK", player.Name);
-                    player.Message("&SYou are now AFK");
-                    player.Info.IsAFK = true;
-                    Server.UpdateTabList();
-                }     
+            Server.Players.CanSee(player)
+                .Message("&S{0} is {1} AFK{2}", player.Name, player.Info.IsAFK ? "no longer" : "now",
+                msg.Length > 0 ? " (" + (msg.Length > 32 ? msg.Remove(32) : msg) + ")" : "");
+            player.Message("&SYou are {0} AFK {1}", player.Info.IsAFK ? "no longer" : "now",
+                msg.Length > 0 ? " (" + (msg.Length > 32 ? msg.Remove(32) : msg) + ")" : "");
+            player.Info.IsAFK = !player.Info.IsAFK;
+            player.Info.oldafkMob = player.Info.afkMob;
+            player.Info.afkMob = player.Info.IsAFK ? "chicken" : player.Info.Mob;
+            Server.UpdateTabList();
+            player.ResetIdBotTimer();
         }
 
         #endregion

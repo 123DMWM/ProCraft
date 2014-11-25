@@ -365,6 +365,8 @@ namespace fCraft {
 
         public string oldMob = "Humanoid";
         public string Mob = "Humanoid";
+        public string oldafkMob = "Humanoid";
+        public string afkMob = "Humanoid";
         public string oldskinName;
         public string skinName;
         
@@ -429,6 +431,8 @@ namespace fCraft {
         public string City;
         /// <summary> Players zipcode based on geoip</summary>
         public string ZipCode;
+        /// <summary> Players time zone based on geoip</summary>
+        public string TimeZone;
         /// <summary> Players latitude based on geoip</summary>
         public string Latitude;
         /// <summary> Players longitude based on geoip</summary>
@@ -763,6 +767,8 @@ namespace fCraft {
                 info.MetroCode = fields[78];
             if (fields.Length > 79)
                 info.AreaCode = fields[79];
+            if (fields.Length > 80)
+                info.TimeZone = fields[80];
 
             if( info.LastSeen < info.FirstLoginDate ) {
                 info.LastSeen = info.FirstLoginDate;
@@ -1273,7 +1279,9 @@ namespace fCraft {
             sb.Append( ',' );
             sb.Append( MetroCode ); // 78
             sb.Append( ',' );
-            sb.Append( AreaCode ); // 79
+            sb.Append(AreaCode); // 79
+            sb.Append(',');
+            sb.Append(TimeZone); // 80
         }
 
         #endregion
