@@ -65,6 +65,16 @@ namespace fCraft {
         }
 
 
+
+        public static World FindMainWorld(Rank rank) {
+            World rankMain = rank.MainWorld;
+            if (rankMain != null) {
+                return rankMain;
+            }
+            return MainWorld;
+        }
+
+
         #region World List Saving/Loading
 
         static World firstWorld;

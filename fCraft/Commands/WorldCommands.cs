@@ -1571,12 +1571,18 @@ namespace fCraft {
                 return;
             }
             if (option.ToLower() == "removeall") {
-                tryagain:
-                World.Bots.ForEach(b => b.removeBot(player));
-                if (World.Bots.Count != 0) {
-                    goto tryagain;
+                if (cmd.IsConfirmed) {
+                    foreach (Bot b in World.Bots) {
+                        b.World.Players.Send(Packet.MakeRemoveEntity(b.ID));
+                        if (File.Exists("./Entities/" + b.Name.ToLower() + ".txt")) {
+                            File.Delete("./Entities/" + b.Name.ToLower() + ".txt");
+                        }
+                    }
+                    World.Bots.Clear();
+                    player.Message("All entities removed.");
+                } else {
+                    player.Confirm(cmd, "This will remove all the entites everywhere, are you sure?");
                 }
-                player.Message("All entities removed from the world.");
                 return;
             }
 
@@ -1626,14 +1632,13 @@ namespace fCraft {
 
                     string skinString1 = cmd.Next();
                     Bot botCreate = new Bot();
-                    botCreate.setBot(botName, skinString1, player.World, player.Position, getNewID());
+                    botCreate.setBot(botName, skinString1, requestedModel, player.World, player.Position, getNewID());
                     botCreate.createBot();
-                    botCreate.changeBotModel(requestedModel, skinString1);
                     player.Message("Successfully created entity {0}&s with id:{1} and skin {2}.", botCreate.Name, botCreate.ID, skinString1 ?? bot.Name);
                     break;
                 case "remove":
                     player.Message("{0} was removed from the server.", bot.Name);
-                    bot.removeBot(player);
+                    bot.removeBot();
                     break;
                 case "model":
                     if (cmd.HasNext) {
@@ -2026,7 +2031,8 @@ namespace fCraft {
                    "If the optional \"all\" is added, also shows inaccessible or hidden worlds. " +
                    "If \"hidden\" is added, shows only inaccessible and hidden worlds. " +
                    "If \"populated\" is added, shows only worlds with players online. " +
-                   "If a rank name is given, shows only worlds where players of that rank can build.",
+                   "If a rank name is given, shows only worlds where players of that rank can build." +
+                   "You can also search by world name using \"*\" as a wildcard(needed).",
             Handler = WorldsHandler
         };
 
@@ -2043,45 +2049,59 @@ namespace fCraft {
                 extraParam = "";
                 worlds = WorldManager.Worlds.Where( player.CanSee ).ToArray();
 
+            } else if (param[0].Equals('@')) {
+                if (param.Length == 1) {
+                    CdWorlds.PrintUsage(player);
+                    return;
+                }
+                string rankName = param.Substring(1);
+                Rank rank = RankManager.FindRank(rankName);
+                if (rank == null) {
+                    player.MessageNoRank(rankName);
+                    return;
+                }
+                listName = String.Format("worlds where {0}&S+ can build", rank.ClassyName);
+                extraParam = "@" + rank.Name + " ";
+                worlds = WorldManager.Worlds.Where(w => (w.BuildSecurity.MinRank <= rank) && player.CanSee(w)).ToArray();
+            } else if (param.EndsWith("*") && param.StartsWith("*")) {
+                listName = "worlds containing \"" + param.ToLower().Replace("*", "") + "\"";
+                extraParam = param.ToLower();
+                worlds = WorldManager.Worlds.Where(w => w.Name.ToLower().Contains(param.ToLower().Replace("*", ""))).ToArray();
+            } else if (param.EndsWith("*")) {
+                listName = "worlds starting with \"" + param.ToLower().Replace("*", "") + "\"";
+                extraParam = param.ToLower();
+                worlds = WorldManager.Worlds.Where(w => w.Name.ToLower().StartsWith(param.ToLower().Replace("*", ""))).ToArray();
+            } else if (param.StartsWith("*")) {
+                listName = "worlds ending with \"" + param.ToLower().Replace("*", "") + "\"";
+                extraParam = param.ToLower();
+                worlds = WorldManager.Worlds.Where(w => w.Name.ToLower().EndsWith(param.ToLower().Replace("*", ""))).ToArray();
             } else {
-                switch( Char.ToLower( param[0] ) ) {
-                    case 'a':
+                switch (param) {
+                    case "a":
+                    case "all":
                         listName = "worlds";
                         extraParam = "all ";
                         worlds = WorldManager.Worlds;
                         break;
-                    case 'h':
+                    case "h":
+                    case "hidden":
                         listName = "hidden worlds";
                         extraParam = "hidden ";
-                        worlds = WorldManager.Worlds.Where( w => !player.CanSee( w ) ).ToArray();
+                        worlds = WorldManager.Worlds.Where(w => !player.CanSee(w)).ToArray();
                         break;
-                    case 'p':
+                    case "p":
+                    case "popular":
+                    case "populated":
                         listName = "populated worlds";
                         extraParam = "populated ";
-                        worlds = WorldManager.Worlds.Where( w => w.Players.Any( player.CanSee ) ).ToArray();
-                        break;
-                    case '@':
-                        if( param.Length == 1 ) {
-                            CdWorlds.PrintUsage( player );
-                            return;
-                        }
-                        string rankName = param.Substring( 1 );
-                        Rank rank = RankManager.FindRank( rankName );
-                        if( rank == null ) {
-                            player.MessageNoRank( rankName );
-                            return;
-                        }
-                        listName = String.Format( "worlds where {0}&S+ can build", rank.ClassyName );
-                        extraParam = "@" + rank.Name + " ";
-                        worlds = WorldManager.Worlds.Where( w => (w.BuildSecurity.MinRank <= rank) && player.CanSee( w ) )
-                                                    .ToArray();
+                        worlds = WorldManager.Worlds.Where(w => w.Players.Any(player.CanSee)).ToArray();
                         break;
                     default:
-                        CdWorlds.PrintUsage( player );
+                        CdWorlds.PrintUsage(player);
                         return;
                 }
-                if( cmd.HasNext && !cmd.NextInt( out offset ) ) {
-                    CdWorlds.PrintUsage( player );
+                if (cmd.HasNext && !cmd.NextInt(out offset)) {
+                    CdWorlds.PrintUsage(player);
                     return;
                 }
             }
@@ -4160,7 +4180,6 @@ namespace fCraft {
             }
         }
         #endregion
-
         #region MaxReachDistance
         static readonly CommandDescriptor CdMRD = new CommandDescriptor {
             Name = "MaxReachDistance",

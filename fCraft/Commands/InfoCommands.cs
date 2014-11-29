@@ -1587,7 +1587,8 @@ namespace fCraft {
             UsableByFrozenPlayers = true,
             Usage = "/Commands [Category]",
             Help = "Shows a list of commands by category" +
-                   "Categories are: Building, Chat, Info, Maintenance, Moderation, New, World, Zone, New, and All.",
+                   "Categories are: Building, Chat, Info, Maintenance, Moderation, New, World, Zone, New, and All." +
+                   "You can also search by command name using \"*\" as a wildcard(needed).",
             Handler = CommandsHandler
         };
 

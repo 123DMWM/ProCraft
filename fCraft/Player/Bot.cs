@@ -19,6 +19,7 @@ THE SOFTWARE.*/
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -56,8 +57,8 @@ namespace fCraft {
         /// <summary>
         /// Current model of the bot
         /// </summary>
-        public string oldModel = "humanoid";
-        public string Model = "humanoid";
+        public String oldModel = "humanoid";
+        public String Model = "humanoid";
 
 
         #region Public Methods
@@ -65,14 +66,16 @@ namespace fCraft {
         /// <summary>
         /// Sets a bot, as well as the bot values. Must be called before any other bot classes.
         /// </summary>
-        public void setBot(String botName, String skinName, World botWorld, Position pos, sbyte entityID) {
+        public void setBot(String botName, String skinName, String modelName, World botWorld, Position pos, sbyte entityID) {
             Name = botName;
             SkinName =  (skinName ?? SkinName);
+            Model =  (modelName ?? Model);
             World = botWorld;
             Position = pos;
             ID = entityID;
 
             World.Bots.Add(this);
+            Server.SaveEntity(this);
         }
 
         /// <summary>
@@ -87,7 +90,11 @@ namespace fCraft {
                     sendTo.Send(Packet.MakeAddEntity(ID, Name,
                         new Position(Position.X, Position.Y, Position.Z, Position.R, Position.L)));
                 }
+                if (sendTo.SupportsChangeModel) {
+                    sendTo.Send(Packet.MakeChangeModel((byte)ID, Model));
+                }
             }
+            Server.SaveEntity(this);
         }
 
         /// <summary>
@@ -96,15 +103,18 @@ namespace fCraft {
         public void teleportBot(Position p) {
             World.Players.Send(Packet.MakeTeleport(ID, p));
             Position = p;
+            Server.SaveEntity(this);
         }
 
         /// <summary>
         /// Completely removes the entity and data of the bot.
         /// </summary>
-        public void removeBot(Player p) {
+        public void removeBot() {
             World.Players.Send(Packet.MakeRemoveEntity(ID));
             World.Bots.Remove(this);
-
+            if (File.Exists("./Entities/" + Name.ToLower() + ".txt")) {
+                File.Delete("./Entities/" + Name.ToLower() + ".txt");
+            }
         }
 
         /// <summary>
@@ -123,6 +133,7 @@ namespace fCraft {
             World.Players.Send(Packet.MakeChangeModel((byte) ID, botModel));
             Model = botModel;
             SkinName = skinName;
+            Server.SaveEntity(this);
         }
 
         /// <summary>
@@ -130,6 +141,7 @@ namespace fCraft {
         /// </summary>
         public void changeBotSkin(String skinName) {
             SkinName = skinName;
+            Server.SaveEntity(this);
         }
 
         #endregion

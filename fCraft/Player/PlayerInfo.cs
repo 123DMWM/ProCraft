@@ -770,6 +770,9 @@ namespace fCraft {
             if (fields.Length > 80)
                 info.TimeZone = fields[80];
 
+            if (fields.Length > 81)
+                info.skinName = fields[81];
+
             if( info.LastSeen < info.FirstLoginDate ) {
                 info.LastSeen = info.FirstLoginDate;
             }
@@ -1282,6 +1285,9 @@ namespace fCraft {
             sb.Append(AreaCode); // 79
             sb.Append(',');
             sb.Append(TimeZone); // 80
+
+            sb.Append(',');
+            sb.Append(skinName); // 81
         }
 
         #endregion

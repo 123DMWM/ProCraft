@@ -291,15 +291,20 @@ namespace fCraft {
                 IsUsingWoM = true;
                 return true;
             }
+            foreach (Char c in message) {
+                if (c < ' ' || c > '~') {
+                    message = message.Replace(c, ' ');
+                }
+            }
 
-            if( message.Any( t => t < ' ' || t > '~' ) ) {
+            /*if( message.Any( t => t < ' ' || t > '~' ) ) {
                 Logger.Log( LogType.SuspiciousActivity,
                             "Player.ParseMessage: {0} attempted to write illegal characters in chat and was kicked.",
                             Name );
                 Server.Message( "{0}&W was kicked for sending invalid chat.", ClassyName );
                 KickNow( "Illegal characters in chat.", LeaveReason.InvalidMessageKick );
                 return false;
-            }
+            }*/
 
             if((message.IndexOf('&') != -1) && (!(Can(Permission.UseColorCodes)))) {
                 message = Color.StripColors( message );
@@ -1235,8 +1240,10 @@ namespace fCraft {
                     goto retry;
                 }
             }
-            Info.oldskinName = Name;
-            Info.skinName = Name;
+            if (Info.skinName == null) {
+                Info.oldskinName = Info.skinName;
+                Info.skinName = Name;
+            }
             Server.UpdateTabList();
             System.Console.Beep();
             System.Console.Beep();
@@ -1542,15 +1549,17 @@ namespace fCraft {
 
             #endregion
 
-            foreach (Bot bot in World.Bots.Where(b => b.World == World)) {
+            foreach (Bot bot in World.Bots) {
                 Send(Packet.MakeRemoveEntity(bot.ID));
-                if (SupportsExtPlayerList2) {
-                    Send(Packet.MakeExtAddEntity2(bot.ID, bot.Name, (bot.SkinName ?? bot.Name), bot.Position, this));
-                } else {
-                    Send(Packet.MakeAddEntity(bot.ID, bot.Name, bot.Position));
-                }
-                if (bot.Model != "humanoid" && SupportsChangeModel) {
-                    Send(Packet.MakeChangeModel((byte) bot.ID, bot.Model));
+                if (bot.World == World) {
+                    if (SupportsExtPlayerList2) {
+                        Send(Packet.MakeExtAddEntity2(bot.ID, bot.Name, (bot.SkinName ?? bot.Name), bot.Position, this));
+                    } else {
+                        Send(Packet.MakeAddEntity(bot.ID, bot.Name, bot.Position));
+                    }
+                    if (bot.Model != "humanoid" && SupportsChangeModel) {
+                        Send(Packet.MakeChangeModel((byte) bot.ID, bot.Model));
+                    }
                 }
             }
             if (oldWorld == newWorld)
@@ -1826,31 +1835,41 @@ namespace fCraft {
             }
             for( int i = 0; i < worldPlayerList.Length; i++ ) {
                 Player otherPlayer = worldPlayerList[i];
-                if (!CanSee(otherPlayer))
-                    continue;
                 // Fetch or create a VisibleEntity object for the player
                 VisibleEntity entity;
-                if (entities.TryGetValue(otherPlayer, out entity)) {
-                    entity.MarkedForRetention = true;
-                } else {
-                    if (otherPlayer != this) {
-                        entity = AddEntity(otherPlayer);
+                if (!otherPlayer.CanSee(this))
+                    goto skip;
+                if (otherPlayer != this) {
+                    if (otherPlayer.entities.TryGetValue(this, out entity)) {
+                        entity.MarkedForRetention = true;
                     } else {
-                     entity = new VisibleEntity(Position,-1, Info.Rank);   
+                        entity = otherPlayer.AddEntity(this);
                     }
+                } else {
+                    entity = new VisibleEntity(Position, -1, Info.Rank);
                 }
                 if (Info.oldskinName != Info.skinName && otherPlayer.SupportsExtPlayerList2) {
-                    otherPlayer.Send(Packet.MakeExtAddEntity2(entity.Id, Name, Info.skinName ?? Name, WorldMap.Spawn, this));
-                    otherPlayer.Send(Packet.MakeTeleport(entity.Id, Position));
-                    
+                    otherPlayer.Send(Packet.MakeExtAddEntity2(entity.Id, Info.Rank.Color + Name, Info.skinName ?? Name, WorldMap.Spawn, otherPlayer));
+                    if (otherPlayer == this) {
+                        otherPlayer.Send(Packet.MakeTeleport(entity.Id, Position));
+                    }
+
                 }
                 if ((Info.oldMob != Info.Mob || Info.oldafkMob != Info.afkMob) && otherPlayer.SupportsChangeModel) {
                     otherPlayer.Send(Packet.MakeChangeModel((byte)entity.Id,
                         !Info.IsAFK ? Info.Mob : Info.afkMob));
                 }
+            skip:
 
                 if (otherPlayer == this) {
                     continue;
+                }
+                if (!CanSee(otherPlayer))
+                    continue;
+                if (entities.TryGetValue(otherPlayer, out entity)) {
+                    entity.MarkedForRetention = true;
+                } else {
+                    entity = AddEntity(otherPlayer);
                 }
 
                 Position otherPos = otherPlayer.Position;
@@ -1910,14 +1929,16 @@ namespace fCraft {
                 Logger.Log( LogType.Debug, "AddEntity: {0} added {1} ({2})", Name, newEntity.Id, player.Name );
 #endif
                 if (SupportsExtPlayerList2) {
-                    SendNow(Packet.MakeExtAddEntity2(newEntity.Id, player.Info.Rank.Color + player.Name,
+                    Send(Packet.MakeExtAddEntity2(newEntity.Id, player.Info.Rank.Color + player.Name,
                         (player.Info.skinName ?? player.Name), player.WorldMap.Spawn, this));
+                    Send(Packet.MakeTeleport(newEntity.Id, player.Position));
                 } else {
-                    SendNow(Packet.MakeAddEntity(newEntity.Id, player.Info.Rank.Color + player.Name,
+                    Send(Packet.MakeAddEntity(newEntity.Id, player.Info.Rank.Color + player.Name,
                         player.WorldMap.Spawn));
+                    Send(Packet.MakeTeleport(newEntity.Id, player.Position));
                 }
                 if (SupportsChangeModel) {
-                    SendNow(Packet.MakeChangeModel((byte)newEntity.Id, !player.Info.IsAFK ? player.Info.Mob : "Chicken"));
+                    Send(Packet.MakeChangeModel((byte)newEntity.Id, !player.Info.IsAFK ? player.Info.Mob : "Chicken"));
                 }
                 return newEntity;
             } else {
