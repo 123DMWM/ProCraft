@@ -121,11 +121,15 @@ namespace fCraft {
             if (GeoIP != LastIP.ToString()) {
                 Scheduler.NewBackgroundTask(GeoipLoginCallback).RunOnce(this, TimeSpan.Zero);
             } else {
-                Server.Players.CanSee(PlayerObject).Message( "&2Player &f{0}&2 comes from {1}, {2}", ClassyName, RegionName, CountryName );
-                if (!IsHidden) {
-                    IRC.SendChannelMessage("&2Player &f{0}&2 comes from {1}, {2}", ClassyName, RegionName, CountryName);
+                if (PlayerObject != null) {
+                    Server.Players.CanSee(PlayerObject)
+                        .Message("&2Player &f{0}&2 comes from {1}, {2}", ClassyName, RegionName, CountryName);
+                    if (!IsHidden) {
+                        IRC.SendChannelMessage("&2Player &f{0}&2 comes from {1}, {2}", ClassyName, RegionName,
+                            CountryName);
+                    }
+                    Logger.Log(LogType.UserActivity, "&f{0}&2 comes from {1}, {2}", ClassyName, RegionName, CountryName);
                 }
-                Logger.Log( LogType.UserActivity, "&f{0}&2 comes from {1}, {2}", ClassyName, RegionName, CountryName );
             }
         }
 

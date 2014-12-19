@@ -60,6 +60,8 @@ namespace fCraft
 
         const int MaxMessageSize = 510; // +2 bytes for CR-LF
 
+        static DateTime lastIrcCommand;
+
         /// <summary> Class represents an IRC connection/thread.
         /// There is an undocumented option (IRCThreads) to "load balance" the outgoing
         /// messages between multiple bots. If that's the case, several IrcThread objects
@@ -332,7 +334,6 @@ namespace fCraft
                             }
 
                             string processedMessage = ProcessMessageFromIRC(rawMessage);
-
                             if (processedMessage.Length > 0) {
                                 if (ConfigKey.IRCBotForwardFromIRC.Enabled()) {
                                     if (msg.Type == IRCMessageType.ChannelAction) {
@@ -343,89 +344,79 @@ namespace fCraft
                                         }
                                         Logger.Log(LogType.IrcChat, "{0}: * {1} {2}", msg.Channel, msg.Nick,
                                             IRCColorsAndNonStandardCharsExceptEmotes.Replace(rawMessage, ""));
-                                    } else {
-                                        if (rawMessage.ToLower() == "!players") {
-                                            var visiblePlayers =
-                                                Server.Players.Where(p => p.Info.IsHidden == false)
-                                                    .OrderBy(p => p.Name)
-                                                    .ToArray();
-                                            if (visiblePlayers.Count() > 0) {
-                                                SendChannelMessage("\u212C&SPlayers online: \u211C" +
-                                                                   visiblePlayers.JoinToRealString());
-                                            } else {
-                                                SendChannelMessage("\u212C&SThere are no players online.");
+                                    } else if (rawMessage.ToLower().StartsWith("!")) {
+                                        if (DateTime.Now.Subtract(lastIrcCommand).TotalSeconds > 5) {
+                                            if (rawMessage.ToLower() == "!players") {
+                                                var visiblePlayers =
+                                                    Server.Players.Where(p => p.Info.IsHidden == false)
+                                                        .OrderBy(p => p.Name)
+                                                        .ToArray();
+                                                if (visiblePlayers.Any()) {
+                                                    SendChannelMessage("\u212C&SPlayers online: \u211C" +
+                                                                       visiblePlayers.JoinToRealString());
+                                                    lastIrcCommand = DateTime.Now;
+                                                } else {
+                                                    SendChannelMessage("\u212C&SThere are no players online.");
+                                                    lastIrcCommand = DateTime.Now;
+                                                }
+                                            } else if (rawMessage.ToLower() == "!cplayers") {
+                                                var visiblePlayers =
+                                                    Server.Players.Where(p => p.Info.IsHidden == false)
+                                                        .OrderBy(p => p.ClassyName)
+                                                        .ToArray();
+                                                if (visiblePlayers.Any()) {
+                                                    SendChannelMessage("\u212C&SPlayers online: \u211C" +
+                                                                       visiblePlayers.JoinToClassyString());
+                                                    lastIrcCommand = DateTime.Now;
+                                                } else {
+                                                    SendChannelMessage("\u212C&SThere are no players online.");
+                                                    lastIrcCommand = DateTime.Now;
+                                                }
+                                            } else if (rawMessage.ToLower().StartsWith("!st")) {
+                                                if (rawMessage.Length >= 5) {
+                                                    Chat.IRCSendStaff(msg.Nick, rawMessage.Remove(0, 4));
+                                                    lastIrcCommand = DateTime.Now;
+                                                }
+                                            } else if (rawMessage.ToLower().StartsWith("!seen")) {
+                                                if (rawMessage.Length > 6) {
+                                                    string findPlayer = rawMessage.Split()[1];
+                                                    PlayerInfo info = PlayerDB.FindPlayerInfoExact(findPlayer);
+                                                    if (info != null) {
+                                                        Player target = info.PlayerObject;
+                                                        if (target != null) {
+                                                            SendChannelMessage("\u212C&SPlayer {0}&e is &aOnline",
+                                                                target.Info.Rank.Color + target.Name);
+                                                            if (target.World != null) {
+                                                                SendChannelMessage("\u212C&SOn world {0}",
+                                                                    target.World.ClassyName);
+                                                            }
+                                                        } else {
+                                                            SendChannelMessage("\u212C&SPlayer {0}&e is &cOffline",
+                                                                info.ClassyName);
+                                                            SendChannelMessage(
+                                                                "\u212C&SWas last seen &f{0}&e ago on world &f{1}",
+                                                                info.TimeSinceLastSeen.ToMiniString(),
+                                                                info.LastWorld);
+                                                        }
+                                                    } else {
+                                                        SendChannelMessage("\u212C&SNo player found with name \"" +
+                                                                           findPlayer + "\".");
+                                                    }
+                                                } else {
+                                                    SendChannelMessage("\u212C&SPlease specify a player name.");
+                                                }
+                                                lastIrcCommand = DateTime.Now;
                                             }
-                                        } else if (rawMessage.ToLower() == "!cplayers") {
-                                            var visiblePlayers =
-                                                Server.Players.Where(p => p.Info.IsHidden == false)
-                                                    .OrderBy(p => p.ClassyName)
-                                                    .ToArray();
-                                            if (visiblePlayers.Count() > 0) {
-                                                SendChannelMessage("\u212C&SPlayers online: \u211C" +
-                                                                   visiblePlayers.JoinToClassyString());
-                                            } else {
-                                                SendChannelMessage("\u212C&SThere are no players online.");
-                                            }
-                                        } else if (rawMessage.ToLower().StartsWith("!st")) {
-                                            if (rawMessage.Length >= 5) {
-                                                Chat.IRCSendStaff(msg.Nick, rawMessage.Remove(0, 4));
-                                            }
-                                        } else if (rawMessage.ToLower().StartsWith("!sinfo")) {
-                                            Process.GetCurrentProcess().Refresh();
-
-                                            SendChannelMessage("\u211c&2" + ConfigKey.ServerName.GetString());
-                                            SendChannelMessage("\u211c&2Servers status: Up for \u212c&1{0:0.0}\u211c&2 hours, using \u212c&1{1:0}\u211c&2 MB",
-                                                            DateTime.UtcNow.Subtract(Server.StartTime).TotalHours,
-                                                            (Process.GetCurrentProcess().PrivateMemorySize64 / (1024 * 1024)));
-
-                                            if (Server.IsMonitoringCPUUsage) {
-                                                SendChannelMessage("\u211c&2  Averaging \u212c&1{0:0.0}\u211c&2% CPU now, \u212c&1{1:0.0}%\u211c&2 overall",
-                                                                Server.CPUUsageLastMinute * 100,
-                                                                Server.CPUUsageTotal * 100);
-                                            }
-
-                                            if (MonoCompat.IsMono) {
-                                                SendChannelMessage("\u211c&2  Running \u212c&1ProCraft 1.23\u211c&2, under Mono \u212c&1{0}",
-                                                                MonoCompat.MonoVersionString);
-                                            } else {
-                                                SendChannelMessage("\u211c&2  Running \u212c&1ProCraft 1.23\u211c&2, under .NET \u212c&1{0}",
-                                                                Environment.Version);
-                                            }
-
-                                            double bytesReceivedRate = Server.Players.Aggregate(0d, (i, p) => i + p.BytesReceivedRate);
-                                            double bytesSentRate = Server.Players.Aggregate(0d, (i, p) => i + p.BytesSentRate);
-                                            SendChannelMessage("\u211c&2  Bandwidth: \u212c&1{0:0.0}\u211c&2 KB/s up, \u212c&1{1:0.0}\u211c&2 KB/s down",
-                                                            bytesSentRate / 1000, bytesReceivedRate / 1000);
-
-                                            SendChannelMessage("\u211c&2  Tracking \u212c&1{0:N0}\u211c&2 players (\u212c&1{1}\u211c&2 online, \u212c&1{2}\u211c&2 banned (\u212c&1{3:0.0}\u211c&2%), \u212c&1{4}\u211c&2 IP-banned).",
-                                                            PlayerDB.PlayerInfoList.Length,
-                                                            Server.CountVisiblePlayers(Player.Console),
-                                                            PlayerDB.BannedCount,
-                                                            PlayerDB.BannedPercentage,
-                                                            IPBanList.Count);
-
-                                            SendChannelMessage("\u211c&2  Players built \u212c&1{0:N0}\u211c&2; deleted \u212c&1{1:N0}\u211c&2; drew \u212c&1{2:N0}\u211c&2 blocks; wrote \u212c&1{3:N0}\u211c&2 messages; issued \u212c&1{4:N0}\u211c&2 kicks; spent \u212c&1{5:N0}\u211c&2 hours total (Average: \u212c&1{6:N0}\u211c&2 hours); joined \u212c&1{7:N0}\u211c&2 times (Average: \u212c&1{8:N0}\u211c&2 times)",
-                                                            PlayerDB.PlayerInfoList.Sum(p => p.BlocksBuilt),
-                                                            PlayerDB.PlayerInfoList.Sum(p => p.BlocksDeleted),
-                                                            PlayerDB.PlayerInfoList.Sum(p => p.BlocksDrawn),
-                                                            PlayerDB.PlayerInfoList.Sum(p => p.MessagesWritten),
-                                                            PlayerDB.PlayerInfoList.Sum(p => p.TimesKickedOthers),
-                                                            PlayerDB.PlayerInfoList.Sum(p => p.TotalTime.TotalHours),
-                                                            PlayerDB.PlayerInfoList.Average(p => p.TotalTime.TotalHours),
-                                                            PlayerDB.PlayerInfoList.Sum(p => p.TimesVisited),
-                                                            PlayerDB.PlayerInfoList.Average(p => p.TimesVisited));
-
-                                            SendChannelMessage("\u211c&2  There are \u212c&1{0}\u211c&2 worlds available (\u212c&1{1}\u211c&2 loaded, \u212c&1{2}\u211c&2 hidden).",
-                                                            WorldManager.Worlds.Length,
-                                                            WorldManager.CountLoadedWorlds(Player.Console),
-                                                            WorldManager.Worlds.Count(w => w.IsHidden));
                                         } else if (rawMessage.ToLower().StartsWith("@")) {
                                             string otherPlayerName, messageText;
                                             if (rawMessage[1] == ' ') {
-                                                otherPlayerName = rawMessage.Substring(2, rawMessage.IndexOf(' ', 2) - 2);
-                                                messageText = rawMessage.Substring(rawMessage.IndexOf(' ', 2) + 1);
+                                                otherPlayerName = rawMessage.Substring(2,
+                                                    rawMessage.IndexOf(' ', 2) - 2);
+                                                messageText =
+                                                    rawMessage.Substring(rawMessage.IndexOf(' ', 2) + 1);
                                             } else {
-                                                otherPlayerName = rawMessage.Substring(1, rawMessage.IndexOf(' ') - 1);
+                                                otherPlayerName = rawMessage.Substring(1,
+                                                    rawMessage.IndexOf(' ') - 1);
                                                 messageText = rawMessage.Substring(rawMessage.IndexOf(' ') + 1);
                                             }
 
@@ -435,33 +426,40 @@ namespace fCraft
 
                                             // if there is more than 1 target player, exclude hidden players
                                             if (allPlayers.Length > 1) {
-                                                allPlayers = Server.FindPlayers(otherPlayerName, SearchOptions.Default);
+                                                allPlayers = Server.FindPlayers(otherPlayerName,
+                                                    SearchOptions.Default);
                                             }
 
                                             if (allPlayers.Length == 1) {
                                                 Player target = allPlayers[0];
                                                 if (target.Info.ReadIRC == true && !target.IsDeaf) {
                                                     Chat.IRCSendPM(msg.Nick, target, messageText);
+                                                    lastIrcCommand = DateTime.Now;
                                                 }
 
                                                 if (target.Info.IsHidden == true) {
                                                     // message was sent to a hidden player
                                                     SendChannelMessage("\u212C&SNo players found matching \"" +
                                                                        otherPlayerName + "\"");
+                                                    lastIrcCommand = DateTime.Now;
 
                                                 } else {
                                                     // message was sent normally
                                                     if (target.Info.ReadIRC == false) {
                                                         if (target.Info.IsHidden == false) {
-                                                            SendChannelMessage("\u212C&WCannot PM " + target.ClassyName +
+                                                            SendChannelMessage("\u212C&WCannot PM " +
+                                                                               target.ClassyName +
                                                                                "&W: they have IRC ignored.");
                                                         }
                                                     } else if (target.IsDeaf) {
-                                                        SendChannelMessage("\u212C&WCannot PM " + target.ClassyName +
+                                                        SendChannelMessage("\u212C&WCannot PM " +
+                                                                           target.ClassyName +
                                                                            "&W: they are currently deaf.");
                                                     } else {
-                                                        SendChannelMessage("&Pto " + target.Name + ": " + messageText);
+                                                        SendChannelMessage("&Pto " + target.Name + ": " +
+                                                                           messageText);
                                                     }
+                                                    lastIrcCommand = DateTime.Now;
                                                 }
 
                                             } else if (allPlayers.Length == 0) {
@@ -477,26 +475,22 @@ namespace fCraft
                                                     SendChannelMessage("\u212C&SMore than " + count +
                                                                        " players matched: " + nameList);
                                                 } else {
-                                                    SendChannelMessage("\u212C&SMore than one player matched: " +
-                                                                       nameList);
+                                                    SendChannelMessage(
+                                                        "\u212C&SMore than one player matched: " + nameList);
                                                 }
+                                                lastIrcCommand = DateTime.Now;
                                             }
-                                        } else
-                                            foreach (Player player in Server.Players) {
-                                                if (player.Info.ReadIRC) {
-                                                    player.Message("&i(IRC) {0}{1}: {2}", msg.Nick, Color.White,
-                                                        processedMessage);
-                                                }
-                                            }
+                                        } else foreach (Player player in Server.Players.Where(player => player.Info.ReadIRC)) {
+                                            player.Message("&i(IRC) {0}{1}: {2}", msg.Nick, Color.White,
+                                                processedMessage);
+                                        }
                                         Logger.Log(LogType.IrcChat, "{0}: {1}: {2}", msg.Channel, msg.Nick,
                                             IRCColorsAndNonStandardCharsExceptEmotes.Replace(rawMessage, ""));
                                     }
                                 } else if (msg.Message.StartsWith("#")) {
-                                    foreach (Player player in Server.Players) {
-                                        if (player.Info.ReadIRC) {
-                                            player.Message("&i(IRC) {0}{1}: {2}", msg.Nick, Color.White,
-                                                processedMessage.Substring(1));
-                                        }
+                                    foreach (Player player in Server.Players.Where(player => player.Info.ReadIRC)) {
+                                        player.Message("&i(IRC) {0}{1}: {2}", msg.Nick, Color.White,
+                                            processedMessage.Substring(1));
                                     }
                                     Logger.Log(LogType.IrcChat, "{0}: {1}: {2}", msg.Channel, msg.Nick,
                                         IRCColorsAndNonStandardCharsExceptEmotes.Replace(rawMessage, ""));

@@ -2048,11 +2048,11 @@ namespace fCraft {
 
         #region GEOIP
 
-        public static void GetGeoip( PlayerInfo info ) {
+        public static void GetGeoip(PlayerInfo info) {
             string ip = info.LastIP.ToString();
-            if (ip == info.GeoIP)
-                return;
-            if (info.LastIP.ToString().StartsWith( "192.168" ) || info.LastIP.ToString().StartsWith( "10.0" ) ||
+            if (ip == info.GeoIP) return;
+            if (!info.IsOnline) return;
+            if (info.LastIP.ToString().StartsWith("192.168") || info.LastIP.ToString().StartsWith("10.0") ||
                 info.LastIP.ToString().StartsWith("127.0") || info.LastIP.ToString().StartsWith("255.255"))
                 ip = Server.ExternalIP.ToString();
             WebClient client = new WebClient();
@@ -2110,12 +2110,14 @@ namespace fCraft {
                     return;
                 }
             }
-            Server.Players.CanSee(info.PlayerObject).Message( "&2Player &f{0}&2 comes from {1}, {2}", info.ClassyName, info.RegionName, info.CountryName );
+            Server.Players.CanSee(info.PlayerObject)
+                .Message("&2Player &f{0}&2 comes from {1}, {2}", info.ClassyName, info.RegionName, info.CountryName);
             if (!info.IsHidden) {
                 IRC.SendChannelMessage("&2Player &f{0}&2 comes from {1}, {2}", info.ClassyName, info.RegionName,
                     info.CountryName);
             }
-            Logger.Log( LogType.UserActivity, "&f{0}&2 comes from {1}, {2}", info.ClassyName, info.RegionName, info.CountryName );
+            Logger.Log(LogType.UserActivity, "&f{0}&2 comes from {1}, {2}", info.ClassyName, info.RegionName,
+                info.CountryName);
         }
 
         #endregion
