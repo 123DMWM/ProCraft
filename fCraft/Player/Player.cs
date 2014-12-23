@@ -2110,11 +2110,13 @@ namespace fCraft {
                     return;
                 }
             }
-            Server.Players.CanSee(info.PlayerObject)
-                .Message("&2Player &f{0}&2 comes from {1}, {2}", info.ClassyName, info.RegionName, info.CountryName);
-            if (!info.IsHidden) {
-                IRC.SendChannelMessage("&2Player &f{0}&2 comes from {1}, {2}", info.ClassyName, info.RegionName,
-                    info.CountryName);
+            if (!info.IsOnline) {
+                Server.Players.CanSee(info.PlayerObject)
+                    .Message("&2Player &f{0}&2 comes from {1}, {2}", info.ClassyName, info.RegionName, info.CountryName);
+                if (!info.IsHidden) {
+                    IRC.SendChannelMessage("&2Player &f{0}&2 comes from {1}, {2}", info.ClassyName, info.RegionName,
+                        info.CountryName);
+                }
             }
             Logger.Log(LogType.UserActivity, "&f{0}&2 comes from {1}, {2}", info.ClassyName, info.RegionName,
                 info.CountryName);

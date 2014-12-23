@@ -3161,6 +3161,7 @@ namespace fCraft {
                 player.Message("  Latitude: &f" + nav.SelectSingleNode("/Response/Latitude"));
                 player.Message("  Longitude: &f" + nav.SelectSingleNode("/Response/Longitude"));
                 player.Message("  Metro Code: &f" + nav.SelectSingleNode("/Response/MetroCode"));
+                player.Message("Geoip information by: http://freegeoip.net/");
             } catch {
                 try {
                     stream = client.OpenRead("http://geo.liamstanley.io/xml/" + ip);
@@ -3174,19 +3175,19 @@ namespace fCraft {
                     XPathDocument doc = new XPathDocument(XmlReader.Create(new StringReader(content), set));
 
                     XPathNavigator nav = doc.CreateNavigator();
-                    player.Message("Geo Info about: &f{0}", nav.SelectSingleNode("/Response/IP"));
+                    player.Message("Geo Info about: &f{0}", nav.SelectSingleNode("/Response/Ip"));
                     player.Message("  Country: &f{0} &s(&f{1}&s)", nav.SelectSingleNode("/Response/CountryName"),
                         nav.SelectSingleNode("/Response/CountryCode"));
                     player.Message("  Region: &f{0} &s(&f{1}&s)", nav.SelectSingleNode("/Response/RegionName"),
                         nav.SelectSingleNode("/Response/RegionCode"));
                     player.Message("  City: &f" + nav.SelectSingleNode("/Response/City"));
                     player.Message("  ZipCode: &f" + nav.SelectSingleNode("/Response/ZipCode"));
-                    player.Message("  Time Zone: &f" + nav.SelectSingleNode("/Response/TimeZone"));
                     player.Message("  Latitude: &f" + nav.SelectSingleNode("/Response/Latitude"));
                     player.Message("  Longitude: &f" + nav.SelectSingleNode("/Response/Longitude"));
                     player.Message("  Metro Code: &f" + nav.SelectSingleNode("/Response/MetroCode"));
+                    player.Message("  Area Code: &f" + nav.SelectSingleNode("/Response/AreaCode"));
+                    player.Message("Geoip information by: http://geo.liamstanley.io/");
                 } catch {
-                    return;
                 }
             }
         }

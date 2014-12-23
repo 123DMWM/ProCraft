@@ -577,7 +577,7 @@ namespace fCraft {
                                 "Use \"normal\" instead of a number to reset to default (bedrock)." },
                 { "texture",    "&H/Env <WorldName> texture <Texture .PNG Url>\n&S" +
                                 "Changes the texture for all visible blocks on a map. "+
-                                "Use \"normal\" instead of a number to reset to default (http://108.49.194.95/terrain/64xDefaultTerrain.png)." }
+                                "Use \"normal\" instead of a number to reset to default (http://108.49.194.95/terrain/64xDefault.png)." }
             },
             Usage = "/Env <WorldName> <Variable>",
             IsConsoleSafe = true,
@@ -617,7 +617,7 @@ namespace fCraft {
                 player.Message( "  Water block: {1}  Bedrock block: {0}",
                                 world.EdgeBlock, world.HorizonBlock );
                 player.Message("  Texture: {0}",
-                                world.Texture == "http://108.49.194.95/terrain/64xDefaultTerrain.png" ? "normal" : world.Texture);
+                                world.Texture == "http://108.49.194.95/terrain/64xDefault.png" ? "normal" : world.Texture);
                 if( !player.IsUsingWoM ) {
                     player.Message( "  You need ClassiCube client to see the changes." );
                 }
@@ -634,7 +634,7 @@ namespace fCraft {
                     world.EdgeLevel = -1;
                     world.EdgeBlock = Block.Admincrete;
                     world.HorizonBlock = Block.Water;
-                    world.Texture = "http://108.49.194.95/terrain/64xDefaultTerrain.png";
+                    world.Texture = "http://108.49.194.95/terrain/64xDefault.png";
                     Logger.Log( LogType.UserActivity,
                                 "Env: {0} {1} reset environment settings for world {2}",
                                 player.Info.Rank.Name, player.Name, world.Name );
@@ -868,10 +868,10 @@ namespace fCraft {
 
                 case "tex":
                 case "texture":
-                    if (valueText == "http://108.49.194.95/terrain/64xDefaultTerrain.png" || valueText == "normal")
+                    if (valueText == "http://108.49.194.95/terrain/64xDefault.png" || valueText == "normal")
                     {
                         player.Message("Reset texture for {0}&S to normal", world.ClassyName);
-                        valueText = "http://108.49.194.95/terrain/64xDefaultTerrain.png";
+                        valueText = "http://108.49.194.95/terrain/64xDefault.png";
                     }
                     if (!valueText.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
                     {
