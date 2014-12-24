@@ -2083,7 +2083,7 @@ namespace fCraft {
                 info.MetroCode = nav.SelectSingleNode("/Response/MetroCode").ToString();
             } catch {
                 try {
-                    stream = client.OpenRead("http://geo.liamstanley.io/xml/" + ip);
+                    stream = client.OpenRead("http://geoip.cf/xml/" + ip);
                     stream.ReadTimeout = (int) new TimeSpan(0, 0, 0, 5).ToMilliSeconds();
                     StreamReader reader = new StreamReader(stream);
                     String content = reader.ReadToEnd();
