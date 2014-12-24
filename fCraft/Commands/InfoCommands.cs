@@ -3164,7 +3164,7 @@ namespace fCraft {
                 player.Message("Geoip information by: http://freegeoip.net/");
             } catch {
                 try {
-                    stream = client.OpenRead("http://geo.liamstanley.io/xml/" + ip);
+                    stream = client.OpenRead("http://geoip.cf/xml/" + ip);
                     stream.ReadTimeout = (int)new TimeSpan(0, 0, 0, 5).ToMilliSeconds();
                     StreamReader reader = new StreamReader(stream);
                     String content = reader.ReadToEnd();
@@ -3186,7 +3186,7 @@ namespace fCraft {
                     player.Message("  Longitude: &f" + nav.SelectSingleNode("/Response/Longitude"));
                     player.Message("  Metro Code: &f" + nav.SelectSingleNode("/Response/MetroCode"));
                     player.Message("  Area Code: &f" + nav.SelectSingleNode("/Response/AreaCode"));
-                    player.Message("Geoip information by: http://geo.liamstanley.io/");
+                    player.Message("Geoip information by: http://geoip.cf/");
                 } catch {
                 }
             }
@@ -3370,7 +3370,7 @@ namespace fCraft {
                 info.MetroCode = nav.SelectSingleNode("/Response/MetroCode").ToString();
             } catch {
                 try {
-                    stream = client.OpenRead("http://geo.liamstanley.io/xml/" + ip);
+                    stream = client.OpenRead("http://geoip.cf/xml/" + ip);
                     stream.ReadTimeout = (int)new TimeSpan(0, 0, 0, 5).ToMilliSeconds();
                     StreamReader reader = new StreamReader(stream);
                     String content = reader.ReadToEnd();
