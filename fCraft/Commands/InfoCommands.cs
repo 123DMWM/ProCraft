@@ -132,7 +132,9 @@ namespace fCraft {
         #region Info
 
         const int MaxAltsToPrint = 15;
-        static readonly Regex RegexNonNameChars = new Regex( @"[^a-zA-Z0-9_\*\?]", RegexOptions.Compiled );
+        static readonly Regex RegexNonNameChars = new Regex(@"[^a-zA-Z0-9_\*\?]", RegexOptions.Compiled);
+
+        static readonly TimeSpan InfoIdleThreshold = TimeSpan.FromMinutes(1);
 
         static readonly CommandDescriptor CdInfo = new CommandDescriptor {
             Name = "Info",
@@ -148,143 +150,9 @@ namespace fCraft {
         };
 
         static void InfoHandler( Player player, CommandReader cmd ) {
-            string name = cmd.Next();
-            if( name == null ) {
-                // no name given, print own info
-                PrintPlayerInfo( player, player.Info );
-                return;
-
-            } else if( name.Equals( player.Name, StringComparison.OrdinalIgnoreCase ) ) {
-                // own name given
-                player.LastUsedPlayerName = player.Name;
-                PrintPlayerInfo( player, player.Info );
-                return;
-
-            } else if( !player.Can( Permission.ViewOthersInfo ) ) {
-                // someone else's name or IP given, permission required.
-                player.MessageNoAccess( Permission.ViewOthersInfo );
-                return;
-            }
-
-            // repeat last-typed name
-            if( name == "-" ) {
-                if( player.LastUsedPlayerName != null ) {
-                    name = player.LastUsedPlayerName;
-                } else {
-                    player.Message( "Cannot repeat player name: you haven't used any names yet." );
-                    return;
-                }
-            }
-
-            PlayerInfo[] infos;
-            IPAddress ip;
-
-            if( name.Contains( "/" ) ) {
-                // IP range matching (CIDR notation)
-                string ipString = name.Substring( 0, name.IndexOf( '/' ) );
-                string rangeString = name.Substring( name.IndexOf( '/' ) + 1 );
-                byte range;
-                if( IPAddressUtil.IsIP( ipString ) && IPAddress.TryParse( ipString, out ip ) &&
-                    Byte.TryParse( rangeString, out range ) && range <= 32 ) {
-                    player.Message( "Searching {0}-{1}", ip.RangeMin( range ), ip.RangeMax( range ) );
-                    infos = PlayerDB.FindPlayersCidr( ip, range );
-                } else {
-                    player.Message( "Info: Invalid IP range format. Use CIDR notation." );
-                    return;
-                }
-
-            } else if( IPAddressUtil.IsIP( name ) && IPAddress.TryParse( name, out ip ) ) {
-                // find players by IP
-                infos = PlayerDB.FindPlayers( ip );
-
-            } else if( name.Equals( "*" ) ) {
-                infos = (PlayerInfo[])PlayerDB.PlayerInfoList.Clone();
-
-            } else if( name.Contains( "*" ) || name.Contains( "?" ) ) {
-                // find players by regex/wildcard
-                Regex regex = PlayerDB.WildcardToRegex(name);
-                infos = PlayerDB.FindPlayers(regex);
-
-            } else if( name.StartsWith( "@" ) ) {
-                string rankName = name.Substring( 1 );
-                Rank rank = RankManager.FindRank( rankName );
-                if( rank == null ) {
-                    player.MessageNoRank( rankName );
-                    return;
-                } else {
-                    infos = PlayerDB.PlayerInfoList
-                                    .Where( info => info.Rank == rank )
-                                    .ToArray();
-                }
-
-            }
-            else if (name.StartsWith("!"))
-            {
-                // find online players by partial matches
-                name = name.Substring(1);
-                infos = Server.FindPlayers(player, name, SearchOptions.IncludeSelf)
-                              .Select(p => p.Info)
-                              .ToArray();
-            }
-            else
-            {
-                // find players by partial matching
-                PlayerInfo tempInfo;
-                if( !PlayerDB.FindPlayerInfo( name, out tempInfo ) ) {
-                    infos = PlayerDB.FindPlayers( name );
-                } else if( tempInfo == null ) {
-                    player.MessageNoPlayer( name );
-                    return;
-                } else {
-                    infos = new[] { tempInfo };
-                }
-            }
-
-            Array.Sort( infos, new PlayerInfoComparer( player ) );
-
-            if( infos.Length == 1 ) {
-                // only one match found; print it right away
-                player.LastUsedPlayerName = infos[0].Name;
-                PrintPlayerInfo( player, infos[0] );
-
-            } else if( infos.Length > 1 ) {
-                // multiple matches found
-                if( infos.Length <= PlayersPerPage ) {
-                    // all fit to one page
-                    player.MessageManyMatches( "player", infos );
-
-                } else {
-                    // pagination
-                    int offset;
-                    if( !cmd.NextInt( out offset ) ) offset = 0;
-                    if( offset >= infos.Length ) {
-                        offset = Math.Max( 0, infos.Length - PlayersPerPage );
-                    }
-                    PlayerInfo[] infosPart = infos.Skip( offset ).Take( PlayersPerPage ).ToArray();
-                    player.MessageManyMatches( "player", infosPart );
-                    if( offset + infosPart.Length < infos.Length ) {
-                        // normal page
-                        player.Message( "Showing {0}-{1} (out of {2}). Next: &H/Info {3} {4}",
-                                        offset + 1, offset + infosPart.Length, infos.Length,
-                                        name, offset + infosPart.Length );
-                    } else {
-                        // last page
-                        player.Message( "Showing matches {0}-{1} (out of {2}).",
-                                        offset + 1, offset + infosPart.Length, infos.Length );
-                    }
-                }
-
-            } else {
-                // no matches found
-                player.MessageNoPlayer( name );
-            }
-        }
-
-        static readonly TimeSpan InfoIdleThreshold = TimeSpan.FromMinutes( 1 );
-
-        static void PrintPlayerInfo( [NotNull] Player player, [NotNull] PlayerInfo info ) {
             if( player == null ) throw new ArgumentNullException( "player" );
-            if( info == null ) throw new ArgumentNullException( "info" );
+            PlayerInfo info = FindPlayerInfo(player, cmd);
+            if (info == null) return;
             Player target = info.PlayerObject;
 
             // hide online status when hidden
@@ -2779,142 +2647,9 @@ namespace fCraft {
         };
 
         static void ExtraInfoHandler( Player player, CommandReader cmd ) {
-            string name = cmd.Next();
-            if( name == null ) {
-                // no name given, print own info
-                PrintPlayerExtraInfo( player, player.Info );
-                return;
-
-            } else if( name.Equals( player.Name, StringComparison.OrdinalIgnoreCase ) ) {
-                // own name given
-                player.LastUsedPlayerName = player.Name;
-                PrintPlayerExtraInfo( player, player.Info );
-                return;
-
-            } else if( !player.Can( Permission.ViewOthersInfo ) ) {
-                // someone else's name or IP given, permission required.
-                player.MessageNoAccess( Permission.ViewOthersInfo );
-                return;
-            }
-
-            // repeat last-typed name
-            if( name == "-" ) {
-                if( player.LastUsedPlayerName != null ) {
-                    name = player.LastUsedPlayerName;
-                } else {
-                    player.Message( "Cannot repeat player name: you haven't used any names yet." );
-                    return;
-                }
-            }
-
-            PlayerInfo[] infos;
-            IPAddress ip;
-
-            if( name.Contains( "/" ) ) {
-                // IP range matching (CIDR notation)
-                string ipString = name.Substring( 0, name.IndexOf( '/' ) );
-                string rangeString = name.Substring( name.IndexOf( '/' ) + 1 );
-                byte range;
-                if( IPAddressUtil.IsIP( ipString ) && IPAddress.TryParse( ipString, out ip ) &&
-                    Byte.TryParse( rangeString, out range ) && range <= 32 ) {
-                    player.Message( "Searching {0}-{1}", ip.RangeMin( range ), ip.RangeMax( range ) );
-                    infos = PlayerDB.FindPlayersCidr( ip, range );
-                } else {
-                    player.Message( "Info: Invalid IP range format. Use CIDR notation." );
-                    return;
-                }
-
-            } else if( IPAddressUtil.IsIP( name ) && IPAddress.TryParse( name, out ip ) ) {
-                // find players by IP
-                infos = PlayerDB.FindPlayers( ip );
-
-            } else if( name.Equals( "*" ) ) {
-                infos = (PlayerInfo[])PlayerDB.PlayerInfoList.Clone();
-
-            } else if( name.Contains( "*" ) || name.Contains( "?" ) ) {
-                // find players by regex/wildcard
-                string regexString = "^" + RegexNonNameChars.Replace( name, "" ).Replace( "*", ".*" ).Replace( "?", "." ) + "$";
-                Regex regex = new Regex( regexString, RegexOptions.IgnoreCase | RegexOptions.Compiled );
-                infos = PlayerDB.FindPlayers( regex );
-
-            } else if( name.StartsWith( "@" ) ) {
-                string rankName = name.Substring( 1 );
-                Rank rank = RankManager.FindRank( rankName );
-                if( rank == null ) {
-                    player.MessageNoRank( rankName );
-                    return;
-                } else {
-                    infos = PlayerDB.PlayerInfoList
-                                    .Where( info => info.Rank == rank )
-                                    .ToArray();
-                }
-
-            }
-            else if (name.StartsWith("!"))
-            {
-                // find online players by partial matches
-                name = name.Substring(1);
-                infos = Server.FindPlayers(player, name, SearchOptions.IncludeSelf)
-                              .Select(p => p.Info)
-                              .ToArray();
-            }
-            else
-            {
-                // find players by partial matching
-                PlayerInfo tempInfo;
-                if( !PlayerDB.FindPlayerInfo( name, out tempInfo ) ) {
-                    infos = PlayerDB.FindPlayers( name );
-                } else if( tempInfo == null ) {
-                    player.MessageNoPlayer( name );
-                    return;
-                } else {
-                    infos = new[] { tempInfo };
-                }
-            }
-
-            Array.Sort( infos, new PlayerInfoComparer( player ) );
-
-            if( infos.Length == 1 ) {
-                // only one match found; print it right away
-                player.LastUsedPlayerName = infos[0].Name;
-                PrintPlayerExtraInfo( player, infos[0] );
-
-            } else if( infos.Length > 1 ) {
-                // multiple matches found
-                if( infos.Length <= PlayersPerPage ) {
-                    // all fit to one page
-                    player.MessageManyMatches( "player", infos );
-
-                } else {
-                    // pagination
-                    int offset;
-                    if( !cmd.NextInt( out offset ) ) offset = 0;
-                    if( offset >= infos.Length ) {
-                        offset = Math.Max( 0, infos.Length - PlayersPerPage );
-                    }
-                    PlayerInfo[] infosPart = infos.Skip( offset ).Take( PlayersPerPage ).ToArray();
-                    player.MessageManyMatches( "player", infosPart );
-                    if( offset + infosPart.Length < infos.Length ) {
-                        // normal page
-                        player.Message( "Showing {0}-{1} (out of {2}). Next: &H/Info {3} {4}",
-                                        offset + 1, offset + infosPart.Length, infos.Length,
-                                        name, offset + infosPart.Length );
-                    } else {
-                        // last page
-                        player.Message( "Showing matches {0}-{1} (out of {2}).",
-                                        offset + 1, offset + infosPart.Length, infos.Length );
-                    }
-                }
-
-            } else {
-                // no matches found
-                player.MessageNoPlayer( name );
-            }
-        }
-               
-        static void PrintPlayerExtraInfo( [NotNull] Player player, [NotNull] PlayerInfo info ) {
             if( player == null ) throw new ArgumentNullException( "player" );
-            if( info == null ) throw new ArgumentNullException( "info" );
+            PlayerInfo info = FindPlayerInfo(player, cmd);
+            if (info == null) return;
             Player target = info.PlayerObject;
             
             player.Message("Extra Info about: {0}", info.ClassyName);
@@ -2963,141 +2698,11 @@ namespace fCraft {
         };
 
         static void IPInfoHandler( Player player, CommandReader cmd ) {
-            string name = cmd.Next();
-            if (name == null) {
-                // no name given, print own info
-                PrintPlayerGeoInfo( player, player.Info );
-                return;
-
-            } else if (name.Equals( player.Name, StringComparison.OrdinalIgnoreCase )) {
-                // own name given
-                player.LastUsedPlayerName = player.Name;
-                PrintPlayerGeoInfo( player, player.Info );
-                return;
-
-            } else if (!player.Can( Permission.ViewOthersInfo )) {
-                // someone else's name or IP given, permission required.
-                player.MessageNoAccess( Permission.ViewOthersInfo );
-                return;
-            }
-
-            // repeat last-typed name
-            if (name == "-") {
-                if (player.LastUsedPlayerName != null) {
-                    name = player.LastUsedPlayerName;
-                } else {
-                    player.Message( "Cannot repeat player name: you haven't used any names yet." );
-                    return;
-                }
-            }
-
-            PlayerInfo[] infos;
-            IPAddress ip;
-
-            if (name.Contains( "/" )) {
-                // IP range matching (CIDR notation)
-                string ipString = name.Substring( 0, name.IndexOf( '/' ) );
-                string rangeString = name.Substring( name.IndexOf( '/' ) + 1 );
-                byte range;
-                if (IPAddressUtil.IsIP( ipString ) && IPAddress.TryParse( ipString, out ip ) &&
-                    Byte.TryParse( rangeString, out range ) && range <= 32) {
-                    player.Message( "Searching {0}-{1}", ip.RangeMin( range ), ip.RangeMax( range ) );
-                    infos = PlayerDB.FindPlayersCidr( ip, range );
-                } else {
-                    player.Message( "Info: Invalid IP range format. Use CIDR notation." );
-                    return;
-                }
-
-            } else if (IPAddressUtil.IsIP( name ) && IPAddress.TryParse( name, out ip )) {
-                // find players by IP
-                infos = PlayerDB.FindPlayers( ip );
-
-            } else if (name.Equals( "*" )) {
-                infos = (PlayerInfo[])PlayerDB.PlayerInfoList.Clone();
-
-            } else if (name.Contains( "*" ) || name.Contains( "?" )) {
-                // find players by regex/wildcard
-                string regexString = "^" + RegexNonNameChars.Replace( name, "" ).Replace( "*", ".*" ).Replace( "?", "." ) + "$";
-                Regex regex = new Regex( regexString, RegexOptions.IgnoreCase | RegexOptions.Compiled );
-                infos = PlayerDB.FindPlayers( regex );
-
-            } else if (name.StartsWith( "@" )) {
-                string rankName = name.Substring( 1 );
-                Rank rank = RankManager.FindRank( rankName );
-                if (rank == null) {
-                    player.MessageNoRank( rankName );
-                    return;
-                } else {
-                    infos = PlayerDB.PlayerInfoList
-                                    .Where( info => info.Rank == rank )
-                                    .ToArray();
-                }
-
-            } else if (name.StartsWith( "!" )) {
-                // find online players by partial matches
-                name = name.Substring( 1 );
-                infos = Server.FindPlayers( player, name, SearchOptions.IncludeSelf )
-                              .Select( p => p.Info )
-                              .ToArray();
-            } else {
-                // find players by partial matching
-                PlayerInfo tempInfo;
-                if (!PlayerDB.FindPlayerInfo( name, out tempInfo )) {
-                    infos = PlayerDB.FindPlayers( name );
-                } else if (tempInfo == null) {
-                    player.MessageNoPlayer( name );
-                    return;
-                } else {
-                    infos = new[] { tempInfo };
-                }
-            }
-
-            Array.Sort( infos, new PlayerInfoComparer( player ) );
-
-            if (infos.Length == 1) {
-                // only one match found; print it right away
-                player.LastUsedPlayerName = infos[0].Name;
-                PrintPlayerGeoInfo( player, infos[0] );
-
-            } else if (infos.Length > 1) {
-                // multiple matches found
-                if (infos.Length <= PlayersPerPage) {
-                    // all fit to one page
-                    player.MessageManyMatches( "player", infos );
-
-                } else {
-                    // pagination
-                    int offset;
-                    if (!cmd.NextInt( out offset ))
-                        offset = 0;
-                    if (offset >= infos.Length) {
-                        offset = Math.Max( 0, infos.Length - PlayersPerPage );
-                    }
-                    PlayerInfo[] infosPart = infos.Skip( offset ).Take( PlayersPerPage ).ToArray();
-                    player.MessageManyMatches( "player", infosPart );
-                    if (offset + infosPart.Length < infos.Length) {
-                        // normal page
-                        player.Message( "Showing {0}-{1} (out of {2}). Next: &H/Info {3} {4}",
-                                        offset + 1, offset + infosPart.Length, infos.Length,
-                                        name, offset + infosPart.Length );
-                    } else {
-                        // last page
-                        player.Message( "Showing matches {0}-{1} (out of {2}).",
-                                        offset + 1, offset + infosPart.Length, infos.Length );
-                    }
-                }
-
-            } else {
-                // no matches found
-                player.MessageNoPlayer( name );
-            }
-        }
-
-        static void PrintPlayerGeoInfo( [NotNull] Player player, [NotNull] PlayerInfo info ) {
             if (player == null)
                 throw new ArgumentNullException( "player" );
-            if (info == null)
-                throw new ArgumentNullException( "info" );
+
+            PlayerInfo info = FindPlayerInfo(player, cmd);
+            if (info == null) return;
 
             if (!player.Can(Permission.ViewPlayerIPs)) { info = player.Info;}
             player.Message( "Geo Info about: {0} &s(&f{1}&s)", info.ClassyName, info.LastIP );
@@ -3414,186 +3019,9 @@ namespace fCraft {
             Handler = SeenHandler
         };
 
-        static void SeenHandler(Player player, CommandReader cmd)
-        {
-            string name = cmd.Next();
-            if (name == null)
-            {
-                // no name given, print own info
-                PrintPlayerSeen(player, player.Info);
-                return;
-
-            }
-            else if (name.Equals(player.Name, StringComparison.OrdinalIgnoreCase))
-            {
-                // own name given
-                player.LastUsedPlayerName = player.Name;
-                PrintPlayerSeen(player, player.Info);
-                return;
-
-            }
-            else if (!player.Can(Permission.ViewOthersInfo))
-            {
-                // someone else's name or IP given, permission required.
-                player.MessageNoAccess(Permission.ViewOthersInfo);
-                return;
-            }
-
-            // repeat last-typed name
-            if (name == "-")
-            {
-                if (player.LastUsedPlayerName != null)
-                {
-                    name = player.LastUsedPlayerName;
-                }
-                else
-                {
-                    player.Message("Cannot repeat player name: you haven't used any names yet.");
-                    return;
-                }
-            }
-
-            PlayerInfo[] infos;
-            IPAddress ip;
-
-            if (name.Contains("/"))
-            {
-                // IP range matching (CIDR notation)
-                string ipString = name.Substring(0, name.IndexOf('/'));
-                string rangeString = name.Substring(name.IndexOf('/') + 1);
-                byte range;
-                if (IPAddressUtil.IsIP(ipString) && IPAddress.TryParse(ipString, out ip) &&
-                    Byte.TryParse(rangeString, out range) && range <= 32)
-                {
-                    player.Message("Searching {0}-{1}", ip.RangeMin(range), ip.RangeMax(range));
-                    infos = PlayerDB.FindPlayersCidr(ip, range);
-                }
-                else
-                {
-                    player.Message("Info: Invalid IP range format. Use CIDR notation.");
-                    return;
-                }
-
-            }
-            else if (IPAddressUtil.IsIP(name) && IPAddress.TryParse(name, out ip))
-            {
-                // find players by IP
-                infos = PlayerDB.FindPlayers(ip);
-
-            }
-            else if (name.Equals("*"))
-            {
-                infos = (PlayerInfo[])PlayerDB.PlayerInfoList.Clone();
-
-            }
-            else if (name.Contains("*") || name.Contains("?"))
-            {
-                // find players by regex/wildcard
-                string regexString = "^" + RegexNonNameChars.Replace(name, "").Replace("*", ".*").Replace("?", ".") + "$";
-                Regex regex = new Regex(regexString, RegexOptions.IgnoreCase | RegexOptions.Compiled);
-                infos = PlayerDB.FindPlayers(regex);
-
-            }
-            else if (name.StartsWith("@"))
-            {
-                string rankName = name.Substring(1);
-                Rank rank = RankManager.FindRank(rankName);
-                if (rank == null)
-                {
-                    player.MessageNoRank(rankName);
-                    return;
-                }
-                else
-                {
-                    infos = PlayerDB.PlayerInfoList
-                                    .Where(info => info.Rank == rank)
-                                    .ToArray();
-                }
-
-            }
-            else if (name.StartsWith("!"))
-            {
-                // find online players by partial matches
-                name = name.Substring(1);
-                infos = Server.FindPlayers(player, name, SearchOptions.IncludeSelf)
-                              .Select(p => p.Info)
-                              .ToArray();
-            }
-            else
-            {
-                // find players by partial matching
-                PlayerInfo tempInfo;
-                if (!PlayerDB.FindPlayerInfo(name, out tempInfo))
-                {
-                    infos = PlayerDB.FindPlayers(name);
-                }
-                else if (tempInfo == null)
-                {
-                    player.MessageNoPlayer(name);
-                    return;
-                }
-                else
-                {
-                    infos = new[] { tempInfo };
-                }
-            }
-
-            Array.Sort(infos, new PlayerInfoComparer(player));
-
-            if (infos.Length == 1)
-            {
-                // only one match found; print it right away
-                player.LastUsedPlayerName = infos[0].Name;
-                PrintPlayerSeen(player, infos[0]);
-
-            }
-            else if (infos.Length > 1)
-            {
-                // multiple matches found
-                if (infos.Length <= PlayersPerPage)
-                {
-                    // all fit to one page
-                    player.MessageManyMatches("player", infos);
-
-                }
-                else
-                {
-                    // pagination
-                    int offset;
-                    if (!cmd.NextInt(out offset)) offset = 0;
-                    if (offset >= infos.Length)
-                    {
-                        offset = Math.Max(0, infos.Length - PlayersPerPage);
-                    }
-                    PlayerInfo[] infosPart = infos.Skip(offset).Take(PlayersPerPage).ToArray();
-                    player.MessageManyMatches("player", infosPart);
-                    if (offset + infosPart.Length < infos.Length)
-                    {
-                        // normal page
-                        player.Message("Showing {0}-{1} (out of {2}). Next: &H/Info {3} {4}",
-                                        offset + 1, offset + infosPart.Length, infos.Length,
-                                        name, offset + infosPart.Length);
-                    }
-                    else
-                    {
-                        // last page
-                        player.Message("Showing matches {0}-{1} (out of {2}).",
-                                        offset + 1, offset + infosPart.Length, infos.Length);
-                    }
-                }
-
-            }
-            else
-            {
-                // no matches found
-                player.MessageNoPlayer(name);
-            }
-        }
-
-        static void PrintPlayerSeen([NotNull] Player player, [NotNull] PlayerInfo info)
-        {
-            if (player == null) throw new ArgumentNullException("player");
-            if (info == null) throw new ArgumentNullException("info");
+        static void SeenHandler(Player player, CommandReader cmd) {
+            PlayerInfo info = FindPlayerInfo(player, cmd);
+            if (info == null) return;
             Player target = info.PlayerObject;
 
             if (target != null)
@@ -3636,5 +3064,137 @@ namespace fCraft {
         }
 
         #endregion
+        #region FindPlayerInfo
+        static PlayerInfo FindPlayerInfo(Player player, CommandReader cmd) {
+            string name = cmd.Next();
+            if (name == null) {
+                // no name given, print own info
+                return player.Info;
+
+            }
+            if (name.Equals(player.Name, StringComparison.OrdinalIgnoreCase)) {
+                // own name given
+                player.LastUsedPlayerName = player.Name;
+                return player.Info;
+
+            }
+            if (!player.Can(Permission.ViewOthersInfo)) {
+                // someone else's name or IP given, permission required.
+                player.MessageNoAccess(Permission.ViewOthersInfo);
+                return null;
+            }
+
+            // repeat last-typed name
+            if (name == "-") {
+                if (player.LastUsedPlayerName != null) {
+                    name = player.LastUsedPlayerName;
+                } else {
+                    player.Message("Cannot repeat player name: you haven't used any names yet.");
+                    return null;
+                }
+            }
+
+            PlayerInfo[] infos;
+            IPAddress ip;
+
+            if (name.Contains("/")) {
+                // IP range matching (CIDR notation)
+                string ipString = name.Substring(0, name.IndexOf('/'));
+                string rangeString = name.Substring(name.IndexOf('/') + 1);
+                byte range;
+                if (IPAddressUtil.IsIP(ipString) && IPAddress.TryParse(ipString, out ip) &&
+                    Byte.TryParse(rangeString, out range) && range <= 32) {
+                    player.Message("Searching {0}-{1}", ip.RangeMin(range), ip.RangeMax(range));
+                    infos = PlayerDB.FindPlayersCidr(ip, range);
+                } else {
+                    player.Message("Info: Invalid IP range format. Use CIDR notation.");
+                    return null;
+                }
+
+            } else if (IPAddressUtil.IsIP(name) && IPAddress.TryParse(name, out ip)) {
+                // find players by IP
+                infos = PlayerDB.FindPlayers(ip);
+
+            } else if (name.Equals("*")) {
+                infos = (PlayerInfo[])PlayerDB.PlayerInfoList.Clone();
+
+            } else if (name.Contains("*") || name.Contains("?")) {
+                // find players by regex/wildcard
+                string regexString = "^" + RegexNonNameChars.Replace(name, "").Replace("*", ".*").Replace("?", ".") + "$";
+                Regex regex = new Regex(regexString, RegexOptions.IgnoreCase | RegexOptions.Compiled);
+                infos = PlayerDB.FindPlayers(regex);
+
+            } else if (name.StartsWith("@")) {
+                string rankName = name.Substring(1);
+                Rank rank = RankManager.FindRank(rankName);
+                if (rank == null) {
+                    player.MessageNoRank(rankName);
+                    return null;
+                }
+                infos = PlayerDB.PlayerInfoList
+                    .Where(info => info.Rank == rank)
+                    .ToArray();
+            } else if (name.StartsWith("!")) {
+                // find online players by partial matches
+                name = name.Substring(1);
+                infos = Server.FindPlayers(player, name, SearchOptions.IncludeSelf)
+                              .Select(p => p.Info)
+                              .ToArray();
+            } else {
+                // find players by partial matching
+                PlayerInfo tempInfo;
+                if (!PlayerDB.FindPlayerInfo(name, out tempInfo)) {
+                    infos = PlayerDB.FindPlayers(name);
+                } else if (tempInfo == null) {
+                    player.MessageNoPlayer(name);
+                    return null;
+                } else {
+                    infos = new[] { tempInfo };
+                }
+            }
+
+            Array.Sort(infos, new PlayerInfoComparer(player));
+
+            if (infos.Length == 1) {
+                // only one match found; print it right away
+                player.LastUsedPlayerName = infos[0].Name;
+                return infos[0];
+
+            }
+            if (infos.Length > 1) {
+                // multiple matches found
+                if (infos.Length <= PlayersPerPage) {
+                    // all fit to one page
+                    player.MessageManyMatches("player", infos);
+
+                } else {
+                    // pagination
+                    int offset;
+                    if (!cmd.NextInt(out offset))
+                        offset = 0;
+                    if (offset >= infos.Length) {
+                        offset = Math.Max(0, infos.Length - PlayersPerPage);
+                    }
+                    PlayerInfo[] infosPart = infos.Skip(offset).Take(PlayersPerPage).ToArray();
+                    player.MessageManyMatches("player", infosPart);
+                    if (offset + infosPart.Length < infos.Length) {
+                        // normal page
+                        player.Message("Showing {0}-{1} (out of {2}). Next: &H/Info {3} {4}",
+                                        offset + 1, offset + infosPart.Length, infos.Length,
+                                        name, offset + infosPart.Length);
+                    } else {
+                        // last page
+                        player.Message("Showing matches {0}-{1} (out of {2}).",
+                                        offset + 1, offset + infosPart.Length, infos.Length);
+                    }
+                }
+
+            } else {
+                // no matches found
+                player.MessageNoPlayer(name);
+            }
+            return null;
+        }
+        #endregion 
     }
 }
