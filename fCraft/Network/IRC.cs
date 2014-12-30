@@ -480,13 +480,13 @@ namespace fCraft
                                                 }
                                                 lastIrcCommand = DateTime.Now;
                                             }
-                                        } else foreach (Player player in Server.Players.Where(player => player.Info.ReadIRC)) {
+                                        }
+                                    } else foreach (Player player in Server.Players.Where(player => player.Info.ReadIRC)) {
                                             player.Message("&i(IRC) {0}{1}: {2}", msg.Nick, Color.White,
                                                 processedMessage);
                                         }
-                                        Logger.Log(LogType.IrcChat, "{0}: {1}: {2}", msg.Channel, msg.Nick,
-                                            IRCColorsAndNonStandardCharsExceptEmotes.Replace(rawMessage, ""));
-                                    }
+                                    Logger.Log(LogType.IrcChat, "{0}: {1}: {2}", msg.Channel, msg.Nick,
+                                        IRCColorsAndNonStandardCharsExceptEmotes.Replace(rawMessage, ""));
                                 } else if (msg.Message.StartsWith("#")) {
                                     foreach (Player player in Server.Players.Where(player => player.Info.ReadIRC)) {
                                         player.Message("&i(IRC) {0}{1}: {2}", msg.Nick, Color.White,
