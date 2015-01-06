@@ -691,52 +691,37 @@ namespace fCraft {
             }
             #endregion
 
-            #region LoadSwears
-            try
-            {
-                //Load Swears.
-                if (Directory.Exists("./Filters"))
-                {
-                    string[] SwearsFileList = Directory.GetFiles("./Filters");
-                    foreach (string filename in SwearsFileList)
-                    {
-                        if (Path.GetExtension("./Filters/" + filename) == ".txt")
-                        {
-                            string[] SwearData = File.ReadAllLines(filename);
-                            string Swear = null;
-                            string Replacement = null;
-                            foreach (string line in SwearData)
-                            {
-                                if (line.Contains("Replace: "))
-                                {
-                                    Swear = line.Remove(0, "Replace: ".Length);
-                                }
-                                else if (line.Contains("With: "))
-                                {
-                                    Replacement = line.Remove(0, "With: ".Length);
-                                }
+            #region LoadFilters
+
+            try {
+                if (Directory.Exists("./Filters")) {
+                    string[] FilterFileList = Directory.GetFiles("./Filters");
+                    int created = 0;
+                    foreach (string filename in FilterFileList) {
+                        Filter filterCreate = new Filter();
+                        if (Path.GetExtension("./Filters/" + filename) == ".txt") {
+                            string[] filterData = File.ReadAllLines(filename);
+                            string idString = filename.Replace("./Filters\\", "").Replace(".txt", "");
+                            string wordString = filterData[0];
+                            string replacementString = filterData[1];
+                            int id;
+                            if (int.TryParse(idString, out id)) {
+                                filterCreate.addFilter(id, wordString, replacementString);
+                                created++;
                             }
-                            if (Swear == null || Replacement == null)
-                            {
-                                Player.Console.Message("Error starting a Filter: {0}, {1}", Swear, Replacement);
-                                continue;
-                            }
-                            
-                            if ((Swear != null) && (Replacement != null))
-                            {
-                                ChatSwears.Start(Swear, Replacement);
-                                continue;
-                            }
+
                         }
+
                     }
-                    if (SwearsFileList.Length > 0) Player.Console.Message("All Filters Loaded. ({0})", SwearsFileList.Length);
-                    else Player.Console.Message("No Filters Were Loaded.");
+                    if (created > 0)
+                        Player.Console.Message("All Filters Loaded. ({0})", created);
+                    else
+                        Player.Console.Message("No filters were loaded.");
                 }
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 Player.Console.Message("Filter Loader Has Crashed: {0}", ex);
             }
+
             #endregion
 
             #region LoadEntities

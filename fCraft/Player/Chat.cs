@@ -14,6 +14,25 @@ namespace fCraft {
     public static class Chat
     {
         static readonly Regex RegexIPMatcher = new Regex(@"\d{1,3}(\.\d{1,3}){3}(:?(\d{0,5})?)");
+        public static List<Filter> Filters = new List<Filter>();
+        #region SaveEntity
+
+        /// <summary>
+        /// Saves the Filter data to be used when restarting the server
+        /// </summary>
+        /// <param name="filter">Filter being saved</param>
+        public static void SaveFilter(Filter filter) {
+            try {
+                String[] filterData = {
+                    filter.Word, filter.Replacement
+                };
+                File.WriteAllLines("./Filters/" + filter.Id + ".txt", filterData);
+            } catch (Exception ex) {
+                Player.Console.Message("Filter Saver Has Crashed: {0}", ex);
+            }
+        }
+
+        #endregion
         /// <summary> Sends a global (white) chat. </summary>
         /// <param name="player"> Player writing the message. </param>
         /// <param name="rawMessage"> Message text. </param>
@@ -21,12 +40,11 @@ namespace fCraft {
         public static bool SendGlobal( [NotNull] Player player, [NotNull] string rawMessage ) {
             if( player == null ) throw new ArgumentNullException( "player" );
             if( rawMessage == null ) throw new ArgumentNullException( "rawMessage" );
-            ChatSwears[] list = ChatSwears.SwearList.OrderBy(swear => swear.ID).ToArray();
-            foreach (ChatSwears Swear in list)
+            foreach (Filter Swear in Filters)
             {
-                if (rawMessage.ToLower().Contains(Swear.Swear.ToLower()))
+                if (rawMessage.ToLower().Contains(Swear.Word.ToLower()))
                 {
-                    rawMessage = rawMessage.ReplaceString(Swear.Swear, Swear.Replacement, StringComparison.InvariantCultureIgnoreCase);
+                    rawMessage = rawMessage.ReplaceString(Swear.Word, Swear.Replacement, StringComparison.InvariantCultureIgnoreCase);
                 }
             }
             if (!player.Can(Permission.ReadStaffChat))

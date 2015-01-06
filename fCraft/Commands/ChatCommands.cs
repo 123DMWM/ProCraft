@@ -1,5 +1,6 @@
 ﻿// Part of fCraft | Copyright 2009-2013 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt //Copyright (c) 2011-2013 Jon Baker, Glenn Marien and Lao Tszy <Jonty800@gmail.com> //Copyright (c) <2012-2014> <LeChosenOne, DingusBungus> | Copyright 2014 123DMWM <shmo1joe2@gmail.com>
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -954,7 +955,7 @@ namespace fCraft
             ChatTimer.Start(duration, message, player.Name);
         }
         #endregion
-        #region Swears
+        #region Filters
 
         static readonly CommandDescriptor CdSwears = new CommandDescriptor
         {
@@ -969,18 +970,17 @@ namespace fCraft
 
         static void SwearsHandler(Player player, CommandReader cmd)
         {
-            ChatSwears[] list = ChatSwears.SwearList.OrderBy(swear => swear.ID).ToArray();
-            if (list.Length == 0)
+            if (Chat.Filters.Count == 0)
             {
-                player.Message("No filters.");
+                player.Message("There are no filters.");
             }
             else
             {
-                player.Message("There are {0} filters:", list.Length);
-                foreach (ChatSwears Swear in list)
+                player.Message("There are {0} filters:", Chat.Filters.Count);
+                foreach (Filter filter in Chat.Filters.OrderBy(f => f.Id))
                 {
                     player.Message("  #{0} \"{1}\" --> \"{2}&S\"",
-                                    Swear.ID, Swear.Swear, Swear.Replacement);
+                                    filter.Id, filter.Word, filter.Replacement);
                 }
             }
         }
@@ -990,11 +990,11 @@ namespace fCraft
             IsConsoleSafe = true,
             Permissions = new[] { Permission.ShutdownServer },
             Category = CommandCategory.Chat,
-            Usage = "/Filter <add/remove> <Word> <Replacement>",
+            Usage = "/Filter <(add|create)|(remove|delete)> <Word> <Replacement>",
             Help = "Adds or removes a word and it's replacement to the filter",
             HelpSections = new Dictionary<string, string> {
                 { "add",  "&H/Filter add <Word> <Replacement>\n&S" +
-                            "Adds a Word and it's replacement to the filter. " },
+                            "Adds a Word and it's replacement to the filter list. " },
                 { "remove",  "&H/Filter remove <filterID>\n&S" +
                             "Removes a filter with the given ID number. " +
                             "To see a list of filters and their IDs, type &H/filterlist" }
@@ -1002,59 +1002,85 @@ namespace fCraft
             Handler = SwearHandler
         };
 
-        static void SwearHandler(Player player, CommandReader cmd)
-        {
+        private static void SwearHandler(Player player, CommandReader cmd) {
             string param = cmd.Next();
-
-            // Abort a timer
-            if (param == null)
-            {
+            if (param == null) {
                 CdSwear.PrintUsage(player);
                 return;
             }
-            else if (param.Equals("remove", StringComparison.OrdinalIgnoreCase))
-            {
-                int swearId;
-                if (cmd.NextInt(out swearId))
-                {
-                    ChatSwears swear = ChatSwears.FindSwearById(swearId);
-                    if (swear == null || !swear.IsRunning)
-                    {
-                        player.Message("Given filter (#{0}) does not exist.", swearId);
+            switch (param.ToLower()) {
+                case "r":
+                case "d":
+                case "remove":
+                case "delete":
+                    int fId;
+                    bool removed = false;
+                    Filter fRemove = null;
+                    if (cmd.NextInt(out fId)) {
+                        foreach (Filter f in Chat.Filters) {
+                            if (f.Id == fId) {
+                                Server.Message("&Y[Filters] {0}&Y removed the filter \"{1}\" -> \"{2}\"",
+                                    player.ClassyName, f.Word, f.Replacement);
+                                fRemove = f;
+                                removed = true;
+                            }
+                        }
+                        if (fRemove != null) {
+                            fRemove.removeFilter();
+                        }
+                        if (!removed) {
+                            player.Message("Given filter (#{0}) does not exist.", fId);
+                        }
+                    } else {
+                        CdSwear.PrintUsage(player);
                     }
-                    else
-                    {
-                        swear.Abort();
-                        Server.Message("&Y[Filters] {0}&Y removed the filter \"{1}\"",
-                                                         player.ClassyName, swear.Swear);
+                    break;
+                case "a":
+                case "add":
+                case "create":
+                    Filter fCreate = new Filter();
+                    if (player.Info.IsMuted) {
+                        player.MessageMuted();
+                        return;
                     }
-                }
-                else
-                {
+                    string word = cmd.Next();
+                    string replacement = cmd.NextAll();
+                    if ("".Equals(word) || "".Equals(replacement)) {
+                        CdSwear.PrintUsage(player);
+                        break;
+                    }
+                    bool exists = false;
+                    foreach (Filter f in Chat.Filters) {
+                        if (f.Word.ToLower().Equals(word.ToLower())) {
+                            exists = true;
+                        }
+                    }
+                    if (!exists) {
+                        Server.Message("&Y[Filters] \"{0}\" is now replaced by \"{1}\"", word, replacement);
+                        fCreate.addFilter(getNewId(), word, replacement);
+                    } else {
+                        player.Message("A filter with that world already exists!");
+                    }
+                    break;
+                default:
                     CdSwear.PrintUsage(player);
-                }
-                return;
-            }
-            // Start a timer
-            else if (param.Equals("add", StringComparison.OrdinalIgnoreCase))
-            {
-                if (player.Info.IsMuted)
-                {
-                    player.MessageMuted();
-                    return;
-                }
-                if (player.DetectChatSpam()) return;
-                string swear = cmd.Next();
-                string replacement = cmd.Next();
-                Server.Message("&Y[Filters] \"{0}\" is now replaced by \"{1}\"", swear, replacement);
-                ChatSwears.Start(swear.ToLower(), replacement);
-            }
-            else
-            {
-                CdSwear.PrintUsage(player);
-                return;
+                    break;
             }
         }
+
+
+        public static int getNewId() {
+            int i = 1;
+            go:
+            foreach (Filter filter in Chat.Filters) {
+                if (filter.Id == i) {
+                    i++;
+                    goto go;
+                }
+            }
+            return i;
+        }
+
         #endregion
         #region Quit
 

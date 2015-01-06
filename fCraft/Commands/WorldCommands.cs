@@ -867,6 +867,7 @@ namespace fCraft {
                     break;
 
                 case "tex":
+                case "terrain":
                 case "texture":
                     if (valueText == "http://108.49.194.95/terrain/64xDefault.png" || valueText == "normal")
                     {

@@ -157,8 +157,8 @@
     <Compile Include="Network\CpeConstants.cs" />
     <Compile Include="Network\DBConnect.cs" />
     <Compile Include="Network\GlobalChat.cs" />
+    <Compile Include="Player\Filter.cs" />
     <Compile Include="Player\Bot.cs" />
-    <Compile Include="Player\ChatSwears.cs" />
     <Compile Include="Player\MailOwner.cs" />
     <Compile Include="Player\Rainbow.cs" />
     <Compile Include="Player\Replace.cs" />
