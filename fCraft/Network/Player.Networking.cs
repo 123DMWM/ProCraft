@@ -1978,8 +1978,10 @@ namespace fCraft {
             if (SupportsExtPlayerList2) {
                 SendNow(Packet.MakeExtAddEntity2(entity.Id, player.Info.Rank.Color + player.Name, (player.Info.skinName ?? player.Name),
                     player.WorldMap.Spawn, this));
+                Send(Packet.MakeTeleport(entity.Id, player.Position));
             } else {
                 SendNow(Packet.MakeAddEntity(entity.Id, player.Info.Rank.Color + player.Name, player.WorldMap.Spawn));
+                Send(Packet.MakeTeleport(entity.Id, player.Position));
             }
 
             if (SupportsChangeModel) {
