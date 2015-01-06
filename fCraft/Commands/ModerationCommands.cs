@@ -1448,38 +1448,17 @@ namespace fCraft {
             }
 
             string silentString = cmd.NextAll();
-            bool silent = false;
-            if (silentString != null)
-            {
-                silent = silentString.Equals("silent", StringComparison.OrdinalIgnoreCase);
-            }
+            bool silent = (silentString.ToLower().Split()[0].Equals("silent") || silentString.ToLower().Split()[0].Equals("s")) ;
 
             player.Info.IsHidden = true;
-            if (silent)
-            {
-                player.Message("&8You are now hidden (silent).");
-            }
-            else
-            {
-                player.Message("&8You are now hidden.");
-            }
+            player.Message(silent ? "&8You are now hidden (silent)." : "&8You are now hidden.");
 
             // to make it look like player just logged out in /Info
             player.Info.LastSeen = DateTime.UtcNow;
 
             if (!silent && ConfigKey.ShowConnectionMessages.Enabled())
             {
-                if (silentString.Equals("")) {
-                    Server.Players.CantSee(player).Message("{0}&s left the server.", player.ClassyName);
-                } else {
-                    if (silentString.Length >= 38) {
-                        Server.Players.CantSee(player)
-                            .Message("{0}&s left the server. (/Quit {1})", player.ClassyName, silentString.Remove(38));
-                    } else {
-                        Server.Players.CantSee(player)
-                            .Message("{0}&s left the server. (/Quit {1})", player.ClassyName, silentString);
-                    }
-                }
+                Server.Players.CantSee(player).Message("{0}&s left the server. {1}", player.ClassyName, "".Equals(silentString) ? "" : "(/Quit " + (silentString.Length > 32 ? silentString.Remove(32) : silentString)  + ")");
             }
 
             // for aware players: notify
