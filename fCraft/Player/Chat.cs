@@ -14,8 +14,9 @@ namespace fCraft {
     public static class Chat
     {
         static readonly Regex RegexIPMatcher = new Regex(@"\d{1,3}(\.\d{1,3}){3}(:?(\d{0,5})?)");
+        #region Filters/Reports
         public static List<Filter> Filters = new List<Filter>();
-        #region SaveEntity
+        public static List<Report> Reports = new List<Report>();
 
         /// <summary>
         /// Saves the Filter data to be used when restarting the server
@@ -26,9 +27,28 @@ namespace fCraft {
                 String[] filterData = {
                     filter.Word, filter.Replacement
                 };
+                if (!Directory.Exists("./Filters")) {
+                    Directory.CreateDirectory("./Filters");
+                }
                 File.WriteAllLines("./Filters/" + filter.Id + ".txt", filterData);
             } catch (Exception ex) {
                 Player.Console.Message("Filter Saver Has Crashed: {0}", ex);
+            }
+        }
+        /// <summary>
+        /// Saves the report to be read by the owner with /reports
+        /// </summary>
+        /// <param name="report">Report being saved</param>
+        public static void SaveReport(Report report) {
+            try {
+                String[] reportData = {report.Sender, report.Datesent.ToBinary().ToString(), report.Message
+                };
+                if (!Directory.Exists("./Reports")) {
+                    Directory.CreateDirectory("./Reports");
+                }
+                File.WriteAllLines("./Reports/" + report.Id + "-" + report.Sender + ".txt", reportData);
+            } catch (Exception ex) {
+                Player.Console.Message("Report Saver Has Crashed: {0}", ex);
             }
         }
 

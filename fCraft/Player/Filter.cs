@@ -20,7 +20,7 @@ namespace fCraft {
         public String Replacement;
 
         /// <summary>
-        /// Sets a bot, as well as the bot values. Must be called before any other bot classes.
+        /// Adds/Creats the filter
         /// </summary>
         public void addFilter(int id, String word, String replacement) {
             Id = id;
@@ -31,7 +31,7 @@ namespace fCraft {
         }
 
         /// <summary>
-        /// Completely removes the entity and data of the bot.
+        /// Completely removes the filter
         /// </summary>
         public void removeFilter() {
             Chat.Filters.Remove(this);

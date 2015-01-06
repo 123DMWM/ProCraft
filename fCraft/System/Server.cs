@@ -630,65 +630,42 @@ namespace fCraft {
             }
             #endregion
 
-            #region LoadMailers
-            try
-            {
-                //Load Mail.
-                if (Directory.Exists("./Mail"))
-                {
-                    string[] MailersFileList = Directory.GetFiles("./Mail");
-                    foreach (string filename in MailersFileList)
-                    {
-                        if (Path.GetExtension("./Mail/" + filename) == ".txt")
-                        {
-                            string[] MailerData = File.ReadAllLines(filename);
-                            DateTime StartDate = DateTime.UtcNow;
-                            DateTime EndDate = StartDate;
-                            PlayerInfo CreatedBy = Player.Console.Info;
-                            string MailerMessage = null;
-                            foreach (string line in MailerData)
-                            {
-                                if (line.Contains("CreatedBy: "))
-                                {
-                                    string creator = line.Remove(0, "CreatedBy: ".Length);
-                                    if (PlayerDB.FindPlayerInfoExact(creator) != null)
-                                    {
-                                        CreatedBy = PlayerDB.FindPlayerInfoExact(creator);
-                                    }
-                                }
-                                else if (line.Contains("Date: "))
-                                {
-                                    string date = line.Remove(0, "Date: ".Length);
-                                    if (DateTime.TryParse(date, out StartDate))
-                                    {
-                                        StartDate = DateTime.Parse(date);
-                                    }
-                                } 
-                                else if (line.Contains("Message: "))
-                                {
-                                    MailerMessage = line.Remove(0, "Message: ".Length);
-                                }
+            #region LoadReports
+
+            try {
+                if (Directory.Exists("./Reports")) {
+                    string[] ReportFileList = Directory.GetFiles("./Reports");
+                    int created = 0;
+                    foreach (string filename in ReportFileList) {
+                        Report rCreate = new Report();
+                        if (Path.GetExtension("./Reports/" + filename) == ".txt") {
+                            string[] reportData = File.ReadAllLines(filename);
+                            string idString = filename.Replace("./Reports\\", "").Replace(".txt", "").Split('-')[0];
+                            string sender = reportData[0];
+                            DateTime dateSent = DateTime.MinValue;
+                            long dateSentBinary;
+                            if (long.TryParse(reportData[1], out dateSentBinary)) {
+                                dateSent = DateTime.FromBinary(dateSentBinary);
                             }
-                            if (StartDate == null || EndDate == null || CreatedBy == null || MailerMessage == null)
-                            {
-                                Player.Console.Message("Error starting a Mail: {0}, {1}, {2}", CreatedBy.Name, StartDate.ToString(), MailerMessage);
-                                continue;
+                            string message = reportData[2];
+                            int id;
+                            if (int.TryParse(idString, out id)) {
+                                rCreate.addReport(id, sender, dateSent, message);
+                                created++;
                             }
-                            if ((StartDate != EndDate) && (CreatedBy != null) && (MailerMessage != null))
-                            {
-                                ChatMailer.Start(MailerMessage, CreatedBy.Name);
-                                continue;
-                            }
+
                         }
+
                     }
-                    if (MailersFileList.Length > 0) Player.Console.Message("All Mail Loaded. ({0})", MailersFileList.Length);
-                    else Player.Console.Message("No Mail Was Loaded.");
+                    if (created > 0)
+                        Player.Console.Message("All Reports Loaded. ({0})", created);
+                    else
+                        Player.Console.Message("No reports were loaded.");
                 }
+            } catch (Exception ex) {
+                Player.Console.Message("Report Loader Has Crashed: {0}", ex);
             }
-            catch (Exception ex)
-            {
-                Player.Console.Message("Mail Loader Has Crashed: {0}", ex);
-            }
+
             #endregion
 
             #region LoadFilters
@@ -1436,6 +1413,9 @@ namespace fCraft {
                     bot.Position.L.ToString(CultureInfo.InvariantCulture),
                     bot.Position.R.ToString(CultureInfo.InvariantCulture)
                 };
+                if (!Directory.Exists("./Entities")) {
+                    Directory.CreateDirectory("./Entities");
+                }
                 File.WriteAllLines("./Entities/" + bot.Name.ToLower() + ".txt", entityData);
             } catch (Exception ex) {
                 Player.Console.Message("Entity Saver Has Crashed: {0}", ex);

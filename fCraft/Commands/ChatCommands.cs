@@ -34,8 +34,8 @@ namespace fCraft
             CommandManager.RegisterCommand(CdSwears);
             CommandManager.RegisterCommand(CdIRC);
             CommandManager.RegisterCommand(CdQuit);
-            CommandManager.RegisterCommand(CdMail);
-            CommandManager.RegisterCommand(CdMailList);
+            CommandManager.RegisterCommand(CdReport);
+            CommandManager.RegisterCommand(CdReports);
             CommandManager.RegisterCommand(CdRBChat);
             CommandManager.RegisterCommand(CdGreeting);
             CommandManager.RegisterCommand(CdIRCStaff);
@@ -682,14 +682,13 @@ namespace fCraft
         }
 
         #endregion
-        #region mailer
-        static readonly CommandDescriptor CdMail = new CommandDescriptor
+        #region Report
+        static readonly CommandDescriptor CdReport = new CommandDescriptor
         {
-            Name = "Mail",
-            Aliases = new[] { "MailOwners" },
+            Name = "Report",
             Category = CommandCategory.New | CommandCategory.Chat,
-            Usage = "/Mail <Message>",
-            Help = "Used to leave a message only the Highest Rank can read.\n" +
+            Usage = "/Report <Message>",
+            Help = "Used to leave a report message only the Highest Rank can read.\n" +
                    "Things to talk about: \n"+
                    "  &fGriefers, Spammers, Trenchers\n" +
                    "  &fAbusive Players, Abusive Admins\n" +
@@ -697,119 +696,118 @@ namespace fCraft
                    "  &fOr just a friendly message\n" +
                    "&sRemember, everything is kept a secret unless stated otherwise.",
 
-            Handler = MOHandler
+            Handler = reportHandler
         };
 
-        static void MOHandler(Player player, CommandReader cmd)
-        {
+        private static void reportHandler(Player player, CommandReader cmd) {
             if (player.DetectChatSpam()) return;
             string message = cmd.NextAll();
-            if (cmd.IsConfirmed)
-            {
-                ChatMailer.Start(message, player.Name);
-                player.Message("Mail sent!");
+            Report rCreate = new Report();
+            if (cmd.IsConfirmed) {
+                rCreate.addReport(getNewReportId(), player.Name, DateTime.Now, message);
+                player.Message("Report sent!");
                 return;
             }
-            else if (message.Length < 1)
-            {
-                CdMail.PrintUsage(player);
-                return;
-            }
-            else
-            {
-                player.Confirm(cmd, "&sYour message will show up like this: \n" +
-                                    "&s[&1Mail&s]\n" + 
-                                    "  &sFrom:&f {0}\n" + 
-                                    "  &sDate: &7{1} {2}\n" + 
-                                    "  &sMessage:&f {3}", 
-                                    player.Name, 
-                                    DateTime.Now.ToShortDateString(), 
-                                    DateTime.Now.ToLongTimeString(), 
-                                    message);
-                return;
+            if (message.Length < 1) {
+                CdReport.PrintUsage(player);
+            } else {
+                player.Confirm(cmd,
+                    "&sYour message will show up like this: \n" + "&s[&1Report&s]\n" + "  &sFrom:&f {0}\n" +
+                    "  &sDate: &7{1} at {2}\n" + "  &sMessage:&f {3}", player.Name, DateTime.Now.ToShortDateString(),
+                    DateTime.Now.ToLongTimeString(), message);
             }
 
         }
-        static readonly CommandDescriptor CdMailList = new CommandDescriptor
+
+        static readonly CommandDescriptor CdReports = new CommandDescriptor
         {
-            Name = "ListMail",
-            Aliases = new[] { "lm" },
+            Name = "Reports",
+            Aliases = new[] { "mail" },
             Permissions = new[] { Permission.ShutdownServer },
             IsConsoleSafe = true,
             Category = CommandCategory.New | CommandCategory.Chat,
-            Usage = "/ListMail",
+            Usage = "/Reports",
             Help = "Use this command to list/remove reports from players",
 
             Handler = MOLHandler
         };
 
-        static void MOLHandler(Player player, CommandReader cmd)
-        {
+        private static void MOLHandler(Player player, CommandReader cmd) {
             string param = cmd.Next();
+            int reportId;
 
-            // List Mails
-            if (param == null)
-            {
-                ChatMailer[] list = ChatMailer.MailerList.OrderBy(Mail => Mail.TimeLeft).ToArray();
-                if (list.Length == 0)
-                {
-                    player.Message("There is no Mail.");
-                }
-                else
-                {
-                    player.Message("There are {0} Messages:", list.Length);
-                    foreach (ChatMailer Mail in list)
-                    {
-                        player.Message("&s[&1Mail ID#" + Mail.ID + "&s] From:&f " + Mail.StartedBy);
+            // List Reports
+            switch (param) {
+                case "abort":
+                case "r":
+                case "d":
+                case "remove":
+                case "delete":
+                    bool removed = false;
+                    Report rRemove = null;
+                    if (cmd.NextInt(out reportId)) {
+                        foreach (Report r in Chat.Reports)
+                            if (r.Id == reportId) {
+                                player.Message("  #{0} has been removed", r.Id);
+                                rRemove = r;
+                                removed = true;
+                            }
+                        if (rRemove != null) {
+                            rRemove.removeFilter();
+                        }
+                        if (!removed) {
+                            player.Message("Given Report (#{0}) does not exist.", reportId);
+                        }
+
+                    } else {
+                        CdReports.PrintUsage(player);
                     }
-                }
-                return;
-            }
-            // Abort a Mail
-            if (param.Equals("abort", StringComparison.OrdinalIgnoreCase))
-            {
-                int MailId;
-                if (cmd.NextInt(out MailId))
-                {
-                    ChatMailer Mail = ChatMailer.FindMailerById(MailId);
-                    if (Mail == null || !Mail.IsRunning)
-                    {
-                        player.Message("Given Mail (#{0}) does not exist.", MailId);
+                    break;
+                case "read":
+                case "open":
+                    bool read = false;
+                    if (cmd.NextInt(out reportId)) {
+                        foreach (Report r in Chat.Reports) {
+                            if (r.Id == reportId) {
+                                player.Message(
+                                    "&s[&1Report&s] #&f{0}\n" + "  &sFrom:&f {1}\n" + "  &sDate: &7{2} at {3}\n" +
+                                    "  &sMessage:&f {4}", r.Id, r.Sender, r.Datesent.ToShortDateString(),
+                                    r.Datesent.ToLongTimeString(), r.Message);
+                                read = true;
+                            }
+                        }
+                        if (!read) {
+                            player.Message("Given Report (#{0}) does not exist.", reportId);
+                        }
+                    } else {
+                        CdReports.PrintUsage(player);
                     }
-                    else
-                    {
-                        Mail.Abort(Mail.ID);
-                        player.Message("  #{0} has been closed", Mail.ID);
+                    break;
+                default:
+                    if (Chat.Reports.Count == 0) {
+                        player.Message("There are no reports.");
+                    } else {
+                        player.Message("There are {0} reports:", Chat.Reports.Count);
+                        foreach (Report r in Chat.Reports.OrderBy(r => r.Datesent)) {
+                            player.Message("&s[&1Report&s] #&f" + r.Id + " &sFrom:&f " + r.Sender);
+                        }
                     }
-                }
-                return;
-            }
-            if (param.Equals("read", StringComparison.OrdinalIgnoreCase))
-            {
-                int MailId;
-                if (cmd.NextInt(out MailId))
-                {
-                    ChatMailer Mail = ChatMailer.FindMailerById(MailId);
-                    if (Mail == null || !Mail.IsRunning)
-                    {
-                        player.Message("Given Mail (#{0}) does not exist.", MailId);
-                    }
-                    else
-                    {
-                        player.Message("&s[&1Mail #{0}&s]\n" +
-                                       "  &sFrom:&f {1}\n" + 
-                                       "  &sDate: &7{2} {3}\n" + 
-                                       "  &sMessage:&f {4}", 
-                                       Mail.ID, 
-                                       Mail.StartedBy, 
-                                       Mail.StartTime.ToShortDateString(), 
-                                       Mail.StartTime.ToLongTimeString(), 
-                                       Mail.Message);
-                    }
-                }
-                return;
+                    break;
             }
         }
+
+        public static int getNewReportId() {
+            int i = 1;
+        go:
+            foreach (Report r in Chat.Reports) {
+                if (r.Id == i) {
+                    i++;
+                    goto go;
+                }
+            }
+            return i;
+        }
+
         #endregion
         #region Timer
 
@@ -1057,7 +1055,7 @@ namespace fCraft
                     }
                     if (!exists) {
                         Server.Message("&Y[Filters] \"{0}\" is now replaced by \"{1}\"", word, replacement);
-                        fCreate.addFilter(getNewId(), word, replacement);
+                        fCreate.addFilter(getNewFilterId(), word, replacement);
                     } else {
                         player.Message("A filter with that world already exists!");
                     }
@@ -1069,7 +1067,7 @@ namespace fCraft
         }
 
 
-        public static int getNewId() {
+        public static int getNewFilterId() {
             int i = 1;
             go:
             foreach (Filter filter in Chat.Filters) {
