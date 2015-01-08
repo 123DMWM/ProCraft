@@ -278,7 +278,7 @@ namespace fCraft {
                 player.Message("Player is offline!");
                 return;
             }
-            if (!validEntities.Contains(model)) {
+            if (!validEntities.Contains(model.ToLower())) {
                 Block block;
                 if (Map.GetBlockByName(model, false, out block)) {
                     model = block.GetHashCode().ToString();
