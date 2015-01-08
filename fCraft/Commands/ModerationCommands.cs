@@ -37,6 +37,7 @@ namespace fCraft {
             CommandManager.RegisterCommand( CdUnfreeze );
             CommandManager.RegisterCommand( CdTeleport );
             CommandManager.RegisterCommand( CdTeleportP );
+            CommandManager.RegisterCommand( CdTop );
             CommandManager.RegisterCommand( CdBring );
             CommandManager.RegisterCommand( CdWorldBring );
             CommandManager.RegisterCommand( CdBringAll );
@@ -2051,6 +2052,44 @@ namespace fCraft {
                     CdTeleportP.PrintUsage(player);
                 }
             }
+        }
+
+        #endregion
+        #region Top
+
+        static readonly CommandDescriptor CdTop = new CommandDescriptor {
+            Name = "Top",
+            Category = CommandCategory.New | CommandCategory.Moderation,
+            Permissions = new[] { Permission.Teleport },
+            Usage = "/Top",
+            Help = "Teleports you to the top block where you are standing",
+            Handler = TopHandler
+        };
+
+        private static void TopHandler(Player player, CommandReader cmd) {
+            int x = player.Position.X/32;
+            int y = player.Position.Y/32;
+            int z = player.WorldMap.Height;
+            retry2:
+            if (player.World.map.GetBlock(x, y, z - 3) == Block.Air) {
+                z = z - 1;
+                goto retry2;
+            }
+            retry:
+            if (player.World.map.GetBlock(x, y, z - 2) != Block.Air ||
+                player.World.map.GetBlock(x, y, z - 1) != Block.Air) {
+                z = z + 1;
+                goto retry;
+            }
+
+            player.TeleportTo(new Position {
+                X = (short) (x*32 + 16),
+                Y = (short) (y*32 + 16),
+                Z = (short) (z*32 + 16),
+                R = player.Position.R,
+                L = player.Position.L
+            });
+            player.Message("Teleported to top");
         }
 
         #endregion
