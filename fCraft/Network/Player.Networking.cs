@@ -1111,7 +1111,6 @@ namespace fCraft {
             var canSee = Server.Players.CanSee(this).ToArray();
 
             // Announce join
-            Info.GeoipLogin();
             if (ConfigKey.ShowConnectionMessages.Enabled())
             {
                 string message = Server.MakePlayerConnectedMessage(this, firstTime, World);
@@ -1134,6 +1133,7 @@ namespace fCraft {
                     Info.IsHidden = false;
                 }
             }
+            Info.GeoipLogin();
 
             // Check if other banned players logged in from this IP
             PlayerInfo[] bannedPlayerNames = PlayerDB.FindPlayers(IP, 25)

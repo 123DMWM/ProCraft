@@ -118,25 +118,37 @@ namespace fCraft {
 
         /// <summary> Begins to asynchronously check player's account type. </summary>
         public void GeoipLogin() {
-            if (GeoIP != LastIP.ToString()) {
+            String ip = LastIP.ToString();
+            if (IPAddress.Parse(ip).IsLocal()) {
+                ip = Server.ExternalIP.ToString();
+            }
+            if (ip != GeoIP) {
                 Scheduler.NewBackgroundTask(GeoipLoginCallback).RunOnce(this, TimeSpan.Zero);
             } else {
-                if (PlayerObject != null) {
-                    Server.Players.CanSee(PlayerObject)
-                        .Message("&2Player &f{0}&2 comes from {1}, {2}", ClassyName, RegionName, CountryName);
-                    if (!IsHidden) {
-                        IRC.SendChannelMessage("&2Player &f{0}&2 comes from {1}, {2}", ClassyName, RegionName,
-                            CountryName);
-                    }
-                    Logger.Log(LogType.UserActivity, "&f{0}&2 comes from {1}, {2}", ClassyName, RegionName, CountryName);
-                }
+                DisplayGeoIp();
             }
         }
 
 
         static void GeoipLoginCallback( SchedulerTask task ) {
             PlayerInfo info = (PlayerInfo)task.UserState;
-            Player.GetGeoip( info );
+            InfoCommands.GetGeoip( info );
+        }
+
+        /// <summary>
+        /// Displayes the GeoIP information to the server.
+        /// </summary>
+        public void DisplayGeoIp() {
+            if (PlayerObject != null) {
+                string comesFrom = String.Format("&2Player &f{0}&2 comes from {1}, {2}", ClassyName, RegionName,
+                    CountryName);
+                Server.Players.CanSee(PlayerObject).Message(comesFrom);
+                PlayerObject.Message(comesFrom);
+                if (!IsHidden) {
+                    IRC.SendChannelMessage(comesFrom);
+                }
+                Logger.Log(LogType.UserActivity, comesFrom);
+            }
         }
 
 
