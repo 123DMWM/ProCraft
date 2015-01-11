@@ -48,7 +48,9 @@ namespace fCraft {
         public int DrawLimit;
 
         /// <summary> Maximum number of uppercase letters that are allowed in a message. </summary>
-        public int MaxCaps;
+        public int MaxCaps = 0;
+        /// <summary> The most amount of personal worlds a player of this rank can have.</summary>
+        public int MaxPersonalWorlds = 0;
 
         /// <summary> Time until the idle kicker will kick this Rank from the server. </summary>
         public int IdleKickTimer;
@@ -232,27 +234,30 @@ namespace fCraft {
 
 
             // Draw command limit, in number-of-blocks (assuming unlimited if not given)
-            if ((attr = el.Attribute("MaxCaps")) != null)
-            {
-                if (Int32.TryParse(attr.Value, out value))
-                {
-                    if (value >= 0 && value < 2048)
-                    {
+            if ((attr = el.Attribute("MaxCaps")) != null) {
+                if (Int32.TryParse(attr.Value, out value)) {
+                    if (value >= 0 && value < 2048) {
                         MaxCaps = value;
-                    }
-                    else
-                    {
+                    } else {
                         Logger.Log(LogType.Warning,
-                                    "Rank({0}): Value for MaxCaps is not within valid range (0-2048). Assuming default ({1}).",
-                                    Name, MaxCaps);
+                            "Rank({0}): Value for MaxCaps is not within valid range (0-2048). Assuming default ({1}).",
+                            Name, MaxCaps);
                     }
-                }
-                else
-                {
+                } else {
                     Logger.Log(LogType.Warning,
-                                "Rank({0}): Could not parse the value for MaxCaps. Assuming default ({1}).",
-                                Name, MaxCaps);
+                        "Rank({0}): Could not parse the value for MaxCaps. Assuming default ({1}).", Name, MaxCaps);
                 }
+            }
+
+            if ((attr = el.Attribute("MaxPW")) != null) {
+                if (!Int32.TryParse(attr.Value, out MaxPersonalWorlds)) {
+                    Logger.Log(LogType.Warning,
+                                "Rank({0}): Could not parse the value for MaxPW. Assuming 0.",
+                                Name);
+                    MaxPersonalWorlds = 0;
+                }
+            } else {
+                MaxPersonalWorlds = 0;
             }
 
 
@@ -403,6 +408,7 @@ namespace fCraft {
             rankTag.Add( new XAttribute( "antiGriefSeconds", AntiGriefSeconds ) );
             if( DrawLimit > 0 ) rankTag.Add( new XAttribute( "drawLimit", DrawLimit ) );
             if( MaxCaps > 0 ) rankTag.Add( new XAttribute( "MaxCaps", MaxCaps ) );
+            rankTag.Add( new XAttribute( "MaxPW", MaxPersonalWorlds) );
             if( IdleKickTimer > 0 ) rankTag.Add( new XAttribute( "idleKickAfter", IdleKickTimer ) );
             if( HasReservedSlot ) rankTag.Add( new XAttribute( "reserveSlot", HasReservedSlot ) );
             if( IsDonor ) rankTag.Add( new XAttribute( "isDonor", IsDonor ) );

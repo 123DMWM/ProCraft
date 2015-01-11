@@ -111,7 +111,7 @@ namespace fCraft {
 
         internal World( [NotNull] string name ) {
             if( name == null ) throw new ArgumentNullException( "name" );
-            if( !IsValidName( name ) ) {
+            if(!IsValidName( name ) ) {
                 throw new ArgumentException( "Unacceptable world name." );
             }
             BlockDB = new BlockDB( this );
@@ -947,20 +947,11 @@ namespace fCraft {
 
         /// <summary> Ensures that player name has the correct length (2-16 characters)
         /// and character set (alphanumeric chars and underscores allowed). </summary>
-        public static bool IsValidName( [NotNull] string name ) {
-            if( name == null ) throw new ArgumentNullException( "name" );
-            if( name.Length < 2 || name.Length > 16 ) return false;
-            for( int i = 0; i < name.Length; i++ ) {
-                char ch = name[i];
-                if( ch < '0' ||
-                    ch > '9' && ch < 'A' ||
-                    ch > 'Z' && ch < '_' ||
-                    ch > '_' && ch < 'a' ||
-                    ch > 'z' ) {
-                    return false;
-                }
-            }
-            return true;
+        public static bool IsValidName([NotNull] string name) {
+            if (name == null) throw new ArgumentNullException("name");
+            if (name.StartsWith("PW_")) return true;
+            if (name.Length < 2 || name.Length > 16) return false;
+            return name.All(ch => ch >= '0' && (ch <= '9' || ch >= 'A') && (ch <= 'Z' || ch >= '_') && (ch <= '_' || ch >= 'a') && ch <= 'z');
         }
 
         /// <summary> Returns a nicely formatted name, with optional color codes. </summary>

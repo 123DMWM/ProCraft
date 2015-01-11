@@ -1050,6 +1050,14 @@ namespace fCraft {
             if( World == null ) PlayerOpException.ThrowNoWorld( this );
             Map map = WorldMap;
             LastUsedBlockType = type;
+            if (World.Name.StartsWith("PW_")) {
+                if (!World.BuildSecurity.ExceptionList.Included.Contains(Info)) {
+                    Message("&WYou are not allowed to build in this world.");
+                    RevertBlockNow(coord);
+                    return false;
+                }
+
+            }
 
             Vector3I coordBelow = new Vector3I( coord.X, coord.Y, coord.Z - 1 );
             Vector3I coordAbove = new Vector3I( coord.X, coord.Y, coord.Z + 1 ); 
@@ -1216,7 +1224,7 @@ namespace fCraft {
                 case CanPlaceResult.WorldDenied:
                     switch( World.BuildSecurity.CheckDetailed( Info ) ) {
                         case SecurityCheckResult.RankTooLow:
-                            Message( "&WYour rank is not allowed to build in this world." );
+                            Message("&WYour rank is not allowed to build in this world.");
                             break;
                         case SecurityCheckResult.BlackListed:
                             Message( "&WYou are not allowed to build in this world." );

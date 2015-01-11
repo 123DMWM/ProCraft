@@ -1763,78 +1763,68 @@ namespace fCraft {
             Handler = TeleportHandler
         };
 
-        static void TeleportHandler( Player player, CommandReader cmd ) {
+        private static void TeleportHandler(Player player, CommandReader cmd) {
             string name = cmd.Next();
-            if( name == null ) {
-                CdTeleport.PrintUsage( player );
+            if (name == null) {
+                CdTeleport.PrintUsage(player);
                 return;
             }
-            if (player.World.Name.ToLower() == "maze")
-            {
+            if (player.World.Name.ToLower() == "maze") {
                 player.Message("Hey no cheating!");
-                return; 
+                return;
             }
-            if (name == "zone")
-            {
+            if (name == "zone") {
                 string zoneName = cmd.Next();
-                if (zoneName == null)
-                {
+                if (zoneName == null) {
                     player.Message("No zone name specified. See &H/Help tpzone");
                     return;
-                }
-                else
-                {
+                } else {
                     Zone zone = player.World.Map.Zones.Find(zoneName);
-                    if (zone == null)
-                    {
+                    if (zone == null) {
                         player.MessageNoZone(zoneName);
                         return;
                     }
-                    int zoneX = (zone.Bounds.XMin + zone.Bounds.XMax) / 2;
-                    int zoneY = (zone.Bounds.YMin + zone.Bounds.YMax) / 2;
-                    int zoneZ = (zone.Bounds.ZMin + zone.Bounds.ZMax) / 2;
-                retry2:
-                    if (player.World.map.GetBlock(zoneX, zoneY, zoneZ - 1) == Block.Air)
-                    {
+                    int zoneX = (zone.Bounds.XMin + zone.Bounds.XMax)/2;
+                    int zoneY = (zone.Bounds.YMin + zone.Bounds.YMax)/2;
+                    int zoneZ = (zone.Bounds.ZMin + zone.Bounds.ZMax)/2;
+                    retry2:
+                    if (player.World.map.GetBlock(zoneX, zoneY, zoneZ - 1) == Block.Air) {
                         zoneZ = zoneZ - 1;
                         goto retry2;
                     }
-                retry:
-                    if (player.World.map.GetBlock(zoneX, zoneY, zoneZ) != Block.Air || player.World.map.GetBlock(zoneX, zoneY, zoneZ + 1) != Block.Air)
-                    {
+                    retry:
+                    if (player.World.map.GetBlock(zoneX, zoneY, zoneZ) != Block.Air ||
+                        player.World.map.GetBlock(zoneX, zoneY, zoneZ + 1) != Block.Air) {
                         zoneZ = zoneZ + 1;
                         goto retry;
                     }
-                    Position zPos = new Position((zoneX) * 32 + 16, (zoneY) * 32 + 16, (zoneZ) * 32 + 64);
+                    Position zPos = new Position((zoneX)*32 + 16, (zoneY)*32 + 16, (zoneZ)*32 + 64);
                     player.TeleportTo((zPos));
                     player.Message("&sTeleporting you to zone " + zone.ClassyName);
                     return;
                 }
             }
-            if (name == "random" || name == "rand")
-            {
+            if (name == "random" || name == "rand") {
                 Random rand = new Random();
                 int x = rand.Next(0, player.WorldMap.Width);
                 int y = rand.Next(0, player.WorldMap.Length);
-                int z = player.Position.Z / 32 + 1;
-            retry2:
-                if (player.World.map.GetBlock(x, y, z - 3) == Block.Air)
-                {
+                int z = player.Position.Z/32 + 1;
+                retry2:
+                if (player.World.map.GetBlock(x, y, z - 3) == Block.Air) {
                     z = z - 1;
                     goto retry2;
                 }
-            retry:
-                if (player.World.map.GetBlock(x, y, z - 2) != Block.Air || player.World.map.GetBlock(x, y, z - 1) != Block.Air)
-                {
+                retry:
+                if (player.World.map.GetBlock(x, y, z - 2) != Block.Air ||
+                    player.World.map.GetBlock(x, y, z - 1) != Block.Air) {
                     z = z + 1;
                     goto retry;
                 }
 
-                player.TeleportTo(new Position
-                {
-                    X = (short)(x * 32 + 16),
-                    Y = (short)(y * 32 + 16),
-                    Z = (short)(z * 32 + 16),
+                player.TeleportTo(new Position {
+                    X = (short) (x*32 + 16),
+                    Y = (short) (y*32 + 16),
+                    Z = (short) (z*32 + 16),
                     R = player.Position.R,
                     L = player.Position.L
                 });
@@ -1842,143 +1832,125 @@ namespace fCraft {
                 return;
             }
 
-            if( cmd.Next() != null ) {
+            if (cmd.Next() != null) {
                 cmd.Rewind();
                 int x, y, z, rot, lot;
                 rot = player.Position.R;
                 lot = player.Position.L;
-                if( cmd.NextInt( out x ) && cmd.NextInt( out y ) && cmd.NextInt( out z ) ) {
-                    if (cmd.HasNext)
-                    {
-                        if (cmd.HasNext)
-                        {
-                            if (cmd.NextInt(out rot) && cmd.NextInt(out lot))
-                            {
-                                if (rot > 255 || rot < 0)
-                                {
+                if (cmd.NextInt(out x) && cmd.NextInt(out y) && cmd.NextInt(out z)) {
+                    if (cmd.HasNext) {
+                        if (cmd.HasNext) {
+                            if (cmd.NextInt(out rot) && cmd.NextInt(out lot)) {
+                                if (rot > 255 || rot < 0) {
                                     player.Message("R must be inbetween 0 and 255. Set to player R");
                                 }
-                                if (lot > 255 || lot < 0)
-                                {
+                                if (lot > 255 || lot < 0) {
                                     player.Message("L must be inbetween 0 and 255. Set to player L");
                                 }
                             }
                         }
                     }
-                    if( x <= -1024 || x >= 1024 || y <= -1024 || y >= 1024 || z <= -1024 || z >= 1024 ) {
-                        player.Message( "Coordinates are outside the valid range!" );
+                    if (x <= -1024 || x >= 1024 || y <= -1024 || y >= 1024 || z <= -1024 || z >= 1024) {
+                        player.Message("Coordinates are outside the valid range!");
 
                     } else {
-                        player.TeleportTo( new Position {
-                            X = (short)(x * 32 + 16),
-                            Y = (short)(y * 32 + 16),
-                            Z = (short)(z * 32 + 48),
-                            R = (byte)rot,
-                            L = (byte)lot
-                        } );
+                        player.TeleportTo(new Position {
+                            X = (short) (x*32 + 16),
+                            Y = (short) (y*32 + 16),
+                            Z = (short) (z*32 + 48),
+                            R = (byte) rot,
+                            L = (byte) lot
+                        });
                     }
                 } else {
-                    CdTeleport.PrintUsage( player );
+                    CdTeleport.PrintUsage(player);
                 }
 
             } else {
-                if( name == "-" ) {
-                    if( player.LastUsedPlayerName != null ) {
+                if (name == "-") {
+                    if (player.LastUsedPlayerName != null) {
                         name = player.LastUsedPlayerName;
                     } else {
-                        player.Message( "Cannot repeat player name: you haven't used any names yet." );
+                        player.Message("Cannot repeat player name: you haven't used any names yet.");
                         return;
                     }
                 }
                 Player[] matches = Server.FindPlayers(player, name, SearchOptions.Default);
-                if( matches.Length == 1 ) {
+                if (matches.Length == 1) {
                     Player target = matches[0];
                     World targetWorld = target.World;
-                    if( targetWorld == null ) PlayerOpException.ThrowNoWorld( target );
-                    if (target.Info.TPDeny && target.Info.Rank >= player.Info.Rank)
-                    {
+                    if (targetWorld == null) PlayerOpException.ThrowNoWorld(target);
+                    if (target.Info.TPDeny && target.Info.Rank >= player.Info.Rank) {
                         player.Message("&CThis player does not want people teleporting to them");
-                        player.Message("Cannot teleport to {0}&S.",
-                                    target.ClassyName,
-                                    targetWorld.ClassyName,
-                                    targetWorld.AccessSecurity.MinRank.ClassyName);
+                        player.Message("Cannot teleport to {0}&S.", target.ClassyName, targetWorld.ClassyName,
+                            targetWorld.AccessSecurity.MinRank.ClassyName);
                         return;
                     }
 
-                    if( targetWorld == player.World ) {
-                        player.TeleportTo( target.Position );
+                    if (targetWorld == player.World) {
+                        player.TeleportTo(target.Position);
 
                     } else {
-                        switch( targetWorld.AccessSecurity.CheckDetailed( player.Info ) ) {
+                        if (targetWorld.Name.StartsWith("PW_") &&
+                            !targetWorld.AccessSecurity.ExceptionList.Included.Contains(player.Info)) {
+                            player.Message(
+                                "You cannot join due to that player being in a personal world that you cannot access.");
+                            return;
+                        }
+                        switch (targetWorld.AccessSecurity.CheckDetailed(player.Info)) {
                             case SecurityCheckResult.Allowed:
                             case SecurityCheckResult.WhiteListed:
-                                if (player.Info.Rank.Name == "Banned")
-                                {
+                                if (player.Info.Rank.Name == "Banned") {
                                     player.Message("&CYou can not change worlds while banned.");
-                                    player.Message("Cannot teleport to {0}&S.",
-                                                target.ClassyName,
-                                                targetWorld.ClassyName,
-                                                targetWorld.AccessSecurity.MinRank.ClassyName);
+                                    player.Message("Cannot teleport to {0}&S.", target.ClassyName,
+                                        targetWorld.ClassyName, targetWorld.AccessSecurity.MinRank.ClassyName);
                                     break;
-                                }  
-                                if( targetWorld.IsFull ) {
-                                    player.Message( "Cannot teleport to {0}&S because world {1}&S is full.",
-                                                    target.ClassyName,
-                                                    targetWorld.ClassyName );
-                                    player.Message("Cannot teleport to {0}&S.",
-                                                target.ClassyName,
-                                                targetWorld.ClassyName,
-                                                targetWorld.AccessSecurity.MinRank.ClassyName);
+                                }
+                                if (targetWorld.IsFull) {
+                                    player.Message("Cannot teleport to {0}&S because world {1}&S is full.",
+                                        target.ClassyName, targetWorld.ClassyName);
+                                    player.Message("Cannot teleport to {0}&S.", target.ClassyName,
+                                        targetWorld.ClassyName, targetWorld.AccessSecurity.MinRank.ClassyName);
                                     break;
                                 }
                                 player.StopSpectating();
-                                player.JoinWorld( targetWorld, WorldChangeReason.Tp, target.Position );
+                                player.JoinWorld(targetWorld, WorldChangeReason.Tp, target.Position);
                                 break;
                             case SecurityCheckResult.BlackListed:
-                                player.Message( "Cannot teleport to {0}&S because you are blacklisted on world {1}",
-                                                target.ClassyName,
-                                                targetWorld.ClassyName );
+                                player.Message("Cannot teleport to {0}&S because you are blacklisted on world {1}",
+                                    target.ClassyName, targetWorld.ClassyName);
                                 break;
                             case SecurityCheckResult.RankTooLow:
-                                if (player.Info.Rank.Name == "Banned")
-                                {
+                                if (player.Info.Rank.Name == "Banned") {
                                     player.Message("&CYou can not change worlds while banned.");
-                                    player.Message("Cannot teleport to {0}&S.",
-                                                target.ClassyName,
-                                                targetWorld.ClassyName,
-                                                targetWorld.AccessSecurity.MinRank.ClassyName);
+                                    player.Message("Cannot teleport to {0}&S.", target.ClassyName,
+                                        targetWorld.ClassyName, targetWorld.AccessSecurity.MinRank.ClassyName);
                                     break;
                                 }
-                                
-                                if (targetWorld.IsFull)
-                                {
-                                    if (targetWorld.IsFull)
-                                    {
+
+                                if (targetWorld.IsFull) {
+                                    if (targetWorld.IsFull) {
                                         player.Message("Cannot teleport to {0}&S because world {1}&S is full.",
-                                                        target.ClassyName,
-                                                        targetWorld.ClassyName);
-                                        player.Message("Cannot teleport to {0}&S.",
-                                                    target.ClassyName,
-                                                    targetWorld.ClassyName,
-                                                    targetWorld.AccessSecurity.MinRank.ClassyName);
+                                            target.ClassyName, targetWorld.ClassyName);
+                                        player.Message("Cannot teleport to {0}&S.", target.ClassyName,
+                                            targetWorld.ClassyName, targetWorld.AccessSecurity.MinRank.ClassyName);
                                         break;
                                     }
                                     player.StopSpectating();
                                     player.JoinWorld(targetWorld, WorldChangeReason.Tp, target.Position);
                                     break;
-                                }                                
-                                player.Message( "Cannot teleport to {0}&S because world {1}&S requires {2}+&S to join.",
-                                                target.ClassyName,
-                                                targetWorld.ClassyName,
-                                                targetWorld.AccessSecurity.MinRank.ClassyName );
+                                }
+                                player.Message("Cannot teleport to {0}&S because world {1}&S requires {2}+&S to join.",
+                                    target.ClassyName, targetWorld.ClassyName,
+                                    targetWorld.AccessSecurity.MinRank.ClassyName);
                                 break;
                         }
                     }
 
-                } else if( matches.Length > 1 ) {
-                    player.MessageManyMatches( "player", matches );
+                } else if (matches.Length > 1) {
+                    player.MessageManyMatches("player", matches);
 
-                } 
+                }
             }
         }
 
