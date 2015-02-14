@@ -580,7 +580,7 @@ namespace fCraft {
                                 "Use \"normal\" instead of a number to reset to default (bedrock)." },
                 { "texture",    "&H/Env <WorldName> texture <Texture .PNG Url>\n&S" +
                                 "Changes the texture for all visible blocks on a map. "+
-                                "Use \"normal\" instead of a number to reset to default (http://108.49.194.95/terrain/64xDefault.png)." }
+                                "Use \"normal\" instead of a number to reset to default (http://96.233.61.56/terrain/64xDefault.png." }
             },
             Usage = "/Env <WorldName> <Variable>",
             IsConsoleSafe = true,
@@ -620,7 +620,7 @@ namespace fCraft {
                 player.Message( "  Water block: {1}  Bedrock block: {0}",
                                 world.EdgeBlock, world.HorizonBlock );
                 player.Message("  Texture: {0}",
-                                world.Texture == "http://108.49.194.95/terrain/64xDefault.png" ? "normal" : world.Texture);
+                                world.Texture == "http://96.233.61.56/terrain/64xDefault.png" ? "normal" : world.Texture);
                 if( !player.IsUsingWoM ) {
                     player.Message( "  You need ClassiCube client to see the changes." );
                 }
