@@ -937,7 +937,7 @@ namespace fCraft {
         public Block EdgeBlock = Block.Admincrete;
 
         /// <summary> The texture that will be used for the blocks. </summary>
-        public string Texture = "http://108.49.194.95/terrain/64xDefault.png";
+        public string Texture = "http://96.233.61.56/terrain/64xDefault.png";
 
         #endregion
 
