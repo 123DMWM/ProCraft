@@ -1089,30 +1089,18 @@ namespace fCraft
             Category = CommandCategory.New | CommandCategory.Chat,
             IsConsoleSafe = false,
             Permissions = new[] { Permission.Chat },
-            Usage = "/Quitmsg [message]",
+            Usage = "/Quit [message]",
             Help = "Quits the server with a reason",
             Handler = QuitHandler
         };
 
-        static void QuitHandler(Player player, CommandReader cmd)
-        {
-            string Msg = "/Quit " + cmd.NextAll();
-
-            if (Msg.Length < 1)
-            {
-                Msg = "/Quit";
-            }
-            if (Msg.Length > 64)
-            {
-                player.Message("Message length must be at most 64 digits long. Not: {0}", Msg.Length);
-                return;
-            }
+        static void QuitHandler(Player player, CommandReader cmd) {
+            string Msg = "/Quit" + (cmd.HasNext ? " " + cmd.NextAll() : "");
             player.usedquit = true;
-            player.quitmessage = Msg;
-            player.Kick(Msg, LeaveReason.ClientQuit);            
-
+            player.quitmessage = (Msg.Length > 70 ? Msg.Remove(70) : Msg);
+            player.Kick(Msg, LeaveReason.ClientQuit);
             Logger.Log(LogType.UserActivity,
-                        "{0} left the server. Reason: {1}", player.Name, Msg);
+                        "{0} left the server. Reason: {1}", player.Name, player.quitmessage);
         }
         #endregion
         #region RBChat

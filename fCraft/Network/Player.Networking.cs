@@ -1478,7 +1478,7 @@ namespace fCraft {
             if (SupportsEnvMapAppearance) {
                 writer.Write(
                     Packet.MakeEnvSetMapAppearance(World.Texture, World.EdgeBlock, World.HorizonBlock,
-                        (short) ((World.EdgeLevel == -1) ? World.EdgeLevel : (WorldMap.Height/2))).Bytes);
+                        (short)((World.EdgeLevel == -1) ? (WorldMap.Height / 2) : World.EdgeLevel)).Bytes);
                 BytesSent += 67;
             }
 

@@ -49,7 +49,7 @@ namespace fCraft {
 
         public bool usedquit = false;
 
-        public string quitmessage = "Used /Quit";
+        public string quitmessage = "/Quit";
 
         /// <summary> Last sign clicked by the player</summary>
         public String LastSignClicked;

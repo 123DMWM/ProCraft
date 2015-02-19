@@ -1464,7 +1464,7 @@ namespace fCraft {
                 player.Message("&h    Info");
                 player.Message("&h    Maintenance");
                 player.Message("&h    Moderation");
-                player.Message("&h    WorldControl");
+                player.Message("&h    World");
                 player.Message("&h    New");
                 player.Message("&h    All");
                 return;

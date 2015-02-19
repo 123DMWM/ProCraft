@@ -1449,22 +1449,23 @@ namespace fCraft {
             }
 
             string silentString = cmd.NextAll();
-            bool silent = (silentString.ToLower().Split()[0].Equals("silent") || silentString.ToLower().Split()[0].Equals("s")) ;
+            bool silent = (silentString.ToLower().Equals("silent") || silentString.ToLower().Equals("s")) ;
 
             player.Info.IsHidden = true;
             player.Message(silent ? "&8You are now hidden (silent)." : "&8You are now hidden.");
 
             // to make it look like player just logged out in /Info
             player.Info.LastSeen = DateTime.UtcNow;
+            String quitMessage = silentString == null ? "" : "/Quit " + (silentString.Length > 64 ? silentString.Remove(64) : silentString);
 
-            if (!silent && ConfigKey.ShowConnectionMessages.Enabled())
-            {
-                Server.Players.CantSee(player).Message("{0}&s left the server. {1}", player.ClassyName, "".Equals(silentString) ? "" : "(/Quit " + (silentString.Length > 32 ? silentString.Remove(32) : silentString)  + ")");
+            if (!silent && ConfigKey.ShowConnectionMessages.Enabled()) {
+                player.quitmessage = quitMessage;
+                player.usedquit = true;
+                Server.Players.CantSee(player).Message("{0}&s left the server. (Reason: {1})", player.ClassyName, quitMessage);
             }
 
             // for aware players: notify
-            Server.Players.CanSee(player).Message("&SPlayer {0}&S is now hidden.", player.ClassyName);
-
+            Server.Players.CanSee(player).Message("&SPlayer {0}&S is now hidden. {1}", player.ClassyName, quitMessage);
             Player.RaisePlayerHideChangedEvent(player, true, silent);
             foreach (Player p1 in Server.Players)
             {

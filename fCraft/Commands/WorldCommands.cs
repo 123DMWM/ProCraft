@@ -551,7 +551,7 @@ namespace fCraft {
             Category = CommandCategory.New | CommandCategory.World,
             Permissions = new[] { Permission.ManageWorlds },
             Help = "Prints or changes the environmental variables for a given world. " +
-                   "Variables are: clouds, fog, sky, level, edge. " +
+                   "Variables are: clouds, fog, shadow, sunlight, sky, level, edge, border, texture. " +
                    "See &H/Help env <Variable>&S for details about each variable. " +
                    "Type &H/Env <WorldName> normal&S to reset everything for a world.",
             HelpSections = new Dictionary<string, string>{
@@ -580,7 +580,7 @@ namespace fCraft {
                                 "Use \"normal\" instead of a number to reset to default (bedrock)." },
                 { "texture",    "&H/Env <WorldName> texture <Texture .PNG Url>\n&S" +
                                 "Changes the texture for all visible blocks on a map. "+
-                                "Use \"normal\" instead of a number to reset to default (http://96.233.61.56/terrain/64xDefault.png." }
+                                "Use \"normal\" instead of a web link to reset to default (http://96.233.61.56/terrain/64xDefault.png." }
             },
             Usage = "/Env <WorldName> <Variable>",
             IsConsoleSafe = true,
@@ -637,7 +637,7 @@ namespace fCraft {
                     world.EdgeLevel = -1;
                     world.EdgeBlock = Block.Admincrete;
                     world.HorizonBlock = Block.Water;
-                    world.Texture = "http://108.49.194.95/terrain/64xDefault.png";
+                    world.Texture = "http://96.233.61.56/terrain/64xDefault.png";
                     Logger.Log( LogType.UserActivity,
                                 "Env: {0} {1} reset environment settings for world {2}",
                                 player.Info.Rank.Name, player.Name, world.Name );
@@ -872,10 +872,10 @@ namespace fCraft {
                 case "tex":
                 case "terrain":
                 case "texture":
-                    if (valueText == "http://108.49.194.95/terrain/64xDefault.png" || valueText == "normal")
+                    if (valueText == "http://96.233.61.56/terrain/64xDefault.png" || valueText == "normal")
                     {
                         player.Message("Reset texture for {0}&S to normal", world.ClassyName);
-                        valueText = "http://108.49.194.95/terrain/64xDefault.png";
+                        valueText = "http://96.233.61.56/terrain/64xDefault.png";
                     }
                     if (!valueText.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
                     {
@@ -1720,7 +1720,7 @@ namespace fCraft {
                            "but we are only allowed to force the terrain onto you.");
             player.Message("So if you want the full experience that this HD Default 64x pack has to offer...");
             player.Message("(Including beautiful Gui and Font)");
-            player.Message("ClassiCube texturepacks: http://108.49.194.95/texturepacks/");
+            player.Message("ClassiCube texturepacks: http://96.233.61.56/texturepacks/");
             player.Message( "Made and converted by 123DMWM^" );
         }
 
@@ -1961,7 +1961,7 @@ namespace fCraft {
             Name = "weather",
             Permissions = new[] { Permission.EditPlayerDB },
             Category = CommandCategory.New | CommandCategory.World,
-            Help = "Changes player weather ingame",
+            Help = "Changes player weather ingame 0(sun) 1(rain) 2(snow)",
             Usage = "/weather [Player] [weather]",
             Handler = WeatherHandler
         };
@@ -1985,7 +1985,7 @@ namespace fCraft {
             }
             if (weather != 0 && weather != 1 && weather != 2)
             {
-                player.Message("Please try something inbetween 0 and 2");
+                player.Message("Must use either 0(sun) 1(rain) 2(snow)");
                 return;
 
             }
@@ -1995,8 +1995,8 @@ namespace fCraft {
                 {
                     if (p.PlayerObject.SupportsEnvWeatherType)
                     {
-                        p.PlayerObject.Message("{0} set your weather to {1}", player.Name, weather);
-                        player.Message("Set weather for {0} to {1}", p.Name, weather);
+                        p.PlayerObject.Message("{0} set your weather to {1} ({2})", player.Name, weather, weather == 0 ? "Sun" : (weather == 1 ? "Rain" : "Snow"));
+                        player.Message("Set weather for {0} to {1} ({2})", p.Name, weather, weather == 0 ? "Sun" : (weather == 1 ? "Rain" : "Snow"));
                         p.PlayerObject.Send(Packet.SetWeather((byte)weather));
                     }
                     else
@@ -2013,7 +2013,7 @@ namespace fCraft {
             {
                 if (player.SupportsEnvWeatherType)
                 {
-                    player.Message("Set weather to {0}", weather);
+                    player.Message("Set weather to {0} ({1})", weather, weather == 0 ? "Sun" : (weather == 1 ? "Rain" : "Snow"));
                     player.Send(Packet.SetWeather((byte)weather));
                 }
                 else
