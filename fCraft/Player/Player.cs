@@ -135,9 +135,6 @@ namespace fCraft {
         [CanBeNull]
         public World World { get; private set; }
 
-        public bool GlobalChatAllowed = false;
-        public bool GlobalChatIgnore = false;
-
         #region General purpose state storage for plugins
         private readonly ConcurrentDictionary<string, object> _publicAuxStateObjects = new ConcurrentDictionary<string, object>();
         public IDictionary<string, object> PublicAuxStateObjects { get { return _publicAuxStateObjects; } }

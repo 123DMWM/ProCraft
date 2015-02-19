@@ -410,16 +410,6 @@ namespace fCraft {
             // Init IRC
             IRC.Init();
 
-            //enable global chat
-            bool startGlobal;
-            if (ConfigKey.IsPublic.TryGetBool(out startGlobal))
-            {
-                if (startGlobal) {
-                    GlobalChat.Init();
-                    GlobalChat.Start();
-                }
-            }
-
             if( ConfigKey.AutoRankEnabled.Enabled() ) {
                 AutoRankManager.Init();
             }
