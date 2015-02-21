@@ -1068,7 +1068,8 @@ namespace fCraft {
                 Random random = new Random();
                 int index = random.Next(0, MOTDlist.Length);
                 motd = MOTDlist[index];
-                if (motd.Length > 64) motd = "Welcome to ProBuild!";
+                string sName = ConfigKey.ServerName.ToString();
+                if (motd.Length > 64) motd = "Welcome to " + (sName.Length > 52 ? sName.Remove(52) : sName) + "!";
                 else motd = "&0=&c=&e= " + motd + " &e=&c=&0=";
                 //motd = ConfigKey.MOTD.GetString();
             }

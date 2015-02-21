@@ -45,6 +45,7 @@ namespace fCraft
             CommandManager.RegisterCommand(Cdbrushes);
             CommandManager.RegisterCommand(CdIdea);
             CommandManager.RegisterCommand(CdAction);
+            CommandManager.RegisterCommand(CdWarn);
 
 
             Player.Moved += new EventHandler<Events.PlayerMovedEventArgs>(Player_IsBack);
@@ -1394,6 +1395,44 @@ namespace fCraft
             if (other != null) {
                 player.Confirm(cmd, "Your messege will show up as: {0} &s{1} {2}", player.ClassyName, action,
                     other.ClassyName);
+            }
+        }
+
+        #endregion
+        #region Warn
+
+        static readonly CommandDescriptor CdWarn = new CommandDescriptor {
+            Name = "Warn",
+            Category = CommandCategory.New | CommandCategory.Chat,
+            Permissions = new[] { Permission.Kick },
+            IsConsoleSafe = true,
+            NotRepeatable = true,
+            DisableLogging = true,
+            Usage = "/Warn [Player] [warning]",
+            Help = "Warns a player about a specified message. Example: \"/Warn Facepalmed stop griefing\" would show up as \"123DontMessWitMe has warned Facepalmed to stop griefing",
+            Handler = WarningHandler
+        };
+
+        private static void WarningHandler(Player player, CommandReader cmd) {
+            if (player.Info.IsMuted) {
+                player.MessageMuted();
+                return;
+            }
+            if (player.DetectChatSpam())
+                return;
+            string searchplayer = cmd.Next();
+            string warning = cmd.NextAll().Trim();
+            Player other = Server.FindPlayerOrPrintMatches(player, searchplayer, SearchOptions.Default);
+            if (other == player) {
+                player.Message("Cannot warn yourself");
+                return;
+            }
+            if (!(cmd.Count <= 2) && cmd.IsConfirmed) {
+                Server.Players.Message("&f{0} &chas warned &f{1} &cto &4{2}", player.ClassyName, other.ClassyName, warning);
+                return;
+            }
+            if (other != null) {
+                player.Confirm(cmd, "Your warning will display as: \"&f{0} &chas warned &f{1} &cto &4{2}\"", player.ClassyName, other.ClassyName, warning);
             }
         }
 
