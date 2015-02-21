@@ -231,12 +231,10 @@ namespace fCraft {
                 "creeper",
                 "croc",
                 "humanoid",
-                "humanoid.armor",
                 "human",
                 "pig",
                 "printer",
                 "sheep",
-                "sheep.fur",
                 "skeleton",
                 "spider",
                 "zombie"

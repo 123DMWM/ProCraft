@@ -352,7 +352,10 @@ namespace fCraft {
                                 commandDescriptor.Permissions.Contains(Permission.DrawAdvanced) ||
                                 commandDescriptor.Permissions.Contains(Permission.CopyAndPaste) ||
                                 commandDescriptor.Permissions.Contains(Permission.UndoOthersActions) ||
-                                commandDescriptor.Permissions.Contains(Permission.UndoAll))) {
+                                commandDescriptor.Permissions.Contains(Permission.UndoAll) ||
+                                commandDescriptor.Permissions.Contains(Permission.Teleport) ||
+                                commandDescriptor.Permissions.Contains(Permission.Bring) ||
+                                commandDescriptor.Permissions.Contains(Permission.BringAll))) {
                         MessageNow("&WYou cannot use this command while playing CTF");
                     } else if (Info.IsFrozen && !commandDescriptor.UsableByFrozenPlayers) {
                         MessageNow("&WYou cannot use this command while frozen.");
