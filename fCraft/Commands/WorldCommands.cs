@@ -582,7 +582,7 @@ namespace fCraft {
                                 "Use \"normal\" instead of a number to reset to default (bedrock)." },
                 { "texture",    "&H/Env <WorldName> texture <Texture .PNG Url>\n&S" +
                                 "Changes the texture for all visible blocks on a map. "+
-                                "Use \"normal\" instead of a web link to reset to default (http://96.233.61.56/terrain/64xDefault.png." }
+                                "Use \"normal\" instead of a web link to reset to default (http://123dmwm.tk/terrain/64xDefault.png." }
             },
             Usage = "/Env <WorldName> <Variable>",
             IsConsoleSafe = true,
@@ -622,7 +622,7 @@ namespace fCraft {
                 player.Message( "  Water block: {1}  Bedrock block: {0}",
                                 world.EdgeBlock, world.HorizonBlock );
                 player.Message("  Texture: {0}",
-                                world.Texture == "http://96.233.61.56/terrain/64xDefault.png" ? "normal" : world.Texture);
+                                world.Texture == "http://123dmwm.tk/terrain/64xDefault.png" ? "normal" : world.Texture);
                 if( !player.IsUsingWoM ) {
                     player.Message( "  You need ClassiCube client to see the changes." );
                 }
@@ -639,7 +639,7 @@ namespace fCraft {
                     world.EdgeLevel = -1;
                     world.EdgeBlock = Block.Admincrete;
                     world.HorizonBlock = Block.Water;
-                    world.Texture = "http://96.233.61.56/terrain/64xDefault.png";
+                    world.Texture = "http://123dmwm.tk/terrain/64xDefault.png";
                     Logger.Log( LogType.UserActivity,
                                 "Env: {0} {1} reset environment settings for world {2}",
                                 player.Info.Rank.Name, player.Name, world.Name );
@@ -892,10 +892,10 @@ namespace fCraft {
                 case "tex":
                 case "terrain":
                 case "texture":
-                    if (valueText == "http://96.233.61.56/terrain/64xDefault.png" || valueText == "normal")
+                    if (valueText == "http://123dmwm.tk/terrain/64xDefault.png" || valueText == "normal")
                     {
                         player.Message("Reset texture for {0}&S to normal", world.ClassyName);
-                        valueText = "http://96.233.61.56/terrain/64xDefault.png";
+                        valueText = "http://123dmwm.tk/terrain/64xDefault.png";
                     }
                     if (!valueText.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
                     {
@@ -1758,7 +1758,7 @@ namespace fCraft {
                            "but we are only allowed to force the terrain onto you.");
             player.Message("So if you want the full experience that this HD Default 64x pack has to offer...");
             player.Message("(Including beautiful Gui and Font)");
-            player.Message("ClassiCube texturepacks: http://96.233.61.56/texturepacks/");
+            player.Message("ClassiCube texturepacks: http://123dmwm.tk/texturepacks/");
             player.Message( "Made and converted by 123DMWM^" );
         }
 

@@ -345,7 +345,7 @@ namespace fCraft {
                     try {
                         world.Texture = tempAttr.Value;
                     } catch {
-                        world.Texture = "http://96.233.61.56/terrain/64xDefault.png";
+                        world.Texture = "http://123dmwm.tk/terrain/64xDefault.png";
                         Logger.Log(LogType.Warning,
                             "WorldManager: Could not parse \"texture\" attribute of Environment settings for world \"{0}\", assuming default (normal).",
                             worldName);
