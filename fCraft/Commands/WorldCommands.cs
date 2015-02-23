@@ -682,8 +682,10 @@ namespace fCraft {
                             player.Message("Set fog color for {0}&S to #{1}", world.ClassyName, valueText);
                         }
                     }
-                    if (player.SupportsEnvColors) {
-                        player.Send(Packet.MakeEnvSetColor(2, world.FogColor));
+                    foreach (Player p in world.Players) {
+                        if (p.SupportsEnvColors) {
+                            p.Send(Packet.MakeEnvSetColor(2, world.FogColor));
+                        }
                     }
                     break;
 
@@ -707,8 +709,10 @@ namespace fCraft {
 
                         }
                     }
-                    if (player.SupportsEnvColors) {
-                        player.Send(Packet.MakeEnvSetColor(1, world.CloudColor));
+                    foreach (Player p in world.Players) {
+                        if (p.SupportsEnvColors) {
+                            p.Send(Packet.MakeEnvSetColor(1, world.CloudColor));
+                        }
                     }
                     break;
 
@@ -730,9 +734,13 @@ namespace fCraft {
                             player.Message("Set sky color for {0}&S to #{1}", world.ClassyName, valueText);
                         }
                     }
-                    if (player.SupportsEnvColors) {
-                        player.Send(Packet.MakeEnvSetColor(0, world.SkyColor));
+
+                    foreach (Player p in world.Players) {
+                        if (p.SupportsEnvColors) {
+                            p.Send(Packet.MakeEnvSetColor(0, world.SkyColor));
+                        }
                     }
+
                     break;
 
                 case "dark":
@@ -754,8 +762,10 @@ namespace fCraft {
                             player.Message("Set shadow color for {0}&S to #{1}", world.ClassyName, valueText);
                         }
                     }
-                    if (player.SupportsEnvColors) {
-                        player.Send(Packet.MakeEnvSetColor(3, world.ShadowColor));
+                    foreach (Player p in world.Players) {
+                        if (p.SupportsEnvColors) {
+                            p.Send(Packet.MakeEnvSetColor(3, world.ShadowColor));
+                        }
                     }
                     break;
 
@@ -779,8 +789,10 @@ namespace fCraft {
                             player.Message("Set sunlight color for {0}&S to #{1}", world.ClassyName, valueText);
                         }
                     }
-                    if (player.SupportsEnvColors) {
-                        player.Send(Packet.MakeEnvSetColor(4, world.LightColor));
+                    foreach (Player p in world.Players) {
+                        if (p.SupportsEnvColors) {
+                            p.Send(Packet.MakeEnvSetColor(4, world.LightColor));
+                        }
                     }
                     break;
 
@@ -804,8 +816,10 @@ namespace fCraft {
                             player.Message("Set water level for {0}&S to {1}", world.ClassyName, level);
                         }
                     }
-                    if (player.SupportsEnvColors) {
-                        player.Send(Packet.MakeEnvSetMapAppearance(world.Texture, world.EdgeBlock, world.HorizonBlock, world.EdgeLevel));
+                    foreach (Player p in world.Players) {
+                        if (p.SupportsEnvColors) {
+                            p.Send(Packet.MakeEnvSetMapAppearance(world.Texture, world.EdgeBlock, world.HorizonBlock, world.EdgeLevel));
+                        }
                     }
                     break;
 
@@ -832,8 +846,10 @@ namespace fCraft {
                             player.Message("Set water block for {0}&S to {1}", world.ClassyName, block);
                         }
                     }
-                    if (player.SupportsEnvColors) {
-                        player.Send(Packet.MakeEnvSetMapAppearance(world.Texture, world.EdgeBlock, world.HorizonBlock, world.EdgeLevel));
+                    foreach (Player p in world.Players) {
+                        if (p.SupportsEnvColors) {
+                            p.Send(Packet.MakeEnvSetMapAppearance(world.Texture, world.EdgeBlock, world.HorizonBlock, world.EdgeLevel));
+                        }
                     }
                     break;
 
@@ -864,8 +880,10 @@ namespace fCraft {
                             player.Message("Set bedrock block for {0}&S to {1}", world.ClassyName, blockhorizon);
                         }
                     }
-                    if (player.SupportsEnvColors) {
-                        player.Send(Packet.MakeEnvSetMapAppearance(world.Texture, world.EdgeBlock, world.HorizonBlock, world.EdgeLevel));
+                    foreach (Player p in world.Players) {
+                        if (p.SupportsEnvColors) {
+                            p.Send(Packet.MakeEnvSetMapAppearance(world.Texture, world.EdgeBlock, world.HorizonBlock, world.EdgeLevel));
+                        }
                     }
                     break;
 
@@ -892,8 +910,10 @@ namespace fCraft {
                         player.Message("Set texture for {0}&S to {1}", world.ClassyName, valueText);
                     }
                     world.Texture = valueText;
-                    if (player.SupportsEnvColors) {
-                        player.Send(Packet.MakeEnvSetMapAppearance(world.Texture, world.EdgeBlock, world.HorizonBlock, world.EdgeLevel));
+                    foreach (Player p in world.Players) {
+                        if (p.SupportsEnvColors) {
+                            p.Send(Packet.MakeEnvSetMapAppearance(world.Texture, world.EdgeBlock, world.HorizonBlock, world.EdgeLevel));
+                        }
                     }
                     break;
 
