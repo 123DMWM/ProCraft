@@ -1655,6 +1655,12 @@ namespace fCraft {
                     }
 
                     string skinString1 = cmd.Next();
+                    if (skinString1.StartsWith("--")) {
+                        skinString1 = String.Format("http://s3.amazonaws.com/MinecraftSkins/{0}.png", skinString1.Replace("--", ""));
+                    }
+                    if (skinString1.StartsWith("++")) {
+                        skinString1 = String.Format("http://i.imgur.com/{0}.png", skinString1.Replace("++", ""));
+                    }
                     Bot botCreate = new Bot();
                     botCreate.setBot(botName, skinString1, requestedModel, player.World, player.Position, getNewID());
                     botCreate.createBot();
@@ -1668,6 +1674,12 @@ namespace fCraft {
                     if (cmd.HasNext) {
                         string model = cmd.Next().ToLower();
                         string skinString2 = cmd.Next();
+                        if (skinString2.StartsWith("--")) {
+                            skinString2 = String.Format("http://s3.amazonaws.com/MinecraftSkins/{0}.png", skinString2.Replace("--", ""));
+                        }
+                        if (skinString2.StartsWith("++")) {
+                            skinString2 = String.Format("http://i.imgur.com/{0}.png", skinString2.Replace("++", ""));
+                        }
                         if (string.IsNullOrEmpty(model)) {
                             player.Message(
                                 "Usage is /Ent model <bot> <model>. Valid models are chicken, creeper, croc, human, pig, printer, sheep, skeleton, spider, zombie, or any block ID/Name.");
@@ -1690,14 +1702,20 @@ namespace fCraft {
                         player.Message("Changed entity model to {0} with skin {1}.", model, skinString2 ?? bot.SkinName);
                         bot.changeBotModel(model, skinString2 ?? bot.SkinName);
                     } else
-                    player.Message(
-                        "Usage is /Ent model <bot> <model>. Valid models are chicken, creeper, croc, human, pig, printer, sheep, skeleton, spider, zombie, or any block ID/Name.");
+                        player.Message(
+                            "Usage is /Ent model <bot> <model>. Valid models are chicken, creeper, croc, human, pig, printer, sheep, skeleton, spider, zombie, or any block ID/Name.");
                     break;
                 case "bring":
                     bot.teleportBot(player.Position);
                     break;
                 case "skin":
-                    string skinString3 = cmd.Next();
+                    string skinString3 = cmd.Next();                    
+                    if (skinString3.StartsWith("--")) {
+                        skinString3 = String.Format("http://s3.amazonaws.com/MinecraftSkins/{0}.png", skinString3.Replace("--", ""));
+                    }
+                    if (skinString3.StartsWith("++")) {
+                        skinString3 = String.Format("http://i.imgur.com/{0}.png", skinString3.Replace("++", ""));
+                    }
                     player.Message("Changed entity skin to {0}.", skinString3 ?? bot.Name);
                     bot.changeBotSkin(skinString3);
                     break;

@@ -768,16 +768,12 @@ namespace fCraft
                 }
                 else if (e.OldWorld == world && e.NewWorld != world)
                 {
-                    if (e.OldWorld.Name == "CTF" && e.NewWorld.Name == "CTF")
-                    {
+                    if (e.OldWorld.Name == "CTF" && e.NewWorld.Name == "CTF") {
                         //Do Nothing.
-                    }
-                    else
-                    {
+                    } else {
                         //Remove player.
                         RemovePlayer(e.Player, e.OldWorld);
-                        if (blueTeam.Count + redTeam.Count == 0)
-                        {
+                        if (blueTeam.Count + redTeam.Count == 0) {
                             e.Player.Message("&eYou were the last player in the game, and thus, the game has ended.");
                             Stop();
                         }
@@ -865,6 +861,9 @@ namespace fCraft
         {
             try
             {
+                if (player.SupportsMessageTypes) {
+                    player.Send(Packet.Message(3, ""));
+                }
                 if (blueTeam.Contains(player))
                 {
                     blueTeam.Remove(player);

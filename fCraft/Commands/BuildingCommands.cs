@@ -1055,6 +1055,9 @@ namespace fCraft {
                 if (225 <= rot || rot <= 32) {
                     Vector3I Pos = new Vector3I(player.Position.X/32, (player.Position.Y - dis)/32,
                         (player.Position.Z - 32)/32);
+                    Pos.X = Math.Min(player.WorldMap.Width - 1, Math.Max(0, Pos.X));
+                    Pos.Y = Math.Min(player.WorldMap.Length - 1, Math.Max(0, Pos.Y));
+                    Pos.Z = Math.Min(player.WorldMap.Height - 1, Math.Max(0, Pos.Z));
 
                     if (player.CanPlace(player.World.Map, Pos, block, BlockChangeContext.Drawn) !=
                         CanPlaceResult.Allowed) {
@@ -1069,7 +1072,10 @@ namespace fCraft {
                     player.Message("Block placed at {0} ({1} blocks away from you)", Pos, dis/32);
                 } else if (33 <= rot && rot <= 96) {
                     Vector3I Pos = new Vector3I((player.Position.X + dis)/32, player.Position.Y/32,
-                        (player.Position.Z - 32)/32);
+                        (player.Position.Z - 32) / 32);
+                    Pos.X = Math.Min(player.WorldMap.Width - 1, Math.Max(0, Pos.X));
+                    Pos.Y = Math.Min(player.WorldMap.Length - 1, Math.Max(0, Pos.Y));
+                    Pos.Z = Math.Min(player.WorldMap.Height - 1, Math.Max(0, Pos.Z));
 
                     if (player.CanPlace(player.World.Map, Pos, block, BlockChangeContext.Drawn) !=
                         CanPlaceResult.Allowed) {
@@ -1084,7 +1090,10 @@ namespace fCraft {
                     player.Message("Block placed at {0} ({1} blocks away from you)", Pos, dis/32);
                 } else if (97 <= rot && rot <= 160) {
                     Vector3I Pos = new Vector3I(player.Position.X/32, (player.Position.Y + dis)/32,
-                        (player.Position.Z - 32)/32);
+                        (player.Position.Z - 32) / 32);
+                    Pos.X = Math.Min(player.WorldMap.Width - 1, Math.Max(0, Pos.X));
+                    Pos.Y = Math.Min(player.WorldMap.Length - 1, Math.Max(0, Pos.Y));
+                    Pos.Z = Math.Min(player.WorldMap.Height - 1, Math.Max(0, Pos.Z));
 
                     if (player.CanPlace(player.World.Map, Pos, block, BlockChangeContext.Drawn) !=
                         CanPlaceResult.Allowed) {
@@ -1099,7 +1108,10 @@ namespace fCraft {
                     player.Message("Block placed at {0} ({1} blocks away from you)", Pos, dis/32);
                 } else if (161 <= rot && rot <= 224) {
                     Vector3I Pos = new Vector3I((player.Position.X - dis)/32, player.Position.Y/32,
-                        (player.Position.Z - 32)/32);
+                        (player.Position.Z - 32) / 32);
+                    Pos.X = Math.Min(player.WorldMap.Width - 1, Math.Max(0, Pos.X));
+                    Pos.Y = Math.Min(player.WorldMap.Length - 1, Math.Max(0, Pos.Y));
+                    Pos.Z = Math.Min(player.WorldMap.Height - 1, Math.Max(0, Pos.Z));
 
                     if (player.CanPlace(player.World.Map, Pos, block, BlockChangeContext.Drawn) !=
                         CanPlaceResult.Allowed) {
@@ -1119,17 +1131,14 @@ namespace fCraft {
             } else {
                 if (192 <= ud && ud <= 224) {
                     Vector3I Pos = new Vector3I(player.Position.X/32, player.Position.Y/32,
-                        (player.Position.Z - 32 + dis)/32);
+                        (player.Position.Z - 32 + dis) / 32);
+                    Pos.X = Math.Min(player.WorldMap.Width - 1, Math.Max(0, Pos.X));
+                    Pos.Y = Math.Min(player.WorldMap.Length - 1, Math.Max(0, Pos.Y));
+                    Pos.Z = Math.Min(player.WorldMap.Height - 1, Math.Max(0, Pos.Z));
 
                     if (player.CanPlace(player.World.Map, Pos, block, BlockChangeContext.Drawn) !=
                         CanPlaceResult.Allowed) {
-                        Pos = new Vector3I(player.Position.X/32, player.Position.Y/32, player.WorldMap.Height);
-                        Player.RaisePlayerPlacedBlockEvent(player, player.WorldMap, Pos, player.WorldMap.GetBlock(Pos),
-                            block, BlockChangeContext.Drawn);
-                        BlockUpdate blockUpdateO = new BlockUpdate(null, Pos, block);
-                        player.World.Map.QueueUpdate(blockUpdateO);
-                        player.Message("Block placed at {0} ({1} blocks away from you)", Pos,
-                            (player.WorldMap.Height - player.Position.Z)/32);
+                        player.Message("&WYou are not allowed to build here");
                         return;
                     }
 
@@ -1137,10 +1146,13 @@ namespace fCraft {
                         block, BlockChangeContext.Drawn);
                     BlockUpdate blockUpdate = new BlockUpdate(null, Pos, block);
                     player.World.Map.QueueUpdate(blockUpdate);
-                    player.Message("Block placed at {0} ({1} blocks away from you)", Pos, dis/32);
+                    player.Message("Block placed at {0} ({1} blocks away from you)", Pos, dis / 32);
                 } else if (33 <= ud && ud <= 65) {
                     Vector3I Pos = new Vector3I(player.Position.X/32, player.Position.Y/32,
-                        (player.Position.Z - 32 - dis)/32);
+                        (player.Position.Z - 32 - dis) / 32);
+                    Pos.X = Math.Min(player.WorldMap.Width - 1, Math.Max(0, Pos.X));
+                    Pos.Y = Math.Min(player.WorldMap.Length - 1, Math.Max(0, Pos.Y));
+                    Pos.Z = Math.Min(player.WorldMap.Height - 1, Math.Max(0, Pos.Z));
 
                     if (player.CanPlace(player.World.Map, Pos, block, BlockChangeContext.Drawn) !=
                         CanPlaceResult.Allowed) {

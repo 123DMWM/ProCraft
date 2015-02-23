@@ -264,6 +264,12 @@ namespace fCraft {
             }
             string model = cmd.Next();
             string skinString = cmd.Next();
+            if (skinString.StartsWith("--")) {
+                skinString = String.Format("http://s3.amazonaws.com/MinecraftSkins/{0}.png", skinString.Replace("--", ""));
+            }
+            if (skinString.StartsWith("++")) {
+                skinString = String.Format("http://i.imgur.com/{0}.png", skinString.Replace("++", ""));
+            }
             PlayerInfo[] p2 = PlayerDB.FindPlayers(namePart);
             PlayerInfo p = PlayerDB.FindPlayerInfoOrPrintMatches(player, namePart, SearchOptions.IncludeSelf);
             if (p2.Length > 1) {
@@ -333,6 +339,12 @@ namespace fCraft {
                 return;
             }
             string skinString = cmd.Next();
+            if (skinString.StartsWith("--")) {
+                skinString = String.Format("http://s3.amazonaws.com/MinecraftSkins/{0}.png", skinString.Replace("--", ""));
+            }
+            if (skinString.StartsWith("++")) {
+                skinString = String.Format("http://i.imgur.com/{0}.png", skinString.Replace("++", ""));
+            }
             PlayerInfo p = PlayerDB.FindPlayerInfoOrPrintMatches(player, namePart, SearchOptions.IncludeSelf);
             if (p == null || !p.IsOnline) {
                 player.Message("Player not found or offline!");
