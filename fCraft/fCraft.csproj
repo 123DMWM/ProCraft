@@ -163,6 +163,11 @@
     <Compile Include="Player\Replace.cs" />
     <Compile Include="Player\SearchOptions.cs" />
     <Compile Include="Player\SecurityController.cs" />
+    <Compile Include="Portals\Portal.cs" />
+    <Compile Include="Portals\PortalDB.cs" />
+    <Compile Include="Portals\PortalException.cs" />
+    <Compile Include="Portals\PortalHandler.cs" />
+    <Compile Include="Portals\PortalRange.cs" />
     <Compile Include="System\Fallback.cs" />
     <Compile Include="System\Utils\BitMap3D.cs" />
     <Compile Include="System\Utils\Direction.cs" />

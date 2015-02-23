@@ -18,6 +18,7 @@ using fCraft.Drawing;
 using fCraft.Events;
 using JetBrains.Annotations;
 using ThreadState = System.Threading.ThreadState;
+using fCraft.Portals;
 
 namespace fCraft {
     /// <summary> Core of an fCraft server. Manages startup/shutdown, online player
@@ -988,6 +989,10 @@ namespace fCraft {
             }
 
             #endregion
+
+
+            PortalHandler.GetInstance();
+            PortalDB.Load();
 
             // garbage collection (every 60s)
             gcTask = Scheduler.NewTask( DoGC ).RunForever( GCInterval, TimeSpan.FromSeconds( 45 ) );

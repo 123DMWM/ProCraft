@@ -121,6 +121,17 @@ namespace fCraft {
         /// <summary> The Time that has passed since the last block change.</summary>
         public DateTime TimeLastBlockChange { get; set; }
 
+        //Portals
+        public bool StandingInPortal = false;
+        public bool CanUsePortal = true;
+        public String PortalWorld;
+        public String PortalName;
+        public bool BuildingPortal = true;
+        public DateTime LastUsedPortal;
+        public DateTime LastWarnedPortal;
+        public bool PortalsEnabled = true;
+        public readonly object PortalLock = new object();
+
         /// <summary> Has player been warned by the DEFCCON system? </summary>
         public bool Warned { get; set; }
         /// <summary> How Many Blocks player has placed this session. </summary>

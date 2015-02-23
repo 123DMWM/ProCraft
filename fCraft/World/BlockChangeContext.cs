@@ -40,5 +40,8 @@ namespace fCraft {
 
         /// <summary> Exploded using tnt. </summary>
         Exploded = 1024,
+
+        /// <summary> A player-made portal </summary>
+        Portal = 2048,
     }
 }

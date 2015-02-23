@@ -139,6 +139,9 @@ namespace fCraft {
         public const string DataBackupDirectory = "databackups";
         public const string DataBackupFileNameFormat = "ProCraftData_{0:yyyyMMdd'_'HH'-'mm'-'ss}.zip";
 
+
+        public const string PortalDBFileName = "PortalDB.txt";
+
         #endregion
 
 

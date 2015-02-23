@@ -84,6 +84,10 @@ namespace fCraft {
         [CanBeNull]
         public Array Signs { get; set; }
 
+
+        public ArrayList Portals;
+        public int portalID = 1;
+
         public static List<Bot> Bots = new List<Bot>();
 
 
