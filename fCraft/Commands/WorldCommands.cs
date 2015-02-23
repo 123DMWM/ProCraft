@@ -602,9 +602,6 @@ namespace fCraft {
                 world = WorldManager.FindWorldOrPrintMatches( player, worldName );
                 if( world == null ) return;
             }
-            if (world.EdgeLevel == -1) {
-                world.EdgeLevel = (short) (world.map.Height/2);
-            }
 
             string variable = cmd.Next();
             string valueText = cmd.Next();
