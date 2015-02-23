@@ -67,7 +67,7 @@ namespace fCraft.Portals
 
                     stopwatch.Stop();
 
-                    Logger.Log(LogType.SystemActivity, "PortalDB.Save: Saved {0} portal(s) of {1} world(s) in {2}ms", portals, worlds, stopwatch.ElapsedMilliseconds);
+                    Logger.Log(LogType.Debug, "PortalDB.Save: Saved {0} portal(s) of {1} world(s) in {2}ms", portals, worlds, stopwatch.ElapsedMilliseconds);
                 }
             }
             catch (Exception ex)
