@@ -370,6 +370,13 @@ namespace fCraft {
                 }
             }
 
+            if (zone.Name.ToLower().StartsWith("command_")) {
+                if (player.Info.Rank != RankManager.HighestRank) {
+                    player.Message("You cannot affect command zones.");
+                    return;
+                }
+            }
+
             //player.Message(cmd.RawMessage);
             //player.Message(cmd.RawMessage.Substring(cmd.Offset));
             if (cmd.RawMessage.Substring(cmd.Offset + 1).StartsWith("#"))
@@ -746,6 +753,13 @@ namespace fCraft {
                     return;
                 }
             }
+
+            if (zone.Name.ToLower().StartsWith("command_")) {
+                if (player.Info.Rank != RankManager.HighestRank) {
+                    player.Message("You cannot affect command zones.");
+                    return;
+                }
+            }
             if( zone != null ) {
                 if( !player.Info.Rank.AllowSecurityCircumvention ) {
                     switch( zone.Controller.CheckDetailed( player.Info ) ) {
@@ -875,6 +889,12 @@ namespace fCraft {
                 if (player.Can(Permission.ManageSpecialZones) == false)
                 {
                     player.Message("You cannot affect special zones.");
+                    return;
+                }
+            }
+            if (oldZone.Name.ToLower().StartsWith("command_")) {
+                if (player.Info.Rank != RankManager.HighestRank) {
+                    player.Message("You cannot affect command zones.");
                     return;
                 }
             }
