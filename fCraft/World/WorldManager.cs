@@ -353,7 +353,7 @@ namespace fCraft {
                 }
                 if ((tempAttr = envEl.Attribute("maxreach")) != null) {
                     if (!short.TryParse(tempAttr.Value, out world.maxReach)) {
-                        world.EdgeLevel = 160;
+                        world.maxReach = 160;
                         Logger.Log(LogType.Warning,
                             "WorldManager: Could not parse \"maxreach\" attribute of Environment settings for world \"{0}\", assuming default (normal 160).",
                             worldName);
