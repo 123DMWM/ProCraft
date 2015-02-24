@@ -1254,14 +1254,13 @@ namespace fCraft {
                         if (deniedZone.Name.ToLower().StartsWith("sign") && deniedZone.Bounds.Height == 1 && deniedZone.Bounds.Length == 1 && deniedZone.Bounds.Width == 1) {
                             if (deniedZone.Sign == null) {
                                 FileInfo SignInfo = new FileInfo("./signs/" + World.Name + "/" + deniedZone.Name + ".txt");
-                                if (IsCommandBlockRunnin || (SignList != null && (DateTime.UtcNow - LastZoneNotification).Seconds > SignList.Length)) {
+                                if ((DateTime.UtcNow - LastZoneNotification).Seconds > SignList.Length) {
                                     goto revert;
-                                    ;
                                 }
                                 if (SignInfo.Exists) {
-                                    SignList = File.ReadAllLines("./signs/" + World.Name + "/" + deniedZone.Name + ".txt");
+                                    String[] SignList2 = File.ReadAllLines("./signs/" + World.Name + "/" + deniedZone.Name + ".txt");
                                     string SignMessage = "";
-                                    foreach (string line in SignList) {
+                                    foreach (string line in SignList2) {
                                         SignMessage += line + "&n";
                                     }
                                     Message(SignMessage);
