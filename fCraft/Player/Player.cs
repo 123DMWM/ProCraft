@@ -1254,16 +1254,18 @@ namespace fCraft {
                         if (deniedZone.Name.ToLower().StartsWith("sign") && deniedZone.Bounds.Height == 1 && deniedZone.Bounds.Length == 1 && deniedZone.Bounds.Width == 1) {
                             if (deniedZone.Sign == null) {
                                 FileInfo SignInfo = new FileInfo("./signs/" + World.Name + "/" + deniedZone.Name + ".txt");
-                                if ((DateTime.UtcNow - LastZoneNotification).Seconds > SignList.Length) {
+                                String[] SignList2 = null;
+                                if (SignList2 != null && (DateTime.UtcNow - LastZoneNotification).Seconds > SignList2.Length) {
                                     goto revert;
                                 }
                                 if (SignInfo.Exists) {
-                                    String[] SignList2 = File.ReadAllLines("./signs/" + World.Name + "/" + deniedZone.Name + ".txt");
+                                    SignList2 = File.ReadAllLines("./signs/" + World.Name + "/" + deniedZone.Name + ".txt");
                                     string SignMessage = "";
                                     foreach (string line in SignList2) {
                                         SignMessage += line + "&n";
                                     }
                                     Message(SignMessage);
+                                    LastZoneNotification = DateTime.Now;
                                     Logger.Log(LogType.Debug, "[Signs] {0} clicked on sign [{1}] On map [{2}]", Name, deniedZone.Name, World.Name);
                                     LastSignClicked = deniedZone.Name;
                                 }
