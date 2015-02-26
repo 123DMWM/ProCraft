@@ -1290,8 +1290,9 @@ namespace fCraft {
                                 }
                                 if (SignInfo.Exists) {
                                     SignList = File.ReadAllLines("./signs/" + World.Name + "/" + deniedZone.Name + ".txt");
-                                    Scheduler.NewTask(CommandBlock).RunRepeating(new TimeSpan(0,0,0), new TimeSpan(0,0,1), SignList.Length);
-                                    
+                                    if (SignList.Length >= 1) {
+                                        Scheduler.NewTask(CommandBlock).RunRepeating(new TimeSpan(0, 0, 0), new TimeSpan(0, 0, 1), SignList.Length);
+                                    }
                                     Logger.Log(LogType.Debug, "[Signs] {0} clicked on command block [{1}] On map [{2}]", Name, deniedZone.Name, World.Name);
                                     LastSignClicked = deniedZone.Name;
                                 }
@@ -1335,7 +1336,12 @@ namespace fCraft {
         void CommandBlock(SchedulerTask task) {
             IsCommandBlockRunnin = true;
             if (SignList[signspot] != null) {
-                ParseMessage(SignList[signspot], false);
+                try {
+                    ParseMessage(SignList[signspot], false);
+                } catch (Exception ex) {
+                    Message("Command produces error: \"" + SignList[signspot] + "\"");
+                    Logger.Log(LogType.Error, ex.ToString());
+                }
             }
             LastZoneNotification = DateTime.UtcNow;
             signspot++;
