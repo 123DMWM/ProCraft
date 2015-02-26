@@ -346,7 +346,7 @@ namespace fCraft
                 if (player.Info.ReadIRC == true)
                 {
                     player.Info.ReadIRC = false;
-                    player.MessageNow("You are now ignoring &iIRC");
+                    player.Message("You are now ignoring &iIRC");
                     string message = String.Format("\u212C&SPlayer {0}&S is now Ignoring IRC", player.ClassyName);
                     if (!player.Info.IsHidden)
                     {
@@ -355,7 +355,7 @@ namespace fCraft
                 }
                 else
                 {
-                    player.MessageNow("You are already ignoring &iIRC");
+                    player.Message("You are already ignoring &iIRC");
                 }
                 return;
             }
@@ -371,11 +371,11 @@ namespace fCraft
 
                 if (player.Ignore(targetInfo))
                 {
-                    player.MessageNow("You are now ignoring {0}", targetInfo.ClassyName);
+                    player.Message("You are now ignoring {0}", targetInfo.ClassyName);
                 }
                 else
                 {
-                    player.MessageNow("You are already ignoring {0}", targetInfo.ClassyName);
+                    player.Message("You are already ignoring {0}", targetInfo.ClassyName);
                 }
 
             }
@@ -384,11 +384,11 @@ namespace fCraft
                 PlayerInfo[] ignoreList = player.IgnoreList;
                 if (ignoreList.Length > 0)
                 {
-                    player.MessageNow("Ignored players: {0}", ignoreList.JoinToClassyString());
+                    player.Message("Ignored players: {0}", ignoreList.JoinToClassyString());
                 }
                 else
                 {
-                    player.MessageNow("You are not currently ignoring anyone.");
+                    player.Message("You are not currently ignoring anyone.");
                 }
             }
         }
@@ -412,7 +412,7 @@ namespace fCraft
                 if (player.Info.ReadIRC == false)
                 {
                     player.Info.ReadIRC = true;
-                    player.MessageNow("You are no longer ignoring &iIRC");
+                    player.Message("You are no longer ignoring &iIRC");
                     string message = String.Format("\u212C&SPlayer {0}&S is no longer Ignoring IRC", player.ClassyName);
                     if (!player.Info.IsHidden)
                     {
@@ -421,7 +421,7 @@ namespace fCraft
                 }
                 else
                 {
-                    player.MessageNow("You are not currently ignoring &iIRC");
+                    player.Message("You are not currently ignoring &iIRC");
                 }
                 return;
             }
@@ -437,11 +437,11 @@ namespace fCraft
 
                 if (player.Unignore(targetInfo))
                 {
-                    player.MessageNow("You are no longer ignoring {0}", targetInfo.ClassyName);
+                    player.Message("You are no longer ignoring {0}", targetInfo.ClassyName);
                 }
                 else
                 {
-                    player.MessageNow("You are not currently ignoring {0}", targetInfo.ClassyName);
+                    player.Message("You are not currently ignoring {0}", targetInfo.ClassyName);
                 }
             }
             else
@@ -449,11 +449,11 @@ namespace fCraft
                 PlayerInfo[] ignoreList = player.IgnoreList;
                 if (ignoreList.Length > 0)
                 {
-                    player.MessageNow("Ignored players: {0}", ignoreList.JoinToClassyString());
+                    player.Message("Ignored players: {0}", ignoreList.JoinToClassyString());
                 }
                 else
                 {
-                    player.MessageNow("You are not currently ignoring anyone.");
+                    player.Message("You are not currently ignoring anyone.");
                 }
             }
         }
@@ -642,16 +642,16 @@ namespace fCraft
             {
                 for (int i = 0; i < LinesToClear; i++)
                 {
-                    player.MessageNow("");
+                    player.Message("");
                 }
-                player.MessageNow("Deafened mode: &2ON");
-                player.MessageNow("You will not see ANY messages until you type &H/Deafen&S again.");
+                player.Message("Deafened mode: &2ON");
+                player.Message("You will not see ANY messages until you type &H/Deafen&S again.");
                 player.IsDeaf = true;
             }
             else
             {
                 player.IsDeaf = false;
-                player.MessageNow("Deafened mode: &4OFF");
+                player.Message("Deafened mode: &4OFF");
             }
         }
 

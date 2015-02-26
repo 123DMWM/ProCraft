@@ -677,7 +677,7 @@ namespace fCraft {
         static void ZoneMarkHandler([NotNull] Player player, [NotNull] CommandReader cmd) {
             switch (player.SelectionMarksExpected) {
                 case 0:
-                    player.MessageNow("Cannot use ZMark - no selection in progress.");
+                    player.Message("Cannot use ZMark - no selection in progress.");
                     break;
                 case 2: {
                         string zoneName = cmd.Next();
@@ -698,7 +698,7 @@ namespace fCraft {
                     }
                     break;
                 default:
-                    player.MessageNow("ZMark can only be used with 2-block/2-click selections.");
+                    player.Message("ZMark can only be used with 2-block/2-click selections.");
                     break;
             }
         }

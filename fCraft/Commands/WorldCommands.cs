@@ -101,7 +101,7 @@ namespace fCraft {
 
         static void BlockDBHandler( Player player, CommandReader cmd ) {
             if( !BlockDB.IsEnabledGlobally ) {
-                player.Message( "&WBlockDB is disabled on this server." );
+                player.Message("&WBlockDB is disabled on this server.");
                 return;
             }
 
@@ -1152,7 +1152,7 @@ namespace fCraft {
 
             // generate the map
             Map map;
-            player.MessageNow("Generating {0}...", templateFullName);
+            player.Message("Generating {0}...", templateFullName);
 
             if (genEmpty) {
                 map = MapGenerator.GenerateEmpty(mapWidth, mapLength, mapHeight);
@@ -1192,7 +1192,7 @@ namespace fCraft {
                     player.Message("&WAn error occurred while saving generated map to {0}", fileName);
                 }
             } else {
-                player.MessageNow("Generation done. Changing map...");
+                player.Message("Generation done. Changing map...");
                 playerWorld.MapChangedBy = player.Name;
                 playerWorld.ChangeMap(map);
             }
@@ -2741,10 +2741,10 @@ namespace fCraft {
 
             Map map = world.Map;
             if( map == null ) {
-                player.MessageNow( "WFlush: {0}&S has no updates to process.",
+                player.Message( "WFlush: {0}&S has no updates to process.",
                                    world.ClassyName );
             } else {
-                player.MessageNow( "WFlush: Flushing {0}&S ({1} blocks)...",
+                player.Message( "WFlush: Flushing {0}&S ({1} blocks)...",
                                    world.ClassyName,
                                    map.UpdateQueueLength + map.DrawQueueBlockCount );
                 world.Flush();
@@ -2899,7 +2899,7 @@ namespace fCraft {
                 try {
                     map = MapUtility.Load(fullFileName);
                 } catch (Exception ex) {
-                    player.MessageNow("Could not load specified file: {0}: {1}", ex.GetType().Name, ex.Message);
+                    player.Message("Could not load specified file: {0}: {1}", ex.GetType().Name, ex.Message);
                     return;
                 }
                 World world = player.World;
@@ -2915,7 +2915,7 @@ namespace fCraft {
                 }
 
                 world.Players.Message(player, "{0}&S loaded a new map for this world.", player.ClassyName);
-                player.MessageNow("New map loaded for the world {0}", world.ClassyName);
+                player.Message("New map loaded for the world {0}", world.ClassyName);
 
                 Logger.Log(LogType.UserActivity, "{0} {1} &sloaded new map for world \"{1}\" from \"{2}\"",
                     player.Info.Rank.Name, player.Name, world.Name, fileName);
@@ -2973,7 +2973,7 @@ namespace fCraft {
                         try {
                             map = MapUtility.Load(fullFileName);
                         } catch (Exception ex) {
-                            player.MessageNow("Could not load specified file: {0}: {1}", ex.GetType().Name, ex.Message);
+                            player.Message("Could not load specified file: {0}: {1}", ex.GetType().Name, ex.Message);
                             return;
                         }
 
@@ -2988,7 +2988,7 @@ namespace fCraft {
 
                         world.Players.Message(player, "{0}&S loaded a new map for the world {1}", player.ClassyName,
                             world.ClassyName);
-                        player.MessageNow("New map for the world {0}&S has been loaded.", world.ClassyName);
+                        player.Message("New map for the world {0}&S has been loaded.", world.ClassyName);
                         Logger.Log(LogType.UserActivity, "{0} {1} &sloaded new map for world \"{2}\" from \"{3}\"",
                             player.Info.Rank.Name, player.Name, world.Name, fullFileName);
 
@@ -3010,7 +3010,7 @@ namespace fCraft {
                         try {
                             map = MapUtility.Load(fullFileName);
                         } catch (Exception ex) {
-                            player.MessageNow("Could not load \"{0}\": {1}: {2}", fileName, ex.GetType().Name,
+                            player.Message("Could not load \"{0}\": {1}: {2}", fileName, ex.GetType().Name,
                                 ex.Message);
                             return;
                         }
@@ -3041,7 +3041,7 @@ namespace fCraft {
                             "{0} {1} &screated a new world named \"{2}\" (loaded from \"{3}\")", player.Info.Rank.Name,
                             player.Name, worldName, fileName);
                         WorldManager.SaveWorldList();
-                        player.MessageNow("Access is {0}+&S, and building is {1}+&S on {2}",
+                        player.Message("Access is {0}+&S, and building is {1}+&S on {2}",
                             newWorld.AccessSecurity.MinRank.ClassyName, newWorld.BuildSecurity.MinRank.ClassyName,
                             newWorld.ClassyName);
                     }
@@ -3090,8 +3090,8 @@ namespace fCraft {
                 }
                 catch (Exception ex)
                 {
-                    player.MessageNow("Could not load specified file: {0}: {1}", ex.GetType().Name, ex.Message);
-                    player.MessageNow("Please use &h/WCS &sfirst on an empty map to create a backup for clearing.", ex.GetType().Name, ex.Message);
+                    player.Message("Could not load specified file: {0}: {1}", ex.GetType().Name, ex.Message);
+                    player.Message("Please use &h/WCS &sfirst on an empty map to create a backup for clearing.", ex.GetType().Name, ex.Message);
                     return;
                 }
                 World world = player.World;
@@ -3112,7 +3112,7 @@ namespace fCraft {
 
                 world.Players.Message(player, "{0}&S cleared this world.",
                                               player.ClassyName);
-                player.MessageNow("New clear map loaded for {0}", world.ClassyName);
+                player.Message("New clear map loaded for {0}", world.ClassyName);
 
                 Logger.Log(LogType.UserActivity,
                             "{0} {1} &scleared map for world \"{1}\" from \"{2}\"",
@@ -3148,7 +3148,7 @@ namespace fCraft {
                         }
                         catch (Exception ex)
                         {
-                            player.MessageNow("Could not load specified file: {0}: {1}", ex.GetType().Name, ex.Message);
+                            player.Message("Could not load specified file: {0}: {1}", ex.GetType().Name, ex.Message);
                             return;
                         }
 
@@ -3167,7 +3167,7 @@ namespace fCraft {
 
                         world.Players.Message(player, "{0}&S cleared the map for world {1}",
                                                player.ClassyName, world.ClassyName);
-                        player.MessageNow("New map for the world {0}&S has been loaded.", world.ClassyName);
+                        player.Message("New map for the world {0}&S has been loaded.", world.ClassyName);
                         Logger.Log(LogType.UserActivity,
                                     "{0} {1} &sloaded new map for world \"{2}\"",
                                     player.Info.Rank.Name, player.Name, world.Name, fullFileName);
@@ -3379,21 +3379,21 @@ namespace fCraft {
             } catch (WorldOpException ex) {
                 switch (ex.ErrorCode) {
                     case WorldOpExceptionCode.NoChangeNeeded:
-                        player.MessageNow("WRename: World is already named \"{0}\"", oldName);
+                        player.Message("WRename: World is already named \"{0}\"", oldName);
                         return;
                     case WorldOpExceptionCode.DuplicateWorldName:
-                        player.MessageNow("WRename: Another world named \"{0}\" already exists.", newName);
+                        player.Message("WRename: Another world named \"{0}\" already exists.", newName);
                         return;
                     case WorldOpExceptionCode.InvalidWorldName:
-                        player.MessageNow("WRename: Invalid world name: \"{0}\"", newName);
+                        player.Message("WRename: Invalid world name: \"{0}\"", newName);
                         return;
                     case WorldOpExceptionCode.MapMoveError:
-                        player.MessageNow(
+                        player.Message(
                             "WRename: World \"{0}\" was renamed to \"{1}\", but the map file could not be moved due to an error: {2}",
                             oldName, newName, ex.InnerException);
                         return;
                     default:
-                        player.MessageNow("&WWRename: Unexpected error renaming world \"{0}\": {1}", oldName, ex.Message);
+                        player.Message("&WWRename: Unexpected error renaming world \"{0}\": {1}", oldName, ex.Message);
                         Logger.Log(LogType.Error,
                             "WorldCommands.Rename: Unexpected error while renaming world {0} to {1}: {2}", oldWorld.Name,
                             newName, ex);
@@ -3481,7 +3481,7 @@ namespace fCraft {
                 Directory.CreateDirectory( dirName );
             }
 
-            player.MessageNow( "Saving map to {0}", fileName );
+            player.Message( "Saving map to {0}", fileName );
 
             const string mapSavingErrorMessage = "Map saving failed. See server logs for details.";
             Map map = world.Map;
@@ -3581,7 +3581,7 @@ namespace fCraft {
                 Directory.CreateDirectory(dirName);
             }
 
-            player.MessageNow("Saving map to {0}", fileName);
+            player.Message("Saving map to {0}", fileName);
 
             const string mapSavingErrorMessage = "Map saving failed. See server logs for details.";
             Map map = world.Map;
@@ -3841,16 +3841,16 @@ namespace fCraft {
             } catch( WorldOpException ex ) {
                 switch( ex.ErrorCode ) {
                     case WorldOpExceptionCode.CannotDoThatToMainWorld:
-                        player.MessageNow( "&WWorld {0}&W is set as the main world. " +
+                        player.Message( "&WWorld {0}&W is set as the main world. " +
                                            "Assign a new main world before deleting this one.",
                                            world.ClassyName );
                         return;
                     case WorldOpExceptionCode.WorldNotFound:
-                        player.MessageNow( "&WWorld {0}&W is already unloaded.",
+                        player.Message( "&WWorld {0}&W is already unloaded.",
                                            world.ClassyName );
                         return;
                     default:
-                        player.MessageNow( "&WUnexpected error occurred while unloading world {0}&W: {1}",
+                        player.Message( "&WUnexpected error occurred while unloading world {0}&W: {1}",
                                            world.ClassyName, ex.GetType().Name );
                         Logger.Log( LogType.Error,
                                     "WorldCommands.WorldUnload: Unexpected error while unloading world {0}: {1}",
@@ -4338,7 +4338,7 @@ namespace fCraft {
                     }
                     string worldNamec = string.Format("PW_{0}_{1}", player.Name,
                         (totalc.Any()) ? "" + (totalc.Count() + 1) : "1");
-                    player.MessageNow("Creating your {0}({1}) personal world: {2}", sizeStringc, sizec, worldNamec);
+                    player.Message("Creating your {0}({1}) personal world: {2}", sizeStringc, sizec, worldNamec);
                     Map map = MapGenerator.GenerateFlatgrass(sizec, sizec, sizec);
                     Server.RequestGC();
                     if (map.Save("./Maps/" + worldNamec + ".fcm")) {
@@ -5148,7 +5148,7 @@ namespace fCraft {
                     if (!op.Prepare(marks))
                         return;
                     if (!player.CanDraw(op.BlocksTotalEstimate)) {
-                        player.MessageNow("You are only allowed to run draw commands that affect up to {0} blocks. This one would affect {1} blocks.",
+                        player.Message("You are only allowed to run draw commands that affect up to {0} blocks. This one would affect {1} blocks.",
                                            player.Info.Rank.DrawLimit,
                                            op.Bounds.Volume);
                         op.Cancel();

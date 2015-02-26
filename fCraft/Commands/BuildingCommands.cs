@@ -591,7 +591,7 @@ namespace fCraft {
             DrawOperation op = (DrawOperation)tag;
             if( !op.Prepare( marks ) ) return;
             if( !player.CanDraw( op.BlocksTotalEstimate ) ) {
-                player.MessageNow( "You are only allowed to run draw commands that affect up to {0} blocks. This one would affect {1} blocks.",
+                player.Message( "You are only allowed to run draw commands that affect up to {0} blocks. This one would affect {1} blocks.",
                                    player.Info.Rank.DrawLimit,
                                    op.Bounds.Volume );
                 op.Cancel();
@@ -984,7 +984,7 @@ namespace fCraft {
                 Rand = new Random()
             };
             player.SelectionStart(1, TreeCallback, args, CdTree.Permissions);
-            player.MessageNow("Tree: Place a block or type /Mark to use your location.");
+            player.Message("Tree: Place a block or type /Mark to use your location.");
         }
 
         static void TreeCallback(Player player, Vector3I[] marks, object tag)
@@ -1190,7 +1190,7 @@ namespace fCraft {
         private static void CenterHandler(Player player, CommandReader cmd)
         {
             player.SelectionStart(2, CenterCallback, null, CdCenter.Permissions);
-            player.MessageNow("Center: Place a block or type /Mark to use your location.");
+            player.Message("Center: Place a block or type /Mark to use your location.");
         }
 
         private static void CenterCallback(Player player, Vector3I[] marks, object tag)
@@ -1690,7 +1690,7 @@ namespace fCraft {
             op.Brush = brush;
 
             player.SelectionStart(2, DrawOperationCallback, op, Permission.Draw);
-            player.MessageNow("{0}: Click or &H/Mark&S 2 blocks.", op.Brush.Description);
+            player.Message("{0}: Click or &H/Mark&S 2 blocks.", op.Brush.Description);
         }
 
 
@@ -1822,7 +1822,7 @@ namespace fCraft {
             string msg = "Undo: ";
             UndoState undoState = player.UndoPop();
             if( undoState == null ) {
-                player.MessageNow( "There is currently nothing to undo." );
+                player.Message( "There is currently nothing to undo." );
                 return;
             }
 
@@ -1837,9 +1837,9 @@ namespace fCraft {
             // Check if command was too massive.
             if( undoState.IsTooLargeToUndo ) {
                 if( undoState.Op != null ) {
-                    player.MessageNow( "Cannot undo {0}: too massive.", undoState.Op.Description );
+                    player.Message( "Cannot undo {0}: too massive.", undoState.Op.Description );
                 } else {
-                    player.MessageNow( "Cannot undo: too massive." );
+                    player.Message( "Cannot undo: too massive." );
                 }
                 return;
             }
@@ -1853,7 +1853,7 @@ namespace fCraft {
 
             msg += String.Format( "Restoring {0} blocks. Type &H/Redo&S to reverse.",
                                   undoState.Buffer.Count );
-            player.MessageNow( msg );
+            player.Message( msg );
 
             var op = new UndoDrawOperation( player, undoState, false );
             op.Prepare( new Vector3I[0] );
@@ -1881,7 +1881,7 @@ namespace fCraft {
 
             UndoState redoState = player.RedoPop();
             if( redoState == null ) {
-                player.MessageNow( "There is currently nothing to redo." );
+                player.Message( "There is currently nothing to redo." );
                 return;
             }
 
@@ -1903,7 +1903,7 @@ namespace fCraft {
 
             msg += String.Format( "Restoring {0} blocks. Type &H/Undo&S to reverse.",
                                   redoState.Buffer.Count );
-            player.MessageNow( msg );
+            player.Message( msg );
 
             var op = new UndoDrawOperation( player, redoState, true );
             op.Prepare( new Vector3I[0] );
@@ -1976,7 +1976,7 @@ namespace fCraft {
                 return;
             }
             player.SelectionStart( 2, CopyCallback, null, CdCopy.Permissions );
-            player.MessageNow( "Copy: Click or &H/Mark&S 2 blocks." );
+            player.Message( "Copy: Click or &H/Mark&S 2 blocks." );
         }
 
 
@@ -1991,7 +1991,7 @@ namespace fCraft {
 
             int volume = bounds.Volume;
             if( !player.CanDraw( volume ) ) {
-                player.MessageNow( "You are only allowed to run commands that affect up to {0} blocks. This one would affect {1} blocks.",
+                player.Message( "You are only allowed to run commands that affect up to {0} blocks. This one would affect {1} blocks.",
                                    player.Info.Rank.DrawLimit, volume );
                 return;
             }
@@ -2015,7 +2015,7 @@ namespace fCraft {
             copyInfo.CopyTime = DateTime.UtcNow;
             player.SetCopyState( copyInfo );
 
-            player.MessageNow( "{0} blocks copied into slot #{1}, origin at {2} corner. You can now &H/Paste",
+            player.Message( "{0} blocks copied into slot #{1}, origin at {2} corner. You can now &H/Paste",
                                volume,
                                player.CopySlot + 1,
                                copyInfo.OriginCorner );
@@ -2075,7 +2075,7 @@ namespace fCraft {
         static void MirrorHandler( Player player, CommandReader cmd ) {
             CopyState originalInfo = player.GetCopyState();
             if( originalInfo == null ) {
-                player.MessageNow( "Nothing to flip! Copy something first." );
+                player.Message( "Nothing to flip! Copy something first." );
                 return;
             }
 
@@ -2191,7 +2191,7 @@ namespace fCraft {
         static void RotateHandler( Player player, CommandReader cmd ) {
             CopyState originalInfo = player.GetCopyState();
             if( originalInfo == null ) {
-                player.MessageNow( "Nothing to rotate! Copy something first." );
+                player.Message( "Nothing to rotate! Copy something first." );
                 return;
             }
 
@@ -2389,10 +2389,10 @@ namespace fCraft {
             player.SelectionStart( expectedMarks, DrawOperationCallback, op, Permission.Draw, Permission.CopyAndPaste );
             CopyState copyInfo = player.GetCopyState();
             if( copyInfo != null ) {
-                player.MessageNow( "{0}: Click or &H/Mark&S the {1} corner.",
+                player.Message( "{0}: Click or &H/Mark&S the {1} corner.",
                                    op.Description, copyInfo.OriginCorner );
             } else {
-                player.MessageNow( "{0}: Click or &H/Mark&S a block.",
+                player.Message( "{0}: Click or &H/Mark&S a block.",
                                    op.Description );
             }
         }
@@ -2451,7 +2451,7 @@ namespace fCraft {
 
             map.Metadata["ProCraft.Temp", "FileName"] = fullFileName;
             player.SelectionStart( 2, RestoreCallback, map, CdRestore.Permissions );
-            player.MessageNow( "Restore: Click or &H/Mark&S 2 blocks." );
+            player.Message( "Restore: Click or &H/Mark&S 2 blocks." );
         }
 
 
@@ -2460,7 +2460,7 @@ namespace fCraft {
             Map map = (Map)tag;
 
             if( !player.CanDraw( selection.Volume ) ) {
-                player.MessageNow(
+                player.Message(
                     "You are only allowed to restore up to {0} blocks at a time. This would affect {1} blocks.",
                     player.Info.Rank.DrawLimit,
                     selection.Volume );
@@ -2528,7 +2528,7 @@ namespace fCraft {
             if( player.SelectionMarksExpected > 0 ) {
                 player.SelectionAddMark( coords, true, true );
             } else {
-                player.MessageNow( "Cannot mark - no selection in progress." );
+                player.Message( "Cannot mark - no selection in progress." );
             }
         }
 
@@ -2808,7 +2808,7 @@ namespace fCraft {
                 permission = Permission.UndoOthersActions;
             }
             player.SelectionStart( 2, UndoAreaSelectionCallback, args, permission );
-            player.MessageNow( "UndoArea: Click or &H/Mark&S 2 blocks." );
+            player.Message( "UndoArea: Click or &H/Mark&S 2 blocks." );
         }
 
 
@@ -2830,7 +2830,7 @@ namespace fCraft {
             if( args == null ) return;
 
             player.SelectionStart( 2, UndoAreaSelectionCallback, args, CdUndoAreaNot.Permissions );
-            player.MessageNow( "UndoAreaNot: Click or &H/Mark&S 2 blocks." );
+            player.Message( "UndoAreaNot: Click or &H/Mark&S 2 blocks." );
         }
 
 
@@ -3258,7 +3258,7 @@ namespace fCraft {
 
             if (!undoState.IsTooLargeToUndo) {
                 if (!undoState.Add(coord, block)) {
-                    player.MessageNow("NOTE: This draw command is too massive to undo.");
+                    player.Message("NOTE: This draw command is too massive to undo.");
                     player.LastDrawOp = null;
                 }
             }
@@ -3271,16 +3271,16 @@ namespace fCraft {
                 throw new ArgumentNullException("player");
             if (blocks == 0) {
                 if (blocksDenied > 0) {
-                    player.MessageNow("No blocks could be {0} due to permission issues.", verb.ToLower());
+                    player.Message("No blocks could be {0} due to permission issues.", verb.ToLower());
                 } else {
-                    player.MessageNow("No blocks were {0}.", verb.ToLower());
+                    player.Message("No blocks were {0}.", verb.ToLower());
                 }
             } else {
                 if (blocksDenied > 0) {
-                    player.MessageNow("{0} {1} blocks ({2} blocks skipped due to permission issues)... " +
+                    player.Message("{0} {1} blocks ({2} blocks skipped due to permission issues)... " +
                                        "The map is now being updated.", verb, blocks, blocksDenied);
                 } else {
-                    player.MessageNow("{0} {1} blocks... The map is now being updated.", verb, blocks);
+                    player.Message("{0} {1} blocks... The map is now being updated.", verb, blocks);
                 }
             }
             if (blocks > 0) {

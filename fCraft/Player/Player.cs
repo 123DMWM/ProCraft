@@ -281,13 +281,13 @@ namespace fCraft {
             if( rawMessage.StartsWith( "/nvm", StringComparison.OrdinalIgnoreCase ) ||
                 rawMessage.StartsWith( "/cancel", StringComparison.OrdinalIgnoreCase ) ) {
                 if( partialMessage != null ) {
-                    MessageNow( "Partial message cancelled." );
+                    Message( "Partial message cancelled." );
                     partialMessage = null;
                 } else if( IsMakingSelection ) {
                     SelectionCancel();
-                    MessageNow( "Selection cancelled." );
+                    Message( "Selection cancelled." );
                 } else {
-                    MessageNow( "There is currently nothing to cancel." );
+                    Message( "There is currently nothing to cancel." );
                 }
                 return;
             }
@@ -355,7 +355,7 @@ namespace fCraft {
                         CommandDescriptor commandDescriptor = CommandManager.GetDescriptor( cmd.Name, true );
 
                     if (commandDescriptor == null) {
-                        MessageNow("Unknown command \"{0}\". See &H/Commands", cmd.Name);
+                        Message("Unknown command \"{0}\". See &H/Commands", cmd.Name);
                         Logger.Log(LogType.UserCommand, "{0}[Not A CMD]: {1}", Name, rawMessage);
                     } else if (IsPlayingCTF && commandDescriptor.Permissions != null &&
                                (commandDescriptor.Permissions.Contains(Permission.Build) ||
@@ -367,9 +367,9 @@ namespace fCraft {
                                 commandDescriptor.Permissions.Contains(Permission.Teleport) ||
                                 commandDescriptor.Permissions.Contains(Permission.Bring) ||
                                 commandDescriptor.Permissions.Contains(Permission.BringAll))) {
-                        MessageNow("&WYou cannot use this command while playing CTF");
+                        Message("&WYou cannot use this command while playing CTF");
                     } else if (Info.IsFrozen && !commandDescriptor.UsableByFrozenPlayers) {
-                        MessageNow("&WYou cannot use this command while frozen.");
+                        Message("&WYou cannot use this command while frozen.");
                         Logger.Log(LogType.UserCommand, "{0}[Frozen]: {1}", Name, rawMessage);
                     } else {
                         if (!commandDescriptor.DisableLogging) {
@@ -392,7 +392,7 @@ namespace fCraft {
                         } else {
                             if (Info.IsFrozen && !LastCommand.Descriptor.UsableByFrozenPlayers)
                             {
-                                MessageNow( "&WYou cannot use this command while frozen." );
+                                Message( "&WYou cannot use this command while frozen." );
                                 return;
                             }
                             LastCommand.Rewind();
@@ -457,7 +457,7 @@ namespace fCraft {
                             Player target = allPlayers[0];
                             if (target == this)
                             {
-                                MessageNow( "Trying to talk to yourself?" );
+                                Message( "Trying to talk to yourself?" );
                                 return;
                             }
                             if( !target.IsIgnoring( Info ) && !target.IsDeaf ) {
@@ -474,12 +474,12 @@ namespace fCraft {
                                 LastUsedPlayerName = target.Name;
                                 if( target.IsIgnoring( Info ) ) {
                                     if( CanSee( target ) ) {
-                                        MessageNow( "&WCannot PM {0}&W: you are ignored.", target.ClassyName );
+                                        Message( "&WCannot PM {0}&W: you are ignored.", target.ClassyName );
                                     }
                                 } else if( target.IsDeaf ) {
-                                    MessageNow( "&SCannot PM {0}&S: they are currently deaf.", target.ClassyName );
+                                    Message( "&SCannot PM {0}&S: they are currently deaf.", target.ClassyName );
                                 } else {
-                                    MessageNow( "&Pto {0}: {1}",
+                                    Message( "&Pto {0}: {1}",
                                                 target.Name, messageText );
                                 }
                             }
@@ -537,7 +537,7 @@ namespace fCraft {
                     {
                         if (Info.IsFrozen)
                         {
-                            MessageNow("&WYou cannot use any commands while frozen.");
+                            Message("&WYou cannot use any commands while frozen.");
                             return;
                         }
                         if (ConfirmCallback != null)
@@ -551,12 +551,12 @@ namespace fCraft {
                             }
                             else
                             {
-                                MessageNow("Confirmation timed out. Enter the command again.");
+                                Message("Confirmation timed out. Enter the command again.");
                             }
                         }
                         else
                         {
-                            MessageNow("There is no command to confirm.");
+                            Message("There is no command to confirm.");
                         }
                     }
                     break;
@@ -564,11 +564,11 @@ namespace fCraft {
 
                 case RawMessageType.PartialMessage:
                     partialMessage = rawMessage.Substring( 0, rawMessage.Length - 1 );
-                    MessageNow( "Partial: &F{0}", partialMessage );
+                    Message( "Partial: &F{0}", partialMessage );
                     break;
 
                 case RawMessageType.Invalid:
-                    MessageNow( "Could not parse message." );
+                    Message( "Could not parse message." );
                     break;
             }
         }
@@ -692,8 +692,8 @@ namespace fCraft {
         }
 
 
-        [StringFormatMethod( "message" )]
-        internal void MessageNow( [NotNull] string message, [NotNull] params object[] args ) {
+        /*[StringFormatMethod( "message" )]
+        internal void Message( [NotNull] string message, [NotNull] params object[] args ) {
             if( message == null ) throw new ArgumentNullException( "message" );
             if( args == null ) throw new ArgumentNullException( "args" );
             if( IsDeaf ) return;
@@ -732,7 +732,7 @@ namespace fCraft {
                     Send( p );
                 }
             }
-        }
+        }*/
 
 
         #region Macros
@@ -1282,7 +1282,7 @@ namespace fCraft {
                             }
 
                             LastZoneNotification = DateTime.UtcNow;
-                        } else if (deniedZone.Name.ToLower().StartsWith("command_") && deniedZone.Bounds.Height == 1 && deniedZone.Bounds.Length == 1 && deniedZone.Bounds.Width == 1) {
+                        } else if ((deniedZone.Name.ToLower().StartsWith("command_") || deniedZone.Name.ToLower().StartsWith("c_command_")) && deniedZone.Bounds.Height == 1 && deniedZone.Bounds.Length == 1 && deniedZone.Bounds.Width == 1) {
                             if (deniedZone.Sign == null) {
                                 FileInfo SignInfo = new FileInfo("./signs/" + World.Name + "/" + deniedZone.Name + ".txt");
                                 if (IsCommandBlockRunnin || (SignList != null && (DateTime.UtcNow - LastZoneNotification).Seconds > SignList.Length)) {
@@ -1291,7 +1291,11 @@ namespace fCraft {
                                 if (SignInfo.Exists) {
                                     SignList = File.ReadAllLines("./signs/" + World.Name + "/" + deniedZone.Name + ".txt");
                                     if (SignList.Length >= 1) {
-                                        Scheduler.NewTask(CommandBlock).RunRepeating(new TimeSpan(0, 0, 0), new TimeSpan(0, 0, 1), SignList.Length);
+                                        if (!deniedZone.Name.ToLower().StartsWith("c_command_")) {
+                                            Scheduler.NewTask(CommandBlock).RunRepeating(new TimeSpan(0, 0, 0), new TimeSpan(0, 0, 1), SignList.Length);
+                                        } else {
+                                            Scheduler.NewTask(CommandBlock).RunRepeating(new TimeSpan(0, 0, 0), new TimeSpan(0, 0, 0, 0, 1), SignList.Length);
+                                        }
                                     }
                                     Logger.Log(LogType.Debug, "[Signs] {0} clicked on command block [{1}] On map [{2}]", Name, deniedZone.Name, World.Name);
                                     LastSignClicked = deniedZone.Name;
@@ -1336,11 +1340,19 @@ namespace fCraft {
         void CommandBlock(SchedulerTask task) {
             IsCommandBlockRunnin = true;
             if (SignList[signspot] != null) {
-                try {
-                    ParseMessage(SignList[signspot], false);
-                } catch (Exception ex) {
-                    Message("Command produces error: \"" + SignList[signspot] + "\"");
-                    Logger.Log(LogType.Error, ex.ToString());
+                if (task.Interval == new TimeSpan(0, 0, 0, 0, 1)) {
+                    try {
+                        Player.Console.ParseMessage(SignList[signspot], true);
+                    } catch (Exception ex) {
+                        Logger.Log(LogType.Error, ex.ToString());
+                    }
+                } else {
+                    try {
+                        ParseMessage(SignList[signspot], false);
+                    } catch (Exception ex) {
+                        Message("Command produces error: \"" + SignList[signspot] + "\"");
+                        Logger.Log(LogType.Error, ex.ToString());
+                    }
                 }
             }
             LastZoneNotification = DateTime.UtcNow;

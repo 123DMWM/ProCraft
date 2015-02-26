@@ -320,7 +320,7 @@ namespace fCraft {
                 throw;
             } catch( Exception ex ) {
                 Logger.LogAndReportCrash( "Error while parsing player's message", "ProCraft", ex, false );
-                MessageNow( "&WError while handling your message ({0}: {1})." +
+                Message( "&WError while handling your message ({0}: {1})." +
                             "It is recommended that you reconnect to the server.",
                             ex.GetType().Name, ex.Message );
             }
@@ -700,11 +700,11 @@ namespace fCraft {
                 totalDelta += Math.Abs(deltaZ);
                 totalDisplacement += deltaZ;
             }
-            MessageNow("{0:HH:mm:ss} &FHeight: Min={1} Max={2} &CJumpHeight={3}",
+            Message("{0:HH:mm:ss} &FHeight: Min={1} Max={2} &CJumpHeight={3}",
                 DateTime.UtcNow, minZ, maxZ, maxDisplacement);
-            MessageNow("&FZ-Velocity: Min={0} Max={1} | Dist: {2} | Displ: {3}",
+            Message("&FZ-Velocity: Min={0} Max={1} | Dist: {2} | Displ: {3}",
                 minDelta, maxDelta, totalDelta, totalDisplacement);
-            MessageNow("");
+            Message("");
             posLog.Clear();
         }
 
@@ -1186,21 +1186,21 @@ namespace fCraft {
                 string[] greetingText = File.ReadAllLines(Paths.GreetingFileName);
                 foreach (string greetingLine in greetingText)
                 {
-                    MessageNow(Chat.ReplaceTextKeywords(this, greetingLine));
+                    Message(Chat.ReplaceTextKeywords(this, greetingLine));
                 }
             }
             else
             {
                 if (firstTime)
                 {
-                    MessageNow("Welcome to {0}", ConfigKey.ServerName.GetString());
+                    Message("Welcome to {0}", ConfigKey.ServerName.GetString());
                 }
                 else
                 {
-                    MessageNow("Welcome back to {0}", ConfigKey.ServerName.GetString());
+                    Message("Welcome back to {0}", ConfigKey.ServerName.GetString());
                 }
 
-                MessageNow("Your rank is {0}&S. Type &H/Help&S for help.",
+                Message("Your rank is {0}&S. Type &H/Help&S for help.",
                             Info.Rank.ClassyName);
             }
 
@@ -1323,12 +1323,12 @@ namespace fCraft {
             {
                 throw new ArgumentOutOfRangeException("reason");
             }
-            if (Thread.CurrentThread != ioThread)
+            /*if (Thread.CurrentThread != ioThread)
             {
                 throw new InvalidOperationException(
                     "Player.JoinWorldNow may only be called from player's own thread. " +
                     "Use Player.JoinWorld instead.");
-            }
+            }*/
 
             string textLine1 = ConfigKey.ServerName.GetString();
             string textLine2;

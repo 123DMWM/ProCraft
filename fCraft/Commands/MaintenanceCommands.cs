@@ -1294,7 +1294,7 @@ namespace fCraft {
                                     "Shutdown aborted by {0}.", player.Name );
                         Server.Message( "&WShutdown aborted by {0}", player.ClassyName );
                     } else {
-                        player.MessageNow( "Cannot abort shutdown - too late." );
+                        player.Message( "Cannot abort shutdown - too late." );
                     }
                     return;
                 } else if( !delayString.TryParseMiniTimespan( out delayTime ) ) {
@@ -1358,7 +1358,7 @@ namespace fCraft {
                                     "Restart aborted by {0}.", player.Name );
                         Server.Message( "&WRestart aborted by {0}", player.ClassyName );
                     } else {
-                        player.MessageNow( "Cannot abort restart - too late." );
+                        player.Message( "Cannot abort restart - too late." );
                     }
                     return;
                 } else if( !delayString.TryParseMiniTimespan( out delayTime ) ) {
@@ -1411,7 +1411,7 @@ namespace fCraft {
 
         static void PruneDBHandler( Player player, CommandReader cmd ) {
             if( !cmd.IsConfirmed ) {
-                player.MessageNow( "PruneDB: Finding inactive players..." );
+                player.Message( "PruneDB: Finding inactive players..." );
                 int inactivePlayers = PlayerDB.CountInactivePlayers();
                 if( inactivePlayers == 0 ) {
                     player.Message( "PruneDB: No inactive players found." );

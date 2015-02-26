@@ -78,7 +78,7 @@ namespace fCraft {
             }
             //check if player can make the drawing
             if ( !player.CanDraw( Count ) ) {
-                player.MessageNow( String.Format( "You are only allowed to run commands that affect up to {0} blocks. This one would affect {1} blocks.",
+                player.Message( String.Format( "You are only allowed to run commands that affect up to {0} blocks. This one would affect {1} blocks.",
                                                player.Info.Rank.DrawLimit, Count ) );
                 return;
             }

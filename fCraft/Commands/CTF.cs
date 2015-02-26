@@ -122,7 +122,7 @@ namespace fCraft
                     }
 
                     //world.Players.Message(player, "{0}&S loaded a new map for the world {1}", player.ClassyName, world.ClassyName);
-                    //player.MessageNow("New map for the world {0}&S has been loaded.", world.ClassyName);
+                    //player.Message("New map for the world {0}&S has been loaded.", world.ClassyName);
                     try
                     {
                         Logger.Log(LogType.UserActivity,

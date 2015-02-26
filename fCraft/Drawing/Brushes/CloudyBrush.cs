@@ -288,7 +288,7 @@ namespace fCraft.Drawing {
             bool extraLarge = (op.Bounds.Volume > ExtraLargeThreshold);
 
             if (extraLarge) {
-                player.MessageNow("{0} brush: Preparing, please wait...", Factory.Name);
+                player.Message("{0} brush: Preparing, please wait...", Factory.Name);
             }
 
             noise3D = new PerlinNoise3D(new Random(Seed)) {
