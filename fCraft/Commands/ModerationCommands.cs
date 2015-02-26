@@ -264,11 +264,13 @@ namespace fCraft {
             }
             string model = cmd.Next();
             string skinString = cmd.Next();
-            if (skinString.StartsWith("--")) {
-                skinString = String.Format("http://s3.amazonaws.com/MinecraftSkins/{0}.png", skinString.Replace("--", ""));
-            }
-            if (skinString.StartsWith("++")) {
-                skinString = String.Format("http://i.imgur.com/{0}.png", skinString.Replace("++", ""));
+            if (skinString != null) {
+                if (skinString.StartsWith("--")) {
+                    skinString = String.Format("http://s3.amazonaws.com/MinecraftSkins/{0}.png", skinString.Replace("--", ""));
+                }
+                if (skinString.StartsWith("++")) {
+                    skinString = String.Format("http://i.imgur.com/{0}.png", skinString.Replace("++", ""));
+                }
             }
             PlayerInfo[] p2 = PlayerDB.FindPlayers(namePart);
             PlayerInfo p = PlayerDB.FindPlayerInfoOrPrintMatches(player, namePart, SearchOptions.IncludeSelf);
@@ -339,11 +341,13 @@ namespace fCraft {
                 return;
             }
             string skinString = cmd.Next();
-            if (skinString.StartsWith("--")) {
-                skinString = String.Format("http://s3.amazonaws.com/MinecraftSkins/{0}.png", skinString.Replace("--", ""));
-            }
-            if (skinString.StartsWith("++")) {
-                skinString = String.Format("http://i.imgur.com/{0}.png", skinString.Replace("++", ""));
+            if (skinString != null) {
+                if (skinString.StartsWith("--")) {
+                    skinString = String.Format("http://s3.amazonaws.com/MinecraftSkins/{0}.png", skinString.Replace("--", ""));
+                }
+                if (skinString.StartsWith("++")) {
+                    skinString = String.Format("http://i.imgur.com/{0}.png", skinString.Replace("++", ""));
+                }
             }
             PlayerInfo p = PlayerDB.FindPlayerInfoOrPrintMatches(player, namePart, SearchOptions.IncludeSelf);
             if (p == null || !p.IsOnline) {
