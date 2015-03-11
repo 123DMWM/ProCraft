@@ -407,7 +407,9 @@ namespace fCraft
                                                 }
                                                 lastIrcCommand = DateTime.Now;
                                             }
-                                        } else if (rawMessage.ToLower().StartsWith("@")) {
+                                        }
+                                    } else if (rawMessage.ToLower().StartsWith("@")) {
+                                        if (DateTime.Now.Subtract(lastIrcCommand).TotalSeconds > 5) {
                                             string otherPlayerName, messageText;
                                             if (rawMessage[1] == ' ') {
                                                 otherPlayerName = rawMessage.Substring(2,
@@ -481,7 +483,8 @@ namespace fCraft
                                                 lastIrcCommand = DateTime.Now;
                                             }
                                         }
-                                    } else foreach (Player player in Server.Players.Where(player => player.Info.ReadIRC)) {
+                                    } else
+                                        foreach (Player player in Server.Players.Where(player => player.Info.ReadIRC)) {
                                             player.Message("&i(IRC) {0}{1}: {2}", msg.Nick, Color.White,
                                                 processedMessage);
                                         }
