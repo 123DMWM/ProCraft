@@ -248,7 +248,11 @@ namespace fCraft {
                     CloudColor = CloudColor,
                     SkyColor = SkyColor,
                     EdgeLevel = EdgeLevel,
-                    EdgeBlock = EdgeBlock
+                    EdgeBlock = EdgeBlock,
+                    LightColor = LightColor,
+                    ShadowColor = ShadowColor,
+                    Weather = Weather,
+                    Texture = Texture
                 };
                 newMap.World = newWorld;
                 newWorld.Map = newMap;
@@ -944,6 +948,9 @@ namespace fCraft {
 
         /// <summary> The texture that will be used for the blocks. </summary>
         public string Texture = "http://123dmwm.tk/terrain/64xDefault.png";
+
+        /// <summary> The current weather in this world. </summary>
+        public byte Weather = 0;
 
         #endregion
 

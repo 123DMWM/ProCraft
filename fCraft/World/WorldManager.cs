@@ -359,6 +359,14 @@ namespace fCraft {
                             worldName);
                     }
                 }
+                if ((tempAttr = envEl.Attribute("weather")) != null) {
+                    if (!byte.TryParse(tempAttr.Value, out world.Weather)) {
+                        world.Weather = 0;
+                        Logger.Log(LogType.Warning,
+                            "WorldManager: Could not parse \"weather\" attribute of Environment settings for world \"{0}\", assuming default (0/sun).",
+                            worldName);
+                    }
+                }
             }
 
             // load loaded/map-changed information
@@ -632,6 +640,7 @@ namespace fCraft {
                     if (world.EdgeBlock != Block.Admincrete) elEnv.Add(new XAttribute("bedrock", world.EdgeBlock));
                     if (world.Texture != null) elEnv.Add(new XAttribute("terrain", world.Texture));
                     elEnv.Add(new XAttribute("maxreach", world.maxReach));
+                    elEnv.Add(new XAttribute("weather", world.Weather));
                     if( elEnv.HasAttributes ) {
                         temp.Add( elEnv );
                     }

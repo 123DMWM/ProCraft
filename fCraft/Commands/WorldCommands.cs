@@ -553,7 +553,7 @@ namespace fCraft {
             Category = CommandCategory.New | CommandCategory.World,
             Permissions = new[] { Permission.ManageWorlds },
             Help = "Prints or changes the environmental variables for a given world. " +
-                   "Variables are: clouds, fog, shadow, sunlight, sky, level, edge, border, texture. " +
+                   "Variables are: border, clouds, edge, fog, level, shadow, sky, sunlight, texture, weather. " +
                    "See &H/Help env <Variable>&S for details about each variable. " +
                    "Type &H/Env <WorldName> normal&S to reset everything for a world.",
             HelpSections = new Dictionary<string, string>{
@@ -582,7 +582,10 @@ namespace fCraft {
                                 "Use \"normal\" instead of a number to reset to default (bedrock)." },
                 { "texture",    "&H/Env <WorldName> texture <Texture .PNG Url>\n&S" +
                                 "Changes the texture for all visible blocks on a map. "+
-                                "Use \"normal\" instead of a web link to reset to default (http://123dmwm.tk/terrain/64xDefault.png." }
+                                "Use \"normal\" instead of a web link to reset to default (http://123dmwm.tk/terrain/64xDefault.png)" },
+                { "weather",    "&H/Env <WorldName> weather <0,1,2/sun,rain,snow>\n&S" +
+                                "Changes the weather on a specified map. "+
+                                "Use \"normal\" instead to use default (0/sun)" }
             },
             Usage = "/Env <WorldName> <Variable>",
             IsConsoleSafe = true,
@@ -662,18 +665,14 @@ namespace fCraft {
 
             bool isValid = true;
 
-            switch( variable.ToLower() ) {
+            switch (variable.ToLower()) {
                 case "fog":
-                    if (valueText.Equals("-1") || valueText.Equals("normal", StringComparison.OrdinalIgnoreCase) || valueText.Equals("reset", StringComparison.OrdinalIgnoreCase) || valueText.Equals("default", StringComparison.OrdinalIgnoreCase))
-                    {
+                    if (valueText.Equals("-1") || valueText.Equals("normal", StringComparison.OrdinalIgnoreCase) || valueText.Equals("reset", StringComparison.OrdinalIgnoreCase) || valueText.Equals("default", StringComparison.OrdinalIgnoreCase)) {
                         player.Message("Reset fog color for {0}&S to normal", world.ClassyName);
                         world.FogColor = null;
-                    }
-                    else
-                    {
+                    } else {
                         isValid = IsValidHex(valueText);
-                        if (!isValid)
-                        {
+                        if (!isValid) {
                             player.Message("Env: \"#{0}\" is not a valid HEX color code.", valueText);
                             return;
                         } else {
@@ -690,16 +689,12 @@ namespace fCraft {
 
                 case "cloud":
                 case "clouds":
-                    if (valueText.Equals("-1") || valueText.Equals("normal", StringComparison.OrdinalIgnoreCase) || valueText.Equals("reset", StringComparison.OrdinalIgnoreCase) || valueText.Equals("default", StringComparison.OrdinalIgnoreCase))
-                    {
+                    if (valueText.Equals("-1") || valueText.Equals("normal", StringComparison.OrdinalIgnoreCase) || valueText.Equals("reset", StringComparison.OrdinalIgnoreCase) || valueText.Equals("default", StringComparison.OrdinalIgnoreCase)) {
                         player.Message("Reset cloud color for {0}&S to normal", world.ClassyName);
                         world.CloudColor = null;
-                    }
-                    else
-                    {
+                    } else {
                         isValid = IsValidHex(valueText);
-                        if (!isValid)
-                        {
+                        if (!isValid) {
                             player.Message("Env: \"#{0}\" is not a valid HEX color code.", valueText);
                             return;
                         } else {
@@ -716,16 +711,12 @@ namespace fCraft {
                     break;
 
                 case "sky":
-                    if (valueText.Equals("-1") || valueText.Equals("normal", StringComparison.OrdinalIgnoreCase) || valueText.Equals("reset", StringComparison.OrdinalIgnoreCase) || valueText.Equals("default", StringComparison.OrdinalIgnoreCase))
-                    {
+                    if (valueText.Equals("-1") || valueText.Equals("normal", StringComparison.OrdinalIgnoreCase) || valueText.Equals("reset", StringComparison.OrdinalIgnoreCase) || valueText.Equals("default", StringComparison.OrdinalIgnoreCase)) {
                         player.Message("Reset sky color for {0}&S to normal", world.ClassyName);
                         world.SkyColor = null;
-                    }
-                    else
-                    {
+                    } else {
                         isValid = IsValidHex(valueText);
-                        if (!isValid)
-                        {
+                        if (!isValid) {
                             player.Message("Env: \"#{0}\" is not a valid HEX color code.", valueText);
                             return;
                         } else {
@@ -744,16 +735,12 @@ namespace fCraft {
 
                 case "dark":
                 case "shadow":
-                    if (valueText.Equals("-1") || valueText.Equals("normal", StringComparison.OrdinalIgnoreCase) || valueText.Equals("reset", StringComparison.OrdinalIgnoreCase) || valueText.Equals("default", StringComparison.OrdinalIgnoreCase))
-                    {
+                    if (valueText.Equals("-1") || valueText.Equals("normal", StringComparison.OrdinalIgnoreCase) || valueText.Equals("reset", StringComparison.OrdinalIgnoreCase) || valueText.Equals("default", StringComparison.OrdinalIgnoreCase)) {
                         player.Message("Reset shadow color for {0}&S to normal", world.ClassyName);
                         world.ShadowColor = null;
-                    }
-                    else
-                    {
+                    } else {
                         isValid = IsValidHex(valueText);
-                        if (!isValid)
-                        {
+                        if (!isValid) {
                             player.Message("Env: \"#{0}\" is not a valid HEX color code.", valueText);
                             return;
                         } else {
@@ -771,16 +758,12 @@ namespace fCraft {
                 case "sun":
                 case "light":
                 case "sunlight":
-                    if (valueText.Equals("-1") || valueText.Equals("normal", StringComparison.OrdinalIgnoreCase) || valueText.Equals("reset", StringComparison.OrdinalIgnoreCase) || valueText.Equals("default", StringComparison.OrdinalIgnoreCase))
-                    {
+                    if (valueText.Equals("-1") || valueText.Equals("normal", StringComparison.OrdinalIgnoreCase) || valueText.Equals("reset", StringComparison.OrdinalIgnoreCase) || valueText.Equals("default", StringComparison.OrdinalIgnoreCase)) {
                         player.Message("Reset sunlight color for {0}&S to normal", world.ClassyName);
                         world.LightColor = null;
-                    }
-                    else
-                    {
+                    } else {
                         isValid = IsValidHex(valueText);
-                        if (!isValid)
-                        {
+                        if (!isValid) {
                             player.Message("Env: \"#{0}\" is not a valid HEX color code.", valueText);
                             return;
                         } else {
@@ -797,20 +780,14 @@ namespace fCraft {
 
                 case "level":
                     short level;
-                    if (valueText.Equals("normal", StringComparison.OrdinalIgnoreCase) || valueText.Equals("reset", StringComparison.OrdinalIgnoreCase) || valueText.Equals("default", StringComparison.OrdinalIgnoreCase) || valueText.Equals("middle", StringComparison.OrdinalIgnoreCase) || valueText.Equals("center", StringComparison.OrdinalIgnoreCase))
-                    {
+                    if (valueText.Equals("normal", StringComparison.OrdinalIgnoreCase) || valueText.Equals("reset", StringComparison.OrdinalIgnoreCase) || valueText.Equals("default", StringComparison.OrdinalIgnoreCase) || valueText.Equals("middle", StringComparison.OrdinalIgnoreCase) || valueText.Equals("center", StringComparison.OrdinalIgnoreCase)) {
                         player.Message("Reset water level for {0}&S to normal", world.ClassyName);
-                        world.EdgeLevel = (short)(world.map.Height/2);
-                    }
-                    else
-                    {
-                        if (!short.TryParse(valueText, out level))
-                        {
+                        world.EdgeLevel = (short)(world.map.Height / 2);
+                    } else {
+                        if (!short.TryParse(valueText, out level)) {
                             player.Message("Env: \"{0}\" is not a valid integer.", valueText);
                             return;
-                        }
-                        else
-                        {
+                        } else {
                             world.EdgeLevel = level;
                             player.Message("Set water level for {0}&S to {1}", world.ClassyName, level);
                         }
@@ -826,19 +803,16 @@ namespace fCraft {
                 case "edge":
                 case "water":
                     Block block;
-                    if( !Map.GetBlockByName( valueText, false, out block ) && !(valueText.Equals("normal", StringComparison.OrdinalIgnoreCase) || valueText.Equals("default", StringComparison.OrdinalIgnoreCase))) 
-                    {
-                        CdEnv.PrintUsage( player );
+                    if (!Map.GetBlockByName(valueText, false, out block) && !(valueText.Equals("normal", StringComparison.OrdinalIgnoreCase) || valueText.Equals("default", StringComparison.OrdinalIgnoreCase))) {
+                        CdEnv.PrintUsage(player);
                         return;
                     }
-                    if (block == Block.Water || valueText.Equals("normal", StringComparison.OrdinalIgnoreCase) || valueText.Equals("default", StringComparison.OrdinalIgnoreCase))
-                    {
-                        player.Message( "Reset water block for {0}&S to normal (Water)", world.ClassyName );
+                    if (block == Block.Water || valueText.Equals("normal", StringComparison.OrdinalIgnoreCase) || valueText.Equals("default", StringComparison.OrdinalIgnoreCase)) {
+                        player.Message("Reset water block for {0}&S to normal (Water)", world.ClassyName);
                         world.HorizonBlock = Block.Water;
                     } else {
-                        if( block == Block.Air || block == Block.Sapling || block == Block.Glass || block == Block.YellowFlower || block == Block.RedFlower || block == Block.BrownMushroom || block == Block.RedMushroom || block == Block.Rope || block == Block.Fire  ) 
-                        {
-                            player.Message( "Env: Cannot use {0} for water textures.", block );
+                        if (block == Block.Air || block == Block.Sapling || block == Block.Glass || block == Block.YellowFlower || block == Block.RedFlower || block == Block.BrownMushroom || block == Block.RedMushroom || block == Block.Rope || block == Block.Fire) {
+                            player.Message("Env: Cannot use {0} for water textures.", block);
                             return;
                         } else {
                             world.HorizonBlock = block;
@@ -856,25 +830,18 @@ namespace fCraft {
                 case "border":
                 case "bedrock":
                     Block blockhorizon;
-                    if (!Map.GetBlockByName(valueText, false, out blockhorizon) && !(valueText.Equals("normal", StringComparison.OrdinalIgnoreCase) || valueText.Equals("default", StringComparison.OrdinalIgnoreCase)))
-                    {
+                    if (!Map.GetBlockByName(valueText, false, out blockhorizon) && !(valueText.Equals("normal", StringComparison.OrdinalIgnoreCase) || valueText.Equals("default", StringComparison.OrdinalIgnoreCase))) {
                         CdEnv.PrintUsage(player);
                         return;
                     }
-                    if (blockhorizon == Block.Admincrete || valueText.Equals("normal", StringComparison.OrdinalIgnoreCase) || valueText.Equals("default", StringComparison.OrdinalIgnoreCase))
-                    {
+                    if (blockhorizon == Block.Admincrete || valueText.Equals("normal", StringComparison.OrdinalIgnoreCase) || valueText.Equals("default", StringComparison.OrdinalIgnoreCase)) {
                         player.Message("Reset bedrock block for {0}&S to normal (Bedrock)", world.ClassyName);
                         world.EdgeBlock = Block.Admincrete;
-                    }
-                    else
-                    {
-                        if (blockhorizon == Block.Air || blockhorizon == Block.Sapling || blockhorizon == Block.Glass || blockhorizon == Block.YellowFlower || blockhorizon == Block.RedFlower || blockhorizon == Block.BrownMushroom || blockhorizon == Block.RedMushroom || blockhorizon == Block.Rope || blockhorizon == Block.Fire)
-                        {
+                    } else {
+                        if (blockhorizon == Block.Air || blockhorizon == Block.Sapling || blockhorizon == Block.Glass || blockhorizon == Block.YellowFlower || blockhorizon == Block.RedFlower || blockhorizon == Block.BrownMushroom || blockhorizon == Block.RedMushroom || blockhorizon == Block.Rope || blockhorizon == Block.Fire) {
                             player.Message("Env: Cannot use {0} for bedrock textures.", blockhorizon);
                             return;
-                        }
-                        else
-                        {
+                        } else {
                             world.EdgeBlock = blockhorizon;
                             player.Message("Set bedrock block for {0}&S to {1}", world.ClassyName, blockhorizon);
                         }
@@ -889,23 +856,17 @@ namespace fCraft {
                 case "tex":
                 case "terrain":
                 case "texture":
-                    if (valueText == "http://123dmwm.tk/terrain/64xDefault.png" || valueText == "normal")
-                    {
+                    if (valueText == "http://123dmwm.tk/terrain/64xDefault.png" || valueText == "normal") {
                         player.Message("Reset texture for {0}&S to normal", world.ClassyName);
                         valueText = "http://123dmwm.tk/terrain/64xDefault.png";
                     }
-                    if (!valueText.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
-                    {
+                    if (!valueText.EndsWith(".png", StringComparison.OrdinalIgnoreCase)) {
                         player.Message("Env Texture: Invalid image type. Please use a \".png\" type image.", world.ClassyName);
                         return;
-                    }
-                    else if (!valueText.StartsWith("http://", StringComparison.OrdinalIgnoreCase))
-                    {
+                    } else if (!valueText.StartsWith("http://", StringComparison.OrdinalIgnoreCase)) {
                         player.Message("Env Texture: Invalid URL. Please use a \"http://\" type url.", world.ClassyName);
                         return;
-                    }
-                    else
-                    {
+                    } else {
                         player.Message("Set texture for {0}&S to {1}", world.ClassyName, valueText);
                     }
                     world.Texture = valueText;
@@ -916,15 +877,41 @@ namespace fCraft {
                     }
                     break;
 
+                case "weather":
+                    byte weather = 0;
+                    if (valueText.Equals("normal", StringComparison.OrdinalIgnoreCase)) {
+                        player.Message("Reset weather for {0}&S to normal(0) ", world.ClassyName);
+                        world.Weather = 0;
+                    } else {
+                        if (!byte.TryParse(valueText, out weather)) {
+                            if (valueText.Equals("sun", StringComparison.OrdinalIgnoreCase)) {
+                                weather = 0;
+                            } else if (valueText.Equals("rain", StringComparison.OrdinalIgnoreCase)) {
+                                weather = 1;
+                            } else if (valueText.Equals("snow", StringComparison.OrdinalIgnoreCase)) {
+                                weather = 2;
+                            }
+                        }
+                        if (weather < 0 || weather > 2) {
+                            player.Message("Please use a valid integer(0,1,2) or string(sun,rain,snow)");
+                            return;
+                        }
+                        world.Weather = weather;
+                        player.Message("&aSet weather for {0}&a to {1} ({2}&a)", world.ClassyName, weather, weather == 0 ? "&eSun" : (weather == 1 ? "&1Rain" : "&fSnow"));
+                    }
+                    foreach (Player p in world.Players) {
+                        if (p.SupportsEnvWeatherType) {
+                            p.Send(Packet.SetWeather(world.Weather));
+                        }
+                    }
+                    break;
+
                 default:
-                    CdEnv.PrintUsage( player );
+                    CdEnv.PrintUsage(player);
                     return;
             }
 
             WorldManager.SaveWorldList();
-            if (player.World == world) {
-                player.Message("Env: Rejoin the world to see the changes.");
-            }
         }
 
         /// <summary> Ensures that the hex color has the correct length (1-6 characters)
@@ -2007,8 +1994,7 @@ namespace fCraft {
             Handler = WeatherHandler
         };
 
-        static void WeatherHandler(Player player, CommandReader cmd)
-        {
+        static void WeatherHandler(Player player, CommandReader cmd) {
             if (cmd.Count == 1) {
                 player.Message(Cdweather.Usage);
                 return;
@@ -2016,49 +2002,40 @@ namespace fCraft {
             string name = cmd.Next();
             PlayerInfo p = PlayerDB.FindPlayerInfoOrPrintMatches(player, name, SearchOptions.IncludeSelf);
             if (p == null) {
-                player.Message(Cdweather.Usage);
                 return;
             }
-            int weather;
-            if (!cmd.NextInt(out weather))
-            {
-                weather = 0;
+            string valueText = cmd.Next();
+            byte weather;
+            if (!byte.TryParse(valueText, out weather)) {
+                if (valueText.Equals("sun", StringComparison.OrdinalIgnoreCase)) {
+                    weather = 0;
+                } else if (valueText.Equals("rain", StringComparison.OrdinalIgnoreCase)) {
+                    weather = 1;
+                } else if (valueText.Equals("snow", StringComparison.OrdinalIgnoreCase)) {
+                    weather = 2;
+                }
             }
-            if (weather != 0 && weather != 1 && weather != 2)
-            {
-                player.Message("Must use either 0(sun) 1(rain) 2(snow)");
+            if (weather < 0 || weather > 2) {
+                player.Message("Please use a valid integer(0,1,2) or string(sun,rain,snow)");
                 return;
-
             }
-            if (p != player.Info)
-            {
-                if (p.IsOnline)
-                {
-                    if (p.PlayerObject.SupportsEnvWeatherType)
-                    {
-                        p.PlayerObject.Message("{0} set your weather to {1} ({2})", player.Name, weather, weather == 0 ? "Sun" : (weather == 1 ? "Rain" : "Snow"));
-                        player.Message("Set weather for {0} to {1} ({2})", p.Name, weather, weather == 0 ? "Sun" : (weather == 1 ? "Rain" : "Snow"));
+            if (p != player.Info) {
+                if (p.IsOnline) {
+                    if (p.PlayerObject.SupportsEnvWeatherType) {
+                        p.PlayerObject.Message("&a{0} set your weather to {1} ({2}&a)", player.Name, weather, weather == 0 ? "&eSun" : (weather == 1 ? "&1Rain" : "&fSnow"));
+                        player.Message("&aSet weather for {0} to {1} ({2}&a)", p.Name, weather, weather == 0 ? "&eSun" : (weather == 1 ? "&1Rain" : "&fSnow"));
                         p.PlayerObject.Send(Packet.SetWeather((byte)weather));
-                    }
-                    else
-                    {
+                    } else {
                         player.Message("That player does not support WeatherType packet");
                     }
-                }
-                else if (p.IsOnline == false || !player.CanSee(p.PlayerObject))
-                {
+                } else if (p.IsOnline == false || !player.CanSee(p.PlayerObject)) {
                     player.Message("That player is not online!");
                 }
-            }
-            else
-            {
-                if (player.SupportsEnvWeatherType)
-                {
-                    player.Message("Set weather to {0} ({1})", weather, weather == 0 ? "Sun" : (weather == 1 ? "Rain" : "Snow"));
+            } else {
+                if (player.SupportsEnvWeatherType) {
+                    player.Message("&aSet weather to {0} ({1}&a)", weather, weather == 0 ? "&eSun" : (weather == 1 ? "&1Rain" : "&fSnow"));
                     player.Send(Packet.SetWeather((byte)weather));
-                }
-                else
-                {
+                } else {
                     player.Message("You don't support WeatherType packet");
                 }
             }

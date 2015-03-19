@@ -1458,11 +1458,9 @@ namespace fCraft {
             BytesSent += 7;
 
             if (SupportsExtPlayerList2) {
-                writer.Write(Packet.MakeExtAddEntity2(Packet.SelfId, Info.Rank.Color + Name, (Info.skinName ?? Name), map.Spawn, this).Bytes);
-                BytesSent += 138;
+                Send(Packet.MakeExtAddEntity2(Packet.SelfId, Info.Rank.Color + Name, (Info.skinName ?? Name), map.Spawn, this));
             } else {
-                writer.Write(Packet.MakeAddEntity(Packet.SelfId, Info.Rank.Color + Name, map.Spawn).Bytes);
-                BytesSent += 74;
+                Send(Packet.MakeAddEntity(Packet.SelfId, Info.Rank.Color + Name, map.Spawn));
             }
 
             if (SupportsChangeModel) {
@@ -1477,48 +1475,40 @@ namespace fCraft {
             #region EnvSetMapAppearance
 
             if (SupportsEnvMapAppearance) {
-                writer.Write(
-                    Packet.MakeEnvSetMapAppearance(World.Texture, World.EdgeBlock, World.HorizonBlock,
-                        (short)((World.EdgeLevel == -1) ? (WorldMap.Height / 2) : World.EdgeLevel)).Bytes);
-                BytesSent += 67;
+                Send(Packet.MakeEnvSetMapAppearance(World.Texture, World.EdgeBlock, World.HorizonBlock,
+                        (short)((World.EdgeLevel == -1) ? (WorldMap.Height / 2) : World.EdgeLevel)));
             }
 
             #endregion
             #region EnvColors
             if (SupportsEnvColors)
             {
-                writer.Write(Packet.MakeEnvSetColor(0, World.SkyColor).Bytes);
-                BytesSent += 8;
-                writer.Write(Packet.MakeEnvSetColor(1, World.CloudColor).Bytes);
-                BytesSent += 8;
-                writer.Write(Packet.MakeEnvSetColor(2, World.FogColor).Bytes);
-                BytesSent += 8;
-                writer.Write(Packet.MakeEnvSetColor(3, World.ShadowColor).Bytes);
-                BytesSent += 8;
-                writer.Write(Packet.MakeEnvSetColor(4, World.LightColor).Bytes);
-                BytesSent += 8;
+                Send(Packet.MakeEnvSetColor(0, World.SkyColor));
+                Send(Packet.MakeEnvSetColor(1, World.CloudColor));
+                Send(Packet.MakeEnvSetColor(2, World.FogColor));
+                Send(Packet.MakeEnvSetColor(3, World.ShadowColor));
+                Send(Packet.MakeEnvSetColor(4, World.LightColor));
+            }
+            if (SupportsEnvWeatherType) {
+                Send(Packet.SetWeather(World.Weather));
             }
             if (SupportsEnvColors && World != null && World.SkyLightEmulator) {
                 string hex;
                 if (Server.SkyColorHex.TryGetValue(Server.ColorTime, out hex)) {
-                    writer.Write(Packet.MakeEnvSetColor(0, hex).Bytes);
-                    BytesSent += 8;
+                    Send(Packet.MakeEnvSetColor(0, hex));
                 }
                 if (Server.CloudAndFogColorHex.TryGetValue(Server.ColorTime, out hex)) {
                     if (World.CloudColor != null)
-                        writer.Write(Packet.MakeEnvSetColor(1, hex).Bytes);
-                    BytesSent += 8;
+                        Send(Packet.MakeEnvSetColor(1, hex));
                     if (World.FogColor != null)
-                        writer.Write(Packet.MakeEnvSetColor(2, hex).Bytes);
-                    BytesSent += 8;
+                        Send(Packet.MakeEnvSetColor(2, hex));
                 }
             }
             #endregion
             #region HackControls
             if (SupportsHackControl)
             {
-                writer.Write(Packet.HackControl(Info.AllowFlying, Info.AllowNoClip, Info.AllowSpeedhack, Info.AllowRespawn, Info.AllowThirdPerson, Info.JumpHeight).Bytes);
-                BytesSent += 8;
+                Send(Packet.HackControl(Info.AllowFlying, Info.AllowNoClip, Info.AllowSpeedhack, Info.AllowRespawn, Info.AllowThirdPerson, Info.JumpHeight));
             }
             #endregion
             #region Reach Distance
