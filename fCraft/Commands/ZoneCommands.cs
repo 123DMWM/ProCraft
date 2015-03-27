@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using fCraft.MapConversion;
 using JetBrains.Annotations;
+using System.Collections.Generic;
+using fCraft.Events;
 
 namespace fCraft {
     /// <summary> Contains commands related to zone management. </summary>
@@ -21,7 +23,26 @@ namespace fCraft {
             CommandManager.RegisterCommand( CdZoneRename );
             CommandManager.RegisterCommand( CdZoneTest );
             CommandManager.RegisterCommand( CdZoneShow );
+            CommandManager.RegisterCommand(cdDoor);
+            CommandManager.RegisterCommand(cdDoorRemove);
+            CommandManager.RegisterCommand(CdDoorList);
+            CommandManager.RegisterCommand(CdDoorCheck);
+            Player.Clicked += PlayerClickedDoor;
+            openDoors = new List<Zone>();
+        }
+        static readonly TimeSpan DoorCloseTimer = TimeSpan.FromMilliseconds(1500);
+        const int maxDoorBlocks = 30;  //change for max door area
+        static List<Zone> openDoors;
 
+        struct DoorInfo {
+            public readonly Zone Zone;
+            public readonly Block[] Buffer;
+            public readonly Map WorldMap;
+            public DoorInfo(Zone zone, Block[] buffer, Map worldMap) {
+                Zone = zone;
+                Buffer = buffer;
+                WorldMap = worldMap;
+            }
         }
         #region ZoneAdd
 
@@ -1056,6 +1077,249 @@ namespace fCraft {
             }
         }
 
+        #endregion
+        #region Doors
+        static readonly CommandDescriptor CdDoorCheck = new CommandDescriptor
+        {
+            Name = "DoorCheck",
+            Usage = "/DoorCheck",
+            Category = CommandCategory.Zone,
+            Permissions = new[] { Permission.Build },
+            Help = "Allows you to identify a door's name. Left click to check doors. To remove a door, use /DoorRemove. To list doors on a world, use /DoorList. To create a door, use /Door.",
+            Handler = DoorCheckH
+        };
+
+        static void DoorCheckH(Player player, CommandReader cmd)
+        {
+            player.Message("Left click to select a door.");
+            player.Info.isDoorChecking = true;
+            player.Info.doorCheckTime = DateTime.Now;
+        }
+
+        static readonly CommandDescriptor CdDoorList = new CommandDescriptor
+        {
+            Name = "DoorList",
+            Usage = "/DoorList [world]",
+            Category = CommandCategory.Zone,
+            Permissions = new[] { Permission.Build },
+            Help = "Lists all doors in the target world. Leave world blank to list current world. To remove a door, use /DoorRemove. To create a door, use /Door. To check a door, use /DoorCheck.",
+            Handler = DoorListH
+        };
+
+        static void DoorListH(Player player, CommandReader cmd)
+        {
+            //if no world is given, list doors on current world
+            string world = cmd.Next();
+            World targetWorld;
+            if (String.IsNullOrEmpty(world))
+            {
+                targetWorld = player.World;
+            }
+            else
+            {
+                targetWorld = WorldManager.FindWorldExact(world);
+                if (targetWorld == null)
+                {
+                    player.Message("Could not find world '{0}'!", world);
+                    return;
+                }
+            }
+
+            player.Message("__Doors on {0}__", targetWorld.Name);
+            var doors = from d in targetWorld.Map.Zones
+                        where d.Name.StartsWith("Door_")
+                        select d;
+
+            //loop through each door zone and print it out
+            foreach (Zone zone in doors)
+            {
+                player.Message(zone.Name);
+            }
+        }
+
+        static readonly CommandDescriptor cdDoor = new CommandDescriptor
+        {
+            Name = "Door",
+            Usage = "/Door [Name]",
+            Category = CommandCategory.Zone,
+            Permissions = new[] { Permission.Build },
+            Help = "Creates door zone. Left click to open doors. To remove a door, use /DoorRemove. To list doors on a world, use /DoorList. To check a door, use /DoorCheck.",
+            Handler = Door
+        };
+
+        static void Door(Player player, CommandReader cmd)
+        {
+            string name = cmd.Next();
+            if (String.IsNullOrEmpty(name))
+            {
+                player.Message("You must have a name for your door! Usage is /door [name]");
+                return;
+            }
+
+            if (player.WorldMap.Zones.FindExact("Door_" + name) != null)
+            {
+                player.Message("There is a door on this world with that name already!");
+                return;
+            }
+
+            Zone door = new Zone();
+            door.Name = "Door_" + name;
+            player.SelectionStart(2, DoorAdd, door, cdDoor.Permissions);
+            player.Message("Door: Place a block or type /mark to use your location.");
+        }
+
+        static readonly CommandDescriptor cdDoorRemove = new CommandDescriptor
+        {
+            Name = "DoorRemove",
+            Usage = "/DoorRemove [name]",
+            Aliases = new[] { "RemoveDoor", "rdoor" },
+            Category = CommandCategory.Zone,
+            Permissions = new[] { Permission.Build },
+            Help = "Removes a door. To create a door, use /Door. To list doors on a world, use /DoorList. To check a door, use /DoorCheck.",
+            Handler = DoorRemove
+        };
+
+        static void DoorRemove(Player player, CommandReader cmd)
+        {
+            Zone zone;
+            string name = cmd.Next();
+            if (String.IsNullOrEmpty(name))
+            {
+                player.Message("You must have a name for your door to remove! Usage is /DoorRemove [name]");
+                return;
+            }
+
+            if (name.StartsWith("Door_"))
+            {
+                name = name.Substring(5);
+            }
+
+            if ((zone = player.WorldMap.Zones.FindExact("Door_" + name)) != null)
+            {
+                player.WorldMap.Zones.Remove(zone);
+                player.Message("Door removed.");
+            }
+            else
+            {
+                player.Message("Could not find door: " + name + " on this map!");
+            }
+        }
+
+        static void DoorAdd(Player player, Vector3I[] marks, object tag)
+        {
+            int sx = Math.Min(marks[0].X, marks[1].X);
+            int ex = Math.Max(marks[0].X, marks[1].X);
+            int sy = Math.Min(marks[0].Y, marks[1].Y);
+            int ey = Math.Max(marks[0].Y, marks[1].Y);
+            int sh = Math.Min(marks[0].Z, marks[1].Z);
+            int eh = Math.Max(marks[0].Z, marks[1].Z);
+
+            int volume = (ex - sx + 1) * (ey - sy + 1) * (eh - sh + 1);
+            if (volume > maxDoorBlocks)
+            {
+                player.Message("Doors are only allowed to be {0} blocks", maxDoorBlocks);
+                return;
+            }
+
+            Zone door = (Zone)tag;
+            door.Create(new BoundingBox(marks[0], marks[1]), player.Info);
+            player.WorldMap.Zones.Add(door);
+            Logger.Log(LogType.UserActivity, "{0} created door {1} (on world {2})", player.Name, door.Name, player.World.Name);
+            player.Message("Door created: {0}x{1}x{2}", door.Bounds.Dimensions.X,
+                                                        door.Bounds.Dimensions.Y,
+                                                        door.Bounds.Dimensions.Z);
+        }
+
+        static readonly object openDoorsLock = new object();
+        public static void PlayerClickedDoor(object sender, PlayerClickedEventArgs e)
+        {
+            //after 10s, revert effects of /DoorCheck
+            if ((DateTime.Now - e.Player.Info.doorCheckTime).TotalSeconds > 10 && e.Player.Info.doorCheckTime != DateTime.MaxValue)
+            {
+                e.Player.Info.doorCheckTime = DateTime.MaxValue;
+                e.Player.Info.isDoorChecking = false;
+            }
+            Zone[] allowed, denied;
+            if (e.Player.WorldMap.Zones.CheckDetailed(e.Coords, e.Player, out allowed, out denied))
+            {
+                foreach (Zone zone in allowed)
+                {
+                    if (zone.Name.StartsWith("Door_"))
+                    {
+                        Player.RaisePlayerPlacedBlockEvent(e.Player, e.Player.WorldMap, e.Coords, e.Block, e.Block, BlockChangeContext.Manual);
+
+                        //if player is checking a door, print the door info instead of opening it
+                        if (e.Player.Info.isDoorChecking)
+                        {
+                            e.Player.Message(zone.Name);
+                            e.Player.Message("Created by {0} on {1}", zone.CreatedBy, zone.CreatedDate);
+                            return;
+                        }
+
+                        lock (openDoorsLock)
+                        {
+                            if (!openDoors.Contains(zone))
+                            {
+                                openDoor(zone, e.Player);
+                                openDoors.Add(zone);
+                            }
+                        }
+                    }
+                }
+            }
+
+        }
+
+        static void openDoor(Zone zone, Player player)
+        {
+
+            int sx = zone.Bounds.XMin;
+            int ex = zone.Bounds.XMax;
+            int sy = zone.Bounds.YMin;
+            int ey = zone.Bounds.YMax;
+            int sz = zone.Bounds.ZMin;
+            int ez = zone.Bounds.ZMax;
+
+            Block[] buffer = new Block[zone.Bounds.Volume];
+
+            int counter = 0;
+            for (int x = sx; x <= ex; x++)
+            {
+                for (int y = sy; y <= ey; y++)
+                {
+                    for (int z = sz; z <= ez; z++)
+                    {
+                        buffer[counter] = player.WorldMap.GetBlock(x, y, z);
+                        player.WorldMap.QueueUpdate(new BlockUpdate(null, new Vector3I(x, y, z), Block.Air));
+                        counter++;
+                    }
+                }
+            }
+
+            DoorInfo info = new DoorInfo(zone, buffer, player.WorldMap);
+            //reclose door
+            Scheduler.NewTask(doorTimer_Elapsed).RunOnce(info, DoorCloseTimer);
+
+        }
+
+        static void doorTimer_Elapsed(SchedulerTask task)
+        {
+            DoorInfo info = (DoorInfo)task.UserState;
+            int counter = 0;
+            for (int x = info.Zone.Bounds.XMin; x <= info.Zone.Bounds.XMax; x++)
+            {
+                for (int y = info.Zone.Bounds.YMin; y <= info.Zone.Bounds.YMax; y++)
+                {
+                    for (int z = info.Zone.Bounds.ZMin; z <= info.Zone.Bounds.ZMax; z++)
+                    {
+                        info.WorldMap.QueueUpdate(new BlockUpdate(null, new Vector3I(x, y, z), info.Buffer[counter]));
+                        counter++;
+                    }
+                }
+            }
+
+            lock (openDoorsLock) { openDoors.Remove(info.Zone); }
+        }
         #endregion
         /// <summary> Ensures that the hex color has the correct length (1-6 characters)
         /// and character set (alphanumeric chars allowed). </summary>

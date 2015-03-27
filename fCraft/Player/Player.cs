@@ -1073,6 +1073,9 @@ namespace fCraft {
                 }
 
             }
+            if (Info.isDoorChecking) {
+                RevertBlockNow(coord);
+            }
 
             Vector3I coordBelow = new Vector3I( coord.X, coord.Y, coord.Z - 1 );
             Vector3I coordAbove = new Vector3I( coord.X, coord.Y, coord.Z + 1 ); 

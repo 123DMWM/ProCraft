@@ -273,7 +273,14 @@ namespace fCraft
                             ex.Message,
                             ReconnectDelay.TotalSeconds);
             }
-
+            public static string[] validCommands = 
+            {
+                "players",
+                "cplayers",
+                "st",
+                "seen",
+                "commands"
+            };
 
             void HandleMessage([NotNull] string message)
             {
@@ -344,7 +351,7 @@ namespace fCraft
                                         }
                                         Logger.Log(LogType.IrcChat, "{0}: * {1} {2}", msg.Channel, msg.Nick,
                                             IRCColorsAndNonStandardCharsExceptEmotes.Replace(rawMessage, ""));
-                                    } else if (rawMessage.ToLower().StartsWith("!") || rawMessage.ToLower().StartsWith(botNick.ToLower() + "!")) {
+                                    } else if (rawMessage.ToLower().StartsWith("!") || (rawMessage.ToLower().StartsWith(botNick.ToLower()) && validCommands.Contains(rawMessage.Split()[1]))) {
                                         if (DateTime.Now.Subtract(lastIrcCommand).TotalSeconds > 5) {
                                             if (rawMessage.ToLower() == "!players" || rawMessage.ToLower() == botNick.ToLower() + " players") {
                                                 var visiblePlayers =
@@ -406,6 +413,9 @@ namespace fCraft
                                                     SendChannelMessage("\u212C&SPlease specify a player name.");
                                                 }
                                                 lastIrcCommand = DateTime.Now;
+                                            } else if (rawMessage.ToLower() == "!commands" || rawMessage.ToLower() == botNick.ToLower() + " commands") {
+                                                SendChannelMessage("\u212CList of commands: \u211CCommands, cplayers, players, seen, st");
+                                                    lastIrcCommand = DateTime.Now;
                                             }
                                         }
                                     } else if (rawMessage.ToLower().StartsWith("@") || rawMessage.ToLower().StartsWith(botNick.ToLower() + " @")) {

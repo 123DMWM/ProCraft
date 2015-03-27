@@ -43,5 +43,8 @@ namespace fCraft {
 
         /// <summary> A player-made portal </summary>
         Portal = 2048,
+
+        /// <summary> A player-made door</summary>
+        Door = 4096,
     }
 }

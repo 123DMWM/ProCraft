@@ -60,22 +60,11 @@ namespace fCraft {
         public static bool SendGlobal( [NotNull] Player player, [NotNull] string rawMessage ) {
             if( player == null ) throw new ArgumentNullException( "player" );
             if( rawMessage == null ) throw new ArgumentNullException( "rawMessage" );
-            string[] splitRawMessage = rawMessage.Split();
-            Regex rgx = new Regex(@"[^a-zA-Z0-9]");
-            for (int i = 0; i < splitRawMessage.Count(); i++) {
-                foreach (Filter Swear in Filters) {
-                    if (rgx.IsMatch(Swear.Word)) {
-                        if (Color.StripColors(Chat.ReplacePercentColorCodes(splitRawMessage[i], true)).Contains(Swear.Word.ToLower())) {
-                            splitRawMessage[i] = Color.StripColors(Chat.ReplacePercentColorCodes(splitRawMessage[i], true)).Replace(Swear.Word.ToLower(), Swear.Replacement);
-                        }
-                    } else {
-                        if (rgx.Replace(Color.StripColors(Chat.ReplacePercentColorCodes(splitRawMessage[i], true)), "").Contains(Swear.Word.ToLower())) {
-                            splitRawMessage[i] = rgx.Replace(Color.StripColors(Chat.ReplacePercentColorCodes(splitRawMessage[i], true)), "").Replace(Swear.Word.ToLower(), Swear.Replacement);
-                        }
-                    }
+            foreach (Filter Swear in Filters) {
+                if (rawMessage.ToLower().Contains(Swear.Word.ToLower())) {
+                    rawMessage = rawMessage.ReplaceString(Swear.Word, Swear.Replacement, StringComparison.InvariantCultureIgnoreCase);
                 }
             }
-            rawMessage = splitRawMessage.JoinToString(" ");
             if (!player.Can(Permission.ReadStaffChat))
             {
                 rawMessage = RegexIPMatcher.Replace(rawMessage, "<Redacted IP>");

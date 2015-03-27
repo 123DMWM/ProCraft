@@ -458,6 +458,9 @@ namespace fCraft {
         /// <summary> Players area code based on geoip</summary>
         public string AreaCode;
         #endregion
+        //Door
+        public bool isDoorChecking = false;
+        public DateTime doorCheckTime = DateTime.MaxValue;
 
 
         #region Constructors and Serialization
