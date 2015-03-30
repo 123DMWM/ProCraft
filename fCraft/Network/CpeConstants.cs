@@ -6,6 +6,7 @@ namespace fCraft
     /// See http://wiki.vg/Classic_Protocol_Extension for details. </summary>
     public enum CpeExtension
     {
+        none,
         /// <summary> Used to extend or restrict the distance at which client may click blocks,
         /// controlled by the server. </summary>
         ClickDistance,
@@ -29,6 +30,11 @@ namespace fCraft
         /// entities (spawned player models) and names on the player list. </summary>
         ExtPlayerList,
 
+        /// <summary> Provides more flexibility in naming of players and loading of skins,
+        /// autocompletion, and player tab-list display. Separates tracking of in-game
+        /// entities (spawned player models) and names on the player list. </summary>
+        ExtPlayerList2,
+
         /// <summary> Allows server to alter some of the colors used by the client in
         /// environment rendering. </summary>
         EnvColors,
@@ -49,7 +55,16 @@ namespace fCraft
         EnvMapAppearance,
 
         /// <summary> Allows changing appearance of player models in supporting clients. </summary>
-        EnvWeatherType
+        EnvWeatherType,
+
+        /// <summary> Allows changing of the player shacking abilities. </summary>
+        HackControl,
+
+        /// <summary> This extension allows the server to send different message types. </summary>
+        MessageType,
+
+        /// <summary> This extension tells teh server extended information about when a player clicks. </summary>
+        PlayerClick
     }
 
 
@@ -67,5 +82,16 @@ namespace fCraft
         Sunny = 0,
         Raining = 1,
         Snowing = 2
+    }
+
+    public enum MessageType : byte {
+        Chat = 0,
+        Status1 = 1,
+        Status2 = 2,
+        Status3 = 3,
+        BottomRight1 = 11,
+        BottomRight2 = 12,
+        BottomRight3 = 13,
+        Announcement = 100
     }
 }

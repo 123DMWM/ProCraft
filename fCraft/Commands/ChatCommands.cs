@@ -1266,7 +1266,7 @@ namespace fCraft
                     return;
                 }
             }
-            if (player.SupportsTextHotKey) {
+            if (player.Supports(CpeExtension.TextHotKey)) {
                 player.Send(Packet.MakeSetTextHotKey(Label, Action, KeyCode, KeyMod));
             } else {
                 player.Message("You do not support TextHotKey");

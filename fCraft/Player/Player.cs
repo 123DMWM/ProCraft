@@ -604,11 +604,11 @@ namespace fCraft {
             if( this == Console ) {
                 Logger.LogToConsole( message );
             } else if( IsUsingWoM ) {
-                foreach (Packet p in LineWrapper.WrapPrefixed( WoMAlertPrefix, WoMAlertPrefix + Color.Sys + message, SupportsEmoteFix )) {
+                foreach (Packet p in LineWrapper.WrapPrefixed( WoMAlertPrefix, WoMAlertPrefix + Color.Sys + message, Supports(CpeExtension.EmoteFix))) {
                     Send( p );
                 }
             } else {
-                foreach (Packet p in LineWrapper.Wrap( Color.Sys + message, SupportsEmoteFix )) {
+                foreach (Packet p in LineWrapper.Wrap( Color.Sys + message, Supports(CpeExtension.EmoteFix) )) {
                     Send( p );
                 }
             }
@@ -631,7 +631,7 @@ namespace fCraft {
             if( IsSuper ) {
                 Logger.LogToConsole( message );
             } else {
-                foreach (Packet p in LineWrapper.Wrap( Color.Sys + message, SupportsEmoteFix )) {
+                foreach (Packet p in LineWrapper.Wrap( Color.Sys + message, Supports(CpeExtension.EmoteFix) )) {
                     Send( p );
                 }
             }
@@ -660,7 +660,7 @@ namespace fCraft {
             }
             else
             {
-                foreach (Packet p in LineWrapper.Wrap( messageType, message, SupportsEmoteFix ))
+                foreach (Packet p in LineWrapper.Wrap( messageType, message, Supports(CpeExtension.EmoteFix) ))
                 {
                     Send(p);
                 }
@@ -685,7 +685,7 @@ namespace fCraft {
             if( this == Console ) {
                 Logger.LogToConsole( message );
             } else {
-                foreach (Packet p in LineWrapper.WrapPrefixed( prefix, message, SupportsEmoteFix )) {
+                foreach (Packet p in LineWrapper.WrapPrefixed( prefix, message, Supports(CpeExtension.EmoteFix) )) {
                     Send( p );
                 }
             }
@@ -2209,6 +2209,8 @@ namespace fCraft {
 
         #region CPE
 
+        readonly HashSet<CpeExtension> supportedExtensions = new HashSet<CpeExtension>();
+
         const string CustomBlocksExtName = "CustomBlocks";
         const int CustomBlocksExtVersion = 1;
         const byte CustomBlocksLevel = 1;
@@ -2242,45 +2244,33 @@ namespace fCraft {
         const string PlayerClickExtName = "PlayerClick";
         const int PlayerClickExtVersion = 1;
 
-        // Note: if more levels are added, change UsesCustomBlocks from bool to int
-        public bool UsesCustomBlocks { get; set; }
-        public bool SupportsBlockPermissions { get; set; }
-        public bool SupportsClickDistance { get; set; }
-        public bool SupportsEnvColors { get; set; }
-        public bool SupportsChangeModel { get; set; }
-        public bool SupportsEnvMapAppearance { get; set; }
-        public bool SupportsEnvWeatherType { get; set; }
-        public bool SupportsHeldBlock { get; set; }
-        public bool SupportsExtPlayerList { get; set; }
-        public bool SupportsExtPlayerList2 { get; set; }
-        public bool SupportsSelectionCuboid { get; set; }
-        public bool SupportsMessageTypes { get; set; }
-        public bool SupportsHackControl { get; set; }
-        public bool SupportsEmoteFix { get; set; }
-        public bool SupportsTextHotKey { get; set; }
-        public bool SupportsPlayerClick { get; set; }
+
+        public bool Supports(CpeExtension extension) {
+            return supportedExtensions.Contains(extension);
+        }
+
         public string ClientName { get; set; }
 
         bool NegotiateProtocolExtension()
         {
             // write our ExtInfo and ExtEntry packets
             writer.Write(Packet.MakeExtInfo("ProCraft", 16).Bytes);
-            writer.Write(Packet.MakeExtEntry(CustomBlocksExtName, CustomBlocksExtVersion).Bytes);
-            writer.Write(Packet.MakeExtEntry(BlockPermissionsExtName, BlockPermissionsExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(ClickDistanceExtName, ClickDistanceExtVersion).Bytes);
+            writer.Write(Packet.MakeExtEntry(CustomBlocksExtName, CustomBlocksExtVersion).Bytes);
+            writer.Write(Packet.MakeExtEntry(HeldBlockExtName, HeldBlockExtVersion).Bytes);
+            writer.Write(Packet.MakeExtEntry(TextHotKeyExtName, TextHotKeyExtVersion).Bytes);
+            writer.Write(Packet.MakeExtEntry(ExtPlayerListExtName, ExtPlayerListExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(EnvColorsExtName, EnvColorsExtVersion).Bytes);
+            writer.Write(Packet.MakeExtEntry(SelectionCuboidExtName, SelectionCuboidExtVersion).Bytes);
+            writer.Write(Packet.MakeExtEntry(BlockPermissionsExtName, BlockPermissionsExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(ChangeModelExtName, ChangeModelExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(EnvMapAppearanceExtName, EnvMapAppearanceExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(EnvWeatherTypeExtName, EnvWeatherTypeExtVersion).Bytes);
-            writer.Write(Packet.MakeExtEntry(HeldBlockExtName, HeldBlockExtVersion).Bytes);
-            writer.Write(Packet.MakeExtEntry(ExtPlayerListExtName, ExtPlayerListExtVersion).Bytes);
-            writer.Write(Packet.MakeExtEntry(ExtPlayerListExtName, ExtPlayerList2ExtVersion).Bytes);
-            writer.Write(Packet.MakeExtEntry(SelectionCuboidExtName, SelectionCuboidExtVersion).Bytes);
-            writer.Write(Packet.MakeExtEntry(MessageTypesExtName, MessageTypesExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(HackControlExtName, HackControlExtVersion).Bytes);
-            writer.Write(Packet.MakeExtEntry(EmoteFixExtName, EmoteFixExtVersion).Bytes);
-            writer.Write(Packet.MakeExtEntry(TextHotKeyExtName, TextHotKeyExtVersion).Bytes);
+            writer.Write(Packet.MakeExtEntry(ExtPlayerListExtName, ExtPlayerList2ExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(PlayerClickExtName, PlayerClickExtVersion).Bytes);
+            writer.Write(Packet.MakeExtEntry(MessageTypesExtName, MessageTypesExtVersion).Bytes);
+            writer.Write(Packet.MakeExtEntry(EmoteFixExtName, EmoteFixExtVersion).Bytes);
 
             // Expect ExtInfo reply from the client
             OpCode extInfoReply = reader.ReadOpCode();
@@ -2294,8 +2284,6 @@ namespace fCraft {
             int expectedEntries = reader.ReadInt16();
 
             // wait for client to send its ExtEntries
-            bool sendCustomBlockPacket = false;
-            List<string> clientExts = new List<string>();
             for (int i = 0; i < expectedEntries; i++) {
                 // Expect ExtEntry replies (0 or more)
                 OpCode extEntryReply = reader.ReadOpCode();
@@ -2306,83 +2294,116 @@ namespace fCraft {
                 }
                 string extName = reader.ReadString();
                 int extVersion = reader.ReadInt32();
-                //Logger.Log(LogType.Debug, "Expected: {0} / Received: {1} {2} {3}", OpCode.ExtEntry, extEntryReply, extName, extVersion);
-                if (extName == CustomBlocksExtName && extVersion == CustomBlocksExtVersion) {
-                    // Hooray, client supports custom blocks! We still need to check support level.
-                    UsesCustomBlocks = true;
-                    clientExts.Add(extName + " " + extVersion);
+                bool addExt = false;
+                CpeExtension addedExt = CpeExtension.none;
+                switch (extName) {
+                    case CustomBlocksExtName:
+                        if (extVersion == CustomBlocksExtVersion) {
+                            addExt = true;
+                            addedExt = CpeExtension.CustomBlocks;
+                        }
+                        break;
+                    case BlockPermissionsExtName:
+                        if (extVersion == BlockPermissionsExtVersion) {
+                            addExt = true;
+                            addedExt = CpeExtension.BlockPermissions;
+                        }
+                        break;
+                    case ClickDistanceExtName:
+                        if (extVersion == ClickDistanceExtVersion) {
+                            addExt = true;
+                            addedExt = CpeExtension.ClickDistance;
+                        }
+                        break;
+                    case EnvColorsExtName:
+                        if (extVersion == EnvColorsExtVersion) {
+                            addExt = true;
+                            addedExt = CpeExtension.EnvColors;
+                        }
+                        break;
+                    case ChangeModelExtName:
+                        if (extVersion == ChangeModelExtVersion) {
+                            addExt = true;
+                            addedExt = CpeExtension.ChangeModel;
+                        }
+                        break;
+                    case EnvMapAppearanceExtName:
+                        if (extVersion == EnvMapAppearanceExtVersion) {
+                            addExt = true;
+                            addedExt = CpeExtension.EnvMapAppearance;
+                        }
+                        break;
+                    case EnvWeatherTypeExtName:
+                        if (extVersion == EnvWeatherTypeExtVersion) {
+                            addExt = true;
+                            addedExt = CpeExtension.EnvWeatherType;
+                        }
+                        break;
+                    case HeldBlockExtName:
+                        if (extVersion == HeldBlockExtVersion) {
+                            addExt = true;
+                            addedExt = CpeExtension.HeldBlock;
+                        }
+                        break;
+                    case ExtPlayerListExtName:
+                        if (extVersion == ExtPlayerListExtVersion || extVersion == ExtPlayerList2ExtVersion) {
+                            addExt = true;
+                            addedExt = extVersion == ExtPlayerListExtVersion ? CpeExtension.ExtPlayerList : CpeExtension.ExtPlayerList2;
+                        }
+                        break;
+                    case SelectionCuboidExtName:
+                        if (extVersion == SelectionCuboidExtVersion) {
+                            addExt = true;
+                            addedExt = CpeExtension.SelectionCuboid;
+                        }
+                        break;
+                    case MessageTypesExtName:
+                        if (extVersion == MessageTypesExtVersion) {
+                            addExt = true;
+                            addedExt = CpeExtension.MessageType;
+                        }
+                        break;
+                    case HackControlExtName:
+                        if (extVersion == HackControlExtVersion) {
+                            addExt = true;
+                            addedExt = CpeExtension.HackControl;
+                        }
+                        break;
+                    case EmoteFixExtName:
+                        if (extVersion == EmoteFixExtVersion) {
+                            addExt = true;
+                            addedExt = CpeExtension.EmoteFix;
+                        }
+                        break;
+                    case TextHotKeyExtName:
+                        if (extVersion == TextHotKeyExtVersion) {
+                            addExt = true;
+                            addedExt = CpeExtension.TextHotKey;
+                        }
+                        break;
+                    case PlayerClickExtName:
+                        if (extVersion == PlayerClickExtVersion) {
+                            addExt = true;
+                            addedExt = CpeExtension.PlayerClick;
+                        }
+                        break;
+                    default:
+                        break;
                 }
-                if (extName == BlockPermissionsExtName && extVersion == BlockPermissionsExtVersion) {
-                    SupportsBlockPermissions = true;
-                    clientExts.Add(extName + " " + extVersion);
-                }
-                if (extName == ClickDistanceExtName && extVersion == ClickDistanceExtVersion) {
-                    SupportsClickDistance = true;
-                    clientExts.Add(extName + " " + extVersion);
-                }
-                if (extName == EnvColorsExtName && extVersion == EnvColorsExtVersion) {
-                    SupportsEnvColors = true;
-                    clientExts.Add(extName + " " + extVersion);
-                }
-                if (extName == ChangeModelExtName && extVersion == ChangeModelExtVersion) {
-                    SupportsChangeModel = true;
-                    clientExts.Add(extName + " " + extVersion);
-                }
-                if (extName == EnvMapAppearanceExtName && extVersion == EnvMapAppearanceExtVersion) {
-                    SupportsEnvMapAppearance = true;
-                    clientExts.Add(extName + " " + extVersion);
-                }
-                if (extName == EnvWeatherTypeExtName && extVersion == EnvWeatherTypeExtVersion) {
-                    SupportsEnvWeatherType = true;
-                    clientExts.Add(extName + " " + extVersion);
-                }
-                if (extName == HeldBlockExtName && extVersion == HeldBlockExtVersion) {
-                    SupportsHeldBlock = true;
-                    clientExts.Add(extName + " " + extVersion);
-                }
-                if (extName == ExtPlayerListExtName && extVersion == ExtPlayerListExtVersion) {
-                    SupportsExtPlayerList = true;
-                    clientExts.Add(extName + " " + extVersion);
-                }
-                if (extName == ExtPlayerListExtName && extVersion == ExtPlayerList2ExtVersion) {
-                    SupportsExtPlayerList2 = true;
-                    clientExts.Add(extName + " " + extVersion);
-                }
-                if (extName == SelectionCuboidExtName && extVersion == SelectionCuboidExtVersion) {
-                    SupportsSelectionCuboid = true;
-                    clientExts.Add(extName + " " + extVersion);
-                }
-                if (extName == MessageTypesExtName && extVersion == MessageTypesExtVersion) {
-                    SupportsMessageTypes = true;
-                    clientExts.Add(extName + " " + extVersion);
-                }
-                if (extName == HackControlExtName && extVersion == HackControlExtVersion) {
-                    SupportsHackControl = true;
-                    clientExts.Add(extName + " " + extVersion);
-                }
-                if (extName == EmoteFixExtName && extVersion == EmoteFixExtVersion) {
-                    SupportsEmoteFix = true;
-                    clientExts.Add(extName + " " + extVersion);
-                }
-                if (extName == TextHotKeyExtName && extVersion == TextHotKeyExtVersion) {
-                    SupportsTextHotKey = true;
-                    clientExts.Add( extName + " " + extVersion );
-                }
-                if (extName == PlayerClickExtName && extVersion == PlayerClickExtVersion) {
-                    SupportsPlayerClick = true;
-                    clientExts.Add(extName + " " + extVersion);
+                if (addExt) {
+                    supportedExtensions.Add(addedExt);
                 }
             }
 
             // log client's capabilities
-            if (clientExts.Count > 0)
+            if (supportedExtensions.Count > 0)
             {
                 Logger.Log(LogType.Debug, "Player {0} is using \"{1}\", supporting: {2}",
                             Info.Name,
                             ClientName,
-                            clientExts.JoinToString(", "));
+                            supportedExtensions.JoinToString(", "));
             }
-            if (clientExts.Count == 0)
+            if (supportedExtensions.Count == 0)
             {
                 Kick("Please use the ClassiCube.net client", LeaveReason.InvalidOpcodeKick);
             }
@@ -2404,13 +2425,13 @@ namespace fCraft {
                 return false;
             }
             byte clientLevel = reader.ReadByte();
-            UsesCustomBlocks = (clientLevel >= CustomBlocksLevel);
+            //UsesCustomBlocks = (clientLevel >= CustomBlocksLevel);
             return true;
         }
 
         // For non-extended players, use appropriate substitution
         public Packet ProcessOutgoingSetBlock(Packet packet) {
-            if (packet.Bytes[7] > (byte) Map.MaxLegalBlockType && !this.UsesCustomBlocks) {
+            if (packet.Bytes[7] > (byte) Map.MaxLegalBlockType && !this.Supports(CpeExtension.CustomBlocks)) {
                 packet.Bytes[7] = (byte) Map.GetFallbackBlock((Block) packet.Bytes[7]);
             }
             return packet;

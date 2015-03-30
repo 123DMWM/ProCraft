@@ -1271,57 +1271,58 @@ namespace fCraft {
             for (int i = 0; i < tempPlayerList.Length; i++) {
                 Player player = tempPlayerList[i];
 
-                if (player.lastSolidPos != null && !player.Info.IsAFK && player.SupportsMessageTypes &&
+                if (player.lastSolidPos != null && !player.Info.IsAFK && player.Supports(CpeExtension.MessageType) &&
                     !player.IsPlayingCTF) {
                     double speed = (Math.Sqrt(player.Position.DistanceSquaredTo(player.lastSolidPos))/32);
-                    player.Send(Packet.Message((byte) 13, String.Format("&eSpeed: &f{0:N2} &eBlocks/s", speed)));
-                    player.Send(Packet.Message(12,
+                    player.Send(Packet.Message((byte)MessageType.BottomRight3, String.Format("&eSpeed: &f{0:N2} &eBlocks/s", speed)));
+                    player.Send(Packet.Message((byte)MessageType.BottomRight2,
                         player.Position.ToBlockCoordsExt().ToString() +
                         InfoCommands.GetCompassStringType(player.Position.R)));
                 }
-                if (player.IsPlayingCTF && player.SupportsMessageTypes) {
-                    player.Send(Packet.Message(11, ""));
+                if (player.IsPlayingCTF && player.Supports(CpeExtension.MessageType)) {
+                    player.Send(Packet.Message((byte)MessageType.BottomRight1, ""));
                     if (((CTF.redRoundsWon*5) + CTF.redScore) > ((CTF.blueRoundsWon*5) + CTF.blueScore)) {
-                        player.Send(Packet.Message(13,
+                        player.Send(Packet.Message((byte)MessageType.BottomRight3,
                             "&4Red &a" + CTF.redRoundsWon + "&4:&f" + CTF.redScore + " &c<-- &1Blue &a" +
                             CTF.blueRoundsWon + "&1:&f" + CTF.blueScore));
                     } else if (((CTF.redRoundsWon*5) + CTF.redScore) < ((CTF.blueRoundsWon*5) + CTF.blueScore)) {
-                        player.Send(Packet.Message(13,
+                        player.Send(Packet.Message((byte)MessageType.BottomRight3,
                             "&4Red &a" + CTF.redRoundsWon + "&4:&f" + CTF.redScore + " &9--> &1Blue &a" +
                             CTF.blueRoundsWon + "&1:&f" + CTF.blueScore));
                     } else {
-                        player.Send(Packet.Message(13,
+                        player.Send(Packet.Message((byte)MessageType.BottomRight3,
                             "&4Red &a" + CTF.redRoundsWon + "&4:&f" + CTF.redScore + " &d<=> &1Blue &a" +
                             CTF.blueRoundsWon + "&1:&f" + CTF.blueScore));
                     }
                     var flagholder = player.World.Players.Where(p => p.IsHoldingFlag);
                     if (flagholder != null) {
                         if (CTF.redHasFlag) {
-                            player.Send(Packet.Message(12,
+                            player.Send(Packet.Message((byte)MessageType.BottomRight2,
                                 flagholder.Take(1)
                                     .JoinToString((r => String.Format("&4{0} &ehas the &1Blue&e flag!", r.Name)))));
                         } else if (CTF.blueHasFlag) {
-                            player.Send(Packet.Message(12,
+                            player.Send(Packet.Message((byte)MessageType.BottomRight2,
                                 flagholder.Take(1)
                                     .JoinToString((r => String.Format("&1{0} &ehas the &4Red&e flag!", r.Name)))));
                         } else {
-                            player.Send(Packet.Message(12, "&eNo one has the flag!"));
+                            player.Send(Packet.Message((byte)MessageType.BottomRight2, "&eNo one has the flag!"));
                         }
 
                     }
                     if (player.Team == "Red") {
-                        player.Send(Packet.Message(3, "&eTeam: &4Red"));
+                        player.Send(Packet.Message((byte)MessageType.Status3, "&eTeam: &4Red"));
                     } else if (player.Team == "Blue") {
-                        player.Send(Packet.Message(3, "&eTeam: &1Blue"));
-                    } else player.Send(Packet.Message(3, "&eTeam: &0None"));
+                        player.Send(Packet.Message((byte)MessageType.Status3, "&eTeam: &1Blue"));
+                    } else
+                        player.Send(Packet.Message((byte)MessageType.Status3, "&eTeam: &0None"));
                 }
-                if (player.IsPlayingCTF && player.SupportsEnvColors) {
+                if (player.IsPlayingCTF && player.Supports(CpeExtension.EnvColors)) {
                     if (((CTF.redRoundsWon*5) + CTF.redScore) > ((CTF.blueRoundsWon*5) + CTF.blueScore)) {
-                        player.Send(Packet.MakeEnvSetColor(2, "AA0000"));
+                        player.Send(Packet.MakeEnvSetColor((byte)EnvVariable.FogColor, "AA0000"));
                     } else if (((CTF.redRoundsWon*5) + CTF.redScore) < ((CTF.blueRoundsWon*5) + CTF.blueScore)) {
-                        player.Send(Packet.MakeEnvSetColor(2, "0000AA"));
+                        player.Send(Packet.MakeEnvSetColor((byte)EnvVariable.FogColor, "0000AA"));
                     } else {
-                        player.Send(Packet.MakeEnvSetColor(2, "AA00AA"));
+                        player.Send(Packet.MakeEnvSetColor((byte)EnvVariable.FogColor, "AA00AA"));
                     }
                 }
                 player.lastSolidPos = player.Position;
@@ -1363,7 +1364,8 @@ namespace fCraft {
             for (int i = 0; i < tempPlayerList.Length; i++)
             {
                 Player player = tempPlayerList[i];
-                if (!player.SupportsExtPlayerList && !player.SupportsExtPlayerList2) continue;
+                if (!player.Supports(CpeExtension.ExtPlayerList) && !player.Supports(CpeExtension.ExtPlayerList2))
+                    continue;
                 var canBeSeen = Players.Where(a => player.CanSee(a)).ToArray();
                 var canBeSeenW = player.World.Players.Where(a => player.CanSee(a)).ToArray();
                 if (!player.IsPlayingCTF)
@@ -1556,13 +1558,13 @@ namespace fCraft {
             {
                 foreach (Player sendtome in Server.Players)
                 {
-                    if (sendtome.SupportsMessageTypes)
+                    if (sendtome.Supports(CpeExtension.MessageType))
                     {
                         if (line.StartsWith("&d", StringComparison.OrdinalIgnoreCase))
                         {
                             line = line.Remove(0, 2);
                         }
-                        sendtome.Send(Packet.Message(100, "&d" + Chat.ReplaceTextKeywords(Player.Console, line)));
+                        sendtome.Send(Packet.Message((byte)MessageType.Announcement, "&d" + Chat.ReplaceTextKeywords(Player.Console, line)));
                     }
                     else
                     {
@@ -1588,9 +1590,9 @@ namespace fCraft {
             {
                 foreach (Player sendtome in Server.Players)
                 {
-                    if (sendtome.SupportsMessageTypes)
+                    if (sendtome.Supports(CpeExtension.MessageType))
                     {
-                        sendtome.Message(100, " ");
+                        sendtome.Message((byte)MessageType.Announcement, " ");
                     }
                 }
             }
@@ -1599,13 +1601,13 @@ namespace fCraft {
         // Changes day color
         private static void ChangeWorldColors(SchedulerTask task) {
             string hex;
-            foreach (Player sendtome in Players.Where(w => w.SupportsEnvColors && w.World != null && w.World.SkyLightEmulator)) {
+            foreach (Player sendtome in Players.Where(w => w.Supports(CpeExtension.EnvColors) && w.World != null && w.World.SkyLightEmulator)) {
                 if (SkyColorHex.TryGetValue(ColorTime, out hex)) {
-                    sendtome.Send(Packet.MakeEnvSetColor(0, hex));
+                    sendtome.Send(Packet.MakeEnvSetColor((byte)EnvVariable.SkyColor, hex));
                 }
                 if (CloudAndFogColorHex.TryGetValue(ColorTime, out hex)) {
-                    sendtome.Send(Packet.MakeEnvSetColor(1, hex));
-                    sendtome.Send(Packet.MakeEnvSetColor(2, hex));
+                    sendtome.Send(Packet.MakeEnvSetColor((byte)EnvVariable.CloudColor, hex));
+                    sendtome.Send(Packet.MakeEnvSetColor((byte)EnvVariable.FogColor, hex));
                 }
             }
             if (ColorTime >= 60) {
@@ -1914,7 +1916,7 @@ namespace fCraft {
                 }
                 foreach (Player p1 in Players)
                 {
-                    if (p1.SupportsExtPlayerList || p1.SupportsExtPlayerList2)
+                    if (p1.Supports(CpeExtension.ExtPlayerList) || p1.Supports(CpeExtension.ExtPlayerList2))
                     {
                         p1.Send(Packet.MakeExtRemovePlayerName(player.NameID));
                     }
@@ -1929,7 +1931,8 @@ namespace fCraft {
 
         internal static void UpdateTabList() {
             foreach (Player p1 in Players) {
-                if (!p1.SupportsExtPlayerList && !p1.SupportsExtPlayerList2) continue;
+                if (!p1.Supports(CpeExtension.ExtPlayerList) && !p1.Supports(CpeExtension.ExtPlayerList2))
+                    continue;
                 var canBeSeen = Players.Where(i => p1.CanSee(i)).ToArray();
                 var canBeSeenW = p1.World.Players.Where(i => p1.CanSee(i)).ToArray();
                 if (!p1.IsPlayingCTF)

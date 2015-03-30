@@ -801,7 +801,7 @@ namespace fCraft {
                 }
 
                 if( zones.Remove( zone.Name ) ) {
-                        foreach (Player p in player.World.Players.Where(a => a.SupportsSelectionCuboid)) {
+                        foreach (Player p in player.World.Players.Where(a => a.Supports(CpeExtension.SelectionCuboid))) {
                             p.Send(Packet.MakeRemoveSelection(zone.ZoneID));
                     }
                     Logger.Log( LogType.UserActivity,
@@ -1068,7 +1068,7 @@ namespace fCraft {
             }
             if (zone != null) {
                 foreach (Player p in player.World.Players) {
-                    if (p.SupportsSelectionCuboid) {
+                    if (p.Supports(CpeExtension.SelectionCuboid)) {
                         if (zone.ShowZone) {
                             p.Send(Packet.MakeMakeSelection(zone.ZoneID, zone.Name, zone.Bounds, zone.Color, alpha));
                         }

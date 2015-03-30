@@ -815,7 +815,7 @@ namespace fCraft
                         player.Position.R = (byte)100;
                         player.Team = "Red";
                         player.IsPlayingCTF = true;
-                        if (player.SupportsHeldBlock)
+                        if (player.Supports(CpeExtension.HeldBlock))
                         {
                             player.Send(Packet.MakeHoldThis(Block.TNT, false));
                             player.Send(Packet.MakeHoldThis(Block.TNT, true));
@@ -828,7 +828,7 @@ namespace fCraft
                         player.TeleportTo(blueSpawn);
                         player.Team = "Blue";
                         player.IsPlayingCTF = true;
-                        if (player.SupportsHeldBlock)
+                        if (player.Supports(CpeExtension.HeldBlock))
                         {
                             player.Send(Packet.MakeHoldThis(Block.TNT, false));
                         }
@@ -841,7 +841,7 @@ namespace fCraft
                         player.Position.R = (byte)100;
                         player.Team = "Red";
                         player.IsPlayingCTF = true;
-                        if (player.SupportsHeldBlock)
+                        if (player.Supports(CpeExtension.HeldBlock))
                         {
                             player.Send(Packet.MakeHoldThis(Block.TNT, false));
                         }
@@ -861,8 +861,8 @@ namespace fCraft
         {
             try
             {
-                if (player.SupportsMessageTypes) {
-                    player.Send(Packet.Message(3, ""));
+                if (player.Supports(CpeExtension.MessageType)) {
+                    player.Send(Packet.Message((byte)MessageType.Status3, ""));
                 }
                 if (blueTeam.Contains(player))
                 {
@@ -876,7 +876,7 @@ namespace fCraft
                         player.IsHoldingFlag = false;
                         world.Map.QueueUpdate(new BlockUpdate(Player.Console, redFlag, Block.Red));
                     }
-                    if (player.SupportsHeldBlock)
+                    if (player.Supports(CpeExtension.HeldBlock))
                     {
                         player.Send(Packet.MakeHoldThis(Block.Stone, false));
                     }
@@ -893,7 +893,7 @@ namespace fCraft
                         player.IsHoldingFlag = false;
                         world.Map.QueueUpdate(new BlockUpdate(Player.Console, blueFlag, Block.Blue));
                     }
-                    if (player.SupportsHeldBlock)
+                    if (player.Supports(CpeExtension.HeldBlock))
                     {
                         player.Send(Packet.MakeHoldThis(Block.Stone, false));
                     }
@@ -997,10 +997,10 @@ namespace fCraft
                 foreach (Player p in cache) {
                     p.IsPlayingCTF = false;
                     p.IsHoldingFlag = false;
-                    if (p.SupportsMessageTypes) {
-                        p.Send(Packet.Message(3, " "));
+                    if (p.Supports(CpeExtension.MessageType)) {
+                        p.Send(Packet.Message((byte)MessageType.Status3, " "));
                     }
-                    if (p.SupportsHeldBlock) {
+                    if (p.Supports(CpeExtension.HeldBlock)) {
                         p.Send(Packet.MakeHoldThis(Block.Stone, false));
                     }
                 }

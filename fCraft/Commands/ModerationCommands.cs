@@ -1483,7 +1483,7 @@ namespace fCraft {
             Player.RaisePlayerHideChangedEvent(player, true, silent);
             foreach (Player p1 in Server.Players)
             {
-                if (p1.SupportsExtPlayerList || p1.SupportsExtPlayerList2)
+                if (p1.Supports(CpeExtension.ExtPlayerList) || p1.Supports(CpeExtension.ExtPlayerList2))
                 {
                     p1.Send(Packet.MakeExtRemovePlayerName(player.NameID));
                 }
@@ -1544,7 +1544,7 @@ namespace fCraft {
             Player.RaisePlayerHideChangedEvent(player, false, silent);
             foreach (Player p1 in Server.Players)
             {
-                if (p1.SupportsExtPlayerList || p1.SupportsExtPlayerList2)
+                if (p1.Supports(CpeExtension.ExtPlayerList) || p1.Supports(CpeExtension.ExtPlayerList2))
                 {
                     p1.Send(Packet.MakeExtRemovePlayerName(player.NameID));
                 }
@@ -2844,7 +2844,7 @@ namespace fCraft {
                 target.AllowFlying = !target.AllowFlying;
                 if (target.IsOnline)
                 {
-                    if (target.PlayerObject.SupportsHackControl)
+                    if (target.PlayerObject.Supports(CpeExtension.HackControl))
                     {
                         target.PlayerObject.Send(Packet.HackControl(
                             target.AllowFlying, target.AllowNoClip, target.AllowSpeedhack,
@@ -2859,7 +2859,7 @@ namespace fCraft {
                 target.AllowNoClip = !target.AllowNoClip;
                 if (target.IsOnline)
                 {
-                    if (target.PlayerObject.SupportsHackControl)
+                    if (target.PlayerObject.Supports(CpeExtension.HackControl))
                     {
                         target.PlayerObject.Send(Packet.HackControl(
                             target.AllowFlying, target.AllowNoClip, target.AllowSpeedhack,
@@ -2874,7 +2874,7 @@ namespace fCraft {
                 target.AllowSpeedhack = !target.AllowSpeedhack;
                 if (target.IsOnline)
                 {
-                    if (target.PlayerObject.SupportsHackControl)
+                    if (target.PlayerObject.Supports(CpeExtension.HackControl))
                     {
                         target.PlayerObject.Send(Packet.HackControl(
                             target.AllowFlying, target.AllowNoClip, target.AllowSpeedhack,
@@ -2889,7 +2889,7 @@ namespace fCraft {
                 target.AllowRespawn = !target.AllowRespawn;
                 if (target.IsOnline)
                 {
-                    if (target.PlayerObject.SupportsHackControl)
+                    if (target.PlayerObject.Supports(CpeExtension.HackControl))
                     {
                         target.PlayerObject.Send(Packet.HackControl(
                             target.AllowFlying, target.AllowNoClip, target.AllowSpeedhack,
@@ -2904,7 +2904,7 @@ namespace fCraft {
                 target.AllowThirdPerson = !target.AllowThirdPerson;
                 if (target.IsOnline)
                 {
-                    if (target.PlayerObject.SupportsHackControl)
+                    if (target.PlayerObject.Supports(CpeExtension.HackControl))
                     {
                         target.PlayerObject.Send(Packet.HackControl(
                             target.AllowFlying, target.AllowNoClip, target.AllowSpeedhack,
@@ -2923,7 +2923,7 @@ namespace fCraft {
                     target.JumpHeight = height;
                     if (target.IsOnline)
                     {
-                        if (target.PlayerObject.SupportsHackControl)
+                        if (target.PlayerObject.Supports(CpeExtension.HackControl))
                         {
                             target.PlayerObject.Send(Packet.HackControl(
                                 target.AllowFlying, target.AllowNoClip, target.AllowSpeedhack,
