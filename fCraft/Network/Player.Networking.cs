@@ -1,4 +1,4 @@
-﻿// Part of fCraft | Copyright 2009-2013 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt //Copyright (c) 2011-2013 Jon Baker, Glenn Marien and Lao Tszy <Jonty800@gmail.com> //Copyright (c) <2012-2014> <LeChosenOne, DingusBungus> | Copyright 2014 123DMWM <shmo1joe2@gmail.com>
+﻿// Part of fCraft | Copyright 2009-2015 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt //Copyright (c) 2011-2013 Jon Baker, Glenn Marien and Lao Tszy <Jonty800@gmail.com> //Copyright (c) <2012-2014> <LeChosenOne, DingusBungus> | ProCraft Copyright 2014-2015 Joseph Beauvais <123DMWM@gmail.com>
 //#define DEBUG_MOVEMENT
 using System;
 using System.Collections.Generic;
@@ -1335,7 +1335,7 @@ namespace fCraft {
 
             if ((newWorld.Name.ToLower() == "ctf" || newWorld.Name.ToLower() == "maze" || newWorld.Name.ToLower() == "parkour") && this.Info.Rank != RankManager.HighestRank)
             {
-                textLine2 = "Loading world " + newWorld.ClassyName + " &f-hax";
+                textLine2 = "Loading world " + newWorld.ClassyName + " &f-hax -respawn";
             }
             else textLine2 = "Loading world " + newWorld.ClassyName;
 
