@@ -353,7 +353,7 @@ namespace fCraft
                                             IRCColorsAndNonStandardCharsExceptEmotes.Replace(rawMessage, ""));
                                     } else if (rawMessage.ToLower().StartsWith("!") || (rawMessage.ToLower().StartsWith(botNick.ToLower()) && validCommands.Contains(rawMessage.Split()[1]))) {
                                         if (DateTime.Now.Subtract(lastIrcCommand).TotalSeconds > 5) {
-                                            if (rawMessage.ToLower() == "!players" || rawMessage.ToLower() == botNick.ToLower() + " players") {
+                                            if (rawMessage.ToLower() == "!players" || rawMessage.ToLower() == ActualBotNick.ToLower() + " players") {
                                                 var visiblePlayers =
                                                     Server.Players.Where(p => p.Info.IsHidden == false)
                                                         .OrderBy(p => p.Name)
@@ -366,7 +366,7 @@ namespace fCraft
                                                     SendChannelMessage("\u212C&SThere are no players online.");
                                                     lastIrcCommand = DateTime.Now;
                                                 }
-                                            } else if (rawMessage.ToLower() == "!cplayers" || rawMessage.ToLower() == botNick.ToLower() + " cplayers") {
+                                            } else if (rawMessage.ToLower() == "!cplayers" || rawMessage.ToLower() == ActualBotNick.ToLower() + " cplayers") {
                                                 var visiblePlayers =
                                                     Server.Players.Where(p => p.Info.IsHidden == false)
                                                         .OrderBy(p => p.ClassyName)
@@ -379,13 +379,13 @@ namespace fCraft
                                                     SendChannelMessage("\u212C&SThere are no players online.");
                                                     lastIrcCommand = DateTime.Now;
                                                 }
-                                            } else if (rawMessage.ToLower().StartsWith("!st") || rawMessage.ToLower().StartsWith(botNick.ToLower() + " st")) {
-                                                if (rawMessage.Length >= (rawMessage.ToLower().StartsWith("!") ? 5 : botNick.Length + 5)) {
-                                                    Chat.IRCSendStaff(msg.Nick, rawMessage.Remove(0, (rawMessage.ToLower().StartsWith("!") ? 4 : botNick.Length + 4)));
+                                            } else if (rawMessage.ToLower().StartsWith("!st") || rawMessage.ToLower().StartsWith(ActualBotNick.ToLower() + " st")) {
+                                                if (rawMessage.Length >= (rawMessage.ToLower().StartsWith("!") ? 5 : ActualBotNick.Length + 5)) {
+                                                    Chat.IRCSendStaff(msg.Nick, rawMessage.Remove(0, (rawMessage.ToLower().StartsWith("!") ? 4 : ActualBotNick.Length + 4)));
                                                     lastIrcCommand = DateTime.Now;
                                                 }
-                                            } else if (rawMessage.ToLower().StartsWith("!seen") || rawMessage.ToLower().StartsWith(botNick.ToLower() + " seen")) {
-                                                if (rawMessage.Length > (rawMessage.ToLower().StartsWith("!") ? 6 : botNick.Length + 6)) {
+                                            } else if (rawMessage.ToLower().StartsWith("!seen") || rawMessage.ToLower().StartsWith(ActualBotNick.ToLower() + " seen")) {
+                                                if (rawMessage.Length > (rawMessage.ToLower().StartsWith("!") ? 6 : ActualBotNick.Length + 6)) {
                                                     string findPlayer = rawMessage.Split()[(rawMessage.ToLower().StartsWith("!") ? 1 : 2)];
                                                     PlayerInfo info = PlayerDB.FindPlayerInfoExact(findPlayer);
                                                     if (info != null) {
@@ -413,12 +413,12 @@ namespace fCraft
                                                     SendChannelMessage("\u212C&SPlease specify a player name.");
                                                 }
                                                 lastIrcCommand = DateTime.Now;
-                                            } else if (rawMessage.ToLower() == "!commands" || rawMessage.ToLower() == botNick.ToLower() + " commands") {
+                                            } else if (rawMessage.ToLower() == "!commands" || rawMessage.ToLower() == ActualBotNick.ToLower() + " commands") {
                                                 SendChannelMessage("\u212CList of commands: \u211CCommands, cplayers, players, seen, st");
                                                     lastIrcCommand = DateTime.Now;
                                             }
                                         }
-                                    } else if (rawMessage.ToLower().StartsWith("@") || rawMessage.ToLower().StartsWith(botNick.ToLower() + " @")) {
+                                    } else if (rawMessage.ToLower().StartsWith("@") || rawMessage.ToLower().StartsWith(ActualBotNick.ToLower() + " @")) {
                                         if (DateTime.Now.Subtract(lastIrcCommand).TotalSeconds > 5) {
                                             string otherPlayerName = rawMessage.Split()[(rawMessage.ToLower().StartsWith("@") ? 0 : 1)].Remove(0,1);
                                             string messageText = rawMessage.Split()[(rawMessage.ToLower().StartsWith("@") ? 1 : 2)];
