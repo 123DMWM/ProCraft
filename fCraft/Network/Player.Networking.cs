@@ -1458,9 +1458,9 @@ namespace fCraft {
             BytesSent += 7;
 
             if (Supports(CpeExtension.ExtPlayerList2)) {
-                Send(Packet.MakeExtAddEntity2(Packet.SelfId, Info.Rank.Color + Name, (Info.skinName ?? Name), map.Spawn, this));
+                Send(Packet.MakeExtAddEntity2(Packet.SelfId, Info.Rank.Color + Name, (Info.skinName ?? Name), Position, this));
             } else {
-                Send(Packet.MakeAddEntity(Packet.SelfId, Info.Rank.Color + Name, map.Spawn));
+                Send(Packet.MakeAddEntity(Packet.SelfId, Info.Rank.Color + Name, Position));
             }
 
             if (Supports(CpeExtension.ChangeModel)) {
