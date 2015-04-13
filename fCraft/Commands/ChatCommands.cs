@@ -46,7 +46,6 @@ namespace fCraft
             CommandManager.RegisterCommand(CdIdea);
             CommandManager.RegisterCommand(CdAction);
             CommandManager.RegisterCommand(CdWarn);
-            CommandManager.RegisterCommand(CdPlugin);
 
 
             Player.Moved += new EventHandler<Events.PlayerMovedEventArgs>(Player_IsBack);
@@ -1437,31 +1436,6 @@ namespace fCraft
             }
         }
 
-        #endregion
-        #region Plugins
-        static readonly CommandDescriptor CdPlugin = new CommandDescriptor {
-            Name = "Plugins",
-            Aliases = new[] { "plugin" },
-            Category = CommandCategory.Chat,
-            Permissions = new Permission[] { Permission.Chat },
-            IsConsoleSafe = true,
-            Usage = "/Plugins",
-            Help = "Displays all plugins on the server.",
-            Handler = PluginsHandler
-        };
-
-        static void PluginsHandler(Player player, CommandReader cmd) {
-            List<String> plugins = new List<String>();
-            player.Message("&c_Current plugins on {0}&c_", ConfigKey.ServerName.GetString());
-
-            //Sloppy :P, PluginManager.Plugins adds ".Init", so this should split the ".Init" from the plugin name
-            foreach (Plugin plugin in PluginManager.Plugins) {
-                String pluginString = plugin.ToString();
-                string[] splitPluginString = pluginString.Split('.');
-                plugins.Add(splitPluginString[0]);
-            }
-            player.Message(String.Join(", ", plugins));
-        }
         #endregion
     }
 }
