@@ -212,9 +212,9 @@ namespace fCraft {
             get {
                 string formattedName = Name;
                 if (!Info.Rank.Prefix.Equals( "" )) {
-                    formattedName = Info.Rank.Color + Info.Rank.Prefix + (Info.IsAFK ? "&e[AFK]" : "") + Color.White + formattedName;
+					formattedName = Info.Rank.Color + Info.Rank.Prefix + (Info.IsAFK ? "&e[&aAFK&e]" : "") + Color.White + formattedName + " &e[&f" + Info.TimeSinceLastLogin.ToMiniString() + "&e]&f";
                 } else {
-                    formattedName = (Info.IsAFK ? "&e[AFK]" : "") + Info.Rank.Color + formattedName;
+					formattedName = (Info.IsAFK ? "&e[&aAFK&e]" : "") + Info.Rank.Color + formattedName + " &e[&f" + Info.TimeSinceLastLogin.ToMiniString() + "&e]&f";
                 }
                 return formattedName;
             }
