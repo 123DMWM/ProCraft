@@ -683,7 +683,7 @@ namespace fCraft {
                 Player[] playerList = Server.Players.CanBeSeen(player).Union(player).ToArray();
                 sb.Replace("{PLAYER_NAME}", player.ClassyName);
                 sb.Replace("{PLAYER_LIST}", playerList.JoinToClassyString());
-                sb.Replace("{PLAYERS}", playerList.Length.ToStringInvariant());
+				sb.Replace("{PLAYERS}", Server.CountPlayers(false).ToStringInvariant());
             }
             return sb.ToString();
         }
