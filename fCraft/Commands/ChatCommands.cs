@@ -706,6 +706,10 @@ namespace fCraft
             if (cmd.IsConfirmed) {
                 rCreate.addReport(getNewReportId(), player.Name, DateTime.Now, message);
                 player.Message("Report sent!");
+				foreach (Player p in Server.Players.Where(q => q.Info.Rank == RankManager.HighestRank)) {
+					p.Message((byte)MessageType.Announcement, "Player {0} has sent in a report!", player.Name);
+					p.Message("Player {0} has sent in a report!", player.Name);
+				}
                 return;
             }
             if (message.Length < 1) {
@@ -764,7 +768,8 @@ namespace fCraft
                     }
                     break;
                 case "read":
-                case "open":
+				case "open":
+				case "view":
                     bool read = false;
                     if (cmd.NextInt(out reportId)) {
                         foreach (Report r in Chat.Reports) {

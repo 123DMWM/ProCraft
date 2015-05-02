@@ -1203,6 +1203,11 @@ namespace fCraft {
                 Message("Your rank is {0}&S. Type &H/Help&S for help.",
                             Info.Rank.ClassyName);
             }
+			if (Info.Rank == RankManager.HighestRank) {
+				if (Chat.Reports.Count() >= 1) {
+					Message(Chat.Reports.Count() + " unread /Reports");
+				}
+			}
 
             // A reminder for first-time users
             if (PlayerDB.Size == 1 && Info.Rank != RankManager.HighestRank)
