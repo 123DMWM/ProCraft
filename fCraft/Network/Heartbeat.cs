@@ -324,6 +324,9 @@ namespace fCraft
 
     /// <summary> Contains data that's sent to heartbeat servers. </summary>
     public sealed class HeartbeatData {
+		static String nameNoCol = Color.StripColors(ConfigKey.ServerName.GetString());
+		String uptime = "[Uptime: " + (DateTime.UtcNow.Subtract(Server.StartTime)).ToMiniString() +"]";
+		String empty = "                                                                ".Remove(0, nameNoCol.Length).Insert(0, nameNoCol);
         internal HeartbeatData([NotNull] Uri heartbeatUri) {
             if (heartbeatUri == null) throw new ArgumentNullException("heartbeatUri");
             IsPublic = ConfigKey.IsPublic.Enabled();
@@ -333,7 +336,7 @@ namespace fCraft
             ProtocolVersion = Config.ProtocolVersion;
             Salt = Heartbeat.Salt;
             KickSalt = Heartbeat.KickSalt;
-            ServerName = Color.StripColors(ConfigKey.ServerName.GetString());
+			ServerName = empty.Remove(empty.Length - uptime.Length, uptime.Length) + uptime;
             CustomData = new Dictionary<string, string>();
             HeartbeatUri = heartbeatUri;
             KickHeartbeatUri = heartbeatUri;
