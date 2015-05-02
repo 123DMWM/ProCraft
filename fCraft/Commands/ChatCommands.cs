@@ -1194,7 +1194,7 @@ namespace fCraft
                 return;
             }
             if (all.Any()) {
-                string message = "Welcome to " + ConfigKey.ServerName.GetString() + ", " + last.Name + "!";
+				string message = "Welcome to " + Color.StripColors(ConfigKey.ServerName.GetString()) + ", " + last.Name + "!";
                 player.ParseMessage(message, false);
                 player.Info.LastServerMessageDate = DateTime.Now;
             } else {
