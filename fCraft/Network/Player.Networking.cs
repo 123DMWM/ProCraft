@@ -1495,7 +1495,8 @@ namespace fCraft {
                 Send(Packet.MakeEnvSetColor((byte)EnvVariable.Shadow, World.ShadowColor));
                 Send(Packet.MakeEnvSetColor((byte)EnvVariable.Sunlight, World.LightColor));
             }
-            if (Supports(CpeExtension.EnvWeatherType)) {
+			if (Supports(CpeExtension.EnvWeatherType)) {
+				Send(Packet.SetWeather((byte)WeatherType.Sunny));
                 Send(Packet.SetWeather(World.Weather));
             }
             if (Supports(CpeExtension.EnvColors) && World != null && World.SkyLightEmulator) {
