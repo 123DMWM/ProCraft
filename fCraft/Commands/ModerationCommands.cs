@@ -1473,9 +1473,12 @@ namespace fCraft {
             String quitMessage = silentString == null ? "" : "/Quit " + (silentString.Length > 64 ? silentString.Remove(64) : silentString);
 
             if (!silent && ConfigKey.ShowConnectionMessages.Enabled()) {
-                player.quitmessage = quitMessage;
-                player.usedquit = true;
-                Server.Players.CantSee(player).Message("{0}&s left the server. (Reason: {1})", player.ClassyName, quitMessage);
+				if (!quitMessage.Equals("")) {
+					player.quitmessage = quitMessage;
+					quitMessage = String.Format(" (Reason: {0})", player.quitmessage);
+					player.usedquit = true;
+				}
+                Server.Players.CantSee(player).Message("{0}&s left the server.{1}", player.ClassyName, quitMessage);
             }
 
             // for aware players: notify
@@ -1532,6 +1535,8 @@ namespace fCraft {
                 }
             }
             player.Info.IsHidden = false;
+			player.quitmessage = "/Quit";
+			player.usedquit = false;
             if (silent)
             {
                 player.Message("&8You are no longer hidden (silent).");
