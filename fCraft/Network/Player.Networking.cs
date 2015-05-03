@@ -1231,10 +1231,11 @@ namespace fCraft {
             }            
 
             RaisePlayerReadyEvent(this);
-            if (this.Supports(CpeExtension.MessageType))
-            {
-                this.Message((byte)MessageType.Status1, Color.White + ConfigKey.ServerName.GetString());
-            }
+
+			if (Supports(CpeExtension.MessageType)) {
+				Message((byte)MessageType.Status1, "&f" + ConfigKey.ServerName.GetString());
+			}
+
             short NID = 1;
             this.NameID = NID;
             retry:
@@ -1596,10 +1597,15 @@ namespace fCraft {
                     }
                 }
             }
-            if (this.Supports(CpeExtension.MessageType))
-            {
-                this.Message((byte)MessageType.Status2, "&eWorld: &f" + newWorld.ClassyName);
-            }
+
+			if (this.Supports(CpeExtension.MessageType)) {
+				if (World != null) {
+					this.Message((byte)MessageType.Status1, Color.White + ConfigKey.ServerName.GetString() + " on world: " + World.ClassyName);
+				} else {
+					this.Message((byte)MessageType.Status1, Color.White + ConfigKey.ServerName.GetString());
+				}
+			}
+
             Server.UpdateTabList();
             Server.RequestGC();
             return true;

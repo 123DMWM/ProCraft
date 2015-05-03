@@ -1273,7 +1273,7 @@ namespace fCraft {
                 if (player.lastSolidPos != null && !player.Info.IsAFK && player.Supports(CpeExtension.MessageType) &&
                     !player.IsPlayingCTF) {
                     double speed = (Math.Sqrt(player.Position.DistanceSquaredTo(player.lastSolidPos))/32);
-                    player.Send(Packet.Message((byte)MessageType.BottomRight3, String.Format("&eSpeed: &f{0:N2} &eBlocks/s", speed)));
+					player.Send(Packet.Message((byte)MessageType.BottomRight3, Color.Sys + "Been playing for: &f" + player.Info.TimeSinceLastLogin.ToMiniString()));
                     player.Send(Packet.Message((byte)MessageType.BottomRight2,
                         player.Position.ToBlockCoordsExt().ToString() +
                         InfoCommands.GetCompassStringType(player.Position.R)));
@@ -1337,7 +1337,6 @@ namespace fCraft {
                         player.Info.afkMob = "chicken";
 
                     }
-                    UpdateTabList();
                     player.Message("You have " + TimeLeft.ToMiniString() + " left before being kicked for idleing");
                 }
 
@@ -1350,10 +1349,10 @@ namespace fCraft {
                     player.Info.IsAFK = false;
                     player.Info.oldafkMob = player.Info.afkMob;
                     player.Info.afkMob = player.Info.Mob;
-                    UpdateTabList();
                     player.ResetIdBotTimer(); // to prevent kick from firing more than once
                 }
-            }
+			}
+			UpdateTabList();
         }
 
         static void TabList(SchedulerTask task)
@@ -1929,7 +1928,14 @@ namespace fCraft {
 
 
         internal static void UpdateTabList() {
-            foreach (Player p1 in Players) {
+			foreach (Player p1 in Players) {
+				if (p1.Supports(CpeExtension.MessageType)) {
+					if (p1.World != null) {
+						p1.Message((byte)MessageType.Status2, p1.ClassyName + " &eon world &f" + p1.World.ClassyName);
+					} else {
+						p1.Message((byte)MessageType.Status2, p1.ClassyName);
+					}
+				}
                 if (!p1.Supports(CpeExtension.ExtPlayerList) && !p1.Supports(CpeExtension.ExtPlayerList2))
                     continue;
                 var canBeSeen = Players.Where(i => p1.CanSee(i)).ToArray();
