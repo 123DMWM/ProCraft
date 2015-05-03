@@ -96,7 +96,7 @@ namespace fCraft {
             if (name == null) throw new ArgumentNullException("name");
             
             Packet packet = new Packet( OpCode.AddEntity );
-            Logger.Log(LogType.Debug, "Send: MakeAddEntity({0}, {1}, {2})", id, name, spawnPosition);
+            //Logger.Log(LogType.Debug, "Send: MakeAddEntity({0}, {1}, {2})", id, name, spawnPosition);
             packet.Bytes[1] = (byte)id;
             Encoding.ASCII.GetBytes( name.PadRight( 64 ), 0, 64, packet.Bytes, 2 );
             ToNetOrder( spawnPosition.X, packet.Bytes, 66 );
@@ -178,7 +178,7 @@ namespace fCraft {
         /// <summary> Creates a new RemoveEntity (0x0C) packet. </summary>
         /// <param name="id"> Entity ID. </param>
         public static Packet MakeRemoveEntity( sbyte id ) {
-            Logger.Log(LogType.Debug, "Send: MakeRemoveEntity({0})", id);
+            //Logger.Log(LogType.Debug, "Send: MakeRemoveEntity({0})", id);
             Packet packet = new Packet( OpCode.RemoveEntity );
             packet.Bytes[1] = (byte)id;
             return packet;
@@ -226,7 +226,7 @@ namespace fCraft {
 
         [Pure]
         public static Packet MakeExtInfo( string sname, short extCount ) {
-            Logger.Log(LogType.Debug, "Send: ExtInfo({0} {1})", sname, extCount);
+            //Logger.Log(LogType.Debug, "Send: ExtInfo({0} {1})", sname, extCount);
             Packet packet = new Packet( OpCode.ExtInfo );
             Encoding.ASCII.GetBytes( sname.PadRight(64), 0, 64, packet.Bytes, 1 );
             ToNetOrder( extCount, packet.Bytes, 65 );
@@ -439,7 +439,7 @@ namespace fCraft {
             if (skinName == null)
                 throw new ArgumentNullException("skinName");
             Packet packet = new Packet(OpCode.ExtAddEntity2);
-            Logger.Log(LogType.Debug, "Send to {4}: MakeExtAddEntity2({0}, {1}, {2}, {3})", (byte)((byte)(entityId) - 128), inGameName, skinName, spawnPosition.ToString(), sentto.Name);
+            //Logger.Log(LogType.Debug, "Send to {4}: MakeExtAddEntity2({0}, {1}, {2}, {3})", (byte)((byte)(entityId) - 128), inGameName, skinName, spawnPosition.ToString(), sentto.Name);
             packet.Bytes[1] = (byte) entityId;
             Encoding.ASCII.GetBytes(inGameName.PadRight(64), 0, 64, packet.Bytes, 2);
             Encoding.ASCII.GetBytes(skinName.PadRight(64), 0, 64, packet.Bytes, 66);
