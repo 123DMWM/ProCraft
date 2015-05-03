@@ -2021,9 +2021,10 @@ namespace fCraft {
                                copyInfo.OriginCorner );
 
             Logger.Log( LogType.UserActivity,
-                        "{0} copied {1} blocks from world {2} (between {3} and {4}).",
+						"{0} copied {1} blocks from world {2} (between (X:{3} Y:{4} Z:{5}) and (X:{6} Y:{7} Z:{8})).",
                         player.Name, volume, playerWorld.Name,
-                        bounds.MinVertex, bounds.MaxVertex );
+						bounds.MinVertex.X, bounds.MinVertex.Y, bounds.MinVertex.Z,
+						bounds.MaxVertex.X, bounds.MaxVertex.Y, bounds.MaxVertex.Z);
         }
 
 

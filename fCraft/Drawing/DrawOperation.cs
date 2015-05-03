@@ -383,17 +383,17 @@ namespace fCraft.Drawing {
                 }
             }
             if (AnnounceCompletion && Map.World != null) {
-                Logger.Log(LogType.UserActivity,
-                           "Player {0} executed {1} on world {2} (between {3} and {4}). Processed {5}, Updated {6}, Skipped {7}, Denied {8} blocks.",
-                           Player.Name,
-                           Description,
-                           Map.World.Name,
-                           Bounds.MinVertex,
-                           Bounds.MaxVertex,
-                           BlocksProcessed,
-                           BlocksUpdated,
-                           BlocksSkipped,
-                           BlocksDenied);
+				Logger.Log(LogType.UserActivity,
+						   "Player {0} executed {1} on world {2} (between (X:{3} Y:{4} Z:{5}) and (X:{6} Y:{7} Z:{8})). Processed {9}, Updated {10}, Skipped {11}, Denied {12} blocks.",
+						   Player.Name,
+						   Description,
+						   Map.World.Name,
+						   Bounds.MinVertex.X, Bounds.MinVertex.Y, Bounds.MinVertex.Z,
+						   Bounds.MaxVertex.X, Bounds.MaxVertex.Y, Bounds.MaxVertex.Z,
+						   BlocksProcessed,
+						   BlocksUpdated,
+						   BlocksSkipped,
+						   BlocksDenied);
             }
         }
 
