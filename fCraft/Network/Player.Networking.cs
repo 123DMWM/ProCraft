@@ -1070,7 +1070,7 @@ namespace fCraft {
                 motd = MOTDlist[index];
                 string sName = ConfigKey.ServerName.ToString();
                 if (motd.Length > 64) motd = "Welcome to " + (sName.Length > 52 ? sName.Remove(52) : sName) + "!";
-                else motd = "&0=&c=&s= " + motd + " &s=&c=&0=";
+                else motd = "&0=&c=&e= " + motd + " &e=&c=&0=";
                 //motd = ConfigKey.MOTD.GetString();
             }
             else motd = ConfigKey.MOTD.GetString();

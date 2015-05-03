@@ -1122,7 +1122,10 @@ namespace fCraft
         };
 
 		static void RBChatHandler(Player player, CommandReader cmd) {
-			if ("bw".Equals(cmd.Next().ToLower())) {
+			string s = cmd.Next();
+			if (s != null)
+				s = s.ToLower();
+			if ("bw".Equals(s)) {
 				if (player.Info.ChatBWRainbows == true) {
 					player.Info.ChatRainbows = false;
 					player.Info.ChatBWRainbows = false;

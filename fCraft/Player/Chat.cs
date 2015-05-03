@@ -387,7 +387,7 @@ namespace fCraft {
 
 			var recepientListStaff = Server.Players.Can(Permission.ReadStaffChat);
 			string formattedMessageStaff = "&s[&YSay&s][&f" + player.Name + "&s] &Y" + rawMessage;
-			var es = new ChatSendingEventArgs(player, rawMessage, formattedMessageStaff, ChatMessageType.Say, recepientListStaff);
+			var es = new ChatSendingEventArgs(player, rawMessage, formattedMessageStaff, ChatMessageType.SayStaff, recepientListStaff);
 			if (!SendInternal(es))
 				return false;
 
@@ -415,7 +415,7 @@ namespace fCraft {
 
 			var recepientListOwner = Server.Players.Where(p => p.Info.Rank == RankManager.HighestRank);
 			string formattedMessageOwner = "&s[&yStaffSay&s][&f" + player.Name + "&s] &Y" + rawMessage;
-			var eo = new ChatSendingEventArgs(player, rawMessage, formattedMessageOwner, ChatMessageType.Staff, recepientListOwner);
+			var eo = new ChatSendingEventArgs(player, rawMessage, formattedMessageOwner, ChatMessageType.StaffSayOwner, recepientListOwner);
 			if (!SendInternal(eo))
 				return false;
 
@@ -551,7 +551,9 @@ namespace fCraft {
                 e.Player.Info.ProcessMessageWritten();
             }
 
-            RaiseSentEvent(e, packets);
+			if (e.MessageType != ChatMessageType.SayStaff && e.MessageType != ChatMessageType.StaffSayOwner) {
+				RaiseSentEvent(e, packets);
+			}
             return true;
         }
 
@@ -1069,7 +1071,13 @@ namespace fCraft {
         Staff,
 
         /// <summary> Local (world) chat message. </summary>
-        World
+		World,
+
+		/// <summary> Message produced by /say command shown to staff members. </summary>
+		SayStaff,
+
+		/// <summary> Message produced by /staffsay command shown to highest rank. </summary>
+		StaffSayOwner
     }
 
 
