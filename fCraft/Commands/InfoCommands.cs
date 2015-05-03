@@ -1862,6 +1862,7 @@ namespace fCraft {
 						player.Message("&SSpecial colors:");
 						player.Message(" &r%r Announcement &h%h Help &i%i IRC &m%m Me");
 						player.Message(" &p%p PM &y%y Say &s%s System &w%w Warning");
+						player.Message(" &n%n Newline");
 					}
 					if (!player.Can(Permission.UseColorCodes)) {
 						Rank reqRank = RankManager.GetMinRankWithAllPermissions(Permission.UseColorCodes);
