@@ -341,7 +341,7 @@ namespace fCraft {
                     if (Info.heldBlock != failsafe) {
                         Info.heldBlock = failsafe;
                         if (Supports(CpeExtension.MessageType) && !IsPlayingCTF) {
-                            Message((byte)MessageType.BottomRight1, "&eBlock:&f" + failsafe.ToString() + " &eID:&f" + failsafe.GetHashCode());
+                            Message((byte)MessageType.BottomRight1, "&sBlock:&f" + failsafe.ToString() + " &sID:&f" + failsafe.GetHashCode());
                         }
                     }
                 } else {
@@ -442,7 +442,7 @@ namespace fCraft {
                                     }
                                     
                                 }
-                                //else Message("&WSignFile for this signpost not found!&n.Looking For: &e./signs/" + World.Name + "/" + deniedZone.Name + "&w.");
+                                //else Message("&WSignFile for this signpost not found!&n.Looking For: &s./signs/" + World.Name + "/" + deniedZone.Name + "&w.");
                                 else SignMessage = "&WYou must be atleast rank " + zone.Controller.MinRank.Name + "&w to enter this area.";
                                 if ((DateTime.UtcNow - LastZoneNotification).Seconds > 5)
                                 {
@@ -493,7 +493,7 @@ namespace fCraft {
                                     }
 
                                 }
-                                //else Message("&WSignFile for this signpost not found!&n.Looking For: &e./signs/" + World.Name + "/" + deniedZone.Name + "&w.");
+                                //else Message("&WSignFile for this signpost not found!&n.Looking For: &s./signs/" + World.Name + "/" + deniedZone.Name + "&w.");
                                 else SignMessage = "&WThis zone is marked as a text area, but no text is added to the message!";
                                 if ((DateTime.UtcNow - LastZoneNotification).Seconds > 5)
                                 {
@@ -534,7 +534,7 @@ namespace fCraft {
                                     }
 
                                 }
-                                //else Message("&WSignFile for this signpost not found!&n.Looking For: &e./signs/" + World.Name + "/" + deniedZone.Name + "&w.");
+                                //else Message("&WSignFile for this signpost not found!&n.Looking For: &s./signs/" + World.Name + "/" + deniedZone.Name + "&w.");
                                 else SignMessage = "&WThis zone is marked as a deny area, but no text is added to the deny message! Regardless, you are not permitted to enter this area.";
                                 if ((DateTime.UtcNow - LastZoneNotification).Seconds > 5)
                                 {
@@ -1070,7 +1070,7 @@ namespace fCraft {
                 motd = MOTDlist[index];
                 string sName = ConfigKey.ServerName.ToString();
                 if (motd.Length > 64) motd = "Welcome to " + (sName.Length > 52 ? sName.Remove(52) : sName) + "!";
-                else motd = "&0=&c=&e= " + motd + " &e=&c=&0=";
+                else motd = "&0=&c=&s= " + motd + " &s=&c=&0=";
                 //motd = ConfigKey.MOTD.GetString();
             }
             else motd = ConfigKey.MOTD.GetString();

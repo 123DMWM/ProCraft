@@ -1071,17 +1071,17 @@ namespace fCraft {
             }
             if (oldlevel - defconlevel > 1 || defconlevel - oldlevel > 1)
             {
-                player.Message("&eDEFCON can only be adjusted one level at a time.");
+                player.Message("&sDEFCON can only be adjusted one level at a time.");
                 return;
             }
             if (defconlevel > 6)
             {
-                player.Message("&eThe maximum DEFCON level is &f6&e.");
+                player.Message("&sThe maximum DEFCON level is &f6&s.");
                 return;
             }
             if (defconlevel < 1)
             {
-                player.Message("&eThe minimum DEFCON level is &c1&e.");
+                player.Message("&sThe minimum DEFCON level is &c1&s.");
                 return;
             }
             if (oldlevel <= 0)
@@ -1100,32 +1100,32 @@ namespace fCraft {
             else if (oldlevel == 1)
             {
                 fCraft.Network.DEFCON.Level = defconlevel;
-                    //player.Message("&eThe DEFCON level was changed to: {0}", defconlevel.ToString());
+                    //player.Message("&sThe DEFCON level was changed to: {0}", defconlevel.ToString());
             }
             else if (oldlevel == 2)
             {
                 fCraft.Network.DEFCON.Level = defconlevel;
-                        //player.Message("&eThe DEFCON level was changed to: {0}", defconlevel.ToString());
+                        //player.Message("&sThe DEFCON level was changed to: {0}", defconlevel.ToString());
             }
             else if (oldlevel == 3)
             {
                 fCraft.Network.DEFCON.Level = defconlevel;
-                        //player.Message("&eThe DEFCON level was changed to: {0}", defconlevel.ToString());
+                        //player.Message("&sThe DEFCON level was changed to: {0}", defconlevel.ToString());
             }
             else if (oldlevel == 4)
             {
                 fCraft.Network.DEFCON.Level = defconlevel;
-                        //player.Message("&eThe DEFCON level was changed to: {0}", defconlevel.ToString());
+                        //player.Message("&sThe DEFCON level was changed to: {0}", defconlevel.ToString());
             }
             else if (oldlevel == 5)
             {
                 fCraft.Network.DEFCON.Level = defconlevel;
-                        //player.Message("&eThe DEFCON level was changed to: {0}", defconlevel.ToString());
+                        //player.Message("&sThe DEFCON level was changed to: {0}", defconlevel.ToString());
             }
             else if (oldlevel == 6)
             {
                 fCraft.Network.DEFCON.Level = defconlevel;
-                //player.Message("&eThe DEFCON level was changed to: {0}", defconlevel.ToString());
+                //player.Message("&sThe DEFCON level was changed to: {0}", defconlevel.ToString());
             }
             switch (fCraft.Network.DEFCON.Level)
             {
@@ -1142,7 +1142,7 @@ namespace fCraft {
                     Chat.SendSay(Player.Console, "&sThe Servers Security was set to &aDEFCON 3 &sby " + player.ClassyName);
                     break;
                 case 2:
-                    Chat.SendSay(Player.Console, "&sThe Servers Security was set to &eDEFCON 2 &sby " + player.ClassyName);
+                    Chat.SendSay(Player.Console, "&sThe Servers Security was set to &sDEFCON 2 &sby " + player.ClassyName);
                     break;
                 case 1:
                     Chat.SendSay(Player.Console, "&sThe Servers Security was set to &cDEFCON 1 &sby " + player.ClassyName);
@@ -1174,28 +1174,28 @@ namespace fCraft {
             switch (fCraft.Network.DEFCON.Level)
             {
                 case 6:
-                    player.Message("&eDEFCON is Switched &fOff&e.");
+                    player.Message("&sDEFCON is Switched &fOff&s.");
                     break;
                 case 5:
-                    player.Message("&eCurrent DEFCON: &3DEFCON 5");
+                    player.Message("&sCurrent DEFCON: &3DEFCON 5");
                     break;
                 case 4:
-                    player.Message("&eCurrent DEFCON: &2DEFCON 4");
+                    player.Message("&sCurrent DEFCON: &2DEFCON 4");
                     break;
                 case 3:
-                    player.Message("&eCurrent DEFCON: &aDEFCON 3");
+                    player.Message("&sCurrent DEFCON: &aDEFCON 3");
                     break;
                 case 2:
-                    player.Message("&eCurrent DEFCON: &eDEFCON 2");
+                    player.Message("&sCurrent DEFCON: &sDEFCON 2");
                     break;
                 case 1:
-                    player.Message("&eCurrent DEFCON: &cDEFCON 1");
+                    player.Message("&sCurrent DEFCON: &cDEFCON 1");
                     break;
                 case 0:
-                    player.Message("&eCurrent DEFCON: &0DEFCON 0");
+                    player.Message("&sCurrent DEFCON: &0DEFCON 0");
                     break;
                 default:
-                    player.Message("&eDEFCON is Switched Off.");
+                    player.Message("&sDEFCON is Switched Off.");
                     break;
 
             }

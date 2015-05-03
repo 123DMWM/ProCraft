@@ -212,9 +212,9 @@ namespace fCraft {
             get {
                 string formattedName = Name;
                 if (!Info.Rank.Prefix.Equals( "" )) {
-					formattedName = Info.Rank.Color + Info.Rank.Prefix + (Info.IsAFK ? "&e[&aAFK&e]" : "") + Color.White + formattedName + " &e[&f" + Info.TimeSinceLastLogin.ToMiniString() + "&e]&f";
+					formattedName = Info.Rank.Color + Info.Rank.Prefix + (Info.IsAFK ? "&s[&aAFK&s]" : "") + Color.White + formattedName + " &s[" + Color.SubstituteSpecialColors(Info.TimeSinceLastLogin.ToMiniString()) + "&s]&f";
                 } else {
-					formattedName = (Info.IsAFK ? "&e[&aAFK&e]" : "") + Info.Rank.Color + formattedName + " &e[&f" + Info.TimeSinceLastLogin.ToMiniString() + "&e]&f";
+					formattedName = (Info.IsAFK ? "&s[&aAFK&s]" : "") + Info.Rank.Color + formattedName + " &s[" + Color.SubstituteSpecialColors(Info.TimeSinceLastLogin.ToMiniString()) + "&s]&f";
                 }
                 return formattedName;
             }
@@ -1272,7 +1272,7 @@ namespace fCraft {
                                     Logger.Log(LogType.Debug, "[Signs] {0} clicked on sign [{1}] On map [{2}]", Name, deniedZone.Name, World.Name);
                                     LastSignClicked = deniedZone.Name;
                                 }
-                                    //else Message("&WSignFile for this signpost not found!&n.Looking For: &e./signs/" + World.Name + "/" + deniedZone.Name + "&w.");
+                                    //else Message("&WSignFile for this signpost not found!&n.Looking For: &s./signs/" + World.Name + "/" + deniedZone.Name + "&w.");
                                 else {
                                     Message("&WThis zone, {0}&W,  is marked as a signpost, but no text is added to the sign!", deniedZone.ClassyName);
                                     Logger.Log(LogType.Debug, "[Signs] {0} clicked on an empty sign [{1}] On map: [{2}]", Name, deniedZone.Name, World.Name);
@@ -1303,7 +1303,7 @@ namespace fCraft {
                                     Logger.Log(LogType.Debug, "[Signs] {0} clicked on command block [{1}] On map [{2}]", Name, deniedZone.Name, World.Name);
                                     LastSignClicked = deniedZone.Name;
                                 }
-                                    //else Message("&WSignFile for this signpost not found!&n.Looking For: &e./signs/" + World.Name + "/" + deniedZone.Name + "&w.");
+                                    //else Message("&WSignFile for this signpost not found!&n.Looking For: &s./signs/" + World.Name + "/" + deniedZone.Name + "&w.");
                                 else {
                                     Message("&WThis zone, {0}&W,  is marked as a command block, but no text is added to the sign!", deniedZone.ClassyName);
                                     Logger.Log(LogType.Debug, "[Signs] {0} clicked on an empty command block [{1}] On map: [{2}]", Name, deniedZone.Name, World.Name);
@@ -1801,7 +1801,7 @@ namespace fCraft {
                     Message("Last block marked at {0}. Type &H/Mark&S or click any block to continue.", coord);
                 }
             } else if (announce) {
-                Message("Block #{0} marked at {1}. Place mark #{2}.",
+                Message("Block #&f{0}&s marked at {1}. Place mark #&f{2}&s.",
                         SelectionMarkCount,
                         coord,
                         SelectionMarkCount + 1);
@@ -2488,9 +2488,9 @@ namespace fCraft {
             // actually kick
             string kickReason;
             if( reason != null ) {
-                kickReason = String.Format( "&eKicked by {0}&e: {1}", player.Name, reason );
+                kickReason = String.Format( "&sKicked by {0}&s: {1}", player.Name, reason );
             } else {
-                kickReason = String.Format( "&eKicked by {0}", player.Name );
+                kickReason = String.Format( "&sKicked by {0}", player.Name );
             }
             Kick( kickReason, context );
 

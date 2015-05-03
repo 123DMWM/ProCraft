@@ -385,7 +385,7 @@ namespace fCraft {
 				return false;
 
 			var recepientListStaff = Server.Players.Can(Permission.ReadStaffChat);
-			string formattedMessageStaff = "&e[&YSay&e][&f" + player.Name + "&e] &Y" + rawMessage;
+			string formattedMessageStaff = "&s[&YSay&s][&f" + player.Name + "&s] &Y" + rawMessage;
 			var es = new ChatSendingEventArgs(player, rawMessage, formattedMessageStaff, ChatMessageType.Say, recepientListStaff);
 			if (!SendInternal(es))
 				return false;
@@ -413,7 +413,7 @@ namespace fCraft {
 				return false;
 
 			var recepientListOwner = Server.Players.Where(p => p.Info.Rank == RankManager.HighestRank);
-			string formattedMessageOwner = "&e[&yStaffSay&e][&f" + player.Name + "&e] &Y" + rawMessage;
+			string formattedMessageOwner = "&s[&yStaffSay&s][&f" + player.Name + "&s] &Y" + rawMessage;
 			var eo = new ChatSendingEventArgs(player, rawMessage, formattedMessageOwner, ChatMessageType.Staff, recepientListOwner);
 			if (!SendInternal(eo))
 				return false;

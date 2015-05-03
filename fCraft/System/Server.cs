@@ -1271,9 +1271,9 @@ namespace fCraft {
                 Player player = tempPlayerList[i];
 
                 if (player.Supports(CpeExtension.MessageType)) {
-					player.Send(Packet.Message((byte)MessageType.BottomRight3, Color.Sys + "Been playing for: &f" + player.Info.TimeSinceLastLogin.ToMiniString()));
+					player.Send(Packet.Message((byte)MessageType.BottomRight3, Color.Sys + "Been playing for: " + player.Info.TimeSinceLastLogin.ToMiniString()));
                     player.Send(Packet.Message((byte)MessageType.BottomRight2,
-                        player.Position.ToBlockCoordsExt().ToString() + "&e[" + compassString((int)player.Position.R) + "&e]"));
+                        player.Position.ToBlockCoordsExt().ToString() + "&s[" + compassString((int)player.Position.R) + "&s]"));
                 }
                 if (player.IsPlayingCTF && player.Supports(CpeExtension.MessageType)) {
                     player.Send(Packet.Message((byte)MessageType.BottomRight1, ""));
@@ -1295,22 +1295,22 @@ namespace fCraft {
                         if (CTF.redHasFlag) {
                             player.Send(Packet.Message((byte)MessageType.BottomRight2,
                                 flagholder.Take(1)
-                                    .JoinToString((r => String.Format("&4{0} &ehas the &1Blue&e flag!", r.Name)))));
+                                    .JoinToString((r => String.Format("&4{0} &shas the &1Blue&s flag!", r.Name)))));
                         } else if (CTF.blueHasFlag) {
                             player.Send(Packet.Message((byte)MessageType.BottomRight2,
                                 flagholder.Take(1)
-                                    .JoinToString((r => String.Format("&1{0} &ehas the &4Red&e flag!", r.Name)))));
+                                    .JoinToString((r => String.Format("&1{0} &shas the &4Red&s flag!", r.Name)))));
                         } else {
-                            player.Send(Packet.Message((byte)MessageType.BottomRight2, "&eNo one has the flag!"));
+                            player.Send(Packet.Message((byte)MessageType.BottomRight2, "&sNo one has the flag!"));
                         }
 
                     }
                     if (player.Team == "Red") {
-                        player.Send(Packet.Message((byte)MessageType.Status3, "&eTeam: &4Red"));
+                        player.Send(Packet.Message((byte)MessageType.Status3, "&sTeam: &4Red"));
                     } else if (player.Team == "Blue") {
-                        player.Send(Packet.Message((byte)MessageType.Status3, "&eTeam: &1Blue"));
+                        player.Send(Packet.Message((byte)MessageType.Status3, "&sTeam: &1Blue"));
                     } else
-                        player.Send(Packet.Message((byte)MessageType.Status3, "&eTeam: &0None"));
+                        player.Send(Packet.Message((byte)MessageType.Status3, "&sTeam: &0None"));
                 }
                 if (player.IsPlayingCTF && player.Supports(CpeExtension.EnvColors)) {
                     if (((CTF.redRoundsWon*5) + CTF.redScore) > ((CTF.blueRoundsWon*5) + CTF.blueScore)) {
@@ -1388,7 +1388,7 @@ namespace fCraft {
                     foreach (Player p2 in canBeSeen)
                     {
                         player.Send(Packet.MakeExtAddPlayerName(p2.NameID, p2.Name, p2.ListName,
-                            p2.World.ClassyName + " &e(&f" + p2.World.CountVisiblePlayers(player) + "&e)", 0));
+                            p2.World.ClassyName + " &s(&f" + p2.World.CountVisiblePlayers(player) + "&s)", 0));
                     }
                 }
                 else
@@ -1397,12 +1397,12 @@ namespace fCraft {
                     {
                         if (p2.IsPlayingCTF && p2.Team == "Red")
                         {
-                            player.Send(Packet.MakeExtAddPlayerName(p2.NameID, p2.Name, "&c" + p2.Name, "&eTeam &4Red",
+                            player.Send(Packet.MakeExtAddPlayerName(p2.NameID, p2.Name, "&c" + p2.Name, "&sTeam &4Red",
                                 0));
                         }
                         else if (p2.IsPlayingCTF && p2.Team == "Blue")
                         {
-                            player.Send(Packet.MakeExtAddPlayerName(p2.NameID, p2.Name, "&9" + p2.Name, "&eTeam &1Blue",
+                            player.Send(Packet.MakeExtAddPlayerName(p2.NameID, p2.Name, "&9" + p2.Name, "&sTeam &1Blue",
                                 0));
                         }
                     }
@@ -1948,7 +1948,7 @@ namespace fCraft {
 			foreach (Player p1 in Players) {
 				if (p1.Supports(CpeExtension.MessageType)) {
 					if (p1.World != null) {
-						p1.Message((byte)MessageType.Status2, p1.ClassyName + " &eon world &f" + p1.World.ClassyName);
+						p1.Message((byte)MessageType.Status2, p1.ClassyName + " &son world &f" + p1.World.ClassyName);
 					} else {
 						p1.Message((byte)MessageType.Status2, p1.ClassyName);
 					}
@@ -1962,7 +1962,7 @@ namespace fCraft {
                     foreach (Player p2 in canBeSeen)
                     {
                         p1.Send(Packet.MakeExtAddPlayerName(p2.NameID, p2.Name, p2.ListName,
-                            p2.World.ClassyName + " &e(&f" + p2.World.CountVisiblePlayers(p1) + "&e)", 0));
+                            p2.World.ClassyName + " &s(&f" + p2.World.CountVisiblePlayers(p1) + "&s)", 0));
                     }
                 }
                 else
@@ -1971,10 +1971,10 @@ namespace fCraft {
                     {
                         if (p2.IsPlayingCTF && p2.Team == "Red")
                         {
-                            p1.Send(Packet.MakeExtAddPlayerName(p2.NameID, p2.Name, "&c" + p2.Name, "&eTeam &4Red", 0));
+                            p1.Send(Packet.MakeExtAddPlayerName(p2.NameID, p2.Name, "&c" + p2.Name, "&sTeam &4Red", 0));
                         } else if (p2.IsPlayingCTF && p2.Team == "Blue")
                         {
-                            p1.Send(Packet.MakeExtAddPlayerName(p2.NameID, p2.Name, "&8" + p2.Name, "&eTeam &1Blue", 0));
+                            p1.Send(Packet.MakeExtAddPlayerName(p2.NameID, p2.Name, "&8" + p2.Name, "&sTeam &1Blue", 0));
                         }
                     }
                 }

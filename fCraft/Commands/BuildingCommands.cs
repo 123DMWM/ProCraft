@@ -582,7 +582,7 @@ namespace fCraft {
             if( brush == null ) return;
             op.Brush = brush;
             player.SelectionStart( op.ExpectedMarks, DrawOperationCallback, op, Permission.Draw );
-            player.Message( "{0}: Click or &H/Mark&S {1} blocks.",
+            player.Message( "{0}: Click or &H/Mark&S &f{1}&s blocks.",
                             op.Description, op.ExpectedMarks );
         }
 
@@ -591,13 +591,13 @@ namespace fCraft {
             DrawOperation op = (DrawOperation)tag;
             if( !op.Prepare( marks ) ) return;
             if( !player.CanDraw( op.BlocksTotalEstimate ) ) {
-                player.Message( "You are only allowed to run draw commands that affect up to {0} blocks. This one would affect {1} blocks.",
+                player.Message( "You are only allowed to run draw commands that affect up to &f{0}&s blocks. This one would affect &f{1}&s blocks.",
                                    player.Info.Rank.DrawLimit,
                                    op.Bounds.Volume );
                 op.Cancel();
                 return;
             }
-            player.Message( "{0}: Processing ~{1} blocks.",
+            player.Message( "{0}: Processing ~&f{1}&s blocks.",
                             op.Description, op.BlocksTotalEstimate );
             op.Begin();
         }

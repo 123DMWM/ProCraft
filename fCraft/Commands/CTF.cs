@@ -438,7 +438,7 @@ namespace fCraft
                                 {                                    
                                     if (player.Team == "Blue")
                                     {
-                                        world.Players.Message("&4" + p.Name + " &etagged &1" + player.Name);
+                                        world.Players.Message("&4" + p.Name + " &stagged &1" + player.Name);
                                         player.TeleportTo(blueSpawn);
                                         if (player.IsHoldingFlag)
                                         {
@@ -452,7 +452,7 @@ namespace fCraft
                                     }
                                     else if (player.Team == "Red")
                                     {
-                                        world.Players.Message("&1" + p.Name + " &etagged &4" + player.Name);
+                                        world.Players.Message("&1" + p.Name + " &stagged &4" + player.Name);
                                         player.TeleportTo(redSpawn);
                                         if (player.IsHoldingFlag)
                                         {
@@ -577,7 +577,7 @@ namespace fCraft
                                     e.Result = CanPlaceResult.Allowed;
                                     redHasFlag = true;
                                     e.Player.IsHoldingFlag = true;
-                                    world.Players.Message("&4" + e.Player.Name + " &egot the &1Blue&e flag.");
+                                    world.Players.Message("&4" + e.Player.Name + " &sgot the &1Blue&s flag.");
                                 }
                             }
                             #endregion
@@ -595,7 +595,7 @@ namespace fCraft
                                     e.Result = CanPlaceResult.Allowed;
                                     blueHasFlag = true;
                                     e.Player.IsHoldingFlag = true;
-                                    world.Players.Message("&1" + e.Player.Name + " &egot the &4Red flag.");
+                                    world.Players.Message("&1" + e.Player.Name + " &sgot the &4Red&s flag.");
                                 }
                             }
                             #endregion
@@ -614,7 +614,7 @@ namespace fCraft
                                     redScore++;
                                     redHasFlag = false;
                                     e.Player.IsHoldingFlag = false;
-                                    world.Players.Message("&4" + e.Player.Name + " &escored a point for &4Red&e team.");
+                                    world.Players.Message("&4" + e.Player.Name + " &sscored a point for &4Red&s team.");
                                     e.Result = CanPlaceResult.CTFDenied;
                                     Check();
                                 }
@@ -635,7 +635,7 @@ namespace fCraft
                                     blueScore++;
                                     blueHasFlag = false;
                                     e.Player.IsHoldingFlag = false;
-                                    world.Players.Message("&1" + e.Player.Name + " &escored a point for the &1Blue&e team");
+                                    world.Players.Message("&1" + e.Player.Name + " &sscored a point for the &1Blue&s team");
                                     e.Result = CanPlaceResult.CTFDenied;
                                     Check();
                                 }
@@ -774,7 +774,7 @@ namespace fCraft
                         //Remove player.
                         RemovePlayer(e.Player, e.OldWorld);
                         if (blueTeam.Count + redTeam.Count == 0) {
-                            e.Player.Message("&eYou were the last player in the game, and thus, the game has ended.");
+                            e.Player.Message("&sYou were the last player in the game, and thus, the game has ended.");
                             Stop();
                         }
                     }

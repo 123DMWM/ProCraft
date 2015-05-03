@@ -248,7 +248,7 @@ namespace fCraft {
             Usage = "/Model [Player] [Model] [SkinName]",
             IsConsoleSafe = true,
             Help = "Change the Model or Skin of [Player]!\n" +
-            "Valid models: &e [Any Block Name or ID#], Chicken, Creeper, Croc, Humanoid, Pig, Printer, Sheep, Skeleton, Spider, Zombie!",
+            "Valid models: &s [Any Block Name or ID#], Chicken, Creeper, Croc, Humanoid, Pig, Printer, Sheep, Skeleton, Spider, Zombie!",
             Handler = ModelHandler
         };
 
@@ -521,7 +521,7 @@ namespace fCraft {
             } else if (option == "server") {
                 if (player.Info.TimesUsedBot == 0) {
                     player.Message(
-                        "&6Bot&f: This is your first time using &6Bot&e, I suggest you use \"/Help Bot\" to further understand how I work.");
+                        "&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
 
                 }
                 Server.Players.Message("&6Bot&f: The name of this server is " + ConfigKey.ServerName.GetString() + ".");
@@ -545,7 +545,7 @@ namespace fCraft {
                 Random RandjokeString = new Random();
                 if (player.Info.TimesUsedBot == 0) {
                     player.Message(
-                        "&6Bot&f: This is your first time using &6Bot&e, I suggest you use \"/Help Bot\" to further understand how I work.");
+                        "&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
 
                 }
                 string joker = jokeStrings[RandjokeString.Next(0, jokeStrings.Length)];
@@ -572,7 +572,7 @@ namespace fCraft {
                 Random randNounString = new Random();
                 if (player.Info.TimesUsedBot == 0) {
                     player.Message(
-                        "&6Bot&f: This is your first time using &6Bot&e, I suggest you use \"/Help Bot\" to further understand how I work.");
+                        "&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
                 }
                 string adjective = adjectiveStrings[randAdjectiveString.Next(0, adjectiveStrings.Length)];
                 string noun = nounStrings[randNounString.Next(0, nounStrings.Length)];
@@ -602,7 +602,7 @@ namespace fCraft {
                 Random RandtipString = new Random();
                 if (player.Info.TimesUsedBot == 0) {
                     player.Message(
-                        "&6Bot&f: This is your first time using &6Bot&e, I suggest you use \"/Help Bot\" to further understand how I work.");
+                        "&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
 
                 }
                 string tipper = tipStrings[RandtipString.Next(0, tipStrings.Length)];
@@ -617,7 +617,7 @@ namespace fCraft {
                 if (helper == "total") {
                     if (player.Info.TimesUsedBot == 0) {
                         player.Message(
-                            "&6Bot&f: This is your first time using &6Bot&e, I suggest you use \"/Help Bot\" to further understand how I work.");
+                            "&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
 
                     }
                     Server.Players.Message(
@@ -632,7 +632,7 @@ namespace fCraft {
                 } else {
                     if (player.Info.TimesUsedBot == 0) {
                         player.Message(
-                            "&6Bot&f: This is your first time using &6Bot&e, I suggest you use \"/Help Bot\" to further understand how I work.");
+                            "&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
 
                     }
                     Server.Players.Message(
@@ -652,7 +652,7 @@ namespace fCraft {
                 if (player.Info.Rank.Can(Permission.Promote) || player.Info.PromoCount != 0) {
                     if (player.Info.TimesUsedBot == 0) {
                         player.Message(
-                            "&6Bot&f: This is your first time using &6Bot&e, I suggest you use \"/Help Bot\" to further understand how I work.");
+                            "&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
 
                     }
                     Server.Players.Message("&6Bot&f: " + player.ClassyName + " &fhas promoted " + player.Info.PromoCount +
@@ -664,7 +664,7 @@ namespace fCraft {
                 } else {
                     if (player.Info.TimesUsedBot == 0) {
                         player.Message(
-                            "&6Bot&f: This is your first time using &6Bot&e, I suggest you use \"/Help Bot\" to further understand how I work.");
+                            "&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
 
                     }
                     Server.Players.Message("&6Bot&f: " + player.ClassyName + " &fcannot promote players yet");
@@ -678,7 +678,7 @@ namespace fCraft {
                 if (player.Info.Rank.Can(Permission.Ban) || player.Info.TimesBannedOthers != 0) {
                     if (player.Info.TimesUsedBot == 0) {
                         player.Message(
-                            "&6Bot&f: This is your first time using &6Bot&e, I suggest you use \"/Help Bot\" to further understand how I work.");
+                            "&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
 
                     }
                     Server.Players.Message("&6Bot&f: " + player.ClassyName + " &fhas banned " +
@@ -690,7 +690,7 @@ namespace fCraft {
                 } else {
                     if (player.Info.TimesUsedBot == 0) {
                         player.Message(
-                            "&6Bot&f: This is your first time using &6Bot&e, I suggest you use \"/Help Bot\" to further understand how I work.");
+                            "&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
 
                     }
                     Server.Players.Message("&6Bot&f: " + player.ClassyName + " &fcannot ban yet");
@@ -704,7 +704,7 @@ namespace fCraft {
                 if (player.Info.Rank.Can(Permission.Kick) || player.Info.TimesKickedOthers != 0) {
                     if (player.Info.TimesUsedBot == 0) {
                         player.Message(
-                            "&6Bot&f: This is your first time using &6Bot&e, I suggest you use \"/Help Bot\" to further understand how I work.");
+                            "&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
 
                     }
                     Server.Players.Message("&6Bot&f: " + player.ClassyName + " &fhas kicked " +
@@ -716,7 +716,7 @@ namespace fCraft {
                 } else {
                     if (player.Info.TimesUsedBot == 0) {
                         player.Message(
-                            "&6Bot&f: This is your first time using &6Bot&e, I suggest you use \"/Help Bot\" to further understand how I work.");
+                            "&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
 
                     }
                     Server.Players.Message("&6Bot&f: " + player.ClassyName + " &fcannot kick yet");
@@ -728,7 +728,7 @@ namespace fCraft {
             } else if (option == "clock") {
                 if (player.Info.TimesUsedBot == 0) {
                     player.Message(
-                        "&6Bot&f: This is your first time using &6Bot&e, I suggest you use \"/Help Bot\" to further understand how I work.");
+                        "&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
                 }
                 Server.Players.Message("&6Bot&f: It is " + DateTime.Now.ToLongTimeString());
                 Server.Players.Message("&6Bot&f: On a " + DateTime.Now.ToLongDateString());
@@ -742,7 +742,7 @@ namespace fCraft {
                 if (helper == "total") {
                     if (player.Info.TimesUsedBot == 0) {
                         player.Message(
-                            "&6Bot&f: This is your first time using &6Bot&e, I suggest you use \"/Help Bot\" to further understand how I work.");
+                            "&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
                     }
                     Server.Players.Message("&6Bot&f: " + player.ClassyName + " &fhas built " + player.Info.BlocksBuilt +
                                            " blocks, deleted " + player.Info.BlocksDeleted + " and drew " +
@@ -756,7 +756,7 @@ namespace fCraft {
                 } else {
                     if (player.Info.TimesUsedBot == 0) {
                         player.Message(
-                            "&6Bot&f: This is your first time using &6Bot&e, I suggest you use \"/Help Bot\" to further understand how I work.");
+                            "&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
                     }
                     Server.Players.Message("&6Bot&f: " + player.ClassyName + " &fhas built " +
                                            player.Info.BlocksBuiltThisGame + " blocks and deleted " +
@@ -784,7 +784,7 @@ namespace fCraft {
                 Random RandfactString = new Random();
                 if (player.Info.TimesUsedBot == 0) {
                     player.Message(
-                        "&6Bot&f: This is your first time using &6Bot&e, I suggest you use \"/Help Bot\" to further understand how I work.");
+                        "&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
 
                 }
                 string facter = factStrings[RandfactString.Next(0, factStrings.Length)];
@@ -806,7 +806,7 @@ namespace fCraft {
                 Random randWisdomString = new Random();
                 if (player.Info.TimesUsedBot == 0) {
                     player.Message(
-                        "&6Bot&f: This is your first time using &6Bot&e, I suggest you use \"/Help Bot\" to further understand how I work.");
+                        "&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
 
                 }
                 string facter = wisdomStrings[randWisdomString.Next(0, wisdomStrings.Length)];
@@ -2307,7 +2307,7 @@ namespace fCraft {
                             //Allow banned players to be moved about...
                             if (target.Info.Rank.Name == "Banned")
                             {
-                                player.Message("&EYou CAN move banned players about... It is considered bad form though...");
+                                player.Message("&sYou CAN move banned players about... It is considered bad form though...");
                             }
                             Logger.Log( LogType.UserActivity,
                                         "Bring: Asked {0} to confirm overriding world permissions to bring player {1} to world {2}",
@@ -2382,7 +2382,7 @@ namespace fCraft {
                         //Allow banned players to be moved about...
                         if (target.Info.Rank.Name == "Banned")
                         {
-                            player.Message("&EYou CAN move banned players about... It is considered bad form though...");
+                            player.Message("&sYou CAN move banned players about... It is considered bad form though...");
                         }
                         Logger.Log( LogType.UserActivity,
                                     "WBring: Asked {0} to confirm overriding world permissions to bring player {1} to world {2}",
@@ -2401,7 +2401,7 @@ namespace fCraft {
                 //Allow banned players to be moved about...
                 if (target.Info.Rank.Name == "Banned")
                 {
-                    player.Message("&EYou CAN move banned players about... It is considered bad form though...");
+                    player.Message("&sYou CAN move banned players about... It is considered bad form though...");
                 }
                 BringPlayerToWorld( player, target, world, false, false );
             }
@@ -2557,7 +2557,7 @@ namespace fCraft {
                         //Allow banned players to be moved about...
                         if (target.Info.Rank.Name == "Banned")
                         {
-                            player.Message("&EYou CAN move banned players about... It is considered bad form though...");
+                            player.Message("&sYou CAN move banned players about... It is considered bad form though...");
                         }
                         target.StopSpectating();
                         if( usePlayerPosition ) {
@@ -2805,7 +2805,7 @@ namespace fCraft {
             Usage = "/Hacks [Player] [Hack] [jumpheight(if needed)]",
             IsConsoleSafe = true,
             Help = "Change the hacking abilities of [Player]\n" +
-            "Valid hacks: &aFlying&e, &aNoclip&e, &aSpeedhack&e, &aRespawn&e, &aThirdPerson&e and &aJumpheight",
+            "Valid hacks: &aFlying&s, &aNoclip&s, &aSpeedhack&s, &aRespawn&s, &aThirdPerson&s and &aJumpheight",
             Handler = HackControlHandler
         };
 
@@ -2813,12 +2813,12 @@ namespace fCraft {
         {
             string first = cmd.Next();
             if (first == null || player.Info.Rank != RankManager.HighestRank) {
-                player.Message("&eCurrent Hacks for {0}", player.ClassyName);
-                player.Message("    &eFlying: &a{0} &eNoclip: &a{1} &eSpeedhack: &a{2}",
+                player.Message("&sCurrent Hacks for {0}", player.ClassyName);
+                player.Message("    &sFlying: &a{0} &sNoclip: &a{1} &sSpeedhack: &a{2}",
                                 player.Info.AllowFlying.ToString(),
                                 player.Info.AllowNoClip.ToString(),
                                 player.Info.AllowSpeedhack.ToString());
-                player.Message("    &eRespawn: &a{0} &eThirdPerson: &a{1} &eJumpHeight: &a{2}",
+                player.Message("    &sRespawn: &a{0} &sThirdPerson: &a{1} &sJumpHeight: &a{2}",
                                 player.Info.AllowRespawn.ToString(),
                                 player.Info.AllowThirdPerson.ToString(),
                                 player.Info.JumpHeight); return;
@@ -2827,12 +2827,12 @@ namespace fCraft {
             if (target == null) { return; }
             string hack = cmd.Next();
             if (hack == null) {
-                player.Message("&eCurrent Hacks for {0}", target.ClassyName);
-                player.Message("    &eFlying: &a{0} &eNoclip: &a{1} &eSpeedhack: &a{2}",
+                player.Message("&sCurrent Hacks for {0}", target.ClassyName);
+                player.Message("    &sFlying: &a{0} &sNoclip: &a{1} &sSpeedhack: &a{2}",
                                 player.Info.AllowFlying.ToString(),
                                 player.Info.AllowNoClip.ToString(),
                                 player.Info.AllowSpeedhack.ToString());
-                player.Message("    &eRespawn: &a{0} &eThirdPerson: &a{1} &eJumpHeight: &a{2}",
+                player.Message("    &sRespawn: &a{0} &sThirdPerson: &a{1} &sJumpHeight: &a{2}",
                                 player.Info.AllowRespawn.ToString(),
                                 player.Info.AllowThirdPerson.ToString(),
                                 player.Info.JumpHeight); return;
@@ -2840,7 +2840,7 @@ namespace fCraft {
             if (hack.Equals("flying") || hack.Equals("fly") || hack.Equals("f"))
             {
                 player.Message("Hacks for {0}", target.ClassyName);
-                player.Message("    Flying: &a{0} &e--> &a{1}", target.AllowFlying.ToString(), (!target.AllowFlying).ToString());
+                player.Message("    Flying: &a{0} &s--> &a{1}", target.AllowFlying.ToString(), (!target.AllowFlying).ToString());
                 target.AllowFlying = !target.AllowFlying;
                 if (target.IsOnline)
                 {
@@ -2855,7 +2855,7 @@ namespace fCraft {
             else if (hack.Equals("noclip") || hack.Equals("clip") || hack.Equals("nc")) 
             {
                 player.Message("Hacks for {0}", target.ClassyName);
-                player.Message("    NoClip: &a{0} &e--> &a{1}", target.AllowNoClip.ToString(), (!target.AllowNoClip).ToString());
+                player.Message("    NoClip: &a{0} &s--> &a{1}", target.AllowNoClip.ToString(), (!target.AllowNoClip).ToString());
                 target.AllowNoClip = !target.AllowNoClip;
                 if (target.IsOnline)
                 {
@@ -2870,7 +2870,7 @@ namespace fCraft {
             else if (hack.Equals("speedhack") || hack.Equals("speed") || hack.Equals("sh"))
             {
                 player.Message("Hacks for {0}", target.ClassyName);
-                player.Message("    SpeedHack: &a{0} &e--> &a{1}", target.AllowSpeedhack.ToString(), (!target.AllowSpeedhack).ToString());
+                player.Message("    SpeedHack: &a{0} &s--> &a{1}", target.AllowSpeedhack.ToString(), (!target.AllowSpeedhack).ToString());
                 target.AllowSpeedhack = !target.AllowSpeedhack;
                 if (target.IsOnline)
                 {
@@ -2885,7 +2885,7 @@ namespace fCraft {
             else if (hack.Equals("respawn") || hack.Equals("spawn") || hack.Equals("rs"))
             {
                 player.Message("Hacks for {0}", target.ClassyName);
-                player.Message("    Respawn: &a{0} &e--> &a{1}", target.AllowRespawn.ToString(), (!target.AllowRespawn).ToString());
+                player.Message("    Respawn: &a{0} &s--> &a{1}", target.AllowRespawn.ToString(), (!target.AllowRespawn).ToString());
                 target.AllowRespawn = !target.AllowRespawn;
                 if (target.IsOnline)
                 {
@@ -2900,7 +2900,7 @@ namespace fCraft {
             else if (hack.Equals("thirdperson") || hack.Equals("third") || hack.Equals("tp"))
             {
                 player.Message("Hacks for {0}", target.ClassyName);
-                player.Message("    ThirdPerson: &a{0} &e--> &a{1}", target.AllowThirdPerson.ToString(), (!target.AllowThirdPerson).ToString());
+                player.Message("    ThirdPerson: &a{0} &s--> &a{1}", target.AllowThirdPerson.ToString(), (!target.AllowThirdPerson).ToString());
                 target.AllowThirdPerson = !target.AllowThirdPerson;
                 if (target.IsOnline)
                 {
@@ -2919,7 +2919,7 @@ namespace fCraft {
                 if (short.TryParse(third, out height))
                 {
                     player.Message("Hacks for {0}", target.ClassyName);
-                    player.Message("    JumpHeight: &a{0} &e--> &a{1}", target.JumpHeight, height);
+                    player.Message("    JumpHeight: &a{0} &s--> &a{1}", target.JumpHeight, height);
                     target.JumpHeight = height;
                     if (target.IsOnline)
                     {
@@ -2933,7 +2933,7 @@ namespace fCraft {
                 }
                 else
                 {
-                    player.Message("Error: Could not parse \"&a{0}&e\" as a short. Try something between &a0&e and &a32767", third); 
+                    player.Message("Error: Could not parse \"&a{0}&s\" as a short. Try something between &a0&s and &a32767", third); 
                 }
             }
             else { player.Message(CdHackControl.Usage); }

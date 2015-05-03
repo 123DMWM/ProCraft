@@ -191,7 +191,7 @@ namespace fCraft {
         {
             Packet packet = new Packet(OpCode.Message);
             packet.Bytes[1] = type;
-            Encoding.ASCII.GetBytes(message.PadRight(64), 0, 64, packet.Bytes, 2);
+            Encoding.ASCII.GetBytes(Color.SubstituteSpecialColors(message).PadRight(64), 0, 64, packet.Bytes, 2);
             return packet;
         }
 
@@ -297,9 +297,9 @@ namespace fCraft {
             Packet packet = new Packet( OpCode.ExtAddPlayerName );
             //Logger.Log(LogType.Debug, "Send: MakeExtAddPlayerName({0}, {1}, {2}, {3}, {4})", nameId, playerName, listName, groupName, groupRank);
             ToNetOrder( nameId, packet.Bytes, 1 );
-            Encoding.ASCII.GetBytes( playerName.PadRight( 64 ), 0, 64, packet.Bytes, 3 );
-            Encoding.ASCII.GetBytes( listName.PadRight( 64 ), 0, 64, packet.Bytes, 67 );
-            Encoding.ASCII.GetBytes( groupName.PadRight( 64 ), 0, 64, packet.Bytes, 131 );
+            Encoding.ASCII.GetBytes( Color.SubstituteSpecialColors(playerName).PadRight( 64 ), 0, 64, packet.Bytes, 3 );
+            Encoding.ASCII.GetBytes( Color.SubstituteSpecialColors(listName).PadRight( 64 ), 0, 64, packet.Bytes, 67 );
+            Encoding.ASCII.GetBytes( Color.SubstituteSpecialColors(groupName).PadRight( 64 ), 0, 64, packet.Bytes, 131 );
             packet.Bytes[195] = groupRank;
             return packet;
         }

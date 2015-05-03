@@ -897,7 +897,7 @@ namespace fCraft {
                             return;
                         }
                         world.Weather = weather;
-                        player.Message("&aSet weather for {0}&a to {1} ({2}&a)", world.ClassyName, weather, weather == 0 ? "&eSun" : (weather == 1 ? "&1Rain" : "&fSnow"));
+                        player.Message("&aSet weather for {0}&a to {1} ({2}&a)", world.ClassyName, weather, weather == 0 ? "&sSun" : (weather == 1 ? "&1Rain" : "&fSnow"));
                     }
                     foreach (Player p in world.Players) {
                         if (p.Supports(CpeExtension.EnvWeatherType)) {
@@ -2022,8 +2022,8 @@ namespace fCraft {
             if (p != player.Info) {
                 if (p.IsOnline) {
                     if (p.PlayerObject.Supports(CpeExtension.EnvWeatherType)) {
-                        p.PlayerObject.Message("&a{0} set your weather to {1} ({2}&a)", player.Name, weather, weather == 0 ? "&eSun" : (weather == 1 ? "&1Rain" : "&fSnow"));
-                        player.Message("&aSet weather for {0} to {1} ({2}&a)", p.Name, weather, weather == 0 ? "&eSun" : (weather == 1 ? "&1Rain" : "&fSnow"));
+                        p.PlayerObject.Message("&a{0} set your weather to {1} ({2}&a)", player.Name, weather, weather == 0 ? "&sSun" : (weather == 1 ? "&1Rain" : "&fSnow"));
+                        player.Message("&aSet weather for {0} to {1} ({2}&a)", p.Name, weather, weather == 0 ? "&sSun" : (weather == 1 ? "&1Rain" : "&fSnow"));
                         p.PlayerObject.Send(Packet.SetWeather((byte)weather));
                     } else {
                         player.Message("That player does not support WeatherType packet");
@@ -2033,7 +2033,7 @@ namespace fCraft {
                 }
             } else {
                 if (player.Supports(CpeExtension.EnvWeatherType)) {
-                    player.Message("&aSet weather to {0} ({1}&a)", weather, weather == 0 ? "&eSun" : (weather == 1 ? "&1Rain" : "&fSnow"));
+                    player.Message("&aSet weather to {0} ({1}&a)", weather, weather == 0 ? "&sSun" : (weather == 1 ? "&1Rain" : "&fSnow"));
                     player.Send(Packet.SetWeather((byte)weather));
                 } else {
                     player.Message("You don't support WeatherType packet");
@@ -4170,7 +4170,7 @@ namespace fCraft {
                 if (turnSkyOn) {
                     world.SkyLightEmulator = true;
                     player.Message(
-                        "&sSkylight Emulator for world {0}&s: &2ON&e. Sky will now change color to emulate time.",
+                        "&sSkylight Emulator for world {0}&s: &2ON&s. Sky will now change color to emulate time.",
                         world.ClassyName);
                     foreach (Player p in world.Players.Where(p => p.Supports(CpeExtension.EnvColors))) {
                         string hex;
@@ -4185,7 +4185,7 @@ namespace fCraft {
                     }
                 } else {
                     world.SkyLightEmulator = false;
-                    player.Message("&sSkylight Emulator for world {0}&s: &4OFF&e.", world.ClassyName);
+                    player.Message("&sSkylight Emulator for world {0}&s: &4OFF&s.", world.ClassyName);
                     foreach (Player p in world.Players.Where(p => p.Supports(CpeExtension.EnvColors) && p.World != null)) {
                         p.Send(Packet.MakeEnvSetColor((byte)EnvVariable.SkyColor, p.World.SkyColor));
                         p.Send(Packet.MakeEnvSetColor((byte)EnvVariable.CloudColor, p.World.CloudColor));
@@ -4250,7 +4250,7 @@ namespace fCraft {
             HelpSections = new Dictionary<string, string>{
                 { "create",     "&H/PW Create [size]\n" +
                                 "&sCreates a personal world with a specified size:\n" +
-                                "&bTiny/64 &f- &aNormal/128 &f- &eLarge/256 &f- &cHuge/512" },
+                                "&bTiny/64 &f- &aNormal/128 &f- &sLarge/256 &f- &cHuge/512" },
                 { "reset",      "&H/PW reset [number]\n" +
                                 "&sResets your specified world back to when you created it.\n" +
                                 "&cCan't be undone!" },

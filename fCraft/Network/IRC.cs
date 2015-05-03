@@ -391,17 +391,17 @@ namespace fCraft
                                                     if (info != null) {
                                                         Player target = info.PlayerObject;
                                                         if (target != null) {
-                                                            SendChannelMessage("\u212C&SPlayer {0}&e is &aOnline",
+                                                            SendChannelMessage("\u212C&SPlayer {0}&s is &aOnline",
                                                                 target.Info.Rank.Color + target.Name);
                                                             if (target.World != null) {
                                                                 SendChannelMessage("\u212C&SOn world {0}",
                                                                     target.World.ClassyName);
                                                             }
                                                         } else {
-                                                            SendChannelMessage("\u212C&SPlayer {0}&e is &cOffline",
+                                                            SendChannelMessage("\u212C&SPlayer {0}&s is &cOffline",
                                                                 info.ClassyName);
                                                             SendChannelMessage(
-                                                                "\u212C&SWas last seen &f{0}&e ago on world &f{1}",
+                                                                "\u212C&SWas last seen &f{0}&s ago on world &f{1}",
                                                                 info.TimeSinceLastSeen.ToMiniString(),
                                                                 info.LastWorld);
                                                         }

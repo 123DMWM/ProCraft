@@ -239,7 +239,7 @@ namespace fCraft.Network
             }
             public string[] AffectedRanks = new[] { "NewPlayer", "AverageJoe", "Constructor", "Citizen" };
             public string[] DeniedRanks = new[] { "NewPlayer", "AverageJoe" };
-            public string ClassyName = "&eDEFCON 2";
+            public string ClassyName = "&sDEFCON 2";
         }
         #endregion
 
@@ -480,7 +480,7 @@ namespace fCraft.Network
             {
                 //MinRankCanFreezeOthers.Players.Message("&CWarning: Player {0}&C may be spamming! B:D Too High.");
                 //Player.Console.Message("Warning: Player " + player.ClassyName + " may be spamming! B:D Too High.");
-                player.Message("Warning: You are Placing TOO Many blocks this session. Ask for a &h/review&e to get promoted, or you may get frozen!");
+                player.Message("Warning: You are Placing TOO Many blocks this session. Ask for a &h/review&s to get promoted, or you may get frozen!");
                 Chat.SendStaffSay(Player.Console, "&cDEFCON: Player " + player.ClassyName + " &cmay be block spamming! Placed too many blocks this session");
                 player.Warned = true;
             }
@@ -488,7 +488,7 @@ namespace fCraft.Network
             {
                 //Player.Console.Message("Warning: Player " + player.ClassyName + " may be spamming! B:D Too High.");
                 Chat.SendStaffSay(Player.Console, "&cDEFCON: Player " + player.ClassyName + " &cmay be block spamming! Placed too many blocks this session");
-                player.Message("Warning: You are Placing TOO Many blocks this session. Ask for a &h/review&e to get promoted, or you may get kicked!");
+                player.Message("Warning: You are Placing TOO Many blocks this session. Ask for a &h/review&s to get promoted, or you may get kicked!");
                 player.Warned = true;
             }
         }
