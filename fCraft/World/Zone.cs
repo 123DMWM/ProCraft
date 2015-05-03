@@ -30,19 +30,19 @@ namespace fCraft {
 
         #region Packet.MakeSelection
 
-        /// <summary> Zone Sign Text (Only Shown if Zone is 1*1*1) </summary>
+        /// <summary> Wheather ot now to show the zone boundary </summary>
         [NotNull]
         public bool ShowZone { get; set; }
 
-        /// <summary> Zone Sign Text (Only Shown if Zone is 1*1*1) </summary>
+        /// <summary> color of the zone boundary </summary>
         [NotNull]
         public string Color { get; set; }
 
-        /// <summary> Zone Sign Text (Only Shown if Zone is 1*1*1) </summary>
+        /// <summary> alpha of the zone boundry </summary>
         [NotNull]
         public short Alpha { get; set; }
 
-        /// <summary> Zone Sign Text (Only Shown if Zone is 1*1*1) </summary>
+        /// <summary> zone id for boundarys </summary>
         [NotNull]
         public byte ZoneID { get; set; }
 
@@ -119,6 +119,7 @@ namespace fCraft {
                                       Int32.Parse( header[4] ), Int32.Parse( header[5] ), Int32.Parse( header[6] ) );
 
             Rank buildRank = Rank.Parse( header[7] );
+
             if (header[0].Contains("Door_")) {
                 buildRank = RankManager.DefaultRank;
             }
@@ -198,6 +199,16 @@ namespace fCraft {
                     EditedDate = DateTime.Parse( xheader[3] );
                 }
             }
+			// Part 5: Zone color
+			if (parts.Length > 4) {
+				string[] zcol = parts[4].Split(' ');
+				bool zoneShow = bool.Parse(zcol[0]);
+				string zoneColor = zcol[1];
+				short zoneAlpha = short.Parse(zcol[2]);
+				ShowZone = zoneShow;
+				Color = zoneColor;
+				Alpha = zoneAlpha;
+			}
         }
 
         internal readonly string RawWhitelist,

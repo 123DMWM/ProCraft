@@ -991,6 +991,10 @@ namespace fCraft {
         };
 
         private static void zshowHandler(Player player, CommandReader cmd) {
+			if (cmd.Count <= 1) {
+				CdZoneShow.PrintUsage(player);
+				return;
+			}
             string zonea = cmd.Next();
             string color = cmd.Next();
             string alp = cmd.Next();
@@ -1016,7 +1020,6 @@ namespace fCraft {
                     zone.ShowZone = true;
                     if (zone.Color != null) {
                         player.Message("Zone ({0}&s) will now show its bounderies", zone.ClassyName);
-                        player.World.Players.Send(Packet.MakeRemoveSelection(zone.ZoneID));
                         player.World.Players.Send(Packet.MakeMakeSelection(zone.ZoneID, zone.Name, zone.Bounds,
                             zone.Color, zone.Alpha));
                     }
