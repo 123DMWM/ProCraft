@@ -1297,8 +1297,6 @@ namespace fCraft {
         #region Where
         const string Compass = "N.......ne......E.......se......S.......sw......W.......nw......" +
                                "N.......ne......E.......se......S.......sw......W.......nw......";
-        const string CompassType = "NNNNNNNNNEEEEEEEEEEEEEEEESSSSSSSSSSSSSSSSWWWWWWWWWWWWWWWWNNNNNNN" +
-                               "NNNNNNNNNEEEEEEEEEEEEEEEESSSSSSSSSSSSSSSSWWWWWWWWWWWWWWWWNNNNNNN";
         static readonly CommandDescriptor CdWhere = new CommandDescriptor {
             Name = "Where",
             Aliases = new[] { "compass", "whereis", "whereami", "position", "pos" },
@@ -1358,13 +1356,6 @@ namespace fCraft {
                                   Compass.Substring(offset - 1, 3),
                                   Compass.Substring(offset + 2, 8));
         }
-        public static string GetCompassStringType(byte rotation)
-        {
-            int offset = (int)(rotation / 255f * 64f) + 32;
-
-            return String.Format("&e[&c{0}&e]", CompassType.Substring(offset, 1));
-        }
-
         #endregion
         #region Help
 

@@ -1270,13 +1270,10 @@ namespace fCraft {
             for (int i = 0; i < tempPlayerList.Length; i++) {
                 Player player = tempPlayerList[i];
 
-                if (player.lastSolidPos != null && !player.Info.IsAFK && player.Supports(CpeExtension.MessageType) &&
-                    !player.IsPlayingCTF) {
-                    double speed = (Math.Sqrt(player.Position.DistanceSquaredTo(player.lastSolidPos))/32);
+                if (player.Supports(CpeExtension.MessageType)) {
 					player.Send(Packet.Message((byte)MessageType.BottomRight3, Color.Sys + "Been playing for: &f" + player.Info.TimeSinceLastLogin.ToMiniString()));
                     player.Send(Packet.Message((byte)MessageType.BottomRight2,
-                        player.Position.ToBlockCoordsExt().ToString() +
-                        InfoCommands.GetCompassStringType(player.Position.R)));
+                        player.Position.ToBlockCoordsExt().ToString() + "&e[" + compassString((int)player.Position.R) + "&e]"));
                 }
                 if (player.IsPlayingCTF && player.Supports(CpeExtension.MessageType)) {
                     player.Send(Packet.Message((byte)MessageType.BottomRight1, ""));
@@ -1354,6 +1351,26 @@ namespace fCraft {
 			}
 			UpdateTabList();
         }
+		public static string compassString(int rot) {
+			if (rot > 240 || rot < 15) {
+				return "&1S";
+			} else if (16 <= rot && rot <= 47) {
+				return "&9S&fW";
+			} else if (48 <= rot && rot <= 79) {
+				return "&fW";
+			} else if (80 <= rot && rot <= 111) {
+				return "&cN&fW";
+			} else if (112 <= rot && rot <= 143) {
+				return "&4N";
+			} else if (144 <= rot && rot <= 175) {
+				return "&cN&fE";
+			} else if (176 <= rot && rot <= 207) {
+				return "&fE";
+			} else if (208 <= rot && rot <= 239) {
+				return "&9S&fE";
+			} else
+				return "&fN/A";
+		}
 
         static void TabList(SchedulerTask task)
         {

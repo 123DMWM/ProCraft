@@ -1600,11 +1600,7 @@ namespace fCraft {
             }
 
 			if (this.Supports(CpeExtension.MessageType)) {
-				if (World != null) {
-					this.Message((byte)MessageType.Status1, Color.White + ConfigKey.ServerName.GetString() + " on world: " + World.ClassyName);
-				} else {
-					this.Message((byte)MessageType.Status1, Color.White + ConfigKey.ServerName.GetString());
-				}
+				Message((byte)MessageType.Status1, Color.White + ConfigKey.ServerName.GetString());
 			}
 
             Server.UpdateTabList();
