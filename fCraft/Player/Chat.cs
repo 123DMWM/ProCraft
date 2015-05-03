@@ -372,37 +372,55 @@ namespace fCraft {
         /// <param name="player"> Player writing the message. </param>
         /// <param name="rawMessage"> Message text. </param>
         /// <returns> True if message was sent, false if it was cancelled by an event callback. </returns>
-        public static bool SendSay([NotNull] Player player, [NotNull] string rawMessage)
-        {
-            if (player == null) throw new ArgumentNullException("player");
-            if (rawMessage == null) throw new ArgumentNullException("rawMessage");
+		public static bool SendSay([NotNull] Player player, [NotNull] string rawMessage) {
+			if (player == null)
+				throw new ArgumentNullException("player");
+			if (rawMessage == null)
+				throw new ArgumentNullException("rawMessage");
 
-            var recepientList = Server.Players;
+			var recepientList = Server.Players.Where(p => !p.Can(Permission.ReadStaffChat));
+			string formattedMessage = Color.Say + rawMessage;
+			var e = new ChatSendingEventArgs(player, rawMessage, formattedMessage, ChatMessageType.Say, recepientList);
+			if (!SendInternal(e))
+				return false;
 
-            string formattedMessage = Color.Say + rawMessage;
+			var recepientListStaff = Server.Players.Can(Permission.ReadStaffChat);
+			string formattedMessageStaff = "&e[&YSay&e][&f" + player.Name + "&e] &Y" + rawMessage;
+			var es = new ChatSendingEventArgs(player, rawMessage, formattedMessageStaff, ChatMessageType.Say, recepientListStaff);
+			if (!SendInternal(es))
+				return false;
 
-            List<Player> owners = new List<Player>();
-            foreach (Player targetplayer in Server.Players)
-            {
-                if (targetplayer.Info.Rank == RankManager.HighestRank)
-                {
-                    if (targetplayer != player) owners.Add(targetplayer);
-                }
-            }
-            if (player != Player.Console) owners.Message("&d[Say: " + player.ClassyName + "&d] " + formattedMessage);
 
-            var e = new ChatSendingEventArgs(player,
-                                              rawMessage,
-                                              formattedMessage,
-                                              ChatMessageType.Say,
-                                              recepientList);
+			Logger.Log(LogType.GlobalChat,
+						"(say){0}: {1}", player.Name, rawMessage);
+			return true;
+		}
 
-            if (!SendInternal(e)) return false;
+		/// <summary> Sends a global announcement to staff (/StaffSay). </summary>
+		/// <param name="player"> Player writing the message. </param>
+		/// <param name="rawMessage"> Message text. </param>
+		/// <returns> True if message was sent, false if it was cancelled by an event callback. </returns>
+		public static bool SendStaffSay([NotNull] Player player, [NotNull] string rawMessage) {
+			if (player == null)
+				throw new ArgumentNullException("player");
+			if (rawMessage == null)
+				throw new ArgumentNullException("rawMessage");
 
-            Logger.Log(LogType.GlobalChat,
-                        "(say){0}: {1}", player.Name, rawMessage);
-            return true;
-        }
+			var recepientList = Server.Players.Where(p => p.Info.Rank != RankManager.HighestRank).Can(Permission.ReadStaffChat);
+			string formattedMessage = Color.Say + rawMessage;
+			var e = new ChatSendingEventArgs(player, rawMessage, formattedMessage, ChatMessageType.Staff, recepientList);
+			if (!SendInternal(e))
+				return false;
+
+			var recepientListOwner = Server.Players.Where(p => p.Info.Rank == RankManager.HighestRank);
+			string formattedMessageOwner = "&e[&yStaffSay&e][&f" + player.Name + "&e] &Y" + rawMessage;
+			var eo = new ChatSendingEventArgs(player, rawMessage, formattedMessageOwner, ChatMessageType.Staff, recepientListOwner);
+			if (!SendInternal(eo))
+				return false;
+
+			Logger.Log(LogType.GlobalChat, "(staff_say){0}: {1}", player.Name, rawMessage);
+			return true;
+		}
 
         public static bool SendIRC([NotNull] string rawMessage, [NotNull] params object[] formatArgs)
         {
@@ -513,31 +531,6 @@ namespace fCraft {
                         "(IRC+staff)(IRC){0}: {1}",
                         player,
                         rawMessage);
-            return true;
-        }
-
-        public static bool SendStaffSay([NotNull] Player player, [NotNull] string rawMessage)
-        {
-            if (player == null) throw new ArgumentNullException("player");
-            if (rawMessage == null) throw new ArgumentNullException("rawMessage");
-
-            var recepientList = Server.Players.Can(Permission.ReadStaffChat)
-                                              .NotIgnoring(player)
-                                              .Union(player);
-
-            string formattedMessage = String.Format("&Y{0}",
-                                                     rawMessage);
-
-            var e = new ChatSendingEventArgs(player,
-                                              rawMessage,
-                                              formattedMessage,
-                                              ChatMessageType.Staff,
-                                              recepientList);
-
-            if (!SendInternal(e)) return false;
-
-            Logger.Log(LogType.GlobalChat,
-                        "(staff_say){0}: {1}", player.Name, rawMessage);
             return true;
         }
 
