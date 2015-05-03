@@ -249,6 +249,7 @@ namespace fCraft {
                     SkyColor = SkyColor,
                     EdgeLevel = EdgeLevel,
                     EdgeBlock = EdgeBlock,
+					HorizonBlock = HorizonBlock,
                     LightColor = LightColor,
                     ShadowColor = ShadowColor,
                     Weather = Weather,
