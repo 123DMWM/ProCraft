@@ -1116,63 +1116,41 @@ namespace fCraft
             Aliases = new[] { "rainbowch", "rbchat", "rbch", "rc" },
             Permissions = new[] { Permission.UseColorCodes },
             IsConsoleSafe = true,
-            Usage = "/RainbowChat On/Off",
+            Usage = "/RainbowChat \"bw\"(black and white optional)",
             Help = "Determines if you speak in rainbow or not.",
             Handler = RBChatHandler
         };
 
-        static void RBChatHandler(Player player, CommandReader cmd)
-        {
-            if (cmd.HasNext)
-            {
-                string state = cmd.Next();
-                if (state.ToLower() == "on" || state.ToLower() == "yes")
-                {
-                    player.Info.ChatRainbows = true;
-                    player.Message("Rainbow Chat: &2On");
-                    player.Message("Your messages will now show up as &cR&4A&6I&eN&aB&2O&bW&3S&9!&s.");
-                    return;
-                }
-                if (state.ToLower() == "off" || state.ToLower() == "no")
-                {
-                    player.Info.ChatRainbows = false;
-                    player.Message("Rainbow Chat: &4Off");
-                    player.Message("Your messages will now show up normally.");
-                    return;
-                }
-                if (state.ToLower() == "state" || state.ToLower() == "what" || state.ToLower() == "current")
-                {
-                    if (player.Info.ChatRainbows == false)
-                    {
-                        player.Message("Rainbow Chat: &4Off");
-                    }
-                    if (player.Info.ChatRainbows == true)
-                    {
-                        player.Message("Rainbow Chat: &2On");
-                    }
-                    return;
-                }
-                else
-                {
-                    CdRBChat.PrintUsage(player);
-                    return;
-                }
-            }
-            if (player.Info.ChatRainbows == true)
-            {
-                player.Info.ChatRainbows = false;
-                player.Message("Rainbow Chat: &4Off");
-                player.Message("Your messages will now show up normally.");
-                return;
-            }
-            else
-            {
-                player.Info.ChatRainbows = true;
-                player.Message("Rainbow Chat: &2On");
-                player.Message("Your messages will now show up as &cR&4A&6I&eN&aB&2O&bW&3S&9!&s.");
-                return;
-            }
-        }
+		static void RBChatHandler(Player player, CommandReader cmd) {
+			if ("bw".Equals(cmd.Next().ToLower())) {
+				if (player.Info.ChatBWRainbows == true) {
+					player.Info.ChatRainbows = false;
+					player.Info.ChatBWRainbows = false;
+					player.Message("BWRainbow Chat: &4Off");
+					player.Message("Your messages will now show up normally.");
+					return;
+				} else {
+					player.Info.ChatBWRainbows = true;
+					player.Info.ChatRainbows = false;
+					player.Message("BWRainbow Chat: &2On");
+					player.Message("Your messages will now show up as &0R&8A&7I&fN&7B&8O&0W&8S&7!&f.");
+					return;
+				}
+			}
+			if (player.Info.ChatRainbows == true) {
+				player.Info.ChatRainbows = false;
+				player.Info.ChatBWRainbows = false;
+				player.Message("Rainbow Chat: &4Off");
+				player.Message("Your messages will now show up normally.");
+				return;
+			} else {
+				player.Info.ChatRainbows = true;
+				player.Info.ChatBWRainbows = false;
+				player.Message("Rainbow Chat: &2On");
+				player.Message("Your messages will now show up as &cR&4A&6I&eN&aB&2O&bW&3S&9!&s.");
+				return;
+			}
+		}
         #endregion
         #region Greet
 
