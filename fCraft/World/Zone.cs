@@ -120,6 +120,25 @@ namespace fCraft {
 
             Rank buildRank = Rank.Parse( header[7] );
 
+
+			if (header.Length > 8) {
+				// Part 5: Zone color
+				try {
+					bool zoneShow;
+					if (bool.TryParse(header[8], out zoneShow)) {
+						ShowZone = zoneShow;
+					}
+					Color = header[9];
+					short zoneAlpha;
+					if (short.TryParse(header[10], out zoneAlpha)) {
+						Alpha = zoneAlpha;
+					}
+				} catch (Exception ex) {
+					Logger.Log(LogType.Error, "Could not load Zone Colors for {0}", Name);
+					Logger.Log(LogType.Error, ex.StackTrace);
+				}
+			}
+
             if (header[0].Contains("Door_")) {
                 buildRank = RankManager.DefaultRank;
             }
@@ -199,20 +218,6 @@ namespace fCraft {
                     EditedDate = DateTime.Parse( xheader[3] );
                 }
             }
-			// Part 5: Zone color
-			try {
-				if (parts.Length > 4) {
-					string[] zcol = parts[4].Split(' ');
-					bool zoneShow = bool.Parse(zcol[0]);
-					string zoneColor = zcol[1];
-					short zoneAlpha = short.Parse(zcol[2]);
-					ShowZone = zoneShow;
-					Color = zoneColor;
-					Alpha = zoneAlpha;
-				}
-			} catch(Exception ex){
-				Logger.Log(LogType.Error, "Could not load Zone Colors for {0} on {1}", Name, world.Name);
-			}
         }
 
         internal readonly string RawWhitelist,

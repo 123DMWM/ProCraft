@@ -324,16 +324,15 @@ namespace fCraft.MapConversion {
             string whitelist = zone.RawWhitelist ?? zoneExceptions.Included.JoinToString( " ", p => p.Name );
             string blacklist = zone.RawBlacklist ?? zoneExceptions.Excluded.JoinToString( " ", p => p.Name );
 
-            return String.Format( "{0},{1},{2},{3},{4}",
+            return String.Format( "{0},{1},{2},{3}",
                                   String.Format( "{0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10}",
                                                  zone.Name,
                                                  zone.Bounds.XMin, zone.Bounds.YMin, zone.Bounds.ZMin,
                                                  zone.Bounds.XMax, zone.Bounds.YMax, zone.Bounds.ZMax,
-                                                 zone.Controller.MinRank.FullName, zone.ShowZone, zone.Color, zone.Alpha ),
+												 zone.Controller.MinRank.FullName, zone.ShowZone, zone.Color, zone.Alpha),
                                   whitelist,
                                   blacklist,
-                                  xheader,
-								  String.Format( "{0} {1} {2}",zone.ShowZone, zone.Color, zone.Alpha )
+                                  xheader
                                   );
         }
     }
