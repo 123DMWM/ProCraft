@@ -31,16 +31,16 @@ namespace fCraft {
         #region Packet.MakeSelection
 
         /// <summary> Wheather ot now to show the zone boundary </summary>
-        [NotNull]
-        public bool ShowZone { get; set; }
+		[NotNull]
+		public bool ShowZone = false;
 
         /// <summary> color of the zone boundary </summary>
         [NotNull]
-        public string Color { get; set; }
+        public string Color = "000";
 
         /// <summary> alpha of the zone boundry </summary>
-        [NotNull]
-        public short Alpha { get; set; }
+		[NotNull]
+		public short Alpha = 0;
 
         /// <summary> zone id for boundarys </summary>
         [NotNull]
@@ -200,14 +200,18 @@ namespace fCraft {
                 }
             }
 			// Part 5: Zone color
-			if (parts.Length > 4) {
-				string[] zcol = parts[4].Split(' ');
-				bool zoneShow = bool.Parse(zcol[0]);
-				string zoneColor = zcol[1];
-				short zoneAlpha = short.Parse(zcol[2]);
-				ShowZone = zoneShow;
-				Color = zoneColor;
-				Alpha = zoneAlpha;
+			try {
+				if (parts.Length > 4) {
+					string[] zcol = parts[4].Split(' ');
+					bool zoneShow = bool.Parse(zcol[0]);
+					string zoneColor = zcol[1];
+					short zoneAlpha = short.Parse(zcol[2]);
+					ShowZone = zoneShow;
+					Color = zoneColor;
+					Alpha = zoneAlpha;
+				}
+			} catch(Exception ex){
+				Logger.Log(LogType.Error, "Could not load Zone Colors for {0} on {1}", Name, world.Name);
 			}
         }
 
