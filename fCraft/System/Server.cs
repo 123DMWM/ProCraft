@@ -1839,11 +1839,11 @@ namespace fCraft {
             if( firstTime ) {
                 return String.Format("&sPlease welcome {0}&S to the server!\n" + 
                                      "&sThis is their first visit",
-                                      player.ClassyName);
+                                      player.ListName);
             } else {
                 return String.Format("&sPlease welcome back {0}&S to the server!\n" +
                                      "&sThey joined {1} times for a total of {2:F1}h",
-                                      player.ClassyName,
+                                      player.ListName,
                                       player.Info.TimesVisited,
                                       player.Info.TotalTime.TotalHours );
             }
@@ -1872,7 +1872,7 @@ namespace fCraft {
                 player.Info.ProcessLogout( player );
 
                 Logger.Log( LogType.UserActivity,
-                            "{0} left the server ({1}).", player.Name, player.LeaveReason );
+                            "{0}&s left the server ({1}).", player.Name, player.LeaveReason );
                 if (player.HasFullyConnected && ConfigKey.ShowConnectionMessages.Enabled())
                 {
                     if (player.usedquit == false)
