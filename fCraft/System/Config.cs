@@ -1000,7 +1000,7 @@ namespace fCraft {
 
             XElement owner = new XElement( "Rank" );
             owner.Add( new XAttribute( "id", RankManager.GenerateID() ) );
-            owner.Add( new XAttribute( "name", "owner" ) );
+            owner.Add( new XAttribute( "name", "Owner" ) );
             owner.Add( new XAttribute( "rank", 100 ) );
             owner.Add( new XAttribute( "color", "red" ) );
             owner.Add( new XAttribute( "prefix", "+" ) );
@@ -1029,19 +1029,19 @@ namespace fCraft {
             owner.Add( new XElement( Permission.UseTimers.ToString() ) );
             owner.Add( new XElement( Permission.ReadStaffChat.ToString() ) );
             XElement temp = new XElement( Permission.Kick.ToString() );
-            temp.Add( new XAttribute( "max", "owner" ) );
+            temp.Add( new XAttribute( "max", "Owner" ) );
             owner.Add( temp );
             temp = new XElement( Permission.Ban.ToString() );
-            temp.Add( new XAttribute( "max", "owner" ) );
+            temp.Add( new XAttribute( "max", "Owner" ) );
             owner.Add( temp );
             owner.Add( new XElement( Permission.BanIP.ToString() ) );
             owner.Add( new XElement( Permission.BanAll.ToString() ) );
 
             temp = new XElement( Permission.Promote.ToString() );
-            temp.Add( new XAttribute( "max", "owner" ) );
+            temp.Add( new XAttribute( "max", "Owner" ) );
             owner.Add( temp );
             temp = new XElement( Permission.Demote.ToString() );
-            temp.Add( new XAttribute( "max", "owner" ) );
+            temp.Add( new XAttribute( "max", "Owner" ) );
             owner.Add( temp );
             owner.Add( new XElement( Permission.Hide.ToString() ) );
 
@@ -1062,6 +1062,9 @@ namespace fCraft {
 
             owner.Add( new XElement( Permission.ManageZones.ToString() ) );
             owner.Add( new XElement( Permission.ManageSpecialZones.ToString() ) );
+            owner.Add( new XElement( Permission.UseEmotes.ToString() ) );
+            owner.Add( new XElement( Permission.ChangeDefconLevel.ToString() ) );
+            owner.Add( new XElement( Permission.ManageSigns.ToString() ) );
             owner.Add( new XElement( Permission.ManageWorlds.ToString() ) );
             owner.Add( new XElement( Permission.FlushWorlds.ToString() ) );
             owner.Add( new XElement( Permission.ManageBlockDB.ToString() ) );
@@ -1084,7 +1087,7 @@ namespace fCraft {
 
             XElement op = new XElement( "Rank" );
             op.Add( new XAttribute( "id", RankManager.GenerateID() ) );
-            op.Add( new XAttribute( "name", "op" ) );
+            op.Add( new XAttribute( "name", "OP" ) );
             op.Add( new XAttribute( "rank", 80 ) );
             op.Add( new XAttribute( "color", "aqua" ) );
             op.Add( new XAttribute( "prefix", "-" ) );
@@ -1094,6 +1097,8 @@ namespace fCraft {
             op.Add( new XAttribute( "antiGriefBlocks", 0 ) );
             op.Add( new XAttribute( "antiGriefSeconds", 0 ) );
             op.Add( new XAttribute( "idleKickAfter", 0 ) );
+            op.Add( new XAttribute( "MaxCaps", 32 ) );
+            op.Add( new XAttribute( "reserveSlot", true ) );
 
             op.Add( new XElement( Permission.Chat.ToString() ) );
             op.Add( new XElement( Permission.Build.ToString() ) );
@@ -1102,7 +1107,6 @@ namespace fCraft {
             op.Add( new XElement( Permission.UseColorCodes.ToString() ) );
 
             op.Add( new XElement( Permission.PlaceGrass.ToString() ) );
-            op.Add( new XElement( Permission.ChangeDefconLevel.ToString() ) );
             op.Add( new XElement( Permission.PlaceWater.ToString() ) );
             op.Add( new XElement( Permission.PlaceLava.ToString() ) );
             op.Add( new XElement( Permission.PlaceAdmincrete.ToString() ) );
@@ -1112,7 +1116,7 @@ namespace fCraft {
             op.Add( new XElement( Permission.UseTimers.ToString() ) );
             op.Add( new XElement( Permission.ReadStaffChat.ToString() ) );
             temp = new XElement( Permission.Kick.ToString() );
-            temp.Add( new XAttribute( "max", "op" ) );
+            temp.Add( new XAttribute( "max", "OP" ) );
             op.Add( temp );
             temp = new XElement( Permission.Ban.ToString() );
             temp.Add( new XAttribute( "max", "builder" ) );
@@ -1139,6 +1143,8 @@ namespace fCraft {
             op.Add( new XElement( Permission.SetSpawn.ToString() ) );
 
             op.Add( new XElement( Permission.ManageZones.ToString() ) );
+            op.Add( new XElement( Permission.ManageSigns.ToString() ) );
+            op.Add( new XElement( Permission.UseEmotes.ToString() ) );
             op.Add( new XElement( Permission.FlushWorlds.ToString() ) );
             op.Add( new XElement( Permission.Lock.ToString() ) );
             op.Add( new XElement( Permission.Draw.ToString() ) );
@@ -1155,7 +1161,7 @@ namespace fCraft {
 
             XElement builder = new XElement( "Rank" );
             builder.Add( new XAttribute( "id", RankManager.GenerateID() ) );
-            builder.Add( new XAttribute( "name", "builder" ) );
+            builder.Add( new XAttribute( "name", "Builder" ) );
             builder.Add( new XAttribute( "rank", 30 ) );
             builder.Add( new XAttribute( "color", "white" ) );
             builder.Add( new XAttribute( "prefix", "" ) );
@@ -1163,11 +1169,13 @@ namespace fCraft {
             builder.Add( new XAttribute( "antiGriefBlocks", 47 ) );
             builder.Add( new XAttribute( "antiGriefSeconds", 6 ) );
             builder.Add( new XAttribute( "idleKickAfter", 20 ) );
+            builder.Add( new XAttribute( "MaxCaps", 16 ) );
 
             builder.Add( new XElement( Permission.Chat.ToString() ) );
             builder.Add( new XElement( Permission.Build.ToString() ) );
             builder.Add( new XElement( Permission.Delete.ToString() ) );
             builder.Add( new XElement( Permission.UseSpeedHack.ToString() ) );
+            builder.Add( new XElement( Permission.UseEmotes.ToString() ) );
 
             builder.Add( new XElement( Permission.PlaceGrass.ToString() ) );
             builder.Add( new XElement( Permission.PlaceWater.ToString() ) );
@@ -1176,7 +1184,7 @@ namespace fCraft {
             builder.Add( new XElement( Permission.DeleteAdmincrete.ToString() ) );
 
             temp = new XElement( Permission.Kick.ToString() );
-            temp.Add( new XAttribute( "max", "builder" ) );
+            temp.Add( new XAttribute( "max", "Builder" ) );
             builder.Add( temp );
 
             builder.Add( new XElement( Permission.ViewOthersInfo.ToString() ) );
@@ -1194,7 +1202,7 @@ namespace fCraft {
 
             XElement guest = new XElement( "Rank" );
             guest.Add( new XAttribute( "id", RankManager.GenerateID() ) );
-            guest.Add( new XAttribute( "name", "guest" ) );
+            guest.Add( new XAttribute( "name", "Guest" ) );
             guest.Add( new XAttribute( "rank", 0 ) );
             guest.Add( new XAttribute( "color", "silver" ) );
             guest.Add( new XAttribute( "prefix", "" ) );
@@ -1202,6 +1210,7 @@ namespace fCraft {
             guest.Add( new XAttribute( "antiGriefBlocks", 37 ) );
             guest.Add( new XAttribute( "antiGriefSeconds", 5 ) );
             guest.Add( new XAttribute( "idleKickAfter", 20 ) );
+            guest.Add( new XAttribute( "MaxCaps", 1 ) );
             guest.Add( new XElement( Permission.Chat.ToString() ) );
             guest.Add( new XElement( Permission.Build.ToString() ) );
             guest.Add( new XElement( Permission.Delete.ToString() ) );
