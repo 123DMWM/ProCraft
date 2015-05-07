@@ -599,6 +599,7 @@ namespace fCraft {
             if (message.Equals("/ok", StringComparison.OrdinalIgnoreCase)) return RawMessageType.Confirmation;
             if (message.EndsWith(" /")) return RawMessageType.PartialMessage;
             if (message.EndsWith(" \\")) return RawMessageType.PartialMessage2;
+            if (message.EndsWith(" \\\\")) message = message.Substring(0, message.Length - 1);
             if (message.EndsWith(" //")) message = message.Substring(0, message.Length - 1);
 
             switch (message[0])
