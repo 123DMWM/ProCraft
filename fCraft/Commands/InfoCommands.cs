@@ -1460,52 +1460,49 @@ namespace fCraft {
                 player.Message("&h    New");
                 player.Message("&h    All");
                 return;
-            }
+			}
+			Array items = CommandManager.GetCommands(player.Info.Rank, false);
+			string output = "";
             if (param.StartsWith("*") && param.EndsWith("*")) {
-                Array items = CommandManager.GetCommands(player.Info.Rank, false);
-                string output = "";
+                foreach (CommandDescriptor item in items) {
+                    if (item.Name.ToLower().Contains(param.ToLower().Trim('*'))) {
+                        output += item.MinRank.Color + item.Name + "&s, ";
+                    }
+                }
+                player.Message("&sCommands containing \"{0}\":", param.Trim('*'));
+				if (output.EndsWith(", ")) {
+					player.Message(output.Remove(output.Length - 2) + ".");
+				} else {
+					player.Message("There are no commands containing \"{0}\"", param.Trim('*'));
+				}
+                return;
+            } else if (param.EndsWith("*")) {
                 foreach (CommandDescriptor item in items) {
                     if (item.Name.ToLower().StartsWith(param.ToLower().Trim('*'))) {
                         output += item.MinRank.Color + item.Name + "&s, ";
                     }
                 }
                 player.Message("&sCommands starting with \"{0}\":", param.Trim('*'));
-                if (output.EndsWith(", "))
-                    player.Message(output.Remove(output.Length - 2) + ".");
-                else
-                    player.Message("There are no commands starting with \"{0}\"", param.Trim('*'));
+				if (output.EndsWith(", ")) {
+					player.Message(output.Remove(output.Length - 2) + ".");
+				} else {
+					player.Message("There are no commands starting with \"{0}\"", param.Trim('*'));
+				}
                 return;
-            }
-            if (param.EndsWith("*")) {
-                Array items = CommandManager.GetCommands(player.Info.Rank, false);
-                string output = "";
-                foreach (CommandDescriptor item in items) {
-                    if (item.Name.ToLower().StartsWith(param.ToLower().Trim('*'))) {
-                        output += item.MinRank.Color + item.Name + "&s, ";
-                    }
-                }
-                player.Message("&sCommands starting with \"{0}\":", param.Trim('*'));
-                if (output.EndsWith(", "))
-                    player.Message(output.Remove(output.Length - 2) + ".");
-                else
-                    player.Message("There are no commands starting with \"{0}\"", param.Trim('*'));
-                return;
-            }
-            if (param.StartsWith("*")) {
-                Array items = CommandManager.GetCommands(player.Info.Rank, false);
-                string output = "";
+			} else if (param.StartsWith("*")) {
                 foreach (CommandDescriptor item in items) {
                     if (item.Name.ToLower().EndsWith(param.ToLower().Trim('*'))) {
                         output += item.MinRank.Color + item.Name + "&s, ";
                     }
                 }
                 player.Message("&sCommands ending with \"{0}\":", param.Trim('*'));
-                if (output.EndsWith(", "))
-                    player.Message(output.Remove(output.Length - 2) + ".");
-                else
-                    player.Message("There are no commands ending with \"{0}\"", param.Trim('*'));
-            }
-            if (param.StartsWith("@")) {
+				if (output.EndsWith(", ")) {
+					player.Message(output.Remove(output.Length - 2) + ".");
+				} else {
+					player.Message("There are no commands ending with \"{0}\"", param.Trim('*'));
+				}
+				return;
+			} else if (param.StartsWith("@")) {
                 string rankName = param.Substring(1);
                 Rank rank = RankManager.FindRank(rankName);
                 if (rank == null) {
