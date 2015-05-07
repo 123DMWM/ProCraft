@@ -559,7 +559,12 @@ namespace fCraft {
                 case RawMessageType.PartialMessage:
                     partialMessage = rawMessage.Substring( 0, rawMessage.Length - 1 );
                     Message( "Partial: &F{0}", partialMessage );
-                    break;
+					break;
+
+				case RawMessageType.PartialMessage2:
+					partialMessage = rawMessage.Substring(0, rawMessage.Length - 2);
+					Message("Partial: &F{0}", partialMessage);
+					break;
 
                 case RawMessageType.Invalid:
                     Message( "Could not parse message." );
