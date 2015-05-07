@@ -1856,10 +1856,10 @@ namespace fCraft {
 					player.Message(" &6%6 Olive &e%e Yellow");
 					player.Message(" &7%7 Silver &f%f White");
 					if (player.Can(Permission.ReadStaffChat)) {
-						player.Message("&SSpecial colors:");
+						player.Message("&SServer colors:");
 						player.Message(" &r%r Announcement &h%h Help &i%i IRC &m%m Me");
 						player.Message(" &p%p PM &y%y Say &s%s System &w%w Warning");
-						player.Message(" &n%n Newline");
+						player.Message(" %n Newline");
 					}
 					if (!player.Can(Permission.UseColorCodes)) {
 						Rank reqRank = RankManager.GetMinRankWithAllPermissions(Permission.UseColorCodes);
