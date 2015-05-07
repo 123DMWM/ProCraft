@@ -1454,45 +1454,41 @@ namespace fCraft {
             Handler = HideHandler
         };
 
-        static void HideHandler([NotNull] Player player, [NotNull] CommandReader cmd)
-        {
-            if (player.Info.IsHidden)
-            {
-                player.Message("You are already hidden.");
-                return;
-            }
+		static void HideHandler([NotNull] Player player, [NotNull] CommandReader cmd) {
+			if (player.Info.IsHidden) {
+				player.Message("You are already hidden.");
+				return;
+			}
 
-            string silentString = cmd.NextAll();
-            bool silent = (silentString.ToLower().Equals("silent") || silentString.ToLower().Equals("s")) ;
+			string silentString = cmd.NextAll();
+			bool silent = (silentString.ToLower().Equals("silent") || silentString.ToLower().Equals("s"));
 
-            player.Info.IsHidden = true;
-            player.Message(silent ? "&8You are now hidden (silent)." : "&8You are now hidden.");
+			player.Info.IsHidden = true;
+			player.Message(silent ? "&8You are now hidden (silent)." : "&8You are now hidden.");
 
-            // to make it look like player just logged out in /Info
-            player.Info.LastSeen = DateTime.UtcNow;
-            String quitMessage = silentString == null ? "" : "/Quit " + (silentString.Length > 64 ? silentString.Remove(64) : silentString);
+			// to make it look like player just logged out in /Info
+			player.Info.LastSeen = DateTime.UtcNow;
+			String quitMessage = (silentString.Length < 1 ? "" : "/Quit " + (silentString.Length > 64 ? silentString.Remove(64) : silentString));
 
-            if (!silent && ConfigKey.ShowConnectionMessages.Enabled()) {
+			if (!silent && ConfigKey.ShowConnectionMessages.Enabled()) {
 				if (!quitMessage.Equals("")) {
 					player.quitmessage = quitMessage;
 					quitMessage = String.Format(" (Reason: {0})", player.quitmessage);
 					player.usedquit = true;
 				}
-                Server.Players.CantSee(player).Message("{0}&s left the server.{1}", player.ClassyName, quitMessage);
-            }
+				Server.Players.CantSee(player).Message("{0}&s left the server.{1}", player.ClassyName, quitMessage);
+			}
 
-            // for aware players: notify
-            Server.Players.CanSee(player).Message("&SPlayer {0}&S is now hidden. {1}", player.ClassyName, quitMessage);
-            Player.RaisePlayerHideChangedEvent(player, true, silent);
-            foreach (Player p1 in Server.Players)
-            {
-                if (p1.Supports(CpeExtension.ExtPlayerList) || p1.Supports(CpeExtension.ExtPlayerList2))
-                {
-                    p1.Send(Packet.MakeExtRemovePlayerName(player.NameID));
-                }
-            }
-            Server.UpdateTabList();
-        }
+			// for aware players: notify
+			Server.Players.CanSee(player).Message("&SPlayer {0}&S is now hidden. {1}", player.ClassyName, quitMessage);
+			Player.RaisePlayerHideChangedEvent(player, true, silent);
+			foreach (Player p1 in Server.Players) {
+				if (p1.Supports(CpeExtension.ExtPlayerList) || p1.Supports(CpeExtension.ExtPlayerList2)) {
+					p1.Send(Packet.MakeExtRemovePlayerName(player.NameID));
+				}
+			}
+			Server.UpdateTabList();
+		}
 
 
         static readonly CommandDescriptor CdUnhide = new CommandDescriptor
@@ -1506,56 +1502,48 @@ namespace fCraft {
             Handler = UnhideHandler
         };
 
-        static void UnhideHandler([NotNull] Player player, [NotNull] CommandReader cmd)
-        {
-            World playerWorld = player.World;
-            if (playerWorld == null) PlayerOpException.ThrowNoWorld(player);
+		static void UnhideHandler([NotNull] Player player, [NotNull] CommandReader cmd) {
+			World playerWorld = player.World;
+			if (playerWorld == null)
+				PlayerOpException.ThrowNoWorld(player);
 
-            if (!player.Info.IsHidden)
-            {
-                player.Message("You are not currently hidden.");
-                return;
-            }
-            bool silent = cmd.HasNext;
+			if (!player.Info.IsHidden) {
+				player.Message("You are not currently hidden.");
+				return;
+			}
+			bool silent = cmd.HasNext;
 
-            // for aware players: notify
-            Server.Players
-                  .CanSee(player)
-                  .Message("&SPlayer {0}&S is no longer hidden.",
-                            player.ClassyName);
+			// for aware players: notify
+			Server.Players
+				  .CanSee(player)
+				  .Message("&SPlayer {0}&S is no longer hidden.",
+							player.ClassyName);
 
-            // for unaware players: fake a join message
-            if (!silent)
-            {
-                if (ConfigKey.ShowConnectionMessages.Enabled())
-                {
-                    player.Info.GeoipLogin();
-                    string msg = Server.MakePlayerConnectedMessage(player, false, playerWorld);
-                    Server.Players.CantSee(player).Message(msg);
-                }
-            }
-            player.Info.IsHidden = false;
+			// for unaware players: fake a join message
+			if (!silent) {
+				if (ConfigKey.ShowConnectionMessages.Enabled()) {
+					player.Info.GeoipLogin();
+					string msg = Server.MakePlayerConnectedMessage(player, false, playerWorld);
+					Server.Players.CantSee(player).Message(msg);
+				}
+			}
+			player.Info.IsHidden = false;
 			player.quitmessage = "/Quit";
 			player.usedquit = false;
-            if (silent)
-            {
-                player.Message("&8You are no longer hidden (silent).");
-            }
-            else
-            {
-                player.Message("&8You are no longer hidden.");
-            }
+			if (silent) {
+				player.Message("&8You are no longer hidden (silent).");
+			} else {
+				player.Message("&8You are no longer hidden.");
+			}
 
-            Player.RaisePlayerHideChangedEvent(player, false, silent);
-            foreach (Player p1 in Server.Players)
-            {
-                if (p1.Supports(CpeExtension.ExtPlayerList) || p1.Supports(CpeExtension.ExtPlayerList2))
-                {
-                    p1.Send(Packet.MakeExtRemovePlayerName(player.NameID));
-                }
-            }
-            Server.UpdateTabList();
-        }
+			Player.RaisePlayerHideChangedEvent(player, false, silent);
+			foreach (Player p1 in Server.Players) {
+				if (p1.Supports(CpeExtension.ExtPlayerList) || p1.Supports(CpeExtension.ExtPlayerList2)) {
+					p1.Send(Packet.MakeExtRemovePlayerName(player.NameID));
+				}
+			}
+			Server.UpdateTabList();
+		}
 
         #endregion
         #region Set Spawn
