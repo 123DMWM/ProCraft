@@ -1179,12 +1179,11 @@ namespace fCraft {
                         type = Block.DoubleSlab;
 
                     }
-                    if (type == Block.Fire && coord.Z > 0 && map.GetBlock(coordBelow) == Block.TNT && Can(Permission.Draw)) {
+                    /*if (type == Block.Fire && coord.Z > 0 && map.GetBlock(coordBelow) == Block.TNT && Can(Permission.Draw)) {
                         RevertBlockNow(coord);
                         coord = coordBelow;
-                        type = Block.Air;
                         Explode(coord);
-                    }
+                    }*/
                     if (type == Block.CobbleSlab && coord.Z > 0 && map.GetBlock(coordBelow) == Block.CobbleSlab)
                     {
                         // Handle cobble stacking
