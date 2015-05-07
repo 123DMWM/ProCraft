@@ -2308,8 +2308,8 @@ namespace fCraft {
 
             if (target != null)
             {
-                player.Message("&sPlayer {0}&s is &aOnline", target.Info.Rank.Color + target.Name);
-                player.Message("&sOn world {0}", target.World.ClassyName);
+                player.Message("&sPlayer {0}&s has been &aOnline&s for {1}", target.Info.Rank.Color + target.Name, target.Info.TimeSinceLastLogin.ToMiniString());
+				player.Message("&sThey are currently on world {0}", target.World.ClassyName);
             }
             else
             {
