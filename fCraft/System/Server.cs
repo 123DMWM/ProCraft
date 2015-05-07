@@ -516,7 +516,6 @@ namespace fCraft {
 
             // Check for idles (every 1s)
             checkIdlesTask = Scheduler.NewTask( CheckIdles ).RunForever( CheckIdlesInterval );// Check for idles (every 30s)
-            tabListTask = Scheduler.NewTask( TabList ).RunForever( CheckIdlesInterval );
 
             // Monitor CPU usage (every 30s)
             try {
@@ -1249,7 +1248,6 @@ namespace fCraft {
 
         // checks for idle players
         static SchedulerTask checkIdlesTask;
-        static SchedulerTask tabListTask;
         static TimeSpan checkIdlesInterval = TimeSpan.FromSeconds( 1 );
 
         /// <summary> Interval at which Server checks for idle players (to kick idlers). </summary>
@@ -1259,7 +1257,6 @@ namespace fCraft {
                 if( value.Ticks < 0 ) throw new ArgumentException( "CheckIdlesInterval may not be negative." );
                 checkIdlesInterval = value;
                 if( checkIdlesTask != null ) checkIdlesTask.Interval = checkIdlesInterval;
-                if( tabListTask != null ) tabListTask.Interval = checkIdlesInterval;
             }
         }
 
@@ -1371,44 +1368,6 @@ namespace fCraft {
 			} else
 				return "&fN/A";
 		}
-
-        static void TabList(SchedulerTask task)
-        {
-
-            Player[] tempPlayerList = Players;
-            for (int i = 0; i < tempPlayerList.Length; i++)
-            {
-                Player player = tempPlayerList[i];
-                if (!player.Supports(CpeExtension.ExtPlayerList) && !player.Supports(CpeExtension.ExtPlayerList2))
-                    continue;
-                var canBeSeen = Players.Where(a => player.CanSee(a)).ToArray();
-                var canBeSeenW = player.World.Players.Where(a => player.CanSee(a)).ToArray();
-                if (!player.IsPlayingCTF)
-                {
-                    foreach (Player p2 in canBeSeen)
-                    {
-                        player.Send(Packet.MakeExtAddPlayerName(p2.NameID, p2.Name, p2.ListName,
-                            p2.World.ClassyName + " &s(&f" + p2.World.CountVisiblePlayers(player) + "&s)", 0));
-                    }
-                }
-                else
-                {
-                    foreach (Player p2 in canBeSeenW)
-                    {
-                        if (p2.IsPlayingCTF && p2.Team == "Red")
-                        {
-                            player.Send(Packet.MakeExtAddPlayerName(p2.NameID, p2.Name, "&c" + p2.Name, "&sTeam &4Red",
-                                0));
-                        }
-                        else if (p2.IsPlayingCTF && p2.Team == "Blue")
-                        {
-                            player.Send(Packet.MakeExtAddPlayerName(p2.NameID, p2.Name, "&9" + p2.Name, "&sTeam &1Blue",
-                                0));
-                        }
-                    }
-                }
-            }
-        }
 
         #region SaveEntity
 
@@ -1944,7 +1903,7 @@ namespace fCraft {
         }
 
 
-        internal static void UpdateTabList() {
+		internal static void UpdateTabList() {
 			foreach (Player p1 in Players) {
 				if (p1.Supports(CpeExtension.MessageType)) {
 					if (p1.World != null) {
@@ -1953,33 +1912,29 @@ namespace fCraft {
 						p1.Message((byte)MessageType.Status2, p1.ClassyName);
 					}
 				}
-                if (!p1.Supports(CpeExtension.ExtPlayerList) && !p1.Supports(CpeExtension.ExtPlayerList2))
-                    continue;
-                var canBeSeen = Players.Where(i => p1.CanSee(i)).ToArray();
-                var canBeSeenW = p1.World.Players.Where(i => p1.CanSee(i)).ToArray();
-                if (!p1.IsPlayingCTF)
-                {
-                    foreach (Player p2 in canBeSeen)
-                    {
-                        p1.Send(Packet.MakeExtAddPlayerName(p2.NameID, p2.Name, p2.ListName,
-                            p2.World.ClassyName + " &s(&f" + p2.World.CountVisiblePlayers(p1) + "&s)", 0));
-                    }
-                }
-                else
-                {
-                    foreach (Player p2 in canBeSeenW)
-                    {
-                        if (p2.IsPlayingCTF && p2.Team == "Red")
-                        {
-                            p1.Send(Packet.MakeExtAddPlayerName(p2.NameID, p2.Name, "&c" + p2.Name, "&sTeam &4Red", 0));
-                        } else if (p2.IsPlayingCTF && p2.Team == "Blue")
-                        {
-                            p1.Send(Packet.MakeExtAddPlayerName(p2.NameID, p2.Name, "&8" + p2.Name, "&sTeam &1Blue", 0));
-                        }
-                    }
-                }
-            }
-        }
+				if (!p1.Supports(CpeExtension.ExtPlayerList) && !p1.Supports(CpeExtension.ExtPlayerList2))
+					continue;
+				var canBeSeen = Players.Where(i => p1.CanSee(i)).ToArray();
+				var canBeSeenW = p1.World.Players.Where(i => p1.CanSee(i)).ToArray();
+				if (!p1.IsPlayingCTF) {
+					foreach (Player p2 in canBeSeen) {
+						if (p2.Info.IsAFK) {
+							p1.Send(Packet.MakeExtAddPlayerName(p2.NameID, p2.Name, p2.ListName, "Away From Keyboard" + " &s(&f" + canBeSeen.Where(p => p.Info.IsAFK).Count() + "&s)", (byte)canBeSeen.Where(p => p.Info.IsAFK).Count()));
+						} else {
+							p1.Send(Packet.MakeExtAddPlayerName(p2.NameID, p2.Name, p2.ListName, p2.World.ClassyName + " &s(&f" + canBeSeen.Where(p => !p.Info.IsAFK && p.World == p2.World).Count() + "&s)", Byte.MaxValue));
+						}
+					}
+				} else {
+					foreach (Player p2 in canBeSeenW) {
+						if (p2.IsPlayingCTF && p2.Team == "Red") {
+							p1.Send(Packet.MakeExtAddPlayerName(p2.NameID, p2.Name, "&c" + p2.Name, "&sTeam &4Red", 0));
+						} else if (p2.IsPlayingCTF && p2.Team == "Blue") {
+							p1.Send(Packet.MakeExtAddPlayerName(p2.NameID, p2.Name, "&8" + p2.Name, "&sTeam &1Blue", 0));
+						}
+					}
+				}
+			}
+		}
 
         internal static void UpdatePlayerList()
         {

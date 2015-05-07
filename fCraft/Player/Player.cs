@@ -210,13 +210,7 @@ namespace fCraft {
         [NotNull]
         public string ListName {
             get {
-                string formattedName = Name;
-                if (!Info.Rank.Prefix.Equals( "" )) {
-					formattedName = Info.Rank.Color + Info.Rank.Prefix + (Info.IsAFK ? "&s[&aAFK&s]" : "") + Color.White + formattedName + " &s[" + Color.SubstituteSpecialColors(Info.TimeSinceLastLogin.ToMiniString()) + "&s]&f";
-                } else {
-					formattedName = (Info.IsAFK ? "&s[&aAFK&s]" : "") + Info.Rank.Color + formattedName + " &s[" + Color.SubstituteSpecialColors(Info.TimeSinceLastLogin.ToMiniString()) + "&s]&f";
-                }
-                return formattedName;
+                return (Info.Rank.Can(Permission.ReadStaffChat) ? (Info.Rank == RankManager.HighestRank ? "&4+&f" : "&b-&f") : "&f") + Name;
             }
         }
 
