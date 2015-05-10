@@ -154,7 +154,7 @@ namespace fCraft.MapConversion {
         }
 
 
-        static readonly byte[] Mapping = new byte[256];
+        protected static readonly byte[] Mapping = new byte[256];
 
         static MapMCSharp() {
             Mapping[100] = (byte)Block.Glass;       // op_glass
