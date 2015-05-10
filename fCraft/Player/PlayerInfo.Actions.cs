@@ -790,7 +790,8 @@ namespace fCraft {
                 target.MaxCopySlots = target.Info.Rank.CopySlots;
 
                 if (target.Supports(CpeExtension.ClickDistance)) {
-                    target.Send(Packet.MakeSetClickDistance((target.World.maxReach < ReachDistance && !Can(Permission.ReadStaffChat)) ? target.World.maxReach : ReachDistance));
+					short maxreach = (target.World.maxReach == null ? (short)160 : target.World.maxReach);
+					target.Send(Packet.MakeSetClickDistance((maxreach < ReachDistance && !Can(Permission.ReadStaffChat)) ? maxreach : ReachDistance));
                 }
 
                 // inform the player of the rank change
