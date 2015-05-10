@@ -33,6 +33,9 @@ namespace fCraft.MapConversion {
         /// <summary> Map foramt used by D3 server. </summary>
         D3,
 
+        /// <summary> Map format used by MCForge-Redux </summary>
+        MCF,
+
         /// <summary> Format used by Opticraft v0.2+. Support contributed by Jared Klopper (LgZ-optical). </summary>
         Opticraft,
 
