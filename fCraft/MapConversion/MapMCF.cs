@@ -1,151 +1,107 @@
-// Part of fCraft | Copyright (c) 2009-2012 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt
-// Initial support contributed by Tyler Kennedy <tk@tkte.ch>
-using System;
+﻿using System;
 using System.IO;
 using System.IO.Compression;
-using JetBrains.Annotations;
 
-namespace fCraft.MapConversion {
-    /// <summary> MCSharp map conversion implementation, for converting MCSharp map format into fCraft's default map format. </summary>
-    public class MapMCSharp : IMapImporter, IMapExporter {
-        public virtual string ServerName {
-            get { return "MCSharp, MCLawl, MCForge, FemtoCraft"; }
+namespace fCraft.MapConversion
+{
+    /// <summary> .mcf map conversion implementation, for converting .mcf map format into fCraft's default map format. </summary>
+    public class MapMCF : MapMCSharp
+    {
+        public override string ServerName {
+            get { return "MCForge-Redux"; }
         }
 
-        public virtual bool SupportsImport {
-            get { return true; }
+        public override string FileExtension {
+            get { return "mcf"; }
+             
         }
 
-        public virtual bool SupportsExport {
-            get { return true; }
+        public override MapFormat Format {
+            get { return MapFormat.MCF; }
         }
 
-        public virtual string FileExtension {
-            get { return "lvl"; }
+        public override bool ClaimsName( string fileName ) {
+            if ( fileName == null ) throw new ArgumentNullException( "fileName" );
+
+            return fileName.EndsWith( "mcf", StringComparison.OrdinalIgnoreCase );
         }
 
-        public virtual MapStorageType StorageType {
-            get { return MapStorageType.SingleFile; }
-        }
+        public override Map Load( string fileName ) {
+            if ( fileName == null ) throw new ArgumentNullException( "fileName" );
+            using ( FileStream mapStream = File.OpenRead( fileName ) ) {
+                using ( var gs = new GZipStream( mapStream, CompressionMode.Decompress ) ) {
 
-        public virtual MapFormat Format {
-            get { return MapFormat.MCSharp; }
-        }
+                    Map map = LoadHeaderInternal(gs);
 
+                    map.Blocks = new byte[map.Volume];
 
-        public virtual bool ClaimsName( string fileName ) {
-            if( fileName == null ) throw new ArgumentNullException( "fileName" );
-            return fileName.EndsWith( ".lvl", StringComparison.OrdinalIgnoreCase );
-        }
+                    int i = 0, b, s;
+                    while ((b = gs.ReadByte()) != -1)
+                    {
+                        s = gs.ReadByte();
 
+                        short val = BitConverter.ToInt16( new[] { ( byte ) b, ( byte ) s }, 0 );
 
-        public virtual bool Claims( string fileName ) {
-            if( fileName == null ) throw new ArgumentNullException( "fileName" );
-            try {
-                using( FileStream mapStream = File.OpenRead( fileName ) ) {
-                    using( GZipStream gs = new GZipStream( mapStream, CompressionMode.Decompress ) ) {
-                        BinaryReader bs = new BinaryReader( gs );
-                        return ( bs.ReadUInt16() == 0x752 );
+                        if (val <= 65)
+                        {
+                            map.Blocks[i] = ( byte ) val;
+                        }
+                        else
+                        {
+                            map.Blocks[i] = Mapping[val];
+                        }
                     }
-                }
-            } catch( Exception ) {
-                return false;
-            }
-        }
 
 
-        public virtual Map LoadHeader( string fileName ) {
-            if( fileName == null ) throw new ArgumentNullException( "fileName" );
-            using( FileStream mapStream = File.OpenRead( fileName ) ) {
-                using( GZipStream gs = new GZipStream( mapStream, CompressionMode.Decompress ) ) {
-                    return LoadHeaderInternal( gs );
-                }
-            }
-        }
-
-
-        protected static Map LoadHeaderInternal( [NotNull] Stream stream ) {
-            if( stream == null ) throw new ArgumentNullException( "stream" );
-            BinaryReader bs = new BinaryReader( stream );
-
-            // Read in the magic number
-            if( bs.ReadUInt16() != 0x752 ) {
-                throw new MapFormatException();
-            }
-
-            // Read in the map dimesions
-            int width = bs.ReadInt16();
-            int length = bs.ReadInt16();
-            int height = bs.ReadInt16();
-
-            // ReSharper disable UseObjectOrCollectionInitializer
-            Map map = new Map( null, width, length, height, false );
-            // ReSharper restore UseObjectOrCollectionInitializer
-
-            // Read in the spawn location
-            map.Spawn = new Position {
-                X = (short)( bs.ReadInt16() * 32 ),
-                Z = (short)( bs.ReadInt16() * 32 ),
-                Y = (short)( bs.ReadInt16() * 32 ),
-                R = bs.ReadByte(),
-                L = bs.ReadByte(),
-            };
-
-            stream.ReadByte();
-            stream.ReadByte();
-            return map;
-        }
-
-
-        public virtual Map Load( string fileName ) {
-            if( fileName == null ) throw new ArgumentNullException( "fileName" );
-            using( FileStream mapStream = File.OpenRead( fileName ) ) {
-                using( GZipStream gs = new GZipStream( mapStream, CompressionMode.Decompress ) ) {
-
-                    Map map = LoadHeaderInternal( gs );
 
                     // Read in the map data
                     map.Blocks = new byte[map.Volume];
-                    BufferUtil.ReadAll( gs, map.Blocks );
+                    BufferUtil.ReadAll(gs, map.Blocks);
 
-                    map.ConvertBlockTypes( Mapping );
+                    map.ConvertBlockTypes(Mapping);
 
                     return map;
                 }
             }
         }
 
-
-        public virtual bool Save( Map mapToSave, string fileName ) {
-            if( mapToSave == null ) throw new ArgumentNullException( "mapToSave" );
-            if( fileName == null ) throw new ArgumentNullException( "fileName" );
-            using( FileStream mapStream = File.Create( fileName ) ) {
-                using( GZipStream gs = new GZipStream( mapStream, CompressionMode.Compress ) ) {
+        public override bool Save( Map mapToSave, string fileName )
+        {
+            if ( mapToSave == null ) throw new ArgumentNullException( "mapToSave" );
+            if ( fileName == null ) throw new ArgumentNullException( "fileName" );
+            using ( FileStream mapStream = File.Create( fileName ) ) {
+                using ( GZipStream gs = new GZipStream( mapStream, CompressionMode.Compress ) ) {
                     BinaryWriter bs = new BinaryWriter( gs );
 
                     // Write the magic number
-                    bs.Write( (ushort)0x752 );
+                    bs.Write((ushort)0x752);
 
                     // Write the map dimensions
-                    bs.Write( (short)mapToSave.Width );
-                    bs.Write( (short)mapToSave.Length );
-                    bs.Write( (short)mapToSave.Height );
+                    bs.Write((short)mapToSave.Width);
+                    bs.Write((short)mapToSave.Length);
+                    bs.Write((short)mapToSave.Height);
 
                     // Write the spawn location
-                    bs.Write( (short)( mapToSave.Spawn.X / 32 ) );
-                    bs.Write( (short)( mapToSave.Spawn.Z / 32 ) );
-                    bs.Write( (short)( mapToSave.Spawn.Y / 32 ) );
+                    bs.Write((short)(mapToSave.Spawn.X / 32));
+                    bs.Write((short)(mapToSave.Spawn.Z / 32));
+                    bs.Write((short)(mapToSave.Spawn.Y / 32));
 
                     //Write the spawn orientation
-                    bs.Write( mapToSave.Spawn.R );
-                    bs.Write( mapToSave.Spawn.L );
+                    bs.Write(mapToSave.Spawn.R);
+                    bs.Write(mapToSave.Spawn.L);
 
                     // Write the VistPermission and BuildPermission bytes
-                    bs.Write( (byte)0 );
-                    bs.Write( (byte)0 );
+                    bs.Write((byte)0);
+                    bs.Write((byte)0);
 
-                    // Write the map data
-                    bs.Write( mapToSave.Blocks, 0, mapToSave.Blocks.Length );
+                    // Convert byte array to short array, as the MCF file stores an array of shorts for blocks
+                    short[] blocks = Array.ConvertAll(mapToSave.Blocks, b => (short) b);
+
+                    // Write blocks to file
+                    foreach (short val in blocks)
+                    {
+                        bs.Write(val);
+                    }
 
                     bs.Close();
                 }
@@ -153,10 +109,42 @@ namespace fCraft.MapConversion {
             }
         }
 
+        static MapMCF()
+        {
+            Mapping[70] = (byte) Block.BrownMushroom; //flagbase
+            
+            Mapping[71] = (byte) Block.White;        //fallsnow
+            Mapping[72] = (byte) Block.White;        //snow
+            
+            Mapping[73] = (byte) Block.StillLava;    //fastdeathlava
+            
+            Mapping[74] = (byte) Block.TNT;          //c4
+            Mapping[75] = (byte) Block.Red;          //c4det
 
-        static readonly byte[] Mapping = new byte[256];
+            //76-79 unused
 
-        static MapMCSharp() {
+            Mapping[80] = (byte) Block.Cobblestone;  //door_cobblestone
+            Mapping[81] = (byte) Block.Air;          //door_cobblestone_air
+            //82 unused
+            Mapping[83] = (byte) Block.Red;          //door_red;
+            Mapping[84] = (byte) Block.Air;          //door_red_air
+
+            Mapping[85] = (byte) Block.Orange;       //door_orange
+            Mapping[86] = (byte) Block.Yellow;       //door_yellow
+            Mapping[87] = (byte)Block.Lime;       //door_lightgreen
+            //88 unused
+            Mapping[89] = (byte)Block.Teal;       //door_aquagreen
+            Mapping[90] = (byte)Block.Cyan;       //door_cyan
+            Mapping[91] = (byte)Block.Aqua;       //door_lightblue
+            Mapping[92] = (byte)Block.Indigo;       //door_purple
+            Mapping[93] = (byte)Block.Violet;       //door_lightpurple
+            Mapping[94] = (byte)Block.Magenta;       //door_pink
+            Mapping[95] = (byte)Block.Pink;       //door_darkpink
+            Mapping[96] = (byte)Block.Black;       //door_darkgray
+            Mapping[97] = (byte)Block.Gray;       //door_lightgray
+            Mapping[98] = (byte)Block.White;       //door_white
+            //99 unused
+
             Mapping[100] = (byte)Block.Glass;       // op_glass
             Mapping[101] = (byte)Block.Obsidian;    // opsidian
             Mapping[102] = (byte)Block.Brick;      // op_brick
