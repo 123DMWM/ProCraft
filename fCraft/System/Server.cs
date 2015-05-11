@@ -1566,7 +1566,7 @@ namespace fCraft {
                 {
                     if (sendtome.Supports(CpeExtension.MessageType))
                     {
-                        sendtome.Message((byte)MessageType.Announcement, " ");
+                        sendtome.Send(Packet.Message((byte)MessageType.Announcement, " "));
                     }
                 }
             }
@@ -1907,9 +1907,9 @@ namespace fCraft {
 			foreach (Player p1 in Players) {
 				if (p1.Supports(CpeExtension.MessageType)) {
 					if (p1.World != null) {
-						p1.Message((byte)MessageType.Status2, p1.ClassyName + " &son world &f" + p1.World.ClassyName);
+						p1.Send(Packet.Message((byte)MessageType.Status2, p1.ListName + " &son world " + p1.World.ClassyName));
 					} else {
-						p1.Message((byte)MessageType.Status2, p1.ClassyName);
+						p1.Send(Packet.Message((byte)MessageType.Status2, p1.ListName));
 					}
 				}
 				if (!p1.Supports(CpeExtension.ExtPlayerList) && !p1.Supports(CpeExtension.ExtPlayerList2))

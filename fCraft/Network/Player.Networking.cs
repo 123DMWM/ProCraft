@@ -341,7 +341,7 @@ namespace fCraft {
                     if (Info.heldBlock != failsafe) {
                         Info.heldBlock = failsafe;
                         if (Supports(CpeExtension.MessageType) && !IsPlayingCTF) {
-                            Message((byte)MessageType.BottomRight1, "&sBlock:&f" + failsafe.ToString() + " &sID:&f" + failsafe.GetHashCode());
+                            Send(Packet.Message((byte)MessageType.BottomRight1, "&sBlock:&f" + failsafe.ToString() + " &sID:&f" + failsafe.GetHashCode()));
                         }
                     }
                 } else {
@@ -1233,7 +1233,7 @@ namespace fCraft {
             RaisePlayerReadyEvent(this);
 
 			if (Supports(CpeExtension.MessageType)) {
-				Message((byte)MessageType.Status1, "&f" + ConfigKey.ServerName.GetString());
+				Send(Packet.Message((byte)MessageType.Status1, "&f" + ConfigKey.ServerName.GetString()));
 			}
 
             short NID = 1;
@@ -1600,7 +1600,7 @@ namespace fCraft {
             }
 
 			if (this.Supports(CpeExtension.MessageType)) {
-				Message((byte)MessageType.Status1, Color.White + ConfigKey.ServerName.GetString());
+				Send(Packet.Message((byte)MessageType.Status1, Color.White + ConfigKey.ServerName.GetString()));
 			}
 
             Server.UpdateTabList();

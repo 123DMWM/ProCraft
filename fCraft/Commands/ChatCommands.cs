@@ -707,7 +707,9 @@ namespace fCraft
                 rCreate.addReport(getNewReportId(), player.Name, DateTime.Now, message);
                 player.Message("Report sent!");
 				foreach (Player p in Server.Players.Where(q => q.Info.Rank == RankManager.HighestRank)) {
-					p.Message((byte)MessageType.Announcement, "Player {0} has sent in a report!", player.Name);
+					if (p.Supports(CpeExtension.MessageType)) {
+						p.Send(Packet.Message((byte)MessageType.Announcement, String.Format("Player {0} has sent in a report!", player.Name)));
+					}
 					p.Message("Player {0} has sent in a report!", player.Name);
 				}
                 return;
