@@ -1927,9 +1927,13 @@ namespace fCraft {
 #if DEBUG_MOVEMENT
                 Logger.Log( LogType.Debug, "AddEntity: {0} added {1} ({2})", Name, newEntity.Id, player.Name );
 #endif
+				Position pos = new Position(0, 0, 0);
+				if (player.World != null) {
+					pos = player.WorldMap.Spawn;
+				}
                 if (Supports(CpeExtension.ExtPlayerList2)) {
                     Send(Packet.MakeExtAddEntity2(newEntity.Id, player.Info.Rank.Color + player.Name,
-                        (player.Info.skinName ?? player.Name), player.WorldMap.Spawn, this));
+                        (player.Info.skinName ?? player.Name), pos, this));
                     Send(Packet.MakeTeleport(newEntity.Id, player.Position));
                 } else {
                     Send(Packet.MakeAddEntity(newEntity.Id, player.Info.Rank.Color + player.Name,
