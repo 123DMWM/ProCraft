@@ -474,7 +474,11 @@ namespace fCraft
 
                 case (byte)'i':
                     ch = (byte)Color.IRC[1];
-                    return true;
+					return true;
+
+				case (byte)'t':
+					ch = (byte)Color.White[1];
+					return true;
             }
             return false;
         }

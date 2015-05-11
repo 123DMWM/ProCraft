@@ -1076,16 +1076,17 @@ namespace fCraft
 
             message = Chat.ReplaceNewlines(message);
 
-            if (useColor)
-            {
-                message = Color.MinecraftToIrcColors(message);
+            if (useColor) {
+				message = message.Replace("&t", ResetReplacement);
+				message = message.Replace("&T", ResetReplacement);
+				message = Color.MinecraftToIrcColors(message);
                 message = message.Replace(BoldCode, BoldReplacement);
                 message = message.Replace(ResetCode, ResetReplacement);
             }
             else
             {
                 message = message.Replace("&n", "\n");
-                message = message.Replace("&N", "\n");
+				message = message.Replace("&N", "\n");
                 message = message.Replace(BoldCode, "");
                 message = message.Replace(ResetCode, "");
                 message = Color.StripColors(message);

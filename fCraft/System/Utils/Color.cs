@@ -191,7 +191,9 @@ namespace fCraft
                     case 'm':
                         return Me;
                     case 'i':
-                        return IRC;
+						return IRC;
+					case 't':
+						return White;
                     default:
                         return null;
                 }
@@ -352,7 +354,8 @@ namespace fCraft
                    code == 'R' || code == 'r' ||
                    code == 'S' || code == 's' ||
                    code == 'W' || code == 'w' ||
-                   code == 'Y' || code == 'y';
+				   code == 'Y' || code == 'y' ||
+				   code == 'T' || code == 't';
         }
 
 
@@ -395,7 +398,10 @@ namespace fCraft
                             break;
                         case 'i':
                             sb[i] = IRC[1];
-                            break;
+							break;
+						case 't':
+							sb[i] = White[1];
+							break;
                         default:
                             if (!IsStandardColorCode(sb[i]))
                             {
