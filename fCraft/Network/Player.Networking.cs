@@ -988,7 +988,7 @@ namespace fCraft {
                 Logger.Log(LogType.SuspiciousActivity,
                             "{0} tried to log in from a banned IP.", Name);
                 string bannedMessage = String.Format("IP-banned {0} ago by {1}: {2}",
-                                                      DateTime.UtcNow.Subtract(ipBanInfo.BanDate).ToMiniString(),
+													  DateTime.UtcNow.Subtract(ipBanInfo.BanDate).ToMiniNoColorString(),
                                                       ipBanInfo.BannedBy,
                                                       ipBanInfo.BanReason);
                 KickNow(bannedMessage, LeaveReason.LoginFailed);

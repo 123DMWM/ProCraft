@@ -324,7 +324,7 @@ namespace fCraft
 
     /// <summary> Contains data that's sent to heartbeat servers. </summary>
     public sealed class HeartbeatData {
-		String uptime = Color.StripColors("[Uptime: " + (DateTime.UtcNow.Subtract(Server.StartTime)).ToMiniString() +"]");
+		String uptime = "[Uptime: " + (DateTime.UtcNow.Subtract(Server.StartTime)).ToMiniNoColorString() + "]";
 		String namePadded = Color.StripColors(ConfigKey.ServerName.GetString()).PadRight(64, ' ');
         internal HeartbeatData([NotNull] Uri heartbeatUri) {
             if (heartbeatUri == null) throw new ArgumentNullException("heartbeatUri");

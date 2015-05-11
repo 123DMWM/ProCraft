@@ -1041,9 +1041,9 @@ namespace fCraft {
                                 ClassyName, player.Name, duration );
                     if( announce ) {
                         Player target = PlayerObject;
-                        Server.Message( null, "&6Bot&f: HEY " + target.ClassyName.ToUpper() + "&f! &n&6Bot&f: " + player.ClassyName + "&f wants you to shut up for about " + duration.ToMiniString() + "&f, Okay? Okay." );
-                        Logger.Log( LogType.UserActivity, "&6Bot&f: HEY " + target.ClassyName.ToUpper() + "&f! &n&6Bot&f: " + player.ClassyName + "&f wants you to shut up for about " + duration.ToMiniString() + "&f, Okay? Okay." );
-                        IRC.SendChannelMessage( "\u212C&6Bot\u211C: HEY " + target.ClassyName + "\u211C! " + player.ClassyName + "\u211C wants you to shut up for about " + duration.ToMiniString() + "\u211C, Okay? Okay." );
+						Server.Message(null, "&6Bot&f: HEY " + target.ClassyName.ToUpper() + "&f! &n&6Bot&f: " + player.ClassyName + "&f wants you to shut up for about " + duration.ToMiniNoColorString() + "&f, Okay? Okay.");
+						Logger.Log(LogType.UserActivity, "&6Bot&f: HEY " + target.ClassyName.ToUpper() + "&f! &n&6Bot&f: " + player.ClassyName + "&f wants you to shut up for about " + duration.ToMiniNoColorString() + "&f, Okay? Okay.");
+						IRC.SendChannelMessage("\u212C&6Bot\u211C: HEY " + target.ClassyName + "\u211C! " + player.ClassyName + "\u211C wants you to shut up for about " + duration.ToMiniNoColorString() + "\u211C, Okay? Okay.");
                         if (target != null)
                         {
                             target.Message( "You were muted by {0}&S for {1}",
