@@ -210,7 +210,7 @@ namespace fCraft {
         [NotNull]
         public string ListName {
             get {
-                return (Info.Rank.Can(Permission.ReadStaffChat) ? Info.Rank.Color + (Info.Rank == RankManager.HighestRank ? "+&f" : "-&f") : "&f") + Name;
+				return (Info.Rank.Can(Permission.ReadStaffChat) ? (Info.Rank == RankManager.HighestRank ? "&7+" : "&f-") : " ") + Info.Rank.Color + Name;
             }
         }
 

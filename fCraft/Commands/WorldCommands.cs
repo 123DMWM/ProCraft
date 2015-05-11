@@ -506,9 +506,9 @@ namespace fCraft {
                     } else {
                         Player target = info.PlayerObject;
                         if( target != null && args.Player.CanSee( target ) ) {
-                            playerName = info.ClassyName;
+                            playerName = info.Rank.Color + info.Name + "&S";
                         } else {
-                            playerName = info.ClassyName + "&S (offline)";
+							playerName = info.Rank.Color + info.Name + "&S (Offline)";
                         }
                     }
                     string contextString;
@@ -520,22 +520,22 @@ namespace fCraft {
                                entry.Context != BlockChangeContext.Drawn ) {
                         if( entry.Context ==
                             ( BlockChangeContext.Drawn | BlockChangeContext.UndoneSelf | BlockChangeContext.Redone ) ) {
-                            contextString = " (Redone)";
+                            contextString = "(Redone)";
                         } else {
-                            contextString = " (" + ( entry.Context & ~BlockChangeContext.Drawn ) + ")";
+                            contextString = "(" + ( entry.Context & ~BlockChangeContext.Drawn ) + ")";
                         }
                     } else {
-                        contextString = " (" + entry.Context + ")";
+                        contextString = "(" + entry.Context + ")";
                     }
 
                     if( entry.OldBlock == (byte)Block.Air ) {
-                        args.Player.Message( "&S  {0} ago: {1}&S placed {2}{3}",
+						args.Player.Message("  {0} ago: {1} +&f{2} &s{3}",
                                              date, playerName, entry.NewBlock, contextString);
                     } else if( entry.NewBlock == (byte)Block.Air ) {
-                        args.Player.Message("&S  {0} ago: {1}&S deleted {2}{3}",
+						args.Player.Message("  {0} ago: {1} -&f{2} &s{3}",
                                              date, playerName, entry.OldBlock, contextString);
                     } else {
-                        args.Player.Message("&S  {0} ago: {1}&S replaced {2} with {3}{4}",
+                        args.Player.Message("  {0} ago: {1} &f{2} &s->&f {3} &s{4}",
                                              date, playerName, entry.OldBlock, entry.NewBlock, contextString);
                     }
                 }
