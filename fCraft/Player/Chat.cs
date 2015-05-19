@@ -494,7 +494,7 @@ namespace fCraft {
                                               ChatMessageType.Staff,
                                               recipientList);
 
-            IRC.SendChannelMessage("\u212C&P(IRC+Staff)\u211C&P" + player.Name + "&P: " + rawMessage);
+            IRC.SendChannelMessage("\u212C(IRC+Staff)\u211C" + player.Name + ": " + rawMessage);
 
             if (!SendInternal(e)) return false;
 
@@ -526,7 +526,7 @@ namespace fCraft {
                                               recipientList);
 
             if (!SendInternal(e)) return false;
-            IRC.SendChannelMessage("\u212C&P(IRC+Staff)\u211C&P(IRC)" + player + "&P: " + rawMessage);
+			IRC.SendChannelMessage("\u211C\u212C(IRC+Staff)(IRC)\u211C" + player + ": " + rawMessage);
 
             Logger.Log(LogType.GlobalChat,
                         "(IRC+staff)(IRC){0}: {1}",

@@ -435,7 +435,7 @@ namespace fCraft {
 
                         if (otherPlayerName.ToLower() == "irc")
                         {
-                            IRC.SendChannelMessage("&P(PM)" + Name + ": " + messageText);
+							IRC.SendChannelMessage("\u211C\u212C(PM)\u211C" + Name + ": " + messageText);
                             Message("&P(PM)" + this.ClassyName + " &P-> IRC&P: " + messageText);
                             return;
                         }
