@@ -1985,7 +1985,7 @@ namespace fCraft {
 
         #endregion
 		#region GeoInfo
-		static Regex nan = new Regex("[^a-zA-Z0-9]");
+		static Regex nan = new Regex("[^a-zA-Z0-9,]");
 
         static readonly CommandDescriptor CdGeoip = new CommandDescriptor {
             Name = "geoip",
