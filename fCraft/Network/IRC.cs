@@ -279,7 +279,8 @@ namespace fCraft
                 "st",
                 "seen",
                 "commands",
-				"bd"
+				"bd",
+				"time"
             };
 
             void HandleMessage([NotNull] string message)
@@ -417,8 +418,23 @@ namespace fCraft
 													SendChannelMessage("Please specify a player name.");
 												}
 												lastIrcCommand = DateTime.Now;
+											} else if (rawMessage.ToLower().StartsWith("!time") || rawMessage.ToLower().StartsWith(ActualBotNick.ToLower() + " time")) {
+												if (rawMessage.Length > (rawMessage.ToLower().StartsWith("!") ? 6 : ActualBotNick.Length + 6)) {
+													string findPlayer = rawMessage.Split()[(rawMessage.ToLower().StartsWith("!") ? 1 : 2)];
+													PlayerInfo info = PlayerDB.FindPlayerInfoExact(findPlayer);
+													if (info != null) {
+														DateTime clock = InfoCommands.GetTime(info);
+														IRC.SendChannelMessage("For \u212C" + info.Name + "\u211C it is " + clock.ToShortTimeString());
+														IRC.SendChannelMessage("On a " + clock.ToLongDateString());
+													} else {
+														SendChannelMessage("No player found with name \"\u212C" + findPlayer + "\u211C\"");
+													}
+												} else {
+													SendChannelMessage("Please specify a player name.");
+												}
+												lastIrcCommand = DateTime.Now;
 											} else if (rawMessage.ToLower() == "!commands" || rawMessage.ToLower() == ActualBotNick.ToLower() + " commands") {
-                                                SendChannelMessage("\u212CList of commands: \u211CBD, Commands, Players, Seen, St");
+                                                SendChannelMessage("\u212CList of commands: \u211CBD, Commands, Players, Seen, St, Time");
                                                     lastIrcCommand = DateTime.Now;
                                             }
                                         }

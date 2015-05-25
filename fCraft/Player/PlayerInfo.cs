@@ -122,7 +122,7 @@ namespace fCraft {
             if (IPAddress.Parse(ip).IsLocal()) {
                 ip = Server.ExternalIP.ToString();
             }
-            if (ip != GeoIP) {
+			if (ip != GeoIP || Accuracy == 0) {
                 Scheduler.NewBackgroundTask(GeoipLoginCallback).RunOnce(this, TimeSpan.Zero);
             } else {
                 DisplayGeoIp();
@@ -130,9 +130,10 @@ namespace fCraft {
         }
 
 
-        static void GeoipLoginCallback( SchedulerTask task ) {
+        public void GeoipLoginCallback( SchedulerTask task ) {
             PlayerInfo info = (PlayerInfo)task.UserState;
-            InfoCommands.GetGeoip( info );
+			InfoCommands.GetGeoip(info);
+			DisplayGeoIp();
         }
 
         /// <summary>
@@ -140,12 +141,14 @@ namespace fCraft {
         /// </summary>
         public void DisplayGeoIp() {
             if (PlayerObject != null) {
-                string comesFrom = String.Format("&2Player &f{0}&2 comes from {1}, {2}", ClassyName, RegionName,
-                    CountryName);
+                string comesFrom = String.Format("&2Player &f{0}&2 comes from {1}", ClassyName,
+					CountryName);
+				string comesFromIRC = String.Format("&2Player \u212C&f{0}\u211C&2 comes from \u212C{1}", ClassyName,
+					CountryName);
                 Server.Players.CanSee(PlayerObject).Message(comesFrom);
                 PlayerObject.Message(comesFrom);
                 if (!IsHidden) {
-                    IRC.SendChannelMessage(comesFrom);
+                    IRC.SendChannelMessage(comesFromIRC);
                 }
                 Logger.Log(LogType.UserActivity, comesFrom);
             }
@@ -442,24 +445,20 @@ namespace fCraft {
         public string CountryCode;
         /// <summary> Players country name based on geoip</summary>
         public string CountryName;
-        /// <summary> Players region code based on geoip</summary>
-        public string RegionCode;
-        /// <summary> Players region name based on geoip</summary>
-        public string RegionName;
-        /// <summary> Players city based on geoip</summary>
-        public string City;
-        /// <summary> Players zipcode based on geoip</summary>
-        public string ZipCode;
         /// <summary> Players time zone based on geoip</summary>
         public string TimeZone;
         /// <summary> Players latitude based on geoip</summary>
         public string Latitude;
         /// <summary> Players longitude based on geoip</summary>
-        public string Longitude;
-        /// <summary> Players metro code based on geoip</summary>
-        public string MetroCode;
-        /// <summary> Players area code based on geoip</summary>
-        public string AreaCode;
+		public string Longitude;
+		/// <summary> List of subdivisions (City, State, etc) sorting by accuracy from left to right. </summary>
+		public string[] Subdivision = new string[] {"NA"};
+		/// <summary> Players geoip accuracy</summary>
+		public byte Accuracy = 0;
+		/// <summary> Players hostname</summary>
+		public string Hostname;
+		/// <summary> Players continent</summary>
+		public string Continent;
         #endregion
         //Door
         public bool isDoorChecking = false;
@@ -773,27 +772,30 @@ namespace fCraft {
                 info.CountryCode = fields[70];
             if (fields.Length > 71)
                 info.CountryName = fields[71];
-            if (fields.Length > 72)
-                info.RegionCode = fields[72];
-            if (fields.Length > 73)
-                info.RegionName = fields[73];
-            if (fields.Length > 74)
-                info.City = fields[74];
-            if (fields.Length > 75)
-                info.ZipCode = fields[75];
+            //if (fields.Length > 72) info.RegionCode = fields[72];
+            //if (fields.Length > 73) info.RegionName = fields[73];
+            //if (fields.Length > 74) info.City = fields[74];
+            //if (fields.Length > 75) info.ZipCode = fields[75];
             if (fields.Length > 76)
                 info.Latitude = fields[76];
             if (fields.Length > 77)
                 info.Longitude = fields[77];
-            if (fields.Length > 78)
-                info.MetroCode = fields[78];
-            if (fields.Length > 79)
-                info.AreaCode = fields[79];
+            //if (fields.Length > 78) info.MetroCode = fields[78];
+            //if (fields.Length > 79) info.AreaCode = fields[79];
             if (fields.Length > 80)
                 info.TimeZone = fields[80];
 
             if (fields.Length > 81)
-                info.skinName = fields[81];
+				info.skinName = fields[81];
+
+			if (fields.Length > 82)
+				info.Subdivision = PlayerDB.Unescape(fields[82]).Split();
+			if (fields.Length > 83)
+				byte.TryParse(fields[83], out info.Accuracy);
+			if (fields.Length > 84)
+				info.Hostname = fields[84];
+			if (fields.Length > 85)
+				info.Continent = fields[85];
 
             if( info.LastSeen < info.FirstLoginDate ) {
                 info.LastSeen = info.FirstLoginDate;
@@ -1290,26 +1292,36 @@ namespace fCraft {
             sb.Append( ',' );
             sb.Append( CountryName ); // 71
             sb.Append( ',' );
-            sb.Append( RegionCode ); // 72
+            //sb.Append( RegionCode ); // 72 unused
             sb.Append( ',' );
-            sb.Append( RegionName ); // 73
+			//sb.Append( RegionName ); // 73 unused
             sb.Append( ',' );
-            sb.Append( City ); // 74
+			//sb.Append( City ); // 74 unused
             sb.Append( ',' );
-            sb.Append( ZipCode ); // 75
+			//sb.Append( ZipCode ); // 75 unused
             sb.Append( ',' );
             sb.Append( Latitude ); // 76
             sb.Append( ',' );
             sb.Append( Longitude ); // 77
             sb.Append( ',' );
-            sb.Append( MetroCode ); // 78
+			//sb.Append( MetroCode ); // 78 unused
             sb.Append( ',' );
-            sb.Append(AreaCode); // 79
+			//sb.Append(AreaCode); // 79 unused
             sb.Append(',');
             sb.Append(TimeZone); // 80
 
             sb.Append(',');
             sb.Append(skinName); // 81
+
+
+			sb.Append(',');
+			sb.AppendEscaped(Subdivision.JoinToString() ?? "NA"); // 82
+			sb.Append(',');
+			sb.Append(Accuracy); // 83
+			sb.Append(',');
+			sb.Append(Hostname); // 84
+			sb.Append(',');
+			sb.Append(Continent); // 85
         }
 
         #endregion

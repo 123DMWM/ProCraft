@@ -662,7 +662,8 @@ namespace fCraft {
             StringBuilder sb = new StringBuilder(input);
             sb.Replace("{SERVER_NAME}", ConfigKey.ServerName.GetString());
             sb.Replace("{RANK}", player.Info.Rank.ClassyName);
-            sb.Replace("{TIME}", DateTime.Now.ToShortTimeString()); // localized
+			sb.Replace("{TIME}", DateTime.Now.ToShortTimeString()); // localized
+			sb.Replace("{PTIME}", InfoCommands.GetTime(player.Info).ToShortTimeString());
             if (player.World == null)
             {
                 sb.Replace("{WORLD}", "(No World)");

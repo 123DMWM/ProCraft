@@ -1267,7 +1267,8 @@ namespace fCraft {
             for (int i = 0; i < tempPlayerList.Length; i++) {
                 Player player = tempPlayerList[i];
 
-                if (player.Supports(CpeExtension.MessageType)) {
+				if (player.Supports(CpeExtension.MessageType)) {
+					player.Send(Packet.Message((byte)MessageType.Status3, Color.Sys + "It is currently: &f" + InfoCommands.GetTime(player.Info).ToShortTimeString()));
 					player.Send(Packet.Message((byte)MessageType.BottomRight3, Color.Sys + "Been playing for: " + player.Info.TimeSinceLastLogin.ToMiniString()));
                     player.Send(Packet.Message((byte)MessageType.BottomRight2,
                         player.Position.ToBlockCoordsExt().ToString() + "&s[" + compassString((int)player.Position.R) + "&s]"));

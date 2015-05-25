@@ -11,6 +11,7 @@ using System.Xml;
 using System.Xml.XPath;
 using ServiceStack.Text;
 using JetBrains.Annotations;
+using NodaTime;
 namespace fCraft {
     /// <summary> Contains commands that don't do anything besides displaying some information or text.
     /// Includes several chat commands. </summary>
@@ -47,6 +48,7 @@ namespace fCraft {
             CommandManager.RegisterCommand( CdGeoipNp );
             CommandManager.RegisterCommand( CdApiPlayer );
             CommandManager.RegisterCommand( CdApiID );
+            CommandManager.RegisterCommand( Cdtimezone );
             //CommandManager.RegisterCommand( CdPWeather );
 
         }
@@ -144,7 +146,7 @@ namespace fCraft {
 
         static void InfoHandler( Player player, CommandReader cmd ) {
             if( player == null ) throw new ArgumentNullException( "player" );
-            PlayerInfo info = FindPlayerInfo(player, cmd);
+            PlayerInfo info = FindPlayerInfo(player, cmd, "");
             if (info == null) return;
             Player target = info.PlayerObject;
 
@@ -1953,7 +1955,7 @@ namespace fCraft {
 
         private static void ExtraInfoHandler(Player player, CommandReader cmd) {
             if (player == null) throw new ArgumentNullException("player");
-            PlayerInfo info = FindPlayerInfo(player, cmd);
+			PlayerInfo info = FindPlayerInfo(player, cmd, "");
             if (info == null) return;
             Player target = info.PlayerObject;
 
@@ -1982,7 +1984,8 @@ namespace fCraft {
         }
 
         #endregion
-        #region GeoInfo
+		#region GeoInfo
+		static Regex nan = new Regex("[^a-zA-Z0-9]");
 
         static readonly CommandDescriptor CdGeoip = new CommandDescriptor {
             Name = "geoip",
@@ -1998,26 +2001,28 @@ namespace fCraft {
             if (player == null)
                 throw new ArgumentNullException( "player" );
 
-            PlayerInfo info = FindPlayerInfo(player, cmd);
+			PlayerInfo info = null;
+			if (!player.Can(Permission.ViewPlayerIPs)) { 
+				info = player.Info;
+			} else {
+				info = FindPlayerInfo(player, cmd, "");
+			}
             if (info == null) return;
+			if (info.GeoIP != info.LastIP.ToString() || info.Accuracy == 0) {
+				GetGeoip(info);
+			}
 
-            if (!player.Can(Permission.ViewPlayerIPs)) { info = player.Info;}
-            player.Message( "Geo Info about: {0} &s(&f{1}&s)", info.ClassyName, info.LastIP );
-            if (info.GeoIP != info.LastIP.ToString())
-                GetGeoip( info );
-            player.Message( "  Country: &f{1} &s(&f{0}&s)", info.CountryCode, info.CountryName );
-            player.Message( "  Region: &f{1} &s(&f{0}&s)", info.RegionCode, info.RegionName );
-            player.Message( "  City: &f" + info.City );
-            player.Message( "  ZipCode: &f" + info.ZipCode );
-            player.Message( "  Time Zone: &f" + info.TimeZone );
-            player.Message( "  Latitude: &f" + info.Latitude );
-            player.Message( "  Longitude: &f" + info.Longitude );
-            player.Message( "  Metro Code: &f" + info.MetroCode );
-            player.Message( "  Area Code: &f" + info.AreaCode );
+            player.Message( "Geo Info about: {0} &s(&f{1}&s)", info.ClassyName, info.GeoIP ?? "N/A" );
+			player.Message("  Country: &f{1} &s(&f{0}&s)", info.CountryCode ?? "N/A", info.CountryName ?? "N/A");
+			player.Message("  Continent: &f{0}", info.Continent ?? "N/A");
+			player.Message("  Subdivisions: &f{0}", info.Subdivision.JoinToString(", "));
+			player.Message("  Latitude: &f{0}", info.Latitude ?? "N/A");
+			player.Message("  Longitude: &f{0}", info.Longitude ?? "N/A");
+			player.Message("  Time Zone: &f{0}", info.TimeZone ?? "N/A");
+			player.Message("  Hostname: &f{0}", info.Hostname ?? "N/A");
+			player.Message("  Accuracy: &f{0}", info.Accuracy);
+			player.Message("Geoip information by: &9http://geoip.cf/");
         }
-
-        #endregion
-        #region GeoInfoNonPlayer
 
         static readonly CommandDescriptor CdGeoipNp = new CommandDescriptor {
             Name = "geoipnonplayer",
@@ -2029,123 +2034,64 @@ namespace fCraft {
             Handler = IPNPInfoHandler
         };
 
-        private static void IPNPInfoHandler(Player player, CommandReader cmd) {
-            string ipString = cmd.Next();
-            IPAddress ip;
-            if (ipString == null) {
-                player.Message(CdGeoipNp.Usage);
-                return;
-            }
-            if (!(IPAddressUtil.IsIP(ipString) && IPAddress.TryParse(ipString, out ip))) {
-                player.Message("Info: Invalid IP range format. Use CIDR notation.");
-                return;
-            }
-            try {
-                Stream stream = new WebClient().OpenRead("http://freegeoip.net/xml/" + ip);
-                if (stream != null) {
-                    stream.ReadTimeout = 5000;
-                    XPathNavigator nav =
-                        new XPathDocument(XmlReader.Create(new StringReader(new StreamReader(stream).ReadToEnd()),
-                            new XmlReaderSettings {ConformanceLevel = ConformanceLevel.Fragment})).CreateNavigator();
+		private static void IPNPInfoHandler(Player player, CommandReader cmd) {
+			string ipString = cmd.Next();
+			IPAddress ip;
+			if (ipString == null) {
+				player.Message(CdGeoipNp.Usage);
+				return;
+			}
+			if (!(IPAddressUtil.IsIP(ipString) && IPAddress.TryParse(ipString, out ip))) {
+				player.Message("Info: Invalid IP range format. Use CIDR notation.");
+				return;
+			}
+			try {
+				var result = JsonObject.Parse((new WebClient()).DownloadString("http://geoip.cf/api/" + ip));
+				player.Message("Geo Info about: &f{0}", result.Get("ip") ?? "N/A");
+				player.Message("  Country: &f{0} &s(&f{1}&s)", result.Get("country") ?? "N/A", result.Get("country_abbr") ?? "N/A");
+				player.Message("  Continent: &f{0}", result.Get("continent") ?? "N/A");
+				player.Message("  Subdivisions: &f{0}", nan.Replace(result.Get("subdivision"), "").Split(',').JoinToString(", "));
+				player.Message("  Latitude: &f{0}", result.Get("latitude") ?? "N/A");
+				player.Message("  Longitude: &f{0}", result.Get("longitude") ?? "N/A");
+				player.Message("  Timezone: &f{0}", result.Get("timezone") ?? "N/A");
+				byte acc;
+				byte.TryParse(result.Get("accuracy"), out acc);
+				player.Message("  Hostname: &f{0}", result.Get("hostname") ?? "N/A");
+				player.Message("  Accuracy: &f{0}", acc);
+				player.Message("Geoip information by: &9http://geoip.cf/");
 
-                    player.Message("Geo Info about: &f{0}", nav.SelectSingleNode("/Response/IP"));
-                    player.Message("  Country: &f{0} &s(&f{1}&s)", nav.SelectSingleNode("/Response/CountryName"),
-                        nav.SelectSingleNode("/Response/CountryCode"));
-                    player.Message("  Region: &f{0} &s(&f{1}&s)", nav.SelectSingleNode("/Response/RegionName"),
-                        nav.SelectSingleNode("/Response/RegionCode"));
-                    player.Message("  City: &f" + nav.SelectSingleNode("/Response/City"));
-                    player.Message("  ZipCode: &f" + nav.SelectSingleNode("/Response/ZipCode"));
-                    player.Message("  Time Zone: &f" + nav.SelectSingleNode("/Response/TimeZone"));
-                    player.Message("  Latitude: &f" + nav.SelectSingleNode("/Response/Latitude"));
-                    player.Message("  Longitude: &f" + nav.SelectSingleNode("/Response/Longitude"));
-                    player.Message("  Metro Code: &f" + nav.SelectSingleNode("/Response/MetroCode"));
-                }
-                player.Message("Geoip information by: &9http://freegeoip.net/");
-            } catch {
-                try {
-                    Stream stream = new WebClient().OpenRead("http://geoip.cf/xml/" + ip);
-                    if (stream != null) {
-                        stream.ReadTimeout = 5000;
-                        XPathNavigator nav =
-                            new XPathDocument(XmlReader.Create(new StringReader(new StreamReader(stream).ReadToEnd()),
-                                new XmlReaderSettings {ConformanceLevel = ConformanceLevel.Fragment})).CreateNavigator();
+			} catch (Exception ex) {
+				Logger.Log(LogType.Warning, "Could not access GeoIP website (Ex: " + ex + ")");
+			}
+		}
 
-                        player.Message("Geo Info about: &f{0}", nav.SelectSingleNode("/Response/Ip"));
-                        player.Message("  Country: &f{0} &s(&f{1}&s)", nav.SelectSingleNode("/Response/CountryName"),
-                            nav.SelectSingleNode("/Response/CountryCode"));
-                        player.Message("  Region: &f{0} &s(&f{1}&s)", nav.SelectSingleNode("/Response/RegionName"),
-                            nav.SelectSingleNode("/Response/RegionCode"));
-                        player.Message("  City: &f" + nav.SelectSingleNode("/Response/City"));
-                        player.Message("  ZipCode: &f" + nav.SelectSingleNode("/Response/ZipCode"));
-                        player.Message("  Latitude: &f" + nav.SelectSingleNode("/Response/Latitude"));
-                        player.Message("  Longitude: &f" + nav.SelectSingleNode("/Response/Longitude"));
-                        player.Message("  Metro Code: &f" + nav.SelectSingleNode("/Response/MetroCode"));
-                        player.Message("  Area Code: &f" + nav.SelectSingleNode("/Response/AreaCode"));
-                    }
-                    player.Message("Geoip information by: &9http://geoip.cf/");
-                } catch (Exception ex) {
-                    Logger.Log(LogType.Warning, "Could not access GeoIP website (Ex: " + ex + ")");
-                }
-            }
-        }
+		public static void GetGeoip(PlayerInfo info) {
+			string ip = info.LastIP.ToString();
+			if (IPAddress.Parse(ip).IsLocal()) {
+				ip = Server.ExternalIP.ToString();
+			}
+			if (ip == info.GeoIP && info.Accuracy != 0) {
+				return;
+			}
+			try {
+				var result = JsonObject.Parse((new WebClient()).DownloadString("http://geoip.cf/api/" + ip));
+				info.CountryName = result.Get("country") ?? "N/A";
+				info.CountryCode = result.Get("country_abbr") ?? "N/A";
+				info.Continent = result.Get("continent") ?? "N/A";
+				info.Subdivision = nan.Replace(result.Get("subdivision"), "").Split(',');
+				info.Latitude = result.Get("latitude") ?? "N/A";
+				info.Longitude = result.Get("longitude") ?? "N/A";
+				info.TimeZone = result.Get("timezone") ?? "N/A";
+				byte.TryParse(result.Get("accuracy"), out info.Accuracy);
+				info.Hostname = result.Get("hostname") ?? "N/A";
+				info.GeoIP = result.Get("ip") ?? "N/A";
+				return;
 
-        #endregion
-        #region GEOIP
-
-        public static void GetGeoip(PlayerInfo info) {
-            string ip = info.LastIP.ToString();
-            if (IPAddress.Parse(ip).IsLocal()) {
-                ip = Server.ExternalIP.ToString();
-            }
-            if (ip == info.GeoIP) {
-                return;
-            }
-            try {
-                Stream stream = new WebClient().OpenRead("http://freegeoip.net/xml/" + ip);
-                if (stream != null) {
-                    stream.ReadTimeout = 5000;
-                    XPathNavigator nav =
-                        new XPathDocument(XmlReader.Create(new StringReader(new StreamReader(stream).ReadToEnd()),
-                            new XmlReaderSettings {ConformanceLevel = ConformanceLevel.Fragment})).CreateNavigator();
-
-                    info.GeoIP = nav.SelectSingleNode("/Response/IP").ToString();
-                    info.CountryCode = nav.SelectSingleNode("/Response/CountryCode").ToString();
-                    info.CountryName = nav.SelectSingleNode("/Response/CountryName").ToString();
-                    info.RegionCode = nav.SelectSingleNode("/Response/RegionCode").ToString();
-                    info.RegionName = nav.SelectSingleNode("/Response/RegionName").ToString();
-                    info.City = nav.SelectSingleNode("/Response/City").ToString();
-                    info.ZipCode = nav.SelectSingleNode("/Response/ZipCode").ToString();
-                    info.TimeZone = nav.SelectSingleNode("/Response/TimeZone").ToString();
-                    info.Latitude = nav.SelectSingleNode("/Response/Latitude").ToString();
-                    info.Longitude = nav.SelectSingleNode("/Response/Longitude").ToString();
-                    info.MetroCode = nav.SelectSingleNode("/Response/MetroCode").ToString();
-                }
-            } catch {
-                try {
-                    Stream stream = new WebClient().OpenRead("http://geoip.cf/xml/" + ip);
-                    if (stream != null) {
-                        stream.ReadTimeout = 5000;
-                        XPathNavigator nav =
-                            new XPathDocument(XmlReader.Create(new StringReader(new StreamReader(stream).ReadToEnd()),
-                                new XmlReaderSettings {ConformanceLevel = ConformanceLevel.Fragment})).CreateNavigator();
-
-                        info.GeoIP = nav.SelectSingleNode("/Response/Ip").ToString();
-                        info.CountryCode = nav.SelectSingleNode("/Response/CountryCode").ToString();
-                        info.CountryName = nav.SelectSingleNode("/Response/CountryName").ToString();
-                        info.RegionCode = nav.SelectSingleNode("/Response/RegionCode").ToString();
-                        info.RegionName = nav.SelectSingleNode("/Response/RegionName").ToString();
-                        info.City = nav.SelectSingleNode("/Response/City").ToString();
-                        info.ZipCode = nav.SelectSingleNode("/Response/ZipCode").ToString();
-                        info.Latitude = nav.SelectSingleNode("/Response/Latitude").ToString();
-                        info.Longitude = nav.SelectSingleNode("/Response/Longitude").ToString();
-                        info.MetroCode = nav.SelectSingleNode("/Response/MetroCode").ToString();
-                        info.AreaCode = nav.SelectSingleNode("/Response/AreaCode").ToString();
-                    }
-                } catch (Exception ex) {
-                    Logger.Log(LogType.Warning, "Could not access GeoIP website (Ex: " + ex + ")");
-                }
-            }
-        }
+			} catch (Exception ex) {
+				Logger.Log(LogType.Warning, "Could not access GeoIP website (Ex: " + ex + ")");
+				return;
+			}
+		}
 
         #endregion
         #region API Player
@@ -2302,7 +2248,7 @@ namespace fCraft {
         };
 
         static void SeenHandler(Player player, CommandReader cmd) {
-            PlayerInfo info = FindPlayerInfo(player, cmd);
+			PlayerInfo info = FindPlayerInfo(player, cmd, "");
             if (info == null) return;
             Player target = info.PlayerObject;
 
@@ -2345,11 +2291,37 @@ namespace fCraft {
             }
         }
 
-        #endregion
+		#endregion
+		#region GetTime
+		static readonly CommandDescriptor Cdtimezone = new CommandDescriptor {
+			Name = "time",
+			Category = CommandCategory.New | CommandCategory.Info,
+			Usage = "/time [player]",
+			Help = "Displays specific players time",
+			IsConsoleSafe = true,
+			Handler = timeHandler
+		};
 
-        #region API Player
+		private static void timeHandler(Player player, CommandReader cmd) {
+			PlayerInfo info = FindPlayerInfo(player, cmd, "");
+			if (info == null) { return; }
+			DateTime clock = GetTime(info);
+			player.Message("&sFor &f" + info.Name + "&s it is &f" + clock.ToShortTimeString());
+			player.Message("&SOn a &f" + clock.ToLongDateString());
+		}
+		public static DateTime GetTime(PlayerInfo info) {
+			if (info.TimeZone == "") {
+				GetGeoip(info);
+			}
+			Instant now = SystemClock.Instance.Now;
+			DateTimeZone tz = DateTimeZoneProviders.Tzdb[(info.TimeZone != "" ? info.TimeZone : "UTC")];
+			ZonedDateTime zdt = now.InZone(tz);
+			return zdt.ToDateTimeUnspecified();
+		}
+		#endregion
+		#region API Player
 
-        static readonly CommandDescriptor CdPWeather = new CommandDescriptor {
+		static readonly CommandDescriptor CdPWeather = new CommandDescriptor {
             Name = "playerweather",
             Aliases = new[] { "pweather", "pw" },
             Category = CommandCategory.New | CommandCategory.Info,
@@ -2373,8 +2345,13 @@ namespace fCraft {
 
         #endregion
         #region FindPlayerInfo
-        static PlayerInfo FindPlayerInfo(Player player, CommandReader cmd) {
-            string name = cmd.Next();
+		public static PlayerInfo FindPlayerInfo(Player player, CommandReader cmd, [CanBeNull] String cname) {
+			string name = null;
+			if (cname != "") {
+				name = cname;
+			} else {
+				name = cmd.Next();
+			}
             if (name == null) {
                 // no name given, print own info
                 return player.Info;

@@ -416,7 +416,7 @@ namespace fCraft {
             Category = CommandCategory.New | CommandCategory.Chat,
             Permissions = new Permission[] { Permission.Chat },
             Usage = "Bot [Option]",
-            Help = "Bot options are &hGo&s, &hServer&s, &hJoke&s, &hTime&s, &hClock&s, &hPromos&s, &hBans&s, &hKicks&s, &hBlocks&s, &hProtip&s, &hFunfact&s, &hWisdom&s, and &hIdea&s.\n" +
+            Help = "Bot options are &hGo&s, &hServer&s, &hJoke&s, &hTime&s, &hClock&s, &hPromos&s, &hBans&s, &hKicks&s, &hBlocks&s, &hProtip&s, &hFunfact&s, and &hIdea&s.\n" +
                    "Type in &h/help bot [option] &sfor more information.\n" +
                    "&6Bot&s is our Automated response system, so please don't abuse it.",
             NotRepeatable = true,
@@ -433,7 +433,7 @@ namespace fCraft {
                                     "Displays the time you spent this game session." +
                                     "&sType: &f!Bot Time Total\n&S" +
                                     "Displays your Total Time spent on the server." },
-                { "clock",          "&sType: &f!Bot Clock\n&S" +
+                { "clock",          "&sType: &f!Bot Clock [player]\n&S" +
                                     "Displays the date and time."},
                 { "promos",         "&sType: &f!Bot Promos\n&S" +
                                     "Displays the amount of players you have promoted."},
@@ -450,8 +450,6 @@ namespace fCraft {
                                     "*May or may not change your life" },
                 { "funfact",        "&sType: &f!Bot Funfact\n&S" +
                                     "Displays a funfact."},
-                { "wisdom",         "&sType: &f!Bot Wisdom\n&S" +
-                                    "Displays some wisdom (Thanks to AndrewPH)"},
                 { "idea",           "&sType: &f!Bot Idea\n&S" +
                                     "Displays a random building idea"}
                 
@@ -460,365 +458,359 @@ namespace fCraft {
             Handler = LeBotHandler,
         };
 
-        private static void LeBotHandler(Player player, CommandReader cmd) {
-            String cmdchat = cmd.Next();
-            String option = cmd.Next();
-            String helper = cmd.Next();
-            if (option != null) option = option.ToLower();
-            if (cmdchat != "<CalledFromChat>") {
-                cmd.Rewind();
-                option = cmd.Next().ToLower();
-                helper = cmd.Next();
-                Server.Players.Message("{0}&f: Bot {1} {2}", player.ClassyName, option, helper);
-                IRC.SendChannelMessage("&s[{3}&s] {0}\u211C: Bot {1} {2}", player.ClassyName, option, helper, player.World.ClassyName);
-            }
-            if (player.Info.TimeSinceLastServerMessage.TotalSeconds < 5) {
-                player.Info.getLeftOverTime(5, cmd);
-                return;
-            }
-            if (option == null) {
-                player.Message(CdBot.Help);
-                return;
-            }
-            if (option == "go") {
-                if (player.Info.TimesUsedBot == 0) {
-                    player.Message(
-                        "&6Bot&f: This is your first time using &6Bot&f, I suggest you use \"&h/Help Bot&f\" to further understand how I work.");
+		private static void LeBotHandler(Player player, CommandReader cmd) {
+			String cmdchat = cmd.Next();
+			String option = cmd.Next();
+			String helper = cmd.Next();
+			if (option != null)
+				option = option.ToLower();
+			if (cmdchat != "<CalledFromChat>") {
+				cmd.Rewind();
+				option = cmd.Next().ToLower();
+				helper = cmd.Next();
+				Server.Players.Message("{0}&f: Bot {1} {2}", player.ClassyName, option, helper);
+				IRC.SendChannelMessage("&s[{3}&s] {0}\u211C: Bot {1} {2}", player.ClassyName, option, helper, player.World.ClassyName);
+			}
+			if (player.Info.TimeSinceLastServerMessage.TotalSeconds < 5) {
+				player.Info.getLeftOverTime(5, cmd);
+				return;
+			}
+			if (option == null) {
+				player.Message(CdBot.Help);
+				return;
+			}
+			switch (option) {
+				case "go":
+					if (player.Info.TimesUsedBot == 0) {
+						player.Message(
+							"&6Bot&f: This is your first time using &6Bot&f, I suggest you use \"&h/Help Bot&f\" to further understand how I work.");
 
-                }
-                Scheduler.NewTask(t => Server.Players.Message("&6Bot&f: 5")).RunManual(TimeSpan.FromSeconds(0));
-                Scheduler.NewTask(t => Logger.Log(LogType.UserActivity, "&6Bot&f: 5"))
-                    .RunManual(TimeSpan.FromSeconds(0));
-                Scheduler.NewTask(t => IRC.SendChannelMessage("\u212C&6Bot\u211C: 5"))
-                    .RunManual(TimeSpan.FromSeconds(0));
-                Scheduler.NewTask(t => Server.Players.Message("&6Bot&f: 4")).RunOnce(TimeSpan.FromSeconds(1));
-                Scheduler.NewTask(t => Logger.Log(LogType.UserActivity, "&6Bot&f: 4"))
-                    .RunManual(TimeSpan.FromSeconds(1));
-                Scheduler.NewTask(t => IRC.SendChannelMessage("\u212C&6Bot\u211C: 4"))
-                    .RunManual(TimeSpan.FromSeconds(1));
-                Scheduler.NewTask(t => Server.Players.Message("&6Bot&f: 3")).RunOnce(TimeSpan.FromSeconds(2));
-                Scheduler.NewTask(t => Logger.Log(LogType.UserActivity, "&6Bot&f: 3"))
-                    .RunManual(TimeSpan.FromSeconds(2));
-                Scheduler.NewTask(t => IRC.SendChannelMessage("\u212C&6Bot\u211C: 3"))
-                    .RunManual(TimeSpan.FromSeconds(2));
-                Scheduler.NewTask(t => Server.Players.Message("&6Bot&f: 2")).RunOnce(TimeSpan.FromSeconds(3));
-                Scheduler.NewTask(t => Logger.Log(LogType.UserActivity, "&6Bot&f: 2"))
-                    .RunManual(TimeSpan.FromSeconds(3));
-                Scheduler.NewTask(t => IRC.SendChannelMessage("\u212C&6Bot\u211C: 2"))
-                    .RunManual(TimeSpan.FromSeconds(3));
-                Scheduler.NewTask(t => Server.Players.Message("&6Bot&f: 1")).RunOnce(TimeSpan.FromSeconds(4));
-                Scheduler.NewTask(t => Logger.Log(LogType.UserActivity, "&6Bot&f: 1"))
-                    .RunManual(TimeSpan.FromSeconds(4));
-                Scheduler.NewTask(t => IRC.SendChannelMessage("\u212C&6Bot\u211C: 1"))
-                    .RunManual(TimeSpan.FromSeconds(4));
-                Scheduler.NewTask(t => Server.Players.Message("&6Bot&f: Go!")).RunOnce(TimeSpan.FromSeconds(5));
-                Scheduler.NewTask(t => Logger.Log(LogType.UserActivity, "&6Bot&f: Go!"))
-                    .RunManual(TimeSpan.FromSeconds(5));
-                Scheduler.NewTask(t => IRC.SendChannelMessage("\u212C&6Bot\u211C: Go!"))
-                    .RunManual(TimeSpan.FromSeconds(5));
-                player.Info.LastServerMessageDate = DateTime.Now;
-                player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
-            } else if (option == "server") {
-                if (player.Info.TimesUsedBot == 0) {
-                    player.Message(
-                        "&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
+					}
+					Scheduler.NewTask(t => Server.Players.Message("&6Bot&f: 5")).RunManual(TimeSpan.FromSeconds(0));
+					Scheduler.NewTask(t => Logger.Log(LogType.UserActivity, "&6Bot&f: 5"))
+						.RunManual(TimeSpan.FromSeconds(0));
+					Scheduler.NewTask(t => IRC.SendChannelMessage("\u212C&6Bot\u211C: 5"))
+						.RunManual(TimeSpan.FromSeconds(0));
+					Scheduler.NewTask(t => Server.Players.Message("&6Bot&f: 4")).RunOnce(TimeSpan.FromSeconds(1));
+					Scheduler.NewTask(t => Logger.Log(LogType.UserActivity, "&6Bot&f: 4"))
+						.RunManual(TimeSpan.FromSeconds(1));
+					Scheduler.NewTask(t => IRC.SendChannelMessage("\u212C&6Bot\u211C: 4"))
+						.RunManual(TimeSpan.FromSeconds(1));
+					Scheduler.NewTask(t => Server.Players.Message("&6Bot&f: 3")).RunOnce(TimeSpan.FromSeconds(2));
+					Scheduler.NewTask(t => Logger.Log(LogType.UserActivity, "&6Bot&f: 3"))
+						.RunManual(TimeSpan.FromSeconds(2));
+					Scheduler.NewTask(t => IRC.SendChannelMessage("\u212C&6Bot\u211C: 3"))
+						.RunManual(TimeSpan.FromSeconds(2));
+					Scheduler.NewTask(t => Server.Players.Message("&6Bot&f: 2")).RunOnce(TimeSpan.FromSeconds(3));
+					Scheduler.NewTask(t => Logger.Log(LogType.UserActivity, "&6Bot&f: 2"))
+						.RunManual(TimeSpan.FromSeconds(3));
+					Scheduler.NewTask(t => IRC.SendChannelMessage("\u212C&6Bot\u211C: 2"))
+						.RunManual(TimeSpan.FromSeconds(3));
+					Scheduler.NewTask(t => Server.Players.Message("&6Bot&f: 1")).RunOnce(TimeSpan.FromSeconds(4));
+					Scheduler.NewTask(t => Logger.Log(LogType.UserActivity, "&6Bot&f: 1"))
+						.RunManual(TimeSpan.FromSeconds(4));
+					Scheduler.NewTask(t => IRC.SendChannelMessage("\u212C&6Bot\u211C: 1"))
+						.RunManual(TimeSpan.FromSeconds(4));
+					Scheduler.NewTask(t => Server.Players.Message("&6Bot&f: Go!")).RunOnce(TimeSpan.FromSeconds(5));
+					Scheduler.NewTask(t => Logger.Log(LogType.UserActivity, "&6Bot&f: Go!"))
+						.RunManual(TimeSpan.FromSeconds(5));
+					Scheduler.NewTask(t => IRC.SendChannelMessage("\u212C&6Bot\u211C: Go!"))
+						.RunManual(TimeSpan.FromSeconds(5));
+					player.Info.LastServerMessageDate = DateTime.Now;
+					player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
+					break;
+				case "server":
+					if (player.Info.TimesUsedBot == 0) {
+						player.Message(
+							"&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
 
-                }
-                Server.Players.Message("&6Bot&f: The name of this server is " + ConfigKey.ServerName.GetString() + ".");
-                Logger.Log(LogType.UserActivity,
-                    "&6Bot&f: The name of this server is " + ConfigKey.ServerName.GetString() + ".");
-                IRC.SendChannelMessage("\u212C&6Bot\u211C: The name of this server is " +
-                                       ConfigKey.ServerName.GetString() + ".");
-                player.Info.LastServerMessageDate = DateTime.Now;
-                player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
-            } else if (option == "joke") {
-                FileInfo jokeList = new FileInfo("./Bot/Jokes.txt");
-                string[] jokeStrings;
-                if (jokeList.Exists) {
-                    jokeStrings = File.ReadAllLines("./Bot/Jokes.txt");
-                } else {
-                    Server.Players.Message("&6Bot&f: I cannot tell a joke at this time!");
-                    Logger.Log(LogType.UserActivity, "&6Bot&f: I cannot tell a joke at this time!");
-                    IRC.SendChannelMessage("\u212C&6Bot\u211C: I cannot tell a joke at this time!");
-                    return;
-                }
-                Random RandjokeString = new Random();
-                if (player.Info.TimesUsedBot == 0) {
-                    player.Message(
-                        "&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
+					}
+					Server.Players.Message("&6Bot&f: The name of this server is " + ConfigKey.ServerName.GetString() + ".");
+					Logger.Log(LogType.UserActivity,
+						"&6Bot&f: The name of this server is " + ConfigKey.ServerName.GetString() + ".");
+					IRC.SendChannelMessage("\u212C&6Bot\u211C: The name of this server is " +
+										   ConfigKey.ServerName.GetString() + ".");
+					player.Info.LastServerMessageDate = DateTime.Now;
+					player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
+					break;
+				case "joke":
+					FileInfo jokeList = new FileInfo("./Bot/Jokes.txt");
+					string[] jokeStrings;
+					if (jokeList.Exists) {
+						jokeStrings = File.ReadAllLines("./Bot/Jokes.txt");
+					} else {
+						Server.Players.Message("&6Bot&f: I cannot tell a joke at this time!");
+						Logger.Log(LogType.UserActivity, "&6Bot&f: I cannot tell a joke at this time!");
+						IRC.SendChannelMessage("\u212C&6Bot\u211C: I cannot tell a joke at this time!");
+						return;
+					}
+					Random RandjokeString = new Random();
+					if (player.Info.TimesUsedBot == 0) {
+						player.Message(
+							"&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
 
-                }
-                string joker = jokeStrings[RandjokeString.Next(0, jokeStrings.Length)];
-                Server.Players.Message("&6Bot&f: " + joker);
-                Logger.Log(LogType.UserActivity, "&6Bot&f: " + joker);
-                IRC.SendChannelMessage("\u212C&6Bot\u211C: " + joker);
-                player.Info.LastServerMessageDate = DateTime.Now;
-                player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
-            } else if (option.Equals("idea")) {
-                FileInfo adjectiveList = new FileInfo("./Bot/Adjectives.txt");
-                FileInfo nounList = new FileInfo("./Bot/Nouns.txt");
-                string[] adjectiveStrings;
-                string[] nounStrings;
-                if (adjectiveList.Exists && nounList.Exists) {
-                    adjectiveStrings = File.ReadAllLines("./Bot/Adjectives.txt");
-                    nounStrings = File.ReadAllLines("./Bot/Nouns.txt");
-                } else {
-                    Server.Players.Message("&6Bot&f: I cannot tell you a build idea at this time!");
-                    Logger.Log(LogType.UserActivity, "&6Bot&f: I cannot tell you a build idea at this time!");
-                    IRC.SendChannelMessage("\u212C&6Bot\u211C: I cannot tell you a build idea at this time!");
-                    return;
-                }
-                Random randAdjectiveString = new Random();
-                Random randNounString = new Random();
-                if (player.Info.TimesUsedBot == 0) {
-                    player.Message(
-                        "&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
-                }
-                string adjective = adjectiveStrings[randAdjectiveString.Next(0, adjectiveStrings.Length)];
-                string noun = nounStrings[randNounString.Next(0, nounStrings.Length)];
-                string ana = "a";
-                if (adjective.StartsWith("a") || adjective.StartsWith("e") || adjective.StartsWith("i") ||
-                    adjective.StartsWith("o") || adjective.StartsWith("u")) {
-                    ana = "an";
-                } else if (noun.EndsWith("s")) {
-                    ana = "some";
-                }
-                Server.Players.Message("&6Bot&f: Build " + ana + " " + adjective + " " + noun);
-                Logger.Log(LogType.UserActivity, "&6Bot&f: Build " + ana + " " + adjective + " " + noun);
-                IRC.SendChannelMessage("\u212C&6Bot\u211C: Build " + ana + " " + adjective + " " + noun);
-                player.Info.LastServerMessageDate = DateTime.Now;
-                player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
-            } else if (option.Equals("protip")) {
-                FileInfo tipList = new FileInfo("./Bot/Protips.txt");
-                string[] tipStrings;
-                if (tipList.Exists) {
-                    tipStrings = File.ReadAllLines("./Bot/Protips.txt");
-                } else {
-                    Server.Players.Message("&6Bot&f: I cannot tell a protip at this time!");
-                    Logger.Log(LogType.UserActivity, "&6Bot&f: I cannot tell a protip at this time!");
-                    IRC.SendChannelMessage("\u212C&6Bot\u211C: I cannot tell a protip at this time!");
-                    return;
-                }
-                Random RandtipString = new Random();
-                if (player.Info.TimesUsedBot == 0) {
-                    player.Message(
-                        "&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
+					}
+					string joker = jokeStrings[RandjokeString.Next(0, jokeStrings.Length)];
+					Server.Players.Message("&6Bot&f: " + joker);
+					Logger.Log(LogType.UserActivity, "&6Bot&f: " + joker);
+					IRC.SendChannelMessage("\u212C&6Bot\u211C: " + joker);
+					player.Info.LastServerMessageDate = DateTime.Now;
+					player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
+					break;
+				case "idea":
+					FileInfo adjectiveList = new FileInfo("./Bot/Adjectives.txt");
+					FileInfo nounList = new FileInfo("./Bot/Nouns.txt");
+					string[] adjectiveStrings;
+					string[] nounStrings;
+					if (adjectiveList.Exists && nounList.Exists) {
+						adjectiveStrings = File.ReadAllLines("./Bot/Adjectives.txt");
+						nounStrings = File.ReadAllLines("./Bot/Nouns.txt");
+					} else {
+						Server.Players.Message("&6Bot&f: I cannot tell you a build idea at this time!");
+						Logger.Log(LogType.UserActivity, "&6Bot&f: I cannot tell you a build idea at this time!");
+						IRC.SendChannelMessage("\u212C&6Bot\u211C: I cannot tell you a build idea at this time!");
+						return;
+					}
+					Random randAdjectiveString = new Random();
+					Random randNounString = new Random();
+					if (player.Info.TimesUsedBot == 0) {
+						player.Message(
+							"&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
+					}
+					string adjective = adjectiveStrings[randAdjectiveString.Next(0, adjectiveStrings.Length)];
+					string noun = nounStrings[randNounString.Next(0, nounStrings.Length)];
+					string ana = "a";
+					if (adjective.StartsWith("a") || adjective.StartsWith("e") || adjective.StartsWith("i") ||
+						adjective.StartsWith("o") || adjective.StartsWith("u")) {
+						ana = "an";
+					} else if (noun.EndsWith("s")) {
+						ana = "some";
+					}
+					Server.Players.Message("&6Bot&f: Build " + ana + " " + adjective + " " + noun);
+					Logger.Log(LogType.UserActivity, "&6Bot&f: Build " + ana + " " + adjective + " " + noun);
+					IRC.SendChannelMessage("\u212C&6Bot\u211C: Build " + ana + " " + adjective + " " + noun);
+					player.Info.LastServerMessageDate = DateTime.Now;
+					player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
+					break;
+				case "protip":
+					FileInfo tipList = new FileInfo("./Bot/Protips.txt");
+					string[] tipStrings;
+					if (tipList.Exists) {
+						tipStrings = File.ReadAllLines("./Bot/Protips.txt");
+					} else {
+						Server.Players.Message("&6Bot&f: I cannot tell a protip at this time!");
+						Logger.Log(LogType.UserActivity, "&6Bot&f: I cannot tell a protip at this time!");
+						IRC.SendChannelMessage("\u212C&6Bot\u211C: I cannot tell a protip at this time!");
+						return;
+					}
+					Random RandtipString = new Random();
+					if (player.Info.TimesUsedBot == 0) {
+						player.Message(
+							"&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
 
-                }
-                string tipper = tipStrings[RandtipString.Next(0, tipStrings.Length)];
-                Server.Players.Message("&6Bot&f: " + tipper);
-                Logger.Log(LogType.UserActivity, "&6Bot&f: " + tipper);
-                IRC.SendChannelMessage("\u212C&6Bot\u211C: " + tipper);
-                player.Info.LastServerMessageDate = DateTime.Now;
-                player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
-            } else if (option == "time") {
-                TimeSpan time = player.Info.TotalTime;
-                TimeSpan timenow = player.Info.TimeSinceLastLogin;
-                if (helper == "total") {
-                    if (player.Info.TimesUsedBot == 0) {
-                        player.Message(
-                            "&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
+					}
+					string tipper = tipStrings[RandtipString.Next(0, tipStrings.Length)];
+					Server.Players.Message("&6Bot&f: " + tipper);
+					Logger.Log(LogType.UserActivity, "&6Bot&f: " + tipper);
+					IRC.SendChannelMessage("\u212C&6Bot\u211C: " + tipper);
+					player.Info.LastServerMessageDate = DateTime.Now;
+					player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
+					break;
+				case "time":
+					TimeSpan time = player.Info.TotalTime;
+					TimeSpan timenow = player.Info.TimeSinceLastLogin;
+					if (helper == "total") {
+						if (player.Info.TimesUsedBot == 0) {
+							player.Message(
+								"&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
 
-                    }
-                    Server.Players.Message(
-                        "&6Bot&f: " + player.ClassyName + "&f has spent a total of {0:F2}&f hours on this server.",
-                        time.TotalHours);
-                    Logger.Log(LogType.UserActivity,
-                        "&6Bot&f: " + player.ClassyName + "&f has spent a total of {0:F2}&f hours on this server.",
-                        time.TotalHours);
-                    IRC.SendChannelMessage(
-                        "\u212C&6Bot\u211C: " + player.ClassyName +
-                        "\u211C has spent a total of {0:F2}\u211C hours on this server.", time.TotalHours);
-                } else {
-                    if (player.Info.TimesUsedBot == 0) {
-                        player.Message(
-                            "&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
+						}
+						Server.Players.Message(
+							"&6Bot&f: " + player.ClassyName + "&f has spent a total of {0:F2}&f hours on this server.",
+							time.TotalHours);
+						Logger.Log(LogType.UserActivity,
+							"&6Bot&f: " + player.ClassyName + "&f has spent a total of {0:F2}&f hours on this server.",
+							time.TotalHours);
+						IRC.SendChannelMessage(
+							"\u212C&6Bot\u211C: " + player.ClassyName +
+							"\u211C has spent a total of {0:F2}\u211C hours on this server.", time.TotalHours);
+					} else {
+						if (player.Info.TimesUsedBot == 0) {
+							player.Message(
+								"&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
 
-                    }
-                    Server.Players.Message(
-                        "&6Bot&f: " + player.ClassyName + "&f has played a total of {0:F2}&f minutes this session.",
-                        timenow.TotalMinutes);
-                    Logger.Log(LogType.UserActivity,
-                        "&6Bot&f: " + player.ClassyName + "&f has played a total of {0:F2}&f minutes this session.",
-                        timenow.TotalMinutes);
-                    IRC.SendChannelMessage(
-                        "\u212C&6Bot\u211C: " + player.ClassyName +
-                        "\u211C has played a total of {0:F2}\u211C minutes this session.", timenow.TotalMinutes);
-                }
+						}
+						Server.Players.Message(
+							"&6Bot&f: " + player.ClassyName + "&f has played a total of {0:F2}&f minutes this session.",
+							timenow.TotalMinutes);
+						Logger.Log(LogType.UserActivity,
+							"&6Bot&f: " + player.ClassyName + "&f has played a total of {0:F2}&f minutes this session.",
+							timenow.TotalMinutes);
+						IRC.SendChannelMessage(
+							"\u212C&6Bot\u211C: " + player.ClassyName +
+							"\u211C has played a total of {0:F2}\u211C minutes this session.", timenow.TotalMinutes);
+					}
 
-                player.Info.LastServerMessageDate = DateTime.Now;
-                player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
-            } else if (option == "promos") {
-                if (player.Info.Rank.Can(Permission.Promote) || player.Info.PromoCount != 0) {
-                    if (player.Info.TimesUsedBot == 0) {
-                        player.Message(
-                            "&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
+					player.Info.LastServerMessageDate = DateTime.Now;
+					player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
+					break;
+				case "promos":
+					if (player.Info.Rank.Can(Permission.Promote) || player.Info.PromoCount != 0) {
+						if (player.Info.TimesUsedBot == 0) {
+							player.Message(
+								"&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
 
-                    }
-                    Server.Players.Message("&6Bot&f: " + player.ClassyName + " &fhas promoted " + player.Info.PromoCount +
-                                           " players.");
-                    Logger.Log(LogType.UserActivity,
-                        "&6Bot&f: " + player.ClassyName + " &fhas promoted " + player.Info.PromoCount + " players.");
-                    IRC.SendChannelMessage("\u212C&6Bot\u211C: " + player.ClassyName + " \u211Chas promoted " +
-                                           player.Info.PromoCount + " players.");
-                } else {
-                    if (player.Info.TimesUsedBot == 0) {
-                        player.Message(
-                            "&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
+						}
+						Server.Players.Message("&6Bot&f: " + player.ClassyName + " &fhas promoted " + player.Info.PromoCount +
+											   " players.");
+						Logger.Log(LogType.UserActivity,
+							"&6Bot&f: " + player.ClassyName + " &fhas promoted " + player.Info.PromoCount + " players.");
+						IRC.SendChannelMessage("\u212C&6Bot\u211C: " + player.ClassyName + " \u211Chas promoted " +
+											   player.Info.PromoCount + " players.");
+					} else {
+						if (player.Info.TimesUsedBot == 0) {
+							player.Message(
+								"&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
 
-                    }
-                    Server.Players.Message("&6Bot&f: " + player.ClassyName + " &fcannot promote players yet");
-                    Logger.Log(LogType.UserActivity, "&6Bot&f: " + player.ClassyName + " &fcannot promote players yet");
-                    IRC.SendChannelMessage("\u212C&6Bot\u211C: " + player.ClassyName +
-                                           " \u211Ccannot promote players yet");
-                }
-                player.Info.LastServerMessageDate = DateTime.Now;
-                player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
-            } else if (option == "bans") {
-                if (player.Info.Rank.Can(Permission.Ban) || player.Info.TimesBannedOthers != 0) {
-                    if (player.Info.TimesUsedBot == 0) {
-                        player.Message(
-                            "&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
+						}
+						Server.Players.Message("&6Bot&f: " + player.ClassyName + " &fcannot promote players yet");
+						Logger.Log(LogType.UserActivity, "&6Bot&f: " + player.ClassyName + " &fcannot promote players yet");
+						IRC.SendChannelMessage("\u212C&6Bot\u211C: " + player.ClassyName +
+											   " \u211Ccannot promote players yet");
+					}
+					player.Info.LastServerMessageDate = DateTime.Now;
+					player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
+					break;
+				case "bans":
+					if (player.Info.Rank.Can(Permission.Ban) || player.Info.TimesBannedOthers != 0) {
+						if (player.Info.TimesUsedBot == 0) {
+							player.Message(
+								"&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
 
-                    }
-                    Server.Players.Message("&6Bot&f: " + player.ClassyName + " &fhas banned " +
-                                           player.Info.TimesBannedOthers + " players.");
-                    Logger.Log(LogType.UserActivity,
-                        "&6Bot&f: " + player.ClassyName + " &fhas banned " + player.Info.TimesBannedOthers + " players.");
-                    IRC.SendChannelMessage("\u212C&6Bot\u211C: " + player.ClassyName + " \u211Chas banned " +
-                                           player.Info.TimesBannedOthers + " players.");
-                } else {
-                    if (player.Info.TimesUsedBot == 0) {
-                        player.Message(
-                            "&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
+						}
+						Server.Players.Message("&6Bot&f: " + player.ClassyName + " &fhas banned " +
+											   player.Info.TimesBannedOthers + " players.");
+						Logger.Log(LogType.UserActivity,
+							"&6Bot&f: " + player.ClassyName + " &fhas banned " + player.Info.TimesBannedOthers + " players.");
+						IRC.SendChannelMessage("\u212C&6Bot\u211C: " + player.ClassyName + " \u211Chas banned " +
+											   player.Info.TimesBannedOthers + " players.");
+					} else {
+						if (player.Info.TimesUsedBot == 0) {
+							player.Message(
+								"&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
 
-                    }
-                    Server.Players.Message("&6Bot&f: " + player.ClassyName + " &fcannot ban yet");
-                    Logger.Log(LogType.UserActivity, "&6Bot&f: " + player.ClassyName + " &fcannot ban yet");
-                    IRC.SendChannelMessage("\u212C&6Bot\u211C: " + player.ClassyName + " \u211Ccannot ban yet");
-                }
+						}
+						Server.Players.Message("&6Bot&f: " + player.ClassyName + " &fcannot ban yet");
+						Logger.Log(LogType.UserActivity, "&6Bot&f: " + player.ClassyName + " &fcannot ban yet");
+						IRC.SendChannelMessage("\u212C&6Bot\u211C: " + player.ClassyName + " \u211Ccannot ban yet");
+					}
 
-                player.Info.LastServerMessageDate = DateTime.Now;
-                player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
-            } else if (option == "kicks") {
-                if (player.Info.Rank.Can(Permission.Kick) || player.Info.TimesKickedOthers != 0) {
-                    if (player.Info.TimesUsedBot == 0) {
-                        player.Message(
-                            "&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
+					player.Info.LastServerMessageDate = DateTime.Now;
+					player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
+					break;
+				case "kicks":
+					if (player.Info.Rank.Can(Permission.Kick) || player.Info.TimesKickedOthers != 0) {
+						if (player.Info.TimesUsedBot == 0) {
+							player.Message(
+								"&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
 
-                    }
-                    Server.Players.Message("&6Bot&f: " + player.ClassyName + " &fhas kicked " +
-                                           player.Info.TimesKickedOthers + " players.");
-                    Logger.Log(LogType.UserActivity,
-                        "&6Bot&f: " + player.ClassyName + " &fhas kicked " + player.Info.TimesKickedOthers + " players.");
-                    IRC.SendChannelMessage("\u212C&6Bot\u211C: " + player.ClassyName + " \u211Chas kicked " +
-                                           player.Info.TimesKickedOthers + " players.");
-                } else {
-                    if (player.Info.TimesUsedBot == 0) {
-                        player.Message(
-                            "&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
+						}
+						Server.Players.Message("&6Bot&f: " + player.ClassyName + " &fhas kicked " +
+											   player.Info.TimesKickedOthers + " players.");
+						Logger.Log(LogType.UserActivity,
+							"&6Bot&f: " + player.ClassyName + " &fhas kicked " + player.Info.TimesKickedOthers + " players.");
+						IRC.SendChannelMessage("\u212C&6Bot\u211C: " + player.ClassyName + " \u211Chas kicked " +
+											   player.Info.TimesKickedOthers + " players.");
+					} else {
+						if (player.Info.TimesUsedBot == 0) {
+							player.Message(
+								"&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
 
-                    }
-                    Server.Players.Message("&6Bot&f: " + player.ClassyName + " &fcannot kick yet");
-                    Logger.Log(LogType.UserActivity, "&6Bot&f: " + player.ClassyName + " &fcannot kick yet");
-                    IRC.SendChannelMessage("\u212C&6Bot\u211C: " + player.ClassyName + " \u211Ccannot kick yet");
-                }
-                player.Info.LastServerMessageDate = DateTime.Now;
-                player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
-            } else if (option == "clock") {
-                if (player.Info.TimesUsedBot == 0) {
-                    player.Message(
-                        "&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
-                }
-                Server.Players.Message("&6Bot&f: It is " + DateTime.Now.ToLongTimeString());
-                Server.Players.Message("&6Bot&f: On a " + DateTime.Now.ToLongDateString());
-                Logger.Log(LogType.UserActivity, "&6Bot&f: It is " + DateTime.Now.ToLongTimeString());
-                Logger.Log(LogType.UserActivity, "&6Bot&f: On a " + DateTime.Now.ToLongDateString());
-                IRC.SendChannelMessage("\u212C&6Bot\u211C: It is " + DateTime.Now.ToLongTimeString());
-                IRC.SendChannelMessage("\u212C&6Bot\u211C: On a " + DateTime.Now.ToLongDateString());
-                player.Info.LastServerMessageDate = DateTime.Now;
-                player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
-            } else if (option == "blocks") {
-                if (helper == "total") {
-                    if (player.Info.TimesUsedBot == 0) {
-                        player.Message(
-                            "&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
-                    }
-                    Server.Players.Message("&6Bot&f: " + player.ClassyName + " &fhas built " + player.Info.BlocksBuilt +
-                                           " blocks, deleted " + player.Info.BlocksDeleted + " and drew " +
-                                           player.Info.BlocksDrawn + ".");
-                    Logger.Log(LogType.UserActivity,
-                        "&6Bot&f: " + player.ClassyName + " &fhas built " + player.Info.BlocksBuilt +
-                        " blocks, deleted " + player.Info.BlocksDeleted + " and drew " + player.Info.BlocksDrawn + ".");
-                    IRC.SendChannelMessage("\u212C&6Bot\u211C: " + player.ClassyName + " \u211Chas built " +
-                                           player.Info.BlocksBuilt + " blocks, deleted " + player.Info.BlocksDeleted +
-                                           " and drew " + player.Info.BlocksDrawn + ".");
-                } else {
-                    if (player.Info.TimesUsedBot == 0) {
-                        player.Message(
-                            "&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
-                    }
-                    Server.Players.Message("&6Bot&f: " + player.ClassyName + " &fhas built " +
-                                           player.Info.BlocksBuiltThisGame + " blocks and deleted " +
-                                           player.Info.BlocksDeletedThisGame + " blocks this session.");
-                    Logger.Log(LogType.UserActivity,
-                        "&6Bot&f: " + player.ClassyName + " &fhas built " + player.Info.BlocksBuiltThisGame +
-                        " blocks and deleted " + player.Info.BlocksDeletedThisGame + " blocks this session.");
-                    IRC.SendChannelMessage("\u212C&6Bot\u211C: " + player.ClassyName + " \u211Chas built " +
-                                           player.Info.BlocksBuiltThisGame + " blocks and deleted " +
-                                           player.Info.BlocksDeletedThisGame + " blocks this session.");
-                }
-                player.Info.LastServerMessageDate = DateTime.Now;
-                player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
-            } else if (option == "funfact") {
-                FileInfo factList = new FileInfo("./Bot/Funfacts.txt");
-                string[] factStrings;
-                if (factList.Exists) {
-                    factStrings = File.ReadAllLines("./Bot/Funfacts.txt");
-                } else {
-                    Server.Players.Message("&6Bot&f: I cannot tell a funfact at this time!");
-                    Logger.Log(LogType.UserActivity, "&6Bot&f: I cannot tell a funfact at this time!");
-                    IRC.SendChannelMessage("\u212C&6Bot\u211C: I cannot tell a funfact at this time!");
-                    return;
-                }
-                Random RandfactString = new Random();
-                if (player.Info.TimesUsedBot == 0) {
-                    player.Message(
-                        "&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
+						}
+						Server.Players.Message("&6Bot&f: " + player.ClassyName + " &fcannot kick yet");
+						Logger.Log(LogType.UserActivity, "&6Bot&f: " + player.ClassyName + " &fcannot kick yet");
+						IRC.SendChannelMessage("\u212C&6Bot\u211C: " + player.ClassyName + " \u211Ccannot kick yet");
+					}
+					player.Info.LastServerMessageDate = DateTime.Now;
+					player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
+					break;
+				case "clock":
+					PlayerInfo info = player.Info;
+					if (player.Info.TimesUsedBot == 0) {
+						player.Message(
+							"&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
+					}
+					DateTime clock = InfoCommands.GetTime(info);
+					Server.Players.Message("&6Bot&f: For " + info.Name + " it is " + clock.ToShortTimeString());
+					Server.Players.Message("&f> On a " + clock.ToLongDateString());
+					Logger.Log(LogType.UserActivity, "Bot: For " + info.Name + " it is " + clock.ToShortTimeString());
+					Logger.Log(LogType.UserActivity, "> On a " + clock.ToLongDateString());
+					IRC.SendChannelMessage("\u212C&6Bot\u211C: For \u212C" + info.Name + "\u211C it is " + clock.ToShortTimeString());
+					IRC.SendChannelMessage("\u211C> On a " + clock.ToLongDateString());
+					player.Info.LastServerMessageDate = DateTime.Now;
+					player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
+					break;
+				case "blocks":
+					if (helper == "total") {
+						if (player.Info.TimesUsedBot == 0) {
+							player.Message(
+								"&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
+						}
+						Server.Players.Message("&6Bot&f: " + player.ClassyName + " &fhas built " + player.Info.BlocksBuilt +
+											   " blocks, deleted " + player.Info.BlocksDeleted + " and drew " +
+											   player.Info.BlocksDrawn + ".");
+						Logger.Log(LogType.UserActivity,
+							"&6Bot&f: " + player.ClassyName + " &fhas built " + player.Info.BlocksBuilt +
+							" blocks, deleted " + player.Info.BlocksDeleted + " and drew " + player.Info.BlocksDrawn + ".");
+						IRC.SendChannelMessage("\u212C&6Bot\u211C: " + player.ClassyName + " \u211Chas built " +
+											   player.Info.BlocksBuilt + " blocks, deleted " + player.Info.BlocksDeleted +
+											   " and drew " + player.Info.BlocksDrawn + ".");
+					} else {
+						if (player.Info.TimesUsedBot == 0) {
+							player.Message(
+								"&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
+						}
+						Server.Players.Message("&6Bot&f: " + player.ClassyName + " &fhas built " +
+											   player.Info.BlocksBuiltThisGame + " blocks and deleted " +
+											   player.Info.BlocksDeletedThisGame + " blocks this session.");
+						Logger.Log(LogType.UserActivity,
+							"&6Bot&f: " + player.ClassyName + " &fhas built " + player.Info.BlocksBuiltThisGame +
+							" blocks and deleted " + player.Info.BlocksDeletedThisGame + " blocks this session.");
+						IRC.SendChannelMessage("\u212C&6Bot\u211C: " + player.ClassyName + " \u211Chas built " +
+											   player.Info.BlocksBuiltThisGame + " blocks and deleted " +
+											   player.Info.BlocksDeletedThisGame + " blocks this session.");
+					}
+					player.Info.LastServerMessageDate = DateTime.Now;
+					player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
+					break;
+				case "funfact":
+					FileInfo factList = new FileInfo("./Bot/Funfacts.txt");
+					string[] factStrings;
+					if (factList.Exists) {
+						factStrings = File.ReadAllLines("./Bot/Funfacts.txt");
+					} else {
+						Server.Players.Message("&6Bot&f: I cannot tell a funfact at this time!");
+						Logger.Log(LogType.UserActivity, "&6Bot&f: I cannot tell a funfact at this time!");
+						IRC.SendChannelMessage("\u212C&6Bot\u211C: I cannot tell a funfact at this time!");
+						return;
+					}
+					Random RandfactString = new Random();
+					if (player.Info.TimesUsedBot == 0) {
+						player.Message(
+							"&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
 
-                }
-                string facter = factStrings[RandfactString.Next(0, factStrings.Length)];
-                Server.Players.Message("&6Bot&f: " + facter);
-                Logger.Log(LogType.UserActivity, "&6Bot&f: " + facter);
-                IRC.SendChannelMessage("\u212C&6Bot\u211C: " + facter);
-                player.Info.LastServerMessageDate = DateTime.Now;
-                player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
-            } else if (option == "wisdom") {
-                string[] wisdomStrings = {
-                    "it uses css to conenct to a html page",
-                    "Well 'crosshair' is a really general term",
-                    "Have you decided to make 800Craft work with ClassiCube yet?", "&fgot somet to tell yah",
-                    "i am still gonna give u alot of credit", "&fnot good at php java coding etc...",
-                    "only good with html and css :(", "&fi made html and css code from scratch and website",
-                    "i wrote from scratch", "&fcould you not list the servers made with my software", "i made template",
-                    "&fbut uses html formatting to script it", "i will use some other BETTER software then"
-                };
-                Random randWisdomString = new Random();
-                if (player.Info.TimesUsedBot == 0) {
-                    player.Message(
-                        "&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
-
-                }
-                string facter = wisdomStrings[randWisdomString.Next(0, wisdomStrings.Length)];
-                Server.Players.Message("&6Bot&f: " + facter);
-                Logger.Log(LogType.UserActivity, "&6Bot&f: " + facter);
-                IRC.SendChannelMessage("\u212C&6Bot\u211C: " + facter);
-                player.Info.LastServerMessageDate = DateTime.Now;
-                player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
-            } else {
-                player.Message(CdBot.Help);
-            }
-        }
+					}
+					string facter = factStrings[RandfactString.Next(0, factStrings.Length)];
+					Server.Players.Message("&6Bot&f: " + facter);
+					Logger.Log(LogType.UserActivity, "&6Bot&f: " + facter);
+					IRC.SendChannelMessage("\u212C&6Bot\u211C: " + facter);
+					player.Info.LastServerMessageDate = DateTime.Now;
+					player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
+					break;
+				default:
+					break;
+			}
+		}
 
         #endregion        
         #region Ban / Unban
