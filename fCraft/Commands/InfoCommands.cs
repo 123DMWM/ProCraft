@@ -2313,10 +2313,14 @@ namespace fCraft {
 			if (info.TimeZone == "") {
 				GetGeoip(info);
 			}
-			Instant now = SystemClock.Instance.Now;
-			DateTimeZone tz = DateTimeZoneProviders.Tzdb[(info.TimeZone != "" ? info.TimeZone : "UTC")];
-			ZonedDateTime zdt = now.InZone(tz);
-			return zdt.ToDateTimeUnspecified();
+			try {
+				Instant now = SystemClock.Instance.Now;
+				DateTimeZone tz = DateTimeZoneProviders.Tzdb[info.TimeZone];
+				ZonedDateTime zdt = now.InZone(tz);
+				return zdt.ToDateTimeUnspecified();
+			} catch (Exception ex){
+				return DateTime.Now;
+			}
 		}
 		#endregion
 		#region API Player
