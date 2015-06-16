@@ -437,7 +437,7 @@ namespace fCraft.ConfigGUI {
 			// 
 			this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
 			this.pictureBox1.Location = new System.Drawing.Point(8, 314);
-			this.pictureBox1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+			this.pictureBox1.Margin = new System.Windows.Forms.Padding(2);
 			this.pictureBox1.Name = "pictureBox1";
 			this.pictureBox1.Size = new System.Drawing.Size(636, 159);
 			this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -1057,7 +1057,7 @@ namespace fCraft.ConfigGUI {
 			// chatPreview
 			// 
 			this.chatPreview.Location = new System.Drawing.Point(7, 256);
-			this.chatPreview.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+			this.chatPreview.Margin = new System.Windows.Forms.Padding(4);
 			this.chatPreview.Name = "chatPreview";
 			this.chatPreview.Size = new System.Drawing.Size(637, 241);
 			this.chatPreview.TabIndex = 2;

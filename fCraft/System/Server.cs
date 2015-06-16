@@ -404,6 +404,7 @@ namespace fCraft {
 
             // prepare the list of commands
             CommandManager.Init();
+			PluginManager.GetInstance();
 
             // prepare the brushes
             BrushManager.Init();
@@ -1854,10 +1855,11 @@ namespace fCraft {
 
         public static string MakePlayerDisconnectedMessage([NotNull] Player player)
         {
-            if (player == null) throw new ArgumentNullException("player");
+			if (player == null)
+				throw new ArgumentNullException("player");
+			UpdateTabList();
             return String.Format("{0}&s left the server.", player.ClassyName);
 
-            UpdateTabList();
         }
 
 

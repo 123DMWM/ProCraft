@@ -49,6 +49,7 @@ namespace fCraft {
             CommandManager.RegisterCommand( CdApiPlayer );
             CommandManager.RegisterCommand( CdApiID );
             CommandManager.RegisterCommand( Cdtimezone );
+            CommandManager.RegisterCommand( CdPlugin );
             //CommandManager.RegisterCommand( CdPWeather );
 
         }
@@ -2047,6 +2048,10 @@ namespace fCraft {
 			}
 			try {
 				var result = JsonObject.Parse((new WebClient()).DownloadString("http://geoip.cf/api/" + ip));
+				if (result.Get("message").Equals("No results found!")) {
+					player.Message("No information found!");
+					return;
+				}
 				player.Message("Geo Info about: &f{0}", result.Get("ip") ?? "N/A");
 				player.Message("  Country: &f{0} &s(&f{1}&s)", result.Get("country") ?? "N/A", result.Get("country_abbr") ?? "N/A");
 				player.Message("  Continent: &f{0}", result.Get("continent") ?? "N/A");
@@ -2075,6 +2080,9 @@ namespace fCraft {
 			}
 			try {
 				var result = JsonObject.Parse((new WebClient()).DownloadString("http://geoip.cf/api/" + ip));
+				if (result.Get("message").Equals("No results found!")) {
+					return;
+				}
 				info.CountryName = result.Get("country") ?? "N/A";
 				info.CountryCode = result.Get("country_abbr") ?? "N/A";
 				info.Continent = result.Get("continent") ?? "N/A";
@@ -2318,7 +2326,7 @@ namespace fCraft {
 				DateTimeZone tz = DateTimeZoneProviders.Tzdb[info.TimeZone];
 				ZonedDateTime zdt = now.InZone(tz);
 				return zdt.ToDateTimeUnspecified();
-			} catch (Exception ex){
+			} catch {
 				return DateTime.Now;
 			}
 		}
@@ -2347,7 +2355,32 @@ namespace fCraft {
             player.Message("Temp in K: ", temp);
         }
 
-        #endregion
+		#endregion
+		#region Plugins
+		static readonly CommandDescriptor CdPlugin = new CommandDescriptor {
+			Name = "Plugins",
+			Aliases = new[] { "plugin" },
+			Category = CommandCategory.Info | CommandCategory.New,
+			Permissions = new Permission[] { Permission.Chat },
+			IsConsoleSafe = true,
+			Usage = "/Plugins",
+			Help = "Displays all plugins on the server.",
+			Handler = PluginsHandler
+		};
+
+		static void PluginsHandler(Player player, CommandReader cmd) {
+			List<String> plugins = new List<String>();
+			player.Message("&c_Current plugins on {0}&c_", ConfigKey.ServerName.GetString());
+
+			//Sloppy :P, PluginManager.Plugins adds ".Init", so this should split the ".Init" from the plugin name
+			foreach (Plugin plugin in PluginManager.Plugins) {
+				String pluginString = plugin.ToString();
+				string[] splitPluginString = pluginString.Split('.');
+				plugins.Add(splitPluginString[0]);
+			}
+			player.Message(String.Join(", ", plugins));
+		}
+		#endregion
         #region FindPlayerInfo
 		public static PlayerInfo FindPlayerInfo(Player player, CommandReader cmd, [CanBeNull] String cname) {
 			string name = null;
