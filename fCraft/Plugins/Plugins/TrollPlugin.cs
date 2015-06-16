@@ -11,8 +11,8 @@ namespace TrollPlugin {
 
         private static CommandDescriptor CdTroll = new CommandDescriptor {
             Name = "Troll",
-            Category = CommandCategory.Chat | CommandCategory.Fun,
-            Permissions = new[] { Permission.Troll },
+            Category = CommandCategory.Chat | CommandCategory.New,
+            Permissions = new[] { Permission.ReadStaffChat },
             IsConsoleSafe = true,
             NotRepeatable = false,
             Usage = "/troll player option [Message]",
@@ -41,15 +41,15 @@ namespace TrollPlugin {
             }
         }
 
-        private static void TrollHandler( Player player, Command cmd ) {
+        private static void TrollHandler( Player player, CommandReader cmd ) {
             string Name = cmd.Next();
             if ( Name == null ) {
                 player.Message( "Player not found. Please specify valid name." );
                 return;
             }
-            if ( !Player.IsValidName( Name ) )
+            if ( !Player.IsValidPlayerName( Name ) )
                 return;
-            Player target = Server.FindPlayerOrPrintMatches( player, Name, true, true );
+            Player target = Server.FindPlayerOrPrintMatches( player, Name, SearchOptions.Default );
             if ( target == null )
                 return;
             string options = cmd.Next();
@@ -65,14 +65,10 @@ namespace TrollPlugin {
             switch ( options.ToLower() ) {
                 case "pm":
                     if ( player.Can( Permission.UseColorCodes ) && Message.Contains( "%" ) ) {
-                        Message = Color.ReplacePercentCodes( Message );
+                        Message = Chat.ReplacePercentColorCodes( Message, false );
                     }
                     Server.Players.Message( "&Pfrom {0}: {1}",
                         target.Name, Message );
-                    break;
-
-                case "ac":
-                    Chat.SendAdmin( target, Message );
                     break;
 
                 case "st":
