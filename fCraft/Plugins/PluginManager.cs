@@ -92,15 +92,15 @@ namespace fCraft {
 
         private void LoadPlugins() {
             if ( Plugins.Count > 0 ) {
-                foreach ( Plugin plugin in Plugins ) {
-                    Logger.Log( LogType.ConsoleOutput, "PluginManager: Loading plugin " + plugin.Name );
-
-                    try {
-                        plugin.Initialize();
-                    } catch ( Exception ex ) {
-                        Logger.Log( LogType.Error, "PluginManager: Failed loading plugin " + plugin.Name + ": " + ex );
-                    }
-                }
+				foreach (Plugin plugin in Plugins) {
+					try {
+						plugin.Initialize();
+						Logger.Log(LogType.ConsoleOutput, "PluginManager: Loading plugin " + plugin.Name);
+					} catch (Exception ex) {
+						Logger.Log(LogType.Error, "PluginManager: Failed loading plugin " + plugin.Name);
+						Logger.Log(LogType.Debug, ex.ToString());
+					}
+				}
             }
         }
     }
