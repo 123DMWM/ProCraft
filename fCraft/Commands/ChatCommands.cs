@@ -1371,6 +1371,10 @@ namespace fCraft
                 return;
             string searchplayer = cmd.Next();
             string action = cmd.NextAll().Trim();
+			if ("".Equals(searchplayer) || "".Equals(action)) {
+				CdAction.PrintUsage(player);
+				return;
+			}
             Player other = Server.FindPlayerOrPrintMatches(player, searchplayer, SearchOptions.Default);
             if (other == player) {
                 player.Message("Cannot action yourself");
