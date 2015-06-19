@@ -1233,7 +1233,7 @@ namespace fCraft {
             RaisePlayerReadyEvent(this);
 
 			if (Supports(CpeExtension.MessageType)) {
-				Send(Packet.Message((byte)MessageType.Status1, "&f" + ConfigKey.ServerName.GetString()));
+				Send(Packet.Message((byte)MessageType.Status1, ConfigKey.ServerName.GetString()));
 			}
 
             short NID = 1;
@@ -1600,7 +1600,7 @@ namespace fCraft {
             }
 
 			if (this.Supports(CpeExtension.MessageType)) {
-				Send(Packet.Message((byte)MessageType.Status1, Color.White + ConfigKey.ServerName.GetString()));
+				Send(Packet.Message((byte)MessageType.Status1, ConfigKey.ServerName.GetString()));
 			}
 
             Server.UpdateTabList();
