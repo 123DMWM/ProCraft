@@ -597,9 +597,9 @@ namespace fCraft {
             if (message == "/") return RawMessageType.RepeatCommand;
             if (message.Equals("/ok", StringComparison.OrdinalIgnoreCase)) return RawMessageType.Confirmation;
             if (message.EndsWith(" /")) return RawMessageType.PartialMessage;
-            if (message.EndsWith(" \\")) return RawMessageType.PartialMessage2;
-            if (message.EndsWith(" \\\\")) message = message.Substring(0, message.Length - 1);
             if (message.EndsWith(" //")) message = message.Substring(0, message.Length - 1);
+			if (message.EndsWith(@" \")) return RawMessageType.PartialMessageNoSpace;
+			if (message.EndsWith(@" /\")) message = message.Substring(0, message.Length  - 2) + @"\";
 
             switch (message[0])
             {
@@ -1110,7 +1110,7 @@ namespace fCraft {
 		RepeatCommand,
 
 		/// <summary> Partial message (ends with " \"). </summary>
-		PartialMessage2,
+		PartialMessageNoSpace,
     }
 }
 

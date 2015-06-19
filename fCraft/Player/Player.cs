@@ -333,9 +333,13 @@ namespace fCraft {
                             rawMessage = rawMessage.Substring( 1 );
                         }
 
-                        if( rawMessage.EndsWith( "//" ) ) {
+                        if( rawMessage.EndsWith( " //" ) ) {
                             rawMessage = rawMessage.Substring( 0, rawMessage.Length - 1 );
-                        }
+						}
+
+						if (rawMessage.EndsWith(@" /\")) {
+							rawMessage = rawMessage.Substring(0, rawMessage.Length - 2) + @"\";
+						}
 
                         Chat.SendGlobal( this, rawMessage );
                     } break;
@@ -561,7 +565,7 @@ namespace fCraft {
                     Message( "Partial: &F{0}", partialMessage );
 					break;
 
-				case RawMessageType.PartialMessage2:
+				case RawMessageType.PartialMessageNoSpace:
 					partialMessage = rawMessage.Substring(0, rawMessage.Length - 2);
 					Message("Partial: &F{0}", partialMessage);
 					break;
