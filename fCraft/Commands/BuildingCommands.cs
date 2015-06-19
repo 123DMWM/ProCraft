@@ -22,6 +22,9 @@ namespace fCraft {
         internal static void Init() {
             CommandManager.RegisterCommand( CdBind );
             CommandManager.RegisterCommand( CdGrass );
+            CommandManager.RegisterCommand( CdSolid );
+            CommandManager.RegisterCommand( CdLava );
+            CommandManager.RegisterCommand( CdWater );
             CommandManager.RegisterCommand( CdPaint );
             CommandManager.RegisterCommand( CdTree );
             CommandManager.RegisterCommand( CdCancel );
@@ -1451,12 +1454,8 @@ namespace fCraft {
         };
 
         static void PaintHandler( Player player, CommandReader cmd ) {
-            player.IsPainting = !player.IsPainting;
-            if( player.IsPainting ) {
-                player.Message( "Paint mode: &2ON" );
-            } else {
-                player.Message( "Paint mode: &4OFF" );
-            }
+			player.IsPainting = !player.IsPainting;
+			player.Message("&sPaint: " + (player.IsPainting ? "&2On" : "&4Off"));
         }
 
 
@@ -1468,68 +1467,15 @@ namespace fCraft {
             Category = CommandCategory.New | CommandCategory.Building,
             Aliases = new[] { "g" },
             Permissions = new[] { Permission.Build },
-            Usage = "/Grass On/Off",
+            Usage = "/Grass",
             Help = "Toggles the grass placement mode. When enabled, any dirt block you place is replaced with a grass block.",
             Handler = GrassHandler
         };
 
         static void GrassHandler(Player player, CommandReader cmd)
         {
-            if (cmd.HasNext)
-            {
-                string state = cmd.Next();
-                if (state.ToLower() == "on" || state.ToLower() == "yes")
-                {
-                    player.GrassGrowth = true;
-                    player.Message("&sGrass: &2On");
-                    return;
-                }
-                if (state.ToLower() == "off" || state.ToLower() == "no")
-                {
-                    player.GrassGrowth = false;
-                    player.Message("&sGrass: &4Off");
-                    return;
-                }
-                if (state.ToLower() == "state" || state.ToLower() == "what" || state.ToLower() == "current")
-                {
-                    if (player.GrassGrowth == false)
-                    {
-                        player.Message("&sGrass: &4Off");
-                    }
-                    if (player.GrassGrowth == true)
-                    {
-                        player.Message("&sGrass: &2On");
-                    }
-                    return;
-                }
-                else
-                {
-                    if (player.GrassGrowth == true)
-                    {
-                        player.GrassGrowth = false;
-                        player.Message("&sGrass: &4Off");
-                        return;
-                    }
-                    else
-                    {
-                        player.GrassGrowth = true;
-                        player.Message("&sGrass: &2On");
-                        return;
-                    }
-                }
-            }
-            if (player.GrassGrowth == true)
-            {
-                player.GrassGrowth = false;
-                player.Message("&sGrass: &4Off");
-                return;
-            }
-            else
-            {
-                player.GrassGrowth = true;
-                player.Message("&sGrass: &2On");
-                return;
-            }
+			player.GrassGrowth = !player.GrassGrowth;
+			player.Message("&sDirt -> Grass: " + (player.GrassGrowth ? "&2On" : "&4Off"));
         }
 
         static readonly CommandDescriptor CdWater = new CommandDescriptor
@@ -2570,12 +2516,8 @@ namespace fCraft {
         };
 
         static void DoNotMarkHandler( Player player, CommandReader cmd ) {
-            player.DisableClickToMark = !player.DisableClickToMark;
-            if( player.DisableClickToMark ) {
-                player.Message( "Click-to-mark disabled." );
-            } else {
-                player.Message( "Click-to-mark re-enabled." );
-            }
+			player.DisableClickToMark = !player.DisableClickToMark;
+			player.Message("&Click-to-mark: " + (player.DisableClickToMark ? "&2enabled" : "&4disabled"));
         }
 
 
