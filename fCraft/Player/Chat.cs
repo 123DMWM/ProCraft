@@ -60,7 +60,6 @@ namespace fCraft {
         public static bool SendGlobal( [NotNull] Player player, [NotNull] string rawMessage ) {
             if( player == null ) throw new ArgumentNullException( "player" );
             if( rawMessage == null ) throw new ArgumentNullException( "rawMessage" );
-            rawMessage = rawMessage.UppercaseFirst();
             foreach (Filter Swear in Filters) {
                 if (rawMessage.ToLower().Contains(Swear.Word.ToLower())) {
                     rawMessage = rawMessage.ReplaceString(Swear.Word, Swear.Replacement, StringComparison.InvariantCultureIgnoreCase);
