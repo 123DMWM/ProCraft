@@ -1247,7 +1247,7 @@ namespace fCraft {
                     goto retry;
                 }
             }
-            if (Info.skinName == null) {
+            if (Info.skinName == "") {
                 Info.oldskinName = Info.skinName;
                 Info.skinName = Name;
             }

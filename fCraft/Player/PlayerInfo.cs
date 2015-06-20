@@ -386,8 +386,8 @@ namespace fCraft {
         public string Mob = "Humanoid";
         public string oldafkMob = "Humanoid";
         public string afkMob = "Humanoid";
-        public string oldskinName;
-        public string skinName;
+        public string oldskinName = "";
+        public string skinName = "";
         
         public short ReachDistance = 160;
 
