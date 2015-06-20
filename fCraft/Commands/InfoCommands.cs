@@ -2045,9 +2045,10 @@ namespace fCraft {
 				player.Message("Info: Invalid IP range format. Use CIDR notation.");
 				return;
 			}
+			JsonObject result = null;
 			try {
-				var result = JsonObject.Parse((new WebClient()).DownloadString("http://geoip.cf/api/" + ip));
-				if (result.Get("message").Equals("No results found!")) {
+				result = JsonObject.Parse((new WebClient()).DownloadString("http://geoip.cf/api/" + ip));
+				if (result.Get("message") != null) {
 					player.Message("No information found!");
 					return;
 				}
@@ -2077,9 +2078,10 @@ namespace fCraft {
 			if (ip == info.GeoIP && info.Accuracy != 0) {
 				return;
 			}
+			JsonObject result = null;
 			try {
-				var result = JsonObject.Parse((new WebClient()).DownloadString("http://geoip.cf/api/" + ip));
-				if (result.Get("message").Equals("No results found!")) {
+				result = JsonObject.Parse((new WebClient()).DownloadString("http://geoip.cf/api/" + ip));
+				if (result.Get("message") != null) {
 					return;
 				}
 				info.CountryName = result.Get("country") ?? "N/A";
@@ -2096,6 +2098,7 @@ namespace fCraft {
 
 			} catch (Exception ex) {
 				Logger.Log(LogType.Warning, "Could not access GeoIP website (Ex: " + ex + ")");
+				Logger.Log(LogType.Debug, ex.ToString());
 				return;
 			}
 		}
