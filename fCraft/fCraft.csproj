@@ -160,7 +160,6 @@
     <Compile Include="MapConversion\MapFCMv3.cs" />
     <Compile Include="MapConversion\MapMCF.cs" />
     <Compile Include="Network\CpeConstants.cs" />
-    <Compile Include="Network\DBConnect.cs" />
     <Compile Include="Player\Report.cs" />
     <Compile Include="Player\Filter.cs" />
     <Compile Include="Player\Bot.cs" />

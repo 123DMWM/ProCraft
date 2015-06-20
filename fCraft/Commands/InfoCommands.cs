@@ -50,7 +50,6 @@ namespace fCraft {
             CommandManager.RegisterCommand( CdApiID );
             CommandManager.RegisterCommand( Cdtimezone );
             CommandManager.RegisterCommand( CdPlugin );
-            //CommandManager.RegisterCommand( CdPWeather );
 
         }
         #region Debug
@@ -2330,31 +2329,6 @@ namespace fCraft {
 				return DateTime.Now;
 			}
 		}
-		#endregion
-		#region API Player
-
-		static readonly CommandDescriptor CdPWeather = new CommandDescriptor {
-            Name = "playerweather",
-            Aliases = new[] { "pweather", "pw" },
-            Category = CommandCategory.New | CommandCategory.Info,
-            IsConsoleSafe = true,
-            Usage = "/playerweather playername",
-            Help = "Disaplys current weather conditions for specified player if geoip information is applicable.",
-            Handler = PWeatherHandler
-        };
-
-        private static void PWeatherHandler(Player player, CommandReader cmd) {
-            string name = cmd.Next();
-            if (name == null) {
-                name = player.Name;
-            }
-            WebClient webClient = new WebClient();
-            var result = JsonObject.Parse(webClient.DownloadString(String.Format("http://api.openweathermap.org/data/2.5/weather?lat={0}&lon={1}&APPID={2}", player.Info.Latitude, player.Info.Longitude, "Insert Api key here")));
-            string temp;
-            result.TryGetValue("temp", out temp);
-            player.Message("Temp in K: ", temp);
-        }
-
 		#endregion
 		#region Plugins
 		static readonly CommandDescriptor CdPlugin = new CommandDescriptor {
