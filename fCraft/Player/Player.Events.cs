@@ -130,9 +130,9 @@ namespace fCraft {
             var h = Clicking;
             if( h == null ) return false;
             h( null, e );
-            return e.Cancel;
             e.Player.Info.LastWorld = e.Player.World.ClassyName;
-            e.Player.Info.LastWorldPos = e.Player.Position.ToString();
+			e.Player.Info.LastWorldPos = e.Player.Position.ToString();
+			return e.Cancel;
         }
 
 

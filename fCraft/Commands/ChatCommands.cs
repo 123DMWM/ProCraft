@@ -1164,6 +1164,7 @@ namespace fCraft
             Name = "Greet",
             Aliases = new[] { "greeting", "welcome" },
             Permissions = new[] { Permission.Chat },
+			IsConsoleSafe = true,
             Category = CommandCategory.New | CommandCategory.Chat,
             Help = "Sends a message welcoming the last player to join the server.",
             Handler = greetHandler

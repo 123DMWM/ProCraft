@@ -2007,121 +2007,127 @@ namespace fCraft {
         }
 
 
-        static readonly CommandDescriptor CdMirror = new CommandDescriptor {
-            Name = "Mirror",
-            Aliases = new[] { "flip" },
-            Category = CommandCategory.Building,
-            Permissions = new[] { Permission.CopyAndPaste },
-            Help = "Flips copied blocks along specified axis/axes. " +
-                   "The axes are: X = horizontal (east-west), Y = horizontal (north-south), Z = vertical. " +
-                   "You can mirror more than one axis at a time, e.g. &H/Mirror X Y",
-            Usage = "/Mirror [X] [Y] [Z]",
-            Handler = MirrorHandler
-        };
+		static readonly CommandDescriptor CdMirror = new CommandDescriptor {
+			Name = "Mirror",
+			Aliases = new[] { "Flip" },
+			Category = CommandCategory.Building,
+			Permissions = new[] { Permission.CopyAndPaste },
+			Help = "Flips copied blocks along specified axis/axes. " +
+				   "The axes are: X = horizontal (east-west), Y = horizontal (north-south), Z = vertical. " +
+				   "You can mirror more than one axis at a time, e.g. &H/Mirror X Y",
+			Usage = "/Mirror [X] [Y] [Z]",
+			Handler = MirrorHandler
+		};
 
-        static void MirrorHandler( Player player, CommandReader cmd ) {
-            CopyState originalInfo = player.GetCopyState();
-            if( originalInfo == null ) {
-                player.Message( "Nothing to flip! Copy something first." );
-                return;
-            }
 
-            // clone to avoid messing up any paste-in-progress
-            CopyState info = new CopyState( originalInfo );
+		static void MirrorHandler([NotNull] Player player, [NotNull] CommandReader cmd) {
+			CopyState originalInfo = player.GetCopyState();
+			if (originalInfo == null) {
+				player.Message("Nothing to flip! Copy something first.");
+				return;
+			}
 
-            bool flipX = false, flipY = false, flipH = false;
-            string axis;
-            while( (axis = cmd.Next()) != null ) {
-                foreach( char c in axis.ToLower() ) {
-                    if( c == 'x' ) flipX = true;
-                    if( c == 'y' ) flipY = true;
-                    if( c == 'z' ) flipH = true;
-                }
-            }
+			// clone to avoid messing up any paste-in-progress
+			CopyState info = new CopyState(originalInfo);
 
-            if( !flipX && !flipY && !flipH ) {
-                CdMirror.PrintUsage( player );
-                return;
-            }
+			bool flipX = false,
+				 flipY = false,
+				 flipH = false;
+			string axis;
+			while ((axis = cmd.Next()) != null) {
+				foreach (char c in axis.ToLower()) {
+					if (c == 'x')
+						flipX = true;
+					if (c == 'y')
+						flipY = true;
+					if (c == 'z')
+						flipH = true;
+				}
+			}
 
-            Block block;
+			if (!flipX && !flipY && !flipH) {
+				CdMirror.PrintUsage(player);
+				return;
+			}
 
-            if( flipX ) {
-                int left = 0;
-                int right = info.Bounds.Width - 1;
-                while( left < right ) {
-                    for (int y = info.Bounds.Length - 1; y >= 0; y--) {
-                        for (int z = info.Bounds.Height - 1; z >= 0; z--) {
-                            block = info.Blocks[left, y, z];
-                            info.Blocks[left, y, z] = info.Blocks[right, y, z];
-                            info.Blocks[right, y, z] = block;
-                        }
-                    }
-                    left++;
-                    right--;
-                }
-            }
+			Block block;
 
-            if( flipY ) {
-                int left = 0;
-                int right = info.Bounds.Width - 1;
-                while( left < right ) {
-                    for (int x = info.Bounds.Length - 1; x >= 0; x--) {
-                        for (int z = info.Bounds.Height - 1; z >= 0; z--) {
-                            block = info.Blocks[x, left, z];
-                            info.Blocks[x, left, z] = info.Blocks[x, right, z];
-                            info.Blocks[x, right, z] = block;
-                        }
-                    }
-                    left++;
-                    right--;
-                }
-            }
+			if (flipX) {
+				int left = 0;
+				int right = info.Bounds.Width - 1;
+				while (left < right) {
+					for (int y = info.Bounds.Length - 1; y >= 0; y--) {
+						for (int z = info.Bounds.Height - 1; z >= 0; z--) {
+							block = info.Blocks[left, y, z];
+							info.Blocks[left, y, z] = info.Blocks[right, y, z];
+							info.Blocks[right, y, z] = block;
+						}
+					}
+					left++;
+					right--;
+				}
+			}
 
-            if( flipH ) {
-                int left = 0;
-                int right = info.Bounds.Width - 1;
-                while( left < right ) {
-                    for (int x = info.Bounds.Length - 1; x >= 0; x--) {
-                        for (int y = info.Bounds.Height - 1; y >= 0; y--) {
-                            block = info.Blocks[x, y, left];
-                            info.Blocks[x, y, left] = info.Blocks[x, y, right];
-                            info.Blocks[x, y, right] = block;
-                        }
-                    }
-                    left++;
-                    right--;
-                }
-            }
+			if (flipY) {
+				int left = 0;
+				int right = info.Bounds.Length - 1;
+				while (left < right) {
+					for (int x = info.Bounds.Width - 1; x >= 0; x--) {
+						for (int z = info.Bounds.Height - 1; z >= 0; z--) {
+							block = info.Blocks[x, left, z];
+							info.Blocks[x, left, z] = info.Blocks[x, right, z];
+							info.Blocks[x, right, z] = block;
+						}
+					}
+					left++;
+					right--;
+				}
+			}
 
-            if( flipX ) {
-                if( flipY ) {
-                    if( flipH ) {
-                        player.Message( "Flipped copy along all axes." );
-                    } else {
-                        player.Message( "Flipped copy along X (east/west) and Y (north/south) axes." );
-                    }
-                } else {
-                    if( flipH ) {
-                        player.Message( "Flipped copy along X (east/west) and Z (vertical) axes." );
-                    } else {
-                        player.Message( "Flipped copy along X (east/west) axis." );
-                    }
-                }
-            } else {
-                if( flipY ) {
-                    if( flipH ) {
-                        player.Message( "Flipped copy along Y (north/south) and Z (vertical) axes." );
-                    } else {
-                        player.Message( "Flipped copy along Y (north/south) axis." );
-                    }
-                } else {
-                    player.Message( "Flipped copy along Z (vertical) axis." );
-                }
-            }
+			if (flipH) {
+				int left = 0;
+				int right = info.Bounds.Height - 1;
+				while (left < right) {
+					for (int x = info.Bounds.Width - 1; x >= 0; x--) {
+						for (int y = info.Bounds.Length - 1; y >= 0; y--) {
+							block = info.Blocks[x, y, left];
+							info.Blocks[x, y, left] = info.Blocks[x, y, right];
+							info.Blocks[x, y, right] = block;
+						}
+					}
+					left++;
+					right--;
+				}
+			}
 
-            player.SetCopyState( info );
-        }
+			if (flipX) {
+				if (flipY) {
+					if (flipH) {
+						player.Message("Flipped copy along all axes.");
+					} else {
+						player.Message("Flipped copy along X (east/west) and Y (north/south) axes.");
+					}
+				} else {
+					if (flipH) {
+						player.Message("Flipped copy along X (east/west) and Z (vertical) axes.");
+					} else {
+						player.Message("Flipped copy along X (east/west) axis.");
+					}
+				}
+			} else {
+				if (flipY) {
+					if (flipH) {
+						player.Message("Flipped copy along Y (north/south) and Z (vertical) axes.");
+					} else {
+						player.Message("Flipped copy along Y (north/south) axis.");
+					}
+				} else {
+					player.Message("Flipped copy along Z (vertical) axis.");
+				}
+			}
+
+			player.SetCopyState(info);
+		}
 
 
 
