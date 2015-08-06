@@ -36,6 +36,7 @@ namespace fCraft {
                 UpdaterFileName,
                 ConfigFileNameDefault,
                 PlayerDBFileName,
+                PortalDBFileName,
                 IPBanListFileName,
                 RulesFileName,
                 AnnouncementsFileName,
@@ -47,6 +48,7 @@ namespace fCraft {
 
             DataFilesToBackup = new[] {
                 PlayerDBFileName,
+                PortalDBFileName,
                 IPBanListFileName,
                 WorldListFileName,
                 ConfigFileName
@@ -96,7 +98,7 @@ namespace fCraft {
         public static string ConfigFileName { get; set; }
 
 
-        public const string PlayerDBFileName = "PlayerDB.txt";
+		public const string PlayerDBFileName = "PlayerDB.txt";
 
         public const string IPBanListFileName = "ipbans.txt";
 
