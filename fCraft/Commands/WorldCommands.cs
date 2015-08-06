@@ -4173,14 +4173,11 @@ namespace fCraft {
                         "&sSkylight Emulator for world {0}&s: &2ON&s. Sky will now change color to emulate time.",
                         world.ClassyName);
                     foreach (Player p in world.Players.Where(p => p.Supports(CpeExtension.EnvColors))) {
-                        string hex;
-                        if (Server.SkyColorHex.TryGetValue(Server.ColorTime, out hex)) {
-                            p.Send(Packet.MakeEnvSetColor((byte)EnvVariable.SkyColor, hex));
-                        }
-                        if (Server.CloudAndFogColorHex.TryGetValue(Server.ColorTime, out hex)) {
-                            p.Send(Packet.MakeEnvSetColor((byte)EnvVariable.CloudColor, hex));
-                            p.Send(Packet.MakeEnvSetColor((byte)EnvVariable.FogColor, hex));
-                        }
+						DateTime time = InfoCommands.GetTime(p.Info);
+							p.Send(Packet.MakeEnvSetColor((byte)EnvVariable.SkyColor, String.Format("{0:X2}{1:X2}{2:X2}",
+								Server.SkyColorHex[time.TimeOfDay.Hours].R,
+								Server.SkyColorHex[time.TimeOfDay.Hours].G,
+								Server.SkyColorHex[time.TimeOfDay.Hours].B)));
                         p.Message("SkyLight Emulator is now enabled!");
                     }
                 } else {

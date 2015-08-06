@@ -1500,16 +1500,11 @@ namespace fCraft {
                 Send(Packet.SetWeather(World.Weather));
             }
             if (Supports(CpeExtension.EnvColors) && World != null && World.SkyLightEmulator) {
-                string hex;
-                if (Server.SkyColorHex.TryGetValue(Server.ColorTime, out hex)) {
-                    Send(Packet.MakeEnvSetColor((byte)EnvVariable.SkyColor, hex));
-                }
-                if (Server.CloudAndFogColorHex.TryGetValue(Server.ColorTime, out hex)) {
-                    if (World.CloudColor != null)
-                        Send(Packet.MakeEnvSetColor((byte)EnvVariable.CloudColor, hex));
-                    if (World.FogColor != null)
-                        Send(Packet.MakeEnvSetColor((byte)EnvVariable.FogColor, hex));
-                }
+				DateTime time = InfoCommands.GetTime(Info);
+				Send(Packet.MakeEnvSetColor((byte)EnvVariable.SkyColor, String.Format("#{0:X2}{1:X2}{2:X2}",
+					Server.SkyColorHex[time.TimeOfDay.Hours].R,
+					Server.SkyColorHex[time.TimeOfDay.Hours].G,
+					Server.SkyColorHex[time.TimeOfDay.Hours].B)));
             }
             #endregion
             #region HackControls

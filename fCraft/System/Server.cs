@@ -38,137 +38,6 @@ namespace fCraft {
 
         /// <summary> Minecraft.net connection URL. </summary>
         public static Uri Uri { get; internal set; }
-
-        /// <summary> Number for determining color of day. </summary>
-        public static byte ColorTime = 1;
-
-        /// <summary> Number for determining color of day. </summary>
-        public static Dictionary<byte, String> SkyColorHex = new Dictionary<byte, string> {
-            {1,  "000000"},
-            {2,  "000000"},
-            {3,  "000003"},
-            {4,  "000108"},
-            {5,  "000110"},
-            {6,  "000117"},
-            {7,  "01011F"},
-            {8,  "010128"},
-            {9,  "02002E"},
-            {10, "020133"},
-            {11, "03053C"},
-            {12, "070D50"},
-            {13, "0F196A"},
-            {14, "1A2883"},
-            {15, "243694"},
-            {16, "2F4499"},
-            {17, "354F95"},
-            {18, "385693"},
-            {19, "3A5E98"},
-            {20, "3F66A1"},
-            {21, "4670AB"},
-            {22, "4E7AB5"},
-            {23, "5585C1"},
-            {24, "5D90CC"},
-            {25, "649AD6"},
-            {26, "6BA2DF"},
-            {27, "71A8E6"},
-            {28, "75ACEA"},
-            {29, "78AFEC"},
-            {30, "79B0EC"},
-            {31, "79B0EC"},
-            {32, "78AFEC"},
-            {33, "75ACEA"},
-            {34, "71A8E6"},
-            {35, "6BA2DF"},
-            {36, "649AD6"},
-            {37, "5D90CC"},
-            {38, "5585C1"},
-            {39, "4E7AB5"},
-            {40, "4670AB"},
-            {41, "3F66A1"},
-            {42, "3A5E98"},
-            {43, "385693"},
-            {44, "354F95"},
-            {45, "2F4499"},
-            {46, "243694"},
-            {47, "1A2883"},
-            {48, "0F196A"},
-            {49, "070D50"},
-            {50, "03053C"},
-            {51, "020133"},
-            {52, "02002E"},
-            {53, "010128"},
-            {54, "01011F"},
-            {55, "000117"},
-            {56, "000110"},
-            {57, "000108"},
-            {58, "000003"},
-            {59, "000000"},
-            {60, "000000"}
-        };
-
-        /// <summary> Number for determining color of day. </summary>
-        public static Dictionary<byte, String> CloudAndFogColorHex = new Dictionary<byte, string> {
-            {1, "444444"},
-            {2, "444444"},
-            {3, "444444"},
-            {4, "444444"},
-            {5, "444444"},
-            {6, "444444"},
-            {7, "444444"},
-            {8, "444444"},
-            {9, "444444"},
-            {10, "444444"},
-            {11, "515151"},
-            {12, "5D5D5D"},
-            {13, "686868"},
-            {14, "717171"},
-            {15, "797979"},
-            {16, "7F7F7F"},
-            {17, "858585"},
-            {18, "8A8A8A"},
-            {19, "919191"},
-            {20, "999999"},
-            {21, "A2A2A2"},
-            {22, "AEAEAE"},
-            {23, "BBBBBB"},
-            {24, "C8C8C8"},
-            {25, "D5D5D5"},
-            {26, "E0E0E0"},
-            {27, "EAEAEA"},
-            {28, "F1F1F1"},
-            {29, "F5F5F5"},
-            {30, "F7F7F7"},
-            {31, "F7F7F7"},
-            {32, "F5F5F5"},
-            {33, "F1F1F1"},
-            {34, "EAEAEA"},
-            {35, "E0E0E0"},
-            {36, "D5D5D5"},
-            {37, "C8C8C8"},
-            {38, "BBBBBB"},
-            {39, "AEAEAE"},
-            {40, "A2A2A2"},
-            {41, "999999"},
-            {42, "919191"},
-            {43, "8A8A8A"},
-            {44, "858585"},
-            {45, "7F7F7F"},
-            {46, "797979"},
-            {47, "717171"},
-            {48, "686868"},
-            {49, "5D5D5D"},
-            {50, "515151"},
-            {51, "444444"},
-            {52, "444444"},
-            {53, "444444"},
-            {54, "444444"},
-            {55, "444444"},
-            {56, "444444"},
-            {57, "444444"},
-            {58, "444444"},
-            {59, "444444"},
-            {60, "444444"}
-        };
         
 
 
@@ -537,7 +406,7 @@ namespace fCraft {
                 Scheduler.NewTask( ShowRandomAnnouncement ).RunForever( announcementInterval );
                 Scheduler.NewTask( RemoveRandomAnnouncement ).RunForever( announcementInterval, new TimeSpan(0, 0, 5));
             }
-            Scheduler.NewTask(ChangeWorldColors).RunForever(TimeSpan.FromMinutes(1));
+            Scheduler.NewTask(ChangeWorldColors).RunForever(TimeSpan.FromHours(1));
 
             #region LoadTimers
             try
@@ -1574,22 +1443,45 @@ namespace fCraft {
             }
         }
 
+		/// <summary> Number for determining color of day. </summary>
+		public static List<System.Drawing.Color> SkyColorHex = new List<System.Drawing.Color> {
+			System.Drawing.ColorTranslator.FromHtml("#000011".ToUpper()),
+			System.Drawing.ColorTranslator.FromHtml("#000011".ToUpper()),
+			System.Drawing.ColorTranslator.FromHtml("#060729".ToUpper()),
+			System.Drawing.ColorTranslator.FromHtml("#141346".ToUpper()),
+			System.Drawing.ColorTranslator.FromHtml("#282A72".ToUpper()),
+			System.Drawing.ColorTranslator.FromHtml("#5158A6".ToUpper()),
+			System.Drawing.ColorTranslator.FromHtml("#8684C0".ToUpper()),
+			System.Drawing.ColorTranslator.FromHtml("#B5ACDB".ToUpper()),
+			System.Drawing.ColorTranslator.FromHtml("#CCCDEE".ToUpper()),
+			System.Drawing.ColorTranslator.FromHtml("#C0DEF7".ToUpper()),
+			System.Drawing.ColorTranslator.FromHtml("#C1EEFE".ToUpper()),
+			System.Drawing.ColorTranslator.FromHtml("#C7F6FF".ToUpper()),
+			System.Drawing.ColorTranslator.FromHtml("#ABEDFE".ToUpper()),
+			System.Drawing.ColorTranslator.FromHtml("#8FDDF9".ToUpper()),
+			System.Drawing.ColorTranslator.FromHtml("#75C3EF".ToUpper()),
+			System.Drawing.ColorTranslator.FromHtml("#69ABE0".ToUpper()),
+			System.Drawing.ColorTranslator.FromHtml("#8FAECD".ToUpper()),
+			System.Drawing.ColorTranslator.FromHtml("#D5CEAD".ToUpper()),
+			System.Drawing.ColorTranslator.FromHtml("#EFAE71".ToUpper()),
+			System.Drawing.ColorTranslator.FromHtml("#A4383E".ToUpper()),
+			System.Drawing.ColorTranslator.FromHtml("#210633".ToUpper()),
+			System.Drawing.ColorTranslator.FromHtml("#150621".ToUpper()),
+			System.Drawing.ColorTranslator.FromHtml("#14070E".ToUpper()),
+			System.Drawing.ColorTranslator.FromHtml("#0A0105".ToUpper()),
+			System.Drawing.ColorTranslator.FromHtml("#090305".ToUpper())
+        };
+
+
         // Changes day color
         private static void ChangeWorldColors(SchedulerTask task) {
-            string hex;
             foreach (Player sendtome in Players.Where(w => w.Supports(CpeExtension.EnvColors) && w.World != null && w.World.SkyLightEmulator)) {
-                if (SkyColorHex.TryGetValue(ColorTime, out hex)) {
-                    sendtome.Send(Packet.MakeEnvSetColor((byte)EnvVariable.SkyColor, hex));
-                }
-                if (CloudAndFogColorHex.TryGetValue(ColorTime, out hex)) {
-                    sendtome.Send(Packet.MakeEnvSetColor((byte)EnvVariable.CloudColor, hex));
-                    sendtome.Send(Packet.MakeEnvSetColor((byte)EnvVariable.FogColor, hex));
-                }
-            }
-            if (ColorTime >= 60) {
-                ColorTime = 1;
-            } else {
-                ColorTime++;
+				DateTime time = InfoCommands.GetTime(sendtome.Info);
+				//sendtome.Send(Packet.MakeEnvSetColor((byte)EnvVariable.SkyColor, SkyColorHex[(time.Hour * 60) + time.Minute].ToArgb()));
+				sendtome.Send(Packet.MakeEnvSetColor((byte)EnvVariable.SkyColor, String.Format("{0:X2}{1:X2}{2:X2}",
+					SkyColorHex[time.TimeOfDay.Hours].R,
+					SkyColorHex[time.TimeOfDay.Hours].G,
+					SkyColorHex[time.TimeOfDay.Hours].B)));
             }
         }
 
