@@ -1175,20 +1175,19 @@ namespace fCraft
                 player.Info.getLeftOverTime(5, cmd);
                 return;
             }
-            var all = Server.Players.Where(p => !p.Info.IsHidden).OrderBy(p => p.Info.TimeSinceLastLogin.ToMilliSeconds());
-            Player last = all.First();
-
-            if (last == player) {
-                player.Message("You were the last player to join silly");
-                return;
-            }
-            if (all.Any()) {
+			var all = Server.Players.Where(p => !p.Info.IsHidden).OrderBy(p => p.Info.TimeSinceLastLogin.ToMilliSeconds());
+			if (all.Any() && all != null) {
+				Player last = all.First();
+				if (last == player) {
+					player.Message("You were the last player to join silly");
+					return;
+				}
 				string message = "Welcome to " + Color.StripColors(ConfigKey.ServerName.GetString()) + ", " + last.Name + "!";
-                player.ParseMessage(message, false);
-                player.Info.LastServerMessageDate = DateTime.Now;
-            } else {
-                player.Message("Error: No one else on!");
-            }
+				player.ParseMessage(message, false);
+				player.Info.LastServerMessageDate = DateTime.Now;
+			} else {
+				player.Message("Error: No one else on!");
+			}
         }
 
         #endregion

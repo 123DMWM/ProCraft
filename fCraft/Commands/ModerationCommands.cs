@@ -462,6 +462,10 @@ namespace fCraft {
 			String cmdchat = cmd.Next();
 			String option = cmd.Next();
 			String helper = cmd.Next();
+			if (cmdchat == null) {
+				player.Message(CdBot.Help);
+				return;
+			}
 			if (option != null)
 				option = option.ToLower();
 			if (cmdchat != "<CalledFromChat>") {

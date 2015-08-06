@@ -1744,12 +1744,17 @@ namespace fCraft {
 
         static void textureHandler(Player player, CommandReader cmd)
         {
-            player.Message("If you havn't already noticed we have our own texture pack\n" + 
-                           "but we are only allowed to force the terrain onto you.");
-            player.Message("So if you want the full experience that this HD Default 64x pack has to offer...");
-            player.Message("(Including beautiful Gui and Font)");
-            player.Message("ClassiCube texturepacks: http://123dmwm.tk/texturepacks/");
-            player.Message( "Made and converted by 123DMWM^" );
+			if (player.World != null && !"".Equals(player.World.Texture)) {
+				if (player.World.Texture.StartsWithIgnoreCase("http://123dmwm.tk/terrain/64xDefault")) {
+					player.Message("This world uses 123DontMessWitMe's custom texture pack");
+				} else {
+					player.Message("This world uses a custom texture pack");
+				}
+				player.Message("A preview can be found here: ");
+				player.Message("  " + player.World.Texture);
+			} else {
+				player.Message("You are not in a world with a custom texturepack.");
+			}
         }
 
         #endregion
