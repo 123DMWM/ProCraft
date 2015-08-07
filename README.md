@@ -1,3 +1,6 @@
-This is my custom classic minecraft server forked from an old fCraft repo which I have updated as much as I could. It has and will always have all the latest [CPE](http://wiki.vg/CPE) functions. I highly suggest you only use this repo to take code from because the server is mainly suited to my needs and has a few difficulties I would rather not take the time to simplify.
+This is a custom server based on [fCraft](https://github.com/fragmer/fCraft) but with tons of extra features and complete [CPE](http://wiki.vg/CPE) support unlike other servers with partial support.
 
-Download compiled server(last warning: I suggest you do not use this software) [**`HERE`**](http://123dmwm.tk/Random/ProCraft.zip) - (Always up to date with latest WORKING code - Latest: July 16, 2015)
+I suggest you **do not** use this server unless you know what you are doing. There are still lots to do and some hardcoded-ish stuff that needs to be removed.
+
+First time download: [**`Download`**](http://123dmwm.tk/ProCraft/ProCraft-1stSetup.zip)
+Drag&Drop Update files: [**`Download`**](http://123dmwm.tk/ProCraft/ProCraft-Updates.zip) - Both are always up to date with latest WORKING code - Latest: August 6, 2015
