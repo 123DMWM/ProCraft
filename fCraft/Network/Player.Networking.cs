@@ -1336,6 +1336,12 @@ namespace fCraft {
                     "Use Player.JoinWorld instead.");
             }*/
 
+
+			if (!StandingInPortal) {
+				LastWorld = World;
+				LastPosition = Position;
+			}
+
             string textLine1 = ConfigKey.ServerName.GetString();
             string textLine2;
 
@@ -1386,8 +1392,8 @@ namespace fCraft {
             {
                 map = newWorld.LoadMap();
             }
-            World = newWorld;
 
+            World = newWorld;
             // Set spawn point
             if (doUseWorldSpawn)
             {

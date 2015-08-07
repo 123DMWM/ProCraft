@@ -54,6 +54,7 @@ namespace fCraft {
             CommandManager.RegisterCommand( CdMaxCaps );
             CommandManager.RegisterCommand( CdHackControl );
             CommandManager.RegisterCommand( CdChangeSkin );
+            CommandManager.RegisterCommand( CdBack );
 
         }
         #region Calculator
@@ -1802,7 +1803,11 @@ namespace fCraft {
                         zoneZ = zoneZ + 1;
                         goto retry;
                     }
-                    Position zPos = new Position((zoneX)*32 + 16, (zoneY)*32 + 16, (zoneZ)*32 + 64);
+					Position zPos = new Position((zoneX) * 32 + 16, (zoneY) * 32 + 16, (zoneZ) * 32 + 64);
+					if (player.World != null) {
+						player.LastWorld = player.World;
+						player.LastPosition = player.Position;
+					}
                     player.TeleportTo((zPos));
                     player.Message("&sTeleporting you to zone " + zone.ClassyName);
                     return;
@@ -1825,6 +1830,10 @@ namespace fCraft {
                     goto retry;
                 }
 
+				if (player.World != null) {
+					player.LastWorld = player.World;
+					player.LastPosition = player.Position;
+				}
                 player.TeleportTo(new Position {
                     X = (short) (x*32 + 16),
                     Y = (short) (y*32 + 16),
@@ -1857,7 +1866,11 @@ namespace fCraft {
                     if (x <= -1024 || x >= 1024 || y <= -1024 || y >= 1024 || z <= -1024 || z >= 1024) {
                         player.Message("Coordinates are outside the valid range!");
 
-                    } else {
+					} else {
+						if (player.World != null) {
+							player.LastWorld = player.World;
+							player.LastPosition = player.Position;
+						}
                         player.TeleportTo(new Position {
                             X = (short) (x*32 + 16),
                             Y = (short) (y*32 + 16),
@@ -1891,7 +1904,11 @@ namespace fCraft {
                         return;
                     }
 
-                    if (targetWorld == player.World) {
+					if (targetWorld == player.World) {
+						if (player.World != null) {
+							player.LastWorld = player.World;
+							player.LastPosition = player.Position;
+						}
                         player.TeleportTo(target.Position);
 
                     } else {
@@ -2011,8 +2028,11 @@ namespace fCraft {
                         player.Message("Coordinates are outside the valid range!");
 
                     }
-                    else
-                    {
+                    else {
+						if (player.World != null) {
+							player.LastWorld = player.World;
+							player.LastPosition = player.Position;
+						}
                         player.TeleportTo(new Position
                         {
                             X = (short)x,
@@ -2282,7 +2302,12 @@ namespace fCraft {
             }
 
             if( target.World == world ) {
-                // teleport within the same world
+				// teleport within the same world
+
+				if (target.World != null) {
+					target.LastWorld = target.World;
+					target.LastPosition = target.Position;
+				}
                 target.TeleportTo( toPlayer.Position );
 
             } else {
@@ -2357,7 +2382,12 @@ namespace fCraft {
 
             if( world == target.World ) {
                 player.Message( "{0}&S is already in world {1}&S. They were brought to spawn.",
-                                target.ClassyName, world.ClassyName );
+								target.ClassyName, world.ClassyName);
+
+				if (target.World != null) {
+					target.LastWorld = target.World;
+					target.LastPosition = target.Position;
+				}
                 target.TeleportTo( target.WorldMap.Spawn );
                 return;
             }
@@ -2488,7 +2518,11 @@ namespace fCraft {
             foreach( Player targetPlayer in targetPlayers.CanBeSeen( player )
                                                          .RankedAtMost( bringLimit ) ) {
                 if( targetPlayer.World == player.World ) {
-                    // teleport within the same world
+					// teleport within the same world
+					if (targetPlayer.World != null) {
+						targetPlayer.LastWorld = targetPlayer.World;
+						targetPlayer.LastPosition = targetPlayer.Position;
+					}
                     targetPlayer.TeleportTo( player.Position );
                     targetPlayer.Position = player.Position;
                     if( targetPlayer.Info.IsFrozen ) {
@@ -2586,6 +2620,10 @@ namespace fCraft {
                 return;
             }
 
+			if (player.World != null) {
+				player.LastWorld = player.World;
+				player.LastPosition = player.Position;
+			}
             player.TeleportTo( target.Position );
             player.Message( "Patrol: Teleporting to {0}", target.ClassyName );
         }
@@ -2927,7 +2965,32 @@ namespace fCraft {
             }
             else { player.Message(CdHackControl.Usage); }
         }
-        #endregion
+		#endregion
+		#region Back
+
+		static readonly CommandDescriptor CdBack = new CommandDescriptor {
+			Name = "Back",
+			Category = CommandCategory.New | CommandCategory.Moderation,
+			Permissions = new[] { Permission.Teleport },
+			Usage = "/Back",
+			Help = "Teleports you to the last place you were before teleporting.",
+			Handler = BackHandler
+		};
+
+		private static void BackHandler(Player player, CommandReader cmd) {
+			if (player.LastPosition == null || player.LastWorld == null) {
+				player.Message("Unknown last location!");
+				return;
+			}
+			if (player.LastWorld != player.World) {
+				player.JoinWorld(player.LastWorld, WorldChangeReason.ManualJoin, player.LastPosition);
+			} else {
+				player.TeleportTo(player.LastPosition);
+				player.Message("Teleported to last location!");
+			}
+		}
+
+		#endregion
         #region tempfreeze
 
         // freeze target if player is allowed to do so

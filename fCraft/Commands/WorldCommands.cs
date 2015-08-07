@@ -1374,6 +1374,10 @@ namespace fCraft {
 
         static void SpawnHandler( Player player, CommandReader cmd ) {
             if( player.World == null ) PlayerOpException.ThrowNoWorld( player );
+			if (player.World != null) {
+				player.LastWorld = player.World;
+				player.LastPosition = player.Position;
+			}
             player.TeleportTo( player.World.LoadMap().Spawn );
         }
 
@@ -1402,7 +1406,11 @@ namespace fCraft {
             {
                 player.Message("&sProbably bad timing, but your suicide note can't be {0} characters long. Max is 64.", note.Length);
                 return;
-            }
+			}
+			if (player.World != null) {
+				player.LastWorld = player.World;
+				player.LastPosition = player.Position;
+			}
             if (note == "")
             {
                 Server.Message("&s{0}&s took the easy way out", player.ClassyName);
@@ -1414,7 +1422,7 @@ namespace fCraft {
             {
                 Server.Message("&s{0}&s took the easy way out and left a note", player.ClassyName);
                 Server.Message("&s[&fNote&s] {0}", note);
-                player.TeleportTo(player.World.LoadMap().Spawn);
+				player.TeleportTo(player.World.LoadMap().Spawn);
                 player.Info.LastServerMessageDate = DateTime.Now;
                 return;
             }

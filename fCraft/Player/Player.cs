@@ -173,7 +173,12 @@ namespace fCraft {
         }
 
         /// <summary> Player's position in the current world. </summary>
-        public Position Position;
+		public Position Position;
+
+		/// <summary> Player's last position before a teleport. </summary>
+		public Position LastPosition;
+		/// <summary> Last world player was on before teleport. </summary>
+		public World LastWorld;
 
         /// <summary> Player's position in the current world. </summary>
         public Position lastSolidPos { get; set; }
