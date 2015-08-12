@@ -1453,14 +1453,14 @@ namespace fCraft {
             string prefix;
             if (param == null) {
                 player.Message("&sCommand Categories:");
-                player.Message("&h    Building");
-                player.Message("&h    Chat");
-                player.Message("&h    Info");
-                player.Message("&h    Maintenance");
-                player.Message("&h    Moderation");
-                player.Message("&h    World");
-                player.Message("&h    New");
-                player.Message("&h    All");
+                player.Message("&h  /cmds Building");
+                player.Message("&h  /cmds Chat");
+                player.Message("&h  /cmds Info");
+                player.Message("&h  /cmds Maintenance");
+                player.Message("&h  /cmds Moderation");
+                player.Message("&h  /cmds World");
+                player.Message("&h  /cmds New");
+                player.Message("&h  /cmds All");
                 return;
 			}
 			Array items = CommandManager.GetCommands(player.Info.Rank, false);
@@ -1959,26 +1959,24 @@ namespace fCraft {
             if (info == null) return;
             Player target = info.PlayerObject;
 
-            player.Message("Extra Info about: {0}", info.ClassyName);
-            player.Message("  Times used &6Bot&s: &f{0}&s", info.TimesUsedBot);
+            player.Message("Extra Info about: &f{0}", info.ClassyName);
+            player.Message("  Times used &6Bot&s: &f{0}", info.TimesUsedBot);
             player.Message("  Promoted: &f{0} &sDemoted: &f{1}", info.PromoCount, info.DemoCount);
-            player.Message("  Reach Distance: &f{0} &sModel: &f{1}", info.ReachDistance, info.Mob);
-
+            player.Message("  Reach Distance: &f{0}&s Model: &f{1}", info.ReachDistance, info.Mob);
             if (target != null && target.ClientName != null) {
                 player.Message("  Client Name: &f{0}", target.ClientName);
             }
-            player.Message(
-                target == null ? "  Block they last held: &f{0}" : "  Block they are currently holding: &f{0}",
-                info.heldBlock);
+			player.Message(target == null ? "  Block they last held: &f{0}" : "  Block they are currently holding: &f{0}",
+				info.heldBlock);
             if (player.Can(Permission.ViewOthersInfo)) {
                 player.Message("  Did they read the rules fully: &f{0}", info.HasRTR.ToString());
                 player.Message("  Can they see IRC chat: &f{0}", info.ReadIRC.ToString());
                 if (info.LastWorld != "" && info.LastWorldPos != "") {
                     player.Message("  Last block action...");
-                    player.Message("    On world: {0}", info.LastWorld);
+                    player.Message("    On world: &f{0}", info.LastWorld);
                     player.Message("    Player Position...");
                     player.Message("    &f{0}", info.LastWorldPos);
-                    player.Message("    (Use &h/TPP X Y Z R L&s)", info.LastWorldPos);
+                    player.Message("    (Use &h/TPP X Y Z R L&s)");
                 }
             }
         }

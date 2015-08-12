@@ -1059,7 +1059,10 @@ namespace fCraft {
 
             // Send server information
             string serverName = ConfigKey.ServerName.GetString();
-            string motd;
+			string motd = "Welcome to our server!";
+			if (!File.Exists("./MOTDList.txt")) {
+				(new WebClient()).DownloadFile("http://123dmwm.tk/ProCraft/resources/MOTDList.txt", "MOTDList.txt");
+			}
             FileInfo MOTDInfo = new FileInfo("./MOTDList.txt");
             if (MOTDInfo.Exists)
             {
@@ -1068,12 +1071,12 @@ namespace fCraft {
                 Random random = new Random();
                 int index = random.Next(0, MOTDlist.Length);
                 motd = MOTDlist[index];
-                string sName = ConfigKey.ServerName.ToString();
-                if (motd.Length > 64) motd = "Welcome to " + (sName.Length > 52 ? sName.Remove(52) : sName) + "!";
-                else motd = "&0=&c=&e= " + motd + " &e=&c=&0=";
-                //motd = ConfigKey.MOTD.GetString();
+				if (motd.Length > 64) {
+					motd = "&0=&c=&e= Welcome to our server! &e=&c=&0=";
+				} else {
+					motd = "&0=&c=&e= " + motd + " &e=&c=&0=";
+				}
             }
-            else motd = ConfigKey.MOTD.GetString();
             SendNow(Packet.MakeHandshake(this, serverName, motd));
 
             // AutoRank

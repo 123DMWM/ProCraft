@@ -1193,11 +1193,6 @@ namespace fCraft {
                         type = Block.DoubleSlab;
 
                     }
-                    /*if (type == Block.Fire && coord.Z > 0 && map.GetBlock(coordBelow) == Block.TNT && Can(Permission.Draw)) {
-                        RevertBlockNow(coord);
-                        coord = coordBelow;
-                        Explode(coord);
-                    }*/
                     if (type == Block.CobbleSlab && coord.Z > 0 && map.GetBlock(coordBelow) == Block.CobbleSlab)
                     {
                         // Handle cobble stacking
@@ -1374,15 +1369,6 @@ namespace fCraft {
         /// Used to undo player's attempted block placement/deletion. </summary>
         public void RevertBlock( Vector3I coords ) {
             SendLowPriority( Packet.MakeSetBlock( coords, WorldMap.GetBlock( coords ) ) );
-        }
-
-        public void Explode(Vector3I coord) {
-            var op = new SphereDrawOperation(this);
-            op.Brush = new NormalBrush(new Block[] {Block.Air});
-            op.Prepare(new Vector3I[] {coord, new Vector3I(coord.X, coord.Y, (coord.Z + 2))});
-            op.AnnounceCompletion = false;
-            op.Context = BlockChangeContext.Exploded;
-            op.Begin();
         }
 
 

@@ -1261,15 +1261,7 @@ namespace fCraft
             string message = String.Format("{0}&SPlayer {1}&S left the server ({2})",
                                             BoldCode,
                                             player.ClassyName,
-                                            leaveReason);
-
-            if (player.usedquit == true)
-            {
-                message = String.Format("{0}&SPlayer {1}&S left the server ({2})",
-                                               BoldCode,
-                                               player.ClassyName,
-                                               player.quitmessage);
-            }
+                                            (player.usedquit ? player.quitmessage : leaveReason.ToString()));
             SendChannelMessage(message);
         }
 
