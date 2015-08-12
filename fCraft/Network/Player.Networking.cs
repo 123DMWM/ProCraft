@@ -1074,6 +1074,7 @@ namespace fCraft {
 				if (motd.Length > 64) {
 					motd = "&0=&c=&e= Welcome to our server! &e=&c=&0=";
 				} else {
+					Info.LastMotdMessage = motd;
 					motd = "&0=&c=&e= " + motd + " &e=&c=&0=";
 				}
             }

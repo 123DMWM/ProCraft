@@ -1968,6 +1968,9 @@ namespace fCraft {
             }
 			player.Message(target == null ? "  Block they last held: &f{0}" : "  Block they are currently holding: &f{0}",
 				info.heldBlock);
+			if (info.LastMotdMessage != null) {
+				player.Message("  Latest motd message: &f{0}", info.LastMotdMessage);
+			}
             if (player.Can(Permission.ViewOthersInfo)) {
                 player.Message("  Did they read the rules fully: &f{0}", info.HasRTR.ToString());
                 player.Message("  Can they see IRC chat: &f{0}", info.ReadIRC.ToString());

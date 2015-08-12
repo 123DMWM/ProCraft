@@ -95,6 +95,7 @@ namespace fCraft {
         public int PromoCount;
         public int DemoCount;
         public int TimesUsedBot;
+		public string LastMotdMessage;
         //dummy
 
         /// <summary> Reason for leaving the server last time. </summary>
