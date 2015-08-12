@@ -1060,9 +1060,6 @@ namespace fCraft {
             // Send server information
             string serverName = ConfigKey.ServerName.GetString();
 			string motd = "Welcome to our server!";
-			if (!File.Exists("./MOTDList.txt")) {
-				(new WebClient()).DownloadFile("http://123dmwm.tk/ProCraft/resources/MOTDList.txt", "MOTDList.txt");
-			}
             FileInfo MOTDInfo = new FileInfo("./MOTDList.txt");
             if (MOTDInfo.Exists)
             {

@@ -617,7 +617,7 @@ namespace fCraft {
 
             #endregion
 
-            #region BotFiles
+            #region ResourceDownloads
 
             if (!Directory.Exists("./Bot")) {
                 Directory.CreateDirectory("./Bot");
@@ -636,7 +636,19 @@ namespace fCraft {
             }
 			if (!File.Exists("Bot/Nouns.txt")) {
 				(new WebClient()).DownloadFile("http://123dmwm.tk/ProCraft/resources/Nouns.txt", "Bot/Nouns.txt");
-            }
+			}
+
+			if (!File.Exists("./MOTDList.txt")) {
+				(new WebClient()).DownloadFile("http://123dmwm.tk/ProCraft/resources/MOTDList.txt", "MOTDList.txt");
+			}
+
+			if (!Directory.Exists("./fonts")) {
+				Directory.CreateDirectory("./fonts");
+				(new WebClient()).DownloadFile("http://123dmwm.tk/ProCraft/resources/comicsans.ttf", "fonts/comicsans.ttf");
+				(new WebClient()).DownloadFile("http://123dmwm.tk/ProCraft/resources/mcclassic.ttf", "fonts/mcclassic.ttf");
+				(new WebClient()).DownloadFile("http://123dmwm.tk/ProCraft/resources/microsoft.ttf", "fonts/microsoft.ttf");
+				(new WebClient()).DownloadFile("http://123dmwm.tk/ProCraft/resources/minecraft.ttf", "fonts/minecraft.ttf");
+			}
 
             #endregion
 
