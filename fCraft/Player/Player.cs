@@ -1207,24 +1207,10 @@ namespace fCraft {
                     }
                     if (map.GetBlock(coordBelow) == Block.Grass
                         && action == ClickAction.Build
-                        && type != Block.Sapling
-                        && type != Block.Leaves
-                        && type != Block.Glass
-                        && type != Block.YellowFlower
-                        && type != Block.RedFlower
-                        && type != Block.RedMushroom
-                        && type != Block.BrownMushroom
-                        && type != Block.Rope
-                        && type != Block.Fire
-                        && type != Block.Ice)
+                        && (type == Block.Grass || type == Block.Dirt))
                     {
-                        // Grass -> Dirt function
-                        blockUpdate = new BlockUpdate(this, coordBelow, Block.Dirt);
-                        Info.ProcessBlockPlaced((byte)Block.Dirt);
-                        map.QueueUpdate(blockUpdate);
-                        RevertBlockNow(coordBelow);
-                        RaisePlayerPlacedBlockEvent(this, World.Map, coordBelow, Block.Grass, Block.Dirt, BlockChangeContext.Replaced);
-                        SendNow(Packet.MakeSetBlock(coordBelow, Block.Dirt));
+						// Grass/Dirt on Grass -> Dirt function
+						PlaceBlock(coordBelow, ClickAction.Build, Block.Dirt);
                     }
                     // handle normal blocks
                     blockUpdate = new BlockUpdate(this, coord, type);
