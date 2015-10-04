@@ -176,6 +176,12 @@ namespace fCraft {
 
         /// <summary> Ability to shut down or restart the server remotely.
         /// Useful for servers that run on dedicated machines. </summary>
-        ShutdownServer
+        ShutdownServer,
+
+        /// <summary> Ability to change own name capitalizations</summary>
+        ChangeNameCaps,
+
+        /// <summary> Ability to change own name color</summary>
+        ChangeNameColor
     }
 }

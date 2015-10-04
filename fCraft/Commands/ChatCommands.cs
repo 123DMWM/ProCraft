@@ -46,6 +46,7 @@ namespace fCraft
             CommandManager.RegisterCommand(CdIdea);
             CommandManager.RegisterCommand(CdAction);
             CommandManager.RegisterCommand(CdWarn);
+            CommandManager.RegisterCommand(CdCapColor);
 
 
             Player.Moved += new EventHandler<Events.PlayerMovedEventArgs>(Player_IsBack);
@@ -1428,6 +1429,78 @@ namespace fCraft
             }
         }
 
+        #endregion
+
+        #region CapColor
+        static readonly CommandDescriptor CdCapColor = new CommandDescriptor
+        {
+            Name = "CapColor",
+            Aliases = new[] { "capcol", "cc" },
+            Category = CommandCategory.New | CommandCategory.Chat,
+            Permissions = new[] { Permission.ChangeNameCaps },
+            Help = "Quick changes your displayed name capitalization or color.",
+            Usage = "/CapColor <NewName>",
+            Handler = CapColHandler
+        };
+
+        static void CapColHandler(Player player, CommandReader cmd)
+        {
+            string targetName = player.Name;
+            string valName = cmd.NextAll();
+
+            PlayerInfo info = player.Info;
+            if (info == null) return;
+
+            //Quickchanges nickname.
+            string oldDisplayedName = info.DisplayedName;
+            if (valName.Length == 0) valName = null;
+            if (valName == null)
+            {
+                valName = info.Name;
+            }
+            if (valName == info.DisplayedName)
+            {
+                player.Message("CapColor: Your DisplayedName is already set to \"{1}&S\"",
+                                    info.Name,
+                                    valName);
+                return;
+            }
+            if (valName != null && Color.StripColors(Chat.ReplacePercentColorCodes(valName, false)).ToLower() != info.Name.ToLower())
+            {
+                player.Message("CapColor: You may not change your name to something else");
+                return;
+            }
+            if (!player.Can(Permission.ChangeNameColor))
+            {
+                valName = Color.StripColors(Chat.ReplacePercentColorCodes(valName, false));
+            }
+            if (cmd.IsConfirmed)
+            {
+                info.DisplayedName = valName;
+
+                if (oldDisplayedName == null)
+                {
+                    player.Message("CapColor: Your DisplayedName was set to \"{1}&S\"",
+                                    info.Name,
+                                    valName);
+                }
+                else if (valName == info.DisplayedName)
+                {
+                    player.Message("CapColor: Your DisplayedName was reset (was \"{1}&S\")",
+                                    info.Name,
+                                    oldDisplayedName);
+                }
+                else
+                {
+                    player.Message("CapColor: Your DisplayedName was changed from \"{1}&S\" to \"{2}&S\"",
+                                    info.Name,
+                                    oldDisplayedName,
+                                    valName);
+                }
+                return;
+            }
+            player.Confirm(cmd, "This will change your displayed name to " + valName);
+        }
         #endregion
     }
 }
