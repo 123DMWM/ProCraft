@@ -325,7 +325,7 @@ namespace fCraft {
             Aliases = new[] { "ChageSkin", "chs" },
             Category = CommandCategory.New | CommandCategory.Moderation,
             Permissions = new[] { Permission.EditPlayerDB },
-            Usage = "/Model [Player] [SkinName]",
+            Usage = "/Skin [Player] [SkinName]",
             IsConsoleSafe = true,
             Help = "Change the Skin of [Player]!",
             Handler = SkinHandler
@@ -338,7 +338,7 @@ namespace fCraft {
             }
             string namePart = cmd.Next();
             if (!cmd.HasNext) {
-                CdChangeModel.PrintUsage(player);
+                CdChangeSkin.PrintUsage(player);
                 return;
             }
             string skinString = cmd.Next();
@@ -350,11 +350,9 @@ namespace fCraft {
                     skinString = String.Format("http://i.imgur.com/{0}.png", skinString.Replace("++", ""));
                 }
             }
-            PlayerInfo p = PlayerDB.FindPlayerInfoOrPrintMatches(player, namePart, SearchOptions.IncludeSelf);
-            if (p == null || !p.IsOnline) {
-                player.Message("Player not found or offline!");
-                return;
-            }
+            PlayerInfo p = InfoCommands.FindPlayerInfo(player, cmd, namePart);
+            if (p == null)  return;
+
             if (p.skinName == skinString) {
                 player.Message("&f{0}&s's skin is already set to &f{1}", p.Name, skinString);
                 return;
