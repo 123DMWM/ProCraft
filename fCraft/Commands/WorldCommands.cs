@@ -1648,7 +1648,7 @@ namespace fCraft {
                         return;
                     }
 
-                    string skinString1 = cmd.Next();
+                    string skinString1 = (cmd.Next() ?? botName);
                     if (skinString1 != null) {
                         if (skinString1.StartsWith("--")) {
                             skinString1 = String.Format("http://s3.amazonaws.com/MinecraftSkins/{0}.png", skinString1.Replace("--", ""));
