@@ -1436,94 +1436,67 @@ namespace fCraft {
             Name = "ReachDistance",
             Aliases = new[] { "Reach", "rd" },
             Permissions = new[] { Permission.EditPlayerDB },
+            IsConsoleSafe = true,
             Category = CommandCategory.New | CommandCategory.World,
             Help = "Changes player reach distance. Every 32 is one block. Default: 160",
             Usage = "/reach [Player] [distance or reset]",
             Handler = ClickDistanceHandler
         };
 
-        static void ClickDistanceHandler(Player player, CommandReader cmd)
-        {
+        static void ClickDistanceHandler(Player player, CommandReader cmd) {
             short distance;
             string first = cmd.Next();
             string second = cmd.Next();
-            if (first == null)
-            {
+            if (first == null) {
                 player.Message(Cdclickdistance.Usage);
                 return;
             }
             PlayerInfo p = PlayerDB.FindPlayerInfoOrPrintMatches(player, first, SearchOptions.IncludeHidden);
-            if (p == null)
-            {
+            if (p == null) {
                 return;
-            }
-            else
-            {
-                if (!short.TryParse(second, out distance))
-                {
-                    if (second != "reset")
-                    {
+            } else {
+                if (!short.TryParse(second, out distance)) {
+                    if (second != "reset") {
                         player.Message("Please try something inbetween 0 and 32767");
                         return;
-                    }
-                    else
-                    {
+                    } else {
                         distance = 160;
                     }
                 }
             }
-            if (distance >= 32767 && distance <= 0)
-            {
+            if (distance >= 32767 && distance <= 0) {
                 player.Message("Please try something inbetween 0 and 32767");
                 return;
-                
+
             }
-            if (distance != p.ReachDistance)
-            {
-                if (p != player.Info)
-                {
-                    if (p.IsOnline == true)
-                    {
-                        if (p.PlayerObject.Supports(CpeExtension.ClickDistance))
-                        {
-                            p.PlayerObject.Message("{0} set your reach distance from {0} to {1} blocks [Units: {2}]", player.Name, p.ReachDistance / 32, distance / 32, distance);
+            if (distance != p.ReachDistance) {
+                if (p != player.Info) {
+                    if (p.IsOnline == true) {
+                        if (p.PlayerObject.Supports(CpeExtension.ClickDistance)) {
+                            p.PlayerObject.Message("{0} set your reach distance from {1} to {2} blocks [Units: {3}]", player.Name, p.ReachDistance / 32, distance / 32, distance);
                             player.Message("Set reach distance for {0} from {1} to {2} blocks [Units: {3}]", p.Name, p.ReachDistance / 32, distance / 32, distance);
                             p.ReachDistance = distance;
                             p.PlayerObject.Send(Packet.MakeSetClickDistance(distance));
-                        }
-                        else
-                        {
+                        } else {
                             player.Message("This player does not support ReachDistance packet");
                         }
-                    }
-                    else
-                    {
+                    } else {
                         player.Message("Set reach distance for {0} from {1} to {2} blocks [Units: {3}]", p.Name, p.ReachDistance / 32, distance / 32, distance);
                         p.ReachDistance = distance;
                     }
-                }
-                else
-                {
-                    if (player.Supports(CpeExtension.ClickDistance))
-                    {
+                } else {
+                    if (player.Supports(CpeExtension.ClickDistance)) {
                         player.Message("Set own reach distance from {0} to {1} blocks [Units: {2}]", player.Info.ReachDistance / 32, distance / 32, distance);
                         player.Info.ReachDistance = distance;
                         player.Send(Packet.MakeSetClickDistance(distance));
-                    }
-                    else
-                    {
+                    } else {
                         player.Message("You don't support ReachDistance packet");
                     }
                 }
-            }
-            else
-            {
-                if (p != player.Info)
-                {
+            } else {
+                if (p != player.Info) {
                     player.Message("{0}'s reach distance is already set to {1}", p.ClassyName, p.ReachDistance);
-                }
-                else
-                {
+                } else {
                     player.Message("Your reach distance is already set to {0}", p.ReachDistance);
                 }
                 return;
