@@ -79,11 +79,6 @@ overwhelming the Internet connection with data.",
 This config key is added in case alternative login/heartbeat services arise.")]
         HeartbeatUrl,
 
-        [StringKey(ConfigSection.General, "https://minecraft.net/heartbeat.jsp",
-            @"URL to send heartbeats to and kick the player if they join this one. Default is minecraft.net.
-This config key is added in case alternative login/heartbeat services arise.")]
-        KickHeartbeatUrl,
-
         #endregion
 
 

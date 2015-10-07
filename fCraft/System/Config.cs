@@ -595,10 +595,6 @@ namespace fCraft {
                     Heartbeat.HeartbeatServerUrl = new Uri(key.GetString());
                     break;
 
-                case ConfigKey.KickHeartbeatUrl:
-                    Heartbeat.KickHeartbeatServerUrl = new Uri(key.GetString());
-                    break;
-
                 case ConfigKey.HelpColor:
                     Color.Help = Color.Parse( key.GetString() );
                     break;
