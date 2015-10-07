@@ -2826,7 +2826,7 @@ namespace fCraft {
         static readonly CommandDescriptor CdHackControl = new CommandDescriptor
         {
             Name = "HackControl",
-            Aliases = new[] { "hacks", "hax" },
+            Aliases = new[] { "hacks", "hack", "hax" },
             Category = CommandCategory.New | CommandCategory.Moderation,
             Permissions = new[] { Permission.Chat},
             Usage = "/Hacks [Player] [Hack] [jumpheight(if needed)]",
@@ -2836,9 +2836,9 @@ namespace fCraft {
             Handler = HackControlHandler
         };
 
-        static void HackControlHandler(Player player, CommandReader cmd)
-        {
+        static void HackControlHandler(Player player, CommandReader cmd) {
             string first = cmd.Next();
+
             if (first == null || player.Info.Rank != RankManager.HighestRank) {
                 player.Message("&sCurrent Hacks for {0}", player.ClassyName);
                 player.Message("    &sFlying: &a{0} &sNoclip: &a{1} &sSpeedhack: &a{2}",
@@ -2848,122 +2848,100 @@ namespace fCraft {
                 player.Message("    &sRespawn: &a{0} &sThirdPerson: &a{1} &sJumpHeight: &a{2}",
                                 player.Info.AllowRespawn.ToString(),
                                 player.Info.AllowThirdPerson.ToString(),
-                                player.Info.JumpHeight); return;
+                                player.Info.JumpHeight);
+                return;
             }
-            PlayerInfo target = PlayerDB.FindPlayerInfoOrPrintMatches(player, first, SearchOptions.IncludeSelf);
-            if (target == null) { return; }
-            string hack = cmd.Next();
-            if (hack == null) {
+
+            PlayerInfo target = InfoCommands.FindPlayerInfo(player, cmd, first);
+            if (target == null) return;
+
+            string hack = (cmd.Next() ?? "null");
+            string hackStr = "hack";
+
+            if (hack == "null") {
                 player.Message("&sCurrent Hacks for {0}", target.ClassyName);
                 player.Message("    &sFlying: &a{0} &sNoclip: &a{1} &sSpeedhack: &a{2}",
-                                player.Info.AllowFlying.ToString(),
-                                player.Info.AllowNoClip.ToString(),
-                                player.Info.AllowSpeedhack.ToString());
+                                target.AllowFlying.ToString(),
+                                target.AllowNoClip.ToString(),
+                                target.AllowSpeedhack.ToString());
                 player.Message("    &sRespawn: &a{0} &sThirdPerson: &a{1} &sJumpHeight: &a{2}",
-                                player.Info.AllowRespawn.ToString(),
-                                player.Info.AllowThirdPerson.ToString(),
-                                player.Info.JumpHeight); return;
-            } else { hack = hack.ToLower(); }
-            if (hack.Equals("flying") || hack.Equals("fly") || hack.Equals("f"))
-            {
-                player.Message("Hacks for {0}", target.ClassyName);
-                player.Message("    Flying: &a{0} &s--> &a{1}", target.AllowFlying.ToString(), (!target.AllowFlying).ToString());
-                target.AllowFlying = !target.AllowFlying;
-                if (target.IsOnline)
-                {
-                    if (target.PlayerObject.Supports(CpeExtension.HackControl))
-                    {
-                        target.PlayerObject.Send(Packet.HackControl(
-                            target.AllowFlying, target.AllowNoClip, target.AllowSpeedhack,
-                            target.AllowRespawn, target.AllowThirdPerson, target.JumpHeight));
-                    }
-                }
-            } 
-            else if (hack.Equals("noclip") || hack.Equals("clip") || hack.Equals("nc")) 
-            {
-                player.Message("Hacks for {0}", target.ClassyName);
-                player.Message("    NoClip: &a{0} &s--> &a{1}", target.AllowNoClip.ToString(), (!target.AllowNoClip).ToString());
-                target.AllowNoClip = !target.AllowNoClip;
-                if (target.IsOnline)
-                {
-                    if (target.PlayerObject.Supports(CpeExtension.HackControl))
-                    {
-                        target.PlayerObject.Send(Packet.HackControl(
-                            target.AllowFlying, target.AllowNoClip, target.AllowSpeedhack,
-                            target.AllowRespawn, target.AllowThirdPerson, target.JumpHeight));
-                    }
-                }
+                                target.AllowRespawn.ToString(),
+                                target.AllowThirdPerson.ToString(),
+                                target.JumpHeight);
+                return;
             }
-            else if (hack.Equals("speedhack") || hack.Equals("speed") || hack.Equals("sh"))
-            {
-                player.Message("Hacks for {0}", target.ClassyName);
-                player.Message("    SpeedHack: &a{0} &s--> &a{1}", target.AllowSpeedhack.ToString(), (!target.AllowSpeedhack).ToString());
-                target.AllowSpeedhack = !target.AllowSpeedhack;
-                if (target.IsOnline)
-                {
-                    if (target.PlayerObject.Supports(CpeExtension.HackControl))
-                    {
-                        target.PlayerObject.Send(Packet.HackControl(
-                            target.AllowFlying, target.AllowNoClip, target.AllowSpeedhack,
-                            target.AllowRespawn, target.AllowThirdPerson, target.JumpHeight));
-                    }
-                }
-            }
-            else if (hack.Equals("respawn") || hack.Equals("spawn") || hack.Equals("rs"))
-            {
-                player.Message("Hacks for {0}", target.ClassyName);
-                player.Message("    Respawn: &a{0} &s--> &a{1}", target.AllowRespawn.ToString(), (!target.AllowRespawn).ToString());
-                target.AllowRespawn = !target.AllowRespawn;
-                if (target.IsOnline)
-                {
-                    if (target.PlayerObject.Supports(CpeExtension.HackControl))
-                    {
-                        target.PlayerObject.Send(Packet.HackControl(
-                            target.AllowFlying, target.AllowNoClip, target.AllowSpeedhack,
-                            target.AllowRespawn, target.AllowThirdPerson, target.JumpHeight));
-                    }
-                }
-            }
-            else if (hack.Equals("thirdperson") || hack.Equals("third") || hack.Equals("tp"))
-            {
-                player.Message("Hacks for {0}", target.ClassyName);
-                player.Message("    ThirdPerson: &a{0} &s--> &a{1}", target.AllowThirdPerson.ToString(), (!target.AllowThirdPerson).ToString());
-                target.AllowThirdPerson = !target.AllowThirdPerson;
-                if (target.IsOnline)
-                {
-                    if (target.PlayerObject.Supports(CpeExtension.HackControl))
-                    {
-                        target.PlayerObject.Send(Packet.HackControl(
-                            target.AllowFlying, target.AllowNoClip, target.AllowSpeedhack,
-                            target.AllowRespawn, target.AllowThirdPerson, target.JumpHeight));
-                    }
-                }
-            }
-            else if (hack.Equals("jumpheight") || hack.Equals("jump") || hack.Equals("height") || hack.Equals("jh"))
-            {
-                short height;
-                string third = cmd.Next();
-                if (short.TryParse(third, out height))
-                {
+
+            switch (hack.ToLower()) {
+                case "flying":
+                case "fly":
+                case "f":
                     player.Message("Hacks for {0}", target.ClassyName);
-                    player.Message("    JumpHeight: &a{0} &s--> &a{1}", target.JumpHeight, height);
-                    target.JumpHeight = height;
-                    if (target.IsOnline)
-                    {
-                        if (target.PlayerObject.Supports(CpeExtension.HackControl))
-                        {
-                            target.PlayerObject.Send(Packet.HackControl(
-                                target.AllowFlying, target.AllowNoClip, target.AllowSpeedhack,
-                                target.AllowRespawn, target.AllowThirdPerson, target.JumpHeight));
-                        }
-                    }
+                    player.Message("    Flying: &a{0} &s--> &a{1}", target.AllowFlying.ToString(), (!target.AllowFlying).ToString());
+                    target.AllowFlying = !target.AllowFlying;
+                    hackStr = "flying";
+                    goto sendPacket;
+                case "noclip":
+                case "clip":
+                case "nc":
+                    player.Message("Hacks for {0}", target.ClassyName);
+                    player.Message("    NoClip: &a{0} &s--> &a{1}", target.AllowNoClip.ToString(), (!target.AllowNoClip).ToString());
+                    target.AllowNoClip = !target.AllowNoClip;
+                    hackStr = "noclip";
+                    goto sendPacket;
+                case "speedhack":
+                case "speed":
+                case "sh":
+                    player.Message("Hacks for {0}", target.ClassyName);
+                    player.Message("    SpeedHack: &a{0} &s--> &a{1}", target.AllowSpeedhack.ToString(), (!target.AllowSpeedhack).ToString());
+                    target.AllowSpeedhack = !target.AllowSpeedhack;
+                    hackStr = "speedhack";
+                    goto sendPacket;
+                case "respawn":
+                case "spawn":
+                case "rs":
+                    player.Message("Hacks for {0}", target.ClassyName);
+                    player.Message("    Respawn: &a{0} &s--> &a{1}", target.AllowRespawn.ToString(), (!target.AllowRespawn).ToString());
+                    target.AllowRespawn = !target.AllowRespawn;
+                    hackStr = "respawn";
+                    goto sendPacket;
+                case "thirdperson":
+                case "third":
+                case "tp":
+                    player.Message("Hacks for {0}", target.ClassyName);
+                    player.Message("    ThirdPerson: &a{0} &s--> &a{1}", target.AllowThirdPerson.ToString(), (!target.AllowThirdPerson).ToString());
+                    target.AllowThirdPerson = !target.AllowThirdPerson;
+                    hackStr = "thirdperson";
+                    goto sendPacket;
+                case "jumpheight":
+                case "jump":
+                case "height":
+                case "jh":
+                    short height;
+                    string third = cmd.Next();
+                    if (short.TryParse(third, out height)) {
+                        player.Message("Hacks for {0}", target.ClassyName);
+                        player.Message("    JumpHeight: &a{0} &s--> &a{1}", target.JumpHeight, height);
+                        target.JumpHeight = height;
+                        hackStr = "jumpheight";
+                        goto sendPacket;
+                    } else  player.Message("Error: Could not parse \"&a{0}&s\" as a short. Try something between &a0&s and &a32767", third);
+                    break;
+                default:
+                    player.Message(CdHackControl.Help);
+                    break;
+            }
+            return;
+        sendPacket:
+            if (target.IsOnline) {
+                if (target.PlayerObject != player) {
+                    target.PlayerObject.Message("{0} has changed your {1} ability, use &h/Hacks &sto check them out.", player.Info.Name, hackStr);
                 }
-                else
-                {
-                    player.Message("Error: Could not parse \"&a{0}&s\" as a short. Try something between &a0&s and &a32767", third); 
+                if (target.PlayerObject.Supports(CpeExtension.HackControl)) {
+                    target.PlayerObject.Send(Packet.HackControl(
+                        target.AllowFlying, target.AllowNoClip, target.AllowSpeedhack,
+                        target.AllowRespawn, target.AllowThirdPerson, target.JumpHeight));
                 }
             }
-            else { player.Message(CdHackControl.Usage); }
         }
 		#endregion
 		#region Back
