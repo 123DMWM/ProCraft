@@ -1523,21 +1523,12 @@ namespace fCraft {
             #region Block Permissions
 
             if (Supports(CpeExtension.BlockPermissions)) {
-                if (!Can(Permission.PlaceAdmincrete)) {
-                    Send(Packet.MakeSetBlockPermission(Block.Admincrete, false, false));
-                }
-                if (!Can(Permission.PlaceWater)) {
-                    Send(Packet.MakeSetBlockPermission(Block.Water, false, true));
-                    Send(Packet.MakeSetBlockPermission(Block.StillWater, false, true));
-                }
-                if (!Can(Permission.PlaceLava)) {
-                    Send(Packet.MakeSetBlockPermission(Block.Lava, false, true));
-                    Send(Packet.MakeSetBlockPermission(Block.StillLava, false, true));
-                }
-                if (!Can(Permission.PlaceGrass))
-                {
-                    Send(Packet.MakeSetBlockPermission(Block.Grass, false, true));
-                }
+                Send(Packet.MakeSetBlockPermission(Block.Admincrete, Can(Permission.PlaceAdmincrete), true));
+                Send(Packet.MakeSetBlockPermission(Block.Water, Can(Permission.PlaceWater), true));
+                Send(Packet.MakeSetBlockPermission(Block.StillWater, Can(Permission.PlaceWater), true));
+                Send(Packet.MakeSetBlockPermission(Block.Lava, Can(Permission.PlaceLava), true));
+                Send(Packet.MakeSetBlockPermission(Block.StillLava, Can(Permission.PlaceLava), true));
+                Send(Packet.MakeSetBlockPermission(Block.Grass, Can(Permission.PlaceGrass), true));
             }
 
             #endregion
