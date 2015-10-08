@@ -84,8 +84,7 @@ namespace fCraft {
 
             Zone newZone = new Zone();
             ZoneCollection zoneCollection = player.WorldMap.Zones;
-            if (givenZoneName.ToLower().StartsWith("deny_") || givenZoneName.ToLower().StartsWith("respawn_") || givenZoneName.ToLower().StartsWith("message_") || givenZoneName.ToLower().StartsWith("death_") || givenZoneName.ToLower().StartsWith("checkpoint_"))
-            {
+            if (IsSpecialZone(givenZoneName.ToLower())) { 
                 if (player.Can(Permission.ManageSpecialZones) == false)
                 {
                     player.Message("You cannot affect special zones.");
@@ -255,8 +254,7 @@ namespace fCraft {
 
             Zone newZone = new Zone();
             ZoneCollection zoneCollection = player.WorldMap.Zones;
-            if (givenZoneName.ToLower().StartsWith("deny_") || givenZoneName.ToLower().StartsWith("respawn_") || givenZoneName.ToLower().StartsWith("message_") || givenZoneName.ToLower().StartsWith("death_") || givenZoneName.ToLower().StartsWith("checkpoint_"))
-            {
+            if (IsSpecialZone(givenZoneName.ToLower())) {
                 if (player.Can(Permission.ManageSpecialZones) == false)
                 {
                     player.Message("You cannot affect special zones.");
@@ -382,8 +380,7 @@ namespace fCraft {
                 player.MessageNoZone( zoneName );
                 return;
             }
-            if (zone.Name.ToLower().StartsWith("deny_") || zone.Name.ToLower().StartsWith("respawn_") || zone.Name.ToLower().StartsWith("message_") || zone.Name.ToLower().StartsWith("death_") || zone.Name.ToLower().StartsWith("checkpoint_"))
-            {
+            if (IsSpecialZone(zone.Name.ToLower())) {
                 if (player.Can(Permission.ManageSpecialZones) == false)
                 {
                     player.Message("You cannot affect special zones.");
@@ -766,8 +763,7 @@ namespace fCraft {
             }
             ZoneCollection zones = player.WorldMap.Zones;
             Zone zone = zones.Find( zoneName );
-            if (zone.Name.ToLower().StartsWith("deny_") || zone.Name.ToLower().StartsWith("respawn_") || zone.Name.ToLower().StartsWith("message_") || zone.Name.ToLower().StartsWith("death_") || zone.Name.ToLower().StartsWith("checkpoint_"))
-            {
+            if (IsSpecialZone(zone.Name.ToLower())) {
                 if (player.Can(Permission.ManageSpecialZones) == false)
                 {
                     player.Message("You cannot affect special zones.");
@@ -905,8 +901,7 @@ namespace fCraft {
                 player.MessageNoZone( oldName );
                 return;
             }
-            if (oldZone.Name.ToLower().StartsWith("deny_") || oldZone.Name.ToLower().StartsWith("respawn_") || oldZone.Name.ToLower().StartsWith("message_") || oldZone.Name.ToLower().StartsWith("death_") || oldZone.Name.ToLower().StartsWith("checkpoint_"))
-            {
+            if (IsSpecialZone(oldZone.Name.ToLower())) {
                 if (player.Can(Permission.ManageSpecialZones) == false)
                 {
                     player.Message("You cannot affect special zones.");
@@ -1339,6 +1334,14 @@ namespace fCraft {
                 }
             }
             return true;
-        }        
+        }
+        /// <summary> Checks if a zone name makes it a special zone </summary>
+        public static bool IsSpecialZone(string name) {
+            if (name == null) throw new ArgumentNullException("name");
+            if (name.StartsWith("deny_") || name.StartsWith("respawn_") || name.StartsWith("message_") || name.StartsWith("death_") || name.StartsWith("checkpoint_") || name.StartsWith("c_command_") || name.StartsWith("command_")) {
+                return true;
+            }
+            return false;
+        }
     }
 }
