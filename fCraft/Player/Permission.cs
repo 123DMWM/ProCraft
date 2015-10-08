@@ -182,6 +182,9 @@ namespace fCraft {
         ChangeNameCaps,
 
         /// <summary> Ability to change own name color</summary>
-        ChangeNameColor
+        ChangeNameColor,
+
+        /// <summary> Ability to use the bot function</summary>
+        UseBot
     }
 }

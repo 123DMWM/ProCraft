@@ -1075,6 +1075,7 @@ namespace fCraft {
 
             owner.Add( new XElement( Permission.ReloadConfig.ToString() ) );
             owner.Add( new XElement( Permission.ShutdownServer.ToString() ) );
+            owner.Add( new XElement( Permission.UseBot.ToString() ) );
             permissions.Add( owner );
             try {
                 RankManager.AddRank( new Rank( owner ) );
@@ -1151,6 +1152,7 @@ namespace fCraft {
             op.Add( new XElement( Permission.DrawAdvanced.ToString() ) );
             op.Add( new XElement( Permission.CopyAndPaste.ToString() ) );
             op.Add( new XElement( Permission.UndoOthersActions.ToString() ) );
+            op.Add( new XElement( Permission.UseBot.ToString() ) );
             permissions.Add( op );
             try {
                 RankManager.AddRank( new Rank( op ) );
@@ -1193,6 +1195,7 @@ namespace fCraft {
             builder.Add( new XElement( Permission.Teleport.ToString() ) );
 
             builder.Add( new XElement( Permission.Draw.ToString() ) );
+            builder.Add( new XElement( Permission.UseBot.ToString() ) );
             permissions.Add( builder );
             try {
                 RankManager.AddRank( new Rank( builder ) );
@@ -1216,6 +1219,7 @@ namespace fCraft {
             guest.Add( new XElement( Permission.Build.ToString() ) );
             guest.Add( new XElement( Permission.Delete.ToString() ) );
             guest.Add( new XElement( Permission.UseSpeedHack.ToString() ) );
+            guest.Add( new XElement( Permission.UseBot.ToString() ) );
             permissions.Add( guest );
             try {
                 RankManager.AddRank( new Rank( guest ) );
