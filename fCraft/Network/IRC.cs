@@ -441,7 +441,7 @@ namespace fCraft
                                     } else if (rawMessage.ToLower().StartsWith("@") || rawMessage.ToLower().StartsWith(ActualBotNick.ToLower() + " @")) {
                                         if (DateTime.Now.Subtract(lastIrcCommand).TotalSeconds > 5) {
                                             string otherPlayerName = rawMessage.Split()[(rawMessage.ToLower().StartsWith("@") ? 0 : 1)].Remove(0,1);
-                                            string messageText = rawMessage.Split()[(rawMessage.ToLower().StartsWith("@") ? 1 : 2)];
+                                            string messageText = rawMessage.ToLower().StartsWith("@") ? rawMessage.Remove(0, rawMessage.Split()[0].Length + 1) : rawMessage.Remove(0, rawMessage.Split()[0].Length + rawMessage.Split()[1].Length + 2);
 
                                             // first, find ALL players (visible and hidden)
                                             Player[] allPlayers = Server.FindPlayers(otherPlayerName,
