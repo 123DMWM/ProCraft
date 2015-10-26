@@ -580,43 +580,22 @@ namespace fCraft
             Category = CommandCategory.New | CommandCategory.Chat,
             Permissions = new[] { Permission.Chat },
             IsConsoleSafe = true,
-            Help = "Turns IRC On or Off.",
-            Usage = "/IRC (On/Off)",
+            Help = "Tells you the IRC channel.",
+            Usage = "/IRC",
             Handler = IRCHandler
         };
 
         private static void IRCHandler(Player player, CommandReader cmd) {
-            string IRCFlag = cmd.Next();
-            if (IRCFlag != null) {
-                if (IRCFlag.ToLower() == "on" || IRCFlag.ToLower() == "true" || IRCFlag.ToLower() == "1" ||
-                    IRCFlag.ToLower() == "yes") {
-                    if (player.Info.ReadIRC == false) {
-                        player.Info.ReadIRC = true;
-                        player.Message("&sYou are now receiving IRC Messages. To disable, type &h/IRC Off&s.");
-                        string message = String.Format("\u212C&SPlayer {0}&S is no longer Ignoring IRC",
-                            player.ClassyName);
-                        if (!player.Info.IsHidden) {
-                            IRC.SendChannelMessage(message);
-                        }
-                    } else {
-                        player.Message("&sYou are already receiving IRC messages.");
-                    }
-                } else if (IRCFlag.ToLower() == "off" || IRCFlag.ToLower() == "false" || IRCFlag.ToLower() == "0" ||
-                    IRCFlag.ToLower() == "no") {
-                    if (player.Info.ReadIRC == true) {
-                        player.Info.ReadIRC = false;
-                        player.Message("&sYou are no longer receiving IRC Messages. To enable, type &h/IRC On&s.");
-                        string message = String.Format("\u212C&SPlayer {0}&S is now Ignoring IRC", player.ClassyName);
-                        if (!player.Info.IsHidden) {
-                            IRC.SendChannelMessage(message);
-                        }
-                    } else {
-                        player.Message("&sYou are already not receiving IRC messages.");
-                    }
-                } else CdIRC.PrintUsage(player);
+            if (!ConfigKey.IRCBotEnabled.Enabled() || ConfigKey.IRCBotChannels.GetString().Length <= 1 || ConfigKey.IRCBotNetwork.GetString().Length <= 1) {
+                player.Message("This server has IRC disabled or does not have IRC settings setup correctly");
+                return;
             } else {
-                if (player.Info.ReadIRC) player.Message("&S  IRC Receive: &AON");
-                else player.Message("&S  IRC Receive: &COFF");
+                player.Message("&IInternet Relayed Chat information");
+                player.Message(" IRC Network: &f{0}", ConfigKey.IRCBotNetwork.GetString());
+                player.Message(" Network Channel/s: ");
+                for (int i = 0; i < ConfigKey.IRCBotChannels.GetString().Split(',').Count(); i++) {
+                    player.Message("  &f" + ConfigKey.IRCBotChannels.GetString().Split(',')[i]);
+                }
             }
         }
 
