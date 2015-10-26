@@ -2273,100 +2273,94 @@ namespace fCraft {
                 }
                 string extName = reader.ReadString();
                 int extVersion = reader.ReadInt32();
-                bool addExt = false;
+                bool addExt = true;
                 CpeExtension addedExt = CpeExtension.none;
                 switch (extName) {
                     case CustomBlocksExtName:
                         if (extVersion == CustomBlocksExtVersion) {
-                            addExt = true;
                             addedExt = CpeExtension.CustomBlocks;
                         }
                         break;
                     case BlockPermissionsExtName:
                         if (extVersion == BlockPermissionsExtVersion) {
-                            addExt = true;
                             addedExt = CpeExtension.BlockPermissions;
                         }
                         break;
                     case ClickDistanceExtName:
                         if (extVersion == ClickDistanceExtVersion) {
-                            addExt = true;
                             addedExt = CpeExtension.ClickDistance;
                         }
                         break;
                     case EnvColorsExtName:
                         if (extVersion == EnvColorsExtVersion) {
-                            addExt = true;
                             addedExt = CpeExtension.EnvColors;
                         }
                         break;
                     case ChangeModelExtName:
                         if (extVersion == ChangeModelExtVersion) {
-                            addExt = true;
                             addedExt = CpeExtension.ChangeModel;
                         }
                         break;
                     case EnvMapAppearanceExtName:
                         if (extVersion == EnvMapAppearanceExtVersion) {
-                            addExt = true;
                             addedExt = CpeExtension.EnvMapAppearance;
                         }
                         break;
                     case EnvWeatherTypeExtName:
                         if (extVersion == EnvWeatherTypeExtVersion) {
-                            addExt = true;
                             addedExt = CpeExtension.EnvWeatherType;
                         }
                         break;
                     case HeldBlockExtName:
                         if (extVersion == HeldBlockExtVersion) {
-                            addExt = true;
                             addedExt = CpeExtension.HeldBlock;
                         }
                         break;
                     case ExtPlayerListExtName:
-                        if (extVersion == ExtPlayerListExtVersion || extVersion == ExtPlayerList2ExtVersion) {
-                            addExt = true;
-                            addedExt = extVersion == ExtPlayerListExtVersion ? CpeExtension.ExtPlayerList : CpeExtension.ExtPlayerList2;
+                        if (extVersion == ExtPlayerListExtVersion) {
+                            addedExt = CpeExtension.ExtPlayerList;
+                            if (Supports(CpeExtension.ExtPlayerList2)) {
+                                addedExt = CpeExtension.ExtPlayerList2;
+                            }
+                        } else if (extVersion == ExtPlayerList2ExtVersion) {
+                            addedExt = CpeExtension.ExtPlayerList2;
+                            if (Supports(CpeExtension.ExtPlayerList)) {
+                                supportedExtensions.Remove(CpeExtension.ExtPlayerList);
+                            }
                         }
                         break;
                     case SelectionCuboidExtName:
                         if (extVersion == SelectionCuboidExtVersion) {
-                            addExt = true;
                             addedExt = CpeExtension.SelectionCuboid;
                         }
                         break;
                     case MessageTypesExtName:
                         if (extVersion == MessageTypesExtVersion) {
-                            addExt = true;
                             addedExt = CpeExtension.MessageType;
                         }
                         break;
                     case HackControlExtName:
                         if (extVersion == HackControlExtVersion) {
-                            addExt = true;
                             addedExt = CpeExtension.HackControl;
                         }
                         break;
                     case EmoteFixExtName:
                         if (extVersion == EmoteFixExtVersion) {
-                            addExt = true;
                             addedExt = CpeExtension.EmoteFix;
                         }
                         break;
                     case TextHotKeyExtName:
                         if (extVersion == TextHotKeyExtVersion) {
-                            addExt = true;
                             addedExt = CpeExtension.TextHotKey;
                         }
                         break;
                     case PlayerClickExtName:
                         if (extVersion == PlayerClickExtVersion) {
-                            addExt = true;
                             addedExt = CpeExtension.PlayerClick;
                         }
                         break;
                     default:
+                        addExt = false;
                         break;
                 }
                 if (addExt) {
