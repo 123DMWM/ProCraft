@@ -1248,7 +1248,7 @@ namespace fCraft
                 return;
             }
             byte KeyMod = 0;
-            if (cmd.HasNext) {
+            if (null != fourth) {
                 if (!Byte.TryParse(fourth, out KeyMod)) {
                     player.Message("Error: Invalid Byte ({0})", fourth);
                     return;
