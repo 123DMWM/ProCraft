@@ -4230,6 +4230,9 @@ namespace fCraft {
             IsConsoleSafe = true,
             Permissions = new[] { Permission.Chat },
             Usage = "/PW [option] [args]",
+            Help = "Allows players to have their own personal world. List of options:\n" +
+                "BuildAccess, Create, Delete, Join, JoinAccess, List, Reset\n" +
+                "For detailed help see &H/Help PW <Option>",
             HelpSections = new Dictionary<string, string>{
                 { "create",     "&H/PW Create [size]\n" +
                                 "&sCreates a personal world with a specified size:\n" +
