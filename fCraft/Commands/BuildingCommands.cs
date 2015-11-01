@@ -93,6 +93,7 @@ namespace fCraft {
             CdUndoAreaNot.Help += GeneralDrawingHelp;
             CommandManager.RegisterCommand( CdStatic );
             CommandManager.RegisterCommand( CdWalls );
+            CommandManager.RegisterCommand( CdPlace );
             CommandManager.RegisterCommand( CdDisPlace );
             CommandManager.RegisterCommand( CdCenter );
             CommandManager.RegisterCommand( CdMazeCuboid );
@@ -1025,11 +1026,11 @@ namespace fCraft {
         #region displace
         private static readonly CommandDescriptor CdDisPlace = new CommandDescriptor
         {
-            Name = "Place",
+            Name = "DPlace",
             Aliases = new[] { "distanceplace", "displace", "dp" },
             Category = CommandCategory.New | CommandCategory.Building,
             Permissions = new[] { Permission.Draw },
-            Usage = "/Place [block] [distance away]",
+            Usage = "/DPlace [block] [distance away]",
             Help = "Places a block a certain distance away from where you are, in the direction you are looking",
             Handler = DisPlace
         };
@@ -1173,6 +1174,54 @@ namespace fCraft {
                     return;
                 }
             }
+        }
+
+        #endregion
+        #region Place
+        private static readonly CommandDescriptor CdPlace = new CommandDescriptor {
+            Name = "Place",
+            Category = CommandCategory.New | CommandCategory.Building,
+            Permissions = new[] { Permission.Draw },
+            Usage = "/Place [x] [y] [z] and/or [block]",
+            Help = "Places a block at specified XYZ",
+            Handler = PlaceHandler
+        };
+
+        private static void PlaceHandler(Player player, CommandReader cmd) {
+            var op = new CuboidDrawOperation(player);
+            Map map = player.WorldMap;
+            Block block = Block.Stone;
+            Vector3I coords;
+            int x, y, z;
+            if (cmd.NextInt(out x) && cmd.NextInt(out y) && cmd.NextInt(out z)) {
+                if (cmd.HasNext) {
+                    string last = cmd.Next();
+                    if (!Map.GetBlockByName(last, false, out block)) {
+                        player.Message("\"{0}\" is not a valid block type", last);
+                        return;
+                    }
+                }
+                coords = new Vector3I(x, y, z);
+            } else {
+                cmd.Rewind();
+                if (cmd.HasNext) {
+                    string last = cmd.Next();
+                    if (!Map.GetBlockByName(last, false, out block)) {
+                        player.Message("\"{0}\" is not a valid block type", last);
+                        return;
+                    }
+                }
+                coords = player.Position.ToBlockCoords();
+            }
+            coords.X = Math.Min(map.Width - 1, Math.Max(0, coords.X));
+            coords.Y = Math.Min(map.Length - 1, Math.Max(0, coords.Y));
+            coords.Z = Math.Min(map.Height - 1, Math.Max(0, coords.Z));
+            op.Brush = new NormalBrush(new Block[] { block});
+            op.Prepare(new Vector3I[] { coords, coords });
+            op.AnnounceCompletion = false;
+            op.Context = BlockChangeContext.Drawn;
+            op.Begin();
+            player.Message("{0} placed at {0}", block.ToString(), coords.ToString());
         }
 
         #endregion
