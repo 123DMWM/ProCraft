@@ -1130,22 +1130,15 @@ namespace fCraft {
             }
 
             CanPlaceResult canPlaceResult;
-            if( type == Block.Slab && coord.Z > 0 && map.GetBlock( coordBelow ) == Block.Slab ) {
+            if (type == Block.Slab && coord.Z > 0 && map.GetBlock(coordBelow) == Block.Slab) {
                 // stair stacking
-                canPlaceResult = CanPlace( map, coordBelow, Block.DoubleSlab, context );
-            }
-            else if (type == Block.CobbleSlab && coord.Z > 0 && map.GetBlock(coordBelow) == Block.CobbleSlab)
-            {
+                canPlaceResult = CanPlace(map, coordBelow, Block.DoubleSlab, context);
+            } else if (type == Block.CobbleSlab && coord.Z > 0 && map.GetBlock(coordBelow) == Block.CobbleSlab) {
                 // stair stacking
                 canPlaceResult = CanPlace(map, coordBelow, Block.Cobblestone, context);
-            } else if (type == Block.Fire && coord.Z > 0 && map.GetBlock(coordBelow) == Block.TNT && Can(Permission.Draw)) {
-                // tnt exploding
-                canPlaceResult = CanPlace(map, coordBelow, Block.Magma, context);
-            }
-            else
-            {
+            } else {
                 // normal placement
-                canPlaceResult = CanPlace( map, coord, type, context );
+                canPlaceResult = CanPlace(map, coord, type, context);
             }
 
             // if all is well, try placing it
@@ -1157,9 +1150,8 @@ namespace fCraft {
                         RevertBlockNow(coord);
                         break;
                     }
-                    if (type == Block.Dirt && GrassGrowth == true)
-                    {
-                        // Grass growing
+                    if (type == Block.Dirt && GrassGrowth) {
+                        // Placed Dirt to Grass
                         type = Block.Grass;
                     }
 
@@ -1200,12 +1192,13 @@ namespace fCraft {
                         coord = coordBelow;
                         type = Block.Cobblestone;
                     }
-                    if (map.GetBlock(coordBelow) == Block.Grass
-                        && action == ClickAction.Build
-                        && (type == Block.Grass || type == Block.Dirt))
-                    {
-						// Grass/Dirt on Grass -> Dirt function
-						PlaceBlock(coordBelow, ClickAction.Build, Block.Dirt);
+                    if (map.GetBlock(coordBelow) == Block.Grass && action == ClickAction.Build && type == Block.Grass && GrassGrowth) {
+                        // Place Grass on Grass -> Dirt
+                        blockUpdate = new BlockUpdate(this, coordBelow, Block.Dirt);
+                        Info.ProcessBlockPlaced((byte)Block.Dirt);
+                        map.QueueUpdate(blockUpdate);
+                        RaisePlayerPlacedBlockEvent(this, World.Map, coordBelow, Block.Grass, Block.Dirt, context);
+                        SendNow(Packet.MakeSetBlock(coordBelow, Block.Dirt));
                     }
                     // handle normal blocks
                     blockUpdate = new BlockUpdate(this, coord, type);
