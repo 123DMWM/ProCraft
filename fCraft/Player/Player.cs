@@ -575,6 +575,10 @@ namespace fCraft {
 					Message("Partial: &F{0}", partialMessage);
 					break;
 
+				case RawMessageType.LongerMessage:
+					partialMessage = rawMessage.Substring(0, rawMessage.Length - 1);
+					break;
+
                 case RawMessageType.Invalid:
                     Message( "Could not parse message." );
                     break;
@@ -2215,6 +2219,8 @@ namespace fCraft {
         const int TextHotKeyExtVersion = 1;
         const string PlayerClickExtName = "PlayerClick";
         const int PlayerClickExtVersion = 1;
+        const string LongerMessagesExtName = "LongerMessages";
+        const int LongerMessagesExtVersion = 1;
 
 
         public bool Supports(CpeExtension extension) {
@@ -2226,7 +2232,7 @@ namespace fCraft {
         bool NegotiateProtocolExtension()
         {
             // write our ExtInfo and ExtEntry packets
-            writer.Write(Packet.MakeExtInfo("ProCraft", 16).Bytes);
+            writer.Write(Packet.MakeExtInfo("ProCraft", 17).Bytes);
             writer.Write(Packet.MakeExtEntry(ClickDistanceExtName, ClickDistanceExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(CustomBlocksExtName, CustomBlocksExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(HeldBlockExtName, HeldBlockExtVersion).Bytes);
@@ -2243,6 +2249,7 @@ namespace fCraft {
             writer.Write(Packet.MakeExtEntry(PlayerClickExtName, PlayerClickExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(MessageTypesExtName, MessageTypesExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(EmoteFixExtName, EmoteFixExtVersion).Bytes);
+            writer.Write(Packet.MakeExtEntry(LongerMessagesExtName, LongerMessagesExtVersion).Bytes);
 
             // Expect ExtInfo reply from the client
             OpCode extInfoReply = reader.ReadOpCode();
@@ -2350,6 +2357,11 @@ namespace fCraft {
                     case PlayerClickExtName:
                         if (extVersion == PlayerClickExtVersion) {
                             addedExt = CpeExtension.PlayerClick;
+                        }
+                        break;
+                    case LongerMessagesExtName:
+                        if (extVersion == LongerMessagesExtVersion) {
+                            addedExt = CpeExtension.LongerMessages;
                         }
                         break;
                     default:

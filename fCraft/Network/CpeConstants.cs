@@ -64,7 +64,10 @@ namespace fCraft
         MessageType,
 
         /// <summary> This extension tells teh server extended information about when a player clicks. </summary>
-        PlayerClick
+        PlayerClick,
+
+        /// <summary> This extension lets the player send longer chat messages </summary>
+        LongerMessages
     }
 
 

@@ -593,6 +593,7 @@ namespace fCraft {
             if (message.EndsWith(" //")) message = message.Substring(0, message.Length - 1);
 			if (message.EndsWith(@" \")) return RawMessageType.PartialMessageNoSpace;
 			if (message.EndsWith(@" /\")) message = message.Substring(0, message.Length  - 2) + @"\";
+            if (message.EndsWith("࿕")) return RawMessageType.LongerMessage;
 
             switch (message[0])
             {
@@ -1104,6 +1105,9 @@ namespace fCraft {
 
 		/// <summary> Partial message (ends with " \"). </summary>
 		PartialMessageNoSpace,
+
+        /// <summary> LongerMessage CPE Support. </summary>
+        LongerMessage,
     }
 }
 

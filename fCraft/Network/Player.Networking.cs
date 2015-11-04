@@ -284,10 +284,10 @@ namespace fCraft {
         bool ProcessMessagePacket() {
             BytesReceived += 66;
             ResetIdBotTimer();
-            reader.ReadByte();
+            byte longerMessage = reader.ReadByte();
             string message = reader.ReadString();
 
-            if( !IsSuper && message.StartsWith( "/womid " ) ) {
+            if ( !IsSuper && message.StartsWith( "/womid " ) ) {
                 IsUsingWoM = true;
                 return true;
             }
@@ -313,6 +313,9 @@ namespace fCraft {
             ParseMessage( message, false );
 #else
             try {
+                if (longerMessage == 1) {
+                    message = message + "࿕";
+                }
                 ParseMessage( message, false );
             } catch( IOException ) {
                 throw;
