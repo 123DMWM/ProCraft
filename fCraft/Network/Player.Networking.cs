@@ -314,7 +314,7 @@ namespace fCraft {
 #else
             try {
                 if (longerMessage == 1) {
-                    message = message + "࿕";
+                    message = message + "λ";
                 }
                 ParseMessage( message, false );
             } catch( IOException ) {

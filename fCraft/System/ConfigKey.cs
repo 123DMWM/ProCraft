@@ -7,7 +7,7 @@ namespace fCraft {
     public enum ConfigKey {
         #region General
 
-        [StringKey( ConfigSection.General, "Custom Minecraft Server (fCraft)",
+        [StringKey( ConfigSection.General, "Custom Minecraft Server (ProCraft)",
 @"The name of the server, as shown on the welcome screen and the
 official server list (if server is public).",
             MinLength = 1, MaxLength = 64 )]

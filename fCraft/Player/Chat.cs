@@ -593,7 +593,7 @@ namespace fCraft {
             if (message.EndsWith(" //")) message = message.Substring(0, message.Length - 1);
 			if (message.EndsWith(@" \")) return RawMessageType.PartialMessageNoSpace;
 			if (message.EndsWith(@" /\")) message = message.Substring(0, message.Length  - 2) + @"\";
-            if (message.EndsWith("࿕")) return RawMessageType.LongerMessage;
+            if (message.EndsWith("λ")) return RawMessageType.LongerMessage;
 
             switch (message[0])
             {
