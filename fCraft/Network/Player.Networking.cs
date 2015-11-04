@@ -292,7 +292,7 @@ namespace fCraft {
                 return true;
             }
             foreach (Char c in message) {
-                if (c < ' ' || c > '~') {
+                if (c < ' ' || c > (Supports(CpeExtension.FullCPFoTreeSevun) ? 255 : 127)) {
                     message = message.Replace(c, ' ');
                 }
             }

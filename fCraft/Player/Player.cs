@@ -616,11 +616,11 @@ namespace fCraft {
             if( this == Console ) {
                 Logger.LogToConsole( message );
             } else if( IsUsingWoM ) {
-                foreach (Packet p in LineWrapper.WrapPrefixed( WoMAlertPrefix, WoMAlertPrefix + Color.Sys + message, Supports(CpeExtension.EmoteFix))) {
+                foreach (Packet p in LineWrapper.WrapPrefixed( WoMAlertPrefix, WoMAlertPrefix + Color.Sys + message, Supports(CpeExtension.EmoteFix), Supports(CpeExtension.FullCPFoTreeSevun))) {
                     Send( p );
                 }
             } else {
-                foreach (Packet p in LineWrapper.Wrap( Color.Sys + message, Supports(CpeExtension.EmoteFix) )) {
+                foreach (Packet p in LineWrapper.Wrap( Color.Sys + message, Supports(CpeExtension.EmoteFix), Supports(CpeExtension.FullCPFoTreeSevun))) {
                     Send( p );
                 }
             }
@@ -643,7 +643,7 @@ namespace fCraft {
             if( IsSuper ) {
                 Logger.LogToConsole( message );
             } else {
-                foreach (Packet p in LineWrapper.Wrap( Color.Sys + message, Supports(CpeExtension.EmoteFix) )) {
+                foreach (Packet p in LineWrapper.Wrap( Color.Sys + message, Supports(CpeExtension.EmoteFix), Supports(CpeExtension.FullCPFoTreeSevun))) {
                     Send( p );
                 }
             }
@@ -672,7 +672,7 @@ namespace fCraft {
             }
             else
             {
-                foreach (Packet p in LineWrapper.Wrap( messageType, message, Supports(CpeExtension.EmoteFix) ))
+                foreach (Packet p in LineWrapper.Wrap( messageType, message, Supports(CpeExtension.EmoteFix), Supports(CpeExtension.FullCPFoTreeSevun)))
                 {
                     Send(p);
                 }
@@ -697,7 +697,7 @@ namespace fCraft {
             if( this == Console ) {
                 Logger.LogToConsole( message );
             } else {
-                foreach (Packet p in LineWrapper.WrapPrefixed( prefix, message, Supports(CpeExtension.EmoteFix) )) {
+                foreach (Packet p in LineWrapper.WrapPrefixed( prefix, message, Supports(CpeExtension.EmoteFix), Supports(CpeExtension.FullCPFoTreeSevun))) {
                     Send( p );
                 }
             }
@@ -2221,6 +2221,8 @@ namespace fCraft {
         const int PlayerClickExtVersion = 1;
         const string LongerMessagesExtName = "LongerMessages";
         const int LongerMessagesExtVersion = 1;
+        const string FullCPFoTreeSevunExtName = "FullCP437";
+        const int FullCPFoTreeSevunExtVersion = 1;
 
 
         public bool Supports(CpeExtension extension) {
@@ -2232,7 +2234,7 @@ namespace fCraft {
         bool NegotiateProtocolExtension()
         {
             // write our ExtInfo and ExtEntry packets
-            writer.Write(Packet.MakeExtInfo("ProCraft", 17).Bytes);
+            writer.Write(Packet.MakeExtInfo("ProCraft", 18).Bytes);
             writer.Write(Packet.MakeExtEntry(ClickDistanceExtName, ClickDistanceExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(CustomBlocksExtName, CustomBlocksExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(HeldBlockExtName, HeldBlockExtVersion).Bytes);
@@ -2250,6 +2252,7 @@ namespace fCraft {
             writer.Write(Packet.MakeExtEntry(MessageTypesExtName, MessageTypesExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(EmoteFixExtName, EmoteFixExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(LongerMessagesExtName, LongerMessagesExtVersion).Bytes);
+            writer.Write(Packet.MakeExtEntry(FullCPFoTreeSevunExtName, FullCPFoTreeSevunExtVersion).Bytes);
 
             // Expect ExtInfo reply from the client
             OpCode extInfoReply = reader.ReadOpCode();
@@ -2362,6 +2365,11 @@ namespace fCraft {
                     case LongerMessagesExtName:
                         if (extVersion == LongerMessagesExtVersion) {
                             addedExt = CpeExtension.LongerMessages;
+                        }
+                        break;
+                    case FullCPFoTreeSevunExtName:
+                        if (extVersion == FullCPFoTreeSevunExtVersion) {
+                            addedExt = CpeExtension.FullCPFoTreeSevun;
                         }
                         break;
                     default:

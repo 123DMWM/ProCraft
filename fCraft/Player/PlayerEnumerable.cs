@@ -491,7 +491,7 @@ namespace fCraft {
             }
             Player[] sourceArray = source.ToArray();
             foreach (Player player in sourceArray) {
-                foreach (Packet packet in LineWrapper.Wrap(message, player.Supports(CpeExtension.EmoteFix))) {
+                foreach (Packet packet in LineWrapper.Wrap(message, player.Supports(CpeExtension.EmoteFix), player.Supports(CpeExtension.FullCPFoTreeSevun))) {
                     player.Send(packet);
                     i++;
                 }
@@ -520,7 +520,7 @@ namespace fCraft {
             int i = 0;
             Player[] sourceArray = source.ToArray();
             foreach (Player player in sourceArray) {
-                foreach (Packet packet in LineWrapper.Wrap(message, player.Supports(CpeExtension.EmoteFix))) {
+                foreach (Packet packet in LineWrapper.Wrap(message, player.Supports(CpeExtension.EmoteFix), player.Supports(CpeExtension.FullCPFoTreeSevun))) {
                     if (player == except) continue;
                     player.Send(packet);
                     i++;
@@ -550,7 +550,7 @@ namespace fCraft {
             int i = 0;
             Player[] sourceArray = source.ToArray();
             foreach (Player player in sourceArray) {
-                foreach (Packet packet in LineWrapper.WrapPrefixed(prefix, message, player.Supports(CpeExtension.EmoteFix))) {
+                foreach (Packet packet in LineWrapper.WrapPrefixed(prefix, message, player.Supports(CpeExtension.EmoteFix), player.Supports(CpeExtension.FullCPFoTreeSevun))) {
                     player.Send(packet);
                     i++;
                 }

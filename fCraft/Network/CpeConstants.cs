@@ -67,7 +67,10 @@ namespace fCraft
         PlayerClick,
 
         /// <summary> This extension lets the player send longer chat messages </summary>
-        LongerMessages
+        LongerMessages,
+
+        /// <summary> This extension lets the player send characters from Code Page 437 </summary>
+        FullCPFoTreeSevun
     }
 
 
