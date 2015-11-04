@@ -139,7 +139,9 @@ namespace fCraft.ConfigGUI {
             } else {
                 nAnnouncements.Value = 1;
             }
-                       
+
+            xUptime.Checked = ConfigKey.SendUpTime.Enabled();
+
         }
 
 
@@ -457,6 +459,7 @@ namespace fCraft.ConfigGUI {
 
 
             ConfigKey.HeartbeatUrl.TrySetValue(cHeartbeatUrl.Text);
+            ConfigKey.SendUpTime.TrySetValue(xUptime.Checked);
 
             
 

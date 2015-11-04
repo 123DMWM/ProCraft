@@ -550,6 +550,10 @@ but will reduce bandwidth use." )]
 @"Automatically restarts the server after a given number of seconds." )]
         RestartInterval,
 
+        [BoolKey(ConfigSection.General, false,
+@"Wether or now to show uptimein the heartbeat")]
+        SendUpTime,
+
         #endregion
     }
 }

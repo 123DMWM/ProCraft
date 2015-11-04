@@ -42,6 +42,7 @@ namespace fCraft
         static readonly Dictionary<string, IPAddress> TargetAddresses = new Dictionary<string, IPAddress>();
         static DateTime nextDnsLookup = DateTime.MinValue;
         static readonly TimeSpan DnsRefreshInterval = TimeSpan.FromMinutes(30);
+        public static bool sendUptime = false;
 
 
         static IPAddress RefreshTargetAddress([NotNull] Uri requestUri)
@@ -307,7 +308,11 @@ namespace fCraft
             Port = Server.Port;
             ProtocolVersion = Config.ProtocolVersion;
             Salt = Heartbeat.Salt;
-			ServerName = namePadded.Remove(namePadded.Length - uptime.Length, uptime.Length) + uptime;
+            if (Heartbeat.sendUptime) {
+                ServerName = namePadded.Remove(namePadded.Length - uptime.Length, uptime.Length) + uptime;
+            } else {
+                ServerName = ConfigKey.ServerName.GetString();
+            }
             CustomData = new Dictionary<string, string>();
             HeartbeatUri = heartbeatUri;
         }

@@ -288,6 +288,7 @@ namespace fCraft.ConfigGUI {
             this.bResetAll = new System.Windows.Forms.Button();
             this.bApply = new System.Windows.Forms.Button();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
+            this.xUptime = new System.Windows.Forms.CheckBox();
             this.tabs.SuspendLayout();
             this.tabGeneral.SuspendLayout();
             this.gHeartbeatUrl.SuspendLayout();
@@ -388,6 +389,7 @@ namespace fCraft.ConfigGUI {
             // 
             // gHeartbeatUrl
             // 
+            this.gHeartbeatUrl.Controls.Add(this.xUptime);
             this.gHeartbeatUrl.Controls.Add(this.lHeartbeatUrlWarning);
             this.gHeartbeatUrl.Controls.Add(this.cHeartbeatUrl);
             this.gHeartbeatUrl.Controls.Add(this.lHeartbeatUrl);
@@ -3371,6 +3373,16 @@ namespace fCraft.ConfigGUI {
             this.toolTip.IsBalloon = true;
             this.toolTip.ReshowDelay = 100;
             // 
+            // xUptime
+            // 
+            this.xUptime.AutoSize = true;
+            this.xUptime.Location = new System.Drawing.Point(24, 48);
+            this.xUptime.Name = "xUptime";
+            this.xUptime.Size = new System.Drawing.Size(100, 19);
+            this.xUptime.TabIndex = 3;
+            this.xUptime.Text = "Show Uptime";
+            this.xUptime.UseVisualStyleBackColor = true;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -3731,5 +3743,6 @@ namespace fCraft.ConfigGUI {
         private TextBox tServerOwner;
         private Label lServerOwner;
         private CheckBox xDonor;
+        private CheckBox xUptime;
     }
 }

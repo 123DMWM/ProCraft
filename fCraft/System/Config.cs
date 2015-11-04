@@ -666,6 +666,10 @@ namespace fCraft {
                 case ConfigKey.WarningColor:
                     Color.Warning = Color.Parse( key.GetString() );
                     break;
+
+                case ConfigKey.SendUpTime:
+                    Heartbeat.sendUptime = key.Enabled();
+                    break;
             }
         }
 
