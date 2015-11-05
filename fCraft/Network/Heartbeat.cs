@@ -311,7 +311,7 @@ namespace fCraft
             if (Heartbeat.sendUptime) {
                 ServerName = namePadded.Remove(namePadded.Length - uptime.Length, uptime.Length) + uptime;
             } else {
-                ServerName = ConfigKey.ServerName.GetString();
+                ServerName = Color.StripColors(ConfigKey.ServerName.GetString());
             }
             CustomData = new Dictionary<string, string>();
             HeartbeatUri = heartbeatUri;
