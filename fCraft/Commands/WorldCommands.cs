@@ -3592,14 +3592,16 @@ namespace fCraft {
             IsConsoleSafe = true,
             Permissions = new[] { Permission.ManageWorlds },
             Usage = "/WSet <World> <Variable> <Value>",
-            Help = "Sets a world variable. Variables are: hide, backups, greeting",
+            Help = "Sets a world variable. Variables are: hide, backups, greeting, motd",
             HelpSections = new Dictionary<string, string>{
                 { "hide",       "&H/WSet <WorldName> Hide On/Off\n&S" +
                                 "When a world is hidden, it does not show up on the &H/Worlds&S list. It can still be joined normally." },
                 { "backups",    "&H/WSet <World> Backups Off&S, &H/WSet <World> Backups Default&S, or &H/WSet <World> Backups <Time>\n&S" +
                                 "Enables or disables periodic backups. Time is given in the compact format." },
                 { "greeting",   "&H/WSet <WorldName> Greeting <Text>\n&S" +
-                                "Sets a greeting message. Message is shown whenever someone joins the map, and can also be viewed in &H/WInfo" }
+                                "Sets a greeting message. Message is shown whenever someone joins the map, and can also be viewed in &H/WInfo" },
+                { "motd",   "&H/WSet <WorldName> Motd <Text>\n&S" +
+                                "Sets a message to be shown when joining/Loading a map." }
             },
             Handler = WorldSetHandler
         };
@@ -3733,6 +3735,30 @@ namespace fCraft {
                             if (!Directory.Exists("./WorldGreeting/")) Directory.CreateDirectory("./WorldGreeting/");
                             File.WriteAllText("./WorldGreeting/" + player.World.Name + ".txt", world.Greeting);
                             world.Greeting = null;
+                        }
+                    }
+                    break;
+
+                case "messageoftheday":
+                case "motd":
+                    if (string.IsNullOrEmpty(value)) {
+                        if (string.IsNullOrEmpty(world.MOTD)) {
+                            player.Message("World \"&f{0}&s\" does not have a custom MOTD", world.Name);
+                        } else {
+                            player.Message("MOTD for \"&F{0}&S\" is: ", world.Name);
+                            player.Message("  " + world.MOTD);
+                        }
+                    } else {
+                        if(value.Length > 64) {
+                            value = value.Substring(0, 64);
+                        }
+                        if (value.ToLower().Equals("remove") || value.ToLower().Equals("delete") || value.ToLower().Equals("reset")) {
+                            player.Message("MOTD for \"&F{0}&S\" has been removed", world.Name);
+                            world.MOTD = null;
+                        } else {
+                            player.Message("MOTD for \"&F{0}&S\" has been set to:", world.Name);
+                            player.Message("  " + value);
+                            world.MOTD = value;
                         }
                     }
                     break;

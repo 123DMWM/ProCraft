@@ -79,6 +79,11 @@ namespace fCraft {
         [CanBeNull]
         public string Greeting { get; set; }
 
+        /// <summary> Message shown to players who join this map.
+        /// Null if no message is set. </summary>
+        [CanBeNull]
+        public string MOTD { get; set; }
+
         /// <summary> List of Signs in the specified world.
         /// Null if no signs are set. </summary>
         [CanBeNull]

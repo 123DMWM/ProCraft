@@ -412,6 +412,8 @@ namespace fCraft {
                     world.UnlockedOn = timestamp.ToDateTime();
                 }
             }
+            tempEl = el.Element("MOTD");
+            if (tempEl != null) world.MOTD = tempEl.Value;
             /* load BlockHunt settings
             XElement tempBH = el.Element("BlockHunt");
             if (tempBH != null)
@@ -661,6 +663,10 @@ namespace fCraft {
                         if( world.UnlockedOn != DateTime.MinValue ) {
                             temp.Add( new XElement( "UnlockedOn", world.UnlockedOn.ToUnixTime() ) );
                         }
+                    }
+
+                    if (!String.IsNullOrEmpty(world.MOTD)) {
+                        temp.Add(new XElement("MOTD", world.MOTD));
                     }
 
                     /*save BlockHunt settings

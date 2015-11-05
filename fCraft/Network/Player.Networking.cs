@@ -1339,14 +1339,8 @@ namespace fCraft {
 				LastPosition = Position;
 			}
 
-            string textLine1 = ConfigKey.ServerName.GetString();
-            string textLine2;
-
-            if ((newWorld.Name.ToLower() == "ctf" || newWorld.Name.ToLower() == "maze" || newWorld.Name.ToLower() == "parkour") && this.Info.Rank != RankManager.HighestRank)
-            {
-                textLine2 = "Loading world " + newWorld.ClassyName + " &f-hax -respawn";
-            }
-            else textLine2 = "Loading world " + newWorld.ClassyName;
+            string textLine1 = "Loading world " + newWorld.ClassyName;
+            string textLine2 = newWorld.MOTD ?? "Welcome!";
 
             if (RaisePlayerJoiningWorldEvent(this, newWorld, reason, textLine1, textLine2))
             {
