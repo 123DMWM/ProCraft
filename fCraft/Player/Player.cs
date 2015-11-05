@@ -215,7 +215,7 @@ namespace fCraft {
         [NotNull]
         public string ListName {
             get {
-				return (Info.Rank.Can(Permission.ReadStaffChat) ? (Info.Rank == RankManager.HighestRank ? "&7+" : "&f-") : " ") + Info.Rank.Color + Name + (Info.DisplayedName != null && Info.DisplayedName.ToLower() != Info.Name.ToLower() ? " &e(&f" + Info.DisplayedName + "&e)" : "");
+				return (Info.Rank.Can(Permission.ReadStaffChat) ? (Info.Rank == RankManager.HighestRank ? "&7+" : "&f-") : " ") + Info.Rank.Color + Name + (Info.DisplayedName != null && Color.StripColors(Chat.ReplacePercentColorCodes(Info.DisplayedName, false)).ToLower() != Info.Name.ToLower() ? " &e(&f" + Info.DisplayedName + "&e)" : "");
             }
         }
 
