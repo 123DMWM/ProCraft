@@ -337,7 +337,7 @@ namespace fCraft {
                     if (!short.TryParse(tempAttr.Value, out world.EdgeLevel)) {
                         world.EdgeLevel = (short) (world.map.Height/2);
                         Logger.Log(LogType.Warning,
-                            "WorldManager: Could not parse \"level\" attribute of Environment settings for world \"{0}\", assuming default (normal).",
+                            "WorldManager: Could not parse \"level\" attribute of Environment settings for world \"{0}\", assuming default (normal height/2).",
                             worldName);
                     }
                 }
@@ -345,9 +345,9 @@ namespace fCraft {
                     try {
                         world.Texture = tempAttr.Value;
                     } catch {
-                        world.Texture = "http://123dmwm.tk/terrain/64xDefault.png";
+                        world.Texture = "Default";
                         Logger.Log(LogType.Warning,
-                            "WorldManager: Could not parse \"texture\" attribute of Environment settings for world \"{0}\", assuming default (normal).",
+                            "WorldManager: Could not parse \"texture\" attribute of Environment settings for world \"{0}\", assuming default (" + Server.DefaultTerrain + ").",
                             worldName);
                     }
                 }

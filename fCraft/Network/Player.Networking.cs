@@ -1478,7 +1478,7 @@ namespace fCraft {
             #region EnvSetMapAppearance
 
             if (Supports(CpeExtension.EnvMapAppearance)) {
-                Send(Packet.MakeEnvSetMapAppearance(World.Texture, World.EdgeBlock, World.HorizonBlock,
+                Send(Packet.MakeEnvSetMapAppearance((World.Texture == "Default" ? Server.DefaultTerrain : World.Texture), World.EdgeBlock, World.HorizonBlock,
                         (short)((World.EdgeLevel == -1) ? (WorldMap.Height / 2) : World.EdgeLevel)));
             }
 

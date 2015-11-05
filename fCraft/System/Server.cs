@@ -38,10 +38,13 @@ namespace fCraft {
 
         /// <summary> Minecraft.net connection URL. </summary>
         public static Uri Uri { get; internal set; }
-        
+
+        /// <summary> Default terrain file for each world.</summary>
+        public static string DefaultTerrain { get; set; }
 
 
-    internal static int MaxUploadSpeed, // set by Config.ApplyConfig
+
+        internal static int MaxUploadSpeed, // set by Config.ApplyConfig
                             BlockUpdateThrottling; // used when there are no players in a world
         internal const int MaxSessionPacketsPerTick = 128, // used when there are no players in a world
                            MaxBlockUpdatesPerTick = 100000; // used when there are no players in a world

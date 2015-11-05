@@ -32,8 +32,8 @@ namespace fCraft.ConfigGUI {
         private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
             this.tabs = new System.Windows.Forms.TabControl();
             this.tabGeneral = new System.Windows.Forms.TabPage();
             this.gHeartbeatUrl = new System.Windows.Forms.GroupBox();
@@ -91,7 +91,6 @@ namespace fCraft.ConfigGUI {
             this.xRankPrefixesInList = new System.Windows.Forms.CheckBox();
             this.xRankPrefixesInChat = new System.Windows.Forms.CheckBox();
             this.xRankColorsInChat = new System.Windows.Forms.CheckBox();
-            this.chatPreview = new fCraft.ConfigGUI.ChatPreview();
             this.tabWorlds = new System.Windows.Forms.TabPage();
             this.xWoMEnableEnvExtensions = new System.Windows.Forms.CheckBox();
             this.bMapPath = new System.Windows.Forms.Button();
@@ -289,6 +288,9 @@ namespace fCraft.ConfigGUI {
             this.bApply = new System.Windows.Forms.Button();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.xUptime = new System.Windows.Forms.CheckBox();
+            this.chatPreview = new fCraft.ConfigGUI.ChatPreview();
+            this.label1 = new System.Windows.Forms.Label();
+            this.tDefaultTerrain = new System.Windows.Forms.TextBox();
             this.tabs.SuspendLayout();
             this.tabGeneral.SuspendLayout();
             this.gHeartbeatUrl.SuspendLayout();
@@ -1051,16 +1053,10 @@ namespace fCraft.ConfigGUI {
             this.xRankColorsInChat.Text = "Show rank colors.";
             this.xRankColorsInChat.UseVisualStyleBackColor = true;
             // 
-            // chatPreview
-            // 
-            this.chatPreview.Location = new System.Drawing.Point(7, 256);
-            this.chatPreview.Margin = new System.Windows.Forms.Padding(4);
-            this.chatPreview.Name = "chatPreview";
-            this.chatPreview.Size = new System.Drawing.Size(637, 241);
-            this.chatPreview.TabIndex = 2;
-            // 
             // tabWorlds
             // 
+            this.tabWorlds.Controls.Add(this.tDefaultTerrain);
+            this.tabWorlds.Controls.Add(this.label1);
             this.tabWorlds.Controls.Add(this.xWoMEnableEnvExtensions);
             this.tabWorlds.Controls.Add(this.bMapPath);
             this.tabWorlds.Controls.Add(this.xMapPath);
@@ -1221,8 +1217,8 @@ namespace fCraft.ConfigGUI {
             this.dgvWorlds.MultiSelect = false;
             this.dgvWorlds.Name = "dgvWorlds";
             this.dgvWorlds.RowHeadersVisible = false;
-            dataGridViewCellStyle2.Padding = new System.Windows.Forms.Padding(0, 1, 0, 1);
-            this.dgvWorlds.RowsDefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle6.Padding = new System.Windows.Forms.Padding(0, 1, 0, 1);
+            this.dgvWorlds.RowsDefaultCellStyle = dataGridViewCellStyle6;
             this.dgvWorlds.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dgvWorlds.Size = new System.Drawing.Size(636, 325);
             this.dgvWorlds.TabIndex = 0;
@@ -1280,8 +1276,8 @@ namespace fCraft.ConfigGUI {
             // dgvcBlockDB
             // 
             this.dgvcBlockDB.DataPropertyName = "BlockDBEnabled";
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.dgvcBlockDB.DefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.dgvcBlockDB.DefaultCellStyle = dataGridViewCellStyle5;
             this.dgvcBlockDB.HeaderText = "BlockDB";
             this.dgvcBlockDB.Name = "dgvcBlockDB";
             this.dgvcBlockDB.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
@@ -3383,6 +3379,31 @@ namespace fCraft.ConfigGUI {
             this.xUptime.Text = "Show Uptime";
             this.xUptime.UseVisualStyleBackColor = true;
             // 
+            // chatPreview
+            // 
+            this.chatPreview.Location = new System.Drawing.Point(7, 256);
+            this.chatPreview.Margin = new System.Windows.Forms.Padding(4);
+            this.chatPreview.Name = "chatPreview";
+            this.chatPreview.Size = new System.Drawing.Size(637, 241);
+            this.chatPreview.TabIndex = 2;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(5, 458);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(88, 15);
+            this.label1.TabIndex = 23;
+            this.label1.Text = "Default Terrain";
+            // 
+            // tDefaultTerrain
+            // 
+            this.tDefaultTerrain.Location = new System.Drawing.Point(97, 455);
+            this.tDefaultTerrain.Name = "tDefaultTerrain";
+            this.tDefaultTerrain.Size = new System.Drawing.Size(547, 21);
+            this.tDefaultTerrain.TabIndex = 24;
+            this.tDefaultTerrain.Text = "http://123dmwm.tk/terrain/64xDefault.png";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -3744,5 +3765,7 @@ namespace fCraft.ConfigGUI {
         private Label lServerOwner;
         private CheckBox xDonor;
         private CheckBox xUptime;
+        private TextBox tDefaultTerrain;
+        private Label label1;
     }
 }

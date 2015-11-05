@@ -231,6 +231,8 @@ namespace fCraft.ConfigGUI {
             }
 
             xWoMEnableEnvExtensions.Checked = ConfigKey.WoMEnableEnvExtensions.Enabled();
+
+            tDefaultTerrain.Text = ConfigKey.DefaultTerrain.GetString();
         }
 
 
@@ -490,6 +492,8 @@ namespace fCraft.ConfigGUI {
             else ConfigKey.MapPath.TrySetValue( ConfigKey.MapPath.GetDefault() );
 
             ConfigKey.WoMEnableEnvExtensions.TrySetValue( xWoMEnableEnvExtensions.Checked );
+
+            ConfigKey.DefaultTerrain.TrySetValue(tDefaultTerrain.Text);
 
 
             // Security

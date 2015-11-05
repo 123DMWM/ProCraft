@@ -670,6 +670,10 @@ namespace fCraft {
                 case ConfigKey.SendUpTime:
                     Heartbeat.sendUptime = key.Enabled();
                     break;
+
+                case ConfigKey.DefaultTerrain:
+                    Server.DefaultTerrain = key.GetString();
+                    break;
             }
         }
 

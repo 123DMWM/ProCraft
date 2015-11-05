@@ -582,7 +582,7 @@ namespace fCraft {
                                 "Use \"normal\" instead of a number to reset to default (bedrock)." },
                 { "texture",    "&H/Env <WorldName> texture <Texture .PNG Url>\n&S" +
                                 "Changes the texture for all visible blocks on a map. "+
-                                "Use \"normal\" instead of a web link to reset to default (http://123dmwm.tk/terrain/64xDefault.png)" },
+                                "Use \"normal\" instead of a web link to reset to default (" + Server.DefaultTerrain + ")" },
                 { "weather",    "&H/Env <WorldName> weather <0,1,2/sun,rain,snow>\n&S" +
                                 "Changes the weather on a specified map. "+
                                 "Use \"normal\" instead to use default (0/sun)" }
@@ -621,8 +621,7 @@ namespace fCraft {
                                 world.EdgeLevel == -1 ? "normal" : world.EdgeLevel + " blocks");
                 player.Message( "  Water block: {1}  Bedrock block: {0}",
                                 world.EdgeBlock, world.HorizonBlock );
-                player.Message("  Texture: {0}",
-                                world.Texture == "http://123dmwm.tk/terrain/64xDefault.png" ? "normal" : world.Texture);
+                player.Message("  Texture: {0}", (world.Texture == "Default" ? Server.DefaultTerrain : world.Texture));
                 if( !player.IsUsingWoM ) {
                     player.Message( "  You need ClassiCube client to see the changes." );
                 }
@@ -639,7 +638,7 @@ namespace fCraft {
                     world.EdgeLevel = -1;
                     world.EdgeBlock = Block.Admincrete;
                     world.HorizonBlock = Block.Water;
-                    world.Texture = "http://123dmwm.tk/terrain/64xDefault.png";
+                    world.Texture = "Default";
                     Logger.Log( LogType.UserActivity,
                                 "Env: {0} {1} reset environment settings for world {2}",
                                 player.Info.Rank.Name, player.Name, world.Name );
@@ -794,7 +793,7 @@ namespace fCraft {
                     }
                     foreach (Player p in world.Players) {
                         if (p.Supports(CpeExtension.EnvMapAppearance)) {
-                            p.Send(Packet.MakeEnvSetMapAppearance(world.Texture, world.EdgeBlock, world.HorizonBlock, world.EdgeLevel));
+                            p.Send(Packet.MakeEnvSetMapAppearance((world.Texture == "Default" ? Server.DefaultTerrain : world.Texture), world.EdgeBlock, world.HorizonBlock, world.EdgeLevel));
                         }
                     }
                     break;
@@ -821,7 +820,7 @@ namespace fCraft {
                     }
                     foreach (Player p in world.Players) {
                         if (p.Supports(CpeExtension.EnvMapAppearance)) {
-                            p.Send(Packet.MakeEnvSetMapAppearance(world.Texture, world.EdgeBlock, world.HorizonBlock, world.EdgeLevel));
+                            p.Send(Packet.MakeEnvSetMapAppearance((world.Texture == "Default" ? Server.DefaultTerrain : world.Texture), world.EdgeBlock, world.HorizonBlock, world.EdgeLevel));
                         }
                     }
                     break;
@@ -848,7 +847,7 @@ namespace fCraft {
                     }
                     foreach (Player p in world.Players) {
                         if (p.Supports(CpeExtension.EnvMapAppearance)) {
-                            p.Send(Packet.MakeEnvSetMapAppearance(world.Texture, world.EdgeBlock, world.HorizonBlock, world.EdgeLevel));
+                            p.Send(Packet.MakeEnvSetMapAppearance((world.Texture == "Default" ? Server.DefaultTerrain : world.Texture), world.EdgeBlock, world.HorizonBlock, world.EdgeLevel));
                         }
                     }
                     break;
@@ -856,11 +855,10 @@ namespace fCraft {
                 case "tex":
                 case "terrain":
                 case "texture":
-                    if (valueText == "http://123dmwm.tk/terrain/64xDefault.png" || valueText == "normal") {
-                        player.Message("Reset texture for {0}&S to normal", world.ClassyName);
-                        valueText = "http://123dmwm.tk/terrain/64xDefault.png";
-                    }
-                    if (!valueText.EndsWith(".png", StringComparison.OrdinalIgnoreCase)) {
+                    if (valueText.ToLower() == "default") {
+                        player.Message("Reset texture for {0}&S to {1}", world.ClassyName, Server.DefaultTerrain);
+                        valueText = "Default";
+                    } else if (!valueText.EndsWith(".png", StringComparison.OrdinalIgnoreCase)) {
                         player.Message("Env Texture: Invalid image type. Please use a \".png\" type image.", world.ClassyName);
                         return;
                     } else if (!valueText.StartsWith("http://", StringComparison.OrdinalIgnoreCase)) {
@@ -872,7 +870,7 @@ namespace fCraft {
                     world.Texture = valueText;
                     foreach (Player p in world.Players) {
                         if (p.Supports(CpeExtension.EnvMapAppearance)) {
-                            p.Send(Packet.MakeEnvSetMapAppearance(world.Texture, world.EdgeBlock, world.HorizonBlock, world.EdgeLevel));
+                            p.Send(Packet.MakeEnvSetMapAppearance((world.Texture == "Default" ? Server.DefaultTerrain : world.Texture), world.EdgeBlock, world.HorizonBlock, world.EdgeLevel));
                         }
                     }
                     break;
@@ -1725,14 +1723,10 @@ namespace fCraft {
 
         static void textureHandler(Player player, CommandReader cmd)
         {
-			if (player.World != null && !"".Equals(player.World.Texture)) {
-				if (player.World.Texture.StartsWithIgnoreCase("http://123dmwm.tk/terrain/64xDefault")) {
-					player.Message("This world uses 123DontMessWitMe's custom texture pack");
-				} else {
-					player.Message("This world uses a custom texture pack");
-				}
+			if (player.World != null && !string.IsNullOrEmpty(player.World.Texture)) {
+				player.Message("This world uses a custom texture pack");
 				player.Message("A preview can be found here: ");
-				player.Message("  " + player.World.Texture);
+				player.Message("  " + (player.World.Texture == "Default" ? Server.DefaultTerrain : player.World.Texture));
 			} else {
 				player.Message("You are not in a world with a custom texturepack.");
 			}

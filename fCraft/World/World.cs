@@ -953,7 +953,7 @@ namespace fCraft {
         public Block EdgeBlock = Block.Admincrete;
 
         /// <summary> The texture that will be used for the blocks. </summary>
-        public string Texture = "http://123dmwm.tk/terrain/64xDefault.png";
+        public string Texture = "Default";
 
         /// <summary> The current weather in this world. </summary>
         public byte Weather = 0;

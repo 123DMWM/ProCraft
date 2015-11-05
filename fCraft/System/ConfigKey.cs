@@ -78,6 +78,11 @@ overwhelming the Internet connection with data.",
             @"URL to send heartbeats to. Default is classicube.net.
 This config key is added in case alternative login/heartbeat services arise.")]
         HeartbeatUrl,
+        
+
+        [BoolKey(ConfigSection.General, false,
+@"Wether or now to show uptimein the heartbeat")]
+        SendUpTime,
 
         #endregion
 
@@ -160,6 +165,10 @@ the build permission for new worlds will default to this rank." )]
 @"Custom path for storing map files. If you change this value,
 make sure to move the map files before starting the server again." )]
         MapPath,
+
+        [StringKey(ConfigSection.Worlds, "http://123dmwm.tk/terrain/64xDefault.png",
+@"Custom URL for world terrain")]
+        DefaultTerrain,
 
         #endregion
 
@@ -548,11 +557,7 @@ but will reduce bandwidth use." )]
 
         [IntKey( ConfigSection.Advanced, 0,
 @"Automatically restarts the server after a given number of seconds." )]
-        RestartInterval,
-
-        [BoolKey(ConfigSection.General, false,
-@"Wether or now to show uptimein the heartbeat")]
-        SendUpTime,
+        RestartInterval
 
         #endregion
     }
