@@ -291,20 +291,6 @@ namespace fCraft {
                 IsUsingWoM = true;
                 return true;
             }
-            foreach (Char c in message) {
-                if (c < ' ' || c > (Supports(CpeExtension.FullCPFoTreeSevun) ? 255 : 127)) {
-                    message = message.Replace(c, ' ');
-                }
-            }
-
-            /*if( message.Any( t => t < ' ' || t > '~' ) ) {
-                Logger.Log( LogType.SuspiciousActivity,
-                            "Player.ParseMessage: {0} attempted to write illegal characters in chat and was kicked.",
-                            Name );
-                Server.Message( "{0}&W was kicked for sending invalid chat.", ClassyName );
-                KickNow( "Illegal characters in chat.", LeaveReason.InvalidMessageKick );
-                return false;
-            }*/
 
             if((message.IndexOf('&') != -1) && (!(Can(Permission.UseColorCodes)))) {
                 message = Color.StripColors( message );
