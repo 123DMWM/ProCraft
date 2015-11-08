@@ -2338,7 +2338,7 @@ namespace fCraft {
 
         static void DoNotMarkHandler( Player player, CommandReader cmd ) {
 			player.DisableClickToMark = !player.DisableClickToMark;
-			player.Message("&Click-to-mark: " + (player.DisableClickToMark ? "&2enabled" : "&4disabled"));
+			player.Message("Click to /Mark: " + (!player.DisableClickToMark ? "&2enabled" : "&4disabled"));
         }
 
 

@@ -291,8 +291,8 @@ namespace fCraft
                     e.Player.Info.IsAFK = false;
                     e.Player.Info.oldafkMob = e.Player.Info.afkMob;
                     e.Player.Info.afkMob = e.Player.Info.Mob;
+                    Server.UpdateTabList();
                 }
-                Server.UpdateTabList();
                 e.Player.ResetIdBotTimer();
             }
         }
