@@ -1608,13 +1608,13 @@ namespace fCraft {
 				var canBeSeen = Players.Where(i => p1.CanSee(i)).ToArray();
 				var canBeSeenW = p1.World.Players.Where(i => p1.CanSee(i)).ToArray();
 				if (!p1.IsPlayingCTF) {
-					foreach (Player p2 in canBeSeen) {
-						if (p2.Info.IsAFK) {
-							p1.Send(Packet.MakeExtAddPlayerName(p2.NameID, p2.Name, p2.ListName, "Away From Keyboard" + " &s(&f" + canBeSeen.Where(p => p.Info.IsAFK).Count() + "&s)", (byte)canBeSeen.Where(p => p.Info.IsAFK).Count()));
-						} else {
-							p1.Send(Packet.MakeExtAddPlayerName(p2.NameID, p2.Name, p2.ListName, p2.World.ClassyName + " &s(&f" + canBeSeen.Where(p => !p.Info.IsAFK && p.World == p2.World).Count() + "&s)", Byte.MaxValue));
-						}
-					}
+                    foreach (Player p2 in canBeSeen) {
+                        p1.Send(Packet.MakeExtAddPlayerName(
+                            p2.NameID, p2.Name,
+                            p2.ListName + (p2.Info.DisplayedName != null && Color.StripColors(Chat.ReplacePercentColorCodes(p2.Info.DisplayedName, false)).ToLower() != p2.Info.Name.ToLower() ? " &s(&f" + Color.StripColors(Chat.ReplacePercentColorCodes(p2.Info.DisplayedName, false)) + "&s)" : ""),
+                            p2.Info.IsAFK ? "&s(&f" + canBeSeen.Where(p => p.Info.IsAFK).Count() + "&s) Away From Keyboard" : "&s(&f" + canBeSeen.Where(p => !p.Info.IsAFK && p.World == p2.World).Count() + "&s) " + p2.World.ClassyName,
+                            (byte)p2.Info.Rank.Index));
+                    }
 				} else {
 					foreach (Player p2 in canBeSeenW) {
 						if (p2.IsPlayingCTF && p2.Team == "Red") {
