@@ -1158,21 +1158,6 @@ namespace fCraft {
                         // Placed Dirt to Grass
                         type = Block.Grass;
                     }
-
-                    if (type == Block.Snow && coord.Z > 0
-                        && (map.GetBlock(coordBelow) == Block.Air
-                        || map.GetBlock(coordBelow) == Block.BrownMushroom
-                        || map.GetBlock(coordBelow) == Block.RedMushroom
-                        || map.GetBlock(coordBelow) == Block.RedFlower
-                        || map.GetBlock(coordBelow) == Block.YellowFlower
-                        || map.GetBlock(coordBelow) == Block.Sapling
-                        || map.GetBlock(coordBelow) == Block.Fire
-                        || map.GetBlock(coordBelow) == Block.Rope))
-                    {
-                        // Handle snow over air
-                        RevertBlockNow(coord);
-                        break;
-                    }
                     if (type == Block.Snow && coord.Z > 0 && map.GetBlock(coordBelow) == Block.Snow)
                     {
                         // Handle Snow Stacking --> Ice
