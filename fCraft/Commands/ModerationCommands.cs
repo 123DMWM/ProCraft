@@ -1415,20 +1415,6 @@ namespace fCraft {
                 player.LastUsedPlayerName = targetInfo.Name;
                 Rank oldrank = targetInfo.Rank;
                 targetInfo.ChangeRank(player, newRank, cmd.NextAll(), true, true, false);
-                if (oldrank < targetInfo.Rank)
-                {
-                    if (targetInfo.IsOnline && !targetInfo.IsHidden)
-                    {
-                        Server.Players.Message("&6Bot&f: Hey " + targetInfo.ClassyName + "&f!\n" +
-                                               "&fCongrats on getting " + newRank.ClassyName + "&f!");
-                        IRC.SendChannelMessage( "\u212C&6Bot\u211C: Hey " + targetInfo.ClassyName + "\u211C! Congrats on getting " + newRank.ClassyName + "\u211C!" );
-                    }
-                    else if (!targetInfo.IsOnline || targetInfo.IsHidden)
-                    {
-                        Server.Players.Message("&6Bot&f: Hey guys! Remember to congrat " + targetInfo.ClassyName + " &fon getting promoted to " + newRank.ClassyName + "&f!");
-                        IRC.SendChannelMessage( "\u212C&6Bot\u211C: Hey guys! Remember to congrat " + targetInfo.ClassyName + " \u211Con getting promoted to " + newRank.ClassyName + "\u211C!" );
-                    }
-                }
             }
             catch (PlayerOpException ex)
             {

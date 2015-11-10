@@ -897,14 +897,11 @@ namespace fCraft {
                             "{0} froze {1}",
                             player.Name, Name );
                 if( announce ) {
-                    Server.Message( null, "&6Bot&f: Low Orbit &bFreeze&f Ray Inbound. &n&4Target&f: " + target.ClassyName );
-                    Logger.Log( LogType.UserActivity, "&6Bot&f: Low Orbit &bFreeze&f Ray Inbound. &n&4Target&f: " + target.ClassyName );
-                    IRC.SendChannelMessage( "\u212C&6Bot\u211C: Low Orbit &bFreeze\u211C Ray Inbound. &4Target\u211C: " + target.ClassyName );
                     if (target != null)
                     {
                         target.Message( "&WYou were &bfrozen&w by {0}", player.ClassyName );
                     }
-                    Server.Message( target, "{1}&s successfully &bfroze&s: {1}",
+                    Server.Message( target, "{0}&s successfully &bfroze&s: {1}",
                                             ClassyName, player.ClassyName );
                 }
 
@@ -1041,9 +1038,6 @@ namespace fCraft {
                                 ClassyName, player.Name, duration );
                     if( announce ) {
                         Player target = PlayerObject;
-						Server.Message(null, "&6Bot&f: HEY " + target.ClassyName.ToUpper() + "&f! &n&6Bot&f: " + player.ClassyName + "&f wants you to shut up for about " + duration.ToMiniNoColorString() + "&f, Okay? Okay.");
-						Logger.Log(LogType.UserActivity, "&6Bot&f: HEY " + target.ClassyName.ToUpper() + "&f! &n&6Bot&f: " + player.ClassyName + "&f wants you to shut up for about " + duration.ToMiniNoColorString() + "&f, Okay? Okay.");
-						IRC.SendChannelMessage("\u212C&6Bot\u211C: HEY " + target.ClassyName + "\u211C! " + player.ClassyName + "\u211C wants you to shut up for about " + duration.ToMiniNoColorString() + "\u211C, Okay? Okay.");
                         if (target != null)
                         {
                             target.Message( "You were muted by {0}&S for {1}",
