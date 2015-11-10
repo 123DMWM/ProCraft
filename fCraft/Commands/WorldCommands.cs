@@ -810,13 +810,13 @@ namespace fCraft {
                         player.Message("Reset water block for {0}&S to normal (Water)", world.ClassyName);
                         world.HorizonBlock = Block.Water;
                     } else {
-                        if (block == Block.Air || block == Block.Sapling || block == Block.Glass || block == Block.YellowFlower || block == Block.RedFlower || block == Block.BrownMushroom || block == Block.RedMushroom || block == Block.Rope || block == Block.Fire) {
-                            player.Message("Env: Cannot use {0} for water textures.", block);
-                            return;
-                        } else {
+                        //if (block == Block.Air || block == Block.Sapling || block == Block.Glass || block == Block.YellowFlower || block == Block.RedFlower || block == Block.BrownMushroom || block == Block.RedMushroom || block == Block.Rope || block == Block.Fire) {
+                            //player.Message("Env: Cannot use {0} for water textures.", block);
+                            //return;
+                        //} else {
                             world.HorizonBlock = block;
                             player.Message("Set water block for {0}&S to {1}", world.ClassyName, block);
-                        }
+                        //}
                     }
                     foreach (Player p in world.Players) {
                         if (p.Supports(CpeExtension.EnvMapAppearance)) {
@@ -837,13 +837,13 @@ namespace fCraft {
                         player.Message("Reset bedrock block for {0}&S to normal (Bedrock)", world.ClassyName);
                         world.EdgeBlock = Block.Admincrete;
                     } else {
-                        if (blockhorizon == Block.Air || blockhorizon == Block.Sapling || blockhorizon == Block.Glass || blockhorizon == Block.YellowFlower || blockhorizon == Block.RedFlower || blockhorizon == Block.BrownMushroom || blockhorizon == Block.RedMushroom || blockhorizon == Block.Rope || blockhorizon == Block.Fire) {
-                            player.Message("Env: Cannot use {0} for bedrock textures.", blockhorizon);
-                            return;
-                        } else {
+                        //if (blockhorizon == Block.Air || blockhorizon == Block.Sapling || blockhorizon == Block.Glass || blockhorizon == Block.YellowFlower || blockhorizon == Block.RedFlower || blockhorizon == Block.BrownMushroom || blockhorizon == Block.RedMushroom || blockhorizon == Block.Rope || blockhorizon == Block.Fire) {
+                            //player.Message("Env: Cannot use {0} for bedrock textures.", blockhorizon);
+                            //return;
+                        //} else {
                             world.EdgeBlock = blockhorizon;
                             player.Message("Set bedrock block for {0}&S to {1}", world.ClassyName, blockhorizon);
-                        }
+                        //}
                     }
                     foreach (Player p in world.Players) {
                         if (p.Supports(CpeExtension.EnvMapAppearance)) {

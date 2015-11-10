@@ -1611,8 +1611,8 @@ namespace fCraft {
                     foreach (Player p2 in canBeSeen) {
                         p1.Send(Packet.MakeExtAddPlayerName(
                             p2.NameID, p2.Name,
-                            p2.ListName + (p2.Info.DisplayedName != null && Color.StripColors(Chat.ReplacePercentColorCodes(p2.Info.DisplayedName, false)).ToLower() != p2.Info.Name.ToLower() ? " &s(&f" + Color.StripColors(Chat.ReplacePercentColorCodes(p2.Info.DisplayedName, false)) + "&s)" : ""),
-                            p2.Info.IsAFK ? "&s(&f" + canBeSeen.Where(p => p.Info.IsAFK).Count() + "&s) Away From Keyboard" : "&s(&f" + canBeSeen.Where(p => !p.Info.IsAFK && p.World == p2.World).Count() + "&s) " + p2.World.ClassyName,
+                            p2.ListName + (p2.Info.DisplayedName != null && Color.StripColors(Chat.ReplacePercentColorCodes(p2.Info.DisplayedName, false)).ToLower() != p2.Info.Name.ToLower() ? " &e(&7" + Color.StripColors(Chat.ReplacePercentColorCodes(p2.Info.DisplayedName, false)) + "&e)" : ""),
+                            p2.Info.IsAFK ? "&e(&f" + canBeSeen.Where(p => p.Info.IsAFK).Count() + "&e) Away From Keyboard" : "&e(&f" + canBeSeen.Where(p => !p.Info.IsAFK && p.World == p2.World).Count() + "&e) " + p2.World.ClassyName,
                             (byte)p2.Info.Rank.Index));
                     }
 				} else {

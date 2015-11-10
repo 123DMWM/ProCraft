@@ -244,7 +244,7 @@ namespace fCraft
             var staff = Server.Players.Where(p => p.Info.Rank.Can(Permission.ReadStaffChat));
             if (staff != null && staff.Any()) {
                 player.Message("&SYour review request has been sent to the Moderators. They will be with you shortly");
-                Chat.SendStaffSay(player, "&SPlayer " + player.ClassyName + " &Srequests a building review.");
+                Server.Players.Where(p => p.Can(Permission.ReadStaffChat)).Message("&SPlayer " + player.ClassyName + " &Srequests a building review.");
             } else {
                 player.Message("&SThere are no staff on! Sorry!");
             }
