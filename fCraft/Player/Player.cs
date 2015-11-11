@@ -616,11 +616,11 @@ namespace fCraft {
             if( this == Console ) {
                 Logger.LogToConsole( message );
             } else if( IsUsingWoM ) {
-                foreach (Packet p in LineWrapper.WrapPrefixed( WoMAlertPrefix, WoMAlertPrefix + Color.Sys + message, Supports(CpeExtension.EmoteFix), Supports(CpeExtension.FullCPFoTreeSevun))) {
+                foreach (Packet p in LineWrapper.WrapPrefixed( WoMAlertPrefix, WoMAlertPrefix + Color.Sys + message, Supports(CpeExtension.EmoteFix), Supports(CpeExtension.FullCP437))) {
                     Send( p );
                 }
             } else {
-                foreach (Packet p in LineWrapper.Wrap( Color.Sys + message, Supports(CpeExtension.EmoteFix), Supports(CpeExtension.FullCPFoTreeSevun))) {
+                foreach (Packet p in LineWrapper.Wrap( Color.Sys + message, Supports(CpeExtension.EmoteFix), Supports(CpeExtension.FullCP437))) {
                     Send( p );
                 }
             }
@@ -643,7 +643,7 @@ namespace fCraft {
             if( IsSuper ) {
                 Logger.LogToConsole( message );
             } else {
-                foreach (Packet p in LineWrapper.Wrap( Color.Sys + message, Supports(CpeExtension.EmoteFix), Supports(CpeExtension.FullCPFoTreeSevun))) {
+                foreach (Packet p in LineWrapper.Wrap( Color.Sys + message, Supports(CpeExtension.EmoteFix), Supports(CpeExtension.FullCP437))) {
                     Send( p );
                 }
             }
@@ -672,7 +672,7 @@ namespace fCraft {
             }
             else
             {
-                foreach (Packet p in LineWrapper.Wrap( messageType, message, Supports(CpeExtension.EmoteFix), Supports(CpeExtension.FullCPFoTreeSevun)))
+                foreach (Packet p in LineWrapper.Wrap( messageType, message, Supports(CpeExtension.EmoteFix), Supports(CpeExtension.FullCP437)))
                 {
                     Send(p);
                 }
@@ -697,7 +697,7 @@ namespace fCraft {
             if( this == Console ) {
                 Logger.LogToConsole( message );
             } else {
-                foreach (Packet p in LineWrapper.WrapPrefixed( prefix, message, Supports(CpeExtension.EmoteFix), Supports(CpeExtension.FullCPFoTreeSevun))) {
+                foreach (Packet p in LineWrapper.WrapPrefixed( prefix, message, Supports(CpeExtension.EmoteFix), Supports(CpeExtension.FullCP437))) {
                     Send( p );
                 }
             }
@@ -992,7 +992,7 @@ namespace fCraft {
             ConfirmCallback = callback;
             ConfirmParameter = callbackParameter;
             ConfirmRequestTime = DateTime.UtcNow;
-            Message( "{0}\n" + 
+            Message( "{0}&n" + 
                      "&sType &H/ok&S to confirm and continue.", String.Format( message, args ) );
         }
 
@@ -2354,7 +2354,7 @@ namespace fCraft {
                         break;
                     case FullCPFoTreeSevunExtName:
                         if (extVersion == FullCPFoTreeSevunExtVersion) {
-                            addedExt = CpeExtension.FullCPFoTreeSevun;
+                            addedExt = CpeExtension.FullCP437;
                         }
                         break;
                     default:

@@ -248,7 +248,7 @@ namespace fCraft {
             Permissions = new[] { Permission.EditPlayerDB },
             Usage = "/Model [Player] [Model] [SkinName]",
             IsConsoleSafe = true,
-            Help = "Change the Model or Skin of [Player]!\n" +
+            Help = "Change the Model or Skin of [Player]!&n" +
             "Valid models: &s [Any Block Name or ID#], Chicken, Creeper, Croc, Humanoid, Pig, Printer, Sheep, Skeleton, Spider, Zombie!",
             Handler = ModelHandler
         };
@@ -415,41 +415,41 @@ namespace fCraft {
             Category = CommandCategory.New | CommandCategory.Chat,
             Permissions = new Permission[] { Permission.Chat },
             Usage = "Bot [Option]",
-            Help = "Bot options are &hGo&s, &hServer&s, &hJoke&s, &hTime&s, &hClock&s, &hPromos&s, &hBans&s, &hKicks&s, &hBlocks&s, &hProtip&s, &hFunfact&s, and &hIdea&s.\n" +
-                   "Type in &h/help bot [option] &sfor more information.\n" +
+            Help = "Bot options are &hGo&s, &hServer&s, &hJoke&s, &hTime&s, &hClock&s, &hPromos&s, &hBans&s, &hKicks&s, &hBlocks&s, &hProtip&s, &hFunfact&s, and &hIdea&s.&n" +
+                   "Type in &h/help bot [option] &sfor more information.&n" +
                    "&6Bot&s is our Automated response system, so please don't abuse it.",
             NotRepeatable = true,
             IsConsoleSafe = true,
             HelpSections = new Dictionary<string, string>{
-                { "go",             "&sType: &f!Bot Go\n&S" +
+                { "go",             "&sType: &f!Bot Go&n&S" +
                                     "Sets a 5 second timer to be used for games." +
                                     "Most useful for when there are no staff on." },
-                { "server",         "&sType: &f!Bot Server\n&S" +
+                { "server",         "&sType: &f!Bot Server&n&S" +
                                     "Displays the server name."},
-                { "joke",           "&sType: &f!Bot Joke\n&S" +
+                { "joke",           "&sType: &f!Bot Joke&n&S" +
                                     "Displays a joke."},
-                { "time",           "&sType: &f!Bot Time\n&S" +
+                { "time",           "&sType: &f!Bot Time&n&S" +
                                     "Displays the time you spent this game session." +
-                                    "&sType: &f!Bot Time Total\n&S" +
+                                    "&sType: &f!Bot Time Total&n&S" +
                                     "Displays your Total Time spent on the server." },
-                { "clock",          "&sType: &f!Bot Clock [player]\n&S" +
+                { "clock",          "&sType: &f!Bot Clock [player]&n&S" +
                                     "Displays the date and time."},
-                { "promos",         "&sType: &f!Bot Promos\n&S" +
+                { "promos",         "&sType: &f!Bot Promos&n&S" +
                                     "Displays the amount of players you have promoted."},
-                { "bans",           "&sType: &f!Bot Bans\n&S" +
+                { "bans",           "&sType: &f!Bot Bans&n&S" +
                                     "Displays the amount of players you have banned."},
-                { "kicks",          "&sType: &f!Bot Kicks\n&S" +
+                { "kicks",          "&sType: &f!Bot Kicks&n&S" +
                                     "Displays the amount of players you have kicked."},
-                { "blocks",         "&sType: &f!Bot Blocks\n&S" +
+                { "blocks",         "&sType: &f!Bot Blocks&n&S" +
                                     "Displays the amount of blocks you have modified this session." +
-                                    "&sType: &f!Bot Blocks Total\n&S" +
+                                    "&sType: &f!Bot Blocks Total&n&S" +
                                     "Displays the amount of blocks you have modified in Total." },
-                { "protip",         "&sType: &f!Bot Protip\n&S" +
+                { "protip",         "&sType: &f!Bot Protip&n&S" +
                                     "Displays a life changing tip.*" +
                                     "*May or may not change your life" },
-                { "funfact",        "&sType: &f!Bot Funfact\n&S" +
+                { "funfact",        "&sType: &f!Bot Funfact&n&S" +
                                     "Displays a funfact."},
-                { "idea",           "&sType: &f!Bot Idea\n&S" +
+                { "idea",           "&sType: &f!Bot Idea&n&S" +
                                     "Displays a random building idea"}
                 
                 
@@ -2818,7 +2818,7 @@ namespace fCraft {
             Permissions = new[] { Permission.Chat},
             Usage = "/Hacks [Player] [Hack] [jumpheight(if needed)]",
             IsConsoleSafe = true,
-            Help = "Change the hacking abilities of [Player]\n" +
+            Help = "Change the hacking abilities of [Player]&n" +
             "Valid hacks: &aFlying&s, &aNoclip&s, &aSpeedhack&s, &aRespawn&s, &aThirdPerson&s and &aJumpheight",
             Handler = HackControlHandler
         };

@@ -975,13 +975,14 @@ namespace fCraft
         }
 
 
+        static string[] split = new string[] { "&N", "&n" };
         public static void SendRawMessage(string prefix, [NotNull] string line, string suffix)
         {
             if (line == null) throw new ArgumentNullException("line");
             // handle newlines
-            if (line.Contains('\n'))
+            if (line.Contains("&N") || line.Contains("&n"))
             {
-                string[] segments = line.Split('\n');
+                string[] segments = line.Split(split, StringSplitOptions.RemoveEmptyEntries);
                 SendRawMessage(prefix, segments[0], suffix);
                 for (int i = 1; i < segments.Length; i++)
                 {
@@ -1105,8 +1106,6 @@ namespace fCraft
             }
             else
             {
-                message = message.Replace("&n", "\n");
-				message = message.Replace("&N", "\n");
                 message = message.Replace(BoldCode, "");
                 message = message.Replace(ResetCode, "");
                 message = Color.StripColors(message);

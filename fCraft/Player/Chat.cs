@@ -549,7 +549,7 @@ namespace fCraft {
             return true;
         }
 
-                /// <summary> Replaces newline codes (&amp;n and &amp;N) with actual newlines (\n). </summary>
+        /// <summary> Replaces newline codes (&amp;n and &amp;N) with actual newlines (\n). </summary>
         /// <param name="message"> Message to process. </param>
         /// <returns> Processed message. </returns>
         /// <exception cref="ArgumentNullException"> message is null. </exception>
@@ -721,119 +721,85 @@ namespace fCraft {
 
         /// <summary> List of chat keywords, and emotes that they stand for. </summary>
         public static readonly Dictionary<string, char> EmoteKeywords = new Dictionary<string, char> {
-            {":)", '\u0001'}, // ☺
-            {"smile", '\u0001'},
+            {":)", '☺'}, {"smile", '☺'},
 
-            {"smile2", '\u0002'}, // ☻
+            {"smile2", '☻'},
 
-            {"heart", '\u0003'}, // ♥
-            {"hearts", '\u0003'},
-            {"<3", '\u0003'},
+            {"heart", '♥'},{"hearts", '♥'},
+            {"<3", '♥'},
 
-            {"diamond", '\u0004'}, // ♦
-            {"diamonds", '\u0004'},
-            {"rhombus", '\u0004'},
+            {"diamond", '♦'}, {"diamonds", '♦'},
+            {"rhombus", '♦'},
 
-            {"club", '\u0005'}, // ♣
-            {"clubs", '\u0005'},
-            {"clover", '\u0005'},
-            {"shamrock", '\u0005'},
+            {"club", '♣'},  {"clubs", '♣'},
+            {"clover", '♣'}, {"shamrock", '♣'},
 
-            {"spade", '\u0006'}, // ♠
-            {"spades", '\u0006'},
+            {"spade", '♠'}, {"spades", '♠'},
 
-            {"*", '\u0007'}, // •
-            {"bullet", '\u0007'},
-            {"dot", '\u0007'},
-            {"point", '\u0007'},
+            {"*", '•'}, {"bullet", '•'},
+            {"dot", '•'}, {"point", '•'},
 
-            {"hole", '\u0008'}, // ◘
+            {"hole", '◘'}, 
 
-            {"circle", '\u0009'}, // ○
-            {"o", '\u0009'},
+            {"circle", '○'}, {"o", '○'},
 
-            {"male", '\u000B'}, // ♂
-            {"mars", '\u000B'},
+            {"male", '♂'}, {"mars", '♂'},
 
-            {"female", '\u000C'}, // ♀
-            {"venus", '\u000C'},
+            {"female", '♀'}, {"venus", '♀'},
 
-            {"8", '\u000D'}, // ♪
-            {"note", '\u000D'},
-            {"quaver", '\u000D'},
+            {"8", '♪'}, {"note", '♪'},
+            {"quaver", '♪'},
 
-            {"notes", '\u000E'}, // ♫
-            {"music", '\u000E'},
+            {"notes", '♫'}, {"music", '♫'},
 
-            {"sun", '\u000F'}, // ☼
-            {"celestia", '\u000F'},
+            {"sun", '☼'}, {"celestia", '☼'},
 
-            {">>", '\u0010'}, // ►
-            {"right2", '\u0010'},
+            {">>", '►'}, {"right2", '►'},
 
-            {"<<", '\u0011'}, // ◄
-            {"left2", '\u0011'},
+            {"<<", '◄'}, {"left2", '◄'},
 
-            {"updown", '\u0012'}, // ↕
-            {"^v", '\u0012'},
+            {"updown", '↕'}, {"^v", '↕'},
 
-            {"!!", '\u0013'}, // ‼
+            {"!!", '‼'},
 
-            {"p", '\u0014'}, // ¶
-            {"para", '\u0014'},
-            {"pilcrow", '\u0014'},
-            {"paragraph", '\u0014'},
+            {"p", '¶'}, {"para", '¶'},
+            {"pilcrow", '¶'}, {"paragraph", '¶'},
 
-            {"s", '\u0015'}, // §
-            {"sect", '\u0015'},
-            {"section", '\u0015'},
+            {"s", '§'}, {"sect", '§'},
+            {"section", '§'},
 
-            {"-", '\u0016'}, // ▬
-            {"_", '\u0016'},
-            {"bar", '\u0016'},
-            {"half", '\u0016'},
+            {"-", '▬'}, {"_", '▬'},
+            {"bar", '▬'}, {"half", '▬'},
 
-            {"updown2", '\u0017'}, // ↨
-            {"^v_", '\u0017'},
+            {"updown2", '↨'}, {"^v_", '↨'},
 
-            {"^", '\u0018'}, // ↑
-            {"up", '\u0018'},
+            {"^", '↑'}, {"up", '↑'},
 
-            {"v", '\u0019'}, // ↓
-            {"down", '\u0019'},
+            {"v", '↓'}, {"down", '↓'},
 
-            {">", '\u001A'}, // →
-            {"->", '\u001A'},
-            {"right", '\u001A'},
+            {">", '→'}, {"->", '→'},
+            {"right", '→'},
 
-            {"<", '\u001B'}, // ←
-            {"<-", '\u001B'},
-            {"left", '\u001B'},
+            {"<", '←'}, {"<-", '←'},
+            {"left", '←'},
 
-            {"l", '\u001C'}, // ∟
-            {"angle", '\u001C'},
-            {"corner", '\u001C'},
+            {"l", '∟'}, {"angle", '∟'},
+            {"corner", '∟'},
 
-            {"<>", '\u001D'}, // ↔
-            {"<->", '\u001D'},
-            {"leftright", '\u001D'},
+            {"<>", '↔'}, {"<->", '↔'},
+            {"leftright", '↔'},
 
-            {"^^", '\u001E'}, // ▲
-            {"up2", '\u001E'},
+            {"^^", '▲'}, {"up2", '▲'},
 
-            {"vv", '\u001F'}, // ▼
-            {"down2", '\u001F'},
+            {"vv", '▼'}, {"down2", '▼'},
 
-            {"house", '\u007F'}, // ⌂
+            {"house", '⌂'},
             
-            {"caret", '^'},
-            {"hat", '^'},
+            {"caret", '^'}, {"hat", '^'},
 
-            {"tilde", '~'},
-            {"wave", '~'},
+            {"tilde", '~'}, {"wave", '~'},
 
-            {"grave", '`'},
-            {"'", '`'}
+            {"grave", '`'}, {"'", '`'}
         };
 
         /// <summary> Removes newlines (\n) and newline codes (&amp;n and &amp;N). </summary>

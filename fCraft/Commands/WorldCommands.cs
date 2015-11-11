@@ -24,9 +24,9 @@ namespace fCraft {
             CommandManager.RegisterCommand( CdBlockInfo );
             CommandManager.RegisterCommand( CdEnv );
             CdGenerate.Help = "Generates a new map. If no dimensions are given, uses current world's dimensions. " +
-                              "If no file name is given, loads generated world into current world.\n" +
-                              "Available themes: Grass, " + Enum.GetNames( typeof( MapGenTheme ) ).JoinToString() + '\n' +
-                              "Available terrain types: Empty, Ocean, " + Enum.GetNames( typeof( MapGenTemplate ) ).JoinToString() + '\n' +
+                              "If no file name is given, loads generated world into current world.&n" +
+                              "Available themes: Grass, " + Enum.GetNames( typeof( MapGenTheme ) ).JoinToString() + "&N" +
+                              "Available terrain types: Empty, Ocean, " + Enum.GetNames( typeof( MapGenTemplate ) ).JoinToString() + "&N" +
                               "Note: You do not need to specify a theme with \"Empty\" and \"Ocean\" templates.";
             CommandManager.RegisterCommand( CdGenerate );
             CommandManager.RegisterCommand( CdJoin );
@@ -73,26 +73,26 @@ namespace fCraft {
                    "If no operation is given, world's BlockDB status is shown. " +
                    "If no WorldName is given, prints status of all worlds.",
             HelpSections = new Dictionary<string, string>{
-                { "auto",       "/BlockDB <WorldName> Auto\n&S" +
+                { "auto",       "/BlockDB <WorldName> Auto&n&S" +
                                 "Allows BlockDB to decide whether it should be enabled or disabled based on each world's permissions (default)." },
-                { "on",         "/BlockDB <WorldName> On\n&S" +
+                { "on",         "/BlockDB <WorldName> On&n&S" +
                                 "Enables block tracking. Information will only be available for blocks that changed while BlockDB was enabled." },
-                { "off",        "/BlockDB <WorldName> Off\n&S" +
+                { "off",        "/BlockDB <WorldName> Off&n&S" +
                                 "Disables block tracking. Block changes will NOT be recorded while BlockDB is disabled. " +
                                 "Note that disabling BlockDB does not delete the existing data. Use &Hclear&S for that." },
-                { "clear",      "/BlockDB <WorldName> Clear\n&S" +
+                { "clear",      "/BlockDB <WorldName> Clear&n&S" +
                                 "Clears all recorded data from the BlockDB. Erases all changes from memory and deletes the .fbdb file." },
-                { "limit",      "/BlockDB <WorldName> Limit <#>|None\n&S" +
+                { "limit",      "/BlockDB <WorldName> Limit <#>|None&n&S" +
                                 "Sets the limit on the maximum number of changes to store for a given world. " +
                                 "Oldest changes will be deleted once the limit is reached. " +
                                 "Put \"None\" to disable limiting. " +
                                 "Unless a Limit or a TimeLimit it specified, all changes will be stored indefinitely." },
-                { "timelimit",  "/BlockDB <WorldName> TimeLimit <Time>/None\n&S" +
+                { "timelimit",  "/BlockDB <WorldName> TimeLimit <Time>/None&n&S" +
                                 "Sets the age limit for stored changes. " +
                                 "Oldest changes will be deleted once the limit is reached. " +
                                 "Use \"None\" to disable time limiting. " +
                                 "Unless a Limit or a TimeLimit it specified, all changes will be stored indefinitely." },
-                { "preload",    "/BlockDB <WorldName> Preload On/Off\n&S" +
+                { "preload",    "/BlockDB <WorldName> Preload On/Off&n&S" +
                                 "Enabled or disables preloading. When BlockDB is preloaded, all changes are stored in memory as well as in a file. " +
                                 "This reduces CPU and disk use for busy maps, but may not be suitable for large maps due to increased memory use." },
             },
@@ -557,33 +557,33 @@ namespace fCraft {
                    "See &H/Help env <Variable>&S for details about each variable. " +
                    "Type &H/Env <WorldName> normal&S to reset everything for a world.",
             HelpSections = new Dictionary<string, string>{
-                { "normal",     "&H/Env <WorldName> normal\n&S" +
+                { "normal",     "&H/Env <WorldName> normal&n&S" +
                                 "Resets all environment settings to their defaults for the given world." },
-                { "clouds",     "&H/Env <WorldName> clouds <Color>\n&S" +
+                { "clouds",     "&H/Env <WorldName> clouds <Color>&n&S" +
                                 "Sets color of the clouds. Use \"normal\" instead of color to reset." },
-                { "fog",        "&H/Env <WorldName> fog <Color>\n&S" +
+                { "fog",        "&H/Env <WorldName> fog <Color>&n&S" +
                                 "Sets color of the fog. Sky color blends with fog color in the distance. " +
                                 "Use \"normal\" instead of color to reset." },
-                { "shadow",     "&H/Env <WorldName> shadow <Color>\n&S" +
+                { "shadow",     "&H/Env <WorldName> shadow <Color>&n&S" +
                                 "Sets color of the shadowed areas. Use \"normal\" instead of color to reset." },
-                { "sunlight",   "&H/Env <WorldName> sunlight <Color>\n&S" +
+                { "sunlight",   "&H/Env <WorldName> sunlight <Color>&n&S" +
                                 "Sets color of the lighted areas. Use \"normal\" instead of color to reset." },
-                { "sky",        "&H/Env <WorldName> sky <Color>\n&S" +
+                { "sky",        "&H/Env <WorldName> sky <Color>&n&S" +
                                 "Sets color of the sky. Sky color blends with fog color in the distance. " +
                                 "Use \"normal\" instead of color to reset." },
-                { "level",      "&H/Env <WorldName> level <#>\n&S" +
+                { "level",      "&H/Env <WorldName> level <#>&n&S" +
                                 "Sets height of the map edges/water level, in terms of blocks from the bottom of the map. " +
                                 "Use \"normal\" instead of a number to reset to default (middle of the map)." },
-                { "edge",       "&H/Env <WorldName> edge <BlockType>\n&S" +
+                { "edge",       "&H/Env <WorldName> edge <BlockType>&n&S" +
                                 "Changes the type of block that's visible beyond the map boundaries. "+
                                 "Use \"normal\" instead of a number to reset to default (water)." },
-                { "border",     "&H/Env <WorldName> border <BlockType>\n&S" +
+                { "border",     "&H/Env <WorldName> border <BlockType>&n&S" +
                                 "Changes the type of block that's visible on sides the map boundaries. "+
                                 "Use \"normal\" instead of a number to reset to default (bedrock)." },
-                { "texture",    "&H/Env <WorldName> texture <Texture .PNG Url>\n&S" +
+                { "texture",    "&H/Env <WorldName> texture <Texture .PNG Url>&n&S" +
                                 "Changes the texture for all visible blocks on a map. "+
                                 "Use \"normal\" instead of a web link to reset to default (" + Server.DefaultTerrain + ")" },
-                { "weather",    "&H/Env <WorldName> weather <0,1,2/sun,rain,snow>\n&S" +
+                { "weather",    "&H/Env <WorldName> weather <0,1,2/sun,rain,snow>&n&S" +
                                 "Changes the weather on a specified map. "+
                                 "Use \"normal\" instead to use default (0/sun)" }
             },
@@ -1529,17 +1529,17 @@ namespace fCraft {
             Usage = "/ent <create / remove / removeAll / model / list / bring>",
             Help = "Commands for manipulating entities. For help and usage for the individual options, use /help ent <option>.",
             HelpSections = new Dictionary<string, string>{
-                { "create", "&H/Ent create <entity name> <model> <skin>\n&S" +
+                { "create", "&H/Ent create <entity name> <model> <skin>&n&S" +
                                 "Creates a new entity with the given name. Valid models are chicken, creeper, croc, human, pig, printer, sheep, skeleton, spider, zombie, or any block ID/Name." },
-                { "remove", "&H/Ent remove <entity name>\n&S" +
+                { "remove", "&H/Ent remove <entity name>&n&S" +
                                 "Removes the given entity." },
-                { "removeall", "&H/Ent removeAll\n&S" +
+                { "removeall", "&H/Ent removeAll&n&S" +
                                 "Removes all entities from the server."},  
-                { "model", "&H/Ent model <entity name> <model>\n&S" +
+                { "model", "&H/Ent model <entity name> <model>&n&S" +
                                 "Changes the model of an entity to the given model. Valid models are chicken, creeper, croc, human, pig, printer, sheep, skeleton, spider, zombie, or any block ID/Name."},
-                { "list", "&H/Ent list\n&S" +
+                { "list", "&H/Ent list&n&S" +
                                 "Prints out a list of all the entites on the server."},
-                 { "bring", "&H/Ent bring <entity name>\n&S" +
+                 { "bring", "&H/Ent bring <entity name>&n&S" +
                                 "Brings the given entity to you."}
             },
             Handler = BotHandler,
@@ -1760,15 +1760,15 @@ namespace fCraft {
             Aliases = new[] { "GameSet", "GSet", "GS" },
             Permissions = new[] { Permission.EditPlayerDB },
             Category = CommandCategory.New,
-            Help = "&sAllows direct editing of game settings per world.\n " + 
-                   "&sList of editable options: HiderSpawn, SeekerSpawn, Blocks.\n" + 
+            Help = "&sAllows direct editing of game settings per world.&n " + 
+                   "&sList of editable options: HiderSpawn, SeekerSpawn, Blocks.&n" + 
                    "&sFor detailed help see &h/Help GSet <Option>",
             HelpSections = new Dictionary<string, string>{
-                { "hiderspawn",  "&H/GSet <WorldName> HiderSpawn <Action>\n" +
+                { "hiderspawn",  "&H/GSet <WorldName> HiderSpawn <Action>&n" +
                                  "&SChanges the spawn for the hiders. Actions: Set, Reset, Display " },
-                { "seekerspawn", "&H/GSet <WorldName> SeekerSpawn <Action>\n" +
+                { "seekerspawn", "&H/GSet <WorldName> SeekerSpawn <Action>&n" +
                                  "&SChanges the spawn for the seeker. Actions: Set, Reset, Display" },
-                { "gameblocks",  "&H/GSet <WorldName> GameBlocks <Action> <Block Name/ID>\n" +
+                { "gameblocks",  "&H/GSet <WorldName> GameBlocks <Action> <Block Name/ID>&n" +
                                  "&SChanges usable blocks in the game. Actions: Add, Remove, Reset, List" }
             },
             Usage = "/GSet <WorldName> <Option> <Action> <block>",
@@ -3588,13 +3588,13 @@ namespace fCraft {
             Usage = "/WSet <World> <Variable> <Value>",
             Help = "Sets a world variable. Variables are: hide, backups, greeting, motd",
             HelpSections = new Dictionary<string, string>{
-                { "hide",       "&H/WSet <WorldName> Hide On/Off\n&S" +
+                { "hide",       "&H/WSet <WorldName> Hide On/Off&n&S" +
                                 "When a world is hidden, it does not show up on the &H/Worlds&S list. It can still be joined normally." },
-                { "backups",    "&H/WSet <World> Backups Off&S, &H/WSet <World> Backups Default&S, or &H/WSet <World> Backups <Time>\n&S" +
+                { "backups",    "&H/WSet <World> Backups Off&S, &H/WSet <World> Backups Default&S, or &H/WSet <World> Backups <Time>&n&S" +
                                 "Enables or disables periodic backups. Time is given in the compact format." },
-                { "greeting",   "&H/WSet <WorldName> Greeting <Text>\n&S" +
+                { "greeting",   "&H/WSet <WorldName> Greeting <Text>&n&S" +
                                 "Sets a greeting message. Message is shown whenever someone joins the map, and can also be viewed in &H/WInfo" },
-                { "motd",   "&H/WSet <WorldName> Motd <Text>\n&S" +
+                { "motd",   "&H/WSet <WorldName> Motd <Text>&n&S" +
                                 "Sets a message to be shown when joining/Loading a map." }
             },
             Handler = WorldSetHandler
@@ -3864,28 +3864,28 @@ namespace fCraft {
             IsConsoleSafe = false,
             IsHidden = true,
             Usage = "/ctf <start / stop / redspawn / bluespawn / redflag / blueflag / swapteam>",
-            Help = "Allows starting CTF / editing CTF properties. List of properties:\n" +
-                "Start, Stop, RedSpawn, BlueSpawn, RedFlag, BlueFlag, SwapTeam\n" +
+            Help = "Allows starting CTF / editing CTF properties. List of properties:&n" +
+                "Start, Stop, RedSpawn, BlueSpawn, RedFlag, BlueFlag, SwapTeam&n" +
                 "For detailed help see &H/Help CTF <Property>",
             HelpSections = new Dictionary<string, string>{
-				{ "start",     	    "&H/CTF start\n&S" +
+				{ "start",     	    "&H/CTF start&n&S" +
 						"Starts a CTF game on the current world of the player." },
-				{ "stop",     		"&H/CTF stop\n&S" +
+				{ "stop",     		"&H/CTF stop&n&S" +
 						"Stops the current CTF game. You needn't be in the same world. " +
 						"Original kick reason is preserved in the logs." },
-				{ "redspawn",   	"&H/CTF redspawn\n&S" +
-						"Sets the spawn of red team to your current position.\n" +
+				{ "redspawn",   	"&H/CTF redspawn&n&S" +
+						"Sets the spawn of red team to your current position.&n" +
 						"Note that spawns are reset after the game it stopped.)"},
-				{ "bluespawn",   	"&H/CTF bluespawn\n&S" +
-						"Sets the spawn of blue team to your current position.\n" +
+				{ "bluespawn",   	"&H/CTF bluespawn&n&S" +
+						"Sets the spawn of blue team to your current position.&n" +
 						"Note that spawns are reset after the game it stopped.)"},
-				{ "redflag",   		"&H/CTF redflag\n&S" +
-						"Sets the position of the red flag to your current position.\n" +
+				{ "redflag",   		"&H/CTF redflag&n&S" +
+						"Sets the position of the red flag to your current position.&n" +
 						"Note that flag positions are reset after the game it stopped.)"},
-				{ "blueflag",   	"&H/CTF blueflag\n&S" +
-						"Sets the position of the blue flag to your current position.\n" +
+				{ "blueflag",   	"&H/CTF blueflag&n&S" +
+						"Sets the position of the blue flag to your current position.&n" +
 						"Note that flag positions are reset after the game it stopped.)"},
-                { "swapteam",       "&H/CTF swapteam\n&S" +
+                { "swapteam",       "&H/CTF swapteam&n&S" +
                         "Switches your team in the CTF Match."}
 			},
             Handler = CTFHandler
@@ -4250,26 +4250,26 @@ namespace fCraft {
             IsConsoleSafe = true,
             Permissions = new[] { Permission.Chat },
             Usage = "/PW [option] [args]",
-            Help = "Allows players to have their own personal world. List of options:\n" +
-                "BuildAccess, Create, Delete, Join, JoinAccess, List, Reset\n" +
+            Help = "Allows players to have their own personal world. List of options:&n" +
+                "BuildAccess, Create, Delete, Join, JoinAccess, List, Reset&n" +
                 "For detailed help see &H/Help PW <Option>",
             HelpSections = new Dictionary<string, string>{
-                { "create",     "&H/PW Create [size]\n" +
-                                "&sCreates a personal world with a specified size:\n" +
+                { "create",     "&H/PW Create [size]&n" +
+                                "&sCreates a personal world with a specified size:&n" +
                                 "&bTiny/64 &f- &aNormal/128 &f- &sLarge/256 &f- &cHuge/512" },
-                { "reset",      "&H/PW reset [number]\n" +
-                                "&sResets your specified world back to when you created it.\n" +
+                { "reset",      "&H/PW reset [number]&n" +
+                                "&sResets your specified world back to when you created it.&n" +
                                 "&cCan't be undone!" },
-                { "delete",     "&H/PW delete [number]\n" +
-                                "&sDeleted your specified world so you can make a new one.\n" +
+                { "delete",     "&H/PW delete [number]&n" +
+                                "&sDeleted your specified world so you can make a new one.&n" +
                                 "&cCan't be undone!" },
-                { "join",       "&H/PW join [number] [player]\n" +
+                { "join",       "&H/PW join [number] [player]&n" +
                                 "&sJoins your specified world or the specified world of the specified player if you have joining rights."},
-                { "buildaccess","&H/PW buildaccess +/-[Player] [number]\n" +
+                { "buildaccess","&H/PW buildaccess +/-[Player] [number]&n" +
                                 "&sAdds/Removed a specified players building rights on your specified world."},
-                { "joinaccess", "&H/PW joinaccess +/-[Player] [number]\n" +
+                { "joinaccess", "&H/PW joinaccess +/-[Player] [number]&n" +
                                 "&sAdds/Removed a specified players joining rights on your specified world."},
-                { "list",       "&H/PW list\n" +
+                { "list",       "&H/PW list&n" +
                                 "&sLists all your personal worlds. And the ones you have access to."}
             },
             Handler = MWHandler
@@ -4380,7 +4380,7 @@ namespace fCraft {
                     }
                     if (!cmd.IsConfirmed) {
                         player.Confirm(cmd,
-                            "This will reset your personal world: " + "  PW_" + player.Name + "_" + wNumberr + "\n" +
+                            "This will reset your personal world: " + "  PW_" + player.Name + "_" + wNumberr + "&n" +
                             "&cThis cannot be undone!");
                         break;
                     }
@@ -4411,7 +4411,7 @@ namespace fCraft {
                     }
                     if (!cmd.IsConfirmed) {
                         player.Confirm(cmd,
-                            "This will delete your personal world: " + "  PW_" + player.Name + "_" + wNumberd + "\n" +
+                            "This will delete your personal world: " + "  PW_" + player.Name + "_" + wNumberd + "&n" +
                             "&cThis cannot be undone!");
                         break;
                     }
@@ -4930,20 +4930,20 @@ namespace fCraft {
             Permissions = new Permission[] { Permission.Chat },
             IsConsoleSafe = false,
             Usage = "/portal [create | remove | info | list | enable | disable ]",
-            Help = "Controls portals, options are: create, remove, list, info, enable, disable\n&S" +
+            Help = "Controls portals, options are: create, remove, list, info, enable, disable&n&S" +
                    "See &H/Help portal <option>&S for details about each option.",
             HelpSections = new Dictionary<string, string>() {
-                { "create",     "&H/portal create [world] [liquid] [portal name]\n&S" +
+                { "create",     "&H/portal create [world] [liquid] [portal name]&n&S" +
                                 "Creates a portal with specified options"},
-                { "remove",     "&H/portal remove [portal name]\n&S" +
+                { "remove",     "&H/portal remove [portal name]&n&S" +
                                 "Removes specified portal."},
-                { "list",       "&H/portal list\n&S" +
+                { "list",       "&H/portal list&n&S" +
                                 "Gives you a list of portals in the current world."},
-                { "info",       "&H/portal info [portal name]\n&S" +
+                { "info",       "&H/portal info [portal name]&n&S" +
                                 "Gives you information of the specified portal."},
-                { "enable",     "&H/portal enable\n&S" +
+                { "enable",     "&H/portal enable&n&S" +
                                 "Enables the use of portals, this is player specific."},
-                { "disable",     "&H/portal disable\n&S" +
+                { "disable",     "&H/portal disable&n&S" +
                                 "Disables the use of portals, this is player specific."},
             },
             Handler = PortalH
