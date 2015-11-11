@@ -1001,7 +1001,7 @@ namespace fCraft {
                     player.Message("You have " + TimeLeft.ToMiniString() + " left before being kicked for idleing");
                 }
 
-                if (player.IdBotTime.Minutes >= player.Info.Rank.IdleKickTimer) {
+                if (player.IdBotTime.TotalMinutes >= player.Info.Rank.IdleKickTimer) {
                     Message("{0}&S was kicked for being idle for {1} min", player.ClassyName,
                         player.Info.Rank.IdleKickTimer);
                     string kickReason = "Idle for " + player.Info.Rank.IdleKickTimer + " minutes";
