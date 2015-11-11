@@ -1544,62 +1544,45 @@ namespace fCraft {
         };
 
         private static void TTHandler(Player player, CommandReader cmd) {
-            string rank = cmd.Next();
-            string stringer = cmd.Next();
+            string rankStr = cmd.Next();
+            string offsetStr = cmd.Next();
             bool swi = false;
-            int offset;
-            TimeSpan age;
-            Rank ranklookup = null;
-            offset = 0;
-            age = TimeSpan.MaxValue;
-            if (rank == null && stringer == null) {
+            int offset = 0;
+            TimeSpan age = TimeSpan.MaxValue;
+            Rank rank = null;
+            if (rankStr == null && offsetStr == null) {
                 swi = true;
             }
-            if (rank != null) {
-                if (RankManager.FindRank(rank) == null) {
-                    if (!int.TryParse(rank, out offset)) {
-                        player.MessageNoRank(rank);
+            if (rankStr != null) {
+                if (RankManager.FindRank(rankStr) == null) {
+                    if (!int.TryParse(rankStr, out offset)) {
+                        player.MessageNoRank(rankStr);
                         return;
                     } else {
                         swi = true;
                     }
                 } else {
-                    ranklookup = RankManager.FindRank(rank);
+                    rank = RankManager.FindRank(rankStr);
                 }
-                if (stringer != null) {
-                    if (!int.TryParse(stringer, out offset)) {
+                if (offsetStr != null) {
+                    if (!int.TryParse(offsetStr, out offset)) {
                         offset = 0;
                     }
                 }
             }
 
-            var visiblePlayers =
-                PlayerDB.PlayerInfoList.Where(
-                    p => p.TotalTime.TotalSeconds > 0 && p.BanStatus.Equals(BanStatus.NotBanned))
-                    .OrderBy(c => c.TotalTime)
-                    .ToArray()
-                    .Reverse();
-            if (swi == false) {
-                visiblePlayers =
-                    PlayerDB.PlayerInfoList.Where(
-                        p =>
-                            p.TotalTime.TotalSeconds > 0 && p.Rank == ranklookup &&
-                            p.BanStatus.Equals(BanStatus.NotBanned)).OrderBy(c => c.TotalTime).ToArray().Reverse();
-            }
+            IEnumerable<PlayerInfo> visiblePlayers = PlayerDB.PlayerInfoList;
+            visiblePlayers = visiblePlayers.Where(p => p.TotalTime.TotalSeconds > 0 && p.TotalTime.TotalHours < 9999 && (!swi ? (p.Rank == rank) : true) && p.BanStatus.Equals(BanStatus.NotBanned)).OrderBy(c => c.TotalTime).ToArray().Reverse();
             if (offset >= visiblePlayers.Count()) {
                 offset = Math.Max(0, visiblePlayers.Count() - PlayersPerPage);
             }
             var playersPart = visiblePlayers.Skip(offset).Take(10).ToArray();
-            player.MessagePrefixed("&S   ", "&STop Players: {0}",
-                playersPart.JoinToString(
-                    (r => String.Format( "&n{0}&S (Time: {1:F2})", r.ClassyName, r.TotalTime.TotalHours )) ) );
-            if (ranklookup == null) {
-                player.Message("Showing players {0}-{1} (out of {2}).", offset + 1, offset + playersPart.Length,
-                    visiblePlayers.Count());
-            } else {
-                player.Message("Showing players in rank ({3}&s) {0}-{1} (out of {2}).", offset + 1,
-                    offset + playersPart.Length, visiblePlayers.Count(), ranklookup.ClassyName);
+            player.Message("&STop Players:");
+            for (int i = 0; i < playersPart.Count(); i++) {
+                string hours = string.Format("{0:F2}", playersPart[i].TotalTime.TotalHours);
+                player.Message(" &7{1}&sH - {0}", playersPart[i].ClassyName, "0000000".Substring(hours.Length) + hours);
             }
+            player.Message("Showing players{3}{0}-{1} (out of {2}).", offset + 1, offset + playersPart.Length, visiblePlayers.Count(), (rank != null ? " in rank (" + rank.ClassyName + "&s)" : " "));
         }
 
         #endregion
