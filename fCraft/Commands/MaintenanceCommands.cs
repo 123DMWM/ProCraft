@@ -583,36 +583,36 @@ namespace fCraft {
                    "BanReason, DisplayedName, KickReason, PreviousRank, RankChangeType, " +
                    "RankReason, TimesKicked, TotalTime, UnbanReason. For detailed help see &H/Help SetInfo <Property>",
             HelpSections = new Dictionary<string, string>{
-                { "banreason",      "&H/SetInfo <PlayerName> BanReason <Reason>\n&S" +
+                { "banreason",      "&H/SetInfo <PlayerName> BanReason <Reason>&n&S" +
                                     "Changes ban reason for the given player. Original ban reason is preserved in the logs." },
-                { "displayedname",  "&H/SetInfo <RealPlayerName> DisplayedName <DisplayedName>\n&S" +
+                { "displayedname",  "&H/SetInfo <RealPlayerName> DisplayedName <DisplayedName>&n&S" +
                                     "Sets or resets the way player's name is displayed in chat. "+
                                     "Any printable symbols or color codes may be used in the displayed name. "+
                                     "Note that player's real name is still used in logs and on the in-game player list. "+
                                     "To remove a custom name, type \"&H/SetInfo <RealName> DisplayedName&S\" (omit the name)." },
-                { "kickreason",     "&H/SetInfo <PlayerName> KickReason <Reason>\n&S" +
+                { "kickreason",     "&H/SetInfo <PlayerName> KickReason <Reason>&n&S" +
                                     "Changes reason of most-recent kick for the given player. " +
                                     "Original kick reason is preserved in the logs." },
-                { "previousrank",   "&H/SetInfo <PlayerName> PreviousRank <RankName>\n&S" +
+                { "previousrank",   "&H/SetInfo <PlayerName> PreviousRank <RankName>&n&S" +
                                     "Changes previous rank held by the player. " +
                                     "To reset previous rank to \"none\" (will show as \"default\" in &H/Info&S), " +
                                     "type \"&H/SetInfo <Name> PreviousRank&S\" (omit the rank name)." },
-                { "rankchangetype", "&H/SetInfo <PlayerName> RankChangeType <Type>\n&S" +
+                { "rankchangetype", "&H/SetInfo <PlayerName> RankChangeType <Type>&n&S" +
                                     "Sets the type of rank change. <Type> can be: Promoted, Demoted, AutoPromoted, AutoDemoted." },
-                { "rankreason",     "&H/SetInfo <PlayerName> RankReason <Reason>\n&S" +
+                { "rankreason",     "&H/SetInfo <PlayerName> RankReason <Reason>&n&S" +
                                     "Changes promotion/demotion reason for the given player. "+
                                     "Original promotion/demotion reason is preserved in the logs." },
-                { "timeskicked",    "&H/SetInfo <PlayerName> TimesKicked <#>\n&S" +
+                { "timeskicked",    "&H/SetInfo <PlayerName> TimesKicked <#>&n&S" +
                                     "Changes the number of times that a player has been kicked. "+
                                     "Acceptable value range: 0-9999" },
-                { "totaltime",      "&H/SetInfo <PlayerName> TotalTime <Time>\n&S" +
+                { "totaltime",      "&H/SetInfo <PlayerName> TotalTime <Time>&n&S" +
                                     "Changes the amount of game time that the player has on record. " +
                                     "Accepts values in the common compact time-span format." },
-                { "unbanreason",    "&H/SetInfo <PlayerName> UnbanReason <Reason>\n&S" +
+                { "unbanreason",    "&H/SetInfo <PlayerName> UnbanReason <Reason>&n&S" +
                                     "Changes unban reason for the given player. " +
                                     "Original unban reason is preserved in the logs." },
-                { "donatedammount", "&H/Setinfo <PlayerName> DonatedAmmount <Ammount>\n" +
-                                    "&SChanges the ammount a player has donated to the server.\n" +
+                { "donatedammount", "&H/Setinfo <PlayerName> DonatedAmmount <Ammount>&n" +
+                                    "&SChanges the ammount a player has donated to the server.&n" +
                                     "&SThis is only usable via Console."
                                     }
             },

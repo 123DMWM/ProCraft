@@ -1397,12 +1397,12 @@ namespace fCraft {
                     }
                 } else {
                     StringBuilder sb = new StringBuilder( Color.Help );
-                    sb.Append( descriptor.Usage ).Append( '\n' );
+                    sb.Append( descriptor.Usage ).Append( "&N" );
 
                     if( descriptor.Aliases != null ) {
                         sb.Append( "Aliases: &H" );
                         sb.Append( descriptor.Aliases.JoinToString() );
-                        sb.Append( "\n&S" );
+                        sb.Append( "&n&S" );
                     }
 
                     if( String.IsNullOrEmpty( descriptor.Help ) ) {

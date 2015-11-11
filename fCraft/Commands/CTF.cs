@@ -986,7 +986,7 @@ namespace fCraft
             try {
                 if (world != null)
                     world.Players.Message(
-                        "&SThe game has ended! The scores are: \n" + "&4Red &7{0}&4:&f{2} &S- &1Blue &7{1}&1:&f{3}",
+                        "&SThe game has ended! The scores are: &n" + "&4Red &7{0}&4:&f{2} &S- &1Blue &7{1}&1:&f{3}",
                         redRoundsWon, blueRoundsWon, redScore, blueScore);
                 instances = 0;
                 Player.PlacingBlock -= PlayerPlacing;

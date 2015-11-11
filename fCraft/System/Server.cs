@@ -1527,11 +1527,11 @@ namespace fCraft {
                 throw new ArgumentNullException( "world" );
             UpdateTabList();
             if( firstTime ) {
-                return String.Format("&sPlease welcome {0}&S to the server!\n" + 
+                return String.Format("&sPlease welcome {0}&S to the server!&n" + 
                                      "&sThis is their first visit",
                                       player.ListName);
             } else {
-                return String.Format("&sPlease welcome back {0}&S to the server!\n" +
+                return String.Format("&sPlease welcome back {0}&S to the server!&n" +
                                      "&sThey joined {1} times for a total of {2:F1}h",
                                       player.ListName,
                                       player.Info.TimesVisited,

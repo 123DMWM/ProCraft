@@ -506,10 +506,10 @@ namespace fCraft
             Category = CommandCategory.Chat,
             Permissions = new[] { Permission.Chat },
             IsConsoleSafe = true,
-            Help = "Gives random number between 1 and 100.\n" +
-                   "&H/Roll MaxNumber\n" +
-                   "&S  Gives number between 1 and max.\n" +
-                   "&H/Roll MinNumber MaxNumber\n" +
+            Help = "Gives random number between 1 and 100.&n" +
+                   "&H/Roll MaxNumber&n" +
+                   "&S  Gives number between 1 and max.&n" +
+                   "&H/Roll MinNumber MaxNumber&n" +
                    "&S  Gives number between min and max.",
             Handler = RollHandler
         };
@@ -668,12 +668,12 @@ namespace fCraft
             Name = "Report",
             Category = CommandCategory.New | CommandCategory.Chat,
             Usage = "/Report <Message>",
-            Help = "Used to leave a report message only the Highest Rank can read.\n" +
-                   "Things to talk about: \n"+
-                   "  &fGriefers, Spammers, Trenchers\n" +
-                   "  &fAbusive Players, Abusive Admins\n" +
-                   "  &fBugs, Suggestions\n" +
-                   "  &fOr just a friendly message\n" +
+            Help = "Used to leave a report message only the Highest Rank can read.&n" +
+                   "Things to talk about: &n"+
+                   "  &fGriefers, Spammers, Trenchers&n" +
+                   "  &fAbusive Players, Abusive Admins&n" +
+                   "  &fBugs, Suggestions&n" +
+                   "  &fOr just a friendly message&n" +
                    "&sRemember, everything is kept a secret unless stated otherwise.",
 
             Handler = reportHandler
@@ -698,8 +698,8 @@ namespace fCraft
                 CdReport.PrintUsage(player);
             } else {
                 player.Confirm(cmd,
-                    "&sYour message will show up like this: \n" + "&s[&1Report&s]\n" + "  &sFrom:&f {0}\n" +
-                    "  &sDate: &7{1} at {2}\n" + "  &sMessage:&f {3}", player.Name, DateTime.Now.ToShortDateString(),
+                    "&sYour message will show up like this: &n" + "&s[&1Report&s]&n" + "  &sFrom:&f {0}&n" +
+                    "  &sDate: &7{1} at {2}&n" + "  &sMessage:&f {3}", player.Name, DateTime.Now.ToShortDateString(),
                     DateTime.Now.ToLongTimeString(), message);
             }
 
@@ -757,7 +757,7 @@ namespace fCraft
                         foreach (Report r in Chat.Reports) {
                             if (r.Id == reportId) {
                                 player.Message(
-                                    "&s[&1Report&s] #&f{0}\n" + "  &sFrom:&f {1}\n" + "  &sDate: &7{2} at {3}\n" +
+                                    "&s[&1Report&s] #&f{0}&n" + "  &sFrom:&f {1}&n" + "  &sDate: &7{2} at {3}&n" +
                                     "  &sMessage:&f {4}", r.Id, r.Sender, r.Datesent.ToShortDateString(),
                                     r.Datesent.ToLongTimeString(), r.Message);
                                 read = true;
@@ -808,7 +808,7 @@ namespace fCraft
             Help = "Starts a timer with a given duration and message. " +
                    "As the timer counts down, announcements are shown globally. See also: &H/Help Timer Abort",
             HelpSections = new Dictionary<string, string> {
-                { "abort",  "&H/Timer Abort <TimerID>\n&S" +
+                { "abort",  "&H/Timer Abort <TimerID>&n&S" +
                             "Aborts a timer with the given ID number. " +
                             "To see a list of timers and their IDs, type &H/Timer&S (without any parameters)." }
             },
@@ -978,9 +978,9 @@ namespace fCraft
             Usage = "/Filter <(add|create)|(remove|delete)> <Word> <Replacement>",
             Help = "Adds or removes a word and it's replacement to the filter",
             HelpSections = new Dictionary<string, string> {
-                { "add",  "&H/Filter add <Word> <Replacement>\n&S" +
+                { "add",  "&H/Filter add <Word> <Replacement>&n&S" +
                             "Adds a Word and it's replacement to the filter list. " },
-                { "remove",  "&H/Filter remove <filterID>\n&S" +
+                { "remove",  "&H/Filter remove <filterID>&n&S" +
                             "Removes a filter with the given ID number. " +
                             "To see a list of filters and their IDs, type &H/filterlist" }
             },

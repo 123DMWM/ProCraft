@@ -70,7 +70,7 @@ namespace fCraft
         LongerMessages,
 
         /// <summary> This extension lets the player send characters from Code Page 437 </summary>
-        FullCPFoTreeSevun
+        FullCP437
     }
 
 
