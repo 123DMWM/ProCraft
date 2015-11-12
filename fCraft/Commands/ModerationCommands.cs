@@ -1979,61 +1979,35 @@ namespace fCraft {
 
         static void TeleportPHandler(Player player, CommandReader cmd)
         {
-            string name = cmd.Next();
-            if (name == null)
-            {
+            int x, y, z;
+            int rot = player.Position.R;
+            int lot = player.Position.L;
+            
+            if (cmd.NextInt(out x) && cmd.NextInt(out y) && cmd.NextInt(out z)) {
+                if (cmd.NextInt(out rot) && cmd.NextInt(out lot)) {
+                    if (rot < 0 || rot > 255) {
+                        player.Message("R must be inbetween 0 and 255, using player R");
+                        rot = player.Position.R;
+                    }
+                    if (lot < 0 || lot > 255) {
+                        player.Message("L must be inbetween 0 and 255, using player L");
+                        lot = player.Position.L;
+                    }
+                }
+                
+                if (x < short.MinValue || x > short.MaxValue || y < short.MinValue ||
+                    y > short.MaxValue || z < short.MinValue || z > short.MaxValue) {
+                    player.Message("Coordinates are outside the valid range!");
+                } else {
+                    if (player.World != null) {
+                        player.LastWorld = player.World;
+                        player.LastPosition = player.Position;
+                    }
+                    player.TeleportTo(new Position((short)x, (short)y, (short)z, 
+                                                   (byte)rot, (byte)lot));
+                }
+            } else {
                 CdTeleportP.PrintUsage(player);
-                return;
-            }
-            if (cmd.Next() != null)
-            {
-                cmd.Rewind();
-                int x, y, z, rot, lot;
-                rot = player.Position.R;
-                lot = player.Position.L;
-                if (cmd.NextInt(out x) && cmd.NextInt(out y) && cmd.NextInt(out z))
-                {
-                    if (cmd.HasNext)
-                    {
-                        if (cmd.HasNext)
-                        {
-                            if (cmd.NextInt(out rot) && cmd.NextInt(out lot))
-                            {
-                                if (rot > 255 || rot < 0)
-                                {
-                                    player.Message("R must be inbetween 0 and 255. Set to player R");
-                                }
-                                if (lot > 255 || lot < 0)
-                                {
-                                    player.Message("L must be inbetween 0 and 255. Set to player L");
-                                }
-                            }
-                        }
-                    }
-                    if (x <= -32768 || x >= 32768 || y <= -32768 || y >= 32768 || z <= -32768 || z >= 32768)
-                    {
-                        player.Message("Coordinates are outside the valid range!");
-
-                    }
-                    else {
-						if (player.World != null) {
-							player.LastWorld = player.World;
-							player.LastPosition = player.Position;
-						}
-                        player.TeleportTo(new Position
-                        {
-                            X = (short)x,
-                            Y = (short)y,
-                            Z = (short)z,
-                            R = (byte)rot,
-                            L = (byte)lot
-                        });
-                    }
-                }
-                else
-                {
-                    CdTeleportP.PrintUsage(player);
-                }
             }
         }
 
@@ -2082,68 +2056,42 @@ namespace fCraft {
             Name = "JoinOnRankWorld",
             Category = CommandCategory.New | CommandCategory.Moderation,
             Aliases = new[] { "jorw", "joinonrank", "jor"},
-            Usage = "/JoinOnRank On/Off ",
+            Usage = "/JoinOnRank [On/Off/State] ",
             Help = "Determines if you spawn on your designated rank world or not.",
-            Handler = SORWHandler
+            Handler = JoinOnRankWorldHandler
         };
 
-        static void SORWHandler(Player player, CommandReader cmd)
+        static void JoinOnRankWorldHandler(Player player, CommandReader cmd)
         {
-            if (!WorldManager.Worlds.Contains(player.Info.Rank.MainWorld))
-            {
-                player.Message("Sorry there is no main world for your rank at the moment.");
+            if (!WorldManager.Worlds.Contains(player.Info.Rank.MainWorld)) {
+                player.Message("Sorry, there is no main world for your rank at the moment.");
                 return;                    
             }
-            if (cmd.HasNext)
-            {
-                string state = cmd.Next();
-                if (state.ToLower() == "on" || state.ToLower() == "yes")
-                {
-                    player.Info.JoinOnRankWorld = true;
-                    player.Message("JoinOnRankWorld: &2On");
-                    player.Message("You will now spawn on world {0}&s when you log onto the server.", player.Info.Rank.MainWorld.ClassyName);
-                    return;
-                }
-                if (state.ToLower() == "off" || state.ToLower() == "no")
-                {
-                    player.Info.JoinOnRankWorld = false;
-                    player.Message("JoinOnRankWorld: &4Off");
-                    player.Message("You will now spawn on world {0}&s when you log onto the server.", WorldManager.MainWorld.ClassyName);
-                    return;
-                }
-                if (state.ToLower() == "state" || state.ToLower() == "what" || state.ToLower() == "current")
-                {
-                    if (player.Info.JoinOnRankWorld == false)
-                    {
-                        player.Message("JoinOnRankWorld: &4Off");
-                    }
-                    if (player.Info.JoinOnRankWorld == true)
-                    {
-                        player.Message("JoinOnRankWorld: &2On");
-                    }
-                    return;
-                }
-                else
-                {
+            
+            if (cmd.HasNext) {
+                string state = cmd.Next().ToLower();
+                if (state == "on" || state == "yes") {
+                    SetAndPrintJoinOnWorldState(player, true);
+                } else if (state == "off" || state == "no") {
+                    SetAndPrintJoinOnWorldState(player, false);
+                } else if (state == "state" || state == "what" || state == "current") {
+                    string message = player.Info.JoinOnRankWorld ? "&2On" : "&4Off";
+                    player.Message("JoinOnRankWorld: " + message );
+                } else {
                     CdJORW.PrintUsage(player);
-                    return;
                 }
-            }
-            if (player.Info.JoinOnRankWorld == true)
-            {
-                player.Info.JoinOnRankWorld = false;
-                player.Message("JoinOnRankWorld: &4Off");
-                player.Message("You will now spawn on world {0}&s when you log onto the server.", WorldManager.MainWorld.ClassyName);
-                return;
-            }
-            else
-            {
-                player.Info.JoinOnRankWorld = true;
-                player.Message("JoinOnRankWorld: &2On");
-                player.Message("You will now spawn on world {0}&s when you log onto the server.", player.Info.Rank.MainWorld.ClassyName);
-                return;
+            } else {
+                SetAndPrintJoinOnWorldState(player, !player.Info.JoinOnRankWorld);
             }
         }
+        
+        static void SetAndPrintJoinOnWorldState(Player player, bool joinRankWorld) {
+            player.Info.JoinOnRankWorld = joinRankWorld;
+            player.Message("JoinOnRankWorld: Set to " + (joinRankWorld ? "&2On" : "&4Off"));
+            World world = joinRankWorld ? player.Info.Rank.MainWorld : WorldManager.MainWorld;
+            player.Message("You will now spawn on world {0}&s when you logon to the server.", world.ClassyName);
+        }
+        
         #endregion
         #region MaxCaps
 
