@@ -317,7 +317,6 @@ namespace fCraft {
             return true;
         }
 
-        Queue<Position> posLog = new Queue<Position>();
         DateTime lastSpamTime = DateTime.MinValue;
         DateTime lastMoveTime = DateTime.MinValue;
 
@@ -349,22 +348,6 @@ namespace fCraft {
 
             Position oldPos = Position;
 
-            /* string[] hexRandom = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f" };
-             Random RandomHexString = new Random();
-             string sky = hexRandom[RandomHexString.Next(0, hexRandom.Length)] + hexRandom[RandomHexString.Next(0, hexRandom.Length)] + hexRandom[RandomHexString.Next(0, hexRandom.Length)] + hexRandom[RandomHexString.Next(0, hexRandom.Length)] + hexRandom[RandomHexString.Next(0, hexRandom.Length)] + hexRandom[RandomHexString.Next(0, hexRandom.Length)];
-             string cloud = hexRandom[RandomHexString.Next(0, hexRandom.Length)] + hexRandom[RandomHexString.Next(0, hexRandom.Length)] + hexRandom[RandomHexString.Next(0, hexRandom.Length)] + hexRandom[RandomHexString.Next(0, hexRandom.Length)] + hexRandom[RandomHexString.Next(0, hexRandom.Length)] + hexRandom[RandomHexString.Next(0, hexRandom.Length)];
-             string fog = hexRandom[RandomHexString.Next(0, hexRandom.Length)] + hexRandom[RandomHexString.Next(0, hexRandom.Length)] + hexRandom[RandomHexString.Next(0, hexRandom.Length)] + hexRandom[RandomHexString.Next(0, hexRandom.Length)] + hexRandom[RandomHexString.Next(0, hexRandom.Length)] + hexRandom[RandomHexString.Next(0, hexRandom.Length)];
-             this.Send(Packet.MakeEnvSetColor((byte)EnvVariable.SkyColor, sky));
-             this.Send(Packet.MakeEnvSetColor((byte)EnvVariable.CloudColor, cloud));
-             this.Send(Packet.MakeEnvSetColor((byte)EnvVariable.FogColor, fog));
-             string[] hexRandom = { "ff5555", "aa0000", "ffaa00", "ffff55", "55ff55", "555555", "55ffff", "00aaaa", "5555ff", "0000aa", "ff55ff", "aa00aa"};
-             int totalhex = 0;
-             for (; totalhex < hexRandom.Count(); totalhex++)
-             {
-                 this.Send(Packet.MakeEnvSetColor((byte)EnvVariable.SkyColor, hexRandom[totalhex]));
-             }
-             if (totalhex == 11) totalhex = 0;*/
-
             // calculate difference between old and new positions
             Position delta = new Position {
                 X = (short)( newPos.X - oldPos.X ),
@@ -383,19 +366,6 @@ namespace fCraft {
             //if(rotChanged && !this.isSolid) ResetIdBotTimer();
             //if(posChanged && this.isSolid) ResetIdBotTimer();
             if (rotChanged) ResetIdBotTimer();
-            /*if (posChanged)
-            {
-                posLog.Enqueue(newPos);
-                lastMoveTime = DateTime.UtcNow;
-            }
-            else
-            {
-                if (lastMoveTime > lastSpamTime && DateTime.UtcNow.Subtract(lastMoveTime) > TimeSpan.FromSeconds(0.5))
-                {
-                    SpamMovementStats();
-                    lastSpamTime = DateTime.UtcNow;
-                }
-            }*/
 
             bool deniedzone = false;
 
@@ -669,32 +639,6 @@ namespace fCraft {
 
             Position = newPos;
             RaisePlayerMovedEvent( this, oldPos );
-        }
-
-        void SpamMovementStats()
-        {
-            short[] zs = posLog.Select(pos => pos.Z).ToArray();
-            int minDelta = int.MaxValue,
-                maxDelta = int.MinValue,
-                totalDelta = 0,
-                totalDisplacement = 0,
-                minZ = zs.Min(),
-                maxZ = zs.Max(),
-                maxDisplacement = Math.Abs(minZ - maxZ);
-            for (int i = 1; i < zs.Length; i++)
-            {
-                int deltaZ = zs[i] - zs[i - 1];
-                minDelta = Math.Min(minDelta, deltaZ);
-                maxDelta = Math.Max(maxDelta, deltaZ);
-                totalDelta += Math.Abs(deltaZ);
-                totalDisplacement += deltaZ;
-            }
-            Message("{0:HH:mm:ss} &FHeight: Min={1} Max={2} &CJumpHeight={3}",
-                DateTime.UtcNow, minZ, maxZ, maxDisplacement);
-            Message("&FZ-Velocity: Min={0} Max={1} | Dist: {2} | Displ: {3}",
-                minDelta, maxDelta, totalDelta, totalDisplacement);
-            Message("");
-            posLog.Clear();
         }
 
 

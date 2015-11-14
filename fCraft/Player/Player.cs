@@ -13,6 +13,7 @@ using System.Xml;
 using System.Xml.XPath;
 using fCraft.Drawing;
 using fCraft.Events;
+using fCraft.Games;
 using JetBrains.Annotations;
 
 namespace fCraft {
@@ -224,15 +225,30 @@ namespace fCraft {
             get { return Info.ClassyName; }
         }
 
-        [CanBeNull] //Although it really shouldn't be.
-        /// <summary> What team the player is currently on. Either Red or Blue./ </summary>
-        public string Team;
+        /// <summary> What team the player is currently on. </summary>
+        public CtfTeam Team;
 
         /// <summary> Whether or not the player is currently playing CTF </summary>
         public bool IsPlayingCTF = false;
 
         /// <summary> Whether or not the player is currently holding other teams flag </summary>
         public bool IsHoldingFlag = false;
+        
+        BoundingBox bb; // cache an instance, as in CTF game we would otherwise create an instance
+        // of this for every single movement packet.
+        public BoundingBox Bounds {
+        	get {
+        		if (bb == null) 
+        			bb = new BoundingBox(Vector3I.Zero, Vector3I.Zero);
+        		bb.XMin = Position.X - 6; bb.XMax = Position.X + 6;
+        		bb.YMin = Position.Y - 6; bb.YMax = Position.Y + 6;
+        		bb.ZMin = Position.Z - 51; bb.ZMax = Position.Z;	
+        		return bb;
+        	}
+        }
+        
+        /// <summary> Time when this player was last killed in a game. </summary>
+        public DateTime LastKilled;
 
         /// <summary> Whether the client supports advanced WoM client functionality. </summary>
         public bool IsUsingWoM { get; private set; }
@@ -659,7 +675,6 @@ namespace fCraft {
         [StringFormatMethod("message")]
         public void Message([NotNull] byte messageType, [NotNull] string message, [NotNull] params object[] args)
         {
-            if (messageType == null) throw new ArgumentNullException("messageType");
             if (message == null) throw new ArgumentNullException("message");
             if (args == null) throw new ArgumentNullException("args");
             if (args.Length > 0)

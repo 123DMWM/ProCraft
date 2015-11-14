@@ -305,6 +305,9 @@
     <Compile Include="Drawing\DrawOps\TorusDrawOperation.cs" />
     <Compile Include="Drawing\IBrush.cs" />
     <Compile Include="Drawing\Axis.cs" />
+    <Compile Include="Games\CtfGame.BlockHandling.cs" />
+    <Compile Include="Games\CtfGame.cs" />
+    <Compile Include="Games\CtfTeam.cs" />
     <Compile Include="Player\Chat.cs" />
     <Compile Include="Commands\CommandCategory.cs" />
     <Compile Include="MapConversion\MapFormatException.cs" />

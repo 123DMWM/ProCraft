@@ -1580,7 +1580,7 @@ namespace fCraft {
             player.Message("&STop Players:");
             for (int i = 0; i < playersPart.Count(); i++) {
                 string hours = string.Format("{0:F2}", playersPart[i].TotalTime.TotalHours);
-                player.Message(" &7{1}&sH - {0}", playersPart[i].ClassyName, "0000000".Substring(hours.Length) + hours);
+                player.Message(" &7{1}&sH - {0}", playersPart[i].ClassyName, hours.PadLeft(7, '0'));
             }
             player.Message("Showing players{3}{0}-{1} (out of {2}).", offset + 1, offset + playersPart.Length, visiblePlayers.Count(), (rank != null ? " in rank (" + rank.ClassyName + "&s)" : " "));
         }

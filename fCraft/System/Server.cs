@@ -16,6 +16,7 @@ using System.Threading;
 using fCraft.AutoRank;
 using fCraft.Drawing;
 using fCraft.Events;
+using fCraft.Games;
 using JetBrains.Annotations;
 using ThreadState = System.Threading.ThreadState;
 using fCraft.Portals;
@@ -939,52 +940,7 @@ namespace fCraft {
                     player.Send(Packet.Message((byte)MessageType.BottomRight2,
                         player.Position.ToBlockCoordsExt().ToString() + "&s[" + compassString((int)player.Position.R) + "&s]"));
                 }
-                if (player.IsPlayingCTF && player.Supports(CpeExtension.MessageType)) {
-                    player.Send(Packet.Message((byte)MessageType.BottomRight1, ""));
-                    if (((CTF.redRoundsWon*5) + CTF.redScore) > ((CTF.blueRoundsWon*5) + CTF.blueScore)) {
-                        player.Send(Packet.Message((byte)MessageType.BottomRight3,
-                            "&4Red &a" + CTF.redRoundsWon + "&4:&f" + CTF.redScore + " &c<-- &1Blue &a" +
-                            CTF.blueRoundsWon + "&1:&f" + CTF.blueScore));
-                    } else if (((CTF.redRoundsWon*5) + CTF.redScore) < ((CTF.blueRoundsWon*5) + CTF.blueScore)) {
-                        player.Send(Packet.Message((byte)MessageType.BottomRight3,
-                            "&4Red &a" + CTF.redRoundsWon + "&4:&f" + CTF.redScore + " &9--> &1Blue &a" +
-                            CTF.blueRoundsWon + "&1:&f" + CTF.blueScore));
-                    } else {
-                        player.Send(Packet.Message((byte)MessageType.BottomRight3,
-                            "&4Red &a" + CTF.redRoundsWon + "&4:&f" + CTF.redScore + " &d<=> &1Blue &a" +
-                            CTF.blueRoundsWon + "&1:&f" + CTF.blueScore));
-                    }
-                    var flagholder = player.World.Players.Where(p => p.IsHoldingFlag);
-                    if (flagholder != null) {
-                        if (CTF.redHasFlag) {
-                            player.Send(Packet.Message((byte)MessageType.BottomRight2,
-                                flagholder.Take(1)
-                                    .JoinToString((r => String.Format("&4{0} &shas the &1Blue&s flag!", r.Name)))));
-                        } else if (CTF.blueHasFlag) {
-                            player.Send(Packet.Message((byte)MessageType.BottomRight2,
-                                flagholder.Take(1)
-                                    .JoinToString((r => String.Format("&1{0} &shas the &4Red&s flag!", r.Name)))));
-                        } else {
-                            player.Send(Packet.Message((byte)MessageType.BottomRight2, "&sNo one has the flag!"));
-                        }
-
-                    }
-                    if (player.Team == "Red") {
-                        player.Send(Packet.Message((byte)MessageType.Status3, "&sTeam: &4Red"));
-                    } else if (player.Team == "Blue") {
-                        player.Send(Packet.Message((byte)MessageType.Status3, "&sTeam: &1Blue"));
-                    } else
-                        player.Send(Packet.Message((byte)MessageType.Status3, "&sTeam: &0None"));
-                }
-                if (player.IsPlayingCTF && player.Supports(CpeExtension.EnvColors)) {
-                    if (((CTF.redRoundsWon*5) + CTF.redScore) > ((CTF.blueRoundsWon*5) + CTF.blueScore)) {
-                        player.Send(Packet.MakeEnvSetColor((byte)EnvVariable.FogColor, "AA0000"));
-                    } else if (((CTF.redRoundsWon*5) + CTF.redScore) < ((CTF.blueRoundsWon*5) + CTF.blueScore)) {
-                        player.Send(Packet.MakeEnvSetColor((byte)EnvVariable.FogColor, "0000AA"));
-                    } else {
-                        player.Send(Packet.MakeEnvSetColor((byte)EnvVariable.FogColor, "AA00AA"));
-                    }
-                }
+                CTF.PrintCtfState(player);
                 player.lastSolidPos = player.Position;
 
                 if (player.Info.Rank.IdleKickTimer <= 0) continue;
@@ -1617,11 +1573,8 @@ namespace fCraft {
                     }
 				} else {
 					foreach (Player p2 in canBeSeenW) {
-						if (p2.IsPlayingCTF && p2.Team == "Red") {
-							p1.Send(Packet.MakeExtAddPlayerName(p2.NameID, p2.Name, "&c" + p2.Name, "&sTeam &4Red", 0));
-						} else if (p2.IsPlayingCTF && p2.Team == "Blue") {
-							p1.Send(Packet.MakeExtAddPlayerName(p2.NameID, p2.Name, "&8" + p2.Name, "&sTeam &1Blue", 0));
-						}
+						if (p2.IsPlayingCTF)
+							p1.Send(Packet.MakeExtAddPlayerName(p2.NameID, p2.Name, "&f" + p2.Name, "&sTeam " + p2.Team.ClassyName, 0));
 					}
 				}
 			}

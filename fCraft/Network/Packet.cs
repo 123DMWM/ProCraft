@@ -200,7 +200,7 @@ namespace fCraft {
         /// <exception cref="ArgumentNullException"> reason is null </exception>
         public static Packet MakeKick( [NotNull] string reason ) {
             if( reason == null ) throw new ArgumentNullException( "reason" );
-
+            reason = Color.SubstituteSpecialColors(reason);
             Packet packet = new Packet( OpCode.Kick );
             Encoding.ASCII.GetBytes( reason.PadRight( 64 ), 0, 64, packet.Bytes, 1 );
             return packet;

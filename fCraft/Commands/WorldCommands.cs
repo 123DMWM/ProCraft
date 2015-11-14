@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading;
 using fCraft.Events;
 using System.Collections;
+using fCraft.Games;
 using ServiceStack.Text;
 using fCraft.Portals;
 
@@ -3868,281 +3869,156 @@ namespace fCraft {
                 "Start, Stop, RedSpawn, BlueSpawn, RedFlag, BlueFlag, SwapTeam&n" +
                 "For detailed help see &H/Help CTF <Property>",
             HelpSections = new Dictionary<string, string>{
-				{ "start",     	    "&H/CTF start&n&S" +
-						"Starts a CTF game on the current world of the player." },
-				{ "stop",     		"&H/CTF stop&n&S" +
-						"Stops the current CTF game. You needn't be in the same world. " +
-						"Original kick reason is preserved in the logs." },
-				{ "redspawn",   	"&H/CTF redspawn&n&S" +
-						"Sets the spawn of red team to your current position.&n" +
-						"Note that spawns are reset after the game it stopped.)"},
-				{ "bluespawn",   	"&H/CTF bluespawn&n&S" +
-						"Sets the spawn of blue team to your current position.&n" +
-						"Note that spawns are reset after the game it stopped.)"},
-				{ "redflag",   		"&H/CTF redflag&n&S" +
-						"Sets the position of the red flag to your current position.&n" +
-						"Note that flag positions are reset after the game it stopped.)"},
-				{ "blueflag",   	"&H/CTF blueflag&n&S" +
-						"Sets the position of the blue flag to your current position.&n" +
-						"Note that flag positions are reset after the game it stopped.)"},
+                { "start",             "&H/CTF start&n&S" +
+                        "Starts a CTF game on the current world of the player." },
+                { "stop",             "&H/CTF stop&n&S" +
+                        "Stops the current CTF game. You needn't be in the same world." },
+                { "redspawn",       "&H/CTF redspawn&n&S" +
+                        "Sets the spawn of red team to your current position.&n" +
+                        "Note that spawn positions are reset after the game is stopped."},
+                { "bluespawn",       "&H/CTF bluespawn&n&S" +
+                        "Sets the spawn of blue team to your current position.&n" +
+                        "Note that spawn positions are reset after the game is stopped."},
+                { "redflag",           "&H/CTF redflag&n&S" +
+                        "Sets the position of the red flag to your current position.&n" +
+                        "Note that flag positions are reset after the game is stopped."},
+                { "blueflag",       "&H/CTF blueflag&n&S" +
+                        "Sets the position of the blue flag to your current position.&n" +
+                        "Note that flag positions are reset after the game is stopped."},
                 { "swapteam",       "&H/CTF swapteam&n&S" +
-                        "Switches your team in the CTF Match."}
-			},
+                        "Switches your team in the CTF game."}
+            },
             Handler = CTFHandler
         };
-
-        private static void CTFHandler(Player player, CommandReader cmd)
-        {
-            if (!cmd.HasNext)
-            {
-                CdCTF.PrintUsage(player);
-                return;
-            }
-            string Options = cmd.Next();
-            World world = player.World;
-            if (world == WorldManager.MainWorld)
-            {
-                player.Message("/ctf cannot be used on the main world");
-                return;
-            }
-            switch (Options.ToLower())
-            {
+        
+        static void CtfGuestHandler(Player player, string options) {
+            switch (options) {
                 case "start":
-                    {
-                        if (player.Can(Permission.ReadStaffChat))
-                        {
-                            if (CTF.instances == 0)
-                            {
-                                if (player.World.Name.ToLower() != "ctf")
-                                {
-                                    player.Message("You can only start a game on the CTF map.");
-                                    break;
-                                }
-                                else
-                                {
-                                    player.Message("Started CTF game on world {0}", player.World.ClassyName);
-                                    CTF.Start(player, player.World);
-                                    break;
-                                }
-                            }
-                            else
-                            {
-                                player.Message("Game is already in progress. Type /ctf stop to stop the game.");
-                                break;
-                            }
-                        }
-                        else
-                        {
-                            player.Message("You need to be a Moderator to start CTF Games.");
-                            break;
-                        }
-                    }
-
+                    player.Message("You need to be a Moderator to start CTF Games.");
+                    break;
                 case "stop":
-                    {
-                        if (player.Can(Permission.ReadStaffChat))
-                        {
-                            if (CTF.instances == 1)
-                            {
-                                player.Message("Stopped CTF game.");
-                                CTF.Stop();
-                                break;
-                            }
-                            else
-                            {
-                                player.Message("No CTF game running.");
-                                break;
-                            }
-                        }
-                        else
-                        {
-                            player.Message("You need to be a Moderator to stop CTF Games.");
-                            break;
-                        }
-                    }
-
+                    player.Message("You need to be a Moderator to stop CTF Games.");
+                    break;
                 case "redspawn":
-                    {
-                        if (player.Can(Permission.ReadStaffChat))
-                        {
-                            player.Message("Red teams spawn set to {0},{1},{2}.", player.Position.ToBlockCoords().X,
-                                           player.Position.ToBlockCoords().Y, player.Position.Z);
-                            CTF.redSpawn = new Position(player.Position.X,
-                                                        player.Position.Y,
-                                                        player.Position.Z);
-                            break;
-                        }
-                        else
-                        {
-                            player.Message("You need to be a Moderator to adjust CTF Spawns.");
-                            break;
-                        }
-                    }
+                    player.Message("You need to be a Moderator to adjust CTF Spawns.");
+                    break;
                 case "bluespawn":
-                    {
-                        if (player.Can(Permission.ReadStaffChat))
-                        {
-                            player.Message("Blue teams spawn set to {0},{1},{2}.", player.Position.ToBlockCoords().X,
-                                           player.Position.ToBlockCoords().Y, player.Position.Z);
-                            CTF.blueSpawn = new Position(player.Position.X,
-                                                        player.Position.Y,
-                                                        player.Position.Z);
-                            break;
-                        }
-                        else
-                        {
-                            player.Message("You need to be a Moderator to adjust CTF Spawns.");
-                            break;
-                        }
-                    }
+                    player.Message("You need to be a Moderator to adjust CTF Spawns.");
+                    break;
                 case "redflag":
-                    {
-                        if (player.Can(Permission.ReadStaffChat))
-                        {
-                            CTF.world.Map.QueueUpdate(new BlockUpdate(Player.Console, CTF.redFlag, Block.Air));
-                            CTF.redFlag = player.Position.ToBlockCoords();
-                            CTF.world.Map.QueueUpdate(new BlockUpdate(Player.Console, CTF.redFlag, Block.Red));
-                            player.Message("Red flag positon set to {0},{1},{2}",
-                                           player.Position.X, player.Position.Y, player.Position.Z);
-                            break;
-                        }
-                        else
-                        {
-                            player.Message("You need to be a Moderator to adjust CTF Flags.");
-                            break;
-                        }
-                    }
+                    player.Message("You need to be a Moderator to adjust CTF Flags.");
+                    break;
                 case "blueflag":
-                    {
-                        if (player.Can(Permission.ReadStaffChat))
-                        {
-                            CTF.world.Map.QueueUpdate(new BlockUpdate(Player.Console, CTF.blueFlag, Block.Air));
-                            CTF.blueFlag = player.Position.ToBlockCoords();
-                            CTF.world.Map.QueueUpdate(new BlockUpdate(Player.Console, CTF.blueFlag, Block.Blue));
-                            player.Message("Blue flag positon set to {0},{1},{2}",
-                                           player.Position.X, player.Position.Y, player.Position.Z);
-                            break;
-                        }
-                        else
-                        {
-                            player.Message("You need to be a Moderator to adjust CTF Flags.");
-                            break;
-                        }
-                    }
+                    player.Message("You need to be a Moderator to adjust CTF Flags.");
+                    break;
+                    
                 case "swapteam":
                 case "switchteam":
                 case "swap":
                 case "changeteam":
                 case "changesides":
                 case "switch":
-                    {
-                        if (player.Team == "Blue")
-                        {
-                            if ((CTF.blueTeam.ToArray().Length) - (CTF.redTeam.ToArray().Length) >= 1)
-                            {
-                                player.Message("You have switched to the &cRed&s team");
-                                if (CTF.blueTeam.Contains(player))
-                                {
-                                    CTF.blueTeam.Remove(player);
-                                    CTF.redTeam.Add(player);
-                                }
-                                if (player.IsHoldingFlag)
-                                {
-                                    world.Players.Message("&cFlag holder &1" + player.Name + " &cswitched to the &4Red&c team, thus dropping the flag for the &1Blue&c team!");
-                                    CTF.blueHasFlag = false;
-                                    player.IsHoldingFlag = false;
-                                    world.Map.QueueUpdate(new BlockUpdate(Player.Console, CTF.redFlag, Block.Red));
-                                }
-                                player.Team = "Red";
-                                player.TeleportTo(CTF.redSpawn);
-                                break;
-                            }
-                            else
-                            {
-                                if (player.Can(Permission.ReadStaffChat))
-                                {
-                                    player.Message("You have switched to the &cRed&s team. The teams are now unbalanced!");
-                                    if (CTF.blueTeam.Contains(player))
-                                    {
-                                        CTF.blueTeam.Remove(player);
-                                        CTF.redTeam.Add(player);
-                                    }
-                                    if (player.IsHoldingFlag)
-                                    {
-                                        world.Players.Message("&cFlag holder &1" + player.Name + " &cswitched to the &4Red&c team, thus dropping the flag for the &1Blue&c team!");
-                                        CTF.blueHasFlag = false;
-                                        player.IsHoldingFlag = false;
-                                        world.Map.QueueUpdate(new BlockUpdate(Player.Console, CTF.redFlag, Block.Red));
-                                    }
-                                    player.Team = "Red";
-                                    player.TeleportTo(CTF.redSpawn);
-                                    break;
-                                }
-                                else
-                                {
-                                    player.Message("You cannot switch teams. The teams would become too unbalanced!");
-                                    break;
-                                }
-                            }
-                        }
-                        else if (player.Team == "Red")
-                        {
-                            if ((CTF.redTeam.ToArray().Length) - (CTF.blueTeam.ToArray().Length) >= 1)
-                            {
-                                player.Message("You have switched to the &9Blue&s team");
-                                if (CTF.redTeam.Contains(player))
-                                {
-                                    CTF.redTeam.Remove(player);
-                                    CTF.blueTeam.Add(player);
-                                }
-                                if (player.IsHoldingFlag)
-                                {
-                                    world.Players.Message("&cFlag holder &4" + player.Name + " &cswitched to the &1Blue&c team, thus dropping the flag for the &4Red&c team!");
-                                    CTF.redHasFlag = false;
-                                    player.IsHoldingFlag = false;
-                                    world.Map.QueueUpdate(new BlockUpdate(Player.Console, CTF.blueFlag, Block.Blue));
-                                }
-                                player.Team = "Blue";
-                                player.TeleportTo(CTF.blueSpawn);
-                                break;
-                            }
-                            else
-                            {
-                                if (player.Can(Permission.ReadStaffChat))
-                                {
-                                    player.Message("You have switched to the &9Blue&s team. The teams are now unbalanced!");
-                                    if (CTF.redTeam.Contains(player))
-                                    {
-                                        CTF.redTeam.Remove(player);
-                                        CTF.blueTeam.Add(player);
-                                    }
-                                    if (player.IsHoldingFlag)
-                                    {
-                                        world.Players.Message("&cFlag holder &4" + player.Name + " &cswitched to the &1Blue&c team, thus dropping the flag for the &4Red&c team!");
-                                        CTF.redHasFlag = false;
-                                        player.IsHoldingFlag = false;
-                                        world.Map.QueueUpdate(new BlockUpdate(Player.Console, CTF.blueFlag, Block.Blue));
-                                    }
-                                    player.Team = "Blue";
-                                    player.TeleportTo(CTF.blueSpawn);
-                                    break;
-                                }
-                                else
-                                {
-                                    player.Message("You cannot switch teams. The teams would become too unbalanced!");
-                                    break;
-                                }
-                            }
-                        }
-                        break;
+                    if (player.Team == CTF.BlueTeam) {
+                        if ((CTF.BlueTeam.Count - CTF.RedTeam.Count) >= 1)
+                            CTF.SwitchTeamTo(player, CTF.RedTeam, false);
+                        else
+                            player.Message("You cannot switch teams. The teams would become too unbalanced!");
+                    } else if (player.Team == CTF.RedTeam) {
+                        
+                        if ((CTF.RedTeam.Count - CTF.BlueTeam.Count) >= 1)
+                            CTF.SwitchTeamTo(player, CTF.BlueTeam, false);
+                        else
+                            player.Message("You cannot switch teams. The teams would become too unbalanced!");
                     }
-
+                    break;
                 default:
                     CdCTF.PrintUsage(player);
                     break;
             }
-
         }
+        
+        static void CtfStaffHandler(Player player, string options) {
+            switch (options) {
+                case "start":
+                    if (!CTF.GameRunning) {
+                        if (player.World.Name.ToLower() != "ctf") {
+                            player.Message("You can only start a game on the CTF map.");
+                        } else {
+                            player.Message("Started CTF game on world {0}", player.World.ClassyName);
+                            CTF.Start(player, player.World);
+                        }
+                    } else {
+                        player.Message("Game is already in progress. Type /ctf stop to stop the game.");
+                    }
+                    break;
+
+                case "stop":
+                    if (CTF.GameRunning) {
+                        player.Message("Stopped CTF game.");
+                        CTF.Stop();
+                    } else {
+                        player.Message("No CTF game running.");
+                    }
+                    break;
+
+                case "redspawn":
+                    player.Message("Red team's spawn set to {0}.", player.Position.ToBlockCoordsExt());
+                    CTF.RedTeam.Spawn = player.Position;
+                    break;
+                case "bluespawn":
+                    player.Message("Blue team's spawn set to {0}", player.Position.ToBlockCoordsExt());
+                    CTF.BlueTeam.Spawn = player.Position;
+                    break;
+                case "redflag":
+                    CTF.RedTeam.FlagPos = player.Position.ToBlockCoordsExt();
+                    CTF.map.QueueUpdate(new BlockUpdate(Player.Console,
+                                                        CTF.RedTeam.FlagPos, CTF.RedTeam.FlagBlock));
+                    player.Message("Red flag positon set to {0}", player.Position.ToBlockCoordsExt());
+                    break;
+                case "blueflag":
+                    CTF.BlueTeam.FlagPos = player.Position.ToBlockCoordsExt();
+                    CTF.map.QueueUpdate(new BlockUpdate(Player.Console,
+                                                        CTF.BlueTeam.FlagPos, CTF.BlueTeam.FlagBlock));
+                    player.Message("Blue flag positon set to {0}", player.Position.ToBlockCoordsExt());
+                    break;
+                case "swapteam":
+                case "switchteam":
+                case "swap":
+                case "changeteam":
+                case "changesides":
+                case "switch":
+                    if (player.Team == CTF.BlueTeam) {
+                        bool unbalanced = (CTF.BlueTeam.Count - CTF.RedTeam.Count) >= 1;
+                        CTF.SwitchTeamTo(player, CTF.RedTeam, unbalanced);
+                    } else if (player.Team == CTF.RedTeam) {
+                        bool unbalanced = (CTF.RedTeam.Count - CTF.BlueTeam.Count) >= 1;
+                        CTF.SwitchTeamTo(player, CTF.BlueTeam, unbalanced);
+                    }
+                    break;
+                default:
+                    CdCTF.PrintUsage(player);
+                    break;
+            }
+        }
+
+        static void CTFHandler(Player player, CommandReader cmd) {
+            if (!cmd.HasNext)  {
+                CdCTF.PrintUsage(player);
+                return;
+            }
+            string Options = cmd.Next().ToLower();
+            World world = player.World;
+            if (world == WorldManager.MainWorld) {
+                player.Message("/ctf cannot be used on the main world");
+                return;
+            }
+            
+            if (player.Can(Permission.ReadStaffChat))
+                CtfStaffHandler(player, Options);
+            else
+                CtfGuestHandler(player, Options);
+        }
+        
         #endregion
         #region SkyLightEmulator
         static readonly CommandDescriptor CdSLE = new CommandDescriptor {
