@@ -10,12 +10,10 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using fCraft.AutoRank;
-using fCraft.Drawing;
 using fCraft.Events;
 using fCraft.MapConversion;
 using JetBrains.Annotations;
 using System.Collections.Concurrent;
-using ServiceStack.Text;
 
 namespace fCraft {
     /// <summary> Represents a connection to a Minecraft client. Handles low-level interactions (e.g. networking). </summary>
@@ -1425,13 +1423,6 @@ namespace fCraft {
 			if (Supports(CpeExtension.EnvWeatherType)) {
 				Send(Packet.SetWeather((byte)WeatherType.Sunny));
                 Send(Packet.SetWeather(World.Weather));
-            }
-            if (Supports(CpeExtension.EnvColors) && World != null && World.SkyLightEmulator) {
-				DateTime time = InfoCommands.GetTime(Info);
-				Send(Packet.MakeEnvSetColor((byte)EnvVariable.SkyColor, String.Format("#{0:X2}{1:X2}{2:X2}",
-					Server.SkyColorHex[time.TimeOfDay.Hours].R,
-					Server.SkyColorHex[time.TimeOfDay.Hours].G,
-					Server.SkyColorHex[time.TimeOfDay.Hours].B)));
             }
             #endregion
             #region HackControls

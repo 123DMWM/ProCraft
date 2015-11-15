@@ -1,18 +1,13 @@
 ﻿// Part of fCraft | Copyright 2009-2015 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt //Copyright (c) 2011-2013 Jon Baker, Glenn Marien and Lao Tszy <Jonty800@gmail.com> //Copyright (c) <2012-2014> <LeChosenOne, DingusBungus> | ProCraft Copyright 2014-2015 Joseph Beauvais <123DMWM@gmail.com>
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using fCraft.MapConversion;
 using JetBrains.Annotations;
 using fCraft.Drawing;
 using System.Text;
-using System.Threading;
-using fCraft.Events;
-using System.Collections;
 using fCraft.Games;
-using ServiceStack.Text;
 using fCraft.Portals;
 
 namespace fCraft {
@@ -54,7 +49,6 @@ namespace fCraft {
             CommandManager.RegisterCommand( CdSuicide );
             CommandManager.RegisterCommand( Cdweather );
             CommandManager.RegisterCommand( CdReJoin );
-            CommandManager.RegisterCommand( CdSLE );
             CommandManager.RegisterCommand( CdMRD );
             CommandManager.RegisterCommand( CdMyWorld );
             CommandManager.RegisterCommand( CdMaxPW );
@@ -4019,62 +4013,6 @@ namespace fCraft {
                 CtfGuestHandler(player, Options);
         }
         
-        #endregion
-        #region SkyLightEmulator
-        static readonly CommandDescriptor CdSLE = new CommandDescriptor {
-            Name = "SkyLightEmulator",
-            Aliases = new[] { "SLE" },
-            Category = CommandCategory.New | CommandCategory.World,
-            Permissions = new[] { Permission.ManageWorlds },
-            Help =
-                "Toggles whether or not to emulate sky color based on time in a world",
-            Usage = "/SLE [World] [on/off]",
-            Handler = SLEHandler
-        };
-
-        static void SLEHandler([NotNull] Player player, [NotNull] CommandReader cmd) {
-            string worldtest = cmd.Next();
-            World world;
-            if (worldtest != null && !worldtest.Equals("0") && !worldtest.Equals("1") && !worldtest.Equals("on") && !worldtest.Equals("off") && !worldtest.Equals("true") && !worldtest.Equals("false")) {
-                world = WorldManager.FindWorldOrPrintMatches(player, worldtest);
-            } else {
-                world = player.World;
-                cmd.Rewind();
-            }
-            if (world == null) { return; }
-            bool turnSkyOn = !world.SkyLightEmulator;
-            if (cmd.HasNext && !cmd.NextOnOff(out turnSkyOn)) {
-                if (world != null) {
-                    turnSkyOn = !world.SkyLightEmulator;
-                }
-            }
-            if (turnSkyOn != world.SkyLightEmulator) {
-                if (turnSkyOn) {
-                    world.SkyLightEmulator = true;
-                    player.Message(
-                        "&sSkylight Emulator for world {0}&s: &2ON&s. Sky will now change color to emulate time.",
-                        world.ClassyName);
-                    foreach (Player p in world.Players.Where(p => p.Supports(CpeExtension.EnvColors))) {
-						DateTime time = InfoCommands.GetTime(p.Info);
-							p.Send(Packet.MakeEnvSetColor((byte)EnvVariable.SkyColor, String.Format("{0:X2}{1:X2}{2:X2}",
-								Server.SkyColorHex[time.TimeOfDay.Hours].R,
-								Server.SkyColorHex[time.TimeOfDay.Hours].G,
-								Server.SkyColorHex[time.TimeOfDay.Hours].B)));
-                        p.Message("SkyLight Emulator is now enabled!");
-                    }
-                } else {
-                    world.SkyLightEmulator = false;
-                    player.Message("&sSkylight Emulator for world {0}&s: &4OFF&s.", world.ClassyName);
-                    foreach (Player p in world.Players.Where(p => p.Supports(CpeExtension.EnvColors) && p.World != null)) {
-                        p.Send(Packet.MakeEnvSetColor((byte)EnvVariable.SkyColor, p.World.SkyColor));
-                        p.Send(Packet.MakeEnvSetColor((byte)EnvVariable.CloudColor, p.World.CloudColor));
-                        p.Send(Packet.MakeEnvSetColor((byte)EnvVariable.FogColor, p.World.FogColor));
-                        p.Message("SkyLight Emulator is now disabled!");
-
-                    }
-                }
-            }
-        }
         #endregion
         #region MaxReachDistance
         static readonly CommandDescriptor CdMRD = new CommandDescriptor {

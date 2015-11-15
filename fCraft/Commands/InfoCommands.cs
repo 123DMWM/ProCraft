@@ -7,11 +7,8 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Xml;
-using System.Xml.XPath;
 using ServiceStack.Text;
 using JetBrains.Annotations;
-using NodaTime;
 namespace fCraft {
     /// <summary> Contains commands that don't do anything besides displaying some information or text.
     /// Includes several chat commands. </summary>
@@ -48,7 +45,6 @@ namespace fCraft {
             CommandManager.RegisterCommand( CdGeoipNp );
             CommandManager.RegisterCommand( CdApiPlayer );
             CommandManager.RegisterCommand( CdApiID );
-            CommandManager.RegisterCommand( Cdtimezone );
             CommandManager.RegisterCommand( CdPlugin );
 
         }
@@ -2285,37 +2281,6 @@ namespace fCraft {
             }
         }
 
-		#endregion
-		#region GetTime
-		static readonly CommandDescriptor Cdtimezone = new CommandDescriptor {
-			Name = "time",
-			Category = CommandCategory.New | CommandCategory.Info,
-			Usage = "/time [player]",
-			Help = "Displays specific players time",
-			IsConsoleSafe = true,
-			Handler = timeHandler
-		};
-
-		private static void timeHandler(Player player, CommandReader cmd) {
-			PlayerInfo info = FindPlayerInfo(player, cmd, "");
-			if (info == null) { return; }
-			DateTime clock = GetTime(info);
-			player.Message("&sFor &f" + info.Name + "&s it is &f" + clock.ToShortTimeString());
-			player.Message("&SOn a &f" + clock.ToLongDateString());
-		}
-		public static DateTime GetTime(PlayerInfo info) {
-			if (info.TimeZone == "") {
-				GetGeoip(info);
-			}
-			try {
-				Instant now = SystemClock.Instance.Now;
-				DateTimeZone tz = DateTimeZoneProviders.Tzdb[info.TimeZone];
-				ZonedDateTime zdt = now.InZone(tz);
-				return zdt.ToDateTimeUnspecified();
-			} catch {
-				return DateTime.Now;
-			}
-		}
 		#endregion
 		#region Plugins
 		static readonly CommandDescriptor CdPlugin = new CommandDescriptor {

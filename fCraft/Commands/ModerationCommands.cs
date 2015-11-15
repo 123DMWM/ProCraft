@@ -415,7 +415,7 @@ namespace fCraft {
             Category = CommandCategory.New | CommandCategory.Chat,
             Permissions = new Permission[] { Permission.Chat },
             Usage = "Bot [Option]",
-            Help = "Bot options are &hGo&s, &hServer&s, &hJoke&s, &hTime&s, &hClock&s, &hPromos&s, &hBans&s, &hKicks&s, &hBlocks&s, &hProtip&s, &hFunfact&s, and &hIdea&s.&n" +
+            Help = "Bot options are &hGo&s, &hServer&s, &hJoke&s, &hTime&s, &hPromos&s, &hBans&s, &hKicks&s, &hBlocks&s, &hProtip&s, &hFunfact&s, and &hIdea&s.&n" +
                    "Type in &h/help bot [option] &sfor more information.&n" +
                    "&6Bot&s is our Automated response system, so please don't abuse it.",
             NotRepeatable = true,
@@ -432,8 +432,6 @@ namespace fCraft {
                                     "Displays the time you spent this game session." +
                                     "&sType: &f!Bot Time Total&n&S" +
                                     "Displays your Total Time spent on the server." },
-                { "clock",          "&sType: &f!Bot Clock [player]&n&S" +
-                                    "Displays the date and time."},
                 { "promos",         "&sType: &f!Bot Promos&n&S" +
                                     "Displays the amount of players you have promoted."},
                 { "bans",           "&sType: &f!Bot Bans&n&S" +
@@ -737,22 +735,6 @@ namespace fCraft {
 						Logger.Log(LogType.UserActivity, "&6Bot&f: " + player.ClassyName + " &fcannot kick yet");
 						IRC.SendChannelMessage("\u212C&6Bot\u211C: " + player.ClassyName + " \u211Ccannot kick yet");
 					}
-					player.Info.LastServerMessageDate = DateTime.Now;
-					player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
-					break;
-				case "clock":
-					PlayerInfo info = player.Info;
-					if (player.Info.TimesUsedBot == 0) {
-						player.Message(
-							"&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
-					}
-					DateTime clock = InfoCommands.GetTime(info);
-					Server.Players.Message("&6Bot&f: For " + info.Name + " it is " + clock.ToShortTimeString());
-					Server.Players.Message("&f> On a " + clock.ToLongDateString());
-					Logger.Log(LogType.UserActivity, "Bot: For " + info.Name + " it is " + clock.ToShortTimeString());
-					Logger.Log(LogType.UserActivity, "> On a " + clock.ToLongDateString());
-					IRC.SendChannelMessage("\u212C&6Bot\u211C: For \u212C" + info.Name + "\u211C it is " + clock.ToShortTimeString());
-					IRC.SendChannelMessage("\u211C> On a " + clock.ToLongDateString());
 					player.Info.LastServerMessageDate = DateTime.Now;
 					player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
 					break;

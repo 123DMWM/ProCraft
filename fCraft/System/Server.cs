@@ -410,7 +410,6 @@ namespace fCraft {
                 Scheduler.NewTask( ShowRandomAnnouncement ).RunForever( announcementInterval );
                 Scheduler.NewTask( RemoveRandomAnnouncement ).RunForever( announcementInterval, new TimeSpan(0, 0, 5));
             }
-            Scheduler.NewTask(ChangeWorldColors).RunForever(TimeSpan.FromHours(1));
 
             #region LoadTimers
             try
@@ -935,7 +934,6 @@ namespace fCraft {
                 Player player = tempPlayerList[i];
 
 				if (player.Supports(CpeExtension.MessageType)) {
-					player.Send(Packet.Message((byte)MessageType.Status3, Color.Sys + "It is currently: &f" + InfoCommands.GetTime(player.Info).ToShortTimeString()));
 					player.Send(Packet.Message((byte)MessageType.BottomRight3, Color.Sys + "Been playing for: " + player.Info.TimeSinceLastLogin.ToMiniString()));
                     player.Send(Packet.Message((byte)MessageType.BottomRight2,
                         player.Position.ToBlockCoordsExt().ToString() + "&s[" + compassString((int)player.Position.R) + "&s]"));
@@ -1192,48 +1190,6 @@ namespace fCraft {
                         sendtome.Send(Packet.Message((byte)MessageType.Announcement, " "));
                     }
                 }
-            }
-        }
-
-		/// <summary> Number for determining color of day. </summary>
-		public static List<System.Drawing.Color> SkyColorHex = new List<System.Drawing.Color> {
-			System.Drawing.ColorTranslator.FromHtml("#000011".ToUpper()),
-			System.Drawing.ColorTranslator.FromHtml("#000011".ToUpper()),
-			System.Drawing.ColorTranslator.FromHtml("#060729".ToUpper()),
-			System.Drawing.ColorTranslator.FromHtml("#141346".ToUpper()),
-			System.Drawing.ColorTranslator.FromHtml("#282A72".ToUpper()),
-			System.Drawing.ColorTranslator.FromHtml("#5158A6".ToUpper()),
-			System.Drawing.ColorTranslator.FromHtml("#8684C0".ToUpper()),
-			System.Drawing.ColorTranslator.FromHtml("#B5ACDB".ToUpper()),
-			System.Drawing.ColorTranslator.FromHtml("#CCCDEE".ToUpper()),
-			System.Drawing.ColorTranslator.FromHtml("#C0DEF7".ToUpper()),
-			System.Drawing.ColorTranslator.FromHtml("#C1EEFE".ToUpper()),
-			System.Drawing.ColorTranslator.FromHtml("#C7F6FF".ToUpper()),
-			System.Drawing.ColorTranslator.FromHtml("#ABEDFE".ToUpper()),
-			System.Drawing.ColorTranslator.FromHtml("#8FDDF9".ToUpper()),
-			System.Drawing.ColorTranslator.FromHtml("#75C3EF".ToUpper()),
-			System.Drawing.ColorTranslator.FromHtml("#69ABE0".ToUpper()),
-			System.Drawing.ColorTranslator.FromHtml("#8FAECD".ToUpper()),
-			System.Drawing.ColorTranslator.FromHtml("#D5CEAD".ToUpper()),
-			System.Drawing.ColorTranslator.FromHtml("#EFAE71".ToUpper()),
-			System.Drawing.ColorTranslator.FromHtml("#A4383E".ToUpper()),
-			System.Drawing.ColorTranslator.FromHtml("#210633".ToUpper()),
-			System.Drawing.ColorTranslator.FromHtml("#150621".ToUpper()),
-			System.Drawing.ColorTranslator.FromHtml("#14070E".ToUpper()),
-			System.Drawing.ColorTranslator.FromHtml("#0A0105".ToUpper()),
-			System.Drawing.ColorTranslator.FromHtml("#090305".ToUpper())
-        };
-
-
-        // Changes day color
-        private static void ChangeWorldColors(SchedulerTask task) {
-            foreach (Player sendtome in Players.Where(w => w.Supports(CpeExtension.EnvColors) && w.World != null && w.World.SkyLightEmulator)) {
-				DateTime time = InfoCommands.GetTime(sendtome.Info);
-				//sendtome.Send(Packet.MakeEnvSetColor((byte)EnvVariable.SkyColor, SkyColorHex[(time.Hour * 60) + time.Minute].ToArgb()));
-				sendtome.Send(Packet.MakeEnvSetColor((byte)EnvVariable.SkyColor, String.Format("{0:X2}{1:X2}{2:X2}",
-					SkyColorHex[time.TimeOfDay.Hours].R,
-					SkyColorHex[time.TimeOfDay.Hours].G,
-					SkyColorHex[time.TimeOfDay.Hours].B)));
             }
         }
 
