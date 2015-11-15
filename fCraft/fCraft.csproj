@@ -275,7 +275,6 @@
     <Compile Include="AutoRank\Conditions.cs" />
     <Compile Include="AutoRank\Criterion.cs" />
     <Compile Include="Commands\ChatCommands.cs" />
-    <Compile Include="Commands\CTF.cs" />
     <Compile Include="Drawing\DrawOps\BlockDBDrawOperation.cs" />
     <Compile Include="Drawing\DrawOps\TriangleDrawOperation.cs" />
     <Compile Include="Drawing\DrawOps\TriangleWireframeDrawOperation.cs" />
