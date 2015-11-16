@@ -902,7 +902,7 @@ namespace fCraft {
                         target.Message( "&WYou were &bfrozen&w by {0}", player.ClassyName );
                     }
                     Server.Message( target, "{0}&s successfully &bfroze&s: {1}",
-                                            ClassyName, player.ClassyName );
+                                            player.ClassyName, ClassyName );
                 }
 
                 // Raise PlayerInfo.FreezeChanged event
