@@ -1487,7 +1487,7 @@ namespace fCraft {
         }
         
         public TimeSpan TimeSinceLastServerMessage {
-            get { return DateTime.Now.Subtract(LastServerMessageDate); }
+            get { return (this != Player.Console.Info ? DateTime.Now.Subtract(LastServerMessageDate) : TimeSpan.MaxValue); }
         }
 
         #endregion

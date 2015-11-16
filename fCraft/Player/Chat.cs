@@ -123,9 +123,7 @@ namespace fCraft {
                 if (LDistance(rawMessage.ToLower(), "how do i rank up?") <= 0.25
                     || LDistance(rawMessage.ToLower(), "how do we rank up") <= 0.25) {
                     if (BotTime > 5) {
-                        Server.Players.Message("&6Bot&f: You rank up by building something nice, preferably big. Then ask a staff member for a review.");
-                        Logger.Log(LogType.UserActivity, "&6Bot&f: You rank up by building something nice, preferably big. Then ask a staff member for a review.");
-                        IRC.SendChannelMessage("\u212C&6Bot\u211C: You rank up by building something nice, preferably big. Then ask a staff member for a review.");
+                        Server.BotMessage("You rank up by building something nice, preferably big. Then ask a staff member for a review.");
                         player.Info.LastServerMessageDate = DateTime.Now;
                         player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
                     }
@@ -134,13 +132,9 @@ namespace fCraft {
                     if (BotTime > 5) {
                         PlayerInfo owner;
                         if (PlayerDB.FindPlayerInfo(ConfigKey.ServerOwner.GetString(), out owner) && owner != null) {
-                            Server.Players.Message("&6Bot&f: The owner is {0}", RankManager.HighestRank.Color + owner.Name);
-                            Logger.Log(LogType.UserActivity, "&6Bot&f: The owner is {0}", RankManager.HighestRank.Color + owner.Name);
-                            IRC.SendChannelMessage("\u212C&6Bot\u211C: The owner is {0}", RankManager.HighestRank.Color + owner.Name);
+                            Server.BotMessage("The owner is {0}", RankManager.HighestRank.Color + owner.Name);
                         } else {
-                            Server.Players.Message("&6Bot&f: The owner is {0}", RankManager.HighestRank.Color + ConfigKey.ServerOwner.GetString());
-                            Logger.Log(LogType.UserActivity, "&6Bot&f: The owner is {0}", RankManager.HighestRank.Color + ConfigKey.ServerOwner.GetString());
-                            IRC.SendChannelMessage("\u212C&6Bot\u211C: The owner is {0}", RankManager.HighestRank.Color + ConfigKey.ServerOwner.GetString());
+                            Server.BotMessage("The owner is {0}", RankManager.HighestRank.Color + ConfigKey.ServerOwner.GetString());
                         }
                         player.Info.LastServerMessageDate = DateTime.Now;
                         player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
@@ -149,9 +143,7 @@ namespace fCraft {
                 if (LDistance(rawMessage.ToLower(), "what is this server called?") <= 0.25
                     || LDistance(rawMessage.ToLower(), "what is the name of this server?") <= 0.25) {
                     if (BotTime > 5) {
-                        Server.Players.Message("&6Bot&f: The server name is: " + ConfigKey.ServerName.GetString());
-                        Logger.Log(LogType.UserActivity, "&6Bot&f: The server name is: " + ConfigKey.ServerName.GetString());
-                        IRC.SendChannelMessage("\u212C&6Bot\u211C: The server name is: " + ConfigKey.ServerName.GetString());
+                        Server.BotMessage("The server name is: " + ConfigKey.ServerName.GetString());
                         player.Info.LastServerMessageDate = DateTime.Now;
                         player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
                     }
@@ -159,9 +151,7 @@ namespace fCraft {
                 if (LDistance(rawMessage.ToLower(), "where can i build?") <= 0.25
                     || LDistance(rawMessage.ToLower(), "where do we build") <= 0.25) {
                     if (BotTime > 5) {
-                        Server.Players.Message("&6Bot&f: You can build anywhere outside of spawn. Just not on another persons build unless they say you can. ");
-                        Logger.Log(LogType.UserActivity, "&6Bot&f: You can build anywhere outside of spawn. Just not on another persons build unless they say you can. ");
-                        IRC.SendChannelMessage("\u212C&6Bot\u211C: You can build anywhere outside of spawn. Just not on another persons build unless they say you can. ");
+                        Server.BotMessage("You can build anywhere outside of spawn. Just not on another persons build unless they say you can. ");
                         player.Info.LastServerMessageDate = DateTime.Now;
                         player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
                     }
@@ -175,15 +165,11 @@ namespace fCraft {
                             meh = meh.NextRankUp;
                             goto tryagain;
                         }
-                        Server.Players.Message("&6Bot&f: Your next rank is: " + meh.ClassyName);
-                        Logger.Log(LogType.UserActivity, "&6Bot&f: Your next rank is: " + meh.ClassyName);
-                        IRC.SendChannelMessage("\u212C&6Bot\u211C: Your next rank is: " + meh.ClassyName);
+                        Server.BotMessage("Your next rank is: " + meh.ClassyName);
                         player.Info.LastServerMessageDate = DateTime.Now;
                         player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
                     } else if (player.Info.Rank == RankManager.HighestRank) {
-                        Server.Players.Message("&6Bot&f: You are already the highest rank.");
-                        Logger.Log(LogType.UserActivity, "&6Bot&f: You are already the highest rank.");
-                        IRC.SendChannelMessage("\u212C&6Bot\u211C: You are already the highest rank.");
+                        Server.BotMessage("You are already the highest rank.");
                         player.Info.LastServerMessageDate = DateTime.Now;
                         player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
                     }

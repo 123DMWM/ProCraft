@@ -558,15 +558,11 @@ namespace fCraft
             {
                 if (num == 69)
                 {
-                    Server.Players.Message( "&6Bot&f: Tehe....69" );
-                    Logger.Log( LogType.UserActivity, "&6Bot&f: Tehe....69" );
-                    IRC.SendChannelMessage("\u212C&6Bot\u211C: Tehe....69");
+                    Server.BotMessage("Tehe....69");
                 }
                 if (num == Server.CountPlayers(false))
                 {
-                    Server.Players.Message( "&6Bot&f: That's how many players are online :D" );
-                    Logger.Log( LogType.UserActivity, "&6Bot&f: That's how many players are online :D" );
-                    IRC.SendChannelMessage("\u212C&6Bot\u211C: That's how many players are online :D");
+                    Server.BotMessage("That's how many players are online :D");
                 }
             }
         }

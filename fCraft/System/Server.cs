@@ -878,6 +878,15 @@ namespace fCraft {
             Players.Except( except ).Message( message, formatArgs );
         }
 
+        public static void BotMessage( string message, [CanBeNull] params object[] formatArgs) {
+            if (formatArgs.Length > 0) {
+                message = String.Format(message, formatArgs);
+            }
+            Server.Players.Message("&6Bot&f: " + message);
+            Logger.Log(LogType.UserActivity, "&6Bot&f: " + message);
+            IRC.SendChannelMessage("\u212C&6Bot\u211C: " + Color.StripColors(Chat.ReplacePercentColorCodes(message, false)));
+        }
+
         #endregion
 
 
@@ -934,7 +943,6 @@ namespace fCraft {
                 Player player = tempPlayerList[i];
 
 				if (player.Supports(CpeExtension.MessageType)) {
-					player.Send(Packet.Message((byte)MessageType.BottomRight3, Color.Sys + "Been playing for: " + player.Info.TimeSinceLastLogin.ToMiniString()));
                     player.Send(Packet.Message((byte)MessageType.BottomRight2,
                         player.Position.ToBlockCoordsExt().ToString() + "&s[" + compassString((int)player.Position.R) + "&s]"));
                 }
