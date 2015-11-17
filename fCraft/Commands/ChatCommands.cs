@@ -339,56 +339,40 @@ namespace fCraft
             Handler = IgnoreHandler
         };
 
-        static void IgnoreHandler(Player player, CommandReader cmd)
-        {
+        static void IgnoreHandler(Player player, CommandReader cmd) {
             string name = cmd.Next();
-            if (name.ToLower() == "irc")
-            {
-                if (player.Info.ReadIRC == true)
-                {
-                    player.Info.ReadIRC = false;
-                    player.Message("You are now ignoring &iIRC");
-                    string message = String.Format("\u212C&SPlayer {0}&S is now Ignoring IRC", player.ClassyName);
-                    if (!player.Info.IsHidden)
-                    {
-                        IRC.SendChannelMessage(message);
+            if (!string.IsNullOrEmpty(name)) {
+                if (name.ToLower() == "irc") {
+                    if (player.Info.ReadIRC == true) {
+                        player.Info.ReadIRC = false;
+                        player.Message("You are now ignoring &iIRC");
+                        string message = String.Format("\u212C&SPlayer {0}&S is now Ignoring IRC", player.ClassyName);
+                        if (!player.Info.IsHidden) {
+                            IRC.SendChannelMessage(message);
+                        }
+                    } else {
+                        player.Message("You are already ignoring &iIRC");
                     }
+                    return;
                 }
-                else
-                {
-                    player.Message("You are already ignoring &iIRC");
-                }
-                return;
-            }
-            if (name != "")
-            {
-                if (cmd.HasNext)
-                {
+                if (cmd.HasNext) {
                     CdIgnore.PrintUsage(player);
                     return;
                 }
                 PlayerInfo targetInfo = PlayerDB.FindPlayerInfoOrPrintMatches(player, name, SearchOptions.ReturnSelfIfOnlyMatch);
                 if (targetInfo == null) return;
 
-                if (player.Ignore(targetInfo))
-                {
+                if (player.Ignore(targetInfo)) {
                     player.Message("You are now ignoring {0}", targetInfo.ClassyName);
-                }
-                else
-                {
+                } else {
                     player.Message("You are already ignoring {0}", targetInfo.ClassyName);
                 }
 
-            }
-            else
-            {
+            } else {
                 PlayerInfo[] ignoreList = player.IgnoreList;
-                if (ignoreList.Length > 0)
-                {
+                if (ignoreList.Length > 0) {
                     player.Message("Ignored players: {0}", ignoreList.JoinToClassyString());
-                }
-                else
-                {
+                } else {
                     player.Message("You are not currently ignoring anyone.");
                 }
             }
@@ -405,55 +389,39 @@ namespace fCraft
             Handler = UnignoreHandler
         };
 
-        static void UnignoreHandler(Player player, CommandReader cmd)
-        {
+        static void UnignoreHandler(Player player, CommandReader cmd) {
             string name = cmd.Next();
-            if (name.ToLower() == "irc")
-            {
-                if (player.Info.ReadIRC == false)
-                {
-                    player.Info.ReadIRC = true;
-                    player.Message("You are no longer ignoring &iIRC");
-                    string message = String.Format("\u212C&SPlayer {0}&S is no longer Ignoring IRC", player.ClassyName);
-                    if (!player.Info.IsHidden)
-                    {
-                        IRC.SendChannelMessage(message);
+            if (!string.IsNullOrEmpty(name)) {
+                if (name.ToLower() == "irc") {
+                    if (player.Info.ReadIRC == false) {
+                        player.Info.ReadIRC = true;
+                        player.Message("You are no longer ignoring &iIRC");
+                        string message = String.Format("\u212C&SPlayer {0}&S is no longer Ignoring IRC", player.ClassyName);
+                        if (!player.Info.IsHidden) {
+                            IRC.SendChannelMessage(message);
+                        }
+                    } else {
+                        player.Message("You are not currently ignoring &iIRC");
                     }
+                    return;
                 }
-                else
-                {
-                    player.Message("You are not currently ignoring &iIRC");
-                }
-                return;
-            }
-            if (name != "")
-            {
-                if (cmd.HasNext)
-                {
+                if (cmd.HasNext) {
                     CdUnignore.PrintUsage(player);
                     return;
                 }
                 PlayerInfo targetInfo = PlayerDB.FindPlayerInfoOrPrintMatches(player, name, SearchOptions.ReturnSelfIfOnlyMatch);
                 if (targetInfo == null) return;
 
-                if (player.Unignore(targetInfo))
-                {
+                if (player.Unignore(targetInfo)) {
                     player.Message("You are no longer ignoring {0}", targetInfo.ClassyName);
-                }
-                else
-                {
+                } else {
                     player.Message("You are not currently ignoring {0}", targetInfo.ClassyName);
                 }
-            }
-            else
-            {
+            } else {
                 PlayerInfo[] ignoreList = player.IgnoreList;
-                if (ignoreList.Length > 0)
-                {
+                if (ignoreList.Length > 0) {
                     player.Message("Ignored players: {0}", ignoreList.JoinToClassyString());
-                }
-                else
-                {
+                } else {
                     player.Message("You are not currently ignoring anyone.");
                 }
             }
