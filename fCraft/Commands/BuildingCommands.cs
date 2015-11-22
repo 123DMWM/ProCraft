@@ -153,7 +153,7 @@ namespace fCraft {
             Category = CommandCategory.Building,
             Permissions = new[] { Permission.Draw },
             RepeatableSelection = true,
-            Help = "Covers blocks that are underneith air.",
+            Help = "Covers blocks that are underneath air.",
             Handler = overlayHandler
         };
 
