@@ -1115,23 +1115,23 @@ namespace fCraft
         };
 
         private static void greetHandler(Player player, CommandReader cmd) {
-            if (player.Info.TimeSinceLastServerMessage.TotalSeconds < 5) {
-                player.Info.getLeftOverTime(5, cmd);
-                return;
+            var all = Server.Players.Where(p => !p.Info.IsHidden).OrderBy(p => p.Info.TimeSinceLastLogin.ToMilliSeconds());
+            if (all.Any() && all != null) {
+                Player last = all.First();
+                if (last == player) {
+                    player.Message("You were the last player to join silly");
+                    return;
+                }
+                if (player.Info.TimeSinceLastServerMessage.TotalSeconds < 5 && last.Info.TimeSinceLastLogin.ToSeconds() > 5) {
+                    player.Info.getLeftOverTime(5, cmd);
+                    return;
+                }
+                string message = "Welcome to " + Color.StripColors(ConfigKey.ServerName.GetString()) + ", " + last.Name + "!";
+                player.ParseMessage(message, false);
+                player.Info.LastServerMessageDate = DateTime.Now;
+            } else {
+                player.Message("Error: No one else on!");
             }
-			var all = Server.Players.Where(p => !p.Info.IsHidden).OrderBy(p => p.Info.TimeSinceLastLogin.ToMilliSeconds());
-			if (all.Any() && all != null) {
-				Player last = all.First();
-				if (last == player) {
-					player.Message("You were the last player to join silly");
-					return;
-				}
-				string message = "Welcome to " + Color.StripColors(ConfigKey.ServerName.GetString()) + ", " + last.Name + "!";
-				player.ParseMessage(message, false);
-				player.Info.LastServerMessageDate = DateTime.Now;
-			} else {
-				player.Message("Error: No one else on!");
-			}
         }
 
         #endregion
