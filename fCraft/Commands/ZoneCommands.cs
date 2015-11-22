@@ -763,6 +763,10 @@ namespace fCraft {
             }
             ZoneCollection zones = player.WorldMap.Zones;
             Zone zone = zones.Find( zoneName );
+            if (zone == null) {
+                player.MessageNoZone(zoneName);
+                return;
+            }
             if (IsSpecialZone(zone.Name.ToLower())) {
                 if (player.Can(Permission.ManageSpecialZones) == false)
                 {
