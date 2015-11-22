@@ -551,16 +551,16 @@ namespace fCraft {
 					TimeSpan time = player.Info.TotalTime;
 					TimeSpan timenow = player.Info.TimeSinceLastLogin;
 					if (helper == "total") {
-						Server.BotMessage(player.ClassyName + " has spent a total of {0:F2} hours on this server.", time.TotalHours);
+						Server.BotMessage(player.ClassyName + "&f has spent a total of {0:F2} hours on this server.", time.TotalHours);
 					} else {
-						Server.BotMessage(player.ClassyName + " has played a total of {0:F2} minutes this session.", timenow.TotalMinutes);
+						Server.BotMessage(player.ClassyName + "&f has played a total of {0:F2} minutes this session.", timenow.TotalMinutes);
 					}
 					break;
 				case "promos":
 					if (player.Info.Rank.Can(Permission.Promote) || player.Info.PromoCount != 0) {
-						Server.BotMessage(player.ClassyName + " has promoted " + player.Info.PromoCount + " players.");
+						Server.BotMessage(player.ClassyName + "&f has promoted " + player.Info.PromoCount + " players.");
 					} else {
-						Server.BotMessage(player.ClassyName + " cannot promote players yet");
+						Server.BotMessage(player.ClassyName + "&f cannot promote players yet");
 					}
 					break;
 				case "bans":
@@ -572,19 +572,19 @@ namespace fCraft {
 					break;
 				case "kicks":
 					if (player.Info.Rank.Can(Permission.Kick) || player.Info.TimesKickedOthers != 0) {
-						Server.BotMessage(player.ClassyName + " &fhas kicked " +
+						Server.BotMessage(player.ClassyName + "&f has kicked " +
 											   player.Info.TimesKickedOthers + " players.");
 					} else {
-						Server.BotMessage(player.ClassyName + " &fcannot kick yet");
+						Server.BotMessage(player.ClassyName + "&f cannot kick yet");
 					}
 					break;
 				case "blocks":
 					if (helper == "total") {
-						Server.BotMessage(player.ClassyName + " &fhas built " + player.Info.BlocksBuilt +
+						Server.BotMessage(player.ClassyName + "&f has built " + player.Info.BlocksBuilt +
 											   " blocks, deleted " + player.Info.BlocksDeleted + " and drew " +
 											   player.Info.BlocksDrawn + ".");
 					} else {
-						Server.BotMessage(player.ClassyName + " &fhas built " +
+						Server.BotMessage(player.ClassyName + "&f has built " +
 											   player.Info.BlocksBuiltThisGame + " blocks and deleted " +
 											   player.Info.BlocksDeletedThisGame + " blocks this session.");
 					}
