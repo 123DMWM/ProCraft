@@ -1450,6 +1450,9 @@ namespace fCraft {
             }
 
             #endregion
+            if (Supports(CpeExtension.MessageType) && !IsPlayingCTF) {
+                Send(Packet.Message((byte)MessageType.BottomRight1, "&sBlock:&f" + Info.heldBlock.ToString() + " &sID:&f" + Info.heldBlock.GetHashCode()));
+            }
 
             foreach (Bot bot in World.Bots) {
                 Send(Packet.MakeRemoveEntity(bot.ID));

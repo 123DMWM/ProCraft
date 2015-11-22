@@ -82,7 +82,7 @@ namespace fCraft {
         public Boolean TPDeny;
 
         /// <summary> The block the player currently has in their hand.</summary>
-        public Block heldBlock;
+        public Block heldBlock = Block.Stone;
 
         /// <summary> Most recent time the player logged in, UTC.
         /// May be DateTime.MinValue if player has never been online. </summary>
