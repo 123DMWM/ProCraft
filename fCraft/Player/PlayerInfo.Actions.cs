@@ -61,8 +61,8 @@ namespace fCraft {
                 }
 
                 // Check if player has sufficient rank permissions
-                if( !unban && !player.Can( Permission.Ban, Rank ) ) {
-                    PlayerOpException.ThrowPermissionLimit( player, this, "ban", Permission.Ban );
+                if( !player.Can( Permission.Ban, Rank ) ) {
+                    PlayerOpException.ThrowPermissionLimit( player, this, unban ? "unban" : "ban", Permission.Ban );
                 }
 
                 PlayerOpException.CheckBanReason( reason, player, this, unban );
