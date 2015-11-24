@@ -8,4 +8,4 @@ I suggest you **do not** use this server unless you know what you are doing. The
 ### If you have not updated since november 7th Please do, I fixed a major bug
 * To update server first safely shut it down, then replace old files with these updated ones
 
-Download is always up to date with latest WORKING code - Latest: November 10, 2015 (yes, I was actually productive on this day)
+Download is always up to date with latest WORKING code - Latest: November 23, 2015
