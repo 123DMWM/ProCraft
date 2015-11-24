@@ -1694,6 +1694,8 @@ namespace fCraft {
                 if (newBrush == null)
                     return null;
                 LastUsedBrush = newBrush;
+            } else if (LastUsedBrush is NormalBrush) {
+                ((NormalBrush)LastUsedBrush).Blocks = null;
             }
             return LastUsedBrush.Clone();
         }

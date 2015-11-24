@@ -59,7 +59,7 @@ namespace fCraft.Drawing {
             get { return Blocks.Length; }
         }
 
-        public Block[] Blocks { get; private set; }
+        public Block[] Blocks { get; set; }
 
         public string Description {
             get {
