@@ -1801,6 +1801,18 @@ namespace fCraft {
                         MoveEntity( entity, otherPos );
                     }
                 }
+
+                if (spectatedPlayer == otherPlayer) { //Hide player being spectated
+                    HideEntity(entity);
+                } else if (otherPlayer.spectatedPlayer == this) { //Hide player spectating you
+                    HideEntity(entity);
+                } else if (otherPlayer.IsSpectating) { //Is other player spectating?...
+                    if (CanSee(otherPlayer)) { //...Update location of player who is able to be seen while hidden
+                        MoveEntity(entity, entity.LastKnownPosition);
+                    } else { //..Hide other player
+                        HideEntity(entity);
+                    }
+                }
             }
             Info.oldskinName = Info.skinName;
             Info.oldMob = Info.Mob;
