@@ -1426,9 +1426,58 @@ namespace fCraft {
             }
             #endregion
             #region HackControls
-            if (Supports(CpeExtension.HackControl))
-            {
-                Send(Packet.HackControl(Info.AllowFlying, Info.AllowNoClip, Info.AllowSpeedhack, Info.AllowRespawn, Info.AllowThirdPerson, Info.JumpHeight));
+            if (Supports(CpeExtension.HackControl)) {
+                bool canFly = true, canNoClip = true, canSpeed = true, canRespawn = true, useMotd = false, isOP = Info.Rank.Can(Permission.ReadStaffChat);
+                if (!String.IsNullOrEmpty(World.MOTD)) {
+                    foreach (String s in World.MOTD.ToLower().Split()) {
+                        switch (s) {
+                            case "-fly":
+                                canFly = false;
+                                useMotd = true;
+                                break;
+                            case "-noclip":
+                                canNoClip = false;
+                                useMotd = true;
+                                break;
+                            case "-speed":
+                                canSpeed = false;
+                                useMotd = true;
+                                break;
+                            case "-respawn":
+                                canRespawn = false;
+                                useMotd = true;
+                                break;
+                            case "-hax":
+                                canFly = false;
+                                canNoClip = false;
+                                canSpeed = false;
+                                canRespawn = false;
+                                useMotd = true;
+                                break;
+                            case "+hax":
+                                canFly = true;
+                                canNoClip = true;
+                                canSpeed = true;
+                                canRespawn = true;
+                                useMotd = true;
+                                break;
+                            case "+ophax":
+                                canFly = isOP;
+                                canNoClip = isOP;
+                                canSpeed = isOP;
+                                canRespawn = isOP;
+                                useMotd = true;
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+                if (useMotd) {
+                    Send(Packet.HackControl(canFly, canNoClip, canSpeed, canRespawn, canNoClip, 40));
+                } else {
+                    Send(Packet.HackControl(Info.AllowFlying, Info.AllowNoClip, Info.AllowSpeedhack, Info.AllowRespawn, Info.AllowThirdPerson, Info.JumpHeight));
+                }
             }
             #endregion
             #region Reach Distance
