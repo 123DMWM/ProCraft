@@ -503,6 +503,7 @@ namespace fCraft {
             PlayerDB.Save();
             IPBanList.Save();
             WorldManager.SaveWorldList();
+            Portals.PortalDB.Save();
             if (player != Player.Console)
             {
                 if (player.WorldMap.HasChangedSinceSave)
