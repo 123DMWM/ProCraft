@@ -35,7 +35,7 @@ namespace fCraft {
             CommandManager.RegisterCommand( CdBum );
             CommandManager.RegisterCommand( CdBDBDB );
             CommandManager.RegisterCommand( cdTaskDebug );
-            CommandManager.RegisterCommand( CdTTime );
+            CommandManager.RegisterCommand( CdMost );
             CommandManager.RegisterCommand( CdLRP );
             CommandManager.RegisterCommand( CdLPR );
             CommandManager.RegisterCommand( CdIPInfo );
@@ -1526,39 +1526,58 @@ namespace fCraft {
         }
 
         #endregion
-        #region TopTime
+        #region Most
 
-        static readonly CommandDescriptor CdTTime = new CommandDescriptor
-        {
-            Name = "TopTime",
-            Aliases = new[] { "tt" },
+        static readonly CommandDescriptor CdMost = new CommandDescriptor {
+            Name = "Most",
             Category = CommandCategory.New | CommandCategory.Info,
             IsConsoleSafe = true,
-            Usage = "/TopTime [Rank] [Offset]",
-            Help = "Lists all players in order of their total time played",
-            Handler = TTHandler
+            Usage = "/Most <stat> [Rank] and/or [Offset]",
+            Help = "Lists all players in order of a specefied statistic. Stats:" +
+                   "Banned, Built, Chat, Deleted, Demoted, Drawn, Hours, Kicked, Logins, Promoted",
+            HelpSections = new Dictionary<string, string>{
+                { "Banned",     "/Most Banned [Args]" +
+                                    "Lists the top players by playeres banned" },
+                { "Built",      "/Most Built [Args]" +
+                                    "Lists the top players by blocks built" },
+                { "Chat",       "/Most Chat [Args]" +
+                                    "Lists the top players by lines of chat sent" },
+                { "Deleted",    "/Most Deleted [Args]" +
+                                    "Lists the top players by blocks deleted" },
+                { "Demoted",    "/Most Demoted [Args]" +
+                                    "Lists the top players by players demoted" },
+                { "Drawn",      "/Most Drawn [Args]" +
+                                    "Lists the top players by blocks drawn" },
+                { "Hours",      "/Most Hours [Args]" +
+                                    "Lists the top players by total hours" },
+                { "Kicked",     "/Most Kicked [Args]" +
+                                    "Lists the top players by players kicked" },
+                { "Logins",     "/Most Logins [Args]" +
+                                    "Lists the top players by total logins" },
+                { "Promoted",   "/Most Promoted [Args]" +
+                                    "Lists the top players by players promoted" },
+            },
+            Handler = MostHandler
         };
 
-        private static void TTHandler(Player player, CommandReader cmd) {
+        private static void MostHandler(Player player, CommandReader cmd) {
+            string stat = cmd.Next();
             string rankStr = cmd.Next();
             string offsetStr = cmd.Next();
-            bool swi = false;
-            int offset = 0;
-            TimeSpan age = TimeSpan.MaxValue;
-            Rank rank = null;
-            if (rankStr == null && offsetStr == null) {
-                swi = true;
-            }
-            if (rankStr != null) {
-                if (RankManager.FindRank(rankStr) == null) {
+            string value;
+            bool noRank = false;
+            int offset = 0, pad = 0;
+            Rank rank = RankManager.FindRank(rankStr);
+            if (string.IsNullOrEmpty(rankStr)) {
+                noRank = true;
+            } else {
+                if (rank == null) {
                     if (!int.TryParse(rankStr, out offset)) {
                         player.MessageNoRank(rankStr);
                         return;
                     } else {
-                        swi = true;
+                        noRank = true;
                     }
-                } else {
-                    rank = RankManager.FindRank(rankStr);
                 }
                 if (offsetStr != null) {
                     if (!int.TryParse(offsetStr, out offset)) {
@@ -1567,18 +1586,126 @@ namespace fCraft {
                 }
             }
 
-            IEnumerable<PlayerInfo> visiblePlayers = PlayerDB.PlayerInfoList;
-            visiblePlayers = visiblePlayers.Where(p => p.TotalTime.TotalSeconds > 0 && p.TotalTime.TotalHours < 9999 && (!swi ? (p.Rank == rank) : true) && p.BanStatus.Equals(BanStatus.NotBanned)).OrderBy(c => c.TotalTime).ToArray().Reverse();
-            if (offset >= visiblePlayers.Count()) {
-                offset = Math.Max(0, visiblePlayers.Count() - PlayersPerPage);
+            IEnumerable<PlayerInfo> allPlayers = PlayerDB.PlayerInfoList;
+            PlayerInfo[] playersPart = allPlayers.ToArray();
+            switch (stat.ToLower()) {
+                case ("bans"):
+                case ("banned"):
+                    allPlayers = allPlayers.Where(p => p.TimesBannedOthers >= 1 && (!noRank ? (p.Rank == rank) : true)).OrderBy(c => c.TimesBannedOthers).ToArray().Reverse();
+                    playersPart = allPlayers.Skip(fixOffset(offset, allPlayers.Count())).Take(10).ToArray();
+                    pad = string.Format("{0:N0}", playersPart[0].TimesBannedOthers).Length;
+                    player.Message("&STop Players ({0}):", stat);
+                    for (int i = 0; i < playersPart.Count(); i++) {
+                        value = string.Format("{0:N0}", playersPart[i].TimesBannedOthers);
+                        sendMostMessage(player, value, playersPart[i], pad);
+                    }
+                    break;
+                case ("built"):
+                    allPlayers = allPlayers.Where(p => p.BlocksBuilt >= 1 && (!noRank ? (p.Rank == rank) : true)).OrderBy(c => c.BlocksBuilt).ToArray().Reverse();
+                    playersPart = allPlayers.Skip(fixOffset(offset, allPlayers.Count())).Take(10).ToArray();
+                    pad = string.Format("{0:N0}", playersPart[0].BlocksBuilt).Length;
+                    player.Message("&STop Players ({0}):", stat);
+                    for (int i = 0; i < playersPart.Count(); i++) {
+                        value = string.Format("{0:N0}", playersPart[i].BlocksBuilt);
+                        sendMostMessage(player, value, playersPart[i], pad);
+                    }
+                    break;
+                case ("chat"):
+                    allPlayers = allPlayers.Where(p => p.MessagesWritten >= 1 && (!noRank ? (p.Rank == rank) : true)).OrderBy(c => c.MessagesWritten).ToArray().Reverse();
+                    playersPart = allPlayers.Skip(fixOffset(offset, allPlayers.Count())).Take(10).ToArray();
+                    pad = string.Format("{0:N0}", playersPart[0].MessagesWritten).Length;
+                    player.Message("&STop Players ({0}):", stat);
+                    for (int i = 0; i < playersPart.Count(); i++) {
+                        value = string.Format("{0:N0}", playersPart[i].MessagesWritten);
+                        sendMostMessage(player, value, playersPart[i], pad);
+                    }
+                    break;
+                case ("deleted"):
+                    allPlayers = allPlayers.Where(p => p.BlocksDeleted >= 1 && (!noRank ? (p.Rank == rank) : true)).OrderBy(c => c.BlocksDeleted).ToArray().Reverse();
+                    playersPart = allPlayers.Skip(fixOffset(offset, allPlayers.Count())).Take(10).ToArray();
+                    pad = string.Format("{0:N0}", playersPart[0].BlocksDeleted).Length;
+                    player.Message("&STop Players ({0}):", stat);
+                    for (int i = 0; i < playersPart.Count(); i++) {
+                        value = string.Format("{0:N0}", playersPart[i].BlocksDeleted);
+                        sendMostMessage(player, value, playersPart[i], pad);
+                    }
+                    break;
+                case ("demoted"):
+                    allPlayers = allPlayers.Where(p => p.DemoCount >= 1 && (!noRank ? (p.Rank == rank) : true)).OrderBy(c => c.DemoCount).ToArray().Reverse();
+                    playersPart = allPlayers.Skip(fixOffset(offset, allPlayers.Count())).Take(10).ToArray();
+                    pad = string.Format("{0:N0}", playersPart[0].DemoCount).Length;
+                    player.Message("&STop Players ({0}):", stat);
+                    for (int i = 0; i < playersPart.Count(); i++) {
+                        value = string.Format("{0:N0}", playersPart[i].DemoCount);
+                        sendMostMessage(player, value, playersPart[i], pad);
+                    }
+                    break;
+                case ("drawn"):
+                    allPlayers = allPlayers.Where(p => p.BlocksDrawn >= 1 && (!noRank ? (p.Rank == rank) : true)).OrderBy(c => c.BlocksDrawn).ToArray().Reverse();
+                    playersPart = allPlayers.Skip(fixOffset(offset, allPlayers.Count())).Take(10).ToArray();
+                    pad = string.Format("{0:N0}&sK", (playersPart[0].BlocksDrawn / 1000D)).Length;
+                    player.Message("&STop Players ({0}):", stat);
+                    for (int i = 0; i < playersPart.Count(); i++) {
+                        value = string.Format("{0:N0}&sK", (playersPart[i].BlocksDrawn / 1000D));
+                        sendMostMessage(player, value, playersPart[i], pad);
+                    }
+                    break;
+                case ("time"):
+                case ("hours"):
+                    allPlayers = allPlayers.Where(p => p.TotalTime.ToHours() >= 1 && (!noRank ? (p.Rank == rank) : true)).OrderBy(c => c.TotalTime.ToHours()).ToArray().Reverse();
+                    playersPart = allPlayers.Skip(fixOffset(offset, allPlayers.Count())).Take(10).ToArray();
+                    pad = string.Format("{0:N2}&sH", playersPart[0].TotalTime.TotalHours).Length;
+                    player.Message("&STop Players ({0}):", stat);
+                    for (int i = 0; i < playersPart.Count(); i++) {
+                        value = string.Format("{0:N2}&sH", playersPart[i].TotalTime.TotalHours);
+                        sendMostMessage(player, value, playersPart[i], pad);
+                    }
+                    break;
+                case ("kicks"):
+                case ("kicked"):
+                    allPlayers = allPlayers.Where(p => p.TimesKickedOthers >= 1 && (!noRank ? (p.Rank == rank) : true)).OrderBy(c => c.TimesKickedOthers).ToArray().Reverse();
+                    playersPart = allPlayers.Skip(fixOffset(offset, allPlayers.Count())).Take(10).ToArray();
+                    pad = string.Format("{0:N0}", playersPart[0].TimesKickedOthers).Length;
+                    player.Message("&STop Players ({0}):", stat);
+                    for (int i = 0; i < playersPart.Count(); i++) {
+                        value = string.Format("{0:N0}", playersPart[i].TimesKickedOthers);
+                        sendMostMessage(player, value, playersPart[i], pad);
+                    }
+                    break;
+                case ("logins"):
+                    allPlayers = allPlayers.Where(p => p.TimesVisited >= 1 && (!noRank ? (p.Rank == rank) : true)).OrderBy(c => c.TimesVisited).ToArray().Reverse();
+                    playersPart = allPlayers.Skip(fixOffset(offset, allPlayers.Count())).Take(10).ToArray();
+                    pad = string.Format("{0:N0}", playersPart[0].TimesVisited).Length;
+                    player.Message("&STop Players ({0}):", stat);
+                    for (int i = 0; i < playersPart.Count(); i++) {
+                        value = string.Format("{0:N0}", playersPart[i].TimesVisited);
+                        sendMostMessage(player, value, playersPart[i], pad);
+                    }
+                    break;
+                case ("promoted"):
+                    allPlayers = allPlayers.Where(p => p.PromoCount >= 1 && (!noRank ? (p.Rank == rank) : true)).OrderBy(c => c.PromoCount).ToArray().Reverse();
+                    playersPart = allPlayers.Skip(fixOffset(offset, allPlayers.Count())).Take(10).ToArray();
+                    pad = string.Format("{0:N0}", playersPart[0].PromoCount).Length;
+                    player.Message("&STop Players ({0}):", stat);
+                    for (int i = 0; i < playersPart.Count(); i++) {
+                        value = string.Format("{0:N0}", playersPart[i].PromoCount);
+                        sendMostMessage(player, value, playersPart[i], pad);
+                    }
+                    break;
+                default:
+                    player.Message("No stats for: {0}", stat);
+                    return;
             }
-            var playersPart = visiblePlayers.Skip(offset).Take(10).ToArray();
-            player.Message("&STop Players:");
-            for (int i = 0; i < playersPart.Count(); i++) {
-                string hours = string.Format("{0:F2}", playersPart[i].TotalTime.TotalHours);
-                player.Message(" &7{1}&sH - {0}", playersPart[i].ClassyName, hours.PadLeft(7, '0'));
+            player.Message("Showing players{3}{0}-{1} (out of {2}).", offset + 1, offset + playersPart.Length, allPlayers.Count(), (rank != null ? " in rank (" + rank.ClassyName + "&s)" : " "));
+        }
+        static void sendMostMessage(Player player, string value, PlayerInfo pInfo, int padLength) {
+                player.Message(" &7{1}&s - {0}", pInfo.ClassyName, value.PadLeft(padLength, '0'));
+        }
+        static int fixOffset(int origOffset, int allPlayerCount) {
+            if (origOffset >= allPlayerCount) {
+                return Math.Max(0, allPlayerCount - 10);
             }
-            player.Message("Showing players{3}{0}-{1} (out of {2}).", offset + 1, offset + playersPart.Length, visiblePlayers.Count(), (rank != null ? " in rank (" + rank.ClassyName + "&s)" : " "));
+            return origOffset;
         }
 
         #endregion
