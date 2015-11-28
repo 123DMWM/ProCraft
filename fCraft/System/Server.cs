@@ -944,7 +944,13 @@ namespace fCraft {
 
 				if (player.Supports(CpeExtension.MessageType)) {
                     player.Send(Packet.Message((byte)MessageType.BottomRight2,
-                        player.Position.ToBlockCoordsExt().ToString() + "&s[" + compassString((int)player.Position.R) + "&s]"));
+                        player.Position.ToBlockCoordsExt().ToString() + "&s[" + compassString(player.Position.R) + "&s]"));
+                    if (player.LastDrawOp != null && !player.IsPlayingCTF)
+                        if (player.LastDrawOp.PercentDone < 100) {
+                            player.Send(Packet.Message((byte)MessageType.Status3, Color.Sys + player.LastDrawOp.Description + " percent done: " + Color.White + player.LastDrawOp.PercentDone.ToString() + "&s%"));
+                        } else if (player.LastDrawOp.PercentDone == 100 || player.LastDrawOp.IsDone) {
+                            player.Send(Packet.Message((byte)MessageType.Status3, ""));
+                        }
                 }
                 CTF.PrintCtfState(player);
                 player.lastSolidPos = player.Position;
