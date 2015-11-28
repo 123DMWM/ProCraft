@@ -1370,6 +1370,31 @@ namespace fCraft {
             }
         }
 
+        /// <summary> Safely downloads data. </summary>
+        [CanBeNull]
+        public static string downloadDatastring(string url) {
+            HttpWebRequest request = Heartbeat.CreateRequest(new Uri(url));
+            request.CachePolicy = new RequestCachePolicy(RequestCacheLevel.BypassCache);
+            request.ReadWriteTimeout = 5000;
+            request.ServicePoint.BindIPEndPointDelegate = BindIPEndPointCallback;
+            request.Timeout = 5000;
+            request.UserAgent = Updater.UserAgent;
+
+            try {
+                using (HttpWebResponse response = (HttpWebResponse)request.GetResponse()) {
+                    if (response.StatusCode != HttpStatusCode.OK) {
+                        Logger.Log(LogType.Warning, "Could not downlaod data: {0}", response.StatusDescription);
+                        return null;
+                    }
+                    using (StreamReader responseReader = new StreamReader(response.GetResponseStream())) {
+                        return responseReader.ReadToEnd();
+                    }
+                }
+            } catch (WebException ex) {
+                Logger.Log(LogType.Warning, "Could not download data: {0}", ex);
+                return null;
+            }
+        }
 
         // Callback for setting the local IP binding. Implements System.Net.BindIPEndPoint delegate.
         public static IPEndPoint BindIPEndPointCallback( ServicePoint servicePoint, IPEndPoint remoteEndPoint,

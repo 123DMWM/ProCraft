@@ -2154,7 +2154,7 @@ namespace fCraft {
 			}
 			JsonObject result = null;
 			try {
-				result = JsonObject.Parse((new WebClient()).DownloadString("http://geoip.cf/api/" + ip));
+				result = JsonObject.Parse(Server.downloadDatastring("http://geoip.cf/api/" + ip));
 				if (result.Get("message") != null) {
 					player.Message("No information found!");
 					return;
@@ -2187,7 +2187,7 @@ namespace fCraft {
 			}
 			JsonObject result = null;
 			try {
-				result = JsonObject.Parse((new WebClient()).DownloadString("http://geoip.cf/api/" + ip));
+				result = JsonObject.Parse(Server.downloadDatastring("http://geoip.cf/api/" + ip));
 				if (result.Get("message") != null) {
 					return;
 				}
@@ -2228,8 +2228,12 @@ namespace fCraft {
             if (name == null) {
                 name = player.Name;
             }
-            WebClient webClient = new WebClient();
-            var result = JsonObject.Parse(webClient.DownloadString("http://www.classicube.net/api/player/" + name));
+            string data = Server.downloadDatastring("http://www.classicube.net/api/player/" + name);
+            if (string.IsNullOrEmpty(data) || !data.Contains("username")) {
+                player.Message("Player not found!");
+                return;
+            }
+            JsonObject result = JsonObject.Parse(data);   
             string error;
             result.TryGetValue("error", out error);
             string flags1;
@@ -2296,11 +2300,15 @@ namespace fCraft {
             string id1 = cmd.Next();
             int id2;
             if (!int.TryParse(id1, out id2)) {
-                player.Message(CdApiID.Usage);
+                player.Message("ID not valid integer!");
                 return;
             }
-            WebClient webClient = new WebClient();
-            var result = JsonObject.Parse(webClient.DownloadString("http://www.classicube.net/api/id/" + id2));
+            string data = Server.downloadDatastring("http://www.classicube.net/api/id/" + id2);
+            if (string.IsNullOrEmpty(data) || !data.Contains("username")) {
+                player.Message("ID not found!");
+                return;
+            }
+            JsonObject result = JsonObject.Parse(data);
             string error;
             result.TryGetValue("error", out error);
             string flags1;

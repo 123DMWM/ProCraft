@@ -155,7 +155,7 @@ namespace fCraft
 
         // Creates an asynchronous HTTP request to the given URL
         [NotNull]
-        private static HttpWebRequest CreateRequest([NotNull] Uri uri) {
+        public static HttpWebRequest CreateRequest([NotNull] Uri uri) {
             if (uri == null) throw new ArgumentNullException("uri");
             HttpWebRequest request = (HttpWebRequest) WebRequest.Create(uri);
             request.CachePolicy = Server.CachePolicy;
