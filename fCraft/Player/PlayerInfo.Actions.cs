@@ -791,7 +791,7 @@ namespace fCraft {
 
 				if (target.Supports(CpeExtension.ClickDistance) && target.World != null) {
 					target.Send(Packet.MakeSetClickDistance((target.World.maxReach < ReachDistance 
-						&& !Can(Permission.ReadStaffChat)) ? target.World.maxReach : ReachDistance));
+						&& !target.IsStaff) ? target.World.maxReach : ReachDistance));
                 }
 
                 // inform the player of the rank change

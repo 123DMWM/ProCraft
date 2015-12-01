@@ -241,10 +241,10 @@ namespace fCraft
             }
 
             if (player.DetectChatSpam()) return;
-            var staff = Server.Players.Where(p => p.Info.Rank.Can(Permission.ReadStaffChat));
+            var staff = Server.Players.Where(p => p.IsStaff);
             if (staff != null && staff.Any()) {
                 player.Message("&SYour review request has been sent to the Moderators. They will be with you shortly");
-                Server.Players.Where(p => p.Can(Permission.ReadStaffChat)).Message("&SPlayer " + player.ClassyName + " &Srequests a building review.");
+                Server.Players.Where(p => p.IsStaff).Message("&SPlayer " + player.ClassyName + " &Srequests a building review.");
             } else {
                 player.Message("&SThere are no staff on! Sorry!");
             }

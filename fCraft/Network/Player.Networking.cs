@@ -1427,9 +1427,9 @@ namespace fCraft {
             #endregion
             #region HackControls
             if (Supports(CpeExtension.HackControl)) {
-                bool canFly = true, canNoClip = true, canSpeed = true, canRespawn = true, useMotd = false, isOP = Info.Rank.Can(Permission.ReadStaffChat);
-                if (!String.IsNullOrEmpty(World.MOTD)) {
-                    foreach (String s in World.MOTD.ToLower().Split()) {
+                bool canFly = true, canNoClip = true, canSpeed = true, canRespawn = true, useMotd = false;
+                if (!string.IsNullOrEmpty(World.MOTD)) {
+                    foreach (string s in World.MOTD.ToLower().Split()) {
                         switch (s) {
                             case "-fly":
                                 canFly = false;
@@ -1462,10 +1462,10 @@ namespace fCraft {
                                 useMotd = true;
                                 break;
                             case "+ophax":
-                                canFly = isOP;
-                                canNoClip = isOP;
-                                canSpeed = isOP;
-                                canRespawn = isOP;
+                                canFly = IsStaff;
+                                canNoClip = IsStaff;
+                                canSpeed = IsStaff;
+                                canRespawn = IsStaff;
                                 useMotd = true;
                                 break;
                             default:
@@ -1483,7 +1483,7 @@ namespace fCraft {
             #region Reach Distance
 
             if (Supports(CpeExtension.ClickDistance)) {
-                Send(Packet.MakeSetClickDistance((World.maxReach < Info.ReachDistance && !Can(Permission.ReadStaffChat) ) ? World.maxReach : Info.ReachDistance));
+                Send(Packet.MakeSetClickDistance((World.maxReach < Info.ReachDistance && !IsStaff) ? World.maxReach : Info.ReachDistance));
             }
 
             #endregion

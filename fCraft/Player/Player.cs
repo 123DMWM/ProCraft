@@ -223,7 +223,7 @@ namespace fCraft {
         [NotNull]
         public string ListName {
             get {
-				return (Info.Rank.Can(Permission.ReadStaffChat) ? (Info.Rank == RankManager.HighestRank ? "&7+" : "&f-") : " ") + Info.Rank.Color + Name;
+				return (IsStaff ? (Info.Rank == RankManager.HighestRank ? "&7+" : "&f-") : " ") + Info.Rank.Color + Name;
             }
         }
 

@@ -849,7 +849,7 @@ namespace fCraft {
             foreach (Rank rank in RankManager.Ranks)
             {
                 string StaffListTemporary = "";
-                if (rank.Can(Permission.ReadStaffChat))
+                if (rank.IsStaff)
                 {
                     foreach (Player stafflistplayer in rank.Players)
                     {
@@ -903,7 +903,7 @@ namespace fCraft {
                 player.Message("&sBelow is a list of ALL staff members.");
                 foreach (Rank rank in RankManager.Ranks)
                 {
-                    if (rank.Can(Permission.ReadStaffChat))
+                    if (rank.IsStaff)
                     {
                         infos = PlayerDB.PlayerInfoList
                                         .Where(info => info.Rank == rank)
@@ -1020,7 +1020,7 @@ namespace fCraft {
             if( ruleFileName != null ) {
                 string sectionFullName = Path.GetFileNameWithoutExtension( ruleFileName );
                 if (sectionFullName.IndexOf("Admin") > -1) {
-                    if (!player.Can(Permission.ReadStaffChat)) {
+                    if (!player.IsStaff) {
                         player.Message("&sYou need to be an Admin to read the Admin Rules.");
                     } else {
                         PrintRuleFile(player, new FileInfo(ruleFileName));
@@ -1992,7 +1992,7 @@ namespace fCraft {
 					player.Message(" &5%5 Purple &d%d Magenta");
 					player.Message(" &6%6 Olive &e%e Yellow");
 					player.Message(" &7%7 Silver &f%f White");
-					if (player.Can(Permission.ReadStaffChat)) {
+					if (player.IsStaff) {
 						player.Message("&SServer colors:");
 						player.Message(" &r%r Announcement &h%h Help &i%i IRC &m%m Me");
 						player.Message(" &p%p PM &y%y Say &s%s System &w%w Warning");

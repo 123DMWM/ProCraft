@@ -4084,7 +4084,7 @@ namespace fCraft {
                 return;
             }
             
-            if (player.Can(Permission.ReadStaffChat))
+            if (player.IsStaff)
                 CtfStaffHandler(player, Options);
             else
                 CtfGuestHandler(player, Options);

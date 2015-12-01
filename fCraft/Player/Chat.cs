@@ -65,7 +65,7 @@ namespace fCraft {
                     rawMessage = rawMessage.ReplaceString(Swear.Word, Swear.Replacement, StringComparison.InvariantCultureIgnoreCase);
                 }
             }
-            if (!player.Can(Permission.ReadStaffChat))
+            if (!player.IsStaff)
             {
                 rawMessage = RegexIPMatcher.Replace(rawMessage, "<Redacted IP>");
             }
@@ -357,7 +357,7 @@ namespace fCraft {
 			if (rawMessage == null)
 				throw new ArgumentNullException("rawMessage");
 
-			var recepientList = Server.Players.Where(p => !p.Can(Permission.ReadStaffChat));
+			var recepientList = Server.Players.Where(p => !p.IsStaff);
 			string formattedMessage = Color.Say + rawMessage;
 			var e = new ChatSendingEventArgs(player, rawMessage, formattedMessage, ChatMessageType.Say, recepientList);
 			if (!SendInternal(e))

@@ -465,6 +465,12 @@ namespace fCraft {
         public bool Can( Permission permission ) {
             return Permissions[(int)permission];
         }
+        /// <summary> Whether the rank is considered Staff. </summary>
+        public bool IsStaff {
+            get {
+                return Permissions[(int)Permission.ReadStaffChat];
+            }
+        }
 
 
         /// <summary> Checks whether this rank is granted the given permission, and whether the limit is high </summary>
