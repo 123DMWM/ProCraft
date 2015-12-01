@@ -1672,6 +1672,74 @@ namespace fCraft {
                 case "bring":
                     bot.teleportBot(player.Position);
                     break;
+                case "tp":
+                case "teleport":
+                    World targetWorld = bot.World;
+                    Bot target = bot;
+                    if (targetWorld == player.World) {
+                        if (player.World != null) {
+                            player.LastWorld = player.World;
+                            player.LastPosition = player.Position;
+                        }
+                        player.TeleportTo(target.Position);
+
+                    } else {
+                        if (targetWorld.Name.StartsWith("PW_") &&
+                            !targetWorld.AccessSecurity.ExceptionList.Included.Contains(player.Info)) {
+                            player.Message(
+                                "You cannot join due to that Bot being in a personal world that you cannot access.");
+                            break;
+                        }
+                        switch (targetWorld.AccessSecurity.CheckDetailed(player.Info)) {
+                            case SecurityCheckResult.Allowed:
+                            case SecurityCheckResult.WhiteListed:
+                                if (player.Info.Rank.Name == "Banned") {
+                                    player.Message("&CYou can not change worlds while banned.");
+                                    player.Message("Cannot teleport to {0}&S.", target.Name,
+                                        targetWorld.ClassyName, targetWorld.AccessSecurity.MinRank.ClassyName);
+                                    break;
+                                }
+                                if (targetWorld.IsFull) {
+                                    player.Message("Cannot teleport to {0}&S because world {1}&S is full.",
+                                        target.Name, targetWorld.ClassyName);
+                                    player.Message("Cannot teleport to {0}&S.", target.Name,
+                                        targetWorld.ClassyName, targetWorld.AccessSecurity.MinRank.ClassyName);
+                                    break;
+                                }
+                                player.StopSpectating();
+                                player.JoinWorld(targetWorld, WorldChangeReason.Tp, target.Position);
+                                break;
+                            case SecurityCheckResult.BlackListed:
+                                player.Message("Cannot teleport to {0}&S because you are blacklisted on world {1}",
+                                    target.Name, targetWorld.ClassyName);
+                                break;
+                            case SecurityCheckResult.RankTooLow:
+                                if (player.Info.Rank.Name == "Banned") {
+                                    player.Message("&CYou can not change worlds while banned.");
+                                    player.Message("Cannot teleport to {0}&S.", target.Name,
+                                        targetWorld.ClassyName, targetWorld.AccessSecurity.MinRank.ClassyName);
+                                    break;
+                                }
+
+                                if (targetWorld.IsFull) {
+                                    if (targetWorld.IsFull) {
+                                        player.Message("Cannot teleport to {0}&S because world {1}&S is full.",
+                                            target.Name, targetWorld.ClassyName);
+                                        player.Message("Cannot teleport to {0}&S.", target.Name,
+                                            targetWorld.ClassyName, targetWorld.AccessSecurity.MinRank.ClassyName);
+                                        break;
+                                    }
+                                    player.StopSpectating();
+                                    player.JoinWorld(targetWorld, WorldChangeReason.Tp, target.Position);
+                                    break;
+                                }
+                                player.Message("Cannot teleport to {0}&S because world {1}&S requires {2}+&S to join.",
+                                    target.Name, targetWorld.ClassyName,
+                                    targetWorld.AccessSecurity.MinRank.ClassyName);
+                                break;
+                        }
+                    }
+                    break;
                 case "skin":
                     string skinString3 = cmd.Next();
                     if (skinString3 != null) {
