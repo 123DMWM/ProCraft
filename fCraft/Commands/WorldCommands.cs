@@ -1617,10 +1617,13 @@ namespace fCraft {
                     string skinString1 = (cmd.Next() ?? botName);
                     if (skinString1 != null) {
                         if (skinString1.StartsWith("--")) {
-                            skinString1 = String.Format("http://s3.amazonaws.com/MinecraftSkins/{0}.png", skinString1.Replace("--", ""));
+                            skinString1 = string.Format("http://minecraft.net/skin/{0}.png", skinString1.Replace("--", ""));
+                        }
+                        if (skinString1.StartsWith("-+")) {
+                            skinString1 = string.Format("http://skins.minecraft.net/MinecraftSkins/{0}.png", skinString1.Replace("-+", ""));
                         }
                         if (skinString1.StartsWith("++")) {
-                            skinString1 = String.Format("http://i.imgur.com/{0}.png", skinString1.Replace("++", ""));
+                            skinString1 = string.Format("http://i.imgur.com/{0}.png", skinString1.Replace("++", ""));
                         }
                     }
                     Bot botCreate = new Bot();
@@ -1638,10 +1641,13 @@ namespace fCraft {
                         string skinString2 = cmd.Next();
                         if (skinString2 != null) {
                             if (skinString2.StartsWith("--")) {
-                                skinString2 = String.Format("http://s3.amazonaws.com/MinecraftSkins/{0}.png", skinString2.Replace("--", ""));
+                                skinString2 = string.Format("http://minecraft.net/skin/{0}.png", skinString2.Replace("--", ""));
+                            }
+                            if (skinString2.StartsWith("-+")) {
+                                skinString2 = string.Format("http://skins.minecraft.net/MinecraftSkins/{0}.png", skinString2.Replace("-+", ""));
                             }
                             if (skinString2.StartsWith("++")) {
-                                skinString2 = String.Format("http://i.imgur.com/{0}.png", skinString2.Replace("++", ""));
+                                skinString2 = string.Format("http://i.imgur.com/{0}.png", skinString2.Replace("++", ""));
                             }
                         }
                         if (string.IsNullOrEmpty(model)) {
@@ -1744,10 +1750,13 @@ namespace fCraft {
                     string skinString3 = cmd.Next();
                     if (skinString3 != null) {
                         if (skinString3.StartsWith("--")) {
-                            skinString3 = String.Format("http://s3.amazonaws.com/MinecraftSkins/{0}.png", skinString3.Replace("--", ""));
+                            skinString3 = string.Format("http://minecraft.net/skin/{0}.png", skinString3.Replace("--", ""));
+                        }
+                        if (skinString3.StartsWith("-+")) {
+                            skinString3 = string.Format("http://skins.minecraft.net/MinecraftSkins/{0}.png", skinString3.Replace("-+", ""));
                         }
                         if (skinString3.StartsWith("++")) {
-                            skinString3 = String.Format("http://i.imgur.com/{0}.png", skinString3.Replace("++", ""));
+                            skinString3 = string.Format("http://i.imgur.com/{0}.png", skinString3.Replace("++", ""));
                         }
                     }
                     player.Message("Changed entity skin to {0}.", skinString3 ?? bot.Name);

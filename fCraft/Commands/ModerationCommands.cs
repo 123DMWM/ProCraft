@@ -267,10 +267,13 @@ namespace fCraft {
             string skinString = cmd.Next();
             if (skinString != null) {
                 if (skinString.StartsWith("--")) {
-                    skinString = String.Format("http://s3.amazonaws.com/MinecraftSkins/{0}.png", skinString.Replace("--", ""));
+                    skinString = string.Format("http://minecraft.net/skin/{0}.png", skinString.Replace("--", ""));
+                }
+                if (skinString.StartsWith("-+")) {
+                    skinString = string.Format("http://skins.minecraft.net/MinecraftSkins/{0}.png", skinString.Replace("-+", ""));
                 }
                 if (skinString.StartsWith("++")) {
-                    skinString = String.Format("http://i.imgur.com/{0}.png", skinString.Replace("++", ""));
+                    skinString = string.Format("http://i.imgur.com/{0}.png", skinString.Replace("++", ""));
                 }
             }
             PlayerInfo[] p2 = PlayerDB.FindPlayers(namePart);
@@ -344,10 +347,13 @@ namespace fCraft {
             string skinString = cmd.Next();
             if (skinString != null) {
                 if (skinString.StartsWith("--")) {
-                    skinString = String.Format("http://s3.amazonaws.com/MinecraftSkins/{0}.png", skinString.Replace("--", ""));
+                    skinString = string.Format("http://minecraft.net/skin/{0}.png", skinString.Replace("--", ""));
+                }
+                if (skinString.StartsWith("-+")) {
+                    skinString = string.Format("http://skins.minecraft.net/MinecraftSkins/{0}.png", skinString.Replace("-+", ""));
                 }
                 if (skinString.StartsWith("++")) {
-                    skinString = String.Format("http://i.imgur.com/{0}.png", skinString.Replace("++", ""));
+                    skinString = string.Format("http://i.imgur.com/{0}.png", skinString.Replace("++", ""));
                 }
             }
             PlayerInfo p = InfoCommands.FindPlayerInfo(player, cmd, namePart);
@@ -456,9 +462,9 @@ namespace fCraft {
         };
 
 		private static void LeBotHandler(Player player, CommandReader cmd) {
-			String cmdchat = cmd.Next();
-			String option = cmd.Next();
-			String helper = cmd.Next();
+			string cmdchat = cmd.Next();
+			string option = cmd.Next();
+			string helper = cmd.Next();
 			if (cmdchat == null) {
 				player.Message(CdBot.Help);
 				return;
@@ -469,7 +475,8 @@ namespace fCraft {
 				cmd.Rewind();
 				option = cmd.Next().ToLower();
 				helper = cmd.Next();
-				player.ParseMessage(string.Format("Bot {1} {2}", option, helper), (player == Player.Console));
+				player.ParseMessage(string.Format("Bot {0} {1}", option ?? "", helper ?? ""), (player == Player.Console));
+                return;
 			}
 			if (player.Info.TimeSinceLastServerMessage.TotalSeconds < 5) {
 				player.Info.getLeftOverTime(5, cmd);
