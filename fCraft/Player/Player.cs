@@ -71,6 +71,13 @@ namespace fCraft {
             }
         }
 
+        /// <summary> Whether the player is considered Staff. </summary>
+        public bool IsStaff {
+            get {
+                return Can(Permission.ReadStaffChat);
+            }
+        }
+
         #region PlayerList
 
         /// <summary> ID for the playername. </summary>

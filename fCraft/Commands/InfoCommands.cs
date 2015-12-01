@@ -639,6 +639,35 @@ namespace fCraft {
             if( rank.IdleKickTimer > 0 ) {
                 player.Message( "Idle kick after {0}", TimeSpan.FromMinutes( rank.IdleKickTimer ).ToMiniString() );
             }
+            if (Directory.Exists(Paths.RankReqDirectory) && player.IsStaff) {
+                string rankReqFileName = null;
+                string[] sectionFiles = Directory.GetFiles(Paths.RankReqPath,rank.Name.ToLower() + ".txt", SearchOption.TopDirectoryOnly);
+                for (int i = 0; i < sectionFiles.Length; i++) {
+                    string sectionFullName = Path.GetFileNameWithoutExtension(sectionFiles[i]).ToLower();
+                    if (rank.Name.ToLower().Equals(sectionFullName)) {
+                        rankReqFileName = sectionFiles[i];
+                        break;
+                    }
+                }
+                if (rankReqFileName != null) {
+                    string sectionFullName = Path.GetFileNameWithoutExtension(rankReqFileName);
+                    FileInfo rankReqFile = new FileInfo(rankReqFileName);
+                    try {
+                        string[] ruleLines = File.ReadAllLines(rankReqFile.FullName);
+                        player.Message("&RRank requirements:");
+                        foreach (string ruleLine in ruleLines) {
+                            if (ruleLine.Trim().Length > 0) {
+                                player.Message("&R{0}", Chat.ReplaceTextKeywords(player, ruleLine));
+                            }
+                        }
+                    } catch (Exception ex) {
+                        Logger.Log(LogType.Error,
+                                    "InfoCommands.PrintRankReq: An error occurred while trying to read {0}: {1}",
+                                    rankReqFile.FullName, ex);
+                        player.Message("&WError reading the rank requirement file.");
+                    }
+                }
+            }
         }
 
         #endregion
@@ -954,7 +983,7 @@ namespace fCraft {
             }
 
             // if a section name is given, but no section files exist
-            if( !Directory.Exists( Paths.RulesPath ) ) {
+            if( !Directory.Exists( Paths.RulesDirectory ) ) {
                 player.Message( "There are no rule sections defined." );
                 return;
             }
@@ -990,17 +1019,13 @@ namespace fCraft {
 
             if( ruleFileName != null ) {
                 string sectionFullName = Path.GetFileNameWithoutExtension( ruleFileName );
-                if (sectionFullName.IndexOf("Admin") > -1 && player.Can(Permission.ReadStaffChat))
-                {
-                    //player.Message( "Rule section \"{0}\":", sectionFullName );
-                    PrintRuleFile(player, new FileInfo(ruleFileName));
-                }
-                else if (sectionFullName.IndexOf("Admin") > -1)
-                {
-                    player.Message("&sYou need to be an Admin to read the Admin Rules.");
-                }
-                else
-                {
+                if (sectionFullName.IndexOf("Admin") > -1) {
+                    if (!player.Can(Permission.ReadStaffChat)) {
+                        player.Message("&sYou need to be an Admin to read the Admin Rules.");
+                    } else {
+                        PrintRuleFile(player, new FileInfo(ruleFileName));
+                    }
+                } else {
                     PrintRuleFile(player, new FileInfo(ruleFileName));
                 }
 
@@ -1018,7 +1043,7 @@ namespace fCraft {
 
         [CanBeNull]
         static string[] GetRuleSectionList() {
-            if( Directory.Exists( Paths.RulesPath ) ) {
+            if( Directory.Exists( Paths.RulesDirectory ) ) {
                 string[] sections = Directory.GetFiles( Paths.RulesPath, "*.txt", SearchOption.TopDirectoryOnly )
                                              .Select( name => Path.GetFileNameWithoutExtension( name ) )
                                              .Where( name => !String.IsNullOrEmpty( name ) )

@@ -110,6 +110,8 @@ namespace fCraft {
 
         public const string RulesDirectory = "rules";
 
+        public const string RankReqDirectory = "rankreq";
+
         public const string HeartbeatDataFileName = "heartbeatdata.txt";
 
         public const string UpdaterFileName = "UpdateInstaller.exe";
@@ -128,7 +130,12 @@ namespace fCraft {
 
         /// <summary> Directory where rule sections are stored. </summary>
         public static string RulesPath {
-            get { return Path.Combine( WorkingPath, RulesDirectory ); }
+            get { return Path.Combine(WorkingPath, RulesDirectory); }
+        }
+
+        /// <summary> Directory where rule sections are stored. </summary>
+        public static string RankReqPath {
+            get { return Path.Combine(WorkingPath, RankReqDirectory); }
         }
 
 
