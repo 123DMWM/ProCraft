@@ -1562,6 +1562,10 @@ namespace fCraft {
 
         private static void MostHandler(Player player, CommandReader cmd) {
             string stat = cmd.Next();
+            if (string.IsNullOrEmpty(stat)) {
+                CdMost.PrintUsage(player);
+                return;
+            }
             string rankStr = cmd.Next();
             string offsetStr = cmd.Next();
             string value;
