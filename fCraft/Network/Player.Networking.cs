@@ -293,13 +293,13 @@ namespace fCraft {
             if((message.IndexOf('&') != -1) && (!(Can(Permission.UseColorCodes)))) {
                 message = Color.StripColors( message );
             }
+            if (longerMessage == 1) {
+                message = message + "λ";
+            }
 #if DEBUG
             ParseMessage( message, false );
 #else
             try {
-                if (longerMessage == 1) {
-                    message = message + "λ";
-                }
                 ParseMessage( message, false );
             } catch( IOException ) {
                 throw;
