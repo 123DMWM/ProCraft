@@ -574,7 +574,7 @@ namespace fCraft {
         {
             if (string.IsNullOrEmpty(message)) return RawMessageType.Invalid;
             if (message == "/") return RawMessageType.RepeatCommand;
-            if (message.Equals("/ok", StringComparison.OrdinalIgnoreCase)) return RawMessageType.Confirmation;
+            if (message.Equals("/ok", StringComparison.OrdinalIgnoreCase)) return RawMessageType.Command;
             if (message.EndsWith(" /")) return RawMessageType.PartialMessage;
             if (message.EndsWith(" //")) message = message.Substring(0, message.Length - 1);
 			if (message.EndsWith(@" \")) return RawMessageType.PartialMessageNoSpace;

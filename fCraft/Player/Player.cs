@@ -373,44 +373,64 @@ namespace fCraft {
                     } break;
 
 
-                case RawMessageType.Command: {
-                        if( rawMessage.EndsWith( "//" ) ) {
-                            rawMessage = rawMessage.Substring( 0, rawMessage.Length - 1 );
+                case RawMessageType.Command:
+                    {
+                        if (rawMessage.ToLower().Equals("/ok")) {
+                            if (Info.IsFrozen) {
+                                Message("&WYou cannot use any commands while frozen.");
+                                return;
+                            }
+                            if (ConfirmCallback != null) {
+                                if (DateTime.UtcNow.Subtract(ConfirmRequestTime) < ConfirmationTimeout) {
+                                    Logger.Log(LogType.UserCommand, "{0}: /ok", Name);
+                                    SendToSpectators("/ok");
+                                    ConfirmCallback(this, ConfirmParameter, fromConsole);
+                                    ConfirmCancel();
+                                } else {
+                                    Message("Confirmation timed out. Enter the command again.");
+                                }
+                            } else {
+                                Message("There is no command to confirm.");
+                            }
+                            break;
                         }
-                        CommandReader cmd = new CommandReader( rawMessage );
-                        CommandDescriptor commandDescriptor = CommandManager.GetDescriptor( cmd.Name, true );
+                        if (rawMessage.EndsWith("//")) {
+                            rawMessage = rawMessage.Substring(0, rawMessage.Length - 1);
+                        }
+                        CommandReader cmd = new CommandReader(rawMessage);
+                        CommandDescriptor commandDescriptor = CommandManager.GetDescriptor(cmd.Name, true);
 
-                    if (commandDescriptor == null) {
-                        Message("Unknown command \"{0}\". See &H/Commands", cmd.Name);
-                        Logger.Log(LogType.UserCommand, "{0}[Not A CMD]: {1}", Name, rawMessage);
-                    } else if (IsPlayingCTF && commandDescriptor.Permissions != null &&
-                               (commandDescriptor.Permissions.Contains(Permission.Build) ||
-                                commandDescriptor.Permissions.Contains(Permission.Draw) ||
-                                commandDescriptor.Permissions.Contains(Permission.DrawAdvanced) ||
-                                commandDescriptor.Permissions.Contains(Permission.CopyAndPaste) ||
-                                commandDescriptor.Permissions.Contains(Permission.UndoOthersActions) ||
-                                commandDescriptor.Permissions.Contains(Permission.UndoAll) ||
-                                commandDescriptor.Permissions.Contains(Permission.Teleport) ||
-                                commandDescriptor.Permissions.Contains(Permission.Bring) ||
-                                commandDescriptor.Permissions.Contains(Permission.BringAll))) {
-                        Message("&WYou cannot use this command while playing CTF");
-                    } else if (Info.IsFrozen && !commandDescriptor.UsableByFrozenPlayers) {
-                        Message("&WYou cannot use this command while frozen.");
-                        Logger.Log(LogType.UserCommand, "{0}[Frozen]: {1}", Name, rawMessage);
-                    } else {
-                        if (!commandDescriptor.DisableLogging) {
-                            Logger.Log(LogType.UserCommand, "{0}: {1}", Name, rawMessage);
+                        if (commandDescriptor == null) {
+                            Message("Unknown command \"{0}\". See &H/Commands", cmd.Name);
+                            Logger.Log(LogType.UserCommand, "{0}[Not A CMD]: {1}", Name, rawMessage);
+                        } else if (IsPlayingCTF && commandDescriptor.Permissions != null &&
+                                   (commandDescriptor.Permissions.Contains(Permission.Build) ||
+                                    commandDescriptor.Permissions.Contains(Permission.Draw) ||
+                                    commandDescriptor.Permissions.Contains(Permission.DrawAdvanced) ||
+                                    commandDescriptor.Permissions.Contains(Permission.CopyAndPaste) ||
+                                    commandDescriptor.Permissions.Contains(Permission.UndoOthersActions) ||
+                                    commandDescriptor.Permissions.Contains(Permission.UndoAll) ||
+                                    commandDescriptor.Permissions.Contains(Permission.Teleport) ||
+                                    commandDescriptor.Permissions.Contains(Permission.Bring) ||
+                                    commandDescriptor.Permissions.Contains(Permission.BringAll))) {
+                            Message("&WYou cannot use this command while playing CTF");
+                        } else if (Info.IsFrozen && !commandDescriptor.UsableByFrozenPlayers) {
+                            Message("&WYou cannot use this command while frozen.");
+                            Logger.Log(LogType.UserCommand, "{0}[Frozen]: {1}", Name, rawMessage);
+                        } else {
+                            if (!commandDescriptor.DisableLogging) {
+                                Logger.Log(LogType.UserCommand, "{0}: {1}", Name, rawMessage);
+                            }
+                            if (commandDescriptor.RepeatableSelection) {
+                                selectionRepeatCommand = cmd;
+                            }
+                            SendToSpectators(cmd.RawMessage);
+                            CommandManager.ParseCommand(this, cmd, fromConsole);
+                            if (!commandDescriptor.NotRepeatable) {
+                                LastCommand = cmd;
+                            }
                         }
-                        if (commandDescriptor.RepeatableSelection) {
-                            selectionRepeatCommand = cmd;
-                        }
-                        SendToSpectators(cmd.RawMessage);
-                        CommandManager.ParseCommand(this, cmd, fromConsole);
-                        if (!commandDescriptor.NotRepeatable) {
-                            LastCommand = cmd;
-                        }
-                    }
-                } break;
+                    } break;
 
                 case RawMessageType.RepeatCommand: {
                         if( LastCommand == null ) {
@@ -560,32 +580,24 @@ namespace fCraft {
 
 
                 case RawMessageType.Confirmation:
-                    {
-                        if (Info.IsFrozen)
-                        {
+                    {//No longer used
+                        if (Info.IsFrozen) {
                             Message("&WYou cannot use any commands while frozen.");
                             return;
                         }
-                        if (ConfirmCallback != null)
-                        {
-                            if (DateTime.UtcNow.Subtract(ConfirmRequestTime) < ConfirmationTimeout)
-                            {
+                        if (ConfirmCallback != null) {
+                            if (DateTime.UtcNow.Subtract(ConfirmRequestTime) < ConfirmationTimeout) {
                                 Logger.Log(LogType.UserCommand, "{0}: /ok", Name);
                                 SendToSpectators("/ok");
                                 ConfirmCallback(this, ConfirmParameter, fromConsole);
                                 ConfirmCancel();
-                            }
-                            else
-                            {
+                            } else {
                                 Message("Confirmation timed out. Enter the command again.");
                             }
-                        }
-                        else
-                        {
+                        } else {
                             Message("There is no command to confirm.");
                         }
-                    }
-                    break;
+                    } break;
 
 
                 case RawMessageType.PartialMessage:
