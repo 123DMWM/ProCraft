@@ -23,6 +23,7 @@ namespace fCraft {
             CommandManager.RegisterCommand( CdRanks );
             CommandManager.RegisterCommand( CdListStaff );
             CommandManager.RegisterCommand( CdOnlineStaff);
+            CommandManager.RegisterCommand( CdListClients);
             CommandManager.RegisterCommand( CdRules );
             CommandManager.RegisterCommand( CdMeasure );
             CommandManager.RegisterCommand( CdPlayers );
@@ -928,6 +929,43 @@ namespace fCraft {
                         player.Message( " {0} &s(&f{1}&s): {2}{3}", ranktarget.ClassyName, ranktarget.PlayerCount, ranktarget.Color, nameList );
                     }
                 }
+            }
+        }
+
+        #endregion
+        #region ListClients
+
+        static readonly CommandDescriptor CdListClients = new CommandDescriptor {
+            Name = "ListClients",
+            Aliases = new[] { "pclients", "clients", "whoisanewb" },
+            Category = CommandCategory.New | CommandCategory.Info,
+            IsConsoleSafe = true,
+            Help = "Shows a list of currently clients users are using.",
+            Handler = ListClientsHandler
+        };
+
+        static void ListClientsHandler(Player player, CommandReader cmd) {
+            Player[] players = Server.Players;
+            var visiblePlayers = players.Where(player.CanSee).OrderBy(p => p, PlayerListSorter.Instance).ToArray();
+
+            Dictionary<string, List<Player>> clients = new Dictionary<string, List<Player>>();
+            foreach (var p in visiblePlayers) {
+                string appName = p.ClientName;
+                if (string.IsNullOrEmpty(appName)) {
+                    appName = "(unknown)";
+                }
+
+                List<Player> usingClient;
+                if (!clients.TryGetValue(appName, out usingClient)) {
+                    usingClient = new List<Player>();
+                    clients[appName] = usingClient;
+                }
+                usingClient.Add(p);
+            }
+            player.Message("Players using:");
+            foreach (var kvp in clients) {
+                player.Message("  &s{0}:&f {1}",
+                               kvp.Key, kvp.Value.JoinToClassyString());
             }
         }
 
