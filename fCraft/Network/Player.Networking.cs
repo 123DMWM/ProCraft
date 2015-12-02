@@ -58,6 +58,16 @@ namespace fCraft {
 
         internal static Player StartSession( [NotNull] TcpClient tcpClient ) {
             if( tcpClient == null ) throw new ArgumentNullException( "tcpClient" );
+            IPAddress ipAddress = ((IPEndPoint)(tcpClient.Client.RemoteEndPoint)).Address;
+            IPBanInfo ipBanInfo = IPBanList.Get(ipAddress);
+            if (ipBanInfo != null) {
+                Logger.Log(LogType.SuspiciousActivity, "Player on banned ip(" + ipAddress.ToString() +") tried to join");
+                string bannedMessage = string.Format("IP-banned {0} ago by {1}: {2}",
+                     DateTime.UtcNow.Subtract(ipBanInfo.BanDate).ToMiniNoColorString(),
+                     ipBanInfo.BannedBy, ipBanInfo.BanReason);
+                tcpClient.Client.Send(Packet.MakeKick(bannedMessage).Bytes);
+                return null;
+            }
             return new Player( tcpClient );
         }
 

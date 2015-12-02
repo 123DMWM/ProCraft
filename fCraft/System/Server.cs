@@ -894,7 +894,7 @@ namespace fCraft {
 
         // checks for incoming connections
         static SchedulerTask checkConnectionsTask;
-        static TimeSpan checkConnectionsInterval = TimeSpan.FromMilliseconds( 250 );
+        static TimeSpan checkConnectionsInterval = TimeSpan.FromMilliseconds( 125 );
 
         public static TimeSpan CheckConnectionsInterval {
 
