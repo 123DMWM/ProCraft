@@ -835,35 +835,24 @@ namespace fCraft {
 
         static void OnlineStaffHandler(Player player, CommandReader cmd)
         {
-            if (cmd.HasNext)
-            {
-                CdListStaff.PrintUsage(player);
-                return;
-            }
-            if (Server.Players.Can(Permission.ReadStaffChat).CanBeSeen(player).Count() > 1)
+            Player[] onlineStaff = Server.Players.Where(p => p.IsStaff && player.CanSee(p)).ToArray();
+            if (!onlineStaff.Any())
             {
                 player.Message("There are no online staff at the moment");
                 return;
             }
-            
-            foreach (Rank rank in RankManager.Ranks)
-            {
+
+            player.Message("Below is a list of online staff members:");
+            foreach (Rank rank in RankManager.Ranks.Where(r => r.IsStaff)) {
                 string StaffListTemporary = "";
-                if (rank.IsStaff)
-                {
-                    foreach (Player stafflistplayer in rank.Players)
-                    {
-                        StaffListTemporary += stafflistplayer.ClassyName + ", ";
-                    }
-                    //player.Message("DEBUG: #" + StaffListTemporary + "#");
-                    if (StaffListTemporary.Length > 2)
-                    {
-                        player.Message("Below is a list of online staff members.");
-                        StaffListTemporary = StaffListTemporary.Remove((StaffListTemporary.Length - 2), 2);
-                        StaffListTemporary += ".";
-                        StaffListTemporary = rank.ClassyName + ": " + StaffListTemporary;
-                        player.Message(StaffListTemporary);
-                    }
+                foreach (Player stafflistplayer in onlineStaff.Where(r => r.Info.Rank == rank)) {
+                    StaffListTemporary += stafflistplayer.ClassyName + ", ";
+                }
+                if (StaffListTemporary.Length > 2) {
+                    StaffListTemporary = StaffListTemporary.Remove((StaffListTemporary.Length - 2), 2);
+                    StaffListTemporary += ".";
+                    StaffListTemporary = rank.ClassyName + ": " + StaffListTemporary;
+                    player.Message(StaffListTemporary);
                 }
             }
         }
