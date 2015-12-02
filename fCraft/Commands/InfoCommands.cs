@@ -2305,7 +2305,7 @@ namespace fCraft {
                 flags2 = flags2 + "Forum Moderator, ";
             }
             if (flags1.Contains('d')) {
-                flags2 = flags2 + "ClassiCube Devloper, ";
+                flags2 = flags2 + "ClassiCube Developer, ";
             }
             if (flags1.Contains('e')) {
                 flags2 = flags2 + "ClassiCube Blog Editor, ";
@@ -2380,7 +2380,7 @@ namespace fCraft {
                 flags2 = flags2 + "Forum Moderator, ";
             }
             if (flags1.Contains('d')) {
-                flags2 = flags2 + "ClassiCube Devloper, ";
+                flags2 = flags2 + "ClassiCube Developer, ";
             }
             if (flags1.Contains('e')) {
                 flags2 = flags2 + "ClassiCube Blog Editor, ";
