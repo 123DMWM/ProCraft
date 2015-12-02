@@ -963,7 +963,7 @@ namespace fCraft {
                         Players.CanSee(player).Message("&S{0} is now AFK (Auto)", player.Name);
                         player.Info.IsAFK = true;
                         player.Info.oldafkMob = player.Info.afkMob;
-                        player.Info.afkMob = "chicken";
+                        player.Info.afkMob = player.AFKModel;
 
                     }
                     player.Message("You have " + TimeLeft.ToMiniString() + " left before being kicked for idleing");
@@ -1063,7 +1063,7 @@ namespace fCraft {
                     {
                         Server.Players.CanSee(player).Message("&S{0} is now AFK (Auto)", player.Name);
                         player.Info.IsAFK = true;
-                        player.Info.Mob = "chicken";
+                        player.Info.Mob = player.AFKModel;
                         int TimeLeft = (player.Info.Rank.IdleKickTimer - (int)player.IdBotTime.ToMinutes());
                         player.Message("You have " + TimeLeft + "m left before you get kicked for being AFK");
                     }
@@ -1091,35 +1091,35 @@ namespace fCraft {
         */
 
 
-                //static void CheckIdles(SchedulerTask task)
-                //{
-                //
-                //    Player[] tempPlayerList = Players;
-                //    for (int i = 0; i < tempPlayerList.Length; i++)
-                //    {
-                //        Player player = tempPlayerList[i];
-                //        int fail;
-                //        if (player.IdBotTime.ToSeconds() % 5 == 0 && player.IdBotTime.ToSeconds() == 5 && int.TryParse(player.Info.Mob, out fail)) //&& player.isPlayingAsHider && player.isPlayingGame)
-                //        {
-                //            short x = (short)(player.Position.X / 32 * 32 + 16);
-                //            short y = (short)(player.Position.Y / 32 * 32 + 16);
-                //            short z = (short)(player.Position.Z / 32 * 32);
-                //            Vector3I Pos = new Vector3I(player.Position.X / 32, player.Position.Y / 32, (player.Position.Z - 32) / 32);
-                //            player.solidPosBlock = player.WorldMap.GetBlock(Pos);
-                //            player.WorldMap.SetBlock(Pos, player.inGameBlock);
-                //            BlockUpdate blockUpdate = new BlockUpdate(null, Pos, player.inGameBlock);
-                //            player.World.Map.QueueUpdate(blockUpdate);
-                //            player.Message("&7You are now a solid block ({0}) Don't walk around or you will be normal again.", player.inGameBlock);
-                //            player.isSolid = true;
-                //            player.Info.IsHidden = true;
-                //            player.lastSolidPos = Pos;
-                //            Player.RaisePlayerHideChangedEvent(player, true, true);
-                //        }                
-                //    }
-                //}
+        //static void CheckIdles(SchedulerTask task)
+        //{
+        //
+        //    Player[] tempPlayerList = Players;
+        //    for (int i = 0; i < tempPlayerList.Length; i++)
+        //    {
+        //        Player player = tempPlayerList[i];
+        //        int fail;
+        //        if (player.IdBotTime.ToSeconds() % 5 == 0 && player.IdBotTime.ToSeconds() == 5 && int.TryParse(player.Info.Mob, out fail)) //&& player.isPlayingAsHider && player.isPlayingGame)
+        //        {
+        //            short x = (short)(player.Position.X / 32 * 32 + 16);
+        //            short y = (short)(player.Position.Y / 32 * 32 + 16);
+        //            short z = (short)(player.Position.Z / 32 * 32);
+        //            Vector3I Pos = new Vector3I(player.Position.X / 32, player.Position.Y / 32, (player.Position.Z - 32) / 32);
+        //            player.solidPosBlock = player.WorldMap.GetBlock(Pos);
+        //            player.WorldMap.SetBlock(Pos, player.inGameBlock);
+        //            BlockUpdate blockUpdate = new BlockUpdate(null, Pos, player.inGameBlock);
+        //            player.World.Map.QueueUpdate(blockUpdate);
+        //            player.Message("&7You are now a solid block ({0}) Don't walk around or you will be normal again.", player.inGameBlock);
+        //            player.isSolid = true;
+        //            player.Info.IsHidden = true;
+        //            player.lastSolidPos = Pos;
+        //            Player.RaisePlayerHideChangedEvent(player, true, true);
+        //        }                
+        //    }
+        //}
 
-            static
-            SchedulerTask gcTask;
+        static
+        SchedulerTask gcTask;
         static TimeSpan gcInterval = TimeSpan.FromSeconds( 60 );
 
         /// <summary> Interval at which Server checks whether forced garbage collection is needed. </summary>

@@ -48,6 +48,7 @@ namespace fCraft {
             CommandManager.RegisterCommand( CdSpectate );
             CommandManager.RegisterCommand( CdUnspectate );
             CommandManager.RegisterCommand( CdChangeModel );
+            CommandManager.RegisterCommand( CdAFKModel );
             CommandManager.RegisterCommand( CdSudo );
             CommandManager.RegisterCommand( CdTPDeny );
             CommandManager.RegisterCommand( CdJORW );
@@ -230,11 +231,9 @@ namespace fCraft {
             {
                 "chicken",
                 "creeper",
-                "croc",
                 "humanoid",
                 "human",
                 "pig",
-                "printer",
                 "sheep",
                 "skeleton",
                 "spider",
@@ -245,81 +244,123 @@ namespace fCraft {
             Name = "Model",
             Aliases = new[] { "ChangeModel", "cm" },
             Category = CommandCategory.New | CommandCategory.Moderation,
-            Permissions = new[] { Permission.EditPlayerDB },
-            Usage = "/Model [Player] [Model] [SkinName]",
+            Permissions = new[] { Permission.ReadStaffChat },
+            Usage = "/Model [Player] [Model]",
             IsConsoleSafe = true,
             Help = "Change the Model or Skin of [Player]!&n" +
-            "Valid models: &s [Any Block Name or ID#], Chicken, Creeper, Croc, Humanoid, Pig, Printer, Sheep, Skeleton, Spider, Zombie!",
+            "Valid models: &s [Any Block Name or ID#], Chicken, Creeper, Humanoid, Pig, Sheep, Skeleton, Spider, Zombie!",
             Handler = ModelHandler
         };
 
         private static void ModelHandler(Player player, CommandReader cmd) {
-            if (!cmd.HasNext) {
-                CdChangeModel.PrintUsage(player);
+            PlayerInfo otherPlayer = InfoCommands.FindPlayerInfo(player, cmd, cmd.Next() ?? player.Name);
+            if (!player.IsStaff && otherPlayer != player.Info) {
+                Rank staffRank = RankManager.GetMinRankWithAnyPermission(Permission.ReadStaffChat);
+                if (staffRank != null) {
+                    player.Message("You must be {0}&s+ to change another players Model", staffRank.ClassyName);
+                } else {
+                    player.Message("No ranks have the ReadStaffChat permission so no one can change other players Model, yell at the owner.");
+                }
                 return;
             }
-            string namePart = cmd.Next();
-            if (!cmd.HasNext) {
-                CdChangeModel.PrintUsage(player);
+            if (otherPlayer.Rank.Index < player.Info.Rank.Index) {
+                player.Message("Cannot change the Model of someone higher rank than you.");
+                return;
+            }
+            if (otherPlayer == null) {
+                player.Message("Your current Model: &f" + player.Info.Mob);
                 return;
             }
             string model = cmd.Next();
-            string skinString = cmd.Next();
-            if (skinString != null) {
-                if (skinString.StartsWith("--")) {
-                    skinString = string.Format("http://minecraft.net/skin/{0}.png", skinString.Replace("--", ""));
-                }
-                if (skinString.StartsWith("-+")) {
-                    skinString = string.Format("http://skins.minecraft.net/MinecraftSkins/{0}.png", skinString.Replace("-+", ""));
-                }
-                if (skinString.StartsWith("++")) {
-                    skinString = string.Format("http://i.imgur.com/{0}.png", skinString.Replace("++", ""));
-                }
-            }
-            PlayerInfo[] p2 = PlayerDB.FindPlayers(namePart);
-            PlayerInfo p = PlayerDB.FindPlayerInfoOrPrintMatches(player, namePart, SearchOptions.IncludeSelf);
-            if (p2.Length > 1) {
+            if (string.IsNullOrEmpty(model)) {
+                player.Message("Current Model for {0}: &f{1}", otherPlayer.Name, otherPlayer.Mob);
                 return;
             }
-            if (p == null) {
-                player.Message("Player not found!");
-                return;
+            if (otherPlayer.IsOnline && otherPlayer.Rank.Index >= player.Info.Rank.Index) {
+                if (!validEntities.Contains(model.ToLower())) {
+                    Block block;
+                    if (Map.GetBlockByName(model, false, out block)) {
+                        model = block.GetHashCode().ToString();
+                    } else {
+                        player.Message("Model not valid, see &h/Help Model&s.");
+                        return;
+                    }
+                }
+                if (otherPlayer.Mob.ToLower() == model.ToLower()) {
+                    player.Message("&f{0}&s's model is already set to &f{1}", otherPlayer.Name, model);
+                    return;
+                }
+                if (otherPlayer.IsOnline) {
+                    otherPlayer.PlayerObject.Message("&f{0}&shanged your model from &f{1} &sto &f{2}", (otherPlayer.PlayerObject == player ? "&sC" : player.Name + " &sc"), otherPlayer.Mob, model);
+                }
+                if (otherPlayer.PlayerObject != player) {
+                    player.Message("&sChanged model of &f{0} &sfrom &f{1} &sto &f{2}", otherPlayer.Name, otherPlayer.Mob, model);
+                }
+                otherPlayer.oldMob = otherPlayer.Mob;
+                otherPlayer.Mob = model;
+            } else {
+                player.Message("Player not found/online or lower rank than you");
             }
-            if (!p.IsOnline) {
-                player.Message("Player is offline!");
-                return;
-            }
-            if (!validEntities.Contains(model.ToLower())) {
-                Block block;
-                if (Map.GetBlockByName(model, false, out block)) {
-                    model = block.GetHashCode().ToString();
+        }
+
+        static readonly CommandDescriptor CdAFKModel = new CommandDescriptor {
+            Name = "AFKModel",
+            Category = CommandCategory.New,
+            Permissions = new[] { Permission.Chat },
+            Usage = "/AFKModel [Player] [Model]",
+            IsConsoleSafe = true,
+            Help = "Change your own model for when you are AFK!&n" +
+    "Valid models: &s [Any Block Name or ID#], Chicken, Creeper, Croc, Humanoid, Pig, Printer, Sheep, Skeleton, Spider, Zombie!",
+            Handler = AFKModelHandler
+        };
+
+        private static void AFKModelHandler(Player player, CommandReader cmd) {
+            PlayerInfo otherPlayer = InfoCommands.FindPlayerInfo(player, cmd, cmd.Next() ?? player.Name);
+            if (!player.IsStaff && otherPlayer != player.Info) {
+                Rank staffRank = RankManager.GetMinRankWithAnyPermission(Permission.ReadStaffChat);
+                if (staffRank != null) {
+                    player.Message("You must be {0}&s+ to change another players AFKModel", staffRank.ClassyName );
                 } else {
-                    player.Message("Model not valid, see &h/Help Model&s. Using default \"Humanoid\" instead.");
+                    player.Message("No ranks have the ReadStaffChat permission so no one can change other players AFKModel, yell at the owner.");
                 }
-            }
-            if (model.ToLower().Equals("crocodile")) {
-                model = "croc";
-            }
-            if (model.ToLower().Equals("nope")) {
-                model = "spider";
-            }
-            if (p.Mob.ToLower() == model.ToLower() && skinString == null) {
-                player.Message("&f{0}&s's model is already set to &f{1}", p.Name, model);
                 return;
             }
-            if (p.IsOnline) {
-                p.PlayerObject.Message("&f{0}&shanged your model from &f{1} &sto &f{2} {3}", (p.PlayerObject == player ? "&sC" : player.Name + " &sc"), p.Mob, model,
-                    (skinString != null ? "&swith skin: &f" + skinString : null));
+            if (otherPlayer.Rank.Index < player.Info.Rank.Index) {
+                player.Message("Cannot change the AFKModel of someone higher rank than you.");
+                return;
             }
-            if (p.PlayerObject != player) {
-                player.Message("&sChanged model of &f{0} &sfrom &f{1} &sto &f{2} {3}", p.Name, p.Mob, model,
-                    (skinString != null ? "&swith skin: &f" + skinString : null));
+            if (otherPlayer == null) {
+                player.Message("Your current AFK Model: &f" + player.AFKModel);
+                return;
             }
-            p.oldMob = p.Mob;
-            p.Mob = model;
-            if (skinString != null) {
-                p.oldskinName = p.skinName;
-                p.skinName = skinString;
+            string model = cmd.Next();
+            if (string.IsNullOrEmpty(model)) {
+                CdAFKModel.PrintUsage(player);
+                return;
+            }
+            if (otherPlayer != null && otherPlayer.IsOnline && otherPlayer.Rank.Index >= player.Info.Rank.Index) {
+                if (!validEntities.Contains(model.ToLower())) {
+                    Block block;
+                    if (Map.GetBlockByName(model, false, out block)) {
+                        model = block.GetHashCode().ToString();
+                    } else {
+                        player.Message("Model not valid, see &h/Help AFKModel&s.");
+                        return;
+                    }
+                }
+                if (otherPlayer.PlayerObject.AFKModel.ToLower() == model.ToLower()) {
+                    player.Message("&f{0}&s's AFKmodel is already set to &f{1}", otherPlayer.Name, model);
+                    return;
+                }
+                if (otherPlayer.IsOnline) {
+                    otherPlayer.PlayerObject.Message("&f{0}&shanged your AFKmodel from &f{1} &sto &f{2}", (otherPlayer.PlayerObject == player ? "&sC" : player.Name + " &sc"), otherPlayer.PlayerObject.AFKModel, model);
+                }
+                if (otherPlayer.PlayerObject != player) {
+                    player.Message("&sChanged AFKmodel of &f{0} &sfrom &f{1} &sto &f{2}", otherPlayer.Name, otherPlayer.PlayerObject.AFKModel, model);
+                }
+                otherPlayer.PlayerObject.AFKModel = model;
+            } else {
+                player.Message("Player not found/online or lower rank than you");
             }
         }
 

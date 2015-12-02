@@ -1428,7 +1428,7 @@ namespace fCraft {
         {
             Name = "ReachDistance",
             Aliases = new[] { "Reach", "rd" },
-            Permissions = new[] { Permission.EditPlayerDB },
+            Permissions = new[] { Permission.DrawAdvanced },
             IsConsoleSafe = true,
             Category = CommandCategory.New | CommandCategory.World,
             Help = "Changes player reach distance. Every 32 is one block. Default: 160",
@@ -1437,24 +1437,36 @@ namespace fCraft {
         };
 
         static void ClickDistanceHandler(Player player, CommandReader cmd) {
-            short distance;
-            string first = cmd.Next();
-            string second = cmd.Next();
-            if (first == null) {
-                player.Message(Cdclickdistance.Usage);
+            PlayerInfo otherPlayer = InfoCommands.FindPlayerInfo(player, cmd, cmd.Next() ?? player.Name);
+            if (!player.IsStaff && otherPlayer != player.Info) {
+                Rank staffRank = RankManager.GetMinRankWithAnyPermission(Permission.ReadStaffChat);
+                if (staffRank != null) {
+                    player.Message("You must be {0}&s+ to change another players reach distance", staffRank.ClassyName);
+                } else {
+                    player.Message("No ranks have the ReadStaffChat permission so no one can change other players reachdistance, yell at the owner.");
+                }
                 return;
             }
-            PlayerInfo p = PlayerDB.FindPlayerInfoOrPrintMatches(player, first, SearchOptions.IncludeHidden);
-            if (p == null) {
+            if (otherPlayer.Rank.Index < player.Info.Rank.Index) {
+                player.Message("Cannot change the Reach Distance of someone higher rank than you.");
                 return;
-            } else {
-                if (!short.TryParse(second, out distance)) {
-                    if (second != "reset") {
-                        player.Message("Please try something inbetween 0 and 32767");
-                        return;
-                    } else {
-                        distance = 160;
-                    }
+            }
+            string second = cmd.Next();
+            if (string.IsNullOrEmpty(second)) {
+                if (otherPlayer == player.Info) {
+                    player.Message("Your current ReachDistance: {0} blocks [Units: {1}]", player.Info.ReachDistance / 32, player.Info.ReachDistance);
+                } else {
+                    player.Message("Current ReachDistance for {2}: {0} blocks [Units: {1}]", otherPlayer.ReachDistance / 32, otherPlayer.ReachDistance, otherPlayer.Name);
+                }
+                return;
+            }
+            short distance;
+            if (!short.TryParse(second, out distance)) {
+                if (second != "reset") {
+                    player.Message("Please try something inbetween 0 and 32767");
+                    return;
+                } else {
+                    distance = 160;
                 }
             }
             if (distance >= 32767 && distance <= 0) {
@@ -1462,20 +1474,20 @@ namespace fCraft {
                 return;
 
             }
-            if (distance != p.ReachDistance) {
-                if (p != player.Info) {
-                    if (p.IsOnline == true) {
-                        if (p.PlayerObject.Supports(CpeExtension.ClickDistance)) {
-                            p.PlayerObject.Message("{0} set your reach distance from {1} to {2} blocks [Units: {3}]", player.Name, p.ReachDistance / 32, distance / 32, distance);
-                            player.Message("Set reach distance for {0} from {1} to {2} blocks [Units: {3}]", p.Name, p.ReachDistance / 32, distance / 32, distance);
-                            p.ReachDistance = distance;
-                            p.PlayerObject.Send(Packet.MakeSetClickDistance(distance));
+            if (distance != otherPlayer.ReachDistance) {
+                if (otherPlayer != player.Info) {
+                    if (otherPlayer.IsOnline == true) {
+                        if (otherPlayer.PlayerObject.Supports(CpeExtension.ClickDistance)) {
+                            otherPlayer.PlayerObject.Message("{0} set your reach distance from {1} to {2} blocks [Units: {3}]", player.Name, otherPlayer.ReachDistance / 32, distance / 32, distance);
+                            player.Message("Set reach distance for {0} from {1} to {2} blocks [Units: {3}]", otherPlayer.Name, otherPlayer.ReachDistance / 32, distance / 32, distance);
+                            otherPlayer.ReachDistance = distance;
+                            otherPlayer.PlayerObject.Send(Packet.MakeSetClickDistance(distance));
                         } else {
                             player.Message("This player does not support ReachDistance packet");
                         }
                     } else {
-                        player.Message("Set reach distance for {0} from {1} to {2} blocks [Units: {3}]", p.Name, p.ReachDistance / 32, distance / 32, distance);
-                        p.ReachDistance = distance;
+                        player.Message("Set reach distance for {0} from {1} to {2} blocks [Units: {3}]", otherPlayer.Name, otherPlayer.ReachDistance / 32, distance / 32, distance);
+                        otherPlayer.ReachDistance = distance;
                     }
                 } else {
                     if (player.Supports(CpeExtension.ClickDistance)) {
@@ -1487,10 +1499,10 @@ namespace fCraft {
                     }
                 }
             } else {
-                if (p != player.Info) {
-                    player.Message("{0}'s reach distance is already set to {1}", p.ClassyName, p.ReachDistance);
+                if (otherPlayer != player.Info) {
+                    player.Message("{0}'s reach distance is already set to {1}", otherPlayer.ClassyName, otherPlayer.ReachDistance);
                 } else {
-                    player.Message("Your reach distance is already set to {0}", p.ReachDistance);
+                    player.Message("Your reach distance is already set to {0}", otherPlayer.ReachDistance);
                 }
                 return;
             }
@@ -1504,11 +1516,9 @@ namespace fCraft {
             {
                 "chicken",
                 "creeper",
-                "croc",
                 "humanoid",
                 "human",
                 "pig",
-                "printer",
                 "sheep",
                 "skeleton",
                 "spider",
@@ -1520,18 +1530,17 @@ namespace fCraft {
             Aliases = new[] { "AddEntity", "AddEnt", "Ent" },
             Permissions = new[] { Permission.BringAll },
             Category = CommandCategory.New | CommandCategory.World,
-            IsConsoleSafe = false,
             Usage = "/ent <create / remove / removeAll / model / list / bring>",
             Help = "Commands for manipulating entities. For help and usage for the individual options, use /help ent <option>.",
             HelpSections = new Dictionary<string, string>{
                 { "create", "&H/Ent create <entity name> <model> <skin>&n&S" +
-                                "Creates a new entity with the given name. Valid models are chicken, creeper, croc, human, pig, printer, sheep, skeleton, spider, zombie, or any block ID/Name." },
+                                "Creates a new entity with the given name. Valid models are chicken, creeper, human, pig, sheep, skeleton, spider, zombie, or any block ID/Name." },
                 { "remove", "&H/Ent remove <entity name>&n&S" +
                                 "Removes the given entity." },
                 { "removeall", "&H/Ent removeAll&n&S" +
                                 "Removes all entities from the server."},  
                 { "model", "&H/Ent model <entity name> <model>&n&S" +
-                                "Changes the model of an entity to the given model. Valid models are chicken, creeper, croc, human, pig, printer, sheep, skeleton, spider, zombie, or any block ID/Name."},
+                                "Changes the model of an entity to the given model. Valid models are chicken, creeper, human, pig, sheep, skeleton, spider, zombie, or any block ID/Name."},
                 { "list", "&H/Ent list&n&S" +
                                 "Prints out a list of all the entites on the server."},
                  { "bring", "&H/Ent bring <entity name>&n&S" +
@@ -1601,7 +1610,7 @@ namespace fCraft {
                             requestedModel = blockmodel.GetHashCode().ToString();
                         } else {
                             player.Message(
-                                "That wasn't a valid entity model! Valid models are chicken, creeper, croc, human, pig, printer, sheep, skeleton, spider, zombie, or any block ID/Name.");
+                                "That wasn't a valid entity model! Valid models are chicken, creeper, human, pig, sheep, skeleton, spider, zombie, or any block ID/Name.");
                             return;
                         }
                     }
@@ -1652,7 +1661,7 @@ namespace fCraft {
                         }
                         if (string.IsNullOrEmpty(model)) {
                             player.Message(
-                                "Usage is /Ent model <bot> <model>. Valid models are chicken, creeper, croc, human, pig, printer, sheep, skeleton, spider, zombie, or any block ID/Name.");
+                                "Usage is /Ent model <bot> <model>. Valid models are chicken, creeper, human, pig, sheep, skeleton, spider, zombie, or any block ID/Name.");
                             break;
                         }
 
@@ -1664,7 +1673,7 @@ namespace fCraft {
                                 model = blockmodel.GetHashCode().ToString();
                             } else {
                                 player.Message(
-                                    "That wasn't a valid entity model! Valid models are chicken, creeper, croc, human, pig, printer, sheep, skeleton, spider, zombie, or any block ID/Name.");
+                                    "That wasn't a valid entity model! Valid models are chicken, creeper, human, pig, sheep, skeleton, spider, zombie, or any block ID/Name.");
                                 break;
                             }
                         }
@@ -1673,7 +1682,7 @@ namespace fCraft {
                         bot.changeBotModel(model, skinString2 ?? bot.SkinName);
                     } else
                         player.Message(
-                            "Usage is /Ent model <bot> <model>. Valid models are chicken, creeper, croc, human, pig, printer, sheep, skeleton, spider, zombie, or any block ID/Name.");
+                            "Usage is /Ent model <bot> <model>. Valid models are chicken, creeper, human, pig, sheep, skeleton, spider, zombie, or any block ID/Name.");
                     break;
                 case "bring":
                     bot.teleportBot(player.Position);
@@ -2039,7 +2048,7 @@ namespace fCraft {
         static readonly CommandDescriptor Cdweather = new CommandDescriptor
         {
             Name = "weather",
-            Permissions = new[] { Permission.EditPlayerDB },
+            Permissions = new[] { Permission.ReadStaffChat },
             Category = CommandCategory.New | CommandCategory.World,
             Help = "Changes player weather ingame 0(sun) 1(rain) 2(snow)",
             Usage = "/weather [Player] [weather]",

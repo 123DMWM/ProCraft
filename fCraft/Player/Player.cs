@@ -2205,6 +2205,7 @@ namespace fCraft {
         }
 
         #region CPE
+        public string AFKModel = "Chicken";
 
         readonly HashSet<CpeExtension> supportedExtensions = new HashSet<CpeExtension>();
 

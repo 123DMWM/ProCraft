@@ -320,7 +320,7 @@ namespace fCraft
                 msg.Length > 0 ? " (" + (msg.Length > 32 ? msg.Remove(32) : msg) + ")" : "");
             player.Info.IsAFK = !player.Info.IsAFK;
             player.Info.oldafkMob = player.Info.afkMob;
-            player.Info.afkMob = player.Info.IsAFK ? "chicken" : player.Info.Mob;
+            player.Info.afkMob = player.Info.IsAFK ? player.AFKModel : player.Info.Mob;
             Server.UpdateTabList();
             player.ResetIdBotTimer();
         }

@@ -1405,7 +1405,7 @@ namespace fCraft {
             }
 
             if (Supports(CpeExtension.ChangeModel)) {
-                Send(Packet.MakeChangeModel(255, !Info.IsAFK ? Info.Mob : "Chicken"));
+                Send(Packet.MakeChangeModel(255, !Info.IsAFK ? Info.Mob : AFKModel));
             }
             // Teleport player to the target location
             // This allows preserving spawn rotation/look, and allows
@@ -1920,7 +1920,7 @@ namespace fCraft {
                     Send(Packet.MakeTeleport(newEntity.Id, player.Position));
                 }
                 if (Supports(CpeExtension.ChangeModel)) {
-                    Send(Packet.MakeChangeModel((byte)newEntity.Id, !player.Info.IsAFK ? player.Info.Mob : "Chicken"));
+                    Send(Packet.MakeChangeModel((byte)newEntity.Id, !player.Info.IsAFK ? player.Info.Mob : AFKModel));
                 }
                 return newEntity;
             } else {
@@ -1968,7 +1968,7 @@ namespace fCraft {
             }
 
             if (Supports(CpeExtension.ChangeModel)) {
-                SendNow(Packet.MakeChangeModel((byte)entity.Id, !player.Info.IsAFK ? player.Info.Mob : "Chicken"));
+                SendNow(Packet.MakeChangeModel((byte)entity.Id, !player.Info.IsAFK ? player.Info.Mob : AFKModel));
             }
         }
 
