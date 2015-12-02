@@ -618,7 +618,7 @@ namespace fCraft {
                                 world.EdgeBlock, world.HorizonBlock );
                 player.Message("  Texture: {0}", (world.Texture == "Default" ? Server.DefaultTerrain : world.Texture));
                 if( !player.IsUsingWoM ) {
-                    player.Message( "  You need ClassiCube client to see the changes." );
+                    player.Message( "  You need ClassicalSharp client to see the changes." );
                 }
                 return;
             }

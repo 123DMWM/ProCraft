@@ -31,7 +31,7 @@ namespace fCraft {
         /// <summary> Internal IP address that the server's bound to (0.0.0.0 if not explicitly specified by the user). </summary>
         public static IPAddress InternalIP { get; private set; }
 
-        /// <summary> External IP address of this machine, as reported by http://www.classicube.net/api/myip/ </summary>
+        /// <summary> External IP address of this machine, as reported by http://fcraft.net/ipcheck.php </summary>
         public static IPAddress ExternalIP { get; private set; }
 
         /// <summary> Number of the local listening port. </summary>

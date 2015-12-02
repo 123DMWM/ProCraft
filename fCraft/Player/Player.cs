@@ -2412,7 +2412,7 @@ namespace fCraft {
             }
             if (supportedExtensions.Count == 0)
             {
-                Kick("Please use the ClassiCube.net client", LeaveReason.InvalidOpcodeKick);
+                Kick("Please use the ClassicalSharp client", LeaveReason.InvalidOpcodeKick);
             }
 
             // if client also supports CustomBlockSupportLevel, figure out what level to use

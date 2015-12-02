@@ -25,7 +25,7 @@ namespace fCraft {
         const int PingInterval = 3; // multiples of SocketPollInterval, approx. 3 seconds
         public DateTime LastZoneNotification = DateTime.UtcNow;
 
-        const string NoSmpMessage = "Only ClassiCube clients work!";
+        const string NoSmpMessage = "Only ClassicalSharp clients work!";
 
 
         static Player() {
