@@ -1166,7 +1166,7 @@ namespace fCraft
 
                 case ChatMessageType.Say:
                     if (enabled) {
-                        SendChannelMessage("\u212C&S[&YSay&S][\u211C" + args.Player.Name + "\u212C&S] \u211C" +
+                        SendChannelMessage("\u212C&S[&YSay&S] \u211C" +
                                            args.Message);
                     }
                     break;
