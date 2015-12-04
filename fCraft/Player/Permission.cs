@@ -24,9 +24,6 @@ namespace fCraft {
 
         /// <summary> Ability to place grass blocks. </summary>
         PlaceGrass,
-
-        /// <summary> Ability to change the servers defcon level. </summary>
-        ChangeDefconLevel,
         
         /// <summary> Ability to place water blocks. </summary>
         PlaceWater,

@@ -1069,7 +1069,6 @@ namespace fCraft {
             owner.Add( new XElement( Permission.ManageZones.ToString() ) );
             owner.Add( new XElement( Permission.ManageSpecialZones.ToString() ) );
             owner.Add( new XElement( Permission.UseEmotes.ToString() ) );
-            owner.Add( new XElement( Permission.ChangeDefconLevel.ToString() ) );
             owner.Add( new XElement( Permission.ManageSigns.ToString() ) );
             owner.Add( new XElement( Permission.ManageWorlds.ToString() ) );
             owner.Add( new XElement( Permission.FlushWorlds.ToString() ) );

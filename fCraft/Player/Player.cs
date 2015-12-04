@@ -1182,12 +1182,6 @@ namespace fCraft {
             // if all is well, try placing it
             switch( canPlaceResult ) {
                 case CanPlaceResult.Allowed:
-                    Network.DEFCON DEFCON = new Network.DEFCON();
-                    if (!DEFCON.Check(this, type))
-                    {
-                        RevertBlockNow(coord);
-                        break;
-                    }
                     if (type == Block.Dirt && GrassGrowth) {
                         // Placed Dirt to Grass
                         type = Block.Grass;

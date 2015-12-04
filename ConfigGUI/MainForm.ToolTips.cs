@@ -472,11 +472,6 @@ Affected commands:
     /Grass
     /Bind";
 
-            vPermissions.Items[(int)Permission.ChangeDefconLevel].ToolTipText =
-@"Ability to change the servers DEFCON level.
-Affected commands:
-    /Defcon";
-
             vPermissions.Items[(int)Permission.PlaceLava].ToolTipText =
 @"Ability to place lava blocks. This also affects draw commands.
 Required permission: Build
