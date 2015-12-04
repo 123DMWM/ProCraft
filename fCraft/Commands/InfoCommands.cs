@@ -382,7 +382,7 @@ namespace fCraft {
                 {
                     totalTime = totalTime.Add(info.TimeSinceLastLogin);
                 }
-                if (info.IsOnline && player.CanSee(target))
+                if (info.IsOnline && target != null)
                 {
                     player.Message("  Total time: {0:F1} hours. This session: {1:F1} hours.",
                                     totalTime.TotalHours,
