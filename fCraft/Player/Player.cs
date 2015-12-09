@@ -1414,7 +1414,7 @@ namespace fCraft {
 
         #region Binding
 
-        readonly Block[] bindings = new Block[67];
+        readonly Block[] bindings = new Block[256];
 
         public void Bind( Block type, Block replacement ) {
             bindings[(byte)type] = replacement;
@@ -1436,11 +1436,9 @@ namespace fCraft {
         }
 
         public void ResetAllBinds() {
-            foreach( Block block in Enum.GetValues( typeof( Block ) ) ) {
-                if( block != Block.None ) {
-                    ResetBind( block );
-                }
-            }
+        	for( int block = 0; block < 255; block++) {
+        		ResetBind( (Block)block );
+        	}
         }
 
         #endregion

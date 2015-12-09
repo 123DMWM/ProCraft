@@ -662,7 +662,7 @@ namespace fCraft {
 
             // if a player is using InDev or SurvivalTest client, they may try to
             // place blocks that are not found in MC Classic. Convert them!
-            if( type > 68 ) {
+            if( type > (byte)Map.MaxCustomBlockType && !Supports(CpeExtension.BlockDefinitions)) {
                 type = MapDat.MapBlock( type );
             }
 
@@ -1466,6 +1466,8 @@ namespace fCraft {
         		short edge =  World.EdgeLevel == -1 ? (short)(WorldMap.Height / 2) : World.EdgeLevel;
         		Send(Packet.MakeEnvSetMapAppearance(tex, World.EdgeBlock, World.HorizonBlock, edge));
             }
+        	if (Supports(CpeExtension.BlockDefinitions))
+        	    BlockDefinition.SendGlobalDefinitions(this);
         	
             if (Supports(CpeExtension.EnvColors))
             {
@@ -1515,6 +1517,7 @@ namespace fCraft {
         bool GetHacksFromMotd(out bool canFly, out bool canNoClip, out bool canSpeed, out bool canRespawn) {
         	bool useMotd = false;
         	canFly = false; canNoClip = false; canSpeed = false; canRespawn = false;
+        	if (String.IsNullOrEmpty(World.MOTD)) return false;
         	
         	foreach (string s in World.MOTD.ToLower().Split()) {
         		switch (s) {

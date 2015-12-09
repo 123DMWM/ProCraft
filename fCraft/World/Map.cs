@@ -41,7 +41,7 @@ namespace fCraft {
         public const Block MaxLegalBlockType = Block.Obsidian; //Highest block before CPE
 
         public const Block MaxCustomBlockType = Block.StoneBrick;
-        readonly static Block[] FallbackBlocks = new Block[256];
+        internal readonly static Block[] FallbackBlocks = new Block[256];
 
         static void DefineFallbackBlocks()
         {

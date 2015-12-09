@@ -677,7 +677,7 @@ namespace fCraft {
                 Shutdown( new ShutdownParams( ShutdownReason.RestartTimer, restartIn, true ), false );
                 ChatTimer.Start( restartIn, "Automatic Server Restart", Player.Console.Name );
             }
-
+           
             // start the main loop - server is now connectible
             Scheduler.Start();
             IsRunning = true;
