@@ -621,7 +621,7 @@ namespace fCraft {
         }
 
 
-        static readonly Dictionary<string, Block> BlockNames = new Dictionary<string, Block>();
+        internal static readonly Dictionary<string, Block> BlockNames = new Dictionary<string, Block>();
         static readonly Dictionary<Block, string> BlockEdgeTextures = new Dictionary<Block, string>();
 
         static Map() {

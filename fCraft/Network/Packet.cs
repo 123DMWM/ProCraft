@@ -454,15 +454,15 @@ namespace fCraft {
         
         [Pure]
         public static Packet MakeDefineBlock(byte block, string name, byte solid, byte speed, byte top, byte side, 
-                                             byte bottom, byte walkSound, bool blocksLight, bool fullBright, byte shape, 
+                                             byte bottom, bool blocksLight, byte walkSound,bool fullBright, byte shape, 
                                              byte draw) {
-            return MakeDefineBlock(block, name, solid, speed, top, side, bottom, walkSound, 
-                                   blocksLight, fullBright, shape, draw, 0, 0, 0, 0);
+            return MakeDefineBlock(block, name, solid, speed, top, side, bottom, blocksLight,
+                                   walkSound, fullBright, shape, draw, 0, 0, 0, 0);
         }
         
         [Pure]
         public static Packet MakeDefineBlock(byte block, string name, byte solid, byte speed, byte top, byte side, 
-                                             byte bottom, byte walkSound, bool blocksLight, bool fullBright, byte shape, byte draw, 
+                                             byte bottom, bool blocksLight, byte walkSound, bool fullBright, byte shape, byte draw, 
                                              byte fogD, byte fogR, byte fogG, byte fogB) {
             Packet packet = new Packet( OpCode.DefineBlock );
             packet.Bytes[1] = block;

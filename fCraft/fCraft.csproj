@@ -229,6 +229,7 @@
     <Compile Include="System\Utils\Trie.cs" />
     <Compile Include="Player\Position.cs" />
     <Compile Include="World\Block.cs" />
+    <Compile Include="World\BlockDefinition.cs" />
     <Compile Include="World\BlockUpdate.cs" />
     <Compile Include="World\Forester.cs" />
     <Compile Include="World\Map.cs" />
