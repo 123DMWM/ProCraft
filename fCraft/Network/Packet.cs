@@ -450,6 +450,47 @@ namespace fCraft {
             packet.Bytes[137] = spawnPosition.L;
             return packet;
         }
+        
+        
+        [Pure]
+        public static Packet MakeDefineBlock(byte block, string name, byte solid, byte speed, byte top, byte side, 
+                                             byte bottom, byte walkSound, bool blocksLight, bool fullBright, byte shape, 
+                                             byte draw) {
+            return MakeDefineBlock(block, name, solid, speed, top, side, bottom, walkSound, 
+                                   blocksLight, fullBright, shape, draw, 0, 0, 0, 0);
+        }
+        
+        [Pure]
+        public static Packet MakeDefineBlock(byte block, string name, byte solid, byte speed, byte top, byte side, 
+                                             byte bottom, byte walkSound, bool blocksLight, bool fullBright, byte shape, byte draw, 
+                                             byte fogD, byte fogR, byte fogG, byte fogB) {
+            Packet packet = new Packet( OpCode.DefineBlock );
+            packet.Bytes[1] = block;
+            Encoding.ASCII.GetBytes(name.PadRight(64), 0, 64, packet.Bytes, 2);
+            packet.Bytes[66] = solid;
+            packet.Bytes[67] = speed;
+            packet.Bytes[68] = top;
+            packet.Bytes[69] = side;
+            packet.Bytes[70] = bottom; 
+            packet.Bytes[71] = (byte)(blocksLight ? 0 : 1);
+            packet.Bytes[72] = walkSound;
+            packet.Bytes[73] = (byte)(fullBright ? 1 : 0);
+            packet.Bytes[74] = shape;
+            packet.Bytes[75] = draw;
+            packet.Bytes[76] = fogD;
+            packet.Bytes[77] = fogR;
+            packet.Bytes[78] = fogG;
+            packet.Bytes[79] = fogB;
+            return packet;
+        }
+        
+        
+        [Pure]
+        public static Packet RemoveBlockDefinition(byte blockId) {
+            Packet packet = new Packet(OpCode.RemoveBlockDefinition);
+            packet.Bytes[1] = blockId;
+            return packet;
+        }
 
         #endregion
 
@@ -501,7 +542,10 @@ namespace fCraft {
             69, // EnvMapAppearance
             2, // EnvSetWeatherType
             8, // HackControl
-            138 // ExtAddEntity2
+            138, // ExtAddEntity2
+            0,
+            80, // DefineBlock
+            2, // RemoveBlockDefinition
         };
     }
 }
