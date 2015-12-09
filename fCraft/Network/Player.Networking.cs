@@ -1302,9 +1302,7 @@ namespace fCraft {
             }
 
             ResetVisibleEntities();
-
             ClearQueue(outputQueue);
-
             Map map;
 
             // try to join the new world
@@ -1313,9 +1311,7 @@ namespace fCraft {
                 bool announce = (oldWorld != null) && (oldWorld.Name != newWorld.Name);
                 map = newWorld.AcceptPlayer(this, announce);
                 if (map == null)
-                {
                     return false;
-                }
             }
             else
             {
@@ -1324,20 +1320,11 @@ namespace fCraft {
 
             World = newWorld;
             // Set spawn point
-            if (doUseWorldSpawn)
-            {
-                Position = map.Spawn;
-            }
-            else
-            {
-                Position = postJoinPosition;
-            }
+            Position = doUseWorldSpawn ? map.Spawn : postJoinPosition;
 
             // Start sending over the level copy
             if (oldWorld != null)
-            {
                 SendNow(Packet.MakeHandshake(this, textLine1, textLine2));
-            }
 
             writer.Write(OpCode.MapBegin);
             BytesSent++;
@@ -1412,106 +1399,7 @@ namespace fCraft {
             // teleporting player to a specific location (e.g. /TP or /Bring)
             writer.Write(Packet.MakeTeleport(Packet.SelfId, Position).Bytes);
             BytesSent += 10;
-
-            #region EnvSetMapAppearance
-
-            if (Supports(CpeExtension.EnvMapAppearance)) {
-                Send(Packet.MakeEnvSetMapAppearance((World.Texture == "Default" ? Server.DefaultTerrain : World.Texture), World.EdgeBlock, World.HorizonBlock,
-                        (short)((World.EdgeLevel == -1) ? (WorldMap.Height / 2) : World.EdgeLevel)));
-            }
-
-            #endregion
-            #region EnvColors
-            if (Supports(CpeExtension.EnvColors))
-            {
-                Send(Packet.MakeEnvSetColor((byte)EnvVariable.SkyColor, World.SkyColor));
-                Send(Packet.MakeEnvSetColor((byte)EnvVariable.CloudColor, World.CloudColor));
-                Send(Packet.MakeEnvSetColor((byte)EnvVariable.FogColor, World.FogColor));
-                Send(Packet.MakeEnvSetColor((byte)EnvVariable.Shadow, World.ShadowColor));
-                Send(Packet.MakeEnvSetColor((byte)EnvVariable.Sunlight, World.LightColor));
-            }
-			if (Supports(CpeExtension.EnvWeatherType)) {
-				Send(Packet.SetWeather((byte)WeatherType.Sunny));
-                Send(Packet.SetWeather(World.Weather));
-            }
-            #endregion
-            #region HackControls
-            if (Supports(CpeExtension.HackControl)) {
-                bool canFly = true, canNoClip = true, canSpeed = true, canRespawn = true, useMotd = false;
-                if (!string.IsNullOrEmpty(World.MOTD)) {
-                    foreach (string s in World.MOTD.ToLower().Split()) {
-                        switch (s) {
-                            case "-fly":
-                                canFly = false;
-                                useMotd = true;
-                                break;
-                            case "-noclip":
-                                canNoClip = false;
-                                useMotd = true;
-                                break;
-                            case "-speed":
-                                canSpeed = false;
-                                useMotd = true;
-                                break;
-                            case "-respawn":
-                                canRespawn = false;
-                                useMotd = true;
-                                break;
-                            case "-hax":
-                                canFly = false;
-                                canNoClip = false;
-                                canSpeed = false;
-                                canRespawn = false;
-                                useMotd = true;
-                                break;
-                            case "+hax":
-                                canFly = true;
-                                canNoClip = true;
-                                canSpeed = true;
-                                canRespawn = true;
-                                useMotd = true;
-                                break;
-                            case "+ophax":
-                                canFly = IsStaff;
-                                canNoClip = IsStaff;
-                                canSpeed = IsStaff;
-                                canRespawn = IsStaff;
-                                useMotd = true;
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                }
-                if (useMotd) {
-                    Send(Packet.HackControl(canFly, canNoClip, canSpeed, canRespawn, canNoClip, 40));
-                } else {
-                    Send(Packet.HackControl(Info.AllowFlying, Info.AllowNoClip, Info.AllowSpeedhack, Info.AllowRespawn, Info.AllowThirdPerson, Info.JumpHeight));
-                }
-            }
-            #endregion
-            #region Reach Distance
-
-            if (Supports(CpeExtension.ClickDistance)) {
-                Send(Packet.MakeSetClickDistance((World.maxReach < Info.ReachDistance && !IsStaff) ? World.maxReach : Info.ReachDistance));
-            }
-
-            #endregion
-            #region Block Permissions
-
-            if (Supports(CpeExtension.BlockPermissions)) {
-                Send(Packet.MakeSetBlockPermission(Block.Admincrete, Can(Permission.PlaceAdmincrete), true));
-                Send(Packet.MakeSetBlockPermission(Block.Water, Can(Permission.PlaceWater), true));
-                Send(Packet.MakeSetBlockPermission(Block.StillWater, Can(Permission.PlaceWater), true));
-                Send(Packet.MakeSetBlockPermission(Block.Lava, Can(Permission.PlaceLava), true));
-                Send(Packet.MakeSetBlockPermission(Block.StillLava, Can(Permission.PlaceLava), true));
-                Send(Packet.MakeSetBlockPermission(Block.Grass, Can(Permission.PlaceGrass), true));
-            }
-
-            #endregion
-            if (Supports(CpeExtension.MessageType) && !IsPlayingCTF) {
-                Send(Packet.Message((byte)MessageType.BottomRight1, "&sBlock:&f" + Info.heldBlock.ToString() + " &sID:&f" + Info.heldBlock.GetHashCode()));
-            }
+            SendJoinCpeExtensions();
 
             foreach (Bot bot in World.Bots) {
                 Send(Packet.MakeRemoveEntity(bot.ID));
@@ -1526,7 +1414,24 @@ namespace fCraft {
                     }
                 }
             }
-            if (oldWorld == newWorld)
+            SendJoinMessage(oldWorld, newWorld);
+            RaisePlayerJoinedWorldEvent(this, oldWorld, reason);
+
+            if (Supports(CpeExtension.SelectionCuboid)) {
+                foreach (Zone z in WorldMap.Zones) {
+                    if (z.ShowZone) {
+                        Send(Packet.MakeMakeSelection(z.ZoneID, z.Name, z.Bounds, z.Color, z.Alpha));
+                    }
+                }
+            }
+            
+            Server.UpdateTabList();
+            Server.RequestGC();
+            return true;
+        }
+        
+        void SendJoinMessage(World oldWorld, World newWorld) {
+        	if (oldWorld == newWorld)
             {
                 Message("&sRejoined world {0}", newWorld.ClassyName);
             }
@@ -1554,24 +1459,108 @@ namespace fCraft {
                     }
                 }
             }
+        }
+        
+        void SendJoinCpeExtensions() {
+            if (Supports(CpeExtension.EnvMapAppearance)) {
+        		string tex = World.Texture == "Default" ? Server.DefaultTerrain : World.Texture;
+        		short edge =  World.EdgeLevel == -1 ? (short)(WorldMap.Height / 2) : World.EdgeLevel;
+        		Send(Packet.MakeEnvSetMapAppearance(tex, World.EdgeBlock, World.HorizonBlock, edge));
+            }
+        	
+            if (Supports(CpeExtension.EnvColors))
+            {
+                Send(Packet.MakeEnvSetColor((byte)EnvVariable.SkyColor, World.SkyColor));
+                Send(Packet.MakeEnvSetColor((byte)EnvVariable.CloudColor, World.CloudColor));
+                Send(Packet.MakeEnvSetColor((byte)EnvVariable.FogColor, World.FogColor));
+                Send(Packet.MakeEnvSetColor((byte)EnvVariable.Shadow, World.ShadowColor));
+                Send(Packet.MakeEnvSetColor((byte)EnvVariable.Sunlight, World.LightColor));
+            }
+            
+			if (Supports(CpeExtension.EnvWeatherType)) {
+				Send(Packet.SetWeather((byte)WeatherType.Sunny));
+                Send(Packet.SetWeather(World.Weather));
+            }
 
-            RaisePlayerJoinedWorldEvent(this, oldWorld, reason);
-
-            if (Supports(CpeExtension.SelectionCuboid)) {
-                foreach (Zone z in WorldMap.Zones) {
-                    if (z.ShowZone) {
-                        Send(Packet.MakeMakeSelection(z.ZoneID, z.Name, z.Bounds, z.Color, z.Alpha));
-                    }
+            if (Supports(CpeExtension.HackControl)) {
+            	bool canFly, canNoClip, canSpeed, canRespawn;
+                bool useMotd = GetHacksFromMotd(out canFly, out canNoClip, out canSpeed, out canRespawn);
+                if (useMotd) {
+                    Send(Packet.HackControl(canFly, canNoClip, canSpeed, canRespawn, canNoClip, 40));
+                } else {
+                    Send(Packet.HackControl(Info.AllowFlying, Info.AllowNoClip, Info.AllowSpeedhack, Info.AllowRespawn, Info.AllowThirdPerson, Info.JumpHeight));
                 }
             }
 
-			if (this.Supports(CpeExtension.MessageType)) {
+            if (Supports(CpeExtension.ClickDistance)) {
+                Send(Packet.MakeSetClickDistance((World.maxReach < Info.ReachDistance && !IsStaff) ? World.maxReach : Info.ReachDistance));
+            }
+
+            if (Supports(CpeExtension.BlockPermissions)) {
+                Send(Packet.MakeSetBlockPermission(Block.Admincrete, Can(Permission.PlaceAdmincrete), true));
+                Send(Packet.MakeSetBlockPermission(Block.Water, Can(Permission.PlaceWater), true));
+                Send(Packet.MakeSetBlockPermission(Block.StillWater, Can(Permission.PlaceWater), true));
+                Send(Packet.MakeSetBlockPermission(Block.Lava, Can(Permission.PlaceLava), true));
+                Send(Packet.MakeSetBlockPermission(Block.StillLava, Can(Permission.PlaceLava), true));
+                Send(Packet.MakeSetBlockPermission(Block.Grass, Can(Permission.PlaceGrass), true));
+            }
+
+            if (Supports(CpeExtension.MessageType) && !IsPlayingCTF) {
+                Send(Packet.Message((byte)MessageType.BottomRight1, "&sBlock:&f" + Info.heldBlock.ToString() + " &sID:&f" + Info.heldBlock.GetHashCode()));
+            }
+            if (Supports(CpeExtension.MessageType)) {
 				Send(Packet.Message((byte)MessageType.Status1, ConfigKey.ServerName.GetString()));
 			}
-
-            Server.UpdateTabList();
-            Server.RequestGC();
-            return true;
+        }
+        
+        bool GetHacksFromMotd(out bool canFly, out bool canNoClip, out bool canSpeed, out bool canRespawn) {
+        	bool useMotd = false;
+        	canFly = false; canNoClip = false; canSpeed = false; canRespawn = false;
+        	
+        	foreach (string s in World.MOTD.ToLower().Split()) {
+        		switch (s) {
+        			case "-fly":
+        				canFly = false;
+        				useMotd = true;
+        				break;
+        			case "-noclip":
+        				canNoClip = false;
+        				useMotd = true;
+        				break;
+        			case "-speed":
+        				canSpeed = false;
+        				useMotd = true;
+        				break;
+        			case "-respawn":
+        				canRespawn = false;
+        				useMotd = true;
+        				break;
+        			case "-hax":
+        				canFly = false;
+        				canNoClip = false;
+        				canSpeed = false;
+        				canRespawn = false;
+        				useMotd = true;
+        				break;
+        			case "+hax":
+        				canFly = true;
+        				canNoClip = true;
+        				canSpeed = true;
+        				canRespawn = true;
+        				useMotd = true;
+        				break;
+        			case "+ophax":
+        				canFly = IsStaff;
+        				canNoClip = IsStaff;
+        				canSpeed = IsStaff;
+        				canRespawn = IsStaff;
+        				useMotd = true;
+        				break;
+        			default:
+        				break;
+        		}
+        	}
+        	return useMotd;
         }
 
         #endregion
