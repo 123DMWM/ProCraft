@@ -1332,49 +1332,7 @@ namespace fCraft {
             // enable Nagle's algorithm (in case it was turned off by LowLatencyMode)
             // to avoid wasting bandwidth for map transfer
             client.NoDelay = false;
-
-            // Fetch compressed map copy
-            byte[] buffer = new byte[1024];
-            int mapBytesSent = 0;
-            byte[] unGzipBlockData = map.Blocks.ToArray();
-            int count = 0;
-            foreach (var get in unGzipBlockData) {
-                if ((int) get > (int) Map.MaxLegalBlockType) {
-                    if (Supports(CpeExtension.CustomBlocks) != true) {
-                        unGzipBlockData[count] = (byte) Fallback.GetFallBack((Block) get);
-                    }
-                }
-                count++;
-            }
-            byte[] blockData = map.GetCompressedCopy(unGzipBlockData);
-            Logger.Log(LogType.Debug,
-                        "Player.JoinWorldNow: Sending compressed map ({0} bytes) to {1}.",
-                        blockData.Length, Name);
-
-            // Transfer the map copy
-            while (mapBytesSent < blockData.Length) {
-                int chunkSize = blockData.Length - mapBytesSent;
-                if (chunkSize > 1024) {
-                    chunkSize = 1024;
-                } else {
-                    // CRC fix for ManicDigger
-                    for (int i = 0; i < buffer.Length; i++) {
-                        buffer[i] = 0;
-                    }
-                }
-                Array.Copy(blockData, mapBytesSent, buffer, 0, chunkSize);
-                byte progress = (byte) (100*mapBytesSent/blockData.Length);
-
-                // write in chunks of 1024 bytes or less
-                writer.Write(OpCode.MapChunk);
-                writer.Write((short) chunkSize);
-                writer.Write(buffer, 0, 1024);
-                writer.Write(progress);
-                BytesSent += 1028;
-                mapBytesSent += chunkSize;
-            }
-
-
+            WriteWorldData(map);
             // Turn off Nagel's algorithm again for LowLatencyMode
             client.NoDelay = ConfigKey.LowLatencyMode.Enabled();
 
@@ -1428,6 +1386,47 @@ namespace fCraft {
             Server.UpdateTabList();
             Server.RequestGC();
             return true;
+        }
+        
+        void WriteWorldData(Map map) {
+        	 // Fetch compressed map copy
+        	byte[] buffer = new byte[1024];
+            int mapBytesSent = 0;
+            byte[] blockData = GetCompressedBlocks(map);
+            Logger.Log(LogType.Debug,
+                        "Player.JoinWorldNow: Sending compressed map ({0} bytes) to {1}.",
+                        blockData.Length, Name);
+
+            // Transfer the map copy
+            while (mapBytesSent < blockData.Length) {
+                int chunkSize = blockData.Length - mapBytesSent;
+                if (chunkSize > 1024) {
+                    chunkSize = 1024;
+                } else {
+                    // CRC fix for ManicDigger
+                    for (int i = 0; i < buffer.Length; i++) {
+                        buffer[i] = 0;
+                    }
+                }
+                Array.Copy(blockData, mapBytesSent, buffer, 0, chunkSize);
+                byte progress = (byte) (100*mapBytesSent/blockData.Length);
+
+                // write in chunks of 1024 bytes or less
+                writer.Write(OpCode.MapChunk);
+                writer.Write((short) chunkSize);
+                writer.Write(buffer, 0, 1024);
+                writer.Write(progress);
+                BytesSent += 1028;
+                mapBytesSent += chunkSize;
+            }
+        }
+        
+        byte[] GetCompressedBlocks(Map map) {
+        	if (Supports(CpeExtension.CustomBlocks))
+        		return map.GetCompressedCopy(map.Blocks);
+        	
+        	byte[] blocks = map.GetFallbackMap();
+        	return Map.MakeCompressedMap(blocks);
         }
         
         void SendJoinMessage(World oldWorld, World newWorld) {

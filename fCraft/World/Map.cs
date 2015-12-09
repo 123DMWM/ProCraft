@@ -958,19 +958,23 @@ namespace fCraft {
         public byte[] GetCompressedCopy(byte[] array) {
             byte[] currentCopy = compressedCopyCache;
             if (currentCopy == null) {
-                using (MemoryStream ms = new MemoryStream()) {
-                    using (GZipStream compressor = new GZipStream(ms, CompressionMode.Compress)) {
-                        // convert block count to big-endian
-                        int convertedBlockCount = IPAddress.HostToNetworkOrder(array.Length);
-                        // write block count to gzip stream
-                        compressor.Write(BitConverter.GetBytes(convertedBlockCount), 0, 4);
-                        compressor.Write(array, 0, array.Length);
-                    }
-                    currentCopy = ms.ToArray();
-                    compressedCopyCache = currentCopy;
-                }
+            	currentCopy = MakeCompressedMap(array);
+                compressedCopyCache = currentCopy;
             }
             return currentCopy;
+        }
+        
+        public static byte[] MakeCompressedMap(byte[] array) {
+        	using (MemoryStream ms = new MemoryStream()) {
+        		using (GZipStream compressor = new GZipStream(ms, CompressionMode.Compress)) {
+        			// convert block count to big-endian
+        			int convertedBlockCount = IPAddress.HostToNetworkOrder(array.Length);
+        			// write block count to gzip stream
+        			compressor.Write(BitConverter.GetBytes(convertedBlockCount), 0, 4);
+        			compressor.Write(array, 0, array.Length);
+        			return ms.ToArray();
+        		}
+        	}
         }
 
         volatile byte[] compressedCopyCache;
