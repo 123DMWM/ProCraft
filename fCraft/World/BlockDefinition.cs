@@ -21,6 +21,20 @@ namespace fCraft {
         
         public byte FallBack; // for non-supporting clients
         
+        public BlockDefinition(byte id, string name, byte collideType, float speed,
+                               byte topTex, byte sideTex, byte bottomTex,
+                               bool blocksLight, byte walkSound, bool fullBright,
+                               byte shape, byte blockDraw, byte fogDensity,
+                               byte fogR, byte fogG, byte fogB, byte fallback) {
+        	
+        	BlockID = id; Name = name; CollideType = collideType;
+        	Speed = speed; TopTex = topTex; SideTex = sideTex;
+        	BottomTex = bottomTex; BlocksLight = blocksLight;
+        	WalkSound = walkSound; FullBright = fullBright;
+        	Shape = shape; BlockDraw = blockDraw; FogDensity = fogDensity;
+        	FogR = fogR; FogG = fogG; FogB = fogB; FallBack = fallback;
+        }
+        
         public Packet MakeDefinePacket() {
             // speed = 2^((raw - 128) / 64);
             // therefore raw = 64log2(speed) + 128

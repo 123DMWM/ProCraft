@@ -1392,14 +1392,14 @@ namespace fCraft {
         	 // Fetch compressed map copy
         	byte[] buffer = new byte[1024];
             int mapBytesSent = 0;
-            byte[] blockData = GetCompressedBlocks(map);
+            byte[] compressed = GetCompressedBlocks(map);
             Logger.Log(LogType.Debug,
                         "Player.JoinWorldNow: Sending compressed map ({0} bytes) to {1}.",
-                        blockData.Length, Name);
+                        compressed.Length, Name);
 
             // Transfer the map copy
-            while (mapBytesSent < blockData.Length) {
-                int chunkSize = blockData.Length - mapBytesSent;
+            while (mapBytesSent < compressed.Length) {
+                int chunkSize = compressed.Length - mapBytesSent;
                 if (chunkSize > 1024) {
                     chunkSize = 1024;
                 } else {
@@ -1408,8 +1408,8 @@ namespace fCraft {
                         buffer[i] = 0;
                     }
                 }
-                Array.Copy(blockData, mapBytesSent, buffer, 0, chunkSize);
-                byte progress = (byte) (100*mapBytesSent/blockData.Length);
+                Array.Copy(compressed, mapBytesSent, buffer, 0, chunkSize);
+                byte progress = (byte) (100*mapBytesSent/compressed.Length);
 
                 // write in chunks of 1024 bytes or less
                 writer.Write(OpCode.MapChunk);

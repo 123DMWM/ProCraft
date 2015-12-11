@@ -971,9 +971,9 @@ namespace fCraft {
         			int convertedBlockCount = IPAddress.HostToNetworkOrder(array.Length);
         			// write block count to gzip stream
         			compressor.Write(BitConverter.GetBytes(convertedBlockCount), 0, 4);
-        			compressor.Write(array, 0, array.Length);
-        			return ms.ToArray();
+        			compressor.Write(array, 0, array.Length);  			
         		}
+        		return ms.ToArray();
         	}
         }
 
