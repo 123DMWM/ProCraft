@@ -7,32 +7,36 @@ namespace fCraft {
 
     public sealed class BlockDefinition {
         
-        public byte BlockID;
-        public string Name;
-        public byte CollideType;
-        public float Speed;
-        public byte TopTex, SideTex, BottomTex;
-        public bool BlocksLight;
-        public byte WalkSound;
-        public bool FullBright;
-        public byte Shape;
-        public byte BlockDraw;
-        public byte FogDensity, FogR, FogG, FogB;
-        
-        public byte FallBack; // for non-supporting clients
+        public byte BlockID { get; set; }
+        public string Name { get; set; }
+        public byte CollideType { get; set; }
+        public float Speed { get; set; }
+        public byte TopTex  { get; set; }
+        public byte SideTex { get; set; } 
+        public byte BottomTex { get; set; }
+        public bool BlocksLight { get; set; }
+        public byte WalkSound { get; set; }
+        public bool FullBright { get; set; }
+        public byte Shape { get; set; }
+        public byte BlockDraw { get; set; }
+        public byte FogDensity { get; set; }
+        public byte FogR { get; set; }
+        public byte FogG { get; set; } 
+        public byte FogB { get; set; }    
+        public byte FallBack { get; set; }
         
         public BlockDefinition(byte id, string name, byte collideType, float speed,
                                byte topTex, byte sideTex, byte bottomTex,
                                bool blocksLight, byte walkSound, bool fullBright,
                                byte shape, byte blockDraw, byte fogDensity,
                                byte fogR, byte fogG, byte fogB, byte fallback) {
-        	
-        	BlockID = id; Name = name; CollideType = collideType;
-        	Speed = speed; TopTex = topTex; SideTex = sideTex;
-        	BottomTex = bottomTex; BlocksLight = blocksLight;
-        	WalkSound = walkSound; FullBright = fullBright;
-        	Shape = shape; BlockDraw = blockDraw; FogDensity = fogDensity;
-        	FogR = fogR; FogG = fogG; FogB = fogB; FallBack = fallback;
+            
+            BlockID = id; Name = name; CollideType = collideType;
+            Speed = speed; TopTex = topTex; SideTex = sideTex;
+            BottomTex = bottomTex; BlocksLight = blocksLight;
+            WalkSound = walkSound; FullBright = fullBright;
+            Shape = shape; BlockDraw = blockDraw; FogDensity = fogDensity;
+            FogR = fogR; FogG = fogG; FogB = fogB; FallBack = fallback;
         }
         
         public Packet MakeDefinePacket() {
@@ -59,27 +63,58 @@ namespace fCraft {
             Map.FallbackBlocks[def.BlockID] = Block.Air;
         }
         
-        public void Serialize(Stream stream) {
-            JsonSerializer.SerializeToStream(this, stream);
-        }
-        
-        public static BlockDefinition Deserialize(Stream stream) {
-            return (BlockDefinition)JsonSerializer.DeserializeFromStream(typeof(BlockDefinition), stream);
-        }
-        
-        public static BlockDefinition Deserialize(string json) {
-            return (BlockDefinition)JsonSerializer.DeserializeFromString(json, typeof(BlockDefinition));
-        }
-        
         public static void SendGlobalDefinitions(Player p) {
-        	for (int i = 0; i < GlobalDefinitions.Length; i++) {
-        		BlockDefinition def = GlobalDefinitions[i];
-        		if (def == null) continue;
-        		
-        		p.Send(def.MakeDefinePacket());
-        		p.Send(Packet.MakeSetBlockPermission(
-        			(Block)def.BlockID, true, true));
-        	}
+            for (int i = 0; i < GlobalDefinitions.Length; i++) {
+                BlockDefinition def = GlobalDefinitions[i];
+                if (def == null) continue;
+                
+                p.Send(def.MakeDefinePacket());
+                p.Send(Packet.MakeSetBlockPermission(
+                    (Block)def.BlockID, true, true));
+            }
+        }
+        
+        const string path = "GlobalBlocks.txt";
+        
+        public static void SaveGlobalDefinitions() {
+            try {
+                SaveGlobal();
+            } catch (Exception ex) {
+                Logger.Log(LogType.Error, "BlockDefinitions.SaveGlobal: " + ex);
+            }
+        }
+        
+        static void SaveGlobal() {
+            using (Stream s = File.Create(path)) {
+                JsonSerializer.SerializeToStream(GlobalDefinitions, s);
+            }
+        }
+        
+        public static void LoadGlobalDefinitions() {
+            if (!File.Exists(path)) return;
+            
+            try {
+                LoadGlobal();
+                for (int i = 0; i < GlobalDefinitions.Length; i++) {
+                    if (GlobalDefinitions[i] == null) 
+                        continue;
+                    // fixup for servicestack not writing out null entries
+                    if (GlobalDefinitions[i].Name == null) {
+                        GlobalDefinitions[i] = null; continue;
+                    }
+                    DefineGlobalBlock(GlobalDefinitions[i]);
+                }
+            } catch (Exception ex) {
+                GlobalDefinitions = new BlockDefinition[256];
+                Logger.Log(LogType.Error, "BlockDefinitions.LoadGlobal: " + ex);
+            }
+        }
+        
+        static void LoadGlobal() {
+            using (Stream s = File.OpenRead("globalblocks.txt")) {
+                GlobalDefinitions = (BlockDefinition[])
+                    JsonSerializer.DeserializeFromStream(typeof(BlockDefinition[]), s);
+            }
         }
     }
 }

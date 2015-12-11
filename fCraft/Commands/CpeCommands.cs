@@ -353,6 +353,7 @@ namespace fCraft {
                     if( p.Supports(CpeExtension.BlockDefinitions))
                        BlockDefinition.SendGlobalDefinitions(p);
                 }
+                BlockDefinition.SaveGlobalDefinitions();
             } catch(Exception ex) {
                 player.Message(ex.ToString());
                 System.Console.WriteLine(ex.ToString());

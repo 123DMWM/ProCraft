@@ -1328,6 +1328,10 @@ namespace fCraft {
 
             writer.Write(OpCode.MapBegin);
             BytesSent++;
+            
+            // needs to be sent before the client receives the map data
+            if (Supports(CpeExtension.BlockDefinitions))
+        	    BlockDefinition.SendGlobalDefinitions(this);
 
             // enable Nagle's algorithm (in case it was turned off by LowLatencyMode)
             // to avoid wasting bandwidth for map transfer
@@ -1423,7 +1427,7 @@ namespace fCraft {
         
         byte[] GetCompressedBlocks(Map map) {
         	bool customBlocks = Supports(CpeExtension.CustomBlocks);
-        	if ( customBlocks && Supports(CpeExtension.BlockDefinitions))
+        	if (customBlocks && Supports(CpeExtension.BlockDefinitions))
         		return map.GetCompressedCopy(map.Blocks);
         	
         	byte[] blocks = customBlocks ? 
@@ -1468,8 +1472,6 @@ namespace fCraft {
         		short edge =  World.EdgeLevel == -1 ? (short)(WorldMap.Height / 2) : World.EdgeLevel;
         		Send(Packet.MakeEnvSetMapAppearance(tex, World.EdgeBlock, World.HorizonBlock, edge));
             }
-        	if (Supports(CpeExtension.BlockDefinitions))
-        	    BlockDefinition.SendGlobalDefinitions(this);
         	
             if (Supports(CpeExtension.EnvColors))
             {
