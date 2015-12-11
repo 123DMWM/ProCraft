@@ -486,7 +486,7 @@ namespace fCraft {
         
         
         [Pure]
-        public static Packet RemoveBlockDefinition(byte blockId) {
+        public static Packet MakeRemoveBlockDefinition(byte blockId) {
             Packet packet = new Packet(OpCode.RemoveBlockDefinition);
             packet.Bytes[1] = blockId;
             return packet;

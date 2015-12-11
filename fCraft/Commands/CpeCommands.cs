@@ -336,9 +336,16 @@ namespace fCraft {
             Handler = GlobalBlockHandler
         };
 
-        static void GlobalBlockHandler( Player player, CommandReader cmd ) {
+        static void GlobalBlockHandler(Player player, CommandReader cmd) {
             try {
                 string name = cmd.Next();
+                if (name == "list") {
+                    GlobalBlockListHandler(player, cmd);
+                    return;
+                } else if (name == "remove" || name == "delete") {
+                    GlobalBlockRemoveHandler(player, cmd);
+                    return;
+                }
                 byte id = byte.Parse(cmd.Next());
                 byte[] args = new byte[15];
                 for (int i = 0; i < 15; i++)
@@ -349,18 +356,90 @@ namespace fCraft {
                     args[2], args[3], args[4], args[5] == 0, args[6], args[7] != 0,
                     args[8], args[9], args[10], args[11], args[12], args[13], args[14]);
                 BlockDefinition.DefineGlobalBlock(def);
-                foreach( Player p in Server.Players ) {
-                    if( p.Supports(CpeExtension.BlockDefinitions))
-                       BlockDefinition.SendGlobalDefinitions(p);
+                foreach (Player p in Server.Players ) {
+                    if (p.Supports(CpeExtension.BlockDefinitions))
+                        BlockDefinition.SendGlobalAdd(player, def);
                 }
                 BlockDefinition.SaveGlobalDefinitions();
-            } catch(Exception ex) {
+            } catch (Exception ex) {
                 player.Message(ex.ToString());
                 System.Console.WriteLine(ex.ToString());
                 player.Message("Ya dun goofed");
             }
         }
         
+        static void GlobalBlockListHandler(Player player, CommandReader cmd) {
+            int offset = 0, index = 0, count = 0;
+            cmd.NextInt( out offset );
+            BlockDefinition[] defs = BlockDefinition.GlobalDefinitions;
+            for( int i = 0; i < defs.Length; i++ ) {
+                BlockDefinition def = defs[i];
+                if (def == null) continue;
+                
+                if (index >= offset) {
+                    count++;
+                    player.Message("&sBlock &h{0} &shas id {1}", def.Name, def.BlockID);
+                    
+                    if(count >= 8) {
+                        player.Message("To see the next set of global definitions, " +
+                                       "type /gb list {0}", offset + 8);
+                        return;
+                    }
+                }
+                index++;
+            }
+        }
+        
+        static void GlobalBlockRemoveHandler(Player player, CommandReader cmd) {
+            int blockId;
+            if (!cmd.NextInt(out blockId)) {
+                player.Message("You must provide a valid block id to remove.");
+                return;
+            }
+            if (blockId <= 0 || blockId > 255) {
+                player.Message("Blockid must be between 1-255");
+                return;
+            }
+            BlockDefinition def = BlockDefinition.GlobalDefinitions[blockId];
+            if (def == null) {
+                player.Message("There is no globally defined custom block with that name.");
+                player.Message("Use \"/gb list\" to see a list of global custom blocks.");
+                return;
+            }
+            BlockDefinition.RemoveGlobalBlock(def);
+             foreach (Player p in Server.Players ) {
+                    if (p.Supports(CpeExtension.BlockDefinitions))
+                        BlockDefinition.SendGlobalRemove(player, def);
+                }
+            player.Message("Note: Players will need to rejoin worlds to see changes.");
+        }
+        
+        static string[][] globalBlockSteps = new [] {
+            new [] { "&sEnter the numerical block id of the block (1-255)",
+                "&sNumbers between 1-127 will redefine standard blocks." },
+            new [] { "&sEnter the name of the block. You can include spaces." },
+            new [] { "&sEnter the solidity of the block (0-2.)",
+                "&s0 = walk through(air), 1 = swim through (water), 2 = solid" },
+            new [] { "&sEnter the movement speed of the new block(0.25-3.96)" },
+            new [] { "&sEnter the terrain.png index for the top texture. (0-255)" },
+            new [] { "&sEnter the terrain.png index for the sides texture. (0-255)" },
+            new [] { "&sEnter the terrain.png index for the bottom texture. (0-255)" },
+            new [] { "&sEnter whether the block prevents sunlight from passing though." },
+            new [] { "&sEnter the walk sound index of the block. (0-11)" },
+            new [] { "&sEnter whether the block is fully bright (e.g. lava)" },
+            new [] { "&sEnter the shape of the block (0-3)",
+                "&s0 = cube, 1 = slab, 2 = snow, 3 = sprites (e.g. roses)" },
+            new [] { "&sEnter the block draw type of this block (0-3)",
+                "&s0 = solid/opaque, 1 = transparent (like grass)",
+                "&s2 = transparent (like leaves), 3 = translucent (like water)" },
+            new [] { "Enter the density of the fog for the block (0-255)",
+                "0 is treated as no fog, 255 is thickest fog." },
+            new [] { "Enter the red component of the fog colour (0-255)" },
+            new [] { "Enter the green component of the fog colour (0-255)" },
+            new [] { "Enter the blue component of the fog colour (0-255)" },
+            new [] { "Enter the fallback block for this block",
+                "This block is shown to clients that don't support BlockDefinitions." },
+        };
         #endregion
     }
 }

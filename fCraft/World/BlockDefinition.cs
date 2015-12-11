@@ -39,27 +39,23 @@ namespace fCraft {
             FogR = fogR; FogG = fogG; FogB = fogB; FallBack = fallback;
         }
         
-        public Packet MakeDefinePacket() {
-            // speed = 2^((raw - 128) / 64);
-            // therefore raw = 64log2(speed) + 128
-            byte rawSpeed = (byte)(64 * Math.Log(Speed, 2) + 128);
-            return Packet.MakeDefineBlock(
-                BlockID, Name, CollideType, rawSpeed, TopTex, SideTex, BottomTex,
-                BlocksLight, WalkSound, FullBright, Shape, BlockDraw,
-                FogDensity, FogR, FogG, FogB);
-        }
-        
         public static BlockDefinition[] GlobalDefinitions = new BlockDefinition[256];
         
         public static void DefineGlobalBlock(BlockDefinition def) {
+            string name = def.Name.ToLower().Replace(" ", "");         
+            Map.BlockNames[name] = (Block)def.BlockID;
+            Map.BlockNames[def.BlockID.ToString()] = (Block)def.BlockID;
+            
             GlobalDefinitions[def.BlockID] = def;
-            Map.BlockNames[def.Name] = (Block)def.BlockID;
             Map.FallbackBlocks[def.BlockID] = (Block)def.FallBack;
         }
         
         public static void RemoveGlobalBlock(BlockDefinition def) {
+            string name = def.Name.ToLower().Replace(" ", "");         
+            Map.BlockNames.Remove(name);
+            Map.BlockNames.Remove(def.BlockID.ToString());
+            
             GlobalDefinitions[def.BlockID] = null;
-            Map.BlockNames.Remove(def.Name);
             Map.FallbackBlocks[def.BlockID] = Block.Air;
         }
         
@@ -73,6 +69,26 @@ namespace fCraft {
                     (Block)def.BlockID, true, true));
             }
         }
+        
+         public static void SendGlobalAdd(Player p, BlockDefinition def) {
+            p.Send(def.MakeDefinePacket());
+            p.Send(Packet.MakeSetBlockPermission((Block)def.BlockID, true, true));
+        }
+        
+        public static void SendGlobalRemove(Player p, BlockDefinition def) {
+            p.Send(Packet.MakeRemoveBlockDefinition(def.BlockID));
+        }
+        
+        Packet MakeDefinePacket() {
+            // speed = 2^((raw - 128) / 64);
+            // therefore raw = 64log2(speed) + 128
+            byte rawSpeed = (byte)(64 * Math.Log(Speed, 2) + 128);
+            return Packet.MakeDefineBlock(
+                BlockID, Name, CollideType, rawSpeed, TopTex, SideTex, BottomTex,
+                BlocksLight, WalkSound, FullBright, Shape, BlockDraw,
+                FogDensity, FogR, FogG, FogB);
+        }
+        
         
         const string path = "GlobalBlocks.txt";
         
