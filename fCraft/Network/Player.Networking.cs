@@ -1422,10 +1422,12 @@ namespace fCraft {
         }
         
         byte[] GetCompressedBlocks(Map map) {
-        	if (Supports(CpeExtension.CustomBlocks))
+        	bool customBlocks = Supports(CpeExtension.CustomBlocks);
+        	if ( customBlocks && Supports(CpeExtension.BlockDefinitions))
         		return map.GetCompressedCopy(map.Blocks);
         	
-        	byte[] blocks = map.GetFallbackMap();
+        	byte[] blocks = customBlocks ? 
+        		map.GetCPEFallbackMap() : map.GetFallbackMap();
         	return Map.MakeCompressedMap(blocks);
         }
         

@@ -68,8 +68,7 @@ namespace fCraft {
         }
 
 
-        public static Block GetFallbackBlock(Block block)
-        {
+        public static Block GetFallbackBlock(Block block) {
             return FallbackBlocks[(int)block];
         }
 
@@ -81,6 +80,20 @@ namespace fCraft {
                 for (int i = 0; i < volume; i++) {
                     byte block = ptr[i];
                     if (block > (byte) MaxLegalBlockType) {
+                        ptr[i] = (byte) FallbackBlocks[block];
+                    }
+                }
+            }
+            return translatedBlocks;
+        }
+        
+        public unsafe byte[] GetCPEFallbackMap() {
+            byte[] translatedBlocks = (byte[]) Blocks.Clone();
+            int volume = translatedBlocks.Length;
+            fixed (byte* ptr = translatedBlocks) {
+                for (int i = 0; i < volume; i++) {
+                    byte block = ptr[i];
+                    if (block > (byte) MaxCustomBlockType) {
                         ptr[i] = (byte) FallbackBlocks[block];
                     }
                 }

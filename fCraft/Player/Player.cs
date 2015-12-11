@@ -2445,7 +2445,13 @@ namespace fCraft {
 
         // For non-extended players, use appropriate substitution
         public Packet ProcessOutgoingSetBlock(Packet packet) {
-            if (packet.Bytes[7] > (byte) Map.MaxLegalBlockType && !this.Supports(CpeExtension.CustomBlocks)) {
+        	bool supportsCustomBlocks = Supports(CpeExtension.CustomBlocks);
+        	bool supportsDefinitions = Supports(CpeExtension.BlockDefinitions);
+        	
+        	if (packet.Bytes[7] > (byte) Map.MaxCustomBlockType && !supportsDefinitions) {
+                packet.Bytes[7] = (byte) Map.GetFallbackBlock((Block) packet.Bytes[7]);
+            }
+        	if (packet.Bytes[7] > (byte) Map.MaxLegalBlockType && !supportsCustomBlocks) {
                 packet.Bytes[7] = (byte) Map.GetFallbackBlock((Block) packet.Bytes[7]);
             }
             return packet;
