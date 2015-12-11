@@ -139,15 +139,9 @@ namespace fCraft {
         public DateTime LastWarnedPortal;
         public bool PortalsEnabled = true;
         public readonly object PortalLock = new object();
-
-        /// <summary> Has player been warned by the DEFCCON system? </summary>
-        public bool Warned { get; set; }
-        /// <summary> How Many Blocks player has placed this session. </summary>
-        public bool SecurityTrip { get; set; }
-
-
-        /// <summary> Set if Player has trace on. </summary>
-        public bool HasTrace { get; set; }
+        // GlobalBlocks
+        internal int currentGBStep = -1;
+        internal BlockDefinition currentGB;
 
         /// <summary> The world that the player is currently on. May be null.
         /// Use .JoinWorld() to make players teleport to another world. </summary>

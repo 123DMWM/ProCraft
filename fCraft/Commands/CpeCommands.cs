@@ -1,5 +1,6 @@
 ﻿// ProCraft Copyright 2014-2015 Joseph Beauvais <123DMWM@gmail.com>
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace fCraft {
@@ -327,45 +328,79 @@ namespace fCraft {
 
         static readonly CommandDescriptor CdGlobalBlock = new CommandDescriptor {
             Name = "GlobalBlock",
-            Aliases = new string[] { "Global", "GB" },
+            Aliases = new string[] { "global", "gb" },
             Category = CommandCategory.World,
             IsConsoleSafe = true,
             Permissions = new[] { Permission.ManageWorlds },
-            Usage = "/GlobalBlock [name] [id] [args] [fallback]",
-            Help = "Good luck buddy!",
+            Usage = "/gb <type/value> <args>",
+            Help = "&sModifies the global custom blocks, or prints information about them.&n" +
+                "&sTypes are: add, abort, list, remove&n" +
+                "&sSee &h/help gb <type>&s for details about each type.",
+            HelpSections = new Dictionary<string, string>{
+                { "add",     "&h/gb add [id]&n" +
+                        "&sBegins the process of defining a global custom block with the given block id." },
+                { "abort",   "&h/gb abort&n" +
+                        "&sAborts the custom block that was currently in the process of being " +
+                        "defined from the last /gb add call." },
+                { "list",    "&h/gb list [offset]&n" +
+                        "&sPrints a list of the names of the global custom blocks, " +
+                        "along with their corresponding block ids. " },
+                { "remove",  "&h/gb remove [id]&n" +
+                        "&sRemoves the global custom block associated which has the numerical block id." },
+            },
             Handler = GlobalBlockHandler
         };
 
         static void GlobalBlockHandler(Player player, CommandReader cmd) {
-            try {
-                string name = cmd.Next();
-                if (name == "list") {
-                    GlobalBlockListHandler(player, cmd);
-                    return;
-                } else if (name == "remove" || name == "delete") {
-                    GlobalBlockRemoveHandler(player, cmd);
-                    return;
+        	string opt = cmd.Next();
+        	if (opt != null ) 
+        		opt = opt.ToLower();
+        	
+            if (opt == "add") {
+                GlobalBlockAddHandler(player, cmd);
+            } else if (opt == "abort") {
+                if (player.currentGB == null ) {
+                    player.Message("You do not have a global custom block definition currently being created.");
+                } else {
+                    player.currentGB = null;
+                    player.currentGBStep = -1;
+                    player.Message("Discarded the global custom block definition that was being created.");
                 }
-                byte id = byte.Parse(cmd.Next());
-                byte[] args = new byte[15];
-                for (int i = 0; i < 15; i++)
-                    args[i] = byte.Parse(cmd.Next());
-                
-                BlockDefinition def = new BlockDefinition(
-                    id, name, args[0], (float)Math.Pow(2, (args[1] - 128) / 64f),
-                    args[2], args[3], args[4], args[5] == 0, args[6], args[7] != 0,
-                    args[8], args[9], args[10], args[11], args[12], args[13], args[14]);
-                BlockDefinition.DefineGlobalBlock(def);
-                foreach (Player p in Server.Players ) {
-                    if (p.Supports(CpeExtension.BlockDefinitions))
-                        BlockDefinition.SendGlobalAdd(player, def);
-                }
-                BlockDefinition.SaveGlobalDefinitions();
-            } catch (Exception ex) {
-                player.Message(ex.ToString());
-                System.Console.WriteLine(ex.ToString());
-                player.Message("Ya dun goofed");
+            } else if (opt == "list") {
+                GlobalBlockListHandler(player, cmd);
+            } else if (opt == "remove" || opt == "delete") {
+                GlobalBlockRemoveHandler(player, cmd);
+            } else {
+        		if (player.currentGB != null) {
+        			cmd.Rewind();
+        			GlobalBlockDefineHandler(player, cmd.NextAll());
+        		} else {
+                	CdGlobalBlock.PrintUsage(player);
+        		}
             }
+        }
+        
+        static void GlobalBlockAddHandler(Player player, CommandReader cmd) {
+            int blockId = 0;
+            if (!CheckBlockId(player, cmd, out blockId))
+                return;
+            
+            BlockDefinition def = BlockDefinition.GlobalDefinitions[blockId];
+            if (def != null) {
+                player.Message("There is already a globally defined custom block with that block id.");
+                player.Message("Use \"/gb remove\" this block first.");
+                player.Message("Use \"/gb list\" to see a list of global custom blocks.");
+                return;
+            }
+            
+            player.currentGB = new BlockDefinition();
+            player.currentGB.BlockID = (byte)blockId;
+            player.Message("&hFrom now on, use /gb [value] to enter arguments.");
+            player.Message("&hYou can abort the currently partially " +
+                           "created custom block at any time by typing \"gb abort\"");
+            
+            player.currentGBStep = 0;
+            PrintStepHelp(player);
         }
         
         static void GlobalBlockListHandler(Player player, CommandReader cmd) {
@@ -391,55 +426,168 @@ namespace fCraft {
         }
         
         static void GlobalBlockRemoveHandler(Player player, CommandReader cmd) {
-            int blockId;
-            if (!cmd.NextInt(out blockId)) {
-                player.Message("You must provide a valid block id to remove.");
+            int blockId = 0;
+            if (!CheckBlockId(player, cmd, out blockId))
                 return;
-            }
-            if (blockId <= 0 || blockId > 255) {
-                player.Message("Blockid must be between 1-255");
-                return;
-            }
+            
             BlockDefinition def = BlockDefinition.GlobalDefinitions[blockId];
             if (def == null) {
-                player.Message("There is no globally defined custom block with that name.");
+                player.Message("There is no globally defined custom block with that block id.");
                 player.Message("Use \"/gb list\" to see a list of global custom blocks.");
                 return;
             }
+            
             BlockDefinition.RemoveGlobalBlock(def);
-             foreach (Player p in Server.Players ) {
-                    if (p.Supports(CpeExtension.BlockDefinitions))
-                        BlockDefinition.SendGlobalRemove(player, def);
-                }
+            foreach (Player p in Server.Players ) {
+                if (p.Supports(CpeExtension.BlockDefinitions))
+                    BlockDefinition.SendGlobalRemove(player, def);
+            }
+            BlockDefinition.SaveGlobalDefinitions();
             player.Message("Note: Players will need to rejoin worlds to see changes.");
         }
         
+        static void GlobalBlockDefineHandler(Player player, string args) {         
+            // print the current step help if no args given
+            if (String.IsNullOrWhiteSpace(args)) {
+                PrintStepHelp(player); return;
+            }
+            
+            BlockDefinition def = player.currentGB;
+            int step = player.currentGBStep;
+            byte value = 0; // as we can't pass properties by reference, make a temp var.
+            bool boolVal = true;
+            
+            if (step == 0) {          
+                step++;  def.Name = args;
+            } else if (step == 1) {
+                if (Byte.TryParse(args, out value) && value <= 2) {
+                    step++; def.CollideType = value;
+                }
+            } else if (step == 2) {
+                float speed;
+                if (Single.TryParse(args, out speed) 
+                    && speed >= 0.25f && value <= 3.96f) {
+                    step++; def.Speed = speed;
+                }
+            } else if (step == 3) {
+                if (Byte.TryParse(args, out value)) {
+                    step++; def.TopTex = value;
+                }
+            } else if (step == 4) {
+                if (Byte.TryParse(args, out value)) {
+                    step++; def.SideTex = value;
+                }
+            } else if (step == 5) {
+                if (Byte.TryParse(args, out value)) {
+                    step++; def.BottomTex = value;
+                }
+            } else if (step == 6) {
+                if (Boolean.TryParse(args, out boolVal)) {
+                    step++; def.BlocksLight = boolVal;
+                }
+            } else if (step == 7) {
+                if (Byte.TryParse(args, out value) && value <= 11) {
+                    step++; def.WalkSound = value;
+                }
+            } else if (step == 8) {
+                if (Boolean.TryParse(args, out boolVal)) {
+                    step++; def.FullBright = boolVal;
+                }
+            } else if (step == 9) {
+                if (Byte.TryParse(args, out value) && value >= 1 && value <= 4) {
+                    step++; def.Shape = value;
+                }
+            } else if (step == 10) {
+                if (Byte.TryParse(args, out value) && value <= 4) {
+                    step++; def.BlockDraw = value;
+                }
+            } else if (step == 11) {
+                if (Byte.TryParse(args, out value)) {
+                    def.FogDensity = value;
+                    step += value == 0 ? 4 : 1;
+                }
+            } else if (step == 12) {
+                if (Byte.TryParse(args, out value)) {
+                    step++; def.FogR = value;
+                }
+            } else if (step == 13) {
+                if (Byte.TryParse(args, out value)) {
+                    step++; def.FogG = value;
+                }
+            } else if (step == 14) {
+                if (Byte.TryParse(args, out value)) {
+                    step++; def.FogB = value;
+                }
+            } else {
+                if (Byte.TryParse(args, out value)) {
+                    if (value > (byte)Map.MaxCustomBlockType) {
+                        player.Message("The fallback block must be an original block, " +
+                                       "or a block defined in the CustomBlocks extension.");
+                    }
+                    def.FallBack = value;
+                    BlockDefinition.DefineGlobalBlock(def);
+                    
+                    foreach (Player p in Server.Players ) {
+                        if (p.Supports(CpeExtension.BlockDefinitions))
+                            BlockDefinition.SendGlobalAdd(player, def);
+                    }
+                    
+                    player.Message("&sCreated a new global custom block " +
+                                   "&h{0} &swith id {1}", def.Name, def.BlockID);
+                    player.currentGBStep = -1;
+                    player.currentGB = null;
+                    return;
+                }
+            }
+            player.currentGBStep = step;
+            PrintStepHelp(player);
+        }
+        
+        static bool CheckBlockId(Player player, CommandReader cmd, out int blockId) {
+            if (!cmd.NextInt(out blockId)) {
+                player.Message("Provided block id is not a number.");
+                return false;
+            }
+            
+            if (blockId <= 0 || blockId > 255) {
+                player.Message("Block id must be between 1-255");
+                return false;
+            }
+            return true;
+        }
+        
+        static void PrintStepHelp(Player p) {
+            string[] help = globalBlockSteps[p.currentGBStep];
+            foreach (string m in help)
+                p.Message(m);
+        }
+        
         static string[][] globalBlockSteps = new [] {
-            new [] { "&sEnter the numerical block id of the block (1-255)",
-                "&sNumbers between 1-127 will redefine standard blocks." },
             new [] { "&sEnter the name of the block. You can include spaces." },
-            new [] { "&sEnter the solidity of the block (0-2.)",
+            new [] { "&sEnter the solidity of the block (0-2)",
                 "&s0 = walk through(air), 1 = swim through (water), 2 = solid" },
-            new [] { "&sEnter the movement speed of the new block(0.25-3.96)" },
+            new [] { "&sEnter the movement speed of the new block. (0.25-3.96)" },
             new [] { "&sEnter the terrain.png index for the top texture. (0-255)" },
             new [] { "&sEnter the terrain.png index for the sides texture. (0-255)" },
             new [] { "&sEnter the terrain.png index for the bottom texture. (0-255)" },
-            new [] { "&sEnter whether the block prevents sunlight from passing though." },
+            new [] { "&sEnter whether the block prevents sunlight from passing though. (true or false)" },
             new [] { "&sEnter the walk sound index of the block. (0-11)" },
-            new [] { "&sEnter whether the block is fully bright (e.g. lava)" },
-            new [] { "&sEnter the shape of the block (0-3)",
-                "&s0 = cube, 1 = slab, 2 = snow, 3 = sprites (e.g. roses)" },
-            new [] { "&sEnter the block draw type of this block (0-3)",
-                "&s0 = solid/opaque, 1 = transparent (like grass)",
-                "&s2 = transparent (like leaves), 3 = translucent (like water)" },
-            new [] { "Enter the density of the fog for the block (0-255)",
+            new [] { "&sEnter whether the block is fully bright (i.e. like lava). (true or false)" },
+            new [] { "&sEnter the shape of the block. (1-4)",
+                "&s1 = cube, 2 = slab, 3 = snow, 4 = sprites (e.g. roses)" },
+            new [] { "&sEnter the block draw type of this block. (0-4)",
+                "&s0 = solid/opaque, 1 = transparent (like glass)",
+                "&s2 = transparent (like leaves), 3 = translucent (like water)",
+                "&s4 = gas (like air)" },
+            new [] { "Enter the density of the fog for the block. (0-255)",
                 "0 is treated as no fog, 255 is thickest fog." },
-            new [] { "Enter the red component of the fog colour (0-255)" },
-            new [] { "Enter the green component of the fog colour (0-255)" },
-            new [] { "Enter the blue component of the fog colour (0-255)" },
-            new [] { "Enter the fallback block for this block",
+            new [] { "Enter the red component of the fog colour. (0-255)" },
+            new [] { "Enter the green component of the fog colour. (0-255)" },
+            new [] { "Enter the blue component of the fog colour. (0-255)" },
+            new [] { "Enter the numerical fallback block id for this block.",
                 "This block is shown to clients that don't support BlockDefinitions." },
         };
+            
         #endregion
     }
 }

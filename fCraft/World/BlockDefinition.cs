@@ -25,6 +25,8 @@ namespace fCraft {
         public byte FogB { get; set; }    
         public byte FallBack { get; set; }
         
+        public BlockDefinition() { }
+        
         public BlockDefinition(byte id, string name, byte collideType, float speed,
                                byte topTex, byte sideTex, byte bottomTex,
                                bool blocksLight, byte walkSound, bool fullBright,
