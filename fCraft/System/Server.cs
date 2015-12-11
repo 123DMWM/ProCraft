@@ -578,7 +578,7 @@ namespace fCraft {
                             string nameString = entityData[0];
                             string skinString = entityData[1];
                             string modelString = entityData[2];
-                            if (!ModerationCommands.validEntities.Contains(modelString)) {
+                            if (!CpeCommands.validEntities.Contains(modelString)) {
                                 Block block;
                                 if (Map.GetBlockByName(modelString, false, out block)) {
                                     modelString = block.GetHashCode().ToString();
