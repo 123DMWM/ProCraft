@@ -139,15 +139,9 @@ namespace fCraft {
         public DateTime LastWarnedPortal;
         public bool PortalsEnabled = true;
         public readonly object PortalLock = new object();
-
-        /// <summary> Has player been warned by the DEFCCON system? </summary>
-        public bool Warned { get; set; }
-        /// <summary> How Many Blocks player has placed this session. </summary>
-        public bool SecurityTrip { get; set; }
-
-
-        /// <summary> Set if Player has trace on. </summary>
-        public bool HasTrace { get; set; }
+        // GlobalBlocks
+        internal int currentGBStep = -1;
+        internal BlockDefinition currentGB;
 
         /// <summary> The world that the player is currently on. May be null.
         /// Use .JoinWorld() to make players teleport to another world. </summary>
@@ -1414,7 +1408,7 @@ namespace fCraft {
 
         #region Binding
 
-        readonly Block[] bindings = new Block[67];
+        readonly Block[] bindings = new Block[256];
 
         public void Bind( Block type, Block replacement ) {
             bindings[(byte)type] = replacement;
@@ -1436,11 +1430,9 @@ namespace fCraft {
         }
 
         public void ResetAllBinds() {
-            foreach( Block block in Enum.GetValues( typeof( Block ) ) ) {
-                if( block != Block.None ) {
-                    ResetBind( block );
-                }
-            }
+        	for( int block = 0; block < 255; block++) {
+        		ResetBind( (Block)block );
+        	}
         }
 
         #endregion
@@ -2237,8 +2229,10 @@ namespace fCraft {
         const int PlayerClickExtVersion = 1;
         const string LongerMessagesExtName = "LongerMessages";
         const int LongerMessagesExtVersion = 1;
-        const string FullCPFoTreeSevunExtName = "FullCP437";
-        const int FullCPFoTreeSevunExtVersion = 1;
+        const string FullCP437ExtName = "FullCP437";
+        const int FullCP437ExtVersion = 1;
+        const string BlockDefinitionsExtName = "BlockDefinitions";
+        const int BlockDefinitionsExtVersion = 1;
 
 
         public bool Supports(CpeExtension extension) {
@@ -2250,25 +2244,32 @@ namespace fCraft {
         bool NegotiateProtocolExtension()
         {
             // write our ExtInfo and ExtEntry packets
-            writer.Write(Packet.MakeExtInfo("ProCraft", 18).Bytes);
+            writer.Write(Packet.MakeExtInfo("ProCraft", 19).Bytes);
             writer.Write(Packet.MakeExtEntry(ClickDistanceExtName, ClickDistanceExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(CustomBlocksExtName, CustomBlocksExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(HeldBlockExtName, HeldBlockExtVersion).Bytes);
+            
             writer.Write(Packet.MakeExtEntry(TextHotKeyExtName, TextHotKeyExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(ExtPlayerListExtName, ExtPlayerListExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(EnvColorsExtName, EnvColorsExtVersion).Bytes);
+            
             writer.Write(Packet.MakeExtEntry(SelectionCuboidExtName, SelectionCuboidExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(BlockPermissionsExtName, BlockPermissionsExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(ChangeModelExtName, ChangeModelExtVersion).Bytes);
+            
             writer.Write(Packet.MakeExtEntry(EnvMapAppearanceExtName, EnvMapAppearanceExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(EnvWeatherTypeExtName, EnvWeatherTypeExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(HackControlExtName, HackControlExtVersion).Bytes);
+            
             writer.Write(Packet.MakeExtEntry(ExtPlayerListExtName, ExtPlayerList2ExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(PlayerClickExtName, PlayerClickExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(MessageTypesExtName, MessageTypesExtVersion).Bytes);
+            
             writer.Write(Packet.MakeExtEntry(EmoteFixExtName, EmoteFixExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(LongerMessagesExtName, LongerMessagesExtVersion).Bytes);
-            writer.Write(Packet.MakeExtEntry(FullCPFoTreeSevunExtName, FullCPFoTreeSevunExtVersion).Bytes);
+            writer.Write(Packet.MakeExtEntry(FullCP437ExtName, FullCP437ExtVersion).Bytes);
+            
+            writer.Write(Packet.MakeExtEntry(BlockDefinitionsExtName, BlockDefinitionsExtVersion).Bytes);
 
             // Expect ExtInfo reply from the client
             OpCode extInfoReply = reader.ReadOpCode();
@@ -2383,9 +2384,14 @@ namespace fCraft {
                             addedExt = CpeExtension.LongerMessages;
                         }
                         break;
-                    case FullCPFoTreeSevunExtName:
-                        if (extVersion == FullCPFoTreeSevunExtVersion) {
+                    case FullCP437ExtName:
+                        if (extVersion == FullCP437ExtVersion) {
                             addedExt = CpeExtension.FullCP437;
+                        }
+                        break;
+                    case BlockDefinitionsExtName:
+                        if (extVersion == BlockDefinitionsExtVersion) {
+                        	addedExt = CpeExtension.BlockDefinitions;
                         }
                         break;
                     default:
@@ -2433,7 +2439,13 @@ namespace fCraft {
 
         // For non-extended players, use appropriate substitution
         public Packet ProcessOutgoingSetBlock(Packet packet) {
-            if (packet.Bytes[7] > (byte) Map.MaxLegalBlockType && !this.Supports(CpeExtension.CustomBlocks)) {
+        	bool supportsCustomBlocks = Supports(CpeExtension.CustomBlocks);
+        	bool supportsDefinitions = Supports(CpeExtension.BlockDefinitions);
+        	
+        	if (packet.Bytes[7] > (byte) Map.MaxCustomBlockType && !supportsDefinitions) {
+                packet.Bytes[7] = (byte) Map.GetFallbackBlock((Block) packet.Bytes[7]);
+            }
+        	if (packet.Bytes[7] > (byte) Map.MaxLegalBlockType && !supportsCustomBlocks) {
                 packet.Bytes[7] = (byte) Map.GetFallbackBlock((Block) packet.Bytes[7]);
             }
             return packet;

@@ -128,9 +128,6 @@ namespace fCraft.MapConversion {
                 using( GZipStream decompressor = new GZipStream( mapStream, CompressionMode.Decompress ) ) {
                     decompressor.Read( map.Blocks, 0, map.Blocks.Length );
                 }
-
-                map.RemoveUnknownBlocktypes();
-
                 return map;
             }
         }

@@ -149,7 +149,6 @@ namespace fCraft.MapConversion {
                     }
                     map.Blocks = new byte[map.Volume];
                     ds.Read( map.Blocks, 0, map.Blocks.Length );
-                    map.RemoveUnknownBlocktypes();
                 }
                 return map;
             }

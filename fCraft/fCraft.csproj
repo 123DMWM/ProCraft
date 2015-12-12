@@ -117,6 +117,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\CpeCommands.cs" />
     <Compile Include="Commands\NewFolder1\EqualityDrawOperation.cs" />
     <Compile Include="Commands\NewFolder1\Expression.cs" />
     <Compile Include="Commands\NewFolder1\FeedData.cs" />
@@ -177,7 +178,6 @@
     <Compile Include="Portals\PortalException.cs" />
     <Compile Include="Portals\PortalHandler.cs" />
     <Compile Include="Portals\PortalRange.cs" />
-    <Compile Include="System\Fallback.cs" />
     <Compile Include="System\Utils\BitMap3D.cs" />
     <Compile Include="System\Utils\Direction.cs" />
     <Compile Include="System\Utils\Paths.cs" />
@@ -229,6 +229,7 @@
     <Compile Include="System\Utils\Trie.cs" />
     <Compile Include="Player\Position.cs" />
     <Compile Include="World\Block.cs" />
+    <Compile Include="World\BlockDefinition.cs" />
     <Compile Include="World\BlockUpdate.cs" />
     <Compile Include="World\Forester.cs" />
     <Compile Include="World\Map.cs" />

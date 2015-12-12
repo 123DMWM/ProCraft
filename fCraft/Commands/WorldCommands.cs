@@ -1830,7 +1830,6 @@ namespace fCraft {
         static void rejoinHandler(Player player, CommandReader cmd)
         {
             player.JoinWorld(player.World, WorldChangeReason.Rejoin, player.Position);
-            return;
         }
 
         #endregion

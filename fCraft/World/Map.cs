@@ -41,7 +41,7 @@ namespace fCraft {
         public const Block MaxLegalBlockType = Block.Obsidian; //Highest block before CPE
 
         public const Block MaxCustomBlockType = Block.StoneBrick;
-        readonly static Block[] FallbackBlocks = new Block[256];
+        internal readonly static Block[] FallbackBlocks = new Block[256];
 
         static void DefineFallbackBlocks()
         {
@@ -68,8 +68,7 @@ namespace fCraft {
         }
 
 
-        public static Block GetFallbackBlock(Block block)
-        {
+        public static Block GetFallbackBlock(Block block) {
             return FallbackBlocks[(int)block];
         }
 
@@ -81,6 +80,20 @@ namespace fCraft {
                 for (int i = 0; i < volume; i++) {
                     byte block = ptr[i];
                     if (block > (byte) MaxLegalBlockType) {
+                        ptr[i] = (byte) FallbackBlocks[block];
+                    }
+                }
+            }
+            return translatedBlocks;
+        }
+        
+        public unsafe byte[] GetCPEFallbackMap() {
+            byte[] translatedBlocks = (byte[]) Blocks.Clone();
+            int volume = translatedBlocks.Length;
+            fixed (byte* ptr = translatedBlocks) {
+                for (int i = 0; i < volume; i++) {
+                    byte block = ptr[i];
+                    if (block > (byte) MaxCustomBlockType) {
                         ptr[i] = (byte) FallbackBlocks[block];
                     }
                 }
@@ -621,7 +634,7 @@ namespace fCraft {
         }
 
 
-        static readonly Dictionary<string, Block> BlockNames = new Dictionary<string, Block>();
+        internal static readonly Dictionary<string, Block> BlockNames = new Dictionary<string, Block>();
         static readonly Dictionary<Block, string> BlockEdgeTextures = new Dictionary<Block, string>();
 
         static Map() {
@@ -958,19 +971,23 @@ namespace fCraft {
         public byte[] GetCompressedCopy(byte[] array) {
             byte[] currentCopy = compressedCopyCache;
             if (currentCopy == null) {
-                using (MemoryStream ms = new MemoryStream()) {
-                    using (GZipStream compressor = new GZipStream(ms, CompressionMode.Compress)) {
-                        // convert block count to big-endian
-                        int convertedBlockCount = IPAddress.HostToNetworkOrder(array.Length);
-                        // write block count to gzip stream
-                        compressor.Write(BitConverter.GetBytes(convertedBlockCount), 0, 4);
-                        compressor.Write(array, 0, array.Length);
-                    }
-                    currentCopy = ms.ToArray();
-                    compressedCopyCache = currentCopy;
-                }
+            	currentCopy = MakeCompressedMap(array);
+                compressedCopyCache = currentCopy;
             }
             return currentCopy;
+        }
+        
+        public static byte[] MakeCompressedMap(byte[] array) {
+        	using (MemoryStream ms = new MemoryStream()) {
+        		using (GZipStream compressor = new GZipStream(ms, CompressionMode.Compress)) {
+        			// convert block count to big-endian
+        			int convertedBlockCount = IPAddress.HostToNetworkOrder(array.Length);
+        			// write block count to gzip stream
+        			compressor.Write(BitConverter.GetBytes(convertedBlockCount), 0, 4);
+        			compressor.Write(array, 0, array.Length);  			
+        		}
+        		return ms.ToArray();
+        	}
         }
 
         volatile byte[] compressedCopyCache;

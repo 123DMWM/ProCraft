@@ -70,7 +70,10 @@ namespace fCraft
         LongerMessages,
 
         /// <summary> This extension lets the player send characters from Code Page 437 </summary>
-        FullCP437
+        FullCP437,
+        
+        /// <summary> This extension lets users define their own custom blocks. </summary>
+        BlockDefinitions,
     }
 
 

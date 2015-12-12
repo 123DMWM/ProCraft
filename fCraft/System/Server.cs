@@ -578,7 +578,7 @@ namespace fCraft {
                             string nameString = entityData[0];
                             string skinString = entityData[1];
                             string modelString = entityData[2];
-                            if (!ModerationCommands.validEntities.Contains(modelString)) {
+                            if (!CpeCommands.validEntities.Contains(modelString)) {
                                 Block block;
                                 if (Map.GetBlockByName(modelString, false, out block)) {
                                     modelString = block.GetHashCode().ToString();
@@ -658,6 +658,7 @@ namespace fCraft {
 
             PortalHandler.GetInstance();
             PortalDB.Load();
+            BlockDefinition.LoadGlobalDefinitions();
 
             // garbage collection (every 60s)
             gcTask = Scheduler.NewTask( DoGC ).RunForever( GCInterval, TimeSpan.FromSeconds( 45 ) );
@@ -677,7 +678,7 @@ namespace fCraft {
                 Shutdown( new ShutdownParams( ShutdownReason.RestartTimer, restartIn, true ), false );
                 ChatTimer.Start( restartIn, "Automatic Server Restart", Player.Console.Name );
             }
-
+           
             // start the main loop - server is now connectible
             Scheduler.Start();
             IsRunning = true;
