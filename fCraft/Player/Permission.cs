@@ -182,6 +182,9 @@ namespace fCraft {
         ChangeNameColor,
 
         /// <summary> Ability to use the bot function</summary>
-        UseBot
+        UseBot,
+        
+        /// <summary> Ability to define and modify custom global blocks. </summary>
+        DefineCustomBlocks,
     }
 }

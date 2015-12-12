@@ -331,7 +331,7 @@ namespace fCraft {
             Aliases = new string[] { "global", "gb" },
             Category = CommandCategory.World,
             IsConsoleSafe = true,
-            Permissions = new[] { Permission.ManageWorlds },
+            Permissions = new[] { Permission.DefineCustomBlocks },
             Usage = "/gb <type/value> <args>",
             Help = "&sModifies the global custom blocks, or prints information about them.&n" +
                 "&sTypes are: add, abort, list, remove&n" +
