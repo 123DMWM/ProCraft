@@ -357,7 +357,10 @@ namespace fCraft {
         		opt = opt.ToLower();
         	
             if (opt == "add") {
-                GlobalBlockAddHandler(player, cmd);
+        		if (player.currentGB != null)
+        			GlobalBlockDefineHandler(player, cmd.NextAll());
+        		else
+        			GlobalBlockAddHandler(player, cmd);
             } else if (opt == "abort") {
                 if (player.currentGB == null ) {
                     player.Message("You do not have a global custom block definition currently being created.");
@@ -494,7 +497,7 @@ namespace fCraft {
                     step++; def.FullBright = boolVal;
                 }
             } else if (step == 9) {
-                if (Byte.TryParse(args, out value) && value >= 1 && value <= 4) {
+                if (Byte.TryParse(args, out value) && value <= 16) {
                     step++; def.Shape = value;
                 }
             } else if (step == 10) {
@@ -573,8 +576,9 @@ namespace fCraft {
             new [] { "&sEnter whether the block prevents sunlight from passing though. (true or false)" },
             new [] { "&sEnter the walk sound index of the block. (0-11)" },
             new [] { "&sEnter whether the block is fully bright (i.e. like lava). (true or false)" },
-            new [] { "&sEnter the shape of the block. (1-4)",
-                "&s1 = cube, 2 = slab, 3 = snow, 4 = sprites (e.g. roses)" },
+            new [] { "&sEnter the shape of the block. (0-16)",
+                "&s0 = sprite(e.g. roses), 1-16 = cube of the given height",
+                "&s(e.g. slabs have height '8', snow has height '2', dirt has height '16')" },
             new [] { "&sEnter the block draw type of this block. (0-4)",
                 "&s0 = solid/opaque, 1 = transparent (like glass)",
                 "&s2 = transparent (like leaves), 3 = translucent (like water)",
