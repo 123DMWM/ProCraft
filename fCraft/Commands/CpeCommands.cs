@@ -352,15 +352,15 @@ namespace fCraft {
         };
 
         static void GlobalBlockHandler(Player player, CommandReader cmd) {
-        	string opt = cmd.Next();
-        	if (opt != null ) 
-        		opt = opt.ToLower();
-        	
+            string opt = cmd.Next();
+            if (opt != null ) 
+                opt = opt.ToLower();
+            
             if (opt == "add") {
-        		if (player.currentGB != null)
-        			GlobalBlockDefineHandler(player, cmd.NextAll());
-        		else
-        			GlobalBlockAddHandler(player, cmd);
+                if (player.currentGB != null)
+                    GlobalBlockDefineHandler(player, cmd.NextAll());
+                else
+                    GlobalBlockAddHandler(player, cmd);
             } else if (opt == "abort") {
                 if (player.currentGB == null ) {
                     player.Message("You do not have a global custom block definition currently being created.");
@@ -374,12 +374,12 @@ namespace fCraft {
             } else if (opt == "remove" || opt == "delete") {
                 GlobalBlockRemoveHandler(player, cmd);
             } else {
-        		if (player.currentGB != null) {
-        			cmd.Rewind();
-        			GlobalBlockDefineHandler(player, cmd.NextAll());
-        		} else {
-                	CdGlobalBlock.PrintUsage(player);
-        		}
+                if (player.currentGB != null) {
+                    cmd.Rewind();
+                    GlobalBlockDefineHandler(player, cmd.NextAll());
+                } else {
+                    CdGlobalBlock.PrintUsage(player);
+                }
             }
         }
         
@@ -391,16 +391,17 @@ namespace fCraft {
             BlockDefinition def = BlockDefinition.GlobalDefinitions[blockId];
             if (def != null) {
                 player.Message("There is already a globally defined custom block with that block id.");
-                player.Message("Use \"/gb remove\" this block first.");
-                player.Message("Use \"/gb list\" to see a list of global custom blocks.");
+                player.Message("Use \"&h/gb remove {0}&s\" this block first.", blockId);
+                player.Message("Use \"&h/gb list&s\" to see a list of global custom blocks.");
                 return;
             }
             
             player.currentGB = new BlockDefinition();
             player.currentGB.BlockID = (byte)blockId;
-            player.Message("&hFrom now on, use /gb [value] to enter arguments.");
-            player.Message("&hYou can abort the currently partially " +
-                           "created custom block at any time by typing \"gb abort\"");
+            player.Message("   &bSet block id to: " + blockId);
+            player.Message("&sFrom now on, use &h/gb [value]&s to enter arguments.");
+            player.Message("&sYou can abort the currently partially " +
+                           "created custom block at any time by typing \"&h/gb abort&s\"");
             
             player.currentGBStep = 0;
             PrintStepHelp(player);
@@ -416,7 +417,7 @@ namespace fCraft {
                 
                 if (index >= offset) {
                     count++;
-                    player.Message("&sBlock &h{0} &shas id {1}", def.Name, def.BlockID);
+                    player.Message("&sCustom block &h{0} &shas name &h{1}", def.BlockID, def.Name);
                     
                     if(count >= 8) {
                         player.Message("To see the next set of global definitions, " +
@@ -436,7 +437,7 @@ namespace fCraft {
             BlockDefinition def = BlockDefinition.GlobalDefinitions[blockId];
             if (def == null) {
                 player.Message("There is no globally defined custom block with that block id.");
-                player.Message("Use \"/gb list\" to see a list of global custom blocks.");
+                player.Message("Use \"&h/gb list\" &sto see a list of global custom blocks.");
                 return;
             }
             
@@ -446,7 +447,10 @@ namespace fCraft {
                     BlockDefinition.SendGlobalRemove(player, def);
             }
             BlockDefinition.SaveGlobalDefinitions();
-            player.Message("Note: Players will need to rejoin worlds to see changes.");
+            
+            Server.Message( "{0} &sremoved the global custom block &h{1} &swith ID {2}",
+                                   player.ClassyName, def.Name, def.BlockID );
+            ReloadAllPlayers();
         }
         
         static void GlobalBlockDefineHandler(Player player, string args) {         
@@ -461,73 +465,89 @@ namespace fCraft {
             bool boolVal = true;
             
             if (step == 0) {          
-                step++;  def.Name = args;
+                step++; def.Name = args;
+                player.Message("   &bSet name to: " + def.Name);
             } else if (step == 1) {
                 if (Byte.TryParse(args, out value) && value <= 2) {
                     step++; def.CollideType = value;
+                    player.Message("   &bSet solidity to: " + value);
                 }
             } else if (step == 2) {
                 float speed;
                 if (Single.TryParse(args, out speed) 
                     && speed >= 0.25f && value <= 3.96f) {
                     step++; def.Speed = speed;
+                    player.Message("   &bSet speed to: " + speed);
                 }
             } else if (step == 3) {
                 if (Byte.TryParse(args, out value)) {
                     step++; def.TopTex = value;
+                    player.Message("   &bSet top texture index to: " + value);
                 }
             } else if (step == 4) {
                 if (Byte.TryParse(args, out value)) {
                     step++; def.SideTex = value;
+                    player.Message("   &bSet sides texture index to: " + value);
                 }
             } else if (step == 5) {
                 if (Byte.TryParse(args, out value)) {
                     step++; def.BottomTex = value;
+                    player.Message("   &bSet bottom texture index to: " + value);
                 }
             } else if (step == 6) {
                 if (Boolean.TryParse(args, out boolVal)) {
                     step++; def.BlocksLight = boolVal;
+                    player.Message("   &bSet blocks light to: " + boolVal);
                 }
             } else if (step == 7) {
                 if (Byte.TryParse(args, out value) && value <= 11) {
                     step++; def.WalkSound = value;
+                     player.Message("   &bSet walk sound to: " + value);
                 }
             } else if (step == 8) {
                 if (Boolean.TryParse(args, out boolVal)) {
                     step++; def.FullBright = boolVal;
+                    player.Message("   &bSet full bright to: " + boolVal);
                 }
             } else if (step == 9) {
                 if (Byte.TryParse(args, out value) && value <= 16) {
                     step++; def.Shape = value;
+                    player.Message("   &bSet block shape to: " + value);
                 }
             } else if (step == 10) {
                 if (Byte.TryParse(args, out value) && value <= 4) {
                     step++; def.BlockDraw = value;
+                    player.Message("   &bSet block draw type to: " + value);
                 }
             } else if (step == 11) {
                 if (Byte.TryParse(args, out value)) {
                     def.FogDensity = value;
                     step += value == 0 ? 4 : 1;
+                     player.Message("   &bSet density of fog to: " + value);
                 }
             } else if (step == 12) {
                 if (Byte.TryParse(args, out value)) {
                     step++; def.FogR = value;
+                    player.Message("   &bSet red component of fog to: " + value);
                 }
             } else if (step == 13) {
                 if (Byte.TryParse(args, out value)) {
                     step++; def.FogG = value;
+                    player.Message("   &bSet green component of fog to: " + value);
                 }
             } else if (step == 14) {
                 if (Byte.TryParse(args, out value)) {
                     step++; def.FogB = value;
+                    player.Message("   &bSet blue component of fog to: " + value);
                 }
             } else {
                 if (Byte.TryParse(args, out value)) {
                     if (value > (byte)Map.MaxCustomBlockType) {
-                        player.Message("The fallback block must be an original block, " +
+                        player.Message("&cThe fallback block must be an original block, " +
                                        "or a block defined in the CustomBlocks extension.");
                     }
                     def.FallBack = value;
+                    player.Message("   &bSet fallback block to: " + value);
                     BlockDefinition.DefineGlobalBlock(def);
                     
                     foreach (Player p in Server.Players ) {
@@ -535,10 +555,13 @@ namespace fCraft {
                             BlockDefinition.SendGlobalAdd(player, def);
                     }
                     
-                    player.Message("&sCreated a new global custom block " +
-                                   "&h{0} &swith id {1}", def.Name, def.BlockID);
+                    BlockDefinition.SaveGlobalDefinitions();
                     player.currentGBStep = -1;
                     player.currentGB = null;
+                    
+                    Server.Message( "{0} &screated a new global custom block &h{1} &swith ID {2}",
+                                   player.ClassyName, def.Name, def.BlockID );
+                    ReloadAllPlayers();
                     return;
                 }
             }
@@ -565,6 +588,16 @@ namespace fCraft {
                 p.Message(m);
         }
         
+        static void ReloadAllPlayers() {
+            Player[] cache = Server.Players;
+            for (int i = 0; i < cache.Length; i++ ) {
+                Player p = cache[i];
+                World world = p.World;
+                if (world == null || !p.Supports(CpeExtension.BlockDefinitions)) 
+                    continue;
+                p.JoinWorld(world, WorldChangeReason.Rejoin, p.Position);
+            }
+        }
         static string[][] globalBlockSteps = new [] {
             new [] { "&sEnter the name of the block. You can include spaces." },
             new [] { "&sEnter the solidity of the block (0-2)",

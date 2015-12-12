@@ -79,6 +79,7 @@ namespace fCraft {
         
         public static void SendGlobalRemove(Player p, BlockDefinition def) {
             p.Send(Packet.MakeRemoveBlockDefinition(def.BlockID));
+            p.Send(Packet.MakeSetBlockPermission((Block)def.BlockID, false, false));
         }
         
         Packet MakeDefinePacket() {
