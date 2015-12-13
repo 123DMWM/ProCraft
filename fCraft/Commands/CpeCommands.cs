@@ -37,6 +37,8 @@ namespace fCraft {
 
         private static void ModelHandler(Player player, CommandReader cmd) {
             PlayerInfo otherPlayer = InfoCommands.FindPlayerInfo(player, cmd, cmd.Next() ?? player.Name);
+            if (otherPlayer == null) return;
+             
             if (!player.IsStaff && otherPlayer != player.Info) {
                 Rank staffRank = RankManager.GetMinRankWithAnyPermission(Permission.ReadStaffChat);
                 if (staffRank != null) {
@@ -99,6 +101,8 @@ namespace fCraft {
 
         private static void AFKModelHandler(Player player, CommandReader cmd) {
             PlayerInfo otherPlayer = InfoCommands.FindPlayerInfo(player, cmd, cmd.Next() ?? player.Name);
+            if (otherPlayer == null) return;
+            
             if (!player.IsStaff && otherPlayer != player.Info) {
                 Rank staffRank = RankManager.GetMinRankWithAnyPermission(Permission.ReadStaffChat);
                 if (staffRank != null) {
