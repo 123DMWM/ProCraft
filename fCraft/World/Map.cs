@@ -295,7 +295,13 @@ namespace fCraft {
 
             if (HasChangedSinceSave)
             {
-                Server.Players.Send(Packet.MakeSetBlock((short)x, (short)y, (short)z, GetBlock(x, y, z)));
+            	Player[] players = World.Players;
+            	Block block = GetBlock(x, y, z);
+            	for( int i = 0; i < players.Length; i++ ) {
+            		// cannot reuse packet as each player may require different modifications to block field
+            		Packet packet = Packet.MakeSetBlock((short)x, (short)y, (short)z, block);
+            		players[i].SendLowPriority( packet );
+            	}
             }
             return true;
         }
@@ -474,8 +480,15 @@ namespace fCraft {
                 Blocks[blockIndex] = (byte)update.BlockType;
 
                 if( !World.IsFlushing ) {
-                    Packet packet = Packet.MakeSetBlock( update.X, update.Y, update.Z, update.BlockType );
-                    World.Players.SendLowPriority( update.Origin, packet );
+                	Player[] players = World.Players;
+                	for( int i = 0; i < players.Length; i++ ) {
+                		// cannot reuse packet as each player may require different modifications to block field
+                		Player p = players[i];
+                		if (p == update.Origin) 
+                			continue;
+                		Packet packet = Packet.MakeSetBlock( update.X, update.Y, update.Z, update.BlockType );
+                		p.SendLowPriority( packet );
+                	}
                 }
                 packetsSent++;
             }

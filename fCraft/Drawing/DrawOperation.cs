@@ -241,7 +241,10 @@ namespace fCraft.Drawing {
 
             World world = Map.World;
             if (world != null && !world.IsFlushing) {
-                world.Players.SendLowPriority(Packet.MakeSetBlock(Coords, newBlock));
+            	// cannot reuse packet as each player may require different modifications to block field
+            	Player[] players = world.Players;
+            	for (int i = 0; i < players.Length; i++)
+            		players[i].SendLowPriority(Packet.MakeSetBlock(Coords, newBlock));
             }
 
             Player.RaisePlayerPlacedBlockEvent(Player,
