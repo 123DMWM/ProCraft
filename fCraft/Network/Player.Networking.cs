@@ -653,6 +653,14 @@ namespace fCraft {
         void ProcessSetBlockPacket() {
             BytesReceived += 9;
             if( World == null || World.Map == null ) return;
+            if (Info.IsAFK) {
+                Server.Players.CanSee(this).Message("&S{0} is no longer AFK", Name);
+                Message("&SYou are no longer AFK");
+                Info.IsAFK = false;
+                Info.oldafkMob = Info.afkMob;
+                Info.afkMob = Info.Mob;
+                Server.UpdateTabList();
+            }
             ResetIdBotTimer();
             short x = reader.ReadInt16();
             short z = reader.ReadInt16();
