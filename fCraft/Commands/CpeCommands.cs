@@ -458,7 +458,7 @@ namespace fCraft {
         
         static void GlobalBlockDefineHandler(Player player, string args) {         
             // print the current step help if no args given
-            if (String.IsNullOrWhiteSpace(args)) {
+            if (string.IsNullOrWhiteSpace(args)) {
                 PrintStepHelp(player); return;
             }
             
@@ -466,106 +466,123 @@ namespace fCraft {
             int step = player.currentGBStep;
             byte value = 0; // as we can't pass properties by reference, make a temp var.
             bool boolVal = true;
-            
-            if (step == 0) {          
-                step++; def.Name = args;
-                player.Message("   &bSet name to: " + def.Name);
-            } else if (step == 1) {
-                if (Byte.TryParse(args, out value) && value <= 2) {
-                    step++; def.CollideType = value;
-                    player.Message("   &bSet solidity to: " + value);
-                }
-            } else if (step == 2) {
-                float speed;
-                if (Single.TryParse(args, out speed) 
-                    && speed >= 0.25f && value <= 3.96f) {
-                    step++; def.Speed = speed;
-                    player.Message("   &bSet speed to: " + speed);
-                }
-            } else if (step == 3) {
-                if (Byte.TryParse(args, out value)) {
-                    step++; def.TopTex = value;
-                    player.Message("   &bSet top texture index to: " + value);
-                }
-            } else if (step == 4) {
-                if (Byte.TryParse(args, out value)) {
-                    step++; def.SideTex = value;
-                    player.Message("   &bSet sides texture index to: " + value);
-                }
-            } else if (step == 5) {
-                if (Byte.TryParse(args, out value)) {
-                    step++; def.BottomTex = value;
-                    player.Message("   &bSet bottom texture index to: " + value);
-                }
-            } else if (step == 6) {
-                if (Boolean.TryParse(args, out boolVal)) {
-                    step++; def.BlocksLight = boolVal;
-                    player.Message("   &bSet blocks light to: " + boolVal);
-                }
-            } else if (step == 7) {
-                if (Byte.TryParse(args, out value) && value <= 11) {
-                    step++; def.WalkSound = value;
-                     player.Message("   &bSet walk sound to: " + value);
-                }
-            } else if (step == 8) {
-                if (Boolean.TryParse(args, out boolVal)) {
-                    step++; def.FullBright = boolVal;
-                    player.Message("   &bSet full bright to: " + boolVal);
-                }
-            } else if (step == 9) {
-                if (Byte.TryParse(args, out value) && value <= 16) {
-                    step++; def.Shape = value;
-                    player.Message("   &bSet block shape to: " + value);
-                }
-            } else if (step == 10) {
-                if (Byte.TryParse(args, out value) && value <= 4) {
-                    step++; def.BlockDraw = value;
-                    player.Message("   &bSet block draw type to: " + value);
-                }
-            } else if (step == 11) {
-                if (Byte.TryParse(args, out value)) {
-                    def.FogDensity = value;
-                    step += value == 0 ? 4 : 1;
-                     player.Message("   &bSet density of fog to: " + value);
-                }
-            } else if (step == 12) {
-                if (Byte.TryParse(args, out value)) {
-                    step++; def.FogR = value;
-                    player.Message("   &bSet red component of fog to: " + value);
-                }
-            } else if (step == 13) {
-                if (Byte.TryParse(args, out value)) {
-                    step++; def.FogG = value;
-                    player.Message("   &bSet green component of fog to: " + value);
-                }
-            } else if (step == 14) {
-                if (Byte.TryParse(args, out value)) {
-                    step++; def.FogB = value;
-                    player.Message("   &bSet blue component of fog to: " + value);
-                }
-            } else {
-                if (Byte.TryParse(args, out value)) {
-                    if (value > (byte)Map.MaxCustomBlockType) {
-                        player.Message("&cThe fallback block must be an original block, " +
-                                       "or a block defined in the CustomBlocks extension.");
+
+            switch (step) {
+                case 0:
+                    step++; def.Name = args;
+                    player.Message("   &bSet name to: " + def.Name);
+                    break;
+                case 1:
+                    if (byte.TryParse(args, out value) && value <= 2) {
+                        step++; def.CollideType = value;
+                        player.Message("   &bSet solidity to: " + value);
                     }
-                    def.FallBack = value;
-                    player.Message("   &bSet fallback block to: " + value);
-                    BlockDefinition.DefineGlobalBlock(def);
-                    
-                    foreach (Player p in Server.Players ) {
-                        if (p.Supports(CpeExtension.BlockDefinitions))
-                            BlockDefinition.SendGlobalAdd(p, def);
+                    break;
+                case 2:
+                    float speed;
+                    if (float.TryParse(args, out speed)
+                        && speed >= 0.25f && value <= 3.96f) {
+                        step++; def.Speed = speed;
+                        player.Message("   &bSet speed to: " + speed);
                     }
-                    
-                    BlockDefinition.SaveGlobalDefinitions();
-                    player.currentGBStep = -1;
-                    player.currentGB = null;
-                    
-                    Server.Message( "{0} &screated a new global custom block &h{1} &swith ID {2}",
-                                   player.ClassyName, def.Name, def.BlockID );
+                    break;
+                case 3:
+                    if (byte.TryParse(args, out value)) {
+                        step++; def.TopTex = value;
+                        player.Message("   &bSet top texture index to: " + value);
+                    }
+                    break;
+                case 4:
+                    if (byte.TryParse(args, out value)) {
+                        step++; def.SideTex = value;
+                        player.Message("   &bSet sides texture index to: " + value);
+                    }
+                    break;
+                case 5:
+                    if (byte.TryParse(args, out value)) {
+                        step++; def.BottomTex = value;
+                        player.Message("   &bSet bottom texture index to: " + value);
+                    }
+                    break;
+                case 6:
+                    if (bool.TryParse(args, out boolVal)) {
+                        step++; def.BlocksLight = boolVal;
+                        player.Message("   &bSet blocks light to: " + boolVal);
+                    }
+                    break;
+                case 7:
+                    if (byte.TryParse(args, out value) && value <= 11) {
+                        step++; def.WalkSound = value;
+                        player.Message("   &bSet walk sound to: " + value);
+                    }
+                    break;
+                case 8:
+                    if (bool.TryParse(args, out boolVal)) {
+                        step++; def.FullBright = boolVal;
+                        player.Message("   &bSet full bright to: " + boolVal);
+                    }
+                    break;
+                case 9:
+                    if (byte.TryParse(args, out value) && value <= 16) {
+                        step++; def.Shape = value;
+                        player.Message("   &bSet block shape to: " + value);
+                    }
+                    break;
+                case 10:
+                    if (byte.TryParse(args, out value) && value <= 4) {
+                        step++; def.BlockDraw = value;
+                        player.Message("   &bSet block draw type to: " + value);
+                    }
+                    break;
+                case 11:
+                    if (byte.TryParse(args, out value)) {
+                        def.FogDensity = value;
+                        step += value == 0 ? 4 : 1;
+                        player.Message("   &bSet density of fog to: " + value);
+                    }
+                    break;
+                case 12:
+                    if (byte.TryParse(args, out value)) {
+                        step++; def.FogR = value;
+                        player.Message("   &bSet red component of fog to: " + value);
+                    }
+                    break;
+                case 13:
+                    if (byte.TryParse(args, out value)) {
+                        step++; def.FogG = value;
+                        player.Message("   &bSet green component of fog to: " + value);
+                    }
+                    break;
+                case 14:
+                    if (byte.TryParse(args, out value)) {
+                        step++; def.FogB = value;
+                        player.Message("   &bSet blue component of fog to: " + value);
+                    }
+                    break;
+                default:
+                    Block block;
+                    if (Map.GetBlockByName(args, false, out block)) {
+                        if (block > Map.MaxCustomBlockType) {
+                            player.Message("&cThe fallback block must be an original block, " +
+                                           "or a block defined in the CustomBlocks extension.");
+                        }
+                        def.FallBack = (byte)block;
+                        player.Message("   &bSet fallback block to: " + block.ToString());
+                        BlockDefinition.DefineGlobalBlock(def);
+
+                        foreach (Player p in Server.Players) {
+                            if (p.Supports(CpeExtension.BlockDefinitions))
+                                BlockDefinition.SendGlobalAdd(p, def);
+                        }
+
+                        BlockDefinition.SaveGlobalDefinitions();
+                        player.currentGBStep = -1;
+                        player.currentGB = null;
+
+                        Server.Message("{0} &screated a new global custom block &h{1} &swith ID {2}",
+                                       player.ClassyName, def.Name, def.BlockID);
+                    }
                     return;
-                }
             }
             player.currentGBStep = step;
             PrintStepHelp(player);
