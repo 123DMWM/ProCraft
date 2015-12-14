@@ -949,7 +949,7 @@ namespace fCraft {
             Category = CommandCategory.New | CommandCategory.Building,
             Permissions = new[] { Permission.Draw },
             Usage = "/Place [x] [y] [z] and/or [block]",
-            Help = "Places a block at specified XYZ",
+            Help = "Places a block at specified XYZ or directly below your feet.",
             Handler = PlaceHandler
         };
 
@@ -977,7 +977,7 @@ namespace fCraft {
                         return;
                     }
                 }
-                coords = player.Position.ToBlockCoords();
+                coords = new Vector3I(player.Position.X / 32, player.Position.Y / 32, (player.Position.Z - 64) / 32);
             }
             coords.X = Math.Min(map.Width - 1, Math.Max(0, coords.X));
             coords.Y = Math.Min(map.Length - 1, Math.Max(0, coords.Y));
