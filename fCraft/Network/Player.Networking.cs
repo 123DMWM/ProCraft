@@ -1778,7 +1778,7 @@ namespace fCraft {
                     } else if( spectatePos != Position ) {
                         SendNow( Packet.MakeSelfTeleport( spectatePos ) );
                     }
-                    if (SpectatedPlayer.Info.heldBlock != this.Info.heldBlock)
+                    if (SpectatedPlayer.Info.heldBlock != Info.heldBlock && SpectatedPlayer.Supports(CpeExtension.HeldBlock))
                     {
                         SendNow(Packet.MakeHoldThis(SpectatedPlayer.Info.heldBlock, false));
                     }

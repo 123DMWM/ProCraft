@@ -1019,14 +1019,14 @@ namespace fCraft {
                     zone.ShowZone = true;
                     if (zone.Color != null) {
                         player.Message("Zone ({0}&s) will now show its bounderies", zone.ClassyName);
-                        player.World.Players.Send(Packet.MakeMakeSelection(zone.ZoneID, zone.Name, zone.Bounds,
+                        player.World.Players.Where(p => p.Supports(CpeExtension.SelectionCuboid)).Send(Packet.MakeMakeSelection(zone.ZoneID, zone.Name, zone.Bounds,
                             zone.Color, zone.Alpha));
                     }
                     return;
                 } else if (color.ToLower().Equals("off") || color.ToLower().Equals("false") || color.ToLower().Equals("no")) {
                     zone.ShowZone = false;
                     player.Message("Zone ({0}&s) will no longer show its bounderies", zone.ClassyName);
-                    player.World.Players.Send(Packet.MakeRemoveSelection(zone.ZoneID));
+                    player.World.Players.Where(p => p.Supports(CpeExtension.SelectionCuboid)).Send(Packet.MakeRemoveSelection(zone.ZoneID));
                     return;
                 } else {
                     player.Message("Error: \"#{0}\" is not a valid HEX color code.", color);
