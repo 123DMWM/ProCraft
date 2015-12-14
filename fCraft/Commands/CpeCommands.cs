@@ -332,13 +332,13 @@ namespace fCraft {
 
         static readonly CommandDescriptor CdGlobalBlock = new CommandDescriptor {
             Name = "GlobalBlock",
-            Aliases = new string[] { "global", "gb" },
+            Aliases = new string[] { "global", "block", "gb" },
             Category = CommandCategory.World,
             IsConsoleSafe = true,
             Permissions = new[] { Permission.DefineCustomBlocks },
             Usage = "/gb <type/value> <args>",
             Help = "&sModifies the global custom blocks, or prints information about them.&n" +
-                "&sTypes are: add, abort, list, remove&n" +
+                "&sTypes are: add, abort, list, remove, texture&n" +
                 "&sSee &h/help gb <type>&s for details about each type.",
             HelpSections = new Dictionary<string, string>{
                 { "add",     "&h/gb add [id]&n" +
@@ -351,6 +351,8 @@ namespace fCraft {
                         "along with their corresponding block ids. " },
                 { "remove",  "&h/gb remove [id]&n" +
                         "&sRemoves the global custom block associated which has the numerical block id." },
+                { "texture",  "&h/gb tex&n" +
+                        "&sShows you the terrain link of the current world and a link of the default with ID's overlayed." },
             },
             Handler = GlobalBlockHandler
         };
@@ -359,32 +361,46 @@ namespace fCraft {
             string opt = cmd.Next();
             if (opt != null ) 
                 opt = opt.ToLower();
-            
-            if (opt == "add") {
-                if (player.currentGB != null)
-                    GlobalBlockDefineHandler(player, cmd.NextAll());
-                else
-                    GlobalBlockAddHandler(player, cmd);
-            } else if (opt == "abort") {
-                if (player.currentGB == null ) {
-                    player.Message("You do not have a global custom block definition currently being created.");
-                } else {
-                    player.currentGB = null;
-                    player.currentGBStep = -1;
-                    player.Message("Discarded the global custom block definition that was being created.");
-                }
-            } else if (opt == "list") {
-                GlobalBlockListHandler(player, cmd);
-            } else if (opt == "remove" || opt == "delete") {
-                GlobalBlockRemoveHandler(player, cmd);
-            } else {
-                if (player.currentGB != null) {
-                    cmd.Rewind();
-                    GlobalBlockDefineHandler(player, cmd.NextAll());
-                } else {
-                    CdGlobalBlock.PrintUsage(player);
-                }
-            }
+            switch (opt) {
+                case "create":
+                case "add":
+                    if (player.currentGB != null)
+                        GlobalBlockDefineHandler(player, cmd.NextAll());
+                    else
+                        GlobalBlockAddHandler(player, cmd);
+                    break;
+                case "nvm":
+                case "abort":
+                    if (player.currentGB == null) {
+                        player.Message("You do not have a global custom block definition currently being created.");
+                    } else {
+                        player.currentGB = null;
+                        player.currentGBStep = -1;
+                        player.Message("Discarded the global custom block definition that was being created.");
+                    }
+                    break;
+                case "list":
+                    GlobalBlockListHandler(player, cmd);
+                    break;
+                case "remove":
+                case "delete":
+                    GlobalBlockRemoveHandler(player, cmd);
+                    break;
+                case "tex":
+                case "texture":
+                case "terrain":
+                    player.Message("Terrain IDs: &9http://123dmwm.tk/ID-Overlay.png");
+                    player.Message("Current world terrain: &9{0}", player.World.Texture == "Default" ? Server.DefaultTerrain : player.World.Texture);
+                    break;
+                default:
+                    if (player.currentGB != null) {
+                        cmd.Rewind();
+                        GlobalBlockDefineHandler(player, cmd.NextAll());
+                    } else {
+                        CdGlobalBlock.PrintUsage(player);
+                    }
+                    break;
+            }            
         }
         
         static void GlobalBlockAddHandler(Player player, CommandReader cmd) {
