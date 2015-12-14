@@ -4802,7 +4802,7 @@ namespace fCraft {
                     player.Message(CdMaxPW.Usage);
                     return;
                 }
-                if (rank != null && max != null) {
+                if (rank != null) {
                     rank.MaxPersonalWorlds = max;
                     player.Message("Set MaxPersonalWorlds for rank ({0}&s) to {1} personal worlds.", rank.ClassyName,
                         rank.MaxPersonalWorlds);

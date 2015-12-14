@@ -1063,9 +1063,7 @@ namespace fCraft {
                     player.Message("Zone ({0}&s) color set! Bounderies: OFF", zone.ClassyName);
                 }
             } else {
-                if (zone.ShowZone == null) {
-                    zone.ShowZone = false;
-                }
+                zone.ShowZone = false;
                 player.Message("Zone ({0}&s) color set!", zone.ClassyName);
             }
             if (zone != null) {

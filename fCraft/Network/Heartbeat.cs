@@ -144,7 +144,7 @@ namespace fCraft
             try {
                 heartBeatRequest = CreateRequest(data.CreateUri());
                 } catch (Exception UriFormatException) {
-                    Logger.Log(LogType.Debug, "No internet connection!");
+                    Logger.Log(LogType.Debug, UriFormatException.ToString());
                     return;
                 }
             var state = new HeartbeatRequestState(heartBeatRequest, data);
