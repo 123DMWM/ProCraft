@@ -470,6 +470,7 @@ namespace fCraft {
             
             Server.Message( "{0} &sremoved the global custom block &h{1} &swith ID {2}",
                                    player.ClassyName, def.Name, def.BlockID );
+            ReloadAllPlayers();
         }
         
         static void GlobalBlockDefineHandler(Player player, string args) {         
@@ -597,6 +598,7 @@ namespace fCraft {
 
                         Server.Message("{0} &screated a new global custom block &h{1} &swith ID {2}",
                                        player.ClassyName, def.Name, def.BlockID);
+                        ReloadAllPlayers();
                     }
                     return;
             }
@@ -621,6 +623,17 @@ namespace fCraft {
             string[] help = globalBlockSteps[p.currentGBStep];
             foreach (string m in help)
                 p.Message(m);
+        }
+
+        static void ReloadAllPlayers() {
+            Player[] cache = Server.Players;
+            for (int i = 0; i < cache.Length; i++) {
+                Player p = cache[i];
+                World world = p.World;
+                if (world == null || !p.Supports(CpeExtension.BlockDefinitions))
+                    continue;
+                p.JoinWorld(world, WorldChangeReason.Rejoin, p.Position);
+            }
         }
 
         static string[][] globalBlockSteps = new [] {
