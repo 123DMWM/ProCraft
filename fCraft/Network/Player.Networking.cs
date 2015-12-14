@@ -1194,6 +1194,7 @@ namespace fCraft {
                 Info.oldskinName = Info.skinName;
                 Info.skinName = Name;
             }
+            Send(Packet.MakeSetPermission(this));
             Server.UpdateTabList();
             System.Console.Beep();
             System.Console.Beep();
@@ -1510,7 +1511,7 @@ namespace fCraft {
             }
 
             if (Supports(CpeExtension.BlockPermissions)) {
-                Send(Packet.MakeSetBlockPermission(Block.Admincrete, Can(Permission.PlaceAdmincrete), true));
+                Send(Packet.MakeSetBlockPermission(Block.Admincrete, Can(Permission.PlaceAdmincrete), Can(Permission.PlaceAdmincrete)));
                 Send(Packet.MakeSetBlockPermission(Block.Water, Can(Permission.PlaceWater), true));
                 Send(Packet.MakeSetBlockPermission(Block.StillWater, Can(Permission.PlaceWater), true));
                 Send(Packet.MakeSetBlockPermission(Block.Lava, Can(Permission.PlaceLava), true));

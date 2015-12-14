@@ -793,6 +793,14 @@ namespace fCraft {
 					target.Send(Packet.MakeSetClickDistance((target.World.maxReach < ReachDistance 
 						&& !target.IsStaff) ? target.World.maxReach : ReachDistance));
                 }
+                if (target.Supports(CpeExtension.BlockPermissions)) {
+                    target.Send(Packet.MakeSetBlockPermission(Block.Admincrete, target.Can(Permission.PlaceAdmincrete), target.Can(Permission.PlaceAdmincrete)));
+                    target.Send(Packet.MakeSetBlockPermission(Block.Water, target.Can(Permission.PlaceWater), true));
+                    target.Send(Packet.MakeSetBlockPermission(Block.StillWater, target.Can(Permission.PlaceWater), true));
+                    target.Send(Packet.MakeSetBlockPermission(Block.Lava, target.Can(Permission.PlaceLava), true));
+                    target.Send(Packet.MakeSetBlockPermission(Block.StillLava, target.Can(Permission.PlaceLava), true));
+                    target.Send(Packet.MakeSetBlockPermission(Block.Grass, target.Can(Permission.PlaceGrass), true));
+                }
 
                 // inform the player of the rank change
                 target.Message( "You were {0} to {1}&S by {2}",
