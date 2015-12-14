@@ -302,6 +302,9 @@ namespace fCraft {
                 } else if( IsMakingSelection ) {
                     SelectionCancel();
                     Message( "Selection cancelled." );
+                } else if (LastDrawOp != null && !LastDrawOp.IsDone && !LastDrawOp.IsCancelled) {
+                    LastDrawOp.Cancel();
+                    Message("Cancelled {0} (was {1}% done). ", LastDrawOp.Description, LastDrawOp.PercentDone);
                 } else {
                     Message( "There is currently nothing to cancel." );
                 }
