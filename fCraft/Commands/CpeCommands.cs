@@ -18,7 +18,7 @@ namespace fCraft {
         
         #region ChangeModel
         
-        internal static string[] validEntities =  { "chicken", "creeper",
+        internal static string[] validEntities =  { "chicken", "creeper", 
             "humanoid", "human", "pig", "sheep", "skeleton", "spider", "zombie"
         };
         
@@ -31,14 +31,14 @@ namespace fCraft {
             Usage = "/Model [Player] [Model]",
             IsConsoleSafe = true,
             Help = "Change the Model or Skin of [Player]!&n" +
-                "Valid models: &s [Any Block Name or ID#], Chicken, Creeper, Humanoid, Pig, Sheep, Skeleton, Spider, Zombie!",
+            "Valid models: &s [Any Block Name or ID#], Chicken, Creeper, Humanoid, Pig, Sheep, Skeleton, Spider, Zombie!",
             Handler = ModelHandler
         };
 
         private static void ModelHandler(Player player, CommandReader cmd) {
             PlayerInfo otherPlayer = InfoCommands.FindPlayerInfo(player, cmd, cmd.Next() ?? player.Name);
             if (otherPlayer == null) return;
-            
+             
             if (!player.IsStaff && otherPlayer != player.Info) {
                 Rank staffRank = RankManager.GetMinRankWithAnyPermission(Permission.ReadStaffChat);
                 if (staffRank != null) {
@@ -95,7 +95,7 @@ namespace fCraft {
             Usage = "/AFKModel [Player] [Model]",
             IsConsoleSafe = true,
             Help = "Change your own model for when you are AFK!&n" +
-                "Valid models: &s [Any Block Name or ID#], Chicken, Creeper, Croc, Humanoid, Pig, Printer, Sheep, Skeleton, Spider, Zombie!",
+    "Valid models: &s [Any Block Name or ID#], Chicken, Creeper, Croc, Humanoid, Pig, Printer, Sheep, Skeleton, Spider, Zombie!",
             Handler = AFKModelHandler
         };
 
@@ -201,7 +201,7 @@ namespace fCraft {
             p.skinName = skinString;
         }
 
-        #endregion
+        #endregion 
         
         #region HackControl
         
@@ -214,7 +214,7 @@ namespace fCraft {
             Usage = "/Hacks [Player] [Hack] [jumpheight(if needed)]",
             IsConsoleSafe = true,
             Help = "Change the hacking abilities of [Player]&n" +
-                "Valid hacks: &aFlying&s, &aNoclip&s, &aSpeedhack&s, &aRespawn&s, &aThirdPerson&s and &aJumpheight",
+            "Valid hacks: &aFlying&s, &aNoclip&s, &aSpeedhack&s, &aRespawn&s, &aThirdPerson&s and &aJumpheight",
             Handler = HackControlHandler
         };
 
@@ -224,13 +224,13 @@ namespace fCraft {
             if (first == null || player.Info.Rank != RankManager.HighestRank) {
                 player.Message("&sCurrent Hacks for {0}", player.ClassyName);
                 player.Message("    &sFlying: &a{0} &sNoclip: &a{1} &sSpeedhack: &a{2}",
-                               player.Info.AllowFlying.ToString(),
-                               player.Info.AllowNoClip.ToString(),
-                               player.Info.AllowSpeedhack.ToString());
+                                player.Info.AllowFlying.ToString(),
+                                player.Info.AllowNoClip.ToString(),
+                                player.Info.AllowSpeedhack.ToString());
                 player.Message("    &sRespawn: &a{0} &sThirdPerson: &a{1} &sJumpHeight: &a{2}",
-                               player.Info.AllowRespawn.ToString(),
-                               player.Info.AllowThirdPerson.ToString(),
-                               player.Info.JumpHeight);
+                                player.Info.AllowRespawn.ToString(),
+                                player.Info.AllowThirdPerson.ToString(),
+                                player.Info.JumpHeight);
                 return;
             }
 
@@ -243,13 +243,13 @@ namespace fCraft {
             if (hack == "null") {
                 player.Message("&sCurrent Hacks for {0}", target.ClassyName);
                 player.Message("    &sFlying: &a{0} &sNoclip: &a{1} &sSpeedhack: &a{2}",
-                               target.AllowFlying.ToString(),
-                               target.AllowNoClip.ToString(),
-                               target.AllowSpeedhack.ToString());
+                                target.AllowFlying.ToString(),
+                                target.AllowNoClip.ToString(),
+                                target.AllowSpeedhack.ToString());
                 player.Message("    &sRespawn: &a{0} &sThirdPerson: &a{1} &sJumpHeight: &a{2}",
-                               target.AllowRespawn.ToString(),
-                               target.AllowThirdPerson.ToString(),
-                               target.JumpHeight);
+                                target.AllowRespawn.ToString(),
+                                target.AllowThirdPerson.ToString(),
+                                target.JumpHeight);
                 return;
             }
 
@@ -332,13 +332,13 @@ namespace fCraft {
 
         static readonly CommandDescriptor CdGlobalBlock = new CommandDescriptor {
             Name = "GlobalBlock",
-            Aliases = new string[] { "global", "gb" },
+            Aliases = new string[] { "global", "block", "gb" },
             Category = CommandCategory.World,
             IsConsoleSafe = true,
             Permissions = new[] { Permission.DefineCustomBlocks },
             Usage = "/gb <type/value> <args>",
             Help = "&sModifies the global custom blocks, or prints information about them.&n" +
-                "&sTypes are: add, abort, list, remove&n" +
+                "&sTypes are: add, abort, list, remove, texture&n" +
                 "&sSee &h/help gb <type>&s for details about each type.",
             HelpSections = new Dictionary<string, string>{
                 { "add",     "&h/gb add [id]&n" +
@@ -351,40 +351,56 @@ namespace fCraft {
                         "along with their corresponding block ids. " },
                 { "remove",  "&h/gb remove [id]&n" +
                         "&sRemoves the global custom block associated which has the numerical block id." },
+                { "texture",  "&h/gb tex&n" +
+                        "&sShows you the terrain link of the current world and a link of the default with ID's overlayed." },
             },
             Handler = GlobalBlockHandler
         };
 
         static void GlobalBlockHandler(Player player, CommandReader cmd) {
             string opt = cmd.Next();
-            if (opt != null )
+            if (opt != null ) 
                 opt = opt.ToLower();
-            
-            if (opt == "add") {
-                if (player.currentGB != null)
-                    GlobalBlockDefineHandler(player, cmd.NextAll());
-                else
-                    GlobalBlockAddHandler(player, cmd);
-            } else if (opt == "abort") {
-                if (player.currentGB == null ) {
-                    player.Message("You do not have a global custom block definition currently being created.");
-                } else {
-                    player.currentGB = null;
-                    player.currentGBStep = -1;
-                    player.Message("Discarded the global custom block definition that was being created.");
-                }
-            } else if (opt == "list") {
-                GlobalBlockListHandler(player, cmd);
-            } else if (opt == "remove" || opt == "delete") {
-                GlobalBlockRemoveHandler(player, cmd);
-            } else {
-                if (player.currentGB != null) {
-                    cmd.Rewind();
-                    GlobalBlockDefineHandler(player, cmd.NextAll());
-                } else {
-                    CdGlobalBlock.PrintUsage(player);
-                }
-            }
+            switch (opt) {
+                case "create":
+                case "add":
+                    if (player.currentGB != null)
+                        GlobalBlockDefineHandler(player, cmd.NextAll());
+                    else
+                        GlobalBlockAddHandler(player, cmd);
+                    break;
+                case "nvm":
+                case "abort":
+                    if (player.currentGB == null) {
+                        player.Message("You do not have a global custom block definition currently being created.");
+                    } else {
+                        player.currentGB = null;
+                        player.currentGBStep = -1;
+                        player.Message("Discarded the global custom block definition that was being created.");
+                    }
+                    break;
+                case "list":
+                    GlobalBlockListHandler(player, cmd);
+                    break;
+                case "remove":
+                case "delete":
+                    GlobalBlockRemoveHandler(player, cmd);
+                    break;
+                case "tex":
+                case "texture":
+                case "terrain":
+                    player.Message("Terrain IDs: &9http://123dmwm.tk/ID-Overlay.png");
+                    player.Message("Current world terrain: &9{0}", player.World.Texture == "Default" ? Server.DefaultTerrain : player.World.Texture);
+                    break;
+                default:
+                    if (player.currentGB != null) {
+                        cmd.Rewind();
+                        GlobalBlockDefineHandler(player, cmd.NextAll());
+                    } else {
+                        CdGlobalBlock.PrintUsage(player);
+                    }
+                    break;
+            }            
         }
         
         static void GlobalBlockAddHandler(Player player, CommandReader cmd) {
@@ -448,18 +464,18 @@ namespace fCraft {
             BlockDefinition.RemoveGlobalBlock(def);
             foreach (Player p in Server.Players ) {
                 if (p.Supports(CpeExtension.BlockDefinitions))
-                    BlockDefinition.SendGlobalRemove(player, def);
+                    BlockDefinition.SendGlobalRemove(p, def);
             }
             BlockDefinition.SaveGlobalDefinitions();
             
             Server.Message( "{0} &sremoved the global custom block &h{1} &swith ID {2}",
-                           player.ClassyName, def.Name, def.BlockID );
+                                   player.ClassyName, def.Name, def.BlockID );
             ReloadAllPlayers();
         }
         
-        static void GlobalBlockDefineHandler(Player player, string args) {
+        static void GlobalBlockDefineHandler(Player player, string args) {         
             // print the current step help if no args given
-            if (String.IsNullOrWhiteSpace(args)) {
+            if (string.IsNullOrWhiteSpace(args)) {
                 PrintStepHelp(player); return;
             }
             
@@ -467,107 +483,124 @@ namespace fCraft {
             int step = player.currentGBStep;
             byte value = 0; // as we can't pass properties by reference, make a temp var.
             bool boolVal = true;
-            
-            if (step == 0) {
-                step++; def.Name = args;
-                player.Message("   &bSet name to: " + def.Name);
-            } else if (step == 1) {
-                if (Byte.TryParse(args, out value) && value <= 2) {
-                    step++; def.CollideType = value;
-                    player.Message("   &bSet solidity to: " + value);
-                }
-            } else if (step == 2) {
-                float speed;
-                if (Single.TryParse(args, out speed)
-                    && speed >= 0.25f && value <= 3.96f) {
-                    step++; def.Speed = speed;
-                    player.Message("   &bSet speed to: " + speed);
-                }
-            } else if (step == 3) {
-                if (Byte.TryParse(args, out value)) {
-                    step++; def.TopTex = value;
-                    player.Message("   &bSet top texture index to: " + value);
-                }
-            } else if (step == 4) {
-                if (Byte.TryParse(args, out value)) {
-                    step++; def.SideTex = value;
-                    player.Message("   &bSet sides texture index to: " + value);
-                }
-            } else if (step == 5) {
-                if (Byte.TryParse(args, out value)) {
-                    step++; def.BottomTex = value;
-                    player.Message("   &bSet bottom texture index to: " + value);
-                }
-            } else if (step == 6) {
-                if (Boolean.TryParse(args, out boolVal)) {
-                    step++; def.BlocksLight = boolVal;
-                    player.Message("   &bSet blocks light to: " + boolVal);
-                }
-            } else if (step == 7) {
-                if (Byte.TryParse(args, out value) && value <= 11) {
-                    step++; def.WalkSound = value;
-                    player.Message("   &bSet walk sound to: " + value);
-                }
-            } else if (step == 8) {
-                if (Boolean.TryParse(args, out boolVal)) {
-                    step++; def.FullBright = boolVal;
-                    player.Message("   &bSet full bright to: " + boolVal);
-                }
-            } else if (step == 9) {
-                if (Byte.TryParse(args, out value) && value <= 16) {
-                    step++; def.Shape = value;
-                    player.Message("   &bSet block shape to: " + value);
-                }
-            } else if (step == 10) {
-                if (Byte.TryParse(args, out value) && value <= 4) {
-                    step++; def.BlockDraw = value;
-                    player.Message("   &bSet block draw type to: " + value);
-                }
-            } else if (step == 11) {
-                if (Byte.TryParse(args, out value)) {
-                    def.FogDensity = value;
-                    step += value == 0 ? 4 : 1;
-                    player.Message("   &bSet density of fog to: " + value);
-                }
-            } else if (step == 12) {
-                if (Byte.TryParse(args, out value)) {
-                    step++; def.FogR = value;
-                    player.Message("   &bSet red component of fog to: " + value);
-                }
-            } else if (step == 13) {
-                if (Byte.TryParse(args, out value)) {
-                    step++; def.FogG = value;
-                    player.Message("   &bSet green component of fog to: " + value);
-                }
-            } else if (step == 14) {
-                if (Byte.TryParse(args, out value)) {
-                    step++; def.FogB = value;
-                    player.Message("   &bSet blue component of fog to: " + value);
-                }
-            } else {
-                if (Byte.TryParse(args, out value)) {
-                    if (value > (byte)Map.MaxCustomBlockType) {
-                        player.Message("&cThe fallback block must be an original block, " +
-                                       "or a block defined in the CustomBlocks extension.");
+
+            switch (step) {
+                case 0:
+                    step++; def.Name = args;
+                    player.Message("   &bSet name to: " + def.Name);
+                    break;
+                case 1:
+                    if (byte.TryParse(args, out value) && value <= 2) {
+                        step++; def.CollideType = value;
+                        player.Message("   &bSet solidity to: " + value);
                     }
-                    def.FallBack = value;
-                    player.Message("   &bSet fallback block to: " + value);
-                    BlockDefinition.DefineGlobalBlock(def);
-                    
-                    foreach (Player p in Server.Players) {
-                        if (p.Supports(CpeExtension.BlockDefinitions))
-                            BlockDefinition.SendGlobalAdd(player, def);
+                    break;
+                case 2:
+                    float speed;
+                    if (float.TryParse(args, out speed)
+                        && speed >= 0.25f && value <= 3.96f) {
+                        step++; def.Speed = speed;
+                        player.Message("   &bSet speed to: " + speed);
                     }
-                    
-                    BlockDefinition.SaveGlobalDefinitions();
-                    player.currentGBStep = -1;
-                    player.currentGB = null;
-                    
-                    Server.Message( "{0} &screated a new global custom block &h{1} &swith ID {2}",
-                                   player.ClassyName, def.Name, def.BlockID );
-                    ReloadAllPlayers();
+                    break;
+                case 3:
+                    if (byte.TryParse(args, out value)) {
+                        step++; def.TopTex = value;
+                        player.Message("   &bSet top texture index to: " + value);
+                    }
+                    break;
+                case 4:
+                    if (byte.TryParse(args, out value)) {
+                        step++; def.SideTex = value;
+                        player.Message("   &bSet sides texture index to: " + value);
+                    }
+                    break;
+                case 5:
+                    if (byte.TryParse(args, out value)) {
+                        step++; def.BottomTex = value;
+                        player.Message("   &bSet bottom texture index to: " + value);
+                    }
+                    break;
+                case 6:
+                    if (bool.TryParse(args, out boolVal)) {
+                        step++; def.BlocksLight = boolVal;
+                        player.Message("   &bSet blocks light to: " + boolVal);
+                    }
+                    break;
+                case 7:
+                    if (byte.TryParse(args, out value) && value <= 11) {
+                        step++; def.WalkSound = value;
+                        player.Message("   &bSet walk sound to: " + value);
+                    }
+                    break;
+                case 8:
+                    if (bool.TryParse(args, out boolVal)) {
+                        step++; def.FullBright = boolVal;
+                        player.Message("   &bSet full bright to: " + boolVal);
+                    }
+                    break;
+                case 9:
+                    if (byte.TryParse(args, out value) && value <= 16) {
+                        step++; def.Shape = value;
+                        player.Message("   &bSet block shape to: " + value);
+                    }
+                    break;
+                case 10:
+                    if (byte.TryParse(args, out value) && value <= 4) {
+                        step++; def.BlockDraw = value;
+                        player.Message("   &bSet block draw type to: " + value);
+                    }
+                    break;
+                case 11:
+                    if (byte.TryParse(args, out value)) {
+                        def.FogDensity = value;
+                        step += value == 0 ? 4 : 1;
+                        player.Message("   &bSet density of fog to: " + value);
+                    }
+                    break;
+                case 12:
+                    if (byte.TryParse(args, out value)) {
+                        step++; def.FogR = value;
+                        player.Message("   &bSet red component of fog to: " + value);
+                    }
+                    break;
+                case 13:
+                    if (byte.TryParse(args, out value)) {
+                        step++; def.FogG = value;
+                        player.Message("   &bSet green component of fog to: " + value);
+                    }
+                    break;
+                case 14:
+                    if (byte.TryParse(args, out value)) {
+                        step++; def.FogB = value;
+                        player.Message("   &bSet blue component of fog to: " + value);
+                    }
+                    break;
+                default:
+                    Block block;
+                    if (Map.GetBlockByName(args, false, out block)) {
+                        if (block > Map.MaxCustomBlockType) {
+                            player.Message("&cThe fallback block must be an original block, " +
+                                           "or a block defined in the CustomBlocks extension.");
+                        }
+                        def.FallBack = (byte)block;
+                        player.Message("   &bSet fallback block to: " + block.ToString());
+                        BlockDefinition.DefineGlobalBlock(def);
+
+                        foreach (Player p in Server.Players) {
+                            if (p.Supports(CpeExtension.BlockDefinitions))
+                                BlockDefinition.SendGlobalAdd(p, def);
+                        }
+
+                        BlockDefinition.SaveGlobalDefinitions();
+                        player.currentGBStep = -1;
+                        player.currentGB = null;
+
+                        Server.Message("{0} &screated a new global custom block &h{1} &swith ID {2}",
+                                       player.ClassyName, def.Name, def.BlockID);
+                        ReloadAllPlayers();
+                    }
                     return;
-                }
             }
             player.currentGBStep = step;
             PrintStepHelp(player);
@@ -591,10 +624,10 @@ namespace fCraft {
             foreach (string m in help)
                 p.Message(m);
         }
-        
+
         static void ReloadAllPlayers() {
             Player[] cache = Server.Players;
-            for (int i = 0; i < cache.Length; i++ ) {
+            for (int i = 0; i < cache.Length; i++) {
                 Player p = cache[i];
                 World world = p.World;
                 if (world == null || !p.Supports(CpeExtension.BlockDefinitions))
@@ -602,6 +635,7 @@ namespace fCraft {
                 p.JoinWorld(world, WorldChangeReason.Rejoin, p.Position);
             }
         }
+
         static string[][] globalBlockSteps = new [] {
             new [] { "&sEnter the name of the block. You can include spaces." },
             new [] { "&sEnter the solidity of the block (0-2)",
@@ -628,7 +662,7 @@ namespace fCraft {
             new [] { "Enter the numerical fallback block id for this block.",
                 "This block is shown to clients that don't support BlockDefinitions." },
         };
-        
+            
         #endregion
     }
 }
