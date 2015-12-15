@@ -52,8 +52,9 @@ namespace fCraft {
             CommandManager.RegisterCommand( CdJORW );
             CommandManager.RegisterCommand( CdMaxCaps );
             CommandManager.RegisterCommand( CdBack );
-
+            CommandManager.RegisterCommand( CdVerify );
         }
+        
         #region Calculator
 
         static readonly CommandDescriptor CdCalculator = new CommandDescriptor
@@ -2456,6 +2457,45 @@ namespace fCraft {
                                 otherPlayers.JoinToClassyString() );
             }
         }
+        #endregion
+        
+        #region Verify
+        
+        static readonly CommandDescriptor CdVerify = new CommandDescriptor {
+            Name = "Verify",
+            Category = CommandCategory.Moderation,
+            IsConsoleSafe = true,
+            Aliases = new[] { "ver" },
+            Permissions = new[] { Permission.ReadStaffChat },
+            Usage = "/verify [PlayerName]",
+            Help = "Used for when players with a last login date before Jan 1 2014 join with a classicube.net account, " +
+                   "marks the account as verified as belonging to the person and allows them to use non-guest commands.&N" +
+                   "&cNote:&s This should only be used after you have contacted the old account owner and " +
+            	   "verified that they created a classicube.net account.&N" +
+            	   "&cNote:&s This command can only be used by players of the highest rank.",
+            Handler = VerifyHandler
+        };
+
+        static void VerifyHandler(Player player, CommandReader cmd) {
+            string targetName = cmd.Next();
+            if (targetName == null) {
+                CdVerify.PrintUsage(player); return;
+            }
+            PlayerInfo target = PlayerDB.FindPlayerInfoOrPrintMatches(player,
+                                                                       targetName,
+                                                                       SearchOptions.ReturnSelfIfOnlyMatch);
+            if (target == null) return;
+            if (target == player.Info) {
+                player.Message("You cannot &H/verify&S yourself."); return;
+            }
+            
+            if (player.Info.Rank != RankManager.HighestRank) {
+                player.Message("You can only use &H/verify&S if you are the highest rank."); return;
+            }
+            target.ClassicubeVerified = true;
+            player.Message(target.ClassyName + "&S is marked as having their account verified.");
+        }
+        
         #endregion
     }
 }

@@ -18,7 +18,7 @@ namespace fCraft {
         
         #region ChangeModel
         
-        internal static string[] validEntities =  { "chicken", "creeper", 
+        internal static string[] validEntities =  { "chicken", "creeper",
             "humanoid", "human", "pig", "sheep", "skeleton", "spider", "zombie"
         };
         
@@ -31,14 +31,14 @@ namespace fCraft {
             Usage = "/Model [Player] [Model]",
             IsConsoleSafe = true,
             Help = "Change the Model or Skin of [Player]!&n" +
-            "Valid models: &s [Any Block Name or ID#], Chicken, Creeper, Humanoid, Pig, Sheep, Skeleton, Spider, Zombie!",
+                "Valid models: &s [Any Block Name or ID#], Chicken, Creeper, Humanoid, Pig, Sheep, Skeleton, Spider, Zombie!",
             Handler = ModelHandler
         };
 
         private static void ModelHandler(Player player, CommandReader cmd) {
             PlayerInfo otherPlayer = InfoCommands.FindPlayerInfo(player, cmd, cmd.Next() ?? player.Name);
             if (otherPlayer == null) return;
-             
+            
             if (!player.IsStaff && otherPlayer != player.Info) {
                 Rank staffRank = RankManager.GetMinRankWithAnyPermission(Permission.ReadStaffChat);
                 if (staffRank != null) {
@@ -95,7 +95,7 @@ namespace fCraft {
             Usage = "/AFKModel [Player] [Model]",
             IsConsoleSafe = true,
             Help = "Change your own model for when you are AFK!&n" +
-    "Valid models: &s [Any Block Name or ID#], Chicken, Creeper, Croc, Humanoid, Pig, Printer, Sheep, Skeleton, Spider, Zombie!",
+                "Valid models: &s [Any Block Name or ID#], Chicken, Creeper, Croc, Humanoid, Pig, Printer, Sheep, Skeleton, Spider, Zombie!",
             Handler = AFKModelHandler
         };
 
@@ -201,7 +201,7 @@ namespace fCraft {
             p.skinName = skinString;
         }
 
-        #endregion 
+        #endregion
         
         #region HackControl
         
@@ -214,7 +214,7 @@ namespace fCraft {
             Usage = "/Hacks [Player] [Hack] [jumpheight(if needed)]",
             IsConsoleSafe = true,
             Help = "Change the hacking abilities of [Player]&n" +
-            "Valid hacks: &aFlying&s, &aNoclip&s, &aSpeedhack&s, &aRespawn&s, &aThirdPerson&s and &aJumpheight",
+                "Valid hacks: &aFlying&s, &aNoclip&s, &aSpeedhack&s, &aRespawn&s, &aThirdPerson&s and &aJumpheight",
             Handler = HackControlHandler
         };
 
@@ -224,13 +224,13 @@ namespace fCraft {
             if (first == null || player.Info.Rank != RankManager.HighestRank) {
                 player.Message("&sCurrent Hacks for {0}", player.ClassyName);
                 player.Message("    &sFlying: &a{0} &sNoclip: &a{1} &sSpeedhack: &a{2}",
-                                player.Info.AllowFlying.ToString(),
-                                player.Info.AllowNoClip.ToString(),
-                                player.Info.AllowSpeedhack.ToString());
+                               player.Info.AllowFlying.ToString(),
+                               player.Info.AllowNoClip.ToString(),
+                               player.Info.AllowSpeedhack.ToString());
                 player.Message("    &sRespawn: &a{0} &sThirdPerson: &a{1} &sJumpHeight: &a{2}",
-                                player.Info.AllowRespawn.ToString(),
-                                player.Info.AllowThirdPerson.ToString(),
-                                player.Info.JumpHeight);
+                               player.Info.AllowRespawn.ToString(),
+                               player.Info.AllowThirdPerson.ToString(),
+                               player.Info.JumpHeight);
                 return;
             }
 
@@ -243,13 +243,13 @@ namespace fCraft {
             if (hack == "null") {
                 player.Message("&sCurrent Hacks for {0}", target.ClassyName);
                 player.Message("    &sFlying: &a{0} &sNoclip: &a{1} &sSpeedhack: &a{2}",
-                                target.AllowFlying.ToString(),
-                                target.AllowNoClip.ToString(),
-                                target.AllowSpeedhack.ToString());
+                               target.AllowFlying.ToString(),
+                               target.AllowNoClip.ToString(),
+                               target.AllowSpeedhack.ToString());
                 player.Message("    &sRespawn: &a{0} &sThirdPerson: &a{1} &sJumpHeight: &a{2}",
-                                target.AllowRespawn.ToString(),
-                                target.AllowThirdPerson.ToString(),
-                                target.JumpHeight);
+                               target.AllowRespawn.ToString(),
+                               target.AllowThirdPerson.ToString(),
+                               target.JumpHeight);
                 return;
             }
 
@@ -357,7 +357,7 @@ namespace fCraft {
 
         static void GlobalBlockHandler(Player player, CommandReader cmd) {
             string opt = cmd.Next();
-            if (opt != null ) 
+            if (opt != null )
                 opt = opt.ToLower();
             
             if (opt == "add") {
@@ -453,11 +453,11 @@ namespace fCraft {
             BlockDefinition.SaveGlobalDefinitions();
             
             Server.Message( "{0} &sremoved the global custom block &h{1} &swith ID {2}",
-                                   player.ClassyName, def.Name, def.BlockID );
+                           player.ClassyName, def.Name, def.BlockID );
             ReloadAllPlayers();
         }
         
-        static void GlobalBlockDefineHandler(Player player, string args) {         
+        static void GlobalBlockDefineHandler(Player player, string args) {
             // print the current step help if no args given
             if (String.IsNullOrWhiteSpace(args)) {
                 PrintStepHelp(player); return;
@@ -468,7 +468,7 @@ namespace fCraft {
             byte value = 0; // as we can't pass properties by reference, make a temp var.
             bool boolVal = true;
             
-            if (step == 0) {          
+            if (step == 0) {
                 step++; def.Name = args;
                 player.Message("   &bSet name to: " + def.Name);
             } else if (step == 1) {
@@ -478,7 +478,7 @@ namespace fCraft {
                 }
             } else if (step == 2) {
                 float speed;
-                if (Single.TryParse(args, out speed) 
+                if (Single.TryParse(args, out speed)
                     && speed >= 0.25f && value <= 3.96f) {
                     step++; def.Speed = speed;
                     player.Message("   &bSet speed to: " + speed);
@@ -506,7 +506,7 @@ namespace fCraft {
             } else if (step == 7) {
                 if (Byte.TryParse(args, out value) && value <= 11) {
                     step++; def.WalkSound = value;
-                     player.Message("   &bSet walk sound to: " + value);
+                    player.Message("   &bSet walk sound to: " + value);
                 }
             } else if (step == 8) {
                 if (Boolean.TryParse(args, out boolVal)) {
@@ -527,7 +527,7 @@ namespace fCraft {
                 if (Byte.TryParse(args, out value)) {
                     def.FogDensity = value;
                     step += value == 0 ? 4 : 1;
-                     player.Message("   &bSet density of fog to: " + value);
+                    player.Message("   &bSet density of fog to: " + value);
                 }
             } else if (step == 12) {
                 if (Byte.TryParse(args, out value)) {
@@ -554,7 +554,7 @@ namespace fCraft {
                     player.Message("   &bSet fallback block to: " + value);
                     BlockDefinition.DefineGlobalBlock(def);
                     
-                    foreach (Player p in Server.Players ) {
+                    foreach (Player p in Server.Players) {
                         if (p.Supports(CpeExtension.BlockDefinitions))
                             BlockDefinition.SendGlobalAdd(player, def);
                     }
@@ -597,7 +597,7 @@ namespace fCraft {
             for (int i = 0; i < cache.Length; i++ ) {
                 Player p = cache[i];
                 World world = p.World;
-                if (world == null || !p.Supports(CpeExtension.BlockDefinitions)) 
+                if (world == null || !p.Supports(CpeExtension.BlockDefinitions))
                     continue;
                 p.JoinWorld(world, WorldChangeReason.Rejoin, p.Position);
             }
@@ -628,7 +628,7 @@ namespace fCraft {
             new [] { "Enter the numerical fallback block id for this block.",
                 "This block is shown to clients that don't support BlockDefinitions." },
         };
-            
+        
         #endregion
     }
 }

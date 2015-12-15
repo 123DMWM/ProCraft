@@ -360,6 +360,12 @@ namespace fCraft {
         static void DrawOperationCallback( Player player, Vector3I[] marks, object tag ) {
             DrawOperation op = (DrawOperation)tag;
             if( !op.Prepare( marks ) ) return;
+            if( !player.Info.ClassicubeVerified ) {
+            	player.Message("As you had an older minecraft.net account, you must have an admin verify your " +
+            	               "new classicube.net account actually is you with /verify before you can use drawing commands.");
+            	op.Cancel();
+            	return;
+            }
             if( !player.CanDraw( op.BlocksTotalEstimate ) ) {
                 player.Message( "You are only allowed to run draw commands that affect up to &f{0}&s blocks. This one would affect &f{1}&s blocks.",
                                    player.Info.Rank.DrawLimit,
