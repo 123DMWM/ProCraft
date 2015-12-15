@@ -154,6 +154,10 @@ namespace fCraft {
                 Logger.Log(LogType.UserActivity, comesFrom);
             }
         }
+        
+        /// <summary> Used when a classicube.net account is created that is the same as an account in existing player DB,
+        /// where the older account has not signed in before Jan 1 2014. Minmises chance of impersonation. </summary>
+        public bool ClassicubeVerified = true;
 
 
         #region Rank
@@ -797,6 +801,10 @@ namespace fCraft {
 				info.Hostname = fields[84];
 			if (fields.Length > 85)
 				info.Continent = fields[85];
+			if (fields.Length > 86) {
+				if (!bool.TryParse(fields[86], out info.ClassicubeVerified))
+					info.ClassicubeVerified = true;
+			}
 
             if( info.LastSeen < info.FirstLoginDate ) {
                 info.LastSeen = info.FirstLoginDate;
@@ -1323,6 +1331,8 @@ namespace fCraft {
 			sb.Append(Hostname); // 84
 			sb.Append(',');
 			sb.Append(Continent); // 85
+			sb.Append(',');
+			sb.Append(ClassicubeVerified); // 86
         }
 
         #endregion
@@ -1336,19 +1346,20 @@ namespace fCraft {
         }
 
 
+        static DateTime classsicubeCutoff = new DateTime(2014, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         public void ProcessLogin( [NotNull] Player player ) {
             if( player == null ) throw new ArgumentNullException( "player" );
             LastIP = player.IP;
+            if( LastLoginDate != DateTime.MinValue && LastLoginDate < classsicubeCutoff )
+            	ClassicubeVerified = false;
             LastLoginDate = DateTime.UtcNow;
             LastSeen = DateTime.UtcNow;
             Interlocked.Increment( ref TimesVisited );
             IsOnline = true;
             PlayerObject = player;
             LastModified = DateTime.UtcNow;
-            if (this.Mob == null)
-            {
-                this.Mob = "humanoid";
-            }
+            if (Mob == null)
+                Mob = "humanoid";
         }
 
 

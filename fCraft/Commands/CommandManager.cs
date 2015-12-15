@@ -239,6 +239,11 @@ namespace fCraft
             }
             else
             {
+            	if (descriptor.MinRank != RankManager.LowestRank && !player.Info.ClassicubeVerified) {
+            		player.Message("As you had an older minecraft.net account, you must have an admin verify your " +
+            		               "new classicube.net account actually is you with /verify before you can use non-guest commands.");
+            		return false;
+            	}
                 if (descriptor.Permissions != null)
                 {
                     if (!descriptor.CanBeCalledBy(player.Info.Rank))
