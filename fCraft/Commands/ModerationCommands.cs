@@ -1812,7 +1812,7 @@ namespace fCraft {
                     player.Message(CdMaxCaps.Usage);
                     return;
                 }
-                if (rank != null && mcaps != null)
+                if (rank != null)
                 {
                     rank.MaxCaps = mcaps;
                     player.Message("Set MaxCaps for rank ({0}&s) to {1} uppercase letters/message.", rank.ClassyName, rank.MaxCaps);

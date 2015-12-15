@@ -306,7 +306,7 @@ namespace fCraft.Games {
 			if (!GameRunning)
 				return;
 			
-			bool foundBackup = true;
+			//bool foundBackup = true; //not used
 			try {
 				Map backupMap = MapConversion.MapUtility.Load("./maps/CTFBackup.fcm");
 				world.MapChangedBy = player.Name;
@@ -315,7 +315,7 @@ namespace fCraft.Games {
 				player.Message( "Could not load CTF backup map.");
 				Logger.Log(LogType.Error,
 				           "Error loading CTF backup map: {0}", ex.Message);
-				foundBackup = false;
+				//foundBackup = false;
 				map = world.LoadMap();
 			}
 			

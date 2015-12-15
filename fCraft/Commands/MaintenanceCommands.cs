@@ -715,8 +715,7 @@ namespace fCraft {
 
                 case "donatedammount":
                 case "da":
-                    if (!(player == Player.Console || player.Info.Name == "Facepalmed" || player.Info.Name == "123DontMessWitMe"))
-                    {
+                    if (player != Player.Console) {
                         player.Message("&WYou are not able to Set a players Donated Ammount.");
                         return;
                     }
@@ -739,8 +738,7 @@ namespace fCraft {
 
                 case "blocksbuilt":
                 case "bb":
-                    if (!(player == Player.Console || player.Info.Name == "Facepalmed" || player.Info.Name == "123DontMessWitMe"))
-                    {
+                    if (player != Player.Console) {
                         player.Message("&WYou are not able to Set a players built amount.");
                         return;
                     }
@@ -764,8 +762,7 @@ namespace fCraft {
 
                 case "blocksdeleted":
                 case "bd":
-                    if (!(player == Player.Console || player.Info.Name == "Facepalmed" || player.Info.Name == "123DontMessWitMe"))
-                    {
+                    if (player != Player.Console) {
                         player.Message("&WYou are not able to Set a players built amount.");
                         return;
                     }

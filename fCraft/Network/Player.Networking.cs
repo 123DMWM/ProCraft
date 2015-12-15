@@ -653,6 +653,14 @@ namespace fCraft {
         void ProcessSetBlockPacket() {
             BytesReceived += 9;
             if( World == null || World.Map == null ) return;
+            if (Info.IsAFK) {
+                Server.Players.CanSee(this).Message("&S{0} is no longer AFK", Name);
+                Message("&SYou are no longer AFK");
+                Info.IsAFK = false;
+                Info.oldafkMob = Info.afkMob;
+                Info.afkMob = Info.Mob;
+                Server.UpdateTabList();
+            }
             ResetIdBotTimer();
             short x = reader.ReadInt16();
             short z = reader.ReadInt16();
@@ -1186,6 +1194,7 @@ namespace fCraft {
                 Info.oldskinName = Info.skinName;
                 Info.skinName = Name;
             }
+            Send(Packet.MakeSetPermission(this));
             Server.UpdateTabList();
             System.Console.Beep();
             System.Console.Beep();
@@ -1502,7 +1511,7 @@ namespace fCraft {
             }
 
             if (Supports(CpeExtension.BlockPermissions)) {
-                Send(Packet.MakeSetBlockPermission(Block.Admincrete, Can(Permission.PlaceAdmincrete), true));
+                Send(Packet.MakeSetBlockPermission(Block.Admincrete, Can(Permission.PlaceAdmincrete), Can(Permission.PlaceAdmincrete)));
                 Send(Packet.MakeSetBlockPermission(Block.Water, Can(Permission.PlaceWater), true));
                 Send(Packet.MakeSetBlockPermission(Block.StillWater, Can(Permission.PlaceWater), true));
                 Send(Packet.MakeSetBlockPermission(Block.Lava, Can(Permission.PlaceLava), true));
@@ -1770,7 +1779,7 @@ namespace fCraft {
                     } else if( spectatePos != Position ) {
                         SendNow( Packet.MakeSelfTeleport( spectatePos ) );
                     }
-                    if (SpectatedPlayer.Info.heldBlock != this.Info.heldBlock)
+                    if (SpectatedPlayer.Info.heldBlock != Info.heldBlock && SpectatedPlayer.Supports(CpeExtension.HeldBlock))
                     {
                         SendNow(Packet.MakeHoldThis(SpectatedPlayer.Info.heldBlock, false));
                     }

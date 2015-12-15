@@ -955,7 +955,7 @@ namespace fCraft {
             Category = CommandCategory.New | CommandCategory.Building,
             Permissions = new[] { Permission.Draw },
             Usage = "/Place [x] [y] [z] and/or [block]",
-            Help = "Places a block at specified XYZ",
+            Help = "Places a block at specified XYZ or directly below your feet.",
             Handler = PlaceHandler
         };
 
@@ -983,7 +983,7 @@ namespace fCraft {
                         return;
                     }
                 }
-                coords = player.Position.ToBlockCoords();
+                coords = new Vector3I(player.Position.X / 32, player.Position.Y / 32, (player.Position.Z - 64) / 32);
             }
             coords.X = Math.Min(map.Width - 1, Math.Max(0, coords.X));
             coords.Y = Math.Min(map.Length - 1, Math.Max(0, coords.Y));
@@ -2354,8 +2354,7 @@ namespace fCraft {
             Category = CommandCategory.Building | CommandCategory.Chat,
             NotRepeatable = true,
             Help = "If you are writing a partial/multiline message, it's cancelled. " +
-                   "Otherwise, cancels current selection (for drawing or zoning). " +
-                   "If you wish to stop a drawing in-progress, use &H/Undo&S instead. ",
+                   "Otherwise, cancels current selection (for drawing or zoning).",
             Handler = CancelHandler
         };
 
@@ -2814,14 +2813,14 @@ namespace fCraft {
             Aliases = new[] { "Drawimg", "Imgdraw", "ImgPrint", "DI" },
             Category = CommandCategory.New | CommandCategory.Building,
             Permissions = new[] { Permission.DrawAdvanced },
-            Usage = "/DrawImage SomeWebsite.com/picture.png [Palette]",
+            Usage = "/DrawImage [Imgur URL] [Palette]",
             Help = "Downloads and draws an image, using minecraft blocks. " +
                    "First mark specifies the origin (corner) block of the image. " +
                    "Second mark specifies direction (from origin block) in which image should be drawn. " +
                    "Optionally, a block palette name can be specified: " +
                    "Layered (default), Light, Dark, Gray, DarkGray, LayeredGray, or BW (black and white). " +
                    "If your image is from imgur.com, simply type '++' followed by the image code. " +
-                   "Example: /DrawImage ++kbFRo.png",
+                   "Example: /DrawImage ++kbFRo",
             Handler = DrawImageHandler
         };
 

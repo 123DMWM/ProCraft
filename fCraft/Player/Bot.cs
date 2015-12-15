@@ -130,7 +130,7 @@ namespace fCraft {
                 }
             }
 
-            World.Players.Send(Packet.MakeChangeModel((byte) ID, botModel));
+            World.Players.Where(p => p.Supports(CpeExtension.ChangeModel)).Send(Packet.MakeChangeModel((byte) ID, botModel));
             Model = botModel;
             SkinName = skinName;
             Server.SaveEntity(this);

@@ -79,18 +79,28 @@ namespace fCraft.Drawing {
         public override bool ReadParams(CommandReader cmd) {
             // get image URL
             string urlString = cmd.Next();
-            if (String.IsNullOrWhiteSpace(urlString)) {
+            if (string.IsNullOrWhiteSpace(urlString)) {
                 return false;
             }
 
+            if (urlString.StartsWith("http://imgur.com/")) {
+                urlString = "http://i.imgur.com/" + urlString.Substring("http://imgur.com/".Length) + ".png";
+            }
             // if string starts with "++", load image from imgur
             if (urlString.StartsWith("++")) {
-                urlString = "http://i.imgur.com/" + urlString.Substring(2);
+                urlString = "http://i.imgur.com/" + urlString.Substring(2) + ".png";
             }
-
             // prepend the protocol, if needed (assume http)
-            if (!urlString.StartsWith("http://", StringComparison.OrdinalIgnoreCase)) {
+            if (!urlString.ToLower().StartsWith("http://") && !urlString.ToLower().StartsWith("https://")) {
                 urlString = "http://" + urlString;
+            }
+            if (!urlString.ToLower().StartsWith("http://i.imgur.com")) {
+                Player.Message("For safety reasons we only accept images uploaded to &9http://imgur.com/ &sSorry for this inconvenience.");
+                return false;
+            }
+            if (!urlString.ToLower().EndsWith(".png") && !urlString.ToLower().EndsWith(".jpg") && !urlString.ToLower().EndsWith(".gif")) {
+                Player.Message("URL must be a link to an image");
+                return false;
             }
 
             // validate the image URL
