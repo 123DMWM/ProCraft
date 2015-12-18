@@ -1479,7 +1479,7 @@ namespace fCraft {
             if (Supports(CpeExtension.EnvMapAppearance)) {
         		string tex = World.Texture == "Default" ? Server.DefaultTerrain : World.Texture;
         		short edge =  World.EdgeLevel == -1 ? (short)(WorldMap.Height / 2) : World.EdgeLevel;
-        		Send(Packet.MakeEnvSetMapAppearance(tex, World.EdgeBlock, World.HorizonBlock, edge));
+        		Send(Packet.MakeEnvSetMapAppearance(tex, World.EdgeBlock, World.HorizonBlock, (edge == -1 ? (short)(World.map.Height/2) : edge)));
             }
         	
             if (Supports(CpeExtension.EnvColors))
