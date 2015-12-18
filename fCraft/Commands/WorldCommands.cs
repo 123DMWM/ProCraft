@@ -4870,7 +4870,7 @@ namespace fCraft {
                             string blockTypeOrName = command.Next();
                             Block pblock;
                             if (blockTypeOrName != null && Map.GetBlockByName(blockTypeOrName, false, out pblock)) {
-                                if (!validPBlocks.Contains(pblock) || (pblock == Block.Air && player.Info.Rank != RankManager.HighestRank)) {
+                                if ((!validPBlocks.Contains(pblock) && pblock <= Block.StoneBrick) || (pblock == Block.Air && player.Info.Rank != RankManager.HighestRank)) {
                                     player.Message("Invalid block, choose a non-solid block");
                                     return;
                                 } else {
