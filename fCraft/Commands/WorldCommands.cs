@@ -945,9 +945,11 @@ namespace fCraft {
             bool genEmpty = false;
             bool noTrees = false;
 
-            if (themeName == null) {
+            if (string.IsNullOrEmpty(themeName)) {
                 CdGenerate.PrintUsage(player);
                 return;
+            } else {
+                themeName = themeName.ToLower();
             }
             MapGenTheme theme = MapGenTheme.Forest;
             MapGenTemplate template = MapGenTemplate.Flat;
