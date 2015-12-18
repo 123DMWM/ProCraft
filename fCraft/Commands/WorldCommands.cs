@@ -853,8 +853,8 @@ namespace fCraft {
                     if (value.ToLower() == "default") {
                         player.Message("Reset texture for {0}&S to {1}", world.ClassyName, Server.DefaultTerrain);
                         value = "Default";
-                    } else if (!value.EndsWith(".png", StringComparison.OrdinalIgnoreCase)) {
-                        player.Message("Env Texture: Invalid image type. Please use a \".png\" type image.", world.ClassyName);
+                    } else if (!value.EndsWith(".png") && !value.EndsWith(".zip")) {
+                        player.Message("Env Texture: Invalid image type. Please use a \".png\" or \".zip\"", world.ClassyName);
                         return;
                     } else if (!(value.StartsWith("http://", StringComparison.OrdinalIgnoreCase) || 
                                  value.StartsWith("https://", StringComparison.OrdinalIgnoreCase))) {
