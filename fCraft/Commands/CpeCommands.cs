@@ -559,9 +559,20 @@ namespace fCraft {
                     }
                     break;
                 case 12:
-                    if (byte.TryParse(args, out value)) {
-                        step++; def.FogR = value;
-                        player.Message("   &bSet red component of fog to: " + value);
+                    if (WorldCommands.IsValidHex(args)) {
+                        System.Drawing.Color col = System.Drawing.ColorTranslator.FromHtml("#" + args.ToUpper().Replace("#", ""));
+                        def.FogR = col.R;
+                        player.Message("   &bSet red component of fog to: " + col.R);
+                        def.FogG = col.G;
+                        player.Message("   &bSet green component of fog to: " + col.G);
+                        def.FogB = col.B;
+                        player.Message("   &bSet blue component of fog to: " + col.B);
+                        step += 3;
+                    } else {
+                        if (byte.TryParse(args, out value)) {
+                            step++; def.FogR = value;
+                            player.Message("   &bSet red component of fog to: " + value);
+                        }
                     }
                     break;
                 case 13:
@@ -645,21 +656,23 @@ namespace fCraft {
             new [] { "&sEnter the terrain.png index for the sides texture. (0-255)" },
             new [] { "&sEnter the terrain.png index for the bottom texture. (0-255)" },
             new [] { "&sEnter whether the block prevents sunlight from passing though. (true or false)" },
-            new [] { "&sEnter the walk sound index of the block. (0-11)" },
+            new [] { "&sEnter the walk sound index of the block. (0-11)",
+                "&s0 = no sound, 1 = wood, 2 = gravel, 3 = grass, 4 = stone,",
+                "&s5 = metal, 6 = glass, 7 = wool, 8 = sand, 9 = snow." },
             new [] { "&sEnter whether the block is fully bright (i.e. like lava). (true or false)" },
             new [] { "&sEnter the shape of the block. (0-16)",
                 "&s0 = sprite(e.g. roses), 1-16 = cube of the given height",
-                "&s(e.g. slabs have height '8', snow has height '2', dirt has height '16')" },
+                "&s(e.g. snow has height '2', slabs have height '8', dirt has height '16')" },
             new [] { "&sEnter the block draw type of this block. (0-4)",
                 "&s0 = solid/opaque, 1 = transparent (like glass)",
                 "&s2 = transparent (like leaves), 3 = translucent (like water)",
                 "&s4 = gas (like air)" },
             new [] { "Enter the density of the fog for the block. (0-255)",
                 "0 is treated as no fog, 255 is thickest fog." },
-            new [] { "Enter the red component of the fog colour. (0-255)" },
+            new [] { "Enter the red component of the fog colour. (0-255) or full hex value" },
             new [] { "Enter the green component of the fog colour. (0-255)" },
             new [] { "Enter the blue component of the fog colour. (0-255)" },
-            new [] { "Enter the numerical fallback block id for this block.",
+            new [] { "Enter the fallback block for this block.",
                 "This block is shown to clients that don't support BlockDefinitions." },
         };
             

@@ -913,7 +913,7 @@ namespace fCraft {
         public static bool IsValidHex( [NotNull] string hex ) {
             if( hex == null ) throw new ArgumentNullException( "hex" );
             if (hex.StartsWith("#")) hex = hex.Remove(0, 1);
-            if( hex.Length < 1 || hex.Length > 6 ) return false;
+            if( hex.Length != 6 ) return false;
             for( int i = 0; i < hex.Length; i++ ) {
                 char ch = hex[i];
                 if( ch < '0' || ch > '9' && 
