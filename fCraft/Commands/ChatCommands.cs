@@ -1214,11 +1214,20 @@ namespace fCraft
             Permissions = new[] { Permission.DrawAdvanced },
             Usage = "/brushes",
             Help = "Lists all available brushes",
+            IsConsoleSafe = true,
             Handler = brushesHandler
         };
 
         private static void brushesHandler( Player player, CommandReader cmd ) {
-            player.Message( BrushManager.CdBrush.Help.Replace( "Gets or sets the current brush. ", "" ) );
+            string brushes = null;
+            foreach (IBrushFactory brush in BrushManager.RegisteredFactories) {
+                if (string.IsNullOrEmpty(brushes)) {
+                    brushes = brush.Name;
+                } else {
+                    brushes = brushes + ", " + brush.Name;
+                }
+            }
+            player.Message("Available brushes: " + brushes);
         }
 
         #endregion
