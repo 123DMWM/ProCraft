@@ -1133,24 +1133,23 @@ namespace fCraft {
                             box.MaxVertex );
 
             Map map = player.WorldMap;
-            Dictionary<Block, int> blockCounts = new Dictionary<Block, int>();
-            foreach( Block block in Enum.GetValues( typeof( Block ) ) ) {
-                blockCounts[block] = 0;
-            }
-            for( int x = box.XMin; x <= box.XMax; x++ ) {
-                for( int y = box.YMin; y <= box.YMax; y++ ) {
-                    for( int z = box.ZMin; z <= box.ZMax; z++ ) {
-                        Block block = map.GetBlock( x, y, z );
-                        blockCounts[block]++;
-                    }
-                }
+            Dictionary<byte, int> blockCounts = new Dictionary<byte, int>();
+            for( int i = 0; i < 256; i++ )
+            	blockCounts[(byte)i] = 0;            
+            
+            for( int z = box.ZMin; z <= box.ZMax; z++ )
+                for( int y = box.YMin; y <= box.YMax; y++ )
+                    for( int x = box.XMin; x <= box.XMax; x++ )
+            {
+            	Block block = map.GetBlock( x, y, z );
+            	blockCounts[(byte)block]++;
             }
             var topBlocks = blockCounts.Where( p => p.Value > 0 )
                                        .OrderByDescending( p => p.Value )
                                        .Take( TopBlocksToList )
                                        .ToArray();
             var blockString = topBlocks.JoinToString( p => String.Format( "{0}: {1} ({2}%)",
-                                                                          p.Key,
+                                                                          (Block)p.Key,
                                                                           p.Value,
                                                                           (p.Value * 100L) / box.Volume ) );
             player.Message( "  Top {0} block types: {1}",
