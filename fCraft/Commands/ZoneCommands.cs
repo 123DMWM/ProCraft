@@ -207,6 +207,7 @@ namespace fCraft {
                             player.Name,
                             zone.Name,
                             zone.Bounds.Volume );
+                zone.ZoneID = World.getNewZoneID(zone);
 
                 zones.Add( zone );
             }

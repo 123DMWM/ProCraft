@@ -190,6 +190,18 @@ namespace fCraft {
             }
         }
 
+        static public byte getNewZoneID(Zone z) {
+            byte i = 255;
+        retry:
+            foreach (Zone r in z.Map.Zones) {
+                if (r.ZoneID == i) {
+                    i--;
+                    goto retry;
+                }
+            }
+            return i;
+        }
+
 
         internal void UnloadMap( bool expectedPendingFlag ) {
             lock( SyncRoot ) {
