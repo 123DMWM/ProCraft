@@ -57,64 +57,64 @@ namespace fCraft {
         /// <param name="player"> Player writing the message. </param>
         /// <param name="rawMessage"> Message text. </param>
         /// <returns> True if message was sent, false if it was cancelled by an event callback. </returns>
-        public static bool SendGlobal( [NotNull] Player player, [NotNull] string rawMessage ) {
-            if( player == null ) throw new ArgumentNullException( "player" );
-            if( rawMessage == null ) throw new ArgumentNullException( "rawMessage" );
+        public static bool SendGlobal([NotNull] Player player, [NotNull] string rawMessage) {
+            if (player == null) throw new ArgumentNullException("player");
+            if (rawMessage == null) throw new ArgumentNullException("rawMessage");
             foreach (Filter Swear in Filters) {
                 if (rawMessage.ToLower().Contains(Swear.Word.ToLower())) {
                     rawMessage = rawMessage.ReplaceString(Swear.Word, Swear.Replacement, StringComparison.InvariantCultureIgnoreCase);
                 }
             }
-            if (!player.IsStaff)
-            {
+            if (!player.IsStaff) {
                 rawMessage = RegexIPMatcher.Replace(rawMessage, "<Redacted IP>");
             }
-            if (rawMessage.Length >= 10 && player.Info.Rank.MaxCaps > 0)
-            {
+            if (rawMessage.Length >= 10 && player.Info.Rank.MaxCaps > 0) {
                 int caps = 0;
-                for (int i = 0; i < rawMessage.Length; i++)
-                {
-                    if (Char.IsUpper(rawMessage[i]))
-                    {
+                for (int i = 0; i < rawMessage.Length; i++) {
+                    if (char.IsUpper(rawMessage[i])) {
                         caps++;
-                    }                    
+                    }
                 }
-                if (player.Info.Rank.MaxCaps == 1)
-                {
-                    if (caps > (rawMessage.Length / 2))
-                    {
+                if (player.Info.Rank.MaxCaps == 1) {
+                    if (caps > (rawMessage.Length / 2)) {
                         rawMessage = rawMessage.ToLower().UppercaseFirst();
                         player.Message("Max uppercase letters reached. Message set to lowercase");
                     }
-                }
-                else if (caps > player.Info.Rank.MaxCaps)
-                {
+                } else if (caps > player.Info.Rank.MaxCaps) {
                     rawMessage = rawMessage.ToLower().UppercaseFirst();
                     player.Message("Max uppercase letters reached. Message set to lowercase");
                 }
             }
-			if (player.Info.ChatRainbows) {
-				rawMessage = Rainbow.Rainbowize(rawMessage);
-			} else if (player.Info.ChatBWRainbows) {
-				rawMessage = Rainbow.BWRainbowize(rawMessage);
-			}
+            if (player.Info.ChatRainbows) {
+                rawMessage = Rainbow.Rainbowize(rawMessage);
+            } else if (player.Info.ChatBWRainbows) {
+                rawMessage = Rainbow.BWRainbowize(rawMessage);
+            }
 
-            var recipientList = Server.Players.NotIgnoring( player );            
+            var recipientList = Server.Players.NotIgnoring(player);
 
-            string formattedMessage = String.Format( "{0}&F: {1}",
+            string formattedMessage = string.Format("{0}&F: {1}",
                                                      player.ClassyName,
                                                      rawMessage);
 
-            var e = new ChatSendingEventArgs( player,
+            var e = new ChatSendingEventArgs(player,
                                               rawMessage,
                                               formattedMessage,
                                               ChatMessageType.Global,
-                                              recipientList );
+                                              recipientList);
 
-            
-            if( !SendInternal( e ) ) return false;
+
+            if (!SendInternal(e)) return false;
             rawMessage = Color.StripColors(rawMessage);
 
+            checkBotResponses(player, rawMessage);
+
+            Logger.Log(LogType.GlobalChat,
+                        "(global){0}: {1}", player.Name, rawMessage);
+            return true;
+        }
+
+        static void checkBotResponses(Player player, string rawMessage) {
             if (player.Can(Permission.UseBot)) {
                 if (rawMessage.StartsWith("Bot ", StringComparison.OrdinalIgnoreCase) && rawMessage.Length < 17) {
                     player.ParseMessage("/bot <CalledFromChat> " + rawMessage.Remove(0, 4), false);
@@ -175,10 +175,6 @@ namespace fCraft {
                     }
                 }
             }
-
-            Logger.Log( LogType.GlobalChat,
-                        "(global){0}: {1}", player.Name, rawMessage );
-            return true;
         }
 
         public static float LDistance( string s, string t ) {
