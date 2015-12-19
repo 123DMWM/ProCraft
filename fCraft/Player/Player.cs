@@ -132,8 +132,9 @@ namespace fCraft {
         //Portals
         public bool StandingInPortal = false;
         public bool CanUsePortal = true;
-        public String PortalWorld;
-        public String PortalName;
+        public string PortalWorld;
+        public Position PortalTPPos;
+        public string PortalName;
         public bool BuildingPortal = true;
         public DateTime LastUsedPortal;
         public DateTime LastWarnedPortal;

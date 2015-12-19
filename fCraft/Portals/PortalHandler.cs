@@ -114,35 +114,44 @@ namespace fCraft.Portals {
 
                                         World world = WorldManager.FindWorldExact(portal.World);
                                         // Teleport player, portal protection
-                                        switch (world.AccessSecurity.CheckDetailed(e.Player.Info)) {
-                                            case SecurityCheckResult.Allowed:
-                                            case SecurityCheckResult.WhiteListed:
-                                                if (world.IsFull) {
-                                                    e.Player.Message("Cannot join {0}&S: world is full.", world.ClassyName);
-                                                    return;
-                                                }
-                                                e.Player.StopSpectating();
-                                                e.Player.JoinWorld(WorldManager.FindWorldExact(portal.World), WorldChangeReason.Portal);
-                                                e.Player.Message("You used portal: " + portal.Name);
+                                        if (world != e.Player.World) {
+                                            switch (world.AccessSecurity.CheckDetailed(e.Player.Info)) {
+                                                case SecurityCheckResult.Allowed:
+                                                case SecurityCheckResult.WhiteListed:
+                                                    if (world.IsFull) {
+                                                        e.Player.Message("Cannot join {0}&S: world is full.", world.ClassyName);
+                                                        return;
+                                                    }
+                                                    e.Player.StopSpectating();
+                                                    if (portal.TeleportPosX != 0 && portal.TeleportPosY != 0 && portal.TeleportPosZ != 0) {
+                                                        e.Player.JoinWorld(WorldManager.FindWorldExact(portal.World), WorldChangeReason.Portal, portal.tpPosition());
+                                                    } else {
+                                                        e.Player.JoinWorld(WorldManager.FindWorldExact(portal.World), WorldChangeReason.Portal);
+                                                    }
+                                                    e.Player.Message("You used portal: " + portal.Name);
 
-                                                // Make sure this method isn't called twice
-                                                e.Player.CanUsePortal = false;
-                                                break;
+                                                    // Make sure this method isn't called twice
+                                                    e.Player.CanUsePortal = false;
+                                                    break;
 
-                                            case SecurityCheckResult.BlackListed:
-                                                if (e.Player.LastWarnedPortal == null || (DateTime.Now - e.Player.LastWarnedPortal).TotalSeconds < 2) {
-                                                    e.Player.LastWarnedPortal = DateTime.Now;
-                                                    e.Player.Message("Cannot join world {0}&S: you are blacklisted.",
-                                                        world.ClassyName);
-                                                }
-                                                break;
-                                            case SecurityCheckResult.RankTooLow:
-                                                if (e.Player.LastWarnedPortal == null || (DateTime.Now - e.Player.LastWarnedPortal).TotalSeconds > 2) {
-                                                    e.Player.LastWarnedPortal = DateTime.Now;
-                                                    e.Player.Message("Cannot join world {0}&S: must be {1}+",
-                                                                 world.ClassyName, world.AccessSecurity.MinRank.ClassyName);
-                                                }
-                                                break;
+                                                case SecurityCheckResult.BlackListed:
+                                                    if (e.Player.LastWarnedPortal == null || (DateTime.Now - e.Player.LastWarnedPortal).TotalSeconds < 2) {
+                                                        e.Player.LastWarnedPortal = DateTime.Now;
+                                                        e.Player.Message("Cannot join world {0}&S: you are blacklisted.",
+                                                            world.ClassyName);
+                                                    }
+                                                    break;
+                                                case SecurityCheckResult.RankTooLow:
+                                                    if (e.Player.LastWarnedPortal == null || (DateTime.Now - e.Player.LastWarnedPortal).TotalSeconds > 2) {
+                                                        e.Player.LastWarnedPortal = DateTime.Now;
+                                                        e.Player.Message("Cannot join world {0}&S: must be {1}+",
+                                                                     world.ClassyName, world.AccessSecurity.MinRank.ClassyName);
+                                                    }
+                                                    break;
+                                            }
+                                        } else {
+                                            e.Player.TeleportTo(portal.tpPosition());
+                                            e.Player.Message("You used portal: " + portal.Name);
                                         }
                                     } else {
                                         e.Player.StandingInPortal = false;

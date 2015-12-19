@@ -15,42 +15,59 @@
 
 //Copyright (C) <2012> Glenn Mariën (http://project-vanilla.com)
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using fCraft.Drawing;
-using System.Threading;
 
 namespace fCraft.Portals {
     public class Portal {
-        public String Name { get; set; }
-        public String Creator { get; set; }
+        public string Name { get; set; }
+        public string Creator { get; set; }
         public DateTime Created { get; set; }
-        public String World { get; set; }
+        public string World { get; set; }
         public Vector3I[] AffectedBlocks { get; set; }
         public PortalRange Range { get; set; }
-        public String Place { get; set; }
+        public string Place { get; set; }
+        public short TeleportPosX { get; set; }
+        public short TeleportPosY { get; set; }
+        public short TeleportPosZ { get; set; }
+        public byte TeleportPosR { get; set; }
+        public byte TeleportPosL { get; set; }
 
-        public Portal(String world, Vector3I[] affectedBlocks, String Name, String Creator, String Place) {
-            this.World = world;
-            this.AffectedBlocks = affectedBlocks;
-            this.Range = Portal.CalculateRange(this);
-            this.Name = Name;
-            this.Creator = Creator;
-            this.Created = DateTime.Now;
-            this.Place = Place;
+        public Portal(string world, Vector3I[] affectedBlocks, string name, string creator, string place, Position teleportPos) {
+            World = world;
+            AffectedBlocks = affectedBlocks;
+            Range = CalculateRange(this);
+            Name = name;
+            Creator = creator;
+            Created = DateTime.Now;
+            Place = place;
+            TeleportPosX = teleportPos.X;
+            TeleportPosY = teleportPos.Y;
+            TeleportPosZ = teleportPos.Z;
+            TeleportPosR = teleportPos.R;
+            TeleportPosL = teleportPos.L;
         }
 
-        public Portal(String world, Vector3I[] affectedBlocks, String Name, String Creator, DateTime Created, String Place) {
-            this.World = world;
-            this.AffectedBlocks = affectedBlocks;
-            this.Range = Portal.CalculateRange(this);
-            this.Name = Name;
-            this.Creator = Creator;
-            this.Created = Created;
-            this.Place = Place;
+        public Portal(string world, Vector3I[] affectedBlocks, string name, string creator, DateTime created, string place, Position teleportPos) {
+            World = world;
+            AffectedBlocks = affectedBlocks;
+            Range = CalculateRange(this);
+            Name = Name;
+            Creator = Creator;
+            Created = Created;
+            Place = Place;
+            TeleportPosX = teleportPos.X;
+            TeleportPosY = teleportPos.Y;
+            TeleportPosZ = teleportPos.Z;
+            TeleportPosR = teleportPos.R;
+            TeleportPosL = teleportPos.L;
         }
-
+        
+        public Position position() {
+            return new Position(TeleportPosX, TeleportPosY, TeleportPosZ, TeleportPosR, TeleportPosL);
+        }
+        public Position tpPosition() {
+            return new Position(TeleportPosX, TeleportPosY, (short)(TeleportPosZ + 64), TeleportPosR, TeleportPosL);
+        }
         public static PortalRange CalculateRange(Portal portal) {
             PortalRange range = new PortalRange(0, 0, 0, 0, 0, 0);
 
