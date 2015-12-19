@@ -433,7 +433,7 @@ namespace fCraft {
         public string LastWorldPos;
 
         /// <summary> Player's position in the current world. </summary>
-        public Position CheckPoint;
+        public Position CheckPoint = new Position(-1, -1, -1);
 
         /// <summary> Whether player wants to spawn on their rank world.</summary>
         public bool JoinOnRankWorld;

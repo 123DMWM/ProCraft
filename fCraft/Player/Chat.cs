@@ -110,7 +110,7 @@ namespace fCraft {
             checkBotResponses(player, rawMessage);
 
             Logger.Log(LogType.GlobalChat,
-                        "(global){0}: {1}", player.Name, rawMessage);
+                        "(global){0}: {1}", player.Info.Rank.Color + player.Name + Color.White, rawMessage);
             return true;
         }
 

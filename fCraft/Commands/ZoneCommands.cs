@@ -84,12 +84,9 @@ namespace fCraft {
 
             Zone newZone = new Zone();
             ZoneCollection zoneCollection = player.WorldMap.Zones;
-            if (IsSpecialZone(givenZoneName.ToLower())) { 
-                if (player.Can(Permission.ManageSpecialZones) == false)
-                {
-                    player.Message("You cannot affect special zones.");
-                    return;
-                }
+            if (IsSpecialZone(givenZoneName.ToLower()) && !player.Can(Permission.ManageSpecialZones)) {
+                player.Message("You cannot affect special zones.");
+                return;
             }
 
             if( givenZoneName.StartsWith( "+" ) ) {
@@ -207,7 +204,6 @@ namespace fCraft {
                             player.Name,
                             zone.Name,
                             zone.Bounds.Volume );
-                zone.ZoneID = World.getNewZoneID(zone);
 
                 zones.Add( zone );
             }
@@ -255,13 +251,11 @@ namespace fCraft {
 
             Zone newZone = new Zone();
             ZoneCollection zoneCollection = player.WorldMap.Zones;
-            if (IsSpecialZone(givenZoneName.ToLower())) {
-                if (player.Can(Permission.ManageSpecialZones) == false)
-                {
-                    player.Message("You cannot affect special zones.");
-                    return;
-                }
+            if (IsSpecialZone(givenZoneName.ToLower()) && !player.Can(Permission.ManageSpecialZones)) {
+                player.Message("You cannot affect special zones.");
+                return;
             }
+            
 
             // Adding an ordinary, rank-restricted zone.
             if (!World.IsValidName(givenZoneName))
@@ -381,12 +375,9 @@ namespace fCraft {
                 player.MessageNoZone( zoneName );
                 return;
             }
-            if (IsSpecialZone(zone.Name.ToLower())) {
-                if (player.Can(Permission.ManageSpecialZones) == false)
-                {
-                    player.Message("You cannot affect special zones.");
-                    return;
-                }
+            if (IsSpecialZone(zone.Name.ToLower()) && !player.Can(Permission.ManageSpecialZones)) {
+                player.Message("You cannot affect special zones.");
+                return;
             }
 
             if (zone.Name.ToLower().StartsWith("command_")) {
@@ -768,12 +759,9 @@ namespace fCraft {
                 player.MessageNoZone(zoneName);
                 return;
             }
-            if (IsSpecialZone(zone.Name.ToLower())) {
-                if (player.Can(Permission.ManageSpecialZones) == false)
-                {
-                    player.Message("You cannot affect special zones.");
-                    return;
-                }
+            if (IsSpecialZone(zone.Name.ToLower()) && !player.Can(Permission.ManageSpecialZones)) {
+                player.Message("You cannot affect special zones.");
+                return;
             }
 
             if (zone.Name.ToLower().StartsWith("command_")) {
@@ -906,12 +894,10 @@ namespace fCraft {
                 player.MessageNoZone( oldName );
                 return;
             }
-            if (IsSpecialZone(oldZone.Name.ToLower())) {
-                if (player.Can(Permission.ManageSpecialZones) == false)
-                {
-                    player.Message("You cannot affect special zones.");
-                    return;
-                }
+
+            if (IsSpecialZone(oldZone.Name.ToLower()) && !player.Can(Permission.ManageSpecialZones)) {
+                player.Message("You cannot affect special zones.");
+                return;
             }
             if (oldZone.Name.ToLower().StartsWith("command_")) {
                 if (player.Info.Rank != RankManager.HighestRank) {
@@ -1321,6 +1307,7 @@ namespace fCraft {
 
             lock (openDoorsLock) { openDoors.Remove(info.Zone); }
         }
+        static string[] specialZoneNames = { "c_command_", "checkpoint_", "command_", "death_", "deny_", "message_", "respawn_", "text_" };
         #endregion
         /// <summary> Ensures that the hex color has the correct length (1-6 characters)
         /// and character set (alphanumeric chars allowed). </summary>
@@ -1340,9 +1327,11 @@ namespace fCraft {
         }
         /// <summary> Checks if a zone name makes it a special zone </summary>
         public static bool IsSpecialZone(string name) {
-            if (name == null) throw new ArgumentNullException("name");
-            if (name.StartsWith("deny_") || name.StartsWith("respawn_") || name.StartsWith("message_") || name.StartsWith("death_") || name.StartsWith("checkpoint_") || name.StartsWith("c_command_") || name.StartsWith("command_")) {
-                return true;
+            if (name == null) return false;
+            foreach (string s in specialZoneNames) {
+                if (name.ToLower().StartsWith(s)) {
+                    return true;
+                }
             }
             return false;
         }

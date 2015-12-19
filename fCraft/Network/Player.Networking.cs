@@ -377,233 +377,70 @@ namespace fCraft {
 
             bool deniedzone = false;
 
-            foreach (Zone zone in World.Map.Zones.Cache)
-            {
-                #region special zones
-
+            #region special zones
+            foreach (Zone zone in World.Map.Zones.Cache) {
                 #region DenyLower
-                //Player.Console.Message("&sTesting Zone: {0}", zone.Name);
-                if (zone.Name.ToLower().StartsWith("deny_"))
-                {
-                    //Player.Console.Message("&sGot a Zone: {0}", zone.Name);
-                    //Player.Console.Message("&sTesting Ranks: {0} -> {1}", zone.Controller.MinRank.Name, Info.Rank.Name);
-                    //Player.Console.Message("&sTesting Ranks: {0} < {1}", RankManager.GetIndex(zone.Controller.MinRank).ToString(), RankManager.GetIndex(Info.Rank).ToString());
-                    if ((zone.Controller.MinRank > Info.Rank) && (zone.Controller.ExceptionList.Included.Contains(Info) == false) || (zone.Controller.ExceptionList.Excluded.Contains(Info) == true))
-                    {
-                        lastValidPosition = Position;                            
-                        //Player.Console.Message("&sFound A Zone That Would Deny {0}: {1}", Info.Name, zone.Name);
-                        //Player.Console.Message("&sTesting Co-Ords {0},{1},{2}: {3}{4}", newPos.X.ToString(), newPos.Y.ToString(), newPos.Z.ToString(), zone.Bounds.MinVertex.ToString(), zone.Bounds.MaxVertex.ToString());
-                        if (zone.Bounds.Contains(newPos.X / 32, newPos.Y /32, newPos.Z /32))
-                        {
+                if (zone.Name.ToLower().StartsWith("deny_")) {
+                    if (!zone.Controller.Check(Info) || zone.Controller.MinRank >= Info.Rank) {
+                        if (!zone.Bounds.Contains(lastValidPosition.X / 32, lastValidPosition.Y / 32, (lastValidPosition.Z - 32) / 32)) {
+                            lastValidPosition = Position;
+                        }
+                        if (zone.Bounds.Contains(newPos.X / 32, newPos.Y / 32, (newPos.Z - 32) / 32)) {
                             deniedzone = true;
-                            if (zone.Sign == null)
-                            {
-                                FileInfo SignInfo = new FileInfo("./signs/" + World.Name + "/" + zone.Name + ".txt");
-                                string SignMessage = "";
-                                if (SignInfo.Exists)
-                                {
-                                    string[] SignList = File.ReadAllLines("./signs/" + World.Name + "/" + zone.Name + ".txt");
-                                    foreach (string line in SignList)
-                                    {
-                                        SignMessage += line + "&n";
-                                    }
-                                    
-                                }
-                                //else Message("&WSignFile for this signpost not found!&n.Looking For: &s./signs/" + World.Name + "/" + deniedZone.Name + "&w.");
-                                else SignMessage = "&WYou must be atleast rank " + zone.Controller.MinRank.Name + "&w to enter this area.";
-                                if ((DateTime.UtcNow - LastZoneNotification).Seconds > 5)
-                                {
-                                    Message(SignMessage);
-                                    LastZoneNotification = DateTime.UtcNow;
-                                }
-                                if (!Info.IsFrozen)
-                                {
-                                    SendNow(Packet.MakeSelfTeleport(new Position
-                                    {
-                                        X = (short)((lastValidPosition.X / 32) * 32),
-                                        Y = (short)((lastValidPosition.Y / 32) * 32),
-                                        Z = (short)(lastValidPosition.Z + 22),
-                                        R = lastValidPosition.R,
-                                        L = lastValidPosition.L
-                                    }));
-                                }
-                            }
+                            sendZoneMessage(zone, "&WYou must be atleast rank " + zone.Controller.MinRank.Name + "&w to enter this area.");
+                            SendNow(Packet.MakeSelfTeleport(lastValidPosition));
                             break;
                         }
                     }
                 }
-                #endregion                
-
+                #endregion
                 #region Message
-                //Player.Console.Message("&sTesting Zone: {0}", zone.Name);
-                if (zone.Name.ToLower().StartsWith("text_"))
-                {
-                    //Player.Console.Message("&sGot a Zone: {0}", zone.Name);
-                    //Player.Console.Message("&sTesting Ranks: {0} -> {1}", zone.Controller.MinRank.Name, Info.Rank.Name);
-                    //Player.Console.Message("&sTesting Ranks: {0} < {1}", RankManager.GetIndex(zone.Controller.MinRank).ToString(), RankManager.GetIndex(Info.Rank).ToString());
-                    if ((zone.Controller.MinRank > Info.Rank) && (zone.Controller.ExceptionList.Included.Contains(Info) == false) || (zone.Controller.ExceptionList.Excluded.Contains(Info) == true))
-                    {
-                        //Player.Console.Message("&sFound A Zone That Would Deny {0}: {1}", Info.Name, zone.Name);
-                        //Player.Console.Message("&sTesting Co-Ords {0},{1},{2}: {3}{4}", newPos.X.ToString(), newPos.Y.ToString(), newPos.Z.ToString(), zone.Bounds.MinVertex.ToString(), zone.Bounds.MaxVertex.ToString());
-                        if (zone.Bounds.Contains(newPos.X / 32, newPos.Y / 32, newPos.Z / 32))
-                        {
-                            if (zone.Sign == null)
-                            {
-                                FileInfo SignInfo = new FileInfo("./signs/" + World.Name + "/" + zone.Name + ".txt");
-                                string SignMessage = "";
-                                if (SignInfo.Exists)
-                                {
-                                    string[] SignList = File.ReadAllLines("./signs/" + World.Name + "/" + zone.Name + ".txt");
-                                    foreach (string line in SignList)
-                                    {
-                                        SignMessage += line + "&n";
-                                    }
-
-                                }
-                                //else Message("&WSignFile for this signpost not found!&n.Looking For: &s./signs/" + World.Name + "/" + deniedZone.Name + "&w.");
-                                else SignMessage = "&WThis zone is marked as a text area, but no text is added to the message!";
-                                if ((DateTime.UtcNow - LastZoneNotification).Seconds > 5)
-                                {
-                                    Message(SignMessage);
-                                    LastZoneNotification = DateTime.UtcNow;
-                                }
-                            }
+                if (zone.Name.ToLower().StartsWith("text_")) {
+                    if (!zone.Controller.Check(Info) || zone.Controller.MinRank >= Info.Rank) {
+                        if (zone.Bounds.Contains(newPos.X / 32, newPos.Y / 32, (newPos.Z - 32) / 32)) {
+                            sendZoneMessage(zone, "&WThis zone is marked as a text area, but no text is added to the message!");
                             break;
                         }
                     }
                 }
                 #endregion
-
                 #region RespawnLower
-                //Player.Console.Message("&sTesting Zone: {0}", zone.Name);
-                if (zone.Name.ToLower().StartsWith("respawn_"))
-                {
-                    //Player.Console.Message("&sGot a Zone: {0}", zone.Name);
-                    //Player.Console.Message("&sTesting Ranks: {0} -> {1}", zone.Controller.MinRank.Name, Info.Rank.Name);
-                    //Player.Console.Message("&sTesting Ranks: {0} < {1}", RankManager.GetIndex(zone.Controller.MinRank).ToString(), RankManager.GetIndex(Info.Rank).ToString());
-                    if ((zone.Controller.MinRank > Info.Rank) && (zone.Controller.ExceptionList.Included.Contains(Info) == false) || (zone.Controller.ExceptionList.Excluded.Contains(Info) == true))
-                    {
-                        //Player.Console.Message("&sFound A Zone That Would Deny {0}: {1}", Info.Name, zone.Name);
-                        //Player.Console.Message("&sTesting Co-Ords {0},{1},{2}: {3}{4}", newPos.X.ToString(), newPos.Y.ToString(), newPos.Z.ToString(), zone.Bounds.MinVertex.ToString(), zone.Bounds.MaxVertex.ToString());
-                        if (zone.Bounds.Contains(newPos.X / 32, newPos.Y / 32, newPos.Z / 32))
-                        {
-                            deniedzone = true;
-                            if (zone.Sign == null)
-                            {
-                                FileInfo SignInfo = new FileInfo("./signs/" + World.Name + "/" + zone.Name + ".txt");
-                                string SignMessage = "";
-                                if (SignInfo.Exists)
-                                {
-                                    string[] SignList = File.ReadAllLines("./signs/" + World.Name + "/" + zone.Name + ".txt");
-                                    foreach (string line in SignList)
-                                    {
-                                        SignMessage += line + "&n";
-                                    }
-
-                                }
-                                //else Message("&WSignFile for this signpost not found!&n.Looking For: &s./signs/" + World.Name + "/" + deniedZone.Name + "&w.");
-                                else SignMessage = "&WThis zone is marked as a deny area, but no text is added to the deny message! Regardless, you are not permitted to enter this area.";
-                                if ((DateTime.UtcNow - LastZoneNotification).Seconds > 5)
-                                {
-                                    Message(SignMessage);
-                                    LastZoneNotification = DateTime.UtcNow;
-                                }
-                                if (!Info.IsFrozen)
-                                {
-                                    TeleportTo(this.WorldMap.Spawn);
-                                }
-                            }
+                if (zone.Name.ToLower().StartsWith("respawn_")) {
+                    if (!zone.Controller.Check(Info) || zone.Controller.MinRank >= Info.Rank) {
+                        if (zone.Bounds.Contains(newPos.X / 32, newPos.Y / 32, (newPos.Z - 32) / 32)) {
+                            sendZoneMessage(zone, "&WRespawned!");
+                            TeleportTo(WorldMap.Spawn);
                             break;
                         }
                     }
                 }
                 #endregion
-
                 #region CheckPoint
-                if (zone.Name.ToLower().StartsWith("checkpoint_") && this.Info.CheckPoint != new Position(((zone.Bounds.XMin + zone.Bounds.XMax) / 2) * 32 + 16, ((zone.Bounds.YMin + zone.Bounds.YMax) / 2) * 32 + 16, ((zone.Bounds.ZMin + zone.Bounds.ZMax) / 2) * 32 + 64))
-                {
-                    if (zone.Controller.ExceptionList.Excluded.Contains(Info) == false)
-                    {
-                        if (zone.Bounds.Contains(newPos.X / 32, newPos.Y / 32, newPos.Z / 32))
-                        {
-                            if (zone.Sign == null)
-                            {
-                                FileInfo SignInfo = new FileInfo("./signs/" + World.Name + "/" + zone.Name + ".txt");
-                                string SignMessage = "";
-                                if (SignInfo.Exists)
-                                {
-                                    string[] SignList = File.ReadAllLines("./signs/" + World.Name + "/" + zone.Name + ".txt");
-                                    foreach (string line in SignList)
-                                    {
-                                        SignMessage += line + "&n";
-                                    }
-
-                                }
-                                else SignMessage = "&aCheckPoint &sreached! This is now your respawn point.";
-                                Message(SignMessage);
-                                LastZoneNotification = DateTime.UtcNow;
-                                this.Info.CheckPoint = new Position(((zone.Bounds.XMin + zone.Bounds.XMax) / 2) * 32 + 16, ((zone.Bounds.YMin + zone.Bounds.YMax) / 2) * 32 + 16, ((zone.Bounds.ZMin + zone.Bounds.ZMax) / 2) * 32 + 64);
-                            }
-                            break;
-                        }
+                if (zone.Name.ToLower().StartsWith("checkpoint_") && Info.CheckPoint != new Position(((zone.Bounds.XMin + zone.Bounds.XMax) / 2) * 32 + 16, ((zone.Bounds.YMin + zone.Bounds.YMax) / 2) * 32 + 16, ((zone.Bounds.ZMin + zone.Bounds.ZMax) / 2) * 32 + 64)) {
+                    if (zone.Bounds.Contains(newPos.X / 32, newPos.Y / 32, (newPos.Z - 32) / 32)) {
+                        sendZoneMessage(zone, "&aCheckPoint &sreached! This is now your respawn point.");
+                        Info.CheckPoint = new Position(((zone.Bounds.XMin + zone.Bounds.XMax) / 2) * 32 + 16, ((zone.Bounds.YMin + zone.Bounds.YMax) / 2) * 32 + 16, ((zone.Bounds.ZMin + zone.Bounds.ZMax) / 2) * 32 + 64);
+                        break;
                     }
                 }
                 #endregion
-
                 #region Death
-                if (zone.Name.ToLower().StartsWith("death_"))
-                {
-                    if (this.Info.CheckPoint != null)
-                    {
-                        if (zone.Bounds.Contains(newPos.X / 32, newPos.Y / 32, newPos.Z / 32))
-                        {
-                            deniedzone = true;
-                            if (zone.Sign == null)
-                            {
-                                FileInfo SignInfo = new FileInfo("./signs/" + World.Name + "/" + zone.Name + ".txt");
-                                string SignMessage = "";
-                                if (SignInfo.Exists)
-                                {
-                                    string[] SignList = File.ReadAllLines("./signs/" + World.Name + "/" + zone.Name + ".txt");
-                                    foreach (string line in SignList)
-                                    {
-                                        SignMessage += line + "&n";
-                                    }
-
-                                }
-                                else SignMessage = "&WYou Died!";
-                                if ((DateTime.UtcNow - LastZoneNotification).Seconds > 1)
-                                {
-                                    Message(SignMessage);
-                                    LastZoneNotification = DateTime.UtcNow;
-                                }
-                                if (!Info.IsFrozen)
-                                {
-                                    if (this.Info.CheckPoint.X != 0 && this.Info.CheckPoint.Y != 0 && this.Info.CheckPoint.Z != 0)
-                                    {
-                                        TeleportTo(new Position(this.Info.CheckPoint.X, this.Info.CheckPoint.Y, this.Info.CheckPoint.Z, this.Position.R, this.Position.L));
-                                    }
-                                    else
-                                    {
-                                        TeleportTo(this.WorldMap.Spawn);
-                                    }
-                                }
-
-                            }
-                            break;
-                        }
+                if (zone.Name.ToLower().StartsWith("death_")) {
+                    if (zone.Bounds.Contains(newPos.X / 32, newPos.Y / 32, (newPos.Z - 32) / 32)) {
+                        sendZoneMessage(zone, "&WYou Died!");
+                        TeleportTo(Info.CheckPoint != new Position(-1, -1, -1) ? Info.CheckPoint : WorldMap.Spawn);
+                        break;
                     }
                 }
                 #endregion
+            }
+            #endregion
 
-                #endregion
-            }           
-
-            if( Info.IsFrozen || deniedzone) {
+            if ( Info.IsFrozen || deniedzone) {
                 // special handling for frozen players
                 if( delta.X * delta.X + delta.Y * delta.Y > AntiSpeedMaxDistanceSquared ||
                     Math.Abs( delta.Z ) > 40 ) {
-                    SendNow( Packet.MakeSelfTeleport( Position ) );
+                    SendNow( Packet.MakeSelfTeleport( lastValidPosition ) );
                 }
                 newPos.X = Position.X;
                 newPos.Y = Position.Y;
@@ -647,6 +484,21 @@ namespace fCraft {
 
             Position = newPos;
             RaisePlayerMovedEvent( this, oldPos );
+        }
+
+        public void sendZoneMessage(Zone zone, string backup) {
+            FileInfo SignInfo = new FileInfo("./signs/" + World.Name + "/" + zone.Name + ".txt");
+            string SignMessage = null;
+            if (SignInfo.Exists) {
+                string[] SignList = File.ReadAllLines("./signs/" + World.Name + "/" + zone.Name + ".txt");
+                foreach (string line in SignList) {
+                    SignMessage += line + "&n";
+                }
+            }
+            if ((DateTime.UtcNow - LastZoneNotification).Seconds > 2) {
+                Message(SignMessage ?? backup);
+                LastZoneNotification = DateTime.UtcNow;
+            }
         }
 
 

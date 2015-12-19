@@ -177,10 +177,12 @@ namespace fCraft {
                     Map = MapGenerator.GenerateFlatgrass( 128, 128, 64 );
                 }
 
-                byte zid = 255;
+                byte zid = byte.MaxValue;
                 foreach (Zone z in map.Zones) {
-                    z.ZoneID = zid;
-                    zid--;
+                    if (z.Map != null) {
+                        z.ZoneID = zid;
+                        zid--;
+                    }
                 }
                 if (EdgeLevel == -1) {
                     EdgeLevel = (short)(map.Height / 2);
@@ -191,15 +193,19 @@ namespace fCraft {
         }
 
         static public byte getNewZoneID(Zone z) {
-            byte i = 255;
+            byte i = byte.MaxValue;
         retry:
-            foreach (Zone r in z.Map.Zones) {
-                if (r.ZoneID == i) {
-                    i--;
-                    goto retry;
+            if (z.Map != null) {
+                foreach (Zone r in z.Map.Zones) {
+                    if (r.ZoneID == i) {
+                        i--;
+                        goto retry;
+                    }
                 }
+                return i;
+            } else {
+                return byte.MaxValue;
             }
-            return i;
         }
 
 

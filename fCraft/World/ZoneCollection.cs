@@ -49,7 +49,8 @@ namespace fCraft {
                 store.Add( zoneName, zone );
                 zone.Changed += OnZoneChanged;
                 UpdateCache();
-                RaiseChangedEvent();       
+                RaiseChangedEvent();
+                FindExact(zone.Name).ZoneID = World.getNewZoneID(zone);
             }
         }
 
