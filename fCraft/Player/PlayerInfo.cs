@@ -465,9 +465,6 @@ namespace fCraft {
 		/// <summary> Players continent</summary>
 		public string Continent;
         #endregion
-        //Door
-        public bool isDoorChecking = false;
-        public DateTime doorCheckTime = DateTime.MaxValue;
 
 
         #region Constructors and Serialization
