@@ -1022,7 +1022,7 @@ namespace fCraft {
             world.map.QueueUpdate(blockUpdate);
             player.RaisePlayerPlacedBlockEvent(player, world.map, coords, block, world.map.GetBlock(coords), BlockChangeContext.Manual, true);
             if (player != Player.Console) {
-                player.SendNow(Packet.MakeSetBlock(coords, Block.Dirt));
+                player.SendNow(Packet.MakeSetBlock(coords, block));
             }
             if (!isConsole) player.Message("{0} placed at {1}", block.ToString(), coords.ToString());
             if (unLoad) {
