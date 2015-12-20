@@ -42,6 +42,7 @@ namespace fCraft.Portals {
         }
 
         static void Player_PlacedBlock(object sender, Events.PlayerPlacedBlockEventArgs e) {
+            if (e.Player == Player.Console) return;
             try {
                 if (e.Player.World.Portals != null && e.Player.World.Portals.Count > 0 && e.Context != BlockChangeContext.Portal) {
                     lock (e.Player.World.Portals.SyncRoot) {

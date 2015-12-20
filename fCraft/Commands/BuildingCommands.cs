@@ -956,12 +956,17 @@ namespace fCraft {
             Permissions = new[] { Permission.Draw },
             Usage = "/Place [x] [y] [z] and/or [block]",
             Help = "Places a block at specified XYZ or directly below your feet.",
+            IsConsoleSafe = true,
             Handler = PlaceHandler
         };
 
         private static void PlaceHandler(Player player, CommandReader cmd) {
-            var op = new CuboidDrawOperation(player);
-            Map map = player.WorldMap;
+            bool isConsole = (player == Player.Console);
+            if (isConsole && cmd.Count < 6) {
+                player.Message("When used by console /Place requires a world name.");
+                player.Message("/Place [x] [y] [z] [block] [world]");
+                return;
+            }
             Block block = Block.Stone;
             Vector3I coords;
             int x, y, z;
@@ -974,6 +979,9 @@ namespace fCraft {
                     }
                 }
                 coords = new Vector3I(x, y, z);
+            } else if (isConsole) {
+                player.Message("Invalid coordinates!");
+                return;
             } else {
                 cmd.Rewind();
                 if (cmd.HasNext) {
@@ -985,15 +993,41 @@ namespace fCraft {
                 }
                 coords = new Vector3I(player.Position.X / 32, player.Position.Y / 32, (player.Position.Z - 64) / 32);
             }
-            coords.X = Math.Min(map.Width - 1, Math.Max(0, coords.X));
-            coords.Y = Math.Min(map.Length - 1, Math.Max(0, coords.Y));
-            coords.Z = Math.Min(map.Height - 1, Math.Max(0, coords.Z));
-            op.Brush = new NormalBrush(new Block[] { block});
-            op.Prepare(new Vector3I[] { coords, coords });
-            op.AnnounceCompletion = false;
-            op.Context = BlockChangeContext.Drawn;
-            op.Begin();
-            player.Message("{0} placed at {0}", block.ToString(), coords.ToString());
+            World world;
+            if (player == Player.Console) {
+                string worldName = cmd.Next();
+                if (string.IsNullOrEmpty(worldName)) {
+                    player.Message("Console must specify a world!");
+                }
+                 World worlds = WorldManager.FindWorldOrPrintMatches(player, worldName);
+                if (worlds == null) {
+                    return;
+                } else {
+                    world = worlds;
+                }
+
+            } else {
+                world = player.World;
+            }
+            bool unLoad = false;
+            if (!world.IsLoaded) {
+                world.LoadMap();
+                unLoad = true;
+            }
+            coords.X = Math.Min(world.map.Width - 1, Math.Max(0, coords.X));
+            coords.Y = Math.Min(world.map.Length - 1, Math.Max(0, coords.Y));
+            coords.Z = Math.Min(world.map.Height - 1, Math.Max(0, coords.Z));
+            BlockUpdate blockUpdate = new BlockUpdate(player, coords, block);
+            player.Info.ProcessBlockPlaced((byte)block);
+            world.map.QueueUpdate(blockUpdate);
+            player.RaisePlayerPlacedBlockEvent(player, world.map, coords, block, world.map.GetBlock(coords), BlockChangeContext.Manual, true);
+            if (player != Player.Console) {
+                player.SendNow(Packet.MakeSetBlock(coords, Block.Dirt));
+            }
+            player.Message("{0} placed at {1}", block.ToString(), coords.ToString());
+            if (unLoad) {
+                world.UnloadMap(true);
+            }
         }
 
         #endregion

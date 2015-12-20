@@ -154,6 +154,14 @@ namespace fCraft {
             }
         }
 
+        internal void RaisePlayerPlacedBlockEvent(Player player, Map map, Vector3I coords,
+                                                  Block oldBlock, Block newBlock, BlockChangeContext context, bool nothing) {
+            var handler = PlacedBlock;
+            if (handler != null) {
+                handler(null, new PlayerPlacedBlockEventArgs(player, map, coords, oldBlock, newBlock, context));
+            }
+        }
+
 
         static void RaisePlayerBeingKickedEvent( [NotNull] PlayerBeingKickedEventArgs e ) {
             if( e == null ) throw new ArgumentNullException( "e" );

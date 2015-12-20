@@ -1066,6 +1066,7 @@ namespace fCraft {
         static readonly CommandDescriptor cdDoor = new CommandDescriptor
         {
             Name = "Door",
+            Aliases = new[] { "doorlist", "removedoor", "rdoor", "doortest" },
             Usage = "/Door [option] [args]",
             Category = CommandCategory.Zone,
             Permissions = new[] { Permission.Build },
