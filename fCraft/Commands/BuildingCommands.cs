@@ -1024,7 +1024,7 @@ namespace fCraft {
             if (player != Player.Console) {
                 player.SendNow(Packet.MakeSetBlock(coords, Block.Dirt));
             }
-            player.Message("{0} placed at {1}", block.ToString(), coords.ToString());
+            if (!isConsole) player.Message("{0} placed at {1}", block.ToString(), coords.ToString());
             if (unLoad) {
                 world.UnloadMap(true);
             }
