@@ -810,7 +810,7 @@ namespace fCraft {
                     return;
             }
 
-            Server.Message("{0} &sedited a global custom block &a{1} &swith ID {&a2}",
+            Server.Message("{0} &sedited a global custom block &a{1} &swith ID &a{2}",
                            player.ClassyName, newDef.Name, newDef.BlockID);
             BlockDefinition.RemoveGlobalBlock(def);
             BlockDefinition.DefineGlobalBlock(newDef);
