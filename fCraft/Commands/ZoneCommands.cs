@@ -150,6 +150,7 @@ namespace fCraft {
                 }
 
                 newZone.Controller.MinRank = minRank;
+                World.getNewZoneID(player.World, newZone);
                 player.SelectionStart( 2, ZoneAddCallback, newZone, CdZoneAdd.Permissions );
                 player.Message( "ZoneAdd: Creating zone {0}&S. Click or &H/Mark&S 2 blocks.",
                                 newZone.ClassyName );

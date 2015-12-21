@@ -177,34 +177,23 @@ namespace fCraft {
                     Map = MapGenerator.GenerateFlatgrass( 128, 128, 64 );
                 }
 
-                byte zid = byte.MaxValue;
-                foreach (Zone z in map.Zones) {
-                    if (z.Map != null) {
-                        z.ZoneID = zid;
-                        zid--;
-                    }
-                }
-                if (EdgeLevel == -1) {
-                    EdgeLevel = (short)(map.Height / 2);
+                byte zid = byte.MinValue;
+                foreach (Zone z in Map.Zones) {
+                    z.ZoneID = zid;
+                    zid++;
                 }
 
                 return Map;
             }
         }
 
-        static public byte getNewZoneID(Zone z) {
-            byte i = byte.MaxValue;
+        static public void getNewZoneID(World world, Zone z) {
         retry:
-            if (z.Map != null) {
-                foreach (Zone r in z.Map.Zones) {
-                    if (r.ZoneID == i) {
-                        i--;
-                        goto retry;
-                    }
+            foreach (Zone r in world.map.Zones) {
+                if (z.ZoneID == r.ZoneID && z.ZoneID < 255) {
+                    z.ZoneID++;
+                    goto retry;
                 }
-                return i;
-            } else {
-                return byte.MaxValue;
             }
         }
 

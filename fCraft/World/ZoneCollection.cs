@@ -50,7 +50,6 @@ namespace fCraft {
                 zone.Changed += OnZoneChanged;
                 UpdateCache();
                 RaiseChangedEvent();
-                FindExact(zone.Name).ZoneID = World.getNewZoneID(zone);
             }
         }
 
