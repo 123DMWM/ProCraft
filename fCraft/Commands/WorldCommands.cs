@@ -4862,7 +4862,7 @@ namespace fCraft {
                 switch (option.ToLower()) {
                     case "create":
                     case "add":
-                        if (player.Can(Permission.ManageWorlds)) {
+                        if (player.Can(Permission.CreatePortals)) {
                             string addWorld = cmd.Next();
                             if (!string.IsNullOrEmpty(addWorld) && WorldManager.FindWorldExact(addWorld) != null) {
                                 DrawOperation operation = new CuboidDrawOperation(player);
@@ -4929,12 +4929,12 @@ namespace fCraft {
                                 }
                             }
                         } else {
-                            player.MessageNoAccess(Permission.ManageWorlds);
+                            player.MessageNoAccess(Permission.CreatePortals);
                         }
                         break;
                     case "remove":
                     case "delete":
-                        if (player.Can(Permission.ManageWorlds)) {
+                        if (player.Can(Permission.CreatePortals)) {
                             string remPortalName = cmd.Next();
                             string remWString = cmd.Next();
                             World remWorld = player.World;
@@ -4970,7 +4970,7 @@ namespace fCraft {
                                 }
                             }
                         } else {
-                            player.MessageNoAccess(Permission.ManageWorlds);
+                            player.MessageNoAccess(Permission.CreatePortals);
                         }
                         break;
                     case "info":

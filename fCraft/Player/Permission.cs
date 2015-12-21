@@ -186,5 +186,8 @@ namespace fCraft {
         
         /// <summary> Ability to define and modify custom global blocks. </summary>
         DefineCustomBlocks,
+
+        /// <summary> Ability to create portals. </summary>
+        CreatePortals,
     }
 }
