@@ -405,7 +405,7 @@ namespace fCraft {
                             fallback.ToString(), block.Speed, block.CollideType);
                         player.Message("   &3Top ID: &a{0}&3, Side ID: &a{1}&3, Bottom ID: &a{2}", 
                             block.TopTex, block.SideTex, block.BottomTex);
-                        player.Message("   &3Emit Light: &a{0}&3, Sound: &a{1}&3, FullBright: &a{2}", 
+                        player.Message("   &3Block Light: &a{0}&3, Sound: &a{1}&3, FullBright: &a{2}", 
                             block.BlocksLight.ToString(), block.WalkSound, block.FullBright.ToString());
                         player.Message("   &3Shape: &a{0}&3, Draw: &a{1}&3, Fog Density: &a{2}", 
                             block.Shape, block.BlockDraw, block.FogDensity);
