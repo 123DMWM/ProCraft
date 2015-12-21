@@ -613,10 +613,10 @@ namespace fCraft {
                 player.Message("  Shadow: {0}   Sunlight: {1}  Edge level: {2}",
                                 world.ShadowColor == null ? "normal" : '#' + world.ShadowColor,
                                 world.LightColor == null ? "normal" : '#' + world.LightColor,
-                                world.EdgeLevel == -1 ? "normal" : world.EdgeLevel + " blocks");
+                                world.getEdgeLevel() + " blocks");
                 player.Message( "  Water block: {1}  Bedrock block: {0}",
                                 world.EdgeBlock, world.HorizonBlock );
-                player.Message("  Texture: {0}", (world.Texture == "Default" ? Server.DefaultTerrain : world.Texture));
+                player.Message("  Texture: {0}", world.getTexture());
                 if( !player.IsUsingWoM ) {
                     player.Message( "  You need ClassicalSharp client to see the changes." );
                 }
@@ -788,7 +788,7 @@ namespace fCraft {
                     }
                     foreach (Player p in world.Players) {
                         if (p.Supports(CpeExtension.EnvMapAppearance)) {
-                            p.Send(Packet.MakeEnvSetMapAppearance((world.Texture == "Default" ? Server.DefaultTerrain : world.Texture), world.EdgeBlock, world.HorizonBlock, world.EdgeLevel == -1 ? (short)(world.map.Height / 2) : world.EdgeLevel));
+                            p.Send(Packet.MakeEnvSetMapAppearance(world.getTexture(), world.EdgeBlock, world.HorizonBlock, world.getEdgeLevel()));
                         }
                     }
                     break;
@@ -815,7 +815,7 @@ namespace fCraft {
                     }
                     foreach (Player p in world.Players) {
                         if (p.Supports(CpeExtension.EnvMapAppearance)) {
-                            p.Send(Packet.MakeEnvSetMapAppearance((world.Texture == "Default" ? Server.DefaultTerrain : world.Texture), world.EdgeBlock, world.HorizonBlock, world.EdgeLevel == -1 ? (short)(world.map.Height / 2) : world.EdgeLevel));
+                            p.Send(Packet.MakeEnvSetMapAppearance(world.getTexture(), world.EdgeBlock, world.HorizonBlock, world.getEdgeLevel()));
                         }
                     }
                     break;
@@ -842,7 +842,7 @@ namespace fCraft {
                     }
                     foreach (Player p in world.Players) {
                         if (p.Supports(CpeExtension.EnvMapAppearance)) {
-                            p.Send(Packet.MakeEnvSetMapAppearance((world.Texture == "Default" ? Server.DefaultTerrain : world.Texture), world.EdgeBlock, world.HorizonBlock, world.EdgeLevel == -1 ? (short)(world.map.Height / 2) : world.EdgeLevel));
+                            p.Send(Packet.MakeEnvSetMapAppearance(world.getTexture(), world.EdgeBlock, world.HorizonBlock, world.getEdgeLevel()));
                         }
                     }
                     break;
@@ -866,7 +866,7 @@ namespace fCraft {
                     world.Texture = value;
                     foreach (Player p in world.Players) {
                         if (p.Supports(CpeExtension.EnvMapAppearance)) {
-                            p.Send(Packet.MakeEnvSetMapAppearance((world.Texture == "Default" ? Server.DefaultTerrain : world.Texture), world.EdgeBlock, world.HorizonBlock, world.EdgeLevel == -1 ? (short)(world.map.Height / 2) : world.EdgeLevel));
+                            p.Send(Packet.MakeEnvSetMapAppearance(world.getTexture(), world.EdgeBlock, world.HorizonBlock, world.getEdgeLevel()));
                         }
                     }
                     break;
@@ -904,7 +904,6 @@ namespace fCraft {
                     CdEnv.PrintUsage(player);
                     return;
             }
-
             WorldManager.SaveWorldList();
         }
 

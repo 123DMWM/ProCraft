@@ -959,6 +959,10 @@ namespace fCraft {
         /// <summary> Elevation of the "ocean" that surrounds maps. Set to -1 to use client default (halfway up the map). </summary>
         public short EdgeLevel = -1;
 
+        public short getEdgeLevel() {
+            return EdgeLevel == -1 ? (short)(map.Height / 2) : EdgeLevel;
+        }
+
         /// <summary> The block which will be displayed on the horizon. </summary>
         public Block HorizonBlock = Block.Water;
 
@@ -967,6 +971,10 @@ namespace fCraft {
 
         /// <summary> The texture that will be used for the blocks. </summary>
         public string Texture = "Default";
+
+        public string getTexture() {
+            return Texture == "Default" ? Server.DefaultTerrain : Texture;
+        }
 
         /// <summary> The current weather in this world. </summary>
         public byte Weather = 0;

@@ -1118,11 +1118,9 @@ namespace fCraft {
         }
 
 
-        internal bool JoinWorldNow([NotNull] World newWorld, bool doUseWorldSpawn, WorldChangeReason reason)
-        {
+        internal bool JoinWorldNow([NotNull] World newWorld, bool doUseWorldSpawn, WorldChangeReason reason) {
             if (newWorld == null) throw new ArgumentNullException("newWorld");
-            if (!Enum.IsDefined(typeof(WorldChangeReason), reason))
-            {
+            if (!Enum.IsDefined(typeof(WorldChangeReason), reason)) {
                 throw new ArgumentOutOfRangeException("reason");
             }
             /*if (Thread.CurrentThread != ioThread)
@@ -1133,16 +1131,15 @@ namespace fCraft {
             }*/
 
 
-			if (!StandingInPortal) {
-				LastWorld = World;
-				LastPosition = Position;
-			}
+            if (!StandingInPortal) {
+                LastWorld = World;
+                LastPosition = Position;
+            }
 
             string textLine1 = "Loading world " + newWorld.ClassyName;
             string textLine2 = newWorld.MOTD ?? "Welcome!";
 
-            if (RaisePlayerJoiningWorldEvent(this, newWorld, reason, textLine1, textLine2))
-            {
+            if (RaisePlayerJoiningWorldEvent(this, newWorld, reason, textLine1, textLine2)) {
                 Logger.Log(LogType.Warning,
                             "Player.JoinWorldNow: Player {0} was prevented from joining world {1} by an event callback.",
                             Name, newWorld.Name);
@@ -1152,10 +1149,8 @@ namespace fCraft {
             World oldWorld = World;
 
             // remove player from the old world
-            if (oldWorld != null && oldWorld != newWorld)
-            {
-                if (!oldWorld.ReleasePlayer(this))
-                {
+            if (oldWorld != null && oldWorld != newWorld) {
+                if (!oldWorld.ReleasePlayer(this)) {
                     Logger.Log(LogType.Error,
                                 "Player.JoinWorldNow: Player asked to be released from its world, " +
                                 "but the world did not contain the player.");
@@ -1167,15 +1162,12 @@ namespace fCraft {
             Map map;
 
             // try to join the new world
-            if (oldWorld != newWorld)
-            {
+            if (oldWorld != newWorld) {
                 bool announce = (oldWorld != null) && (oldWorld.Name != newWorld.Name);
                 map = newWorld.AcceptPlayer(this, announce);
                 if (map == null)
                     return false;
-            }
-            else
-            {
+            } else {
                 map = newWorld.LoadMap();
             }
 
@@ -1184,15 +1176,16 @@ namespace fCraft {
             Position = doUseWorldSpawn ? map.Spawn : postJoinPosition;
 
             // Start sending over the level copy
-            if (oldWorld != null)
+            if (oldWorld != null) {
                 SendNow(Packet.MakeHandshake(this, textLine1, textLine2));
+            }
+            // needs to be sent before the client receives the map data
+            if (Supports(CpeExtension.BlockDefinitions)) {
+                BlockDefinition.SendGlobalDefinitions(this);
+            }
 
             writer.Write(OpCode.MapBegin);
             BytesSent++;
-            
-            // needs to be sent before the client receives the map data
-            if (Supports(CpeExtension.BlockDefinitions))
-        	    BlockDefinition.SendGlobalDefinitions(this);
 
             // enable Nagle's algorithm (in case it was turned off by LowLatencyMode)
             // to avoid wasting bandwidth for map transfer
@@ -1208,46 +1201,17 @@ namespace fCraft {
             writer.Write((short)map.Length);
             BytesSent += 7;
 
-            if (Supports(CpeExtension.ExtPlayerList2)) {
-				Send(Packet.MakeExtAddEntity2(Packet.SelfId, Info.Rank.Color + Name, (Info.skinName == "" ? Name : Info.skinName), Position, this));
-            } else {
-                Send(Packet.MakeAddEntity(Packet.SelfId, Info.Rank.Color + Name, Position));
-            }
+            SendJoinCpeExtensions();
 
-            if (Supports(CpeExtension.ChangeModel)) {
-                Send(Packet.MakeChangeModel(255, !Info.IsAFK ? Info.Mob : AFKModel));
-            }
             // Teleport player to the target location
             // This allows preserving spawn rotation/look, and allows
             // teleporting player to a specific location (e.g. /TP or /Bring)
             writer.Write(Packet.MakeTeleport(Packet.SelfId, Position).Bytes);
             BytesSent += 10;
-            SendJoinCpeExtensions();
 
-            foreach (Bot bot in World.Bots) {
-                Send(Packet.MakeRemoveEntity(bot.ID));
-                if (bot.World == World) {
-                    if (Supports(CpeExtension.ExtPlayerList2)) {
-                        Send(Packet.MakeExtAddEntity2(bot.ID, bot.Name, (bot.SkinName == "" ? bot.Name : bot.SkinName), bot.Position, this));
-                    } else {
-                        Send(Packet.MakeAddEntity(bot.ID, bot.Name, bot.Position));
-                    }
-                    if (bot.Model != "humanoid" && Supports(CpeExtension.ChangeModel)) {
-                        Send(Packet.MakeChangeModel((byte) bot.ID, bot.Model));
-                    }
-                }
-            }
             SendJoinMessage(oldWorld, newWorld);
             RaisePlayerJoinedWorldEvent(this, oldWorld, reason);
 
-            if (Supports(CpeExtension.SelectionCuboid)) {
-                foreach (Zone z in WorldMap.Zones) {
-                    if (z.ShowZone) {
-                        Send(Packet.MakeMakeSelection(z.ZoneID, z.Name, z.Bounds, z.Color, z.Alpha));
-                    }
-                }
-            }
-            
             Server.UpdateTabList();
             Server.RequestGC();
             return true;
@@ -1329,11 +1293,17 @@ namespace fCraft {
         
         void SendJoinCpeExtensions() {
             if (Supports(CpeExtension.EnvMapAppearance)) {
-        		string tex = World.Texture == "Default" ? Server.DefaultTerrain : World.Texture;
-        		short edge =  World.EdgeLevel == -1 ? (short)(WorldMap.Height / 2) : World.EdgeLevel;
-        		Send(Packet.MakeEnvSetMapAppearance(tex, World.EdgeBlock, World.HorizonBlock, (edge == -1 ? (short)(World.map.Height/2) : edge)));
+                Send(Packet.MakeEnvSetMapAppearance(World.getTexture(), World.EdgeBlock, World.HorizonBlock, World.getEdgeLevel()));
             }
-        	
+            if (Supports(CpeExtension.ExtPlayerList2)) {
+                Send(Packet.MakeExtAddEntity2(Packet.SelfId, Info.Rank.Color + Name, (Info.skinName == "" ? Name : Info.skinName), Position, this));
+            } else {
+                Send(Packet.MakeAddEntity(Packet.SelfId, Info.Rank.Color + Name, Position));
+            }
+
+            if (Supports(CpeExtension.ChangeModel)) {
+                Send(Packet.MakeChangeModel(255, !Info.IsAFK ? Info.Mob : AFKModel));
+            }
             if (Supports(CpeExtension.EnvColors))
             {
                 Send(Packet.MakeEnvSetColor((byte)EnvVariable.SkyColor, World.SkyColor));
@@ -1377,6 +1347,26 @@ namespace fCraft {
             if (Supports(CpeExtension.MessageType)) {
 				Send(Packet.Message((byte)MessageType.Status1, ConfigKey.ServerName.GetString()));
 			}
+            foreach (Bot bot in World.Bots) {
+                Send(Packet.MakeRemoveEntity(bot.ID));
+                if (bot.World == World) {
+                    if (Supports(CpeExtension.ExtPlayerList2)) {
+                        Send(Packet.MakeExtAddEntity2(bot.ID, bot.Name, (bot.SkinName == "" ? bot.Name : bot.SkinName), bot.Position, this));
+                    } else {
+                        Send(Packet.MakeAddEntity(bot.ID, bot.Name, bot.Position));
+                    }
+                    if (bot.Model != "humanoid" && Supports(CpeExtension.ChangeModel)) {
+                        Send(Packet.MakeChangeModel((byte)bot.ID, bot.Model));
+                    }
+                }
+            }
+            if (Supports(CpeExtension.SelectionCuboid)) {
+                foreach (Zone z in WorldMap.Zones) {
+                    if (z.ShowZone) {
+                        Send(Packet.MakeMakeSelection(z.ZoneID, z.Name, z.Bounds, z.Color, z.Alpha));
+                    }
+                }
+            }
         }
         
         bool GetHacksFromMotd(out bool canFly, out bool canNoClip, out bool canSpeed, out bool canRespawn) {
