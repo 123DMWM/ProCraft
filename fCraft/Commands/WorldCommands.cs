@@ -4919,7 +4919,7 @@ namespace fCraft {
                                 }
                                 operation.Brush = brush;
                                 player.PortalWorld = addWorld;
-                                player.SelectionStart(operation.ExpectedMarks, PortalCreateCallback, operation, Permission.ManageWorlds);
+                                player.SelectionStart(operation.ExpectedMarks, PortalCreateCallback, operation, Permission.CreatePortals);
                                 player.Message("Click {0} blocks or use &H/Mark&S to mark the area of the portal.", operation.ExpectedMarks);
                             } else {
                                 if (string.IsNullOrEmpty(addWorld)) {
