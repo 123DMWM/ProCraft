@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using fCraft.AutoRank;
 using JetBrains.Annotations;
+using System.Diagnostics;
 
 namespace fCraft {
     /// <summary> Several yet-undocumented commands, mostly related to AutoRank. </summary>
@@ -491,27 +492,33 @@ namespace fCraft {
             Category = CommandCategory.New | CommandCategory.Maintenance,
             IsConsoleSafe = true,
             Help = "Saves all possible databases",
-            Permissions = new[] { Permission.EditPlayerDB },
+            Permissions = new[] { Permission.EditPlayerDB, Permission.ShutdownServer },
             Usage = "/Save",
             Handler = SaveHandler
         };
 
         static void SaveHandler(Player player, CommandReader cmd)
         {
+            string option = cmd.Next() ?? "n/a";
+            Stopwatch sw = Stopwatch.StartNew();
+            player.Message("Saving...");
             PlayerDB.Save();
             IPBanList.Save();
             WorldManager.SaveWorldList();
             Portals.PortalDB.Save();
-            if (player != Player.Console)
-            {
-                if (player.WorldMap.HasChangedSinceSave)
-                {
-                    player.WorldMap.World.SaveMap();
+            BlockDefinition.SaveGlobalDefinitions();
+            foreach(World w in WorldManager.Worlds.Where(i => i.IsLoaded && i.map != null)) {
+                if (w.map.HasChangedSinceSave) {
+                    w.SaveMap();
                 }
             }
-
+            if (option.ToLower().Equals("backup")) {
+                player.Message("Backing up data...");
+                Server.BackupData();
+            }
+            sw.Stop();
+            player.Message("Finished in {0}ms", sw.ElapsedMilliseconds);
         }
-
         #endregion
         #region MassRank
 

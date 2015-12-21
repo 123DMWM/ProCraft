@@ -43,7 +43,9 @@ namespace fCraft {
                 GreetingFileName,
                 HeartbeatDataFileName,
                 WorldListFileName,
-                AutoRankFileName
+                AutoRankFileName,
+                PortalDBFileName,
+                GlobalDefinitionsFileName
             };
 
             DataFilesToBackup = new[] {
@@ -51,7 +53,8 @@ namespace fCraft {
                 PortalDBFileName,
                 IPBanListFileName,
                 WorldListFileName,
-                ConfigFileName
+                ConfigFileName,
+                GlobalDefinitionsFileName
             };
         }
 
@@ -121,6 +124,8 @@ namespace fCraft {
         public const string AutoRankFileName = "autorank.xml";
 
         public const string BlockDBDirectory = "blockdb";
+
+        public const string GlobalDefinitionsFileName = "GlobalBlocks.txt";
 
 
         /// <summary> Directory where block database files (.fbdb) are stored. </summary>

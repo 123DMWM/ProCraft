@@ -673,21 +673,20 @@ namespace fCraft
         {
             Name = "Reports",
             Aliases = new[] { "mail" },
-            Permissions = new[] { Permission.ShutdownServer },
+            Permissions = new[] { Permission.ShutdownServer, Permission.EditPlayerDB, Permission.ReloadConfig },
             IsConsoleSafe = true,
             Category = CommandCategory.New | CommandCategory.Chat,
-            Usage = "/Reports",
+            Usage = "/Reports [option] {args}",
             Help = "Use this command to list/remove reports from players",
 
-            Handler = MOLHandler
+            Handler = ReportsHandler
         };
 
-        private static void MOLHandler(Player player, CommandReader cmd) {
-            string param = cmd.Next();
+        private static void ReportsHandler(Player player, CommandReader cmd) {
+            string param = cmd.Next() ?? "n/a";
             int reportId;
-
             // List Reports
-            switch (param) {
+            switch (param.ToLower()) {
                 case "abort":
                 case "r":
                 case "d":

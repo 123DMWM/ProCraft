@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using ServiceStack.Text;
+using System.Diagnostics;
 
 namespace fCraft {
 
@@ -81,7 +82,7 @@ namespace fCraft {
             p.Send(Packet.MakeRemoveBlockDefinition(def.BlockID));
             p.Send(Packet.MakeSetBlockPermission((Block)def.BlockID, false, false));
         }
-        
+
         Packet MakeDefinePacket() {
             // speed = 2^((raw - 128) / 64);
             // therefore raw = 64log2(speed) + 128
@@ -92,9 +93,6 @@ namespace fCraft {
                 FogDensity, FogR, FogG, FogB);
         }
         
-        
-        const string path = "GlobalBlocks.txt";
-        
         public static void SaveGlobalDefinitions() {
             try {
                 SaveGlobal();
@@ -104,13 +102,15 @@ namespace fCraft {
         }
         
         static void SaveGlobal() {
-            using (Stream s = File.Create(path)) {
+            Stopwatch sw = Stopwatch.StartNew();
+            using (Stream s = File.Create(Paths.GlobalDefinitionsFileName)) {
                 JsonSerializer.SerializeToStream(GlobalDefinitions, s);
             }
+            Logger.Log(LogType.Debug, "BlockDefinitions.SaveGlobal: Saved Block definitions in {0}ms", sw.ElapsedMilliseconds);
         }
         
         public static void LoadGlobalDefinitions() {
-            if (!File.Exists(path)) return;
+            if (!File.Exists(Paths.GlobalDefinitionsFileName)) return;
             
             try {
                 LoadGlobal();
@@ -130,7 +130,7 @@ namespace fCraft {
         }
         
         static void LoadGlobal() {
-            using (Stream s = File.OpenRead("globalblocks.txt")) {
+            using (Stream s = File.OpenRead(Paths.GlobalDefinitionsFileName)) {
                 GlobalDefinitions = (BlockDefinition[])
                     JsonSerializer.DeserializeFromStream(typeof(BlockDefinition[]), s);
             }
