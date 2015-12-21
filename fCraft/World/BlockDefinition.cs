@@ -68,18 +68,18 @@ namespace fCraft {
                 if (def == null) continue;
                 
                 p.SendNow(def.MakeDefinePacket());
-                p.Send(Packet.MakeSetBlockPermission(
+                p.SendNow(Packet.MakeSetBlockPermission(
                     (Block)def.BlockID, true, true));
             }
         }
         
          public static void SendGlobalAdd(Player p, BlockDefinition def) {
-            p.SendNow(def.MakeDefinePacket());
+            p.Send(def.MakeDefinePacket());
             p.Send(Packet.MakeSetBlockPermission((Block)def.BlockID, true, true));
         }
         
         public static void SendGlobalRemove(Player p, BlockDefinition def) {
-            p.SendNow(Packet.MakeRemoveBlockDefinition(def.BlockID));
+            p.Send(Packet.MakeRemoveBlockDefinition(def.BlockID));
             p.Send(Packet.MakeSetBlockPermission((Block)def.BlockID, false, false));
         }
 
