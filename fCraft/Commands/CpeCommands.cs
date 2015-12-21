@@ -336,9 +336,9 @@ namespace fCraft {
             Category = CommandCategory.World,
             IsConsoleSafe = true,
             Permissions = new[] { Permission.DefineCustomBlocks },
-            Usage = "/gb <type/value> <args>",
+            Usage = "/gb [type/value] {args}",
             Help = "&sModifies the global custom blocks, or prints information about them.&n" +
-                "&sTypes are: add, abort, list, remove, texture&n" +
+                "&sTypes are: add, abort, edit, info, list, remove, texture&n" +
                 "&sSee &h/help gb <type>&s for details about each type.",
             HelpSections = new Dictionary<string, string>{
                 { "add",     "&h/gb add [id]&n" +
@@ -346,6 +346,11 @@ namespace fCraft {
                 { "abort",   "&h/gb abort&n" +
                         "&sAborts the custom block that was currently in the process of being " +
                         "defined from the last /gb add call." },
+                { "edit",     "&h/gb edit [id] [option] {args}&n" +
+                        "&sEdits already defined blocks so you don't have to re-add them to change something. " +
+                        "Options: Name, Solidity, Speed, TopId, SideID, BottomID, Light, Sound, FullBright, Shape, Draw, FogDensity, (FogHex or FogR, FogG, FogB), FallBack"},
+                { "info",     "&h/gb info [id]&n" +
+                        "&sDisplays custom block information for specified ID." },
                 { "list",    "&h/gb list [offset]&n" +
                         "&sPrints a list of the names of the global custom blocks, " +
                         "along with their corresponding block ids. " },
@@ -377,6 +382,35 @@ namespace fCraft {
                         player.currentGB = null;
                         player.currentGBStep = -1;
                         player.Message("Discarded the global custom block definition that was being created.");
+                    }
+                    break;
+                case "edit":
+                case "change":
+                    GlobalBlockEditHandler(player, cmd);
+                    break;
+                case "i":
+                case "info":
+                    int id;
+                    if (CheckBlockId(player, cmd, out id)) {
+                        BlockDefinition block = BlockDefinition.GlobalDefinitions[id];
+                        if (block == null) {
+                            player.Message("No custom block by the ID: &a{0}", id);
+                            player.Message("Use \"&h/gb list\" &sto see a list of global custom blocks.");
+                            return;
+                        }
+                        Block fallback;
+                        Map.GetBlockByName(block.FallBack.ToString(), false, out fallback);
+                        player.Message("&3---Name&3:&a{0} &3ID:&a{1}&3---", block.Name, block.BlockID);
+                        player.Message("   &3FallBack: &a{0}&3, Solidity: &a{2}&3, Speed: &a{1}",
+                            fallback.ToString(), block.Speed, block.CollideType);
+                        player.Message("   &3Top ID: &a{0}&3, Side ID: &a{1}&3, Bottom ID: &a{2}", 
+                            block.TopTex, block.SideTex, block.BottomTex);
+                        player.Message("   &3Emit Light: &a{0}&3, Sound: &a{1}&3, FullBright: &a{2}", 
+                            block.BlocksLight.ToString(), block.WalkSound, block.FullBright.ToString());
+                        player.Message("   &3Shape: &a{0}&3, Draw: &a{1}&3, Fog Density: &a{2}", 
+                            block.Shape, block.BlockDraw, block.FogDensity);
+                        player.Message("   &3Fog Red: &a{0}&3, Fog Green: &a{1}&3, Fog Blue: &a{2}",
+                            block.FogR, block.FogG, block.FogB);
                     }
                     break;
                 case "list":
@@ -593,6 +627,7 @@ namespace fCraft {
                         if (block > Map.MaxCustomBlockType) {
                             player.Message("&cThe fallback block must be an original block, " +
                                            "or a block defined in the CustomBlocks extension.");
+                            break;
                         }
                         def.FallBack = (byte)block;
                         player.Message("   &bSet fallback block to: " + block.ToString());
@@ -616,7 +651,181 @@ namespace fCraft {
             player.currentGBStep = step;
             PrintStepHelp(player);
         }
-        
+        static void GlobalBlockEditHandler(Player player, CommandReader cmd) {
+            int ID;
+            if (!cmd.NextInt(out ID)) {
+                PrintStepHelp(player); return;
+            }
+            BlockDefinition def = BlockDefinition.GlobalDefinitions[ID];
+            if (def == null) {
+                player.Message("There are no custom defined blocks by that ID");
+                return;
+            }
+            BlockDefinition newDef = def;
+            string option = cmd.Next() ?? "n/a";
+            string args = cmd.NextAll();
+            if (string.IsNullOrEmpty(args)) {
+                player.Message("Please specify what you want to change the {0} option to.", option);
+                return;
+            }
+            byte value = 0;
+            bool boolVal = true;
+
+            switch (option.ToLower()) {
+                case "name":
+                    player.Message("&bChanged name of &a{0}&b to &A{1}", def.Name, args);
+                    newDef.Name = args;
+                    break;
+                case "solid":
+                case "solidity":
+                case "collide":
+                case "collidetype":
+                    if (byte.TryParse(args, out value) && value <= 2) {
+                        player.Message("&bChanged solidity of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.CollideType, value);
+                        newDef.CollideType = value;
+                    }
+                    break;
+                case "speed":
+                    float speed;
+                    if (float.TryParse(args, out speed)
+                        && speed >= 0.25f && value <= 3.96f) {
+                        player.Message("&bChanged speed of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.Speed, speed);
+                        newDef.Speed = speed;
+                    }
+                    break;
+                case "topid":
+                case "toptex":
+                case "toptexture":
+                    if (byte.TryParse(args, out value)) {
+                        player.Message("&bChanged top texture index of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.TopTex, value);
+                        newDef.TopTex = value;
+                    }
+                    break;
+                case "sideid":
+                case "sidetex":
+                case "sidetexture":
+                    if (byte.TryParse(args, out value)) {
+                        player.Message("&bChanged sides texture index of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.SideTex, value);
+                        newDef.SideTex = value;
+                    }
+                    break;
+                case "bottomid":
+                case "bottomtex":
+                case "bottomtexture":
+                    if (byte.TryParse(args, out value)) {
+                        player.Message("&bChanged bottom texture index of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.BottomTex, value);
+                        newDef.BottomTex = value;
+                    }
+                    break;
+                case "light":
+                case "blockslight":
+                    if (bool.TryParse(args, out boolVal)) {
+                        player.Message("&bChanged blocks light of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.BlocksLight, boolVal);
+                        newDef.BlocksLight = boolVal;
+                    }
+                    break;
+                case "sound":
+                case "walksound":
+                    if (byte.TryParse(args, out value) && value <= 11) {
+                        player.Message("&bChanged walk sound of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.WalkSound, value);
+                        newDef.WalkSound = value;
+                    }
+                    break;
+                case "fullbright":
+                    if (bool.TryParse(args, out boolVal)) {
+                        player.Message("&bChanged full bright of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.FullBright, boolVal);
+                        newDef.FullBright = boolVal;
+                    }
+                    break;
+                case "size":
+                case "shape":
+                    if (byte.TryParse(args, out value) && value <= 16) {
+                        player.Message("&bChanged block shape of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.Shape, value);
+                        newDef.Shape = value;
+                    }
+                    break;
+                case "draw":
+                case "blockdraw":
+                    if (byte.TryParse(args, out value) && value <= 4) {
+                        player.Message("&bChanged block draw type of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.BlockDraw, value);
+                        newDef.BlockDraw = value;
+                    }
+                    break;
+                case "fogdensity":
+                case "fogd":
+                    if (byte.TryParse(args, out value)) {
+                        player.Message("&bChanged density of fog of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.FogDensity, value);
+                        newDef.FogDensity = value;
+                    }
+                    break;
+                case "foghex":
+                    if (WorldCommands.IsValidHex(args)) {
+                        System.Drawing.Color col = System.Drawing.ColorTranslator.FromHtml("#" + args.ToUpper().Replace("#", ""));
+                        player.Message("&bChanged red fog component of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.FogR, col.R);
+                        newDef.FogR = col.R;
+                        player.Message("&bChanged green fog component of fog of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.FogG, col.G);
+                        newDef.FogG = col.G;
+                        player.Message("&bChanged blue fog component of fog of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.FogB, col.B);
+                        newDef.FogB = col.B;
+                    }
+                    break;
+                case "fogr":
+                case "fogred":
+                    if (byte.TryParse(args, out value)) {
+                        player.Message("&bChanged red fog component of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.FogR, value);
+                        def.FogG = value;
+                    }
+                    break;
+                case "fogg":
+                case "foggreen":
+                    if (byte.TryParse(args, out value)) {
+                        player.Message("&bChanged green fog component of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.FogG, value);
+                        newDef.FogG = value;
+                    }
+                    break;
+                case "fogb":
+                case "fogblue":
+                    if (byte.TryParse(args, out value)) {
+                        player.Message("&bChanged blue fog component of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.FogB, value);
+                        newDef.FogB = value;
+                    }
+                    break;
+                case "fallback":
+                case "block":
+                    Block block;
+                    Map.GetBlockByName(def.FallBack.ToString(), false, out block);
+                    Block newBlock;
+                    if (Map.GetBlockByName(args, false, out newBlock)) {
+                        if (block > Map.MaxCustomBlockType) {
+                            player.Message("&cThe fallback block must be an original block, " +
+                                           "or a block defined in the CustomBlocks extension.");
+                            break;
+                        }
+                        player.Message("&bChanged fallback block of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.FallBack, block.ToString());
+                        newDef.FallBack = (byte)block;
+                    }
+                    break;
+                default:
+                    CdGlobalBlock.PrintUsage(player);
+                    return;
+            }
+
+            Server.Message("{0} &sedited a global custom block &a{1} &swith ID {&a2}",
+                           player.ClassyName, newDef.Name, newDef.BlockID);
+            BlockDefinition.RemoveGlobalBlock(def);
+            BlockDefinition.DefineGlobalBlock(newDef);
+
+            foreach (Player p in Server.Players) {
+                if (p.Supports(CpeExtension.BlockDefinitions)) {
+                    BlockDefinition.SendGlobalRemove(p, def);
+                    BlockDefinition.SendGlobalAdd(p, newDef);
+                }
+            }
+
+            BlockDefinition.SaveGlobalDefinitions();
+            ReloadAllPlayers();
+        }
+
         static bool CheckBlockId(Player player, CommandReader cmd, out int blockId) {
             if (!cmd.NextInt(out blockId)) {
                 player.Message("Provided block id is not a number.");
