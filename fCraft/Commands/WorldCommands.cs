@@ -1473,11 +1473,11 @@ namespace fCraft {
                     distance = 160;
                 }
             }
-            if (distance >= 32767 && distance <= 0) {
-                player.Message("Please try something inbetween 0 and 32767");
+            if (distance < 0 || distance > 32767) {
+                player.Message("Reach distance must be between 0 and 32767");
                 return;
-
             }
+            
             if (distance != otherPlayer.ReachDistance) {
                 if (otherPlayer != player.Info) {
                     if (otherPlayer.IsOnline == true) {
