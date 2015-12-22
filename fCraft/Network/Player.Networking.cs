@@ -1296,7 +1296,8 @@ namespace fCraft {
                 Send(Packet.MakeEnvSetMapAppearance(World.getTexture(), World.EdgeBlock, World.HorizonBlock, World.getEdgeLevel()));
             }
             if (Supports(CpeExtension.ExtPlayerList2)) {
-                Send(Packet.MakeExtAddEntity2(Packet.SelfId, Info.Rank.Color + Name, (Info.skinName == "" ? Name : Info.skinName), Position, this));
+        		string skinName = Info.skinName == "" ? Name : Info.skinName;
+        		Send(Packet.MakeExtAddEntity2(Packet.SelfId, Info.Rank.Color + Name, skinName, Position));
             } else {
                 Send(Packet.MakeAddEntity(Packet.SelfId, Info.Rank.Color + Name, Position));
             }
@@ -1347,11 +1348,13 @@ namespace fCraft {
             if (Supports(CpeExtension.MessageType)) {
 				Send(Packet.Message((byte)MessageType.Status1, ConfigKey.ServerName.GetString()));
 			}
+            
             foreach (Bot bot in World.Bots) {
                 Send(Packet.MakeRemoveEntity(bot.ID));
                 if (bot.World == World) {
                     if (Supports(CpeExtension.ExtPlayerList2)) {
-                        Send(Packet.MakeExtAddEntity2(bot.ID, bot.Name, (bot.SkinName == "" ? bot.Name : bot.SkinName), bot.Position, this));
+                		string skinName = bot.SkinName == "" ? bot.Name : bot.SkinName;
+                		Send(Packet.MakeExtAddEntity2(bot.ID, bot.Name, skinName, bot.Position));
                     } else {
                         Send(Packet.MakeAddEntity(bot.ID, bot.Name, bot.Position));
                     }
@@ -1638,7 +1641,7 @@ namespace fCraft {
                 }
                 if (bot.oldSkinName != bot.SkinName && Supports(CpeExtension.ExtPlayerList2)) {
                     Send(Packet.MakeRemoveEntity(bot.ID));
-					Send(Packet.MakeExtAddEntity2(bot.ID, bot.Name, (bot.SkinName == "" ? bot.Name : bot.SkinName), bot.Position, this));
+					Send(Packet.MakeExtAddEntity2(bot.ID, bot.Name, (bot.SkinName == "" ? bot.Name : bot.SkinName), bot.Position));
                     Send(Packet.MakeChangeModel((byte)bot.ID, bot.Model));
                     bot.oldSkinName = bot.SkinName;
                 }
@@ -1661,7 +1664,7 @@ namespace fCraft {
                 }
                 if (Info.oldskinName != Info.skinName && otherPlayer.Supports(CpeExtension.ExtPlayerList2)) {
 					otherPlayer.Send(Packet.MakeExtAddEntity2(entity.Id, Info.Rank.Color + Name, 
-						(Info.skinName == "" ? Name : Info.skinName), WorldMap.Spawn, otherPlayer));
+						(Info.skinName == "" ? Name : Info.skinName), WorldMap.Spawn));
                     if (otherPlayer == this) {
                         otherPlayer.Send(Packet.MakeTeleport(entity.Id, Position));
                     }
@@ -1752,18 +1755,12 @@ namespace fCraft {
 #if DEBUG_MOVEMENT
                 Logger.Log( LogType.Debug, "AddEntity: {0} added {1} ({2})", Name, newEntity.Id, player.Name );
 #endif
-				Position pos = new Position(0, 0, 0);
-				if (player.World != null) {
-					pos = player.WorldMap.Spawn;
-				}
+				Position pos = newEntity.LastKnownPosition;
                 if (Supports(CpeExtension.ExtPlayerList2)) {
-                    Send(Packet.MakeExtAddEntity2(newEntity.Id, player.Info.Rank.Color + player.Name,
-						(player.Info.skinName == "" ? player.Name : player.Info.skinName), pos, this));
-                    Send(Packet.MakeTeleport(newEntity.Id, player.Position));
+					string skinName = player.Info.skinName == "" ? player.Name : player.Info.skinName;
+					Send(Packet.MakeExtAddEntity2(newEntity.Id, player.Info.Rank.Color + player.Name, skinName, pos));
                 } else {
-                    Send(Packet.MakeAddEntity(newEntity.Id, player.Info.Rank.Color + player.Name,
-                        player.WorldMap.Spawn));
-                    Send(Packet.MakeTeleport(newEntity.Id, player.Position));
+					Send(Packet.MakeAddEntity(newEntity.Id, player.Info.Rank.Color + player.Name, pos));
                 }
                 if (Supports(CpeExtension.ChangeModel)) {
                     Send(Packet.MakeChangeModel((byte)newEntity.Id, !player.Info.IsAFK ? player.Info.Mob : AFKModel));
@@ -1806,7 +1803,7 @@ namespace fCraft {
             if (Supports(CpeExtension.ExtPlayerList2)) {
 				SendNow(Packet.MakeExtAddEntity2(entity.Id, player.Info.Rank.Color + player.Name, 
 					(player.Info.skinName == "" ? player.Name : player.Info.skinName),
-                    player.WorldMap.Spawn, this));
+                    player.WorldMap.Spawn));
                 Send(Packet.MakeTeleport(entity.Id, player.Position));
             } else {
                 SendNow(Packet.MakeAddEntity(entity.Id, player.Info.Rank.Color + player.Name, player.WorldMap.Spawn));

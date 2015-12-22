@@ -84,11 +84,10 @@ namespace fCraft {
         public void createBot() {
             foreach (Player sendTo in World.Players) {
                 if (sendTo.Supports(CpeExtension.ExtPlayerList2)) {
-					sendTo.Send(Packet.MakeExtAddEntity2(ID, Name, (SkinName == "" ? Name : SkinName),
-                        new Position(Position.X, Position.Y, Position.Z, Position.R, Position.L), sendTo));
+        			string skinName = SkinName == "" ? Name : SkinName;
+        			sendTo.Send(Packet.MakeExtAddEntity2(ID, Name, skinName, Position));
                 } else {
-                    sendTo.Send(Packet.MakeAddEntity(ID, Name,
-                        new Position(Position.X, Position.Y, Position.Z, Position.R, Position.L)));
+        			sendTo.Send(Packet.MakeAddEntity(ID, Name, Position));
                 }
                 if (sendTo.Supports(CpeExtension.ChangeModel)) {
                     sendTo.Send(Packet.MakeChangeModel((byte)ID, Model));
