@@ -710,6 +710,7 @@ namespace fCraft {
             Name = "Tree",
             Category = CommandCategory.New | CommandCategory.Building,
             Permissions = new[] { Permission.Draw },
+            RepeatableSelection = true,
             Usage = "/Tree Shape Height",
             Help = "Plants a tree of given shape and height. Available shapes: Normal, Bamboo and Palm. Cone, Round, Rainforest, Mangrove",
             Handler = TreeHandler

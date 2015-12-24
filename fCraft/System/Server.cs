@@ -1444,7 +1444,8 @@ namespace fCraft {
                     Logger.Log( LogType.SuspiciousActivity,
                                 "Server.RegisterPlayer: Player {0} logged in twice. Ghost from {1} was kicked.",
                                 ghost.Name, ghost.IP );
-                    ghost.KickSynchronously( "Connected from elsewhere!", LeaveReason.ClientReconnect );
+                    ghost.Kick( "Connected from elsewhere!", LeaveReason.ClientReconnect, false );
+                    Server.UnregisterPlayer( ghost );
                 }
 
                 int maxSessions = ConfigKey.MaxConnectionsPerIP.GetInt();

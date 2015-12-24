@@ -45,6 +45,7 @@ namespace fCraft {
         bool canReceive = true,
              canSend = true,
              canQueue = true;
+        bool unregisterOnKick = true;
 
         readonly Thread ioThread;
         readonly TcpClient client;
@@ -564,13 +565,8 @@ namespace fCraft {
             Server.RaiseSessionDisconnectedEvent( this, LeaveReason );
 
             if( HasRegistered ) {
-                lock( kickSyncLock ) {
-                    if( useSyncKick ) {
-                        syncKickWaiter.Set();
-                    } else {
-                        Server.UnregisterPlayer( this );
-                    }
-                }
+                if( unregisterOnKick )
+                    Server.UnregisterPlayer( this );
                 RaisePlayerDisconnectedEvent( this, LeaveReason );
             }
 
@@ -1017,14 +1013,7 @@ namespace fCraft {
             State = SessionState.Online;
 
             // Add player to the userlist
-            lock (syncKickWaiter)
-            {
-                if (!useSyncKick)
-                {
-                    Server.UpdatePlayerList();
-                }
-            }            
-
+            Server.UpdatePlayerList();
             RaisePlayerReadyEvent(this);
 
 			if (Supports(CpeExtension.MessageType)) {
@@ -1476,7 +1465,7 @@ namespace fCraft {
 
         /// <summary> Kick (asynchronous). Immediately blocks all client input, but waits
         /// until client thread has sent the kick packet. </summary>
-        public void Kick( [NotNull] string message, LeaveReason leaveReason ) {
+        public void Kick( [NotNull] string message, LeaveReason leaveReason, bool unregister = true ) {
             if( message == null ) throw new ArgumentNullException( "message" );
             if( !Enum.IsDefined( typeof( LeaveReason ), leaveReason ) ) {
                 throw new ArgumentOutOfRangeException( "leaveReason" );
@@ -1486,6 +1475,7 @@ namespace fCraft {
 
             canReceive = false;
             canQueue = false;
+            unregisterOnKick = unregister;
 
             // clear all pending output to be written to client (it won't matter after the kick)
             ClearQueue(outputQueue);
@@ -1494,23 +1484,6 @@ namespace fCraft {
             // bypassing Send() because canQueue is false
             priorityOutputQueue.Enqueue( Packet.MakeKick( message ) );
         }
-
-
-        bool useSyncKick;
-        readonly ManualResetEvent syncKickWaiter = new ManualResetEvent( false );
-        readonly object kickSyncLock = new object();
-
-
-        internal void KickSynchronously( [NotNull] string message, LeaveReason reason ) {
-            if( message == null ) throw new ArgumentNullException( "message" );
-            lock( kickSyncLock ) {
-                useSyncKick = true;
-                Kick( message, reason );
-            }
-            syncKickWaiter.WaitOne();
-            Server.UnregisterPlayer( this );
-        }
-
 
         /// <summary> Kick (synchronous). Immediately sends the kick packet.
         /// Can only be used from IoThread (this is not thread-safe). </summary>
