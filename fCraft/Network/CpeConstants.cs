@@ -74,6 +74,9 @@ namespace fCraft
         
         /// <summary> This extension lets users define their own custom blocks. </summary>
         BlockDefinitions,
+        
+        /// <summary> This extension lets users define their own custom blocks. </summary>
+        BlockDefinitionsExt,
     }
 
 

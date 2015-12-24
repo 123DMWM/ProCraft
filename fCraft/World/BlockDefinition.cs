@@ -38,9 +38,9 @@ namespace fCraft {
         
         public static void DefineGlobalBlock(BlockDefinition def) {
             // fixup for legacy files
-            if (def.MinX == 0 && def.MaxX == 0 ) def.MaxX = 1;
-            if (def.MinY == 0 && def.MaxY == 0 ) def.MaxY = 1;
-            if (def.MinZ == 0 && def.MaxZ == 0 ) def.MaxY = 1;
+            if (def.MinX == 0 && def.MaxX == 0 ) def.MaxX = 16;
+            if (def.MinY == 0 && def.MaxY == 0 ) def.MaxY = 16;
+            if (def.MinZ == 0 && def.MaxZ == 0 ) def.MaxZ = 16;
             
             string name = def.Name.ToLower().Replace(" ", "");         
             Map.BlockNames[name] = (Block)def.BlockID;
@@ -64,27 +64,26 @@ namespace fCraft {
                 BlockDefinition def = GlobalDefinitions[i];
                 if (def == null) continue;
                 
-                p.SendNow(def.MakeDefinePacket());
+                if (p.Supports(CpeExtension.BlockDefinitionsExt) && def.Shape != 0)
+                    p.SendNow(Packet.MakeDefineBlockExt(def));
+                else
+                    p.SendNow(Packet.MakeDefineBlock(def));
                 p.SendNow(Packet.MakeSetBlockPermission(
                     (Block)def.BlockID, true, true));
             }
         }
         
          public static void SendGlobalAdd(Player p, BlockDefinition def) {
-            p.Send(def.MakeDefinePacket());
+            if (p.Supports(CpeExtension.BlockDefinitionsExt) && def.Shape != 0)
+                p.Send(Packet.MakeDefineBlockExt(def));
+            else
+                p.Send(Packet.MakeDefineBlock(def));
             p.Send(Packet.MakeSetBlockPermission((Block)def.BlockID, true, true));
         }
         
         public static void SendGlobalRemove(Player p, BlockDefinition def) {
             p.Send(Packet.MakeRemoveBlockDefinition(def.BlockID));
             p.Send(Packet.MakeSetBlockPermission((Block)def.BlockID, false, false));
-        }
-
-        Packet MakeDefinePacket() {
-            // speed = 2^((raw - 128) / 64);
-            // therefore raw = 64log2(speed) + 128
-            byte rawSpeed = (byte)(64 * Math.Log(Speed, 2) + 128);
-            return Packet.MakeDefineBlock(this, rawSpeed);
         }
         
         public static void SaveGlobalDefinitions() {

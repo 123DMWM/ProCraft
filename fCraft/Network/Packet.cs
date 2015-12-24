@@ -451,33 +451,58 @@ namespace fCraft {
         }
         
         [Pure]
-        public static Packet MakeDefineBlock(BlockDefinition def, byte speed) {
+        public static Packet MakeDefineBlock(BlockDefinition def) {
             Packet packet = new Packet( OpCode.DefineBlock );
-            packet.Bytes[1] = def.BlockID;
-            Encoding.ASCII.GetBytes(def.Name.PadRight(64), 0, 64, packet.Bytes, 2);
-            packet.Bytes[66] = def.CollideType;
-            packet.Bytes[67] = speed;
-            packet.Bytes[68] = def.TopTex;
-            packet.Bytes[69] = def.SideTex;
-            packet.Bytes[70] = def.BottomTex;
-            packet.Bytes[71] = (byte)(def.BlocksLight ? 0 : 1);
-            packet.Bytes[72] = def.WalkSound;
-            packet.Bytes[73] = (byte)(def.FullBright ? 1 : 0);
+            MakeDefineBlockStart(def, ref packet);
             packet.Bytes[74] = def.Shape;
-            packet.Bytes[75] = def.BlockDraw;
-            packet.Bytes[76] = def.FogDensity;
-            packet.Bytes[77] = def.FogR;
-            packet.Bytes[78] = def.FogG;
-            packet.Bytes[79] = def.FogB;
+            MakeDefineBlockEnd(def, 75, ref packet);
             return packet;
-        }
-        
+        }       
         
         [Pure]
         public static Packet MakeRemoveBlockDefinition(byte blockId) {
             Packet packet = new Packet(OpCode.RemoveBlockDefinition);
             packet.Bytes[1] = blockId;
             return packet;
+        }
+        
+        [Pure]
+        public static Packet MakeDefineBlockExt(BlockDefinition def) {
+            Packet packet = new Packet( OpCode.DefineBlockExt );
+            MakeDefineBlockStart(def, ref packet);
+            packet.Bytes[74] = def.MinX;
+            packet.Bytes[75] = def.MinY;
+            packet.Bytes[76] = def.MinZ;
+            packet.Bytes[77] = def.MaxX;
+            packet.Bytes[78] = def.MaxY;
+            packet.Bytes[79] = def.MaxZ;
+            MakeDefineBlockEnd(def, 80, ref packet);
+            return packet;
+        }
+        
+        static void MakeDefineBlockStart(BlockDefinition def, ref Packet packet) {
+        	// speed = 2^((raw - 128) / 64);
+            // therefore raw = 64log2(speed) + 128
+            byte rawSpeed = (byte)(64 * Math.Log(def.Speed, 2) + 128);
+            
+            packet.Bytes[1] = def.BlockID;
+            Encoding.ASCII.GetBytes(def.Name.PadRight(64), 0, 64, packet.Bytes, 2);
+            packet.Bytes[66] = def.CollideType;
+            packet.Bytes[67] = rawSpeed;
+            packet.Bytes[68] = def.TopTex;
+            packet.Bytes[69] = def.SideTex;
+            packet.Bytes[70] = def.BottomTex;
+            packet.Bytes[71] = (byte)(def.BlocksLight ? 0 : 1);
+            packet.Bytes[72] = def.WalkSound;
+            packet.Bytes[73] = (byte)(def.FullBright ? 1 : 0);
+        }
+        
+        static void MakeDefineBlockEnd(BlockDefinition def, int offset, ref Packet packet) {
+            packet.Bytes[offset + 0] = def.BlockDraw;
+            packet.Bytes[offset + 1] = def.FogDensity;
+            packet.Bytes[offset + 2] = def.FogR;
+            packet.Bytes[offset + 3] = def.FogG;
+            packet.Bytes[offset + 4] = def.FogB;
         }
 
         #endregion
@@ -534,6 +559,7 @@ namespace fCraft {
             0,
             80, // DefineBlock
             2, // RemoveBlockDefinition
+            85, // DefineBlockExt
         };
     }
 }
