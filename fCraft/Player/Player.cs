@@ -2247,7 +2247,8 @@ namespace fCraft {
         const int FullCP437ExtVersion = 1;
         const string BlockDefinitionsExtName = "BlockDefinitions";
         const int BlockDefinitionsExtVersion = 1;
-
+        const string BlockDefinitionsExtExtName = "BlockDefinitionsExt";
+        const int BlockDefinitionsExtExtVersion = 1;
 
         public bool Supports(CpeExtension extension) {
             return supportedExtensions.Contains(extension);
@@ -2258,7 +2259,7 @@ namespace fCraft {
         bool NegotiateProtocolExtension()
         {
             // write our ExtInfo and ExtEntry packets
-            writer.Write(Packet.MakeExtInfo("ProCraft", 19).Bytes);
+            writer.Write(Packet.MakeExtInfo("ProCraft", 20).Bytes);
             writer.Write(Packet.MakeExtEntry(ClickDistanceExtName, ClickDistanceExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(CustomBlocksExtName, CustomBlocksExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(HeldBlockExtName, HeldBlockExtVersion).Bytes);
@@ -2284,6 +2285,7 @@ namespace fCraft {
             writer.Write(Packet.MakeExtEntry(FullCP437ExtName, FullCP437ExtVersion).Bytes);
             
             writer.Write(Packet.MakeExtEntry(BlockDefinitionsExtName, BlockDefinitionsExtVersion).Bytes);
+            writer.Write(Packet.MakeExtEntry(BlockDefinitionsExtExtName, BlockDefinitionsExtExtVersion).Bytes);
 
             // Expect ExtInfo reply from the client
             OpCode extInfoReply = reader.ReadOpCode();
@@ -2311,14 +2313,12 @@ namespace fCraft {
                 CpeExtension addedExt = CpeExtension.none;
                 switch (extName) {
                     case CustomBlocksExtName:
-                        if (extVersion == CustomBlocksExtVersion) {
+                        if (extVersion == CustomBlocksExtVersion)
                             addedExt = CpeExtension.CustomBlocks;
-                        }
                         break;
                     case BlockPermissionsExtName:
-                        if (extVersion == BlockPermissionsExtVersion) {
+                        if (extVersion == BlockPermissionsExtVersion)
                             addedExt = CpeExtension.BlockPermissions;
-                        }
                         break;
                     case ClickDistanceExtName:
                         if (extVersion == ClickDistanceExtVersion) {
@@ -2326,14 +2326,12 @@ namespace fCraft {
                         }
                         break;
                     case EnvColorsExtName:
-                        if (extVersion == EnvColorsExtVersion) {
+                        if (extVersion == EnvColorsExtVersion)
                             addedExt = CpeExtension.EnvColors;
-                        }
                         break;
                     case ChangeModelExtName:
-                        if (extVersion == ChangeModelExtVersion) {
+                        if (extVersion == ChangeModelExtVersion)
                             addedExt = CpeExtension.ChangeModel;
-                        }
                         break;
                     case EnvMapAppearanceExtName:
                         if (extVersion == EnvMapAppearanceExtVersion) {
@@ -2341,14 +2339,12 @@ namespace fCraft {
                         }
                         break;
                     case EnvWeatherTypeExtName:
-                        if (extVersion == EnvWeatherTypeExtVersion) {
+                        if (extVersion == EnvWeatherTypeExtVersion)
                             addedExt = CpeExtension.EnvWeatherType;
-                        }
                         break;
                     case HeldBlockExtName:
-                        if (extVersion == HeldBlockExtVersion) {
+                        if (extVersion == HeldBlockExtVersion)
                             addedExt = CpeExtension.HeldBlock;
-                        }
                         break;
                     case ExtPlayerListExtName:
                         if (extVersion == ExtPlayerListExtVersion) {
@@ -2364,50 +2360,46 @@ namespace fCraft {
                         }
                         break;
                     case SelectionCuboidExtName:
-                        if (extVersion == SelectionCuboidExtVersion) {
+                        if (extVersion == SelectionCuboidExtVersion)
                             addedExt = CpeExtension.SelectionCuboid;
-                        }
                         break;
                     case MessageTypesExtName:
-                        if (extVersion == MessageTypesExtVersion) {
+                        if (extVersion == MessageTypesExtVersion)
                             addedExt = CpeExtension.MessageType;
-                        }
                         break;
                     case HackControlExtName:
-                        if (extVersion == HackControlExtVersion) {
+                        if (extVersion == HackControlExtVersion)
                             addedExt = CpeExtension.HackControl;
-                        }
                         break;
                     case EmoteFixExtName:
-                        if (extVersion == EmoteFixExtVersion) {
+                        if (extVersion == EmoteFixExtVersion)
                             addedExt = CpeExtension.EmoteFix;
-                        }
                         break;
                     case TextHotKeyExtName:
-                        if (extVersion == TextHotKeyExtVersion) {
+                        if (extVersion == TextHotKeyExtVersion)
                             addedExt = CpeExtension.TextHotKey;
-                        }
                         break;
                     case PlayerClickExtName:
-                        if (extVersion == PlayerClickExtVersion) {
+                        if (extVersion == PlayerClickExtVersion)
                             addedExt = CpeExtension.PlayerClick;
-                        }
                         break;
                     case LongerMessagesExtName:
-                        if (extVersion == LongerMessagesExtVersion) {
+                        if (extVersion == LongerMessagesExtVersion)
                             addedExt = CpeExtension.LongerMessages;
-                        }
                         break;
                     case FullCP437ExtName:
-                        if (extVersion == FullCP437ExtVersion) {
+                        if (extVersion == FullCP437ExtVersion)
                             addedExt = CpeExtension.FullCP437;
-                        }
                         break;
                     case BlockDefinitionsExtName:
-                        if (extVersion == BlockDefinitionsExtVersion) {
+                        if (extVersion == BlockDefinitionsExtVersion)
                         	addedExt = CpeExtension.BlockDefinitions;
-                        }
                         break;
+                    case BlockDefinitionsExtExtName:
+                        if (extVersion == BlockDefinitionsExtExtVersion)
+                            addedExt = CpeExtension.BlockDefinitionsExt;
+                        break;
+                      
                     default:
                         addExt = false;
                         break;

@@ -118,6 +118,9 @@ namespace fCraft
         
         /// <summary> Packet telling the client to remove the given block defined by the server. </summary>
         RemoveBlockDefinition = 36,
+        
+        /// <summary> Packet telling the client to create a new block as defined by the data in the packet. </summary>
+        DefineBlockExt = 37,
     }
 }
 
