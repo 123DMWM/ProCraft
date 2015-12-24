@@ -804,6 +804,18 @@ namespace fCraft {
                         newDef.FallBack = (byte)block;
                     }
                     break;
+                case "minx":
+                    def.MinX = EditCoord(player, "min X", def.Name, args, def.MinX); break;
+                case "miny":
+                    def.MinY = EditCoord(player, "min Y", def.Name, args, def.MinY); break;
+                case "minz":
+                    def.MinZ = EditCoord(player, "min Z", def.Name, args, def.MinZ); break;
+                case "maxx":
+                    def.MaxX = EditCoord(player, "max X", def.Name, args, def.MaxX); break;
+                case "maxy":
+                    def.MaxY = EditCoord(player, "max Y", def.Name, args, def.MaxY); break;
+                case "maxz":
+                    def.MaxZ = EditCoord(player, "max Z", def.Name, args, def.MaxZ); break;
                 default:
                     CdGlobalBlock.PrintUsage(player);
                     return;
@@ -823,6 +835,15 @@ namespace fCraft {
 
             BlockDefinition.SaveGlobalDefinitions();
             ReloadAllPlayers();
+        }
+        
+        static byte EditCoord(Player player, string coord, string name, string args, byte origValue) {
+            byte value;
+            if (byte.TryParse(args, out value) && value <= 16) {
+                player.Message("&bChanged {0} coordinate of &a{1}&b from &a{2}&b to &a{3}", coord, name, origValue, value);
+                return value;
+            }
+            return origValue;
         }
 
         static bool CheckBlockId(Player player, CommandReader cmd, out int blockId) {

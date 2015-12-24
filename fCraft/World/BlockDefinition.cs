@@ -38,9 +38,12 @@ namespace fCraft {
         
         public static void DefineGlobalBlock(BlockDefinition def) {
             // fixup for legacy files
-            if (def.MinX == 0 && def.MaxX == 0 ) def.MaxX = 16;
-            if (def.MinY == 0 && def.MaxY == 0 ) def.MaxY = 16;
-            if (def.MinZ == 0 && def.MaxZ == 0 ) def.MaxZ = 16;
+            if (def.MinX == 0 && def.MaxX == 0 ) 
+            	def.MaxX = 16;
+            if (def.MinZ == 0 && def.MaxZ == 0 ) 
+            	def.MaxZ = 16;
+            if (def.MinY == 0 && def.MaxY == 0 )
+            	def.MaxY = def.Shape == 0 ? (byte)16 : def.Shape;
             
             string name = def.Name.ToLower().Replace(" ", "");         
             Map.BlockNames[name] = (Block)def.BlockID;
