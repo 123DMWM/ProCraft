@@ -652,11 +652,10 @@ namespace fCraft {
             PrintStepHelp(player);
         }
         static void GlobalBlockEditHandler(Player player, CommandReader cmd) {
-            int ID;
-            if (!cmd.NextInt(out ID)) {
-                PrintStepHelp(player); return;
-            }
-            BlockDefinition def = BlockDefinition.GlobalDefinitions[ID];
+            int blockId;
+            if (!CheckBlockId(player, cmd, out blockId))
+                return;
+            BlockDefinition def = BlockDefinition.GlobalDefinitions[blockId];
             if (def == null) {
                 player.Message("There are no custom defined blocks by that ID");
                 return;
@@ -827,13 +826,17 @@ namespace fCraft {
         }
 
         static bool CheckBlockId(Player player, CommandReader cmd, out int blockId) {
+        	if (!cmd.HasNext) {
+        		blockId = 0;
+        		player.Message("You most provide a block ID argument.");
+                return false;
+        	}
             if (!cmd.NextInt(out blockId)) {
                 player.Message("Provided block id is not a number.");
                 return false;
-            }
-            
-            if (blockId <= 0 || blockId > 255) {
-                player.Message("Block id must be between 1-255");
+            }           
+            if (blockId <= 0 || blockId >= 255) {
+                player.Message("Block id must be between 1-254");
                 return false;
             }
             return true;
