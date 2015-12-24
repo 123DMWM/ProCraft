@@ -26,25 +26,22 @@ namespace fCraft {
         public byte FogB { get; set; }    
         public byte FallBack { get; set; }
         
-        public BlockDefinition() { }
-        
-        public BlockDefinition(byte id, string name, byte collideType, float speed,
-                               byte topTex, byte sideTex, byte bottomTex,
-                               bool blocksLight, byte walkSound, bool fullBright,
-                               byte shape, byte blockDraw, byte fogDensity,
-                               byte fogR, byte fogG, byte fogB, byte fallback) {
-            
-            BlockID = id; Name = name; CollideType = collideType;
-            Speed = speed; TopTex = topTex; SideTex = sideTex;
-            BottomTex = bottomTex; BlocksLight = blocksLight;
-            WalkSound = walkSound; FullBright = fullBright;
-            Shape = shape; BlockDraw = blockDraw; FogDensity = fogDensity;
-            FogR = fogR; FogG = fogG; FogB = fogB; FallBack = fallback;
-        }
+        // BlockDefinitionsExt fields
+        public byte MinX { get; set; }
+        public byte MinY { get; set; }
+        public byte MinZ { get; set; }
+        public byte MaxX { get; set; }
+        public byte MaxY { get; set; }
+        public byte MaxZ { get; set; }
         
         public static BlockDefinition[] GlobalDefinitions = new BlockDefinition[256];
         
         public static void DefineGlobalBlock(BlockDefinition def) {
+            // fixup for legacy files
+            if (def.MinX == 0 && def.MaxX == 0 ) def.MaxX = 1;
+            if (def.MinY == 0 && def.MaxY == 0 ) def.MaxY = 1;
+            if (def.MinZ == 0 && def.MaxZ == 0 ) def.MaxY = 1;
+            
             string name = def.Name.ToLower().Replace(" ", "");         
             Map.BlockNames[name] = (Block)def.BlockID;
             Map.BlockNames[def.BlockID.ToString()] = (Block)def.BlockID;
@@ -87,10 +84,7 @@ namespace fCraft {
             // speed = 2^((raw - 128) / 64);
             // therefore raw = 64log2(speed) + 128
             byte rawSpeed = (byte)(64 * Math.Log(Speed, 2) + 128);
-            return Packet.MakeDefineBlock(
-                BlockID, Name, CollideType, rawSpeed, TopTex, SideTex, BottomTex,
-                BlocksLight, WalkSound, FullBright, Shape, BlockDraw,
-                FogDensity, FogR, FogG, FogB);
+            return Packet.MakeDefineBlock(this, rawSpeed);
         }
         
         public static void SaveGlobalDefinitions() {

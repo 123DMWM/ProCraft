@@ -450,36 +450,25 @@ namespace fCraft {
             return packet;
         }
         
-        
         [Pure]
-        public static Packet MakeDefineBlock(byte block, string name, byte solid, byte speed, byte top, byte side, 
-                                             byte bottom, bool blocksLight, byte walkSound,bool fullBright, byte shape, 
-                                             byte draw) {
-            return MakeDefineBlock(block, name, solid, speed, top, side, bottom, blocksLight,
-                                   walkSound, fullBright, shape, draw, 0, 0, 0, 0);
-        }
-        
-        [Pure]
-        public static Packet MakeDefineBlock(byte block, string name, byte solid, byte speed, byte top, byte side, 
-                                             byte bottom, bool blocksLight, byte walkSound, bool fullBright, byte shape, byte draw, 
-                                             byte fogD, byte fogR, byte fogG, byte fogB) {
+        public static Packet MakeDefineBlock(BlockDefinition def, byte speed) {
             Packet packet = new Packet( OpCode.DefineBlock );
-            packet.Bytes[1] = block;
-            Encoding.ASCII.GetBytes(name.PadRight(64), 0, 64, packet.Bytes, 2);
-            packet.Bytes[66] = solid;
+            packet.Bytes[1] = def.BlockID;
+            Encoding.ASCII.GetBytes(def.Name.PadRight(64), 0, 64, packet.Bytes, 2);
+            packet.Bytes[66] = def.CollideType;
             packet.Bytes[67] = speed;
-            packet.Bytes[68] = top;
-            packet.Bytes[69] = side;
-            packet.Bytes[70] = bottom; 
-            packet.Bytes[71] = (byte)(blocksLight ? 0 : 1);
-            packet.Bytes[72] = walkSound;
-            packet.Bytes[73] = (byte)(fullBright ? 1 : 0);
-            packet.Bytes[74] = shape;
-            packet.Bytes[75] = draw;
-            packet.Bytes[76] = fogD;
-            packet.Bytes[77] = fogR;
-            packet.Bytes[78] = fogG;
-            packet.Bytes[79] = fogB;
+            packet.Bytes[68] = def.TopTex;
+            packet.Bytes[69] = def.SideTex;
+            packet.Bytes[70] = def.BottomTex;
+            packet.Bytes[71] = (byte)(def.BlocksLight ? 0 : 1);
+            packet.Bytes[72] = def.WalkSound;
+            packet.Bytes[73] = (byte)(def.FullBright ? 1 : 0);
+            packet.Bytes[74] = def.Shape;
+            packet.Bytes[75] = def.BlockDraw;
+            packet.Bytes[76] = def.FogDensity;
+            packet.Bytes[77] = def.FogR;
+            packet.Bytes[78] = def.FogG;
+            packet.Bytes[79] = def.FogB;
             return packet;
         }
         
