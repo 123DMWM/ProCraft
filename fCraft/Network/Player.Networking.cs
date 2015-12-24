@@ -533,17 +533,8 @@ namespace fCraft {
             // Sometimes MC allows clicking out of bounds,
             // like at map transitions or at the top layer of the world.
             // Those clicks should be simply ignored.
-            if( World.Map.InBounds( coords ) ) {
-                var e = new PlayerClickingEventArgs( this, coords, action, (Block)type );
-                if( RaisePlayerClickingEvent( e ) ) {
-                    RevertBlockNow( coords );
-                } else {
-                    RaisePlayerClickedEvent( this, coords, e.Action, e.Block );
-                    PlaceBlock( coords, e.Action, e.Block );
-                    Info.LastWorld = this.World.ClassyName;
-                    Info.LastWorldPos = this.Position.ToString();
-                }
-            }
+            if( World.Map.InBounds( coords ) )
+            	PlaceBlockWithEvents( coords, action, (Block)type );
         }
 
         void ProcessPlayerClickPacket() {

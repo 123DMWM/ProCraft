@@ -1104,6 +1104,18 @@ namespace fCraft {
         int signspot = 0;
 
 
+        public void PlaceBlockWithEvents( Vector3I coords, ClickAction action, Block type ) {
+            var e = new PlayerClickingEventArgs( this, coords, action, type );
+            if( RaisePlayerClickingEvent( e ) ) {
+                RevertBlockNow( coords );
+            } else {
+                RaisePlayerClickedEvent( this, coords, e.Action, e.Block );
+                PlaceBlock( coords, e.Action, e.Block );
+                Info.LastWorld = this.World.ClassyName;
+                Info.LastWorldPos = this.Position.ToString();
+            }
+        }
+        
         /// <summary> Handles manually-placed/deleted blocks.
         /// Returns true if player's action should result in a kick. </summary>
         public bool PlaceBlock( Vector3I coord, ClickAction action, Block type ) {

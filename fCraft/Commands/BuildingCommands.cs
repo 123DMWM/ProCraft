@@ -969,6 +969,8 @@ namespace fCraft {
                 return;
             }
             Block block = Block.Stone;
+            if (!isConsole && player.LastUsedBlockType != Block.None)
+            	block = player.LastUsedBlockType;
             Vector3I coords;
             int x, y, z;
             if (cmd.NextInt(out x) && cmd.NextInt(out y) && cmd.NextInt(out z)) {
@@ -1000,13 +1002,9 @@ namespace fCraft {
                 if (string.IsNullOrEmpty(worldName)) {
                     player.Message("Console must specify a world!");
                 }
-                 World worlds = WorldManager.FindWorldOrPrintMatches(player, worldName);
-                if (worlds == null) {
+                world = WorldManager.FindWorldOrPrintMatches(player, worldName);
+                if (world == null)
                     return;
-                } else {
-                    world = worlds;
-                }
-
             } else {
                 world = player.World;
             }
@@ -1018,14 +1016,18 @@ namespace fCraft {
             coords.X = Math.Min(world.map.Width - 1, Math.Max(0, coords.X));
             coords.Y = Math.Min(world.map.Length - 1, Math.Max(0, coords.Y));
             coords.Z = Math.Min(world.map.Height - 1, Math.Max(0, coords.Z));
-            BlockUpdate blockUpdate = new BlockUpdate(player, coords, block);
-            player.Info.ProcessBlockPlaced((byte)block);
-            world.map.QueueUpdate(blockUpdate);
-            player.RaisePlayerPlacedBlockEvent(player, world.map, coords, block, world.map.GetBlock(coords), BlockChangeContext.Manual, true);
-            if (player != Player.Console) {
+            
+            if (player == Player.Console) {
+                BlockUpdate blockUpdate = new BlockUpdate(player, coords, block);
+                player.Info.ProcessBlockPlaced((byte)block);
+                world.map.QueueUpdate(blockUpdate);
+                player.RaisePlayerPlacedBlockEvent(player, world.map, coords, block, world.map.GetBlock(coords), BlockChangeContext.Manual, true);
+            } else {
                 player.SendNow(Packet.MakeSetBlock(coords, block));
+                player.PlaceBlockWithEvents(coords, ClickAction.Build, block);
             }
-            if (!isConsole) player.Message("{0} placed at {1}", block.ToString(), coords.ToString());
+            if (!isConsole) 
+                player.Message("{0} placed at {1}", block.ToString(), coords.ToString());
             if (unLoad) {
                 world.UnloadMap(true);
             }
