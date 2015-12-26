@@ -433,12 +433,13 @@ namespace fCraft {
 
 
         [Pure]
-        public static Packet MakeExtAddEntity2(sbyte entityId, [NotNull] string inGameName, [NotNull] string skinName, Position spawnPosition) {
+        public static Packet MakeExtAddEntity2(sbyte entityId, [NotNull] string inGameName, [NotNull] string skinName, Position spawnPosition, Player sentto) {
             if (inGameName == null)
                 throw new ArgumentNullException("inGameName");
             if (skinName == null)
                 throw new ArgumentNullException("skinName");
             Packet packet = new Packet(OpCode.ExtAddEntity2);
+            //Logger.Log(LogType.Debug, "Send to {4}: MakeExtAddEntity2({0}, {1}, {2}, {3})", (byte)((byte)(entityId) - 128), inGameName, skinName, spawnPosition.ToString(), sentto.Name);
             packet.Bytes[1] = (byte) entityId;
             Encoding.ASCII.GetBytes(inGameName.PadRight(64), 0, 64, packet.Bytes, 2);
             Encoding.ASCII.GetBytes(skinName.PadRight(64), 0, 64, packet.Bytes, 66);
