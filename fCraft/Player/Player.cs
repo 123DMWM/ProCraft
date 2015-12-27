@@ -1260,7 +1260,7 @@ namespace fCraft {
                 case CanPlaceResult.ZoneDenied:
                     Zone deniedZone = WorldMap.Zones.FindDenied( coord, this );
                     if (deniedZone != null) {
-                        if (deniedZone.Name.ToLower().StartsWith("sign") && deniedZone.Bounds.Volume == 1) {
+                        if (deniedZone.Name.ToLower().StartsWith("sign_") && deniedZone.Bounds.Volume == 1) {
                             if (deniedZone.Sign == null) {
                                 FileInfo SignInfo = new FileInfo("./signs/" + World.Name + "/" + deniedZone.Name + ".txt");
                                 String[] SignList2 = null;

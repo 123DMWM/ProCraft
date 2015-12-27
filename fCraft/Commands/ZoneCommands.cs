@@ -81,8 +81,7 @@ namespace fCraft {
 
             Zone newZone = new Zone();
             ZoneCollection zoneCollection = player.WorldMap.Zones;
-            if (IsSpecialZone(givenZoneName.ToLower()) && !player.Can(Permission.ManageSpecialZones)) {
-                player.Message("You cannot affect special zones.");
+            if (!canManageSpecialZone(givenZoneName.ToLower(), player)) {
                 return;
             }
 
@@ -224,7 +223,7 @@ namespace fCraft {
             World playerWorld = player.World;
             if (playerWorld == null) PlayerOpException.ThrowNoWorld(player);
 
-            string givenZoneName = "Sign" + cmd.Next();
+            string givenZoneName = "Sign_" + cmd.Next();
             if (givenZoneName == null || !cmd.HasNext)
             {
                 CdSignAdd.PrintUsage(player);
@@ -249,11 +248,10 @@ namespace fCraft {
 
             Zone newZone = new Zone();
             ZoneCollection zoneCollection = player.WorldMap.Zones;
-            if (IsSpecialZone(givenZoneName.ToLower()) && !player.Can(Permission.ManageSpecialZones)) {
-                player.Message("You cannot affect special zones.");
+            if (!canManageSpecialZone(givenZoneName.ToLower(), player)) {
                 return;
             }
-            
+
 
             // Adding an ordinary, rank-restricted zone.
             if (!World.IsValidName(givenZoneName))
@@ -373,8 +371,7 @@ namespace fCraft {
                 player.MessageNoZone( zoneName );
                 return;
             }
-            if (IsSpecialZone(zone.Name.ToLower()) && !player.Can(Permission.ManageSpecialZones)) {
-                player.Message("You cannot affect special zones.");
+            if (!canManageSpecialZone(zone.Name.ToLower(), player)) {
                 return;
             }
 
@@ -757,8 +754,7 @@ namespace fCraft {
                 player.MessageNoZone(zoneName);
                 return;
             }
-            if (IsSpecialZone(zone.Name.ToLower()) && !player.Can(Permission.ManageSpecialZones)) {
-                player.Message("You cannot affect special zones.");
+            if (!canManageSpecialZone(zone.Name.ToLower(), player)) {
                 return;
             }
 
@@ -820,8 +816,8 @@ namespace fCraft {
         {
             if (player.World == null) PlayerOpException.ThrowNoWorld(player);
 
-            string zoneName = "Sign" + cmd.Next();
-            if (zoneName == "Sign")
+            string zoneName = "Sign_" + cmd.Next();
+            if (zoneName == "Sign_")
             {
                 CdSignRemove.PrintUsage(player);
                 return;
@@ -893,8 +889,7 @@ namespace fCraft {
                 return;
             }
 
-            if (IsSpecialZone(oldZone.Name.ToLower()) && !player.Can(Permission.ManageSpecialZones)) {
-                player.Message("You cannot affect special zones.");
+            if (!canManageSpecialZone(oldZone.Name.ToLower(), player)) {
                 return;
             }
             if (oldZone.Name.ToLower().StartsWith("command_")) {
@@ -1265,7 +1260,8 @@ namespace fCraft {
 
             lock (openDoorsLock) { openDoors.Remove(info.Zone); }
         }
-        static string[] specialZoneNames = { "c_command_", "checkpoint_", "command_", "death_", "deny_", "message_", "respawn_", "text_" };
+        static string[] specialZoneNames = { "checkpoint_", "death_", "deny_", "message_", "respawn_", "text_" };
+        static string[] specialOwnerZoneNames = { "c_command_", "command_" };
         #endregion
         /// <summary> Ensures that the hex color has the correct length (1-6 characters)
         /// and character set (alphanumeric chars allowed). </summary>
@@ -1284,11 +1280,38 @@ namespace fCraft {
             return true;
         }
         /// <summary> Checks if a zone name makes it a special zone </summary>
-        public static bool IsSpecialZone(string name) {
+        public static bool canManageSpecialZone(string name, Player player) {
             if (name == null) return false;
-            foreach (string s in specialZoneNames) {
-                if (name.ToLower().StartsWith(s)) {
-                    return true;
+            Rank rank = RankManager.GetMinRankWithAnyPermission(Permission.ManageSpecialZones);
+            if (name.ToLower().StartsWith("command_") || name.ToLower().StartsWith("c_command_")) {
+                foreach (string s in specialOwnerZoneNames) {
+                    if (name.ToLower().StartsWith(s)) {
+                        if (player.Info.Rank == RankManager.HighestRank && player.Can(Permission.ManageSpecialZones)) {
+                            return true;
+                        } else {
+                            if (rank != null) {
+                                player.Message("You must be {0}&s to affect this special zone.", RankManager.HighestRank.ClassyName);
+                            } else {
+                                player.Message("No rank has permission to affect special zones.");
+                            }
+                            return false;
+                        }
+                    }
+                }
+            } else {
+                foreach (string s in specialZoneNames) {
+                    if (name.ToLower().StartsWith(s)) {
+                        if (player.Can(Permission.ManageSpecialZones)) {
+                            return true;
+                        } else {
+                            if (rank != null) {
+                                player.Message("You must be {0}&s to affect this special zone.", rank.ClassyName);
+                            } else {
+                                player.Message("No rank has permission to affect special zones.");
+                            }
+                            return false;
+                        }
+                    }
                 }
             }
             return false;
