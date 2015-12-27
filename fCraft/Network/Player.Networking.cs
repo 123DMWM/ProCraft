@@ -388,7 +388,11 @@ namespace fCraft {
                         }
                         if (zone.Bounds.Contains(newPos.X / 32, newPos.Y / 32, (newPos.Z - 32) / 32)) {
                             deniedzone = true;
-                            sendZoneMessage(zone, "&WYou must be atleast rank " + zone.Controller.MinRank.Name + "&w to enter this area.");
+                            if (zone.Controller.MinRank.NextRankUp != null) {
+                                sendZoneMessage(zone, "&WYou must be atleast rank " + zone.Controller.MinRank.NextRankUp.Name + "&w to enter this area.");
+                            } else {
+                                sendZoneMessage(zone, "&WNo rank may enter this area.");
+                            }
                             SendNow(Packet.MakeSelfTeleport(lastValidPosition));
                             break;
                         }
@@ -441,7 +445,7 @@ namespace fCraft {
                 // special handling for frozen players
                 if( delta.X * delta.X + delta.Y * delta.Y > AntiSpeedMaxDistanceSquared ||
                     Math.Abs( delta.Z ) > 40 ) {
-                    SendNow( Packet.MakeSelfTeleport( lastValidPosition ) );
+                    SendNow( Packet.MakeSelfTeleport( Position ) );
                 }
                 newPos.X = Position.X;
                 newPos.Y = Position.Y;
@@ -452,9 +456,7 @@ namespace fCraft {
                 delta.Y = 0;
                 delta.Z = 0;
 
-            }
-
-            else if( !Can( Permission.UseSpeedHack ) || !Info.AllowSpeedhack) {
+            } else if( !Can( Permission.UseSpeedHack ) || !Info.AllowSpeedhack) {
                 int distSquared = delta.X * delta.X + delta.Y * delta.Y + delta.Z * delta.Z;
                 // speedhack detection
                 if( DetectMovementPacketSpam() ) {
