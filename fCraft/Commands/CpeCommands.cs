@@ -411,6 +411,8 @@ namespace fCraft {
                             block.Shape, block.BlockDraw, block.FogDensity);
                         player.Message("   &3Fog Red: &a{0}&3, Fog Green: &a{1}&3, Fog Blue: &a{2}",
                             block.FogR, block.FogG, block.FogB);
+                        player.Message("   &3Min X: &a{0}&3, Max X: &a{1}&3, Min Y: &a{2}&3, Max Y: &a{3}",
+                            block.MinX, block.MaxX, block.MinY, block.MaxY);
                     }
                     break;
                 case "list":
@@ -506,13 +508,13 @@ namespace fCraft {
                                    player.ClassyName, def.Name, def.BlockID );
             ReloadAllPlayers();
         }
-        
-        static void GlobalBlockDefineHandler(Player player, string args) {         
+
+        static void GlobalBlockDefineHandler(Player player, string args) {
             // print the current step help if no args given
             if (string.IsNullOrWhiteSpace(args)) {
                 PrintStepHelp(player); return;
             }
-            
+
             BlockDefinition def = player.currentGB;
             int step = player.currentGBStep;
             byte value = 0; // as we can't pass properties by reference, make a temp var.
@@ -569,13 +571,25 @@ namespace fCraft {
                     break;
                 case 8:
                     if (bool.TryParse(args, out boolVal)) {
-                        step++; def.FullBright = boolVal;
+                        if (player.Supports(CpeExtension.BlockDefinitionsExt)) {
+                            step = 16;
+                        } else {
+                            step++;
+                        }
+                        def.FullBright = boolVal;
                         player.Message("   &bSet full bright to: " + boolVal);
                     }
                     break;
                 case 9:
                     if (byte.TryParse(args, out value) && value <= 16) {
-                        step++; def.Shape = value;
+                        step++;
+                        def.Shape = value;
+                        def.MinX = 0;
+                        def.MinY = 0;
+                        def.MinZ = 0;
+                        def.MaxX = 16;
+                        def.MaxY = 16;
+                        def.MaxZ = value;
                         player.Message("   &bSet block shape to: " + value);
                     }
                     break;
@@ -621,6 +635,63 @@ namespace fCraft {
                         player.Message("   &bSet blue component of fog to: " + value);
                     }
                     break;
+                case 16:
+                    if (args.ToLower().Equals("-1")) {
+                        player.Message("   &bBlock will display as a Sprite");
+                        def.Shape = 0;
+                        def.MinX = 0;
+                        def.MinY = 0;
+                        def.MinZ = 0;
+                        def.MaxX = 16;
+                        def.MaxY = 16;
+                        def.MaxZ = 16;
+                        step = 10;
+                        break;
+                    }
+                    if (args.Split().Count() != 3) {
+                        player.Message("Please specify 3 coordinates");
+                        return;
+                    }
+                    byte minx, miny, minz;
+                    if (byte.TryParse(args.Split()[0], out minx)
+                        && byte.TryParse(args.Split()[1], out miny)
+                        && byte.TryParse(args.Split()[2], out minz)
+                        && (minx <= 15 && minx >= 0)
+                        && (miny <= 15 && miny >= 0)
+                        && (minz <= 15 && minz >= 0)) {
+                    } else {
+                        player.Message("Invalid coordinates! All 3 must be between 0 and 15");
+                        return;
+                    }
+                    step++;
+                    def.MinX = minx;
+                    def.MinY = miny;
+                    def.MinZ = minz;
+                    player.Message("   &bSet minimum coords to X:{0} Y:{1} Z:{2}", minx, miny, minz);
+                    break;
+                case 17:
+                    if (args.Split().Count() != 3) {
+                        player.Message("Please specify 3 coordinates");
+                        return;
+                    }
+                    byte maxx, maxy, maxz;
+                    if (byte.TryParse(args.Split()[0], out maxx)
+                        && byte.TryParse(args.Split()[1], out maxy)
+                        && byte.TryParse(args.Split()[2], out maxz)
+                        && (maxx <= 16 && maxx >= 1)
+                        && (maxy <= 16 && maxy >= 1)
+                        && (maxz <= 16 && maxz >= 1)) {
+                    } else {
+                        player.Message("Invalid coordinates! All 3 must be between 1 and 16");
+                        return;
+                    }
+                    step = 10;
+                    def.MaxX = maxx;
+                    def.MaxY = maxy;
+                    def.MaxZ = maxz;
+                    def.Shape = maxz;
+                    player.Message("   &bSet maximum coords to X:{0} Y:{1} Z:{2}", maxx, maxy, maxz);
+                    break;
                 default:
                     Block block;
                     if (Map.GetBlockByName(args, false, out block)) {
@@ -634,7 +705,7 @@ namespace fCraft {
                         BlockDefinition.DefineGlobalBlock(def);
 
                         foreach (Player p in Server.Players) {
-                            if (p.Supports(CpeExtension.BlockDefinitions))
+                            if (p.Supports(CpeExtension.BlockDefinitions) || p.Supports(CpeExtension.BlockDefinitionsExt))
                                 BlockDefinition.SendGlobalAdd(p, def);
                         }
 
@@ -669,6 +740,7 @@ namespace fCraft {
             }
             byte value = 0;
             bool boolVal = true;
+            bool hasChanged = false;
 
             switch (option.ToLower()) {
                 case "name":
@@ -682,6 +754,7 @@ namespace fCraft {
                     if (byte.TryParse(args, out value) && value <= 2) {
                         player.Message("&bChanged solidity of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.CollideType, value);
                         newDef.CollideType = value;
+                        hasChanged = true;
                     }
                     break;
                 case "speed":
@@ -690,6 +763,7 @@ namespace fCraft {
                         && speed >= 0.25f && value <= 3.96f) {
                         player.Message("&bChanged speed of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.Speed, speed);
                         newDef.Speed = speed;
+                        hasChanged = true;
                     }
                     break;
                 case "topid":
@@ -698,6 +772,7 @@ namespace fCraft {
                     if (byte.TryParse(args, out value)) {
                         player.Message("&bChanged top texture index of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.TopTex, value);
                         newDef.TopTex = value;
+                        hasChanged = true;
                     }
                     break;
                 case "sideid":
@@ -706,6 +781,7 @@ namespace fCraft {
                     if (byte.TryParse(args, out value)) {
                         player.Message("&bChanged sides texture index of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.SideTex, value);
                         newDef.SideTex = value;
+                        hasChanged = true;
                     }
                     break;
                 case "bottomid":
@@ -714,6 +790,7 @@ namespace fCraft {
                     if (byte.TryParse(args, out value)) {
                         player.Message("&bChanged bottom texture index of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.BottomTex, value);
                         newDef.BottomTex = value;
+                        hasChanged = true;
                     }
                     break;
                 case "light":
@@ -721,6 +798,7 @@ namespace fCraft {
                     if (bool.TryParse(args, out boolVal)) {
                         player.Message("&bChanged blocks light of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.BlocksLight, boolVal);
                         newDef.BlocksLight = boolVal;
+                        hasChanged = true;
                     }
                     break;
                 case "sound":
@@ -728,19 +806,23 @@ namespace fCraft {
                     if (byte.TryParse(args, out value) && value <= 11) {
                         player.Message("&bChanged walk sound of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.WalkSound, value);
                         newDef.WalkSound = value;
+                        hasChanged = true;
                     }
                     break;
                 case "fullbright":
                     if (bool.TryParse(args, out boolVal)) {
                         player.Message("&bChanged full bright of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.FullBright, boolVal);
                         newDef.FullBright = boolVal;
+                        hasChanged = true;
                     }
                     break;
                 case "size":
                 case "shape":
+                case "height":
                     if (byte.TryParse(args, out value) && value <= 16) {
                         player.Message("&bChanged block shape of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.Shape, value);
                         newDef.Shape = value;
+                        hasChanged = true;
                     }
                     break;
                 case "draw":
@@ -748,6 +830,7 @@ namespace fCraft {
                     if (byte.TryParse(args, out value) && value <= 4) {
                         player.Message("&bChanged block draw type of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.BlockDraw, value);
                         newDef.BlockDraw = value;
+                        hasChanged = true;
                     }
                     break;
                 case "fogdensity":
@@ -755,6 +838,7 @@ namespace fCraft {
                     if (byte.TryParse(args, out value)) {
                         player.Message("&bChanged density of fog of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.FogDensity, value);
                         newDef.FogDensity = value;
+                        hasChanged = true;
                     }
                     break;
                 case "foghex":
@@ -766,6 +850,7 @@ namespace fCraft {
                         newDef.FogG = col.G;
                         player.Message("&bChanged blue fog component of fog of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.FogB, col.B);
                         newDef.FogB = col.B;
+                        hasChanged = true;
                     }
                     break;
                 case "fogr":
@@ -773,6 +858,7 @@ namespace fCraft {
                     if (byte.TryParse(args, out value)) {
                         player.Message("&bChanged red fog component of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.FogR, value);
                         def.FogG = value;
+                        hasChanged = true;
                     }
                     break;
                 case "fogg":
@@ -780,6 +866,7 @@ namespace fCraft {
                     if (byte.TryParse(args, out value)) {
                         player.Message("&bChanged green fog component of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.FogG, value);
                         newDef.FogG = value;
+                        hasChanged = true;
                     }
                     break;
                 case "fogb":
@@ -787,6 +874,7 @@ namespace fCraft {
                     if (byte.TryParse(args, out value)) {
                         player.Message("&bChanged blue fog component of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.FogB, value);
                         newDef.FogB = value;
+                        hasChanged = true;
                     }
                     break;
                 case "fallback":
@@ -802,45 +890,78 @@ namespace fCraft {
                         }
                         player.Message("&bChanged fallback block of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.FallBack, block.ToString());
                         newDef.FallBack = (byte)block;
+                        hasChanged = true;
                     }
                     break;
+                case "min":
+                    if (args.ToLower().Equals("-1")){
+                        player.Message("Block will display as a sprite!");
+                        newDef.Shape = 0;
+                        hasChanged = true;
+                        break;
+                    }
+                    if (args.Split().Count() != 3) {
+                        player.Message("Please specify 3 coordinates!");
+                        break;
+                    }
+                    newDef.MinX = EditCoord(player, "min X", def.Name, args.Split()[0], def.MinX, ref hasChanged);
+                    newDef.MinY = EditCoord(player, "min Y", def.Name, args.Split()[1], def.MinY, ref hasChanged);
+                    newDef.MinZ = EditCoord(player, "min Z", def.Name, args.Split()[2], def.MinZ, ref hasChanged);
+                    hasChanged = true;
+                    break;
+                case "max":
+                    if (args.Split().Count() != 3) {
+                        player.Message("Please specify 3 coordinates!");
+                        break;
+                    }
+                    newDef.MaxX = EditCoord(player, "max X", def.Name, args.Split()[0], def.MaxX, ref hasChanged);
+                    newDef.MaxY = EditCoord(player, "max Y", def.Name, args.Split()[1], def.MaxY, ref hasChanged);
+                    newDef.MaxZ = EditCoord(player, "max Z", def.Name, args.Split()[2], def.MaxZ, ref hasChanged);
+                    hasChanged = true;
+                    break;
                 case "minx":
-                    def.MinX = EditCoord(player, "min X", def.Name, args, def.MinX); break;
+                    newDef.MinX = EditCoord(player, "min X", def.Name, args, def.MinX, ref hasChanged); break;
                 case "miny":
-                    def.MinY = EditCoord(player, "min Y", def.Name, args, def.MinY); break;
+                    newDef.MinY = EditCoord(player, "min Y", def.Name, args, def.MinY, ref hasChanged); break;
                 case "minz":
-                    def.MinZ = EditCoord(player, "min Z", def.Name, args, def.MinZ); break;
+                    newDef.MinZ = EditCoord(player, "min Z", def.Name, args, def.MinZ, ref hasChanged); break;
                 case "maxx":
-                    def.MaxX = EditCoord(player, "max X", def.Name, args, def.MaxX); break;
+                    newDef.MaxX = EditCoord(player, "max X", def.Name, args, def.MaxX, ref hasChanged); break;
                 case "maxy":
-                    def.MaxY = EditCoord(player, "max Y", def.Name, args, def.MaxY); break;
+                    newDef.MaxY = EditCoord(player, "max Y", def.Name, args, def.MaxY, ref hasChanged); break;
                 case "maxz":
-                    def.MaxZ = EditCoord(player, "max Z", def.Name, args, def.MaxZ); break;
+                    newDef.MaxZ = EditCoord(player, "max Z", def.Name, args, def.MaxZ, ref hasChanged);
+                    if (byte.TryParse(args, out value)) {
+                        newDef.Shape = value;
+                    }
+                    break;
                 default:
                     CdGlobalBlock.PrintUsage(player);
                     return;
             }
+            if (hasChanged) {
+                Server.Message("{0} &sedited a global custom block &a{1} &swith ID &a{2}",
+                               player.ClassyName, newDef.Name, newDef.BlockID);
+                BlockDefinition.RemoveGlobalBlock(def);
+                BlockDefinition.DefineGlobalBlock(newDef);
 
-            Server.Message("{0} &sedited a global custom block &a{1} &swith ID &a{2}",
-                           player.ClassyName, newDef.Name, newDef.BlockID);
-            BlockDefinition.RemoveGlobalBlock(def);
-            BlockDefinition.DefineGlobalBlock(newDef);
-
-            foreach (Player p in Server.Players) {
-                if (p.Supports(CpeExtension.BlockDefinitions)) {
-                    BlockDefinition.SendGlobalRemove(p, def);
-                    BlockDefinition.SendGlobalAdd(p, newDef);
+                foreach (Player p in Server.Players) {
+                    if (p.Supports(CpeExtension.BlockDefinitions)) {
+                        BlockDefinition.SendGlobalRemove(p, def);
+                        BlockDefinition.SendGlobalAdd(p, newDef);
+                    }
                 }
-            }
 
-            BlockDefinition.SaveGlobalDefinitions();
-            ReloadAllPlayers();
+                BlockDefinition.SaveGlobalDefinitions();
+                ReloadAllPlayers();
+            }
         }
         
-        static byte EditCoord(Player player, string coord, string name, string args, byte origValue) {
+        static byte EditCoord(Player player, string coord, string name, string args, byte origValue, ref bool hasChanged) {
             byte value;
             if (byte.TryParse(args, out value) && value <= 16) {
                 player.Message("&bChanged {0} coordinate of &a{1}&b from &a{2}&b to &a{3}", coord, name, origValue, value);
+                hasChanged = true;
                 return value;
             }
             return origValue;
@@ -907,6 +1028,11 @@ namespace fCraft {
             new [] { "Enter the blue component of the fog colour. (0-255)" },
             new [] { "Enter the fallback block for this block.",
                 "This block is shown to clients that don't support BlockDefinitions." },
+            new [] { "Enter the min X Y Z coords of this block,",
+                "Min = 0 Max = 15 Example: &h/gb 0 0 0",
+                "&h/gb -1&s to make it a sprite" },
+            new [] { "Enter the max X Y Z coords of this block,",
+                "Min = 1 Max = 16 Example: &h/gb 16 16 16" },
         };
             
         #endregion

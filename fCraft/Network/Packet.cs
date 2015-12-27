@@ -472,11 +472,11 @@ namespace fCraft {
             Packet packet = new Packet( OpCode.DefineBlockExt );
             MakeDefineBlockStart(def, ref packet);
             packet.Bytes[74] = def.MinX;
-            packet.Bytes[75] = def.MinY;
-            packet.Bytes[76] = def.MinZ;
+            packet.Bytes[75] = def.MinZ;
+            packet.Bytes[76] = def.MinY;
             packet.Bytes[77] = def.MaxX;
-            packet.Bytes[78] = def.MaxY;
-            packet.Bytes[79] = def.MaxZ;
+            packet.Bytes[78] = def.MaxZ;
+            packet.Bytes[79] = def.MaxY;
             MakeDefineBlockEnd(def, 80, ref packet);
             return packet;
         }
