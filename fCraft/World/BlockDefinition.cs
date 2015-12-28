@@ -34,16 +34,32 @@ namespace fCraft {
         public byte MaxY { get; set; }
         public byte MaxZ { get; set; }
         
+        public BlockDefinition Copy() {
+            BlockDefinition def = new BlockDefinition();
+            def.BlockID = BlockID; def.Name = Name;
+            def.CollideType = CollideType; def.Speed = Speed;
+            def.TopTex = TopTex; def.SideTex = SideTex;
+            def.BottomTex = BottomTex; def.BlocksLight = BlocksLight;
+            def.WalkSound = WalkSound; def.FullBright = FullBright;
+            def.Shape = Shape; def.BlockDraw = BlockDraw;
+            def.FogDensity = FogDensity; def.FogR = FogR;
+            def.FogG = FogG; def.FogB = FogB;
+            def.FallBack = FallBack;
+            def.MinX = MinX; def.MinY = MinY; def.MinZ = MinZ;
+            def.MaxX = MaxX; def.MaxY = MaxY; def.MaxZ = MaxZ;
+            return def;
+        }
+        
         public static BlockDefinition[] GlobalDefinitions = new BlockDefinition[256];
         
         public static void DefineGlobalBlock(BlockDefinition def) {
             // fixup for legacy files
             if (def.MinX == 0 && def.MaxX == 0 ) 
-            	def.MaxX = 16;
+                def.MaxX = 16;
             if (def.MinY == 0 && def.MaxY == 0 ) 
-            	def.MaxY = 16;
+                def.MaxY = 16;
             if (def.MinZ == 0 && def.MaxZ == 0 )
-            	def.MaxZ = def.Shape == 0 ? (byte)16 : def.Shape;
+                def.MaxZ = def.Shape == 0 ? (byte)16 : def.Shape;
             
             string name = def.Name.ToLower().Replace(" ", "");         
             Map.BlockNames[name] = (Block)def.BlockID;

@@ -338,7 +338,7 @@ namespace fCraft {
             Permissions = new[] { Permission.DefineCustomBlocks },
             Usage = "/gb [type/value] {args}",
             Help = "&sModifies the global custom blocks, or prints information about them.&n" +
-                "&sTypes are: add, abort, edit, info, list, remove, texture&n" +
+                "&sTypes are: add, abort, duplicate, edit, info, list, remove, texture&n" +
                 "&sSee &h/help gb <type>&s for details about each type.",
             HelpSections = new Dictionary<string, string>{
                 { "add",     "&h/gb add [id]&n" +
@@ -346,9 +346,11 @@ namespace fCraft {
                 { "abort",   "&h/gb abort&n" +
                         "&sAborts the custom block that was currently in the process of being " +
                         "defined from the last /gb add call." },
+                { "duplicate",     "&h/gb duplicate [source id] [new id]&n" +
+                        "&sCreates a new custom block, using all the global custom block data of the given existing custom block id. " },
                 { "edit",     "&h/gb edit [id] [option] {args}&n" +
                         "&sEdits already defined blocks so you don't have to re-add them to change something. " +
-                        "Options: Name, Solidity, Speed, TopId, SideID, BottomID, Light, Sound, FullBright, Shape, Draw, FogDensity, (FogHex or FogR, FogG, FogB), FallBack"},
+                        "Options: Name, Solidity, Speed, AllId, TopId, SideID, BottomID, Light, Sound, FullBright, Shape, Draw, FogDensity, (FogHex or FogR, FogG, FogB), FallBack"},
                 { "info",     "&h/gb info [id]&n" +
                         "&sDisplays custom block information for specified ID." },
                 { "list",    "&h/gb list [offset]&n" +
@@ -387,6 +389,10 @@ namespace fCraft {
                 case "edit":
                 case "change":
                     GlobalBlockEditHandler(player, cmd);
+                    break;
+                case "copy":
+                case "duplicate":
+                    GlobalBlockDuplicateHandler(player, cmd);
                     break;
                 case "i":
                 case "info":
@@ -722,6 +728,37 @@ namespace fCraft {
             player.currentGBStep = step;
             PrintStepHelp(player);
         }
+        
+        static void GlobalBlockDuplicateHandler(Player p, CommandReader cmd) {
+            int sourceId, newId;
+            if (!CheckBlockId(p, cmd, out sourceId) || !CheckBlockId(p, cmd, out newId))
+                return;
+            
+            BlockDefinition srcDef = BlockDefinition.GlobalDefinitions[sourceId];
+            if (srcDef == null) {
+                p.Message("There is no custom block with the id: &a{0}", sourceId);
+                p.Message("Use \"&h/gb list&s\" to see a list of global custom blocks.");
+                return;
+            }
+            BlockDefinition dstDef = BlockDefinition.GlobalDefinitions[newId];
+            if (dstDef != null) {
+                p.Message("There is already a custom block with the id: &a{0}", newId);
+                p.Message("Use \"&h/gb remove {0}&s\" on this block first.", newId);
+                p.Message("Use \"&h/gb list&s\" to see a list of global custom blocks.");
+                return;
+            }            
+            BlockDefinition def = srcDef.Copy();
+            def.BlockID = (byte)newId;
+            BlockDefinition.DefineGlobalBlock(def);
+            Server.Message("{0} &screated a new global custom block &h{1} &swith ID {2}",
+                           p.ClassyName, def.Name, def.BlockID);
+            
+            foreach (Player pl in Server.Players) {
+                if (pl.Supports(CpeExtension.BlockDefinitions))
+                    BlockDefinition.SendGlobalAdd(pl, def);
+            }            
+        }
+        
         static void GlobalBlockEditHandler(Player player, CommandReader cmd) {
             int blockId;
             if (!CheckBlockId(player, cmd, out blockId))
@@ -763,6 +800,17 @@ namespace fCraft {
                         && speed >= 0.25f && value <= 3.96f) {
                         player.Message("&bChanged speed of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.Speed, speed);
                         newDef.Speed = speed;
+                        hasChanged = true;
+                    }
+                    break;
+                case "allid":
+                case "alltex":
+                case "alltexture":
+                    if (byte.TryParse(args, out value)) {
+                        player.Message("&bChanged top, sides, and bottom texture index of &a{0}&b to &a{1}", def.Name, value);
+                        newDef.TopTex = value;
+                        newDef.SideTex = value;
+                        newDef.BottomTex = value;
                         hasChanged = true;
                     }
                     break;
@@ -968,11 +1016,11 @@ namespace fCraft {
         }
 
         static bool CheckBlockId(Player player, CommandReader cmd, out int blockId) {
-        	if (!cmd.HasNext) {
-        		blockId = 0;
-        		player.Message("You most provide a block ID argument.");
+            if (!cmd.HasNext) {
+                blockId = 0;
+                player.Message("You most provide a block ID argument.");
                 return false;
-        	}
+            }
             if (!cmd.NextInt(out blockId)) {
                 player.Message("Provided block id is not a number.");
                 return false;
