@@ -1314,7 +1314,7 @@ namespace fCraft {
                     }
                 }
             }
-            return false;
+            return true;
         }
     }
 }

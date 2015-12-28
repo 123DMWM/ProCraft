@@ -750,6 +750,7 @@ namespace fCraft {
             BlockDefinition def = srcDef.Copy();
             def.BlockID = (byte)newId;
             BlockDefinition.DefineGlobalBlock(def);
+            BlockDefinition.SaveGlobalDefinitions();
             Server.Message("{0} &screated a new global custom block &h{1} &swith ID {2}",
                            p.ClassyName, def.Name, def.BlockID);
             
