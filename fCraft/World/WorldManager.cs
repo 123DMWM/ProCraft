@@ -632,7 +632,7 @@ namespace fCraft {
 
                     // save environmental settings
                     XElement elEnv = new XElement( EnvironmentXmlTagName );
-                    if( world.CloudColor != null ) elEnv.Add( new XElement( "cloud", world.CloudColor ) );
+                    if( world.CloudColor != null ) elEnv.Add( new XAttribute( "cloud", world.CloudColor ) );
                     if (world.FogColor != null) elEnv.Add(new XAttribute("fog", world.FogColor));
                     if (world.SkyColor != null) elEnv.Add(new XAttribute("sky", world.SkyColor));
                     if (world.ShadowColor != null) elEnv.Add(new XAttribute("shadow", world.ShadowColor));
