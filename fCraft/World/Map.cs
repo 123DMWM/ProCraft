@@ -101,6 +101,22 @@ namespace fCraft {
             return translatedBlocks;
         }
 
+        public unsafe byte[] GetFallbackMapRanderer() {
+            BlockDefinition.LoadGlobalDefinitions();
+            byte[] translatedBlocks = (byte[])Blocks.Clone();
+            int volume = translatedBlocks.Length;
+            fixed (byte* ptr = translatedBlocks)
+            {
+                for (int i = 0; i < volume; i++) {
+                    byte block = ptr[i];
+                    if (block > (byte)MaxCustomBlockType) {
+                        ptr[i] = (byte)FallbackBlocks[block];
+                    }
+                }
+            }
+            return translatedBlocks;
+        }
+
         /// <summary> Default spawning point on the map. </summary>
         /// <exception cref="ArgumentOutOfRangeException"> If spawn coordinates are outside the map. </exception>
         public Position Spawn {
