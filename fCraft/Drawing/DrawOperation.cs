@@ -244,7 +244,7 @@ namespace fCraft.Drawing {
             	// cannot reuse packet as each player may require different modifications to block field
             	Player[] players = world.Players;
             	for (int i = 0; i < players.Length; i++)
-            		players[i].SendLowPriority(Packet.MakeSetBlock(Coords, newBlock));
+            		players[i].SendLowPriority(Packet.MakeSetBlock(Coords, newBlock, players[i]));
             }
 
             Player.RaisePlayerPlacedBlockEvent(Player,

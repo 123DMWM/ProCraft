@@ -338,7 +338,7 @@ namespace fCraft {
                     if (Info.heldBlock != failsafe) {
                         Info.heldBlock = failsafe;
                         if (Supports(CpeExtension.MessageType) && !IsPlayingCTF) {
-                            Send(Packet.Message((byte)MessageType.BottomRight1, "&sBlock:&f" + Info.getHeldBlockName() + " &sID:&f" + (byte)Info.heldBlock));
+                            Send(Packet.Message((byte)MessageType.BottomRight1, "&sBlock:&f" + Map.getBlockName(Info.heldBlock) + " &sID:&f" + (byte)Info.heldBlock));
                         }
                     }
                 } else {
@@ -1324,7 +1324,7 @@ namespace fCraft {
             }
 
             if (Supports(CpeExtension.MessageType) && !IsPlayingCTF) {
-                Send(Packet.Message((byte)MessageType.BottomRight1, "&sBlock:&f" + Info.getHeldBlockName() + " &sID:&f" + (byte)Info.heldBlock));
+                Send(Packet.Message((byte)MessageType.BottomRight1, "&sBlock:&f" + Map.getBlockName(Info.heldBlock) + " &sID:&f" + (byte)Info.heldBlock));
             }
             if (Supports(CpeExtension.MessageType)) {
 				Send(Packet.Message((byte)MessageType.Status1, ConfigKey.ServerName.GetString()));

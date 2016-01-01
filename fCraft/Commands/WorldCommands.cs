@@ -492,18 +492,18 @@ namespace fCraft {
             if( results.Length > 0 ) {
                 Array.Reverse( results );
                 foreach( BlockDBEntry entry in results ) {
-                    string date = DateTime.UtcNow.Subtract( DateTimeUtil.ToDateTime( entry.Timestamp ) ).ToMiniString();
+                    string date = DateTime.UtcNow.Subtract( DateTimeUtil.ToDateTime( entry.Timestamp ) ).ToMiniNoColorString();
 
                     PlayerInfo info = PlayerDB.FindPlayerInfoByID( entry.PlayerID );
                     string playerName;
                     if( info == null ) {
-                        playerName = "?";
+                        playerName = "?&S";
                     } else {
                         Player target = info.PlayerObject;
                         if( target != null && args.Player.CanSee( target ) ) {
-                            playerName = info.Rank.Color + info.Name + "&S";
+                            playerName = info.Rank.Color + info.Name + "&s(&aOn&S)";
                         } else {
-							playerName = info.Rank.Color + info.Name + "&S (Offline)";
+							playerName = info.Rank.Color + info.Name + "&s(&7Off&s)";
                         }
                     }
                     string contextString;
@@ -524,14 +524,17 @@ namespace fCraft {
                     }
 
                     if( entry.OldBlock == (byte)Block.Air ) {
-						args.Player.Message("  {0} ago: {1} +&f{2} &s{3}",
-                                             date, playerName, entry.NewBlock, contextString);
+						args.Player.Message(" {0} ago {1} placed &f{2} &s{3}",
+                                             date, playerName, Map.getBlockName(entry.NewBlock), 
+                                             contextString);
                     } else if( entry.NewBlock == (byte)Block.Air ) {
-						args.Player.Message("  {0} ago: {1} -&f{2} &s{3}",
-                                             date, playerName, entry.OldBlock, contextString);
+						args.Player.Message(" {0} ago {1} deleted &f{2} &s{3}",
+                                             date, playerName, Map.getBlockName(entry.OldBlock), 
+                                             contextString);
                     } else {
-                        args.Player.Message("  {0} ago: {1} &f{2} &s->&f {3} &s{4}",
-                                             date, playerName, entry.OldBlock, entry.NewBlock, contextString);
+                        args.Player.Message(" {0} ago {1} replaced &f{2} &swith &f{3} &s{4}",
+                                             date, playerName, Map.getBlockName(entry.OldBlock), 
+                                             Map.getBlockName(entry.NewBlock), contextString);
                     }
                 }
             } else {
