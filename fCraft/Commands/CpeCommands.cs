@@ -366,7 +366,7 @@ namespace fCraft {
 
         static void GlobalBlockHandler(Player player, CommandReader cmd) {
             string opt = cmd.Next();
-            if (opt != null ) 
+            if (opt != null)
                 opt = opt.ToLower();
             switch (opt) {
                 case "create":
@@ -396,30 +396,33 @@ namespace fCraft {
                     break;
                 case "i":
                 case "info":
-                    int id;
-                    if (CheckBlockId(player, cmd, out id)) {
-                        BlockDefinition block = BlockDefinition.GlobalDefinitions[id];
-                        if (block == null) {
-                            player.Message("No custom block by the ID: &a{0}", id);
-                            player.Message("Use \"&h/gb list\" &sto see a list of global custom blocks.");
-                            return;
-                        }
-                        Block fallback;
-                        Map.GetBlockByName(block.FallBack.ToString(), false, out fallback);
-                        player.Message("&3---Name&3:&a{0} &3ID:&a{1}&3---", block.Name, block.BlockID);
-                        player.Message("   &3FallBack: &a{0}&3, Solidity: &a{2}&3, Speed: &a{1}",
-                            fallback.ToString(), block.Speed, block.CollideType);
-                        player.Message("   &3Top ID: &a{0}&3, Side ID: &a{1}&3, Bottom ID: &a{2}", 
-                            block.TopTex, block.SideTex, block.BottomTex);
-                        player.Message("   &3Block Light: &a{0}&3, Sound: &a{1}&3, FullBright: &a{2}", 
-                            block.BlocksLight.ToString(), block.WalkSound, block.FullBright.ToString());
-                        player.Message("   &3Shape: &a{0}&3, Draw: &a{1}&3, Fog Density: &a{2}", 
-                            block.Shape, block.BlockDraw, block.FogDensity);
-                        player.Message("   &3Fog Red: &a{0}&3, Fog Green: &a{1}&3, Fog Blue: &a{2}",
-                            block.FogR, block.FogG, block.FogB);
-                        player.Message("   &3Min X: &a{0}&3, Max X: &a{1}&3, Min Y: &a{2}&3, Max Y: &a{3}",
-                            block.MinX, block.MaxX, block.MinY, block.MaxY);
+                    string input = cmd.Next() ?? "n/a";
+                    Block def;
+                    if (!Map.GetBlockByName(input, false, out def)) {
+                        player.Message("No blocks by that name or id!");
+                        return;
                     }
+                    BlockDefinition block = BlockDefinition.GlobalDefinitions[(byte)def];
+                    if (block == null) {
+                        player.Message("No custom block by the Name/ID");
+                        player.Message("Use \"&h/gb list\" &sto see a list of global custom blocks.");
+                        return;
+                    }
+                    Block fallback;
+                    Map.GetBlockByName(block.FallBack.ToString(), false, out fallback);
+                    player.Message("&3---Name&3:&a{0} &3ID:&a{1}&3---", block.Name, block.BlockID);
+                    player.Message("   &3FallBack: &a{0}&3, Solidity: &a{2}&3, Speed: &a{1}",
+                        fallback.ToString(), block.Speed, block.CollideType);
+                    player.Message("   &3Top ID: &a{0}&3, Side ID: &a{1}&3, Bottom ID: &a{2}",
+                        block.TopTex, block.SideTex, block.BottomTex);
+                    player.Message("   &3Block Light: &a{0}&3, Sound: &a{1}&3, FullBright: &a{2}",
+                        block.BlocksLight.ToString(), block.WalkSound, block.FullBright.ToString());
+                    player.Message("   &3Shape: &a{0}&3, Draw: &a{1}&3, Fog Density: &a{2}",
+                        block.Shape, block.BlockDraw, block.FogDensity);
+                    player.Message("   &3Fog Red: &a{0}&3, Fog Green: &a{1}&3, Fog Blue: &a{2}",
+                        block.FogR, block.FogG, block.FogB);
+                    player.Message("   &3Min X: &a{0}&3, Max X: &a{1}&3, Min Y: &a{2}&3, Max Y: &a{3}",
+                        block.MinX, block.MaxX, block.MinY, block.MaxY);
                     break;
                 case "list":
                     GlobalBlockListHandler(player, cmd);
@@ -442,7 +445,7 @@ namespace fCraft {
                         CdGlobalBlock.PrintUsage(player);
                     }
                     break;
-            }            
+            }
         }
         
         static void GlobalBlockAddHandler(Player player, CommandReader cmd) {
@@ -492,11 +495,13 @@ namespace fCraft {
         }
         
         static void GlobalBlockRemoveHandler(Player player, CommandReader cmd) {
-            int blockId = 0;
-            if (!CheckBlockId(player, cmd, out blockId))
+            string input = cmd.Next() ?? "n/a";
+            Block blockID;
+            if (!Map.GetBlockByName(input, false, out blockID)) {
+                player.Message("No blocks by that Name/ID!");
                 return;
-            
-            BlockDefinition def = BlockDefinition.GlobalDefinitions[blockId];
+            }
+            BlockDefinition def = BlockDefinition.GlobalDefinitions[(byte)blockID];
             if (def == null) {
                 player.Message("There is no globally defined custom block with that block id.");
                 player.Message("Use \"&h/gb list\" &sto see a list of global custom blocks.");
@@ -730,25 +735,33 @@ namespace fCraft {
         }
         
         static void GlobalBlockDuplicateHandler(Player p, CommandReader cmd) {
-            int sourceId, newId;
-            if (!CheckBlockId(p, cmd, out sourceId) || !CheckBlockId(p, cmd, out newId))
+            string input1 = cmd.Next() ?? "n/a";
+            string input2 = cmd.Next() ?? "n/a";
+            Block blockID1 = Block.None, blockID2 = Block.None;
+            if (!Map.GetBlockByName(input1, false, out blockID1)) {
+                p.Message("No blocks by that Name/ID!");
                 return;
-            
-            BlockDefinition srcDef = BlockDefinition.GlobalDefinitions[sourceId];
+            }
+            if (!Map.GetBlockByName(input2, false, out blockID2)) {
+                p.Message("No blocks by that Name/ID!");
+                return;
+            }
+
+            BlockDefinition srcDef = BlockDefinition.GlobalDefinitions[(int)blockID1];
             if (srcDef == null) {
-                p.Message("There is no custom block with the id: &a{0}", sourceId);
+                p.Message("There is no custom block with the id: &a{0}", (byte)blockID1);
                 p.Message("Use \"&h/gb list&s\" to see a list of global custom blocks.");
                 return;
             }
-            BlockDefinition dstDef = BlockDefinition.GlobalDefinitions[newId];
+            BlockDefinition dstDef = BlockDefinition.GlobalDefinitions[(int)blockID2];
             if (dstDef != null) {
-                p.Message("There is already a custom block with the id: &a{0}", newId);
-                p.Message("Use \"&h/gb remove {0}&s\" on this block first.", newId);
+                p.Message("There is already a custom block with the id: &a{0}", (byte)blockID2);
+                p.Message("Use \"&h/gb remove {0}&s\" on this block first.", (byte)blockID2);
                 p.Message("Use \"&h/gb list&s\" to see a list of global custom blocks.");
                 return;
             }            
             BlockDefinition def = srcDef.Copy();
-            def.BlockID = (byte)newId;
+            def.BlockID = (byte)blockID2;
             BlockDefinition.DefineGlobalBlock(def);
             BlockDefinition.SaveGlobalDefinitions();
             Server.Message("{0} &screated a new global custom block &h{1} &swith ID {2}",
@@ -761,10 +774,13 @@ namespace fCraft {
         }
         
         static void GlobalBlockEditHandler(Player player, CommandReader cmd) {
-            int blockId;
-            if (!CheckBlockId(player, cmd, out blockId))
+            string input = cmd.Next() ?? "n/a";
+            Block blockID;
+            if (!Map.GetBlockByName(input, false, out blockID)) {
+                player.Message("No blocks by that Name/ID!");
                 return;
-            BlockDefinition def = BlockDefinition.GlobalDefinitions[blockId];
+            }
+            BlockDefinition def = BlockDefinition.GlobalDefinitions[(byte)blockID];
             if (def == null) {
                 player.Message("There are no custom defined blocks by that ID");
                 return;
@@ -1032,7 +1048,7 @@ namespace fCraft {
             }
             return true;
         }
-        
+
         static void PrintStepHelp(Player p) {
             string[] help = globalBlockSteps[p.currentGBStep];
             foreach (string m in help)

@@ -84,6 +84,19 @@ namespace fCraft {
         /// <summary> The block the player currently has in their hand.</summary>
         public Block heldBlock = Block.Stone;
 
+        /// <summary> The block the player currently has in their hand.</summary>
+        public string getHeldBlockName() {
+            Block outBlock;
+            if (Map.GetBlockByName(heldBlock.ToString(), false, out outBlock)){
+                if (outBlock > Map.MaxCustomBlockType) {
+                    return BlockDefinition.GlobalDefinitions[(int)outBlock].Name;
+                }
+                return outBlock.ToString();
+            } else {
+                return Block.None.ToString();
+            }
+        }
+
         /// <summary> Most recent time the player logged in, UTC.
         /// May be DateTime.MinValue if player has never been online. </summary>
         public DateTime LastLoginDate;
