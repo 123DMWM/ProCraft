@@ -17,14 +17,14 @@ namespace fCraft.GUI {
 
         static IsoCat() {
             using( Bitmap tilesBmp = Resources.Tileset ) {
-                TileX = tilesBmp.Width / 50;
+                TileX = tilesBmp.Width / 66;
                 TileY = tilesBmp.Height;
                 TileStride = TileX * TileY * 4;
-                Tiles = new byte[50 * TileStride];
+                Tiles = new byte[66 * TileStride];
 
                 MaxTileDim = Math.Max( TileX, TileY );
 
-                for( int i = 0; i < 50; i++ ) {
+                for( int i = 0; i < 66; i++ ) {
                     for( int y = 0; y < TileY; y++ ) {
                         for( int x = 0; x < TileX; x++ ) {
                             int p = i * TileStride + ( y * TileX + x ) * 4;
@@ -40,9 +40,9 @@ namespace fCraft.GUI {
 
             using( Bitmap stilesBmp = Resources.TilesetShadowed ) {
 
-                ShadowTiles = new byte[50 * TileStride];
+                ShadowTiles = new byte[66 * TileStride];
 
-                for( int i = 0; i < 50; i++ ) {
+                for( int i = 0; i < 66; i++ ) {
                     for( int y = 0; y < TileY; y++ ) {
                         for( int x = 0; x < TileX; x++ ) {
                             int p = i * TileStride + ( y * TileX + x ) * 4;
@@ -138,7 +138,7 @@ namespace fCraft.GUI {
             }
 
             try {
-                fixed( byte* bpx = map.Blocks,
+                fixed( byte* bpx = map.GetFallbackMapRanderer(),
                     tp = Tiles,
                     stp = ShadowTiles ) {
                     bp = bpx;
@@ -188,7 +188,12 @@ namespace fCraft.GUI {
                                 blockUp == 38 || blockLeft == 38 || blockRight == 38 || // flower
                                 blockUp == 6 || blockLeft == 6 || blockRight == 6 || // sapling
                                 blockUp == 39 || blockLeft == 39 || blockRight == 39 ||
-                                blockUp == 40 || blockLeft == 40 || blockRight == 40 ) // mushroom
+                                blockUp == 40 || blockLeft == 40 || blockRight == 40 || // mushroom
+                                blockUp == 50 || blockLeft == 50 || blockRight == 50 || // cobble step
+                                blockUp == 51 || blockLeft == 51 || blockRight == 51 || // rope
+                                blockUp == 53 || blockLeft == 53 || blockRight == 53 || // snow
+                                blockUp == 54 || blockLeft == 54 || blockRight == 54 || // fire
+                                blockUp == 60 || blockLeft == 60 || blockRight == 60) // ice
 
                                 BlendTile();
                         }

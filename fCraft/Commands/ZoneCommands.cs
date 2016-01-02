@@ -1,4 +1,4 @@
-﻿// Part of fCraft | Copyright 2009-2015 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt //Copyright (c) 2011-2013 Jon Baker, Glenn Marien and Lao Tszy <Jonty800@gmail.com> //Copyright (c) <2012-2014> <LeChosenOne, DingusBungus> | ProCraft Copyright 2014-2015 Joseph Beauvais <123DMWM@gmail.com>
+﻿// Part of fCraft | Copyright 2009-2015 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt //Copyright (c) 2011-2013 Jon Baker, Glenn Marien and Lao Tszy <Jonty800@gmail.com> //Copyright (c) <2012-2014> <LeChosenOne, DingusBungus> | ProCraft Copyright 2014-2016 Joseph Beauvais <123DMWM@gmail.com>
 using System;
 using System.IO;
 using System.Linq;
@@ -24,12 +24,11 @@ namespace fCraft {
             CommandManager.RegisterCommand( CdZoneTest );
             CommandManager.RegisterCommand( CdZoneShow );
             CommandManager.RegisterCommand( cdDoor );
-            Player.Clicked += PlayerClickedDoor;
             openDoors = new List<Zone>();
         }
         static readonly TimeSpan DoorCloseTimer = TimeSpan.FromMilliseconds(1500);
         const int maxDoorBlocks = 36;  //change for max door area
-        static List<Zone> openDoors;
+        public static List<Zone> openDoors;
 
         struct DoorInfo {
             public readonly Zone Zone;
@@ -1183,34 +1182,9 @@ namespace fCraft {
                                                         door.Bounds.Dimensions.Z);
         }
 
-        static readonly object openDoorsLock = new object();
-        public static void PlayerClickedDoor(object sender, PlayerClickedEventArgs e)
-        {
-            //after 10s, revert effects of /DoorCheck
-            Zone[] allowed, denied;
-            if (e.Player.WorldMap.Zones.CheckDetailed(e.Coords, e.Player, out allowed, out denied))
-            {
-                foreach (Zone zone in allowed)
-                {
-                    if (zone.Name.StartsWith("Door_"))
-                    {
-                        Player.RaisePlayerPlacedBlockEvent(e.Player, e.Player.WorldMap, e.Coords, e.Block, e.Block, BlockChangeContext.Manual);
+        public static readonly object openDoorsLock = new object();
 
-                        lock (openDoorsLock)
-                        {
-                            if (!openDoors.Contains(zone))
-                            {
-                                openDoor(zone, e.Player);
-                                openDoors.Add(zone);
-                            }
-                        }
-                    }
-                }
-            }
-
-        }
-
-        static void openDoor(Zone zone, Player player)
+        public static void openDoor(Zone zone, Player player)
         {
 
             int sx = zone.Bounds.XMin;
@@ -1222,6 +1196,7 @@ namespace fCraft {
 
             Block[] buffer = new Block[zone.Bounds.Volume];
 
+            DoorInfo info = new DoorInfo(zone, buffer, player.WorldMap);
             int counter = 0;
             for (int x = sx; x <= ex; x++)
             {
@@ -1230,13 +1205,12 @@ namespace fCraft {
                     for (int z = sz; z <= ez; z++)
                     {
                         buffer[counter] = player.WorldMap.GetBlock(x, y, z);
-                        player.WorldMap.QueueUpdate(new BlockUpdate(null, new Vector3I(x, y, z), Block.Air));
+                        info.WorldMap.QueueUpdate(new BlockUpdate(null, new Vector3I(x, y, z), Block.Air));
                         counter++;
                     }
                 }
             }
 
-            DoorInfo info = new DoorInfo(zone, buffer, player.WorldMap);
             //reclose door
             Scheduler.NewTask(doorTimer_Elapsed).RunOnce(info, DoorCloseTimer);
 

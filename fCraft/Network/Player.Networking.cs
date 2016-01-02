@@ -1,4 +1,4 @@
-﻿// Part of fCraft | Copyright 2009-2015 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt //Copyright (c) 2011-2013 Jon Baker, Glenn Marien and Lao Tszy <Jonty800@gmail.com> //Copyright (c) <2012-2014> <LeChosenOne, DingusBungus> | ProCraft Copyright 2014-2015 Joseph Beauvais <123DMWM@gmail.com>
+﻿// Part of fCraft | Copyright 2009-2015 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt //Copyright (c) 2011-2013 Jon Baker, Glenn Marien and Lao Tszy <Jonty800@gmail.com> //Copyright (c) <2012-2014> <LeChosenOne, DingusBungus> | ProCraft Copyright 2014-2016 Joseph Beauvais <123DMWM@gmail.com>
 //#define DEBUG_MOVEMENT
 using System;
 using System.Collections.Generic;
@@ -338,7 +338,7 @@ namespace fCraft {
                     if (Info.heldBlock != failsafe) {
                         Info.heldBlock = failsafe;
                         if (Supports(CpeExtension.MessageType) && !IsPlayingCTF) {
-                            Send(Packet.Message((byte)MessageType.BottomRight1, "&sBlock:&f" + failsafe.ToString() + " &sID:&f" + failsafe.GetHashCode()));
+                            Send(Packet.Message((byte)MessageType.BottomRight1, "&sBlock:&f" + Map.getBlockName(Info.heldBlock) + " &sID:&f" + (byte)Info.heldBlock));
                         }
                     }
                 } else {
@@ -1324,7 +1324,7 @@ namespace fCraft {
             }
 
             if (Supports(CpeExtension.MessageType) && !IsPlayingCTF) {
-                Send(Packet.Message((byte)MessageType.BottomRight1, "&sBlock:&f" + Info.heldBlock.ToString() + " &sID:&f" + Info.heldBlock.GetHashCode()));
+                Send(Packet.Message((byte)MessageType.BottomRight1, "&sBlock:&f" + Map.getBlockName(Info.heldBlock) + " &sID:&f" + (byte)Info.heldBlock));
             }
             if (Supports(CpeExtension.MessageType)) {
 				Send(Packet.Message((byte)MessageType.Status1, ConfigKey.ServerName.GetString()));

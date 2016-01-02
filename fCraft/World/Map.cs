@@ -101,6 +101,22 @@ namespace fCraft {
             return translatedBlocks;
         }
 
+        public unsafe byte[] GetFallbackMapRanderer() {
+            BlockDefinition.LoadGlobalDefinitions();
+            byte[] translatedBlocks = (byte[])Blocks.Clone();
+            int volume = translatedBlocks.Length;
+            fixed (byte* ptr = translatedBlocks)
+            {
+                for (int i = 0; i < volume; i++) {
+                    byte block = ptr[i];
+                    if (block > (byte)MaxCustomBlockType) {
+                        ptr[i] = (byte)FallbackBlocks[block];
+                    }
+                }
+            }
+            return translatedBlocks;
+        }
+
         /// <summary> Default spawning point on the map. </summary>
         /// <exception cref="ArgumentOutOfRangeException"> If spawn coordinates are outside the map. </exception>
         public Position Spawn {
@@ -299,7 +315,7 @@ namespace fCraft {
             	Block block = GetBlock(x, y, z);
             	for( int i = 0; i < players.Length; i++ ) {
             		// cannot reuse packet as each player may require different modifications to block field
-            		Packet packet = Packet.MakeSetBlock((short)x, (short)y, (short)z, block);
+            		Packet packet = Packet.MakeSetBlock(new Vector3I(x, y, z), block, players[i]);
             		players[i].SendLowPriority( packet );
             	}
             }
@@ -347,6 +363,19 @@ namespace fCraft {
             if( coords.X < Width && coords.Y < Length && coords.Z < Height && coords.X >= 0 && coords.Y >= 0 && coords.Z >= 0 )
                 return (Block)Blocks[Index( coords )];
             return Block.None;
+        }
+
+        /// <summary> Get the name of the block, used when blockdefinition blocks should show their Name instead of ID .</summary>
+        public static string getBlockName(Block block) {
+            Block outBlock;
+            if (GetBlockByName(block.ToString(), false, out outBlock)) {
+                if (outBlock > MaxCustomBlockType) {
+                    return BlockDefinition.GlobalDefinitions[(int)outBlock].Name;
+                }
+                return outBlock.ToString();
+            } else {
+                return Block.None.ToString();
+            }
         }
 
 
@@ -486,7 +515,7 @@ namespace fCraft {
                 		Player p = players[i];
                 		if (p == update.Origin) 
                 			continue;
-                		Packet packet = Packet.MakeSetBlock( update.X, update.Y, update.Z, update.BlockType );
+                		Packet packet = Packet.MakeSetBlock(new Vector3I(update.X, update.Y, update.Z), update.BlockType, p);
                 		p.SendLowPriority( packet );
                 	}
                 }

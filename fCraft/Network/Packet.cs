@@ -58,31 +58,16 @@ namespace fCraft {
 
 
         /// <summary> Creates a new SetBlockServer (0x06) packet. </summary>
-        /// <param name="x"> X coordinate (horizontal, along width) of the block. </param>
-        /// <param name="y"> Y coordinate (horizontal, along length) of the block. </param>
-        /// <param name="z"> Z coordinate (vertical, along height) of the block. </param>
-        /// <param name="type"> Block type to set at given coordinates. </param>
-        public static Packet MakeSetBlock( short x, short y, short z, Block type ) {
-            Packet packet = new Packet( OpCode.SetBlockServer );
-            //Logger.Log(LogType.Debug, "Send: MakeSetBlock ({0}, {1}, {2})({3})", x, y, z, type);
-            ToNetOrder( x, packet.Bytes, 1 );
-            ToNetOrder( z, packet.Bytes, 3 );
-            ToNetOrder( y, packet.Bytes, 5 );
-            packet.Bytes[7] = (byte)type;
-            return packet;
-        }
-
-
-        /// <summary> Creates a new SetBlockServer (0x06) packet. </summary>
         /// <param name="coords"> Coordinates of the block. </param>
         /// <param name="type"> Block type to set at given coordinates. </param>
-        public static Packet MakeSetBlock( Vector3I coords, Block type ) {
+        /// <param name="player"> Player packet is being sent to, used to get fallback block </param>
+        public static Packet MakeSetBlock( Vector3I coords, Block type, Player player ) {
             Packet packet = new Packet( OpCode.SetBlockServer );
             //Logger.Log(LogType.Debug, "Send: MakeSetBlock({0})({1})", coords, type);
             ToNetOrder( (short)coords.X, packet.Bytes, 1 );
             ToNetOrder( (short)coords.Z, packet.Bytes, 3 );
             ToNetOrder( (short)coords.Y, packet.Bytes, 5 );
-            packet.Bytes[7] = (byte)type;
+            packet.Bytes[7] = (byte)player.getFallback(type);
             return packet;
         }
 

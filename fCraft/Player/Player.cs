@@ -1,4 +1,4 @@
-﻿// Part of fCraft | Copyright 2009-2015 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt //Copyright (c) 2011-2013 Jon Baker, Glenn Marien and Lao Tszy <Jonty800@gmail.com> //Copyright (c) <2012-2014> <LeChosenOne, DingusBungus> | ProCraft Copyright 2014-2015 Joseph Beauvais <123DMWM@gmail.com>
+﻿// Part of fCraft | Copyright 2009-2015 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt //Copyright (c) 2011-2013 Jon Baker, Glenn Marien and Lao Tszy <Jonty800@gmail.com> //Copyright (c) <2012-2014> <LeChosenOne, DingusBungus> | ProCraft Copyright 2014-2016 Joseph Beauvais <123DMWM@gmail.com>
 using System;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
@@ -1190,6 +1190,23 @@ namespace fCraft {
             // if all is well, try placing it
             switch( canPlaceResult ) {
                 case CanPlaceResult.Allowed:
+                    //after 10s, revert effects of /DoorCheck
+                    Zone[] allowed, denied;
+                    if (WorldMap.Zones.CheckDetailed(coord, this, out allowed, out denied)) {
+                        foreach (Zone zone in allowed) {
+                            if (zone.Name.StartsWith("Door_")) {
+                                RevertBlockNow(coord);
+                                lock (ZoneCommands.openDoorsLock) {
+                                    if (!ZoneCommands.openDoors.Contains(zone)) {
+                                        ZoneCommands.openDoor(zone, this);
+                                        ZoneCommands.openDoors.Add(zone);
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    }
+
                     if (type == Block.Dirt && GrassGrowth) {
                         // Placed Dirt to Grass
                         type = Block.Grass;
@@ -1223,7 +1240,7 @@ namespace fCraft {
                         Info.ProcessBlockPlaced((byte)Block.Dirt);
                         map.QueueUpdate(blockUpdate);
                         RaisePlayerPlacedBlockEvent(this, World.Map, coordBelow, Block.Grass, Block.Dirt, context);
-                        SendNow(Packet.MakeSetBlock(coordBelow, Block.Dirt));
+                        SendNow(Packet.MakeSetBlock(coordBelow, Block.Dirt, this));
                     }
                     // handle normal blocks
                     blockUpdate = new BlockUpdate(this, coord, type);
@@ -1231,7 +1248,7 @@ namespace fCraft {
                     Block old = map.GetBlock(coord);
                     map.QueueUpdate(blockUpdate);
                     RaisePlayerPlacedBlockEvent(this, World.Map, coord, old, type, context);
-                    SendNow(Packet.MakeSetBlock(coord, type));
+                    SendNow(Packet.MakeSetBlock(coord, type, this));
                     
                     break;
                     
@@ -1378,7 +1395,7 @@ namespace fCraft {
         /// <param name="block"> Block type to send. </param>
         public void SendBlock( Vector3I coords, Block block ) {
             if( !WorldMap.InBounds( coords ) ) throw new ArgumentOutOfRangeException( "coords" );
-            SendLowPriority( Packet.MakeSetBlock( coords, block ) );
+            SendLowPriority( Packet.MakeSetBlock( coords, block, this) );
         }
 
 
@@ -1386,7 +1403,7 @@ namespace fCraft {
         /// and sends it (async) to the player.
         /// Used to undo player's attempted block placement/deletion. </summary>
         public void RevertBlock( Vector3I coords ) {
-            SendLowPriority( Packet.MakeSetBlock( coords, WorldMap.GetBlock( coords ) ) );
+            SendLowPriority( Packet.MakeSetBlock( coords, WorldMap.GetBlock( coords ), this) );
         }
 
 
@@ -1394,7 +1411,7 @@ namespace fCraft {
         // Used to undo player's attempted block placement/deletion.
         // To avoid threading issues, only use this from this player's IoThread.
         void RevertBlockNow( Vector3I coords ) {
-            SendNow(Packet.MakeSetBlock(coords, WorldMap.GetBlock(coords)));
+            SendNow(Packet.MakeSetBlock(coords, WorldMap.GetBlock(coords), this));
         }
 
 
@@ -1415,6 +1432,33 @@ namespace fCraft {
             }
             spamBlockLog.Enqueue( DateTime.UtcNow );
             return false;
+        }
+
+        public Block getFallback(Block block) {
+            if ((Supports(CpeExtension.BlockDefinitions) 
+                || Supports(CpeExtension.BlockDefinitions))
+                && Supports(CpeExtension.CustomBlocks)) {
+
+                return block; //No fallback block needed
+
+            } else if ((Supports(CpeExtension.BlockDefinitions) 
+                || Supports(CpeExtension.BlockDefinitions))
+                && !Supports(CpeExtension.CustomBlocks)) {
+
+                if (block > Map.MaxLegalBlockType && block < Map.MaxCustomBlockType) {
+                    return Map.GetFallbackBlock(block); //Get fallback for just CustomBlocks
+                } else { return block; }
+
+            } else if (!(Supports(CpeExtension.BlockDefinitions) 
+                || Supports(CpeExtension.BlockDefinitions))
+                && Supports(CpeExtension.CustomBlocks)) {
+
+                if (block > Map.MaxCustomBlockType) {
+                    return Map.GetFallbackBlock(block); //Get fallback block for Block Definition Blocks
+                } else { return block; }
+
+            }
+            return Map.GetFallbackBlock(Map.GetFallbackBlock(block)); //Get absolute FallBack Block (Doubled Just incase someone made a CustomBlock a fallback block)
         }
 
         #endregion

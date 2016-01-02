@@ -1,4 +1,4 @@
-﻿// Part of fCraft | Copyright 2009-2015 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt //Copyright (c) 2011-2013 Jon Baker, Glenn Marien and Lao Tszy <Jonty800@gmail.com> //Copyright (c) <2012-2014> <LeChosenOne, DingusBungus> | ProCraft Copyright 2014-2015 Joseph Beauvais <123DMWM@gmail.com>
+﻿// Part of fCraft | Copyright 2009-2015 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt //Copyright (c) 2011-2013 Jon Baker, Glenn Marien and Lao Tszy <Jonty800@gmail.com> //Copyright (c) <2012-2014> <LeChosenOne, DingusBungus> | ProCraft Copyright 2014-2016 Joseph Beauvais <123DMWM@gmail.com>
 //#define DEBUG_CHECK_DUPLICATE_COORDS
 
 using System;
@@ -244,7 +244,7 @@ namespace fCraft.Drawing {
             	// cannot reuse packet as each player may require different modifications to block field
             	Player[] players = world.Players;
             	for (int i = 0; i < players.Length; i++)
-            		players[i].SendLowPriority(Packet.MakeSetBlock(Coords, newBlock));
+            		players[i].SendLowPriority(Packet.MakeSetBlock(Coords, newBlock, players[i]));
             }
 
             Player.RaisePlayerPlacedBlockEvent(Player,
