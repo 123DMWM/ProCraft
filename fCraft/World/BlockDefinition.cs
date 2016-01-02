@@ -79,7 +79,7 @@ namespace fCraft {
         }
         
         public static void SendGlobalDefinitions(Player p) {
-            for (int i = 0; i < GlobalDefinitions.Length; i++) {
+            for (int i = (int)Map.MaxCustomBlockType + 1; i < GlobalDefinitions.Length; i++) {
                 BlockDefinition def = GlobalDefinitions[i];
                 if (def == null) continue;
                 
@@ -126,7 +126,7 @@ namespace fCraft {
             
             try {
                 LoadGlobal();
-                for (int i = 0; i < GlobalDefinitions.Length; i++) {
+                for (int i = (int)Map.MaxCustomBlockType + 1; i < GlobalDefinitions.Length; i++) {
                     if (GlobalDefinitions[i] == null) 
                         continue;
                     // fixup for servicestack not writing out null entries

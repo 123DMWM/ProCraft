@@ -398,7 +398,7 @@ namespace fCraft {
                 case "info":
                     string input = cmd.Next() ?? "n/a";
                     Block def;
-                    if (!Map.GetBlockByName(input, false, out def)) {
+                    if (!Map.GetBlockByName(input, false, out def) && def > Map.MaxCustomBlockType) {
                         player.Message("No blocks by that name or id!");
                         return;
                     }
@@ -497,7 +497,7 @@ namespace fCraft {
         static void GlobalBlockRemoveHandler(Player player, CommandReader cmd) {
             string input = cmd.Next() ?? "n/a";
             Block blockID;
-            if (!Map.GetBlockByName(input, false, out blockID)) {
+            if (!Map.GetBlockByName(input, false, out blockID) && blockID > Map.MaxCustomBlockType) {
                 player.Message("No blocks by that Name/ID!");
                 return;
             }
@@ -738,11 +738,11 @@ namespace fCraft {
             string input1 = cmd.Next() ?? "n/a";
             string input2 = cmd.Next() ?? "n/a";
             Block blockID1 = Block.None, blockID2 = Block.None;
-            if (!Map.GetBlockByName(input1, false, out blockID1)) {
+            if (!Map.GetBlockByName(input1, false, out blockID1) && blockID1 > Map.MaxCustomBlockType) {
                 p.Message("No blocks by that Name/ID!");
                 return;
             }
-            if (!Map.GetBlockByName(input2, false, out blockID2)) {
+            if (!Map.GetBlockByName(input2, false, out blockID2) && blockID2 > Map.MaxCustomBlockType) {
                 p.Message("No blocks by that Name/ID!");
                 return;
             }
@@ -776,7 +776,7 @@ namespace fCraft {
         static void GlobalBlockEditHandler(Player player, CommandReader cmd) {
             string input = cmd.Next() ?? "n/a";
             Block blockID;
-            if (!Map.GetBlockByName(input, false, out blockID)) {
+            if (!Map.GetBlockByName(input, false, out blockID) && blockID > Map.MaxCustomBlockType) {
                 player.Message("No blocks by that Name/ID!");
                 return;
             }
@@ -1042,8 +1042,8 @@ namespace fCraft {
                 player.Message("Provided block id is not a number.");
                 return false;
             }           
-            if (blockId <= 0 || blockId >= 255) {
-                player.Message("Block id must be between 1-254");
+            if (blockId <= 65 || blockId >= 255) {
+                player.Message("Block id must be between 65-254");
                 return false;
             }
             return true;
