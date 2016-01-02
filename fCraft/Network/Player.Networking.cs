@@ -1356,50 +1356,48 @@ namespace fCraft {
         	canFly = false; canNoClip = false; canSpeed = false; canRespawn = false;
         	if (String.IsNullOrEmpty(World.MOTD)) return false;
         	
-        	foreach (string s in World.MOTD.ToLower().Split()) {
-        		switch (s) {
-        			case "-fly":
-        				canFly = false;
-        				useMotd = true;
-        				break;
-        			case "-noclip":
-        				canNoClip = false;
-        				useMotd = true;
-        				break;
-        			case "-speed":
-        				canSpeed = false;
-        				useMotd = true;
-        				break;
-        			case "-respawn":
-        				canRespawn = false;
-        				useMotd = true;
-        				break;
-        			case "-hax":
-        				canFly = false;
-        				canNoClip = false;
-        				canSpeed = false;
-        				canRespawn = false;
-        				useMotd = true;
-        				break;
-        			case "+hax":
-        				canFly = true;
-        				canNoClip = true;
-        				canSpeed = true;
-        				canRespawn = true;
-        				useMotd = true;
-        				break;
-        			case "+ophax":
-        				canFly = IsStaff;
-        				canNoClip = IsStaff;
-        				canSpeed = IsStaff;
-        				canRespawn = IsStaff;
-        				useMotd = true;
-        				break;
-        			default:
-        				break;
-        		}
-        	}
-        	return useMotd;
+            foreach (string s in World.MOTD.ToLower().Split()) {
+                switch (s) {
+                    case "-fly":
+                    case "+fly":
+                        canFly = s == "+fly";
+                        useMotd = true;
+                        break;
+                    case "-noclip":
+                    case "+noclip":
+                        canNoClip = s == "+noclip";
+                        useMotd = true;
+                        break;
+                    case "-speed":
+                    case "+speed":
+                        canSpeed = s == "+speed";
+                        useMotd = true;
+                        break;
+                    case "-respawn":
+                    case "+respawn":
+                        canRespawn = s == "+respawn";
+                        useMotd = true;
+                        break;
+                    case "-hax":
+                    case "+hax":
+                        canFly = s == "+hax";
+                        canNoClip = s == "+hax";
+                        canSpeed = s == "+hax";
+                        canRespawn = s == "+hax";
+                        useMotd = true;
+                        break;
+                    case "+ophax":
+                        canFly = IsStaff;
+                        canNoClip = IsStaff;
+                        canSpeed = IsStaff;
+                        canRespawn = IsStaff;
+                        useMotd = true;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            return useMotd;
         }
 
         #endregion
