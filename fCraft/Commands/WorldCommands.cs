@@ -3836,10 +3836,12 @@ namespace fCraft {
                         if (value.ToLower().Equals("remove") || value.ToLower().Equals("delete") || value.ToLower().Equals("reset")) {
                             player.Message("MOTD for \"&F{0}&S\" has been removed", world.Name);
                             world.MOTD = null;
+                            WorldManager.SaveWorldList();
                         } else {
                             player.Message("MOTD for \"&F{0}&S\" has been set to:", world.Name);
                             player.Message("  " + value);
                             world.MOTD = value;
+                            WorldManager.SaveWorldList();
                         }
                     }
                     break;
