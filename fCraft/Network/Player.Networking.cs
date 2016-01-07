@@ -1632,8 +1632,12 @@ namespace fCraft {
 
                 }
                 if ((Info.oldMob != Info.Mob || Info.oldafkMob != Info.afkMob) && otherPlayer.Supports(CpeExtension.ChangeModel)) {
-                    otherPlayer.Send(Packet.MakeChangeModel((byte)entity.Id,
-                        !Info.IsAFK ? Info.Mob : Info.afkMob));
+
+                    string thisModel = Info.IsAFK ? AFKModel : Info.Mob;
+                    if (otherPlayer.Info.Rank.CanSee(Info.Rank) && (thisModel.ToLower().Equals("air") || thisModel.ToLower().Equals("0"))) {
+                        thisModel = "Humanoid";
+                    }
+                    otherPlayer.Send(Packet.MakeChangeModel((byte)entity.Id, thisModel));
                 }
             skip:
 
@@ -1730,7 +1734,11 @@ namespace fCraft {
                     Send(Packet.MakeTeleport(newEntity.Id, player.Position));
                 }
                 if (Supports(CpeExtension.ChangeModel)) {
-                    Send(Packet.MakeChangeModel((byte)newEntity.Id, !player.Info.IsAFK ? player.Info.Mob : AFKModel));
+                    string addedModel = player.Info.IsAFK ? player.AFKModel : player.Info.Mob;
+                    if (Info.Rank.CanSee(player.Info.Rank) && (addedModel.ToLower().Equals("air") || addedModel.ToLower().Equals("0"))) {
+                        addedModel = "Humanoid";
+                    }
+                    Send(Packet.MakeChangeModel((byte)newEntity.Id, addedModel));
                 }
                 return newEntity;
             } else {
@@ -1778,7 +1786,11 @@ namespace fCraft {
             }
 
             if (Supports(CpeExtension.ChangeModel)) {
-                SendNow(Packet.MakeChangeModel((byte)entity.Id, !player.Info.IsAFK ? player.Info.Mob : AFKModel));
+                string readdedModel = player.Info.IsAFK ? player.AFKModel : player.Info.Mob;
+                if (Info.Rank.CanSee(player.Info.Rank) && (readdedModel.ToLower().Equals("air") || readdedModel.ToLower().Equals("0"))) {
+                    readdedModel = "Humanoid";
+                }
+                SendNow(Packet.MakeChangeModel((byte)entity.Id, readdedModel));
             }
         }
 
