@@ -1275,7 +1275,7 @@ namespace fCraft {
         
         void SendJoinCpeExtensions() {
             if (Supports(CpeExtension.EnvMapAppearance)) {
-                Send(Packet.MakeEnvSetMapAppearance(World.getTexture(), World.EdgeBlock, World.HorizonBlock, World.getEdgeLevel()));
+                Send(Packet.MakeEnvSetMapAppearance(World.GetTexture(), World.EdgeBlock, World.HorizonBlock, World.GetEdgeLevel()));
             }
             if (Supports(CpeExtension.ExtPlayerList2)) {
                 Send(Packet.MakeExtAddEntity2(Packet.SelfId, Info.Rank.Color + Name, (Info.skinName == "" ? Name : Info.skinName), Position, this));

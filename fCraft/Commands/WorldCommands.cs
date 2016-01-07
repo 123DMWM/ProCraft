@@ -616,10 +616,10 @@ namespace fCraft {
                 player.Message("  Shadow: {0}   Sunlight: {1}  Edge level: {2}",
                                 world.ShadowColor == null ? "normal" : '#' + world.ShadowColor,
                                 world.LightColor == null ? "normal" : '#' + world.LightColor,
-                                world.getEdgeLevel() + " blocks");
+                                world.GetEdgeLevel() + " blocks");
                 player.Message( "  Water block: {1}  Bedrock block: {0}",
                                 world.EdgeBlock, world.HorizonBlock );
-                player.Message("  Texture: {0}", world.getTexture());
+                player.Message("  Texture: {0}", world.GetTexture());
                 if( !player.IsUsingWoM ) {
                     player.Message( "  You need ClassicalSharp client to see the changes." );
                 }
@@ -791,7 +791,7 @@ namespace fCraft {
                     }
                     foreach (Player p in world.Players) {
                         if (p.Supports(CpeExtension.EnvMapAppearance)) {
-                            p.Send(Packet.MakeEnvSetMapAppearance(world.getTexture(), world.EdgeBlock, world.HorizonBlock, world.getEdgeLevel()));
+                            p.Send(Packet.MakeEnvSetMapAppearance(world.GetTexture(), world.EdgeBlock, world.HorizonBlock, world.GetEdgeLevel()));
                         }
                     }
                     break;
@@ -818,7 +818,7 @@ namespace fCraft {
                     }
                     foreach (Player p in world.Players) {
                         if (p.Supports(CpeExtension.EnvMapAppearance)) {
-                            p.Send(Packet.MakeEnvSetMapAppearance(world.getTexture(), world.EdgeBlock, world.HorizonBlock, world.getEdgeLevel()));
+                            p.Send(Packet.MakeEnvSetMapAppearance(world.GetTexture(), world.EdgeBlock, world.HorizonBlock, world.GetEdgeLevel()));
                         }
                     }
                     break;
@@ -845,7 +845,7 @@ namespace fCraft {
                     }
                     foreach (Player p in world.Players) {
                         if (p.Supports(CpeExtension.EnvMapAppearance)) {
-                            p.Send(Packet.MakeEnvSetMapAppearance(world.getTexture(), world.EdgeBlock, world.HorizonBlock, world.getEdgeLevel()));
+                            p.Send(Packet.MakeEnvSetMapAppearance(world.GetTexture(), world.EdgeBlock, world.HorizonBlock, world.GetEdgeLevel()));
                         }
                     }
                     break;
@@ -869,7 +869,7 @@ namespace fCraft {
                     world.Texture = value;
                     foreach (Player p in world.Players) {
                         if (p.Supports(CpeExtension.EnvMapAppearance)) {
-                            p.Send(Packet.MakeEnvSetMapAppearance(world.getTexture(), world.EdgeBlock, world.HorizonBlock, world.getEdgeLevel()));
+                            p.Send(Packet.MakeEnvSetMapAppearance(world.GetTexture(), world.EdgeBlock, world.HorizonBlock, world.GetEdgeLevel()));
                         }
                     }
                     break;
