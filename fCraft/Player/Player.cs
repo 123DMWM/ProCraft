@@ -1202,9 +1202,9 @@ namespace fCraft {
                                         ZoneCommands.openDoors.Add(zone);
                                     }
                                 }
+                                break;
                             }
                         }
-                        break;
                     }
 
                     if (type == Block.Dirt && GrassGrowth) {
