@@ -49,6 +49,7 @@ namespace fCraft {
         public string Email;
 
         public DateTime LastServerMessageDate;
+        public Player LastPlayerGreeted = Player.Console;
 
         public void getLeftOverTime(Double maxTime, CommandReader cmd) {
             double timeLeft = maxTime - Math.Round(TimeSinceLastServerMessage.TotalSeconds);
