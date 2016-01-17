@@ -255,6 +255,8 @@ namespace fCraft {
                     CloudColor = CloudColor,
                     SkyColor = SkyColor,
                     EdgeLevel = EdgeLevel,
+                    CloudsHeight = CloudsHeight,
+                    MaxFogDistance = MaxFogDistance,
                     EdgeBlock = EdgeBlock,
 					HorizonBlock = HorizonBlock,
                     LightColor = LightColor,
@@ -951,6 +953,16 @@ namespace fCraft {
         public short GetEdgeLevel() {
         	return (EdgeLevel == -1 && map != null) ? (short)(map.Height / 2) : EdgeLevel;
         }
+                
+        /// <summary> Elevation of the clouds height of the map. The default height is map.Height + 2. </summary>
+        public short CloudsHeight = short.MinValue;
+        
+        public short GetCloudsHeight() {
+        	return (CloudsHeight == -1 && map != null) ? (short)(map.Height + 2) : CloudsHeight;
+        }
+        
+        /// <summary> Maximum fog distance that can be seen by the player. The default value is 0. </summary>
+        public short MaxFogDistance = 0;
 
         /// <summary> The block which will be displayed on the horizon. </summary>
         public Block HorizonBlock = Block.Water;

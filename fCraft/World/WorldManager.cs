@@ -335,9 +335,25 @@ namespace fCraft {
                 }
                 if ((tempAttr = envEl.Attribute("level")) != null) {
                     if (!short.TryParse(tempAttr.Value, out world.EdgeLevel)) {
-                        world.EdgeLevel = (short) (world.map.Height/2);
+                        world.EdgeLevel = -1;
                         Logger.Log(LogType.Warning,
-                            "WorldManager: Could not parse \"level\" attribute of Environment settings for world \"{0}\", assuming default (normal height/2).",
+                            "WorldManager: Could not parse \"level\" attribute of Environment settings for world \"{0}\", assuming default (normal height / 2).",
+                            worldName);
+                    }
+                }
+            	if ((tempAttr = envEl.Attribute("cloudsheight")) != null) {
+                    if (!short.TryParse(tempAttr.Value, out world.CloudsHeight)) {
+                        world.CloudsHeight = short.MinValue;
+                        Logger.Log(LogType.Warning,
+                            "WorldManager: Could not parse \"cloudsheight\" attribute of Environment settings for world \"{0}\", assuming default (normal height + 2).",
+                            worldName);
+                    }
+                }
+            	if ((tempAttr = envEl.Attribute("maxfog")) != null) {
+                    if (!short.TryParse(tempAttr.Value, out world.MaxFogDistance)) {
+                        world.MaxFogDistance = 0;
+                        Logger.Log(LogType.Warning,
+                            "WorldManager: Could not parse \"maxfog\" attribute of Environment settings for world \"{0}\", assuming default (0).",
                             worldName);
                     }
                 }
@@ -643,6 +659,8 @@ namespace fCraft {
                     if (world.Texture != null) elEnv.Add(new XAttribute("terrain", world.Texture));
                     elEnv.Add(new XAttribute("maxreach", world.maxReach));
                     elEnv.Add(new XAttribute("weather", world.Weather));
+                    if (world.CloudsHeight != short.MinValue) elEnv.Add(new XAttribute("cloudsheight", world.CloudsHeight));
+                    elEnv.Add(new XAttribute("maxfog", world.MaxFogDistance));
                     if( elEnv.HasAttributes ) {
                         temp.Add( elEnv );
                     }

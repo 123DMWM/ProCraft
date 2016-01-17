@@ -6,7 +6,7 @@ namespace fCraft
     /// See http://wiki.vg/Classic_Protocol_Extension for details. </summary>
     public enum CpeExt
     {
-        none,
+        None,
         /// <summary> Used to extend or restrict the distance at which client may click blocks,
         /// controlled by the server. </summary>
         ClickDistance,
@@ -53,6 +53,10 @@ namespace fCraft
         /// <summary> This extension allows the server to specify custom terrain textures,
         /// and tweak appearance of map edges. </summary>
         EnvMapAppearance,
+        
+        /// <summary> This extension allows the server to specify custom terrain textures,
+        /// and tweak appearance of map edges, clouds height, and max fog distance. </summary>
+        EnvMapAppearance2,
 
         /// <summary> Allows changing appearance of player models in supporting clients. </summary>
         EnvWeatherType,

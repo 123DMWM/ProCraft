@@ -551,7 +551,7 @@ namespace fCraft {
             Category = CommandCategory.New | CommandCategory.World,
             Permissions = new[] { Permission.ManageWorlds },
             Help = "Prints or changes the environmental variables for a given world. " +
-                   "Variables are: border, clouds, edge, fog, level, shadow, sky, sunlight, texture, weather. " +
+                   "Variables are: border, clouds, edge, fog, level, cloudsheight, shadow, sky, sunlight, texture, weather, maxfog. " +
                    "See &H/Help env <Variable>&S for details about each variable. " +
                    "Type &H/Env <WorldName> normal&S to reset everything for a world.",
             HelpSections = new Dictionary<string, string>{
@@ -572,6 +572,9 @@ namespace fCraft {
                 { "level",      "&H/Env <WorldName> level <#>&n&S" +
                                 "Sets height of the map edges/water level, in terms of blocks from the bottom of the map. " +
                                 "Use \"normal\" instead of a number to reset to default (middle of the map)." },
+                { "cloudsheight","&H/Env <WorldName> cloudsheight <#>&n&S" +
+                                "Sets height of the clouds, in terms of blocks from the bottom of the map. " +
+                                "Use \"normal\" instead of a number to reset to default (map height + 2)." },
                 { "edge",       "&H/Env <WorldName> edge <BlockType>&n&S" +
                                 "Changes the type of block that's visible beyond the map boundaries. "+
                                 "Use \"normal\" instead of a number to reset to default (water)." },
@@ -583,7 +586,10 @@ namespace fCraft {
                                 "Use \"normal\" instead of a web link to reset to default (" + Server.DefaultTerrain + ")" },
                 { "weather",    "&H/Env <WorldName> weather <0,1,2/sun,rain,snow>&n&S" +
                                 "Changes the weather on a specified map. "+
-                                "Use \"normal\" instead to use default (0/sun)" }
+                                "Use \"normal\" instead to use default (0/sun)" },
+                { "maxfog",     "&H/Env <WorldName> maxfog <#>&n&S" +
+                                "Sets the maximum distance clients can see around them. " +
+                                "Use \"normal\" instead of a number to reset to default (0)." }
             },
             Usage = "/Env <WorldName> <Variable>",
             IsConsoleSafe = true,
@@ -617,11 +623,14 @@ namespace fCraft {
                                 world.ShadowColor == null ? "normal" : '#' + world.ShadowColor,
                                 world.LightColor == null ? "normal" : '#' + world.LightColor,
                                 world.GetEdgeLevel() + " blocks");
+                player.Message("  Clouds height: {0}  Max fog distance: {1}",
+                                world.GetCloudsHeight() + " blocks",
+                                world.MaxFogDistance <= 0 ? "(no limit)" : world.MaxFogDistance.ToString());
                 player.Message( "  Water block: {1}  Bedrock block: {0}",
                                 world.EdgeBlock, world.HorizonBlock );
                 player.Message("  Texture: {0}", world.GetTexture());
                 if( !player.IsUsingWoM ) {
-                    player.Message( "  You need ClassicalSharp client to see the changes." );
+                    player.Message( "  You need ClassiCube or ClassicalSharp client to see the changes." );
                 }
                 return;
             }
@@ -634,6 +643,8 @@ namespace fCraft {
                     world.ShadowColor = null;
                     world.LightColor = null; 
                     world.EdgeLevel = -1;
+                    world.CloudsHeight = short.MinValue;
+                    world.MaxFogDistance = 0;
                     world.EdgeBlock = Block.Admincrete;
                     world.HorizonBlock = Block.Water;
                     world.Texture = "Default";
@@ -790,9 +801,51 @@ namespace fCraft {
                         }
                     }
                     foreach (Player p in world.Players) {
-                        if (p.Supports(CpeExt.EnvMapAppearance)) {
-                            p.Send(Packet.MakeEnvSetMapAppearance(world.GetTexture(), world.EdgeBlock, world.HorizonBlock, world.GetEdgeLevel()));
+                        if (p.Supports(CpeExt.EnvMapAppearance) || p.Supports(CpeExt.EnvMapAppearance2))
+                            p.SendCurrentMapAppearance();
+                    }
+                    break;
+                
+                case "cloudheight":                    
+                case "cloudsheight":
+                    short cloudsHeight;
+                    if (value.Equals("normal", StringComparison.OrdinalIgnoreCase) || value.Equals("reset", StringComparison.OrdinalIgnoreCase) || value.Equals("default", StringComparison.OrdinalIgnoreCase) || value.Equals("middle", StringComparison.OrdinalIgnoreCase) || value.Equals("center", StringComparison.OrdinalIgnoreCase)) {
+                        player.Message("Reset clouds height for {0}&S to normal", world.ClassyName);
+                        world.CloudsHeight = (short)(world.map.Height + 2);
+                    } else {
+                        if (!short.TryParse(value, out cloudsHeight)) {
+                            player.Message("Env: \"{0}\" is not a valid integer.", value);
+                            return;
+                        } else {
+                            world.CloudsHeight = cloudsHeight;
+                            player.Message("Set clouds height for {0}&S to {1}", world.ClassyName, cloudsHeight);
                         }
+                    }
+                    foreach (Player p in world.Players) {
+                        if (p.Supports(CpeExt.EnvMapAppearance2))
+                            p.SendCurrentMapAppearance();
+                    }
+                    break;
+                
+                case "fogdist":                    
+                case "maxfog":
+                case "maxdist":
+                    short fogDist;
+                    if (value.Equals("normal", StringComparison.OrdinalIgnoreCase) || value.Equals("reset", StringComparison.OrdinalIgnoreCase) || value.Equals("default", StringComparison.OrdinalIgnoreCase) || value.Equals("middle", StringComparison.OrdinalIgnoreCase) || value.Equals("center", StringComparison.OrdinalIgnoreCase)) {
+                        player.Message("Reset max fog distance for {0}&S to normal", world.ClassyName);
+                        world.MaxFogDistance = 0;
+                    } else {
+                        if (!short.TryParse(value, out fogDist)) {
+                            player.Message("Env: \"{0}\" is not a valid integer.", value);
+                            return;
+                        } else {
+                            world.MaxFogDistance = fogDist;
+                            player.Message("Set max fog distance for {0}&S to {1}", world.ClassyName, fogDist);
+                        }
+                    }
+                    foreach (Player p in world.Players) {
+                        if (p.Supports(CpeExt.EnvMapAppearance2))
+                            p.SendCurrentMapAppearance();
                     }
                     break;
 
@@ -817,9 +870,8 @@ namespace fCraft {
                         //}
                     }
                     foreach (Player p in world.Players) {
-                        if (p.Supports(CpeExt.EnvMapAppearance)) {
-                            p.Send(Packet.MakeEnvSetMapAppearance(world.GetTexture(), world.EdgeBlock, world.HorizonBlock, world.GetEdgeLevel()));
-                        }
+                        if (p.Supports(CpeExt.EnvMapAppearance) || p.Supports(CpeExt.EnvMapAppearance2))
+                            p.SendCurrentMapAppearance();
                     }
                     break;
 
@@ -844,9 +896,8 @@ namespace fCraft {
                         //}
                     }
                     foreach (Player p in world.Players) {
-                        if (p.Supports(CpeExt.EnvMapAppearance)) {
-                            p.Send(Packet.MakeEnvSetMapAppearance(world.GetTexture(), world.EdgeBlock, world.HorizonBlock, world.GetEdgeLevel()));
-                        }
+                        if (p.Supports(CpeExt.EnvMapAppearance) || p.Supports(CpeExt.EnvMapAppearance2))
+                            p.SendCurrentMapAppearance();
                     }
                     break;
 
@@ -868,9 +919,8 @@ namespace fCraft {
                     }
                     world.Texture = value;
                     foreach (Player p in world.Players) {
-                        if (p.Supports(CpeExt.EnvMapAppearance)) {
-                            p.Send(Packet.MakeEnvSetMapAppearance(world.GetTexture(), world.EdgeBlock, world.HorizonBlock, world.GetEdgeLevel()));
-                        }
+                        if (p.Supports(CpeExt.EnvMapAppearance) || p.Supports(CpeExt.EnvMapAppearance2))
+                            p.SendCurrentMapAppearance();
                     }
                     break;
 
@@ -4264,7 +4314,6 @@ namespace fCraft {
                             player.Name, worldNamec, worldNamec);
                         newWorld.AccessSecurity.Include(player.Info);
                         newWorld.BuildSecurity.Include(player.Info);
-                        newWorld.EdgeLevel = (short) (sizec/2);
                         WorldManager.SaveWorldList();
                     }
                     Server.RequestGC();

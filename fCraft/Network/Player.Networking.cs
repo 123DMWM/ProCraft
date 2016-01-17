@@ -1274,9 +1274,8 @@ namespace fCraft {
         }
         
         void SendJoinCpeExtensions() {
-            if (Supports(CpeExt.EnvMapAppearance)) {
-                Send(Packet.MakeEnvSetMapAppearance(World.GetTexture(), World.EdgeBlock, World.HorizonBlock, World.GetEdgeLevel()));
-            }
+        	if (Supports(CpeExt.EnvMapAppearance) || Supports(CpeExt.EnvMapAppearance2))
+        		SendCurrentMapAppearance();
             if (Supports(CpeExt.ExtPlayerList2)) {
                 Send(Packet.MakeExtAddEntity2(Packet.SelfId, Info.Rank.Color + Name, (Info.skinName == "" ? Name : Info.skinName), Position, this));
             } else {
@@ -1349,6 +1348,14 @@ namespace fCraft {
                     }
                 }
             }
+        }
+        
+        internal void SendCurrentMapAppearance() {
+            if (Supports(CpeExt.EnvMapAppearance2))
+                Send(Packet.MakeEnvSetMapAppearance2(World.GetTexture(), World.EdgeBlock, World.HorizonBlock, World.GetEdgeLevel(),
+            	                                     World.GetCloudsHeight(), World.MaxFogDistance));
+            else
+                Send(Packet.MakeEnvSetMapAppearance(World.GetTexture(), World.EdgeBlock, World.HorizonBlock, World.GetEdgeLevel()));
         }
         
         bool GetHacksFromMotd(out bool canFly, out bool canNoClip, out bool canSpeed, out bool canRespawn) {

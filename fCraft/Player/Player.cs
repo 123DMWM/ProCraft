@@ -2266,6 +2266,7 @@ namespace fCraft {
         const int ChangeModelExtVersion = 1;
         const string EnvMapAppearanceExtName = "EnvMapAppearance";
         const int EnvMapAppearanceExtVersion = 1;
+        const int EnvMapAppearance2ExtVersion = 2;
         const string EnvWeatherTypeExtName = "EnvWeatherType";
         const int EnvWeatherTypeExtVersion = 1;
         const string HeldBlockExtName = "HeldBlock";
@@ -2316,7 +2317,7 @@ namespace fCraft {
             writer.Write(Packet.MakeExtEntry(BlockPermissionsExtName, BlockPermissionsExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(ChangeModelExtName, ChangeModelExtVersion).Bytes);
             
-            writer.Write(Packet.MakeExtEntry(EnvMapAppearanceExtName, EnvMapAppearanceExtVersion).Bytes);
+            writer.Write(Packet.MakeExtEntry(EnvMapAppearanceExtName, EnvMapAppearance2ExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(EnvWeatherTypeExtName, EnvWeatherTypeExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(HackControlExtName, HackControlExtVersion).Bytes);
             
@@ -2354,7 +2355,7 @@ namespace fCraft {
                 string extName = reader.ReadString();
                 int extVersion = reader.ReadInt32();
                 bool addExt = true;
-                CpeExt addedExt = CpeExt.none;
+                CpeExt addedExt = CpeExt.None;
                 switch (extName) {
                     case CustomBlocksExtName:
                         if (extVersion == CustomBlocksExtVersion)
@@ -2380,6 +2381,8 @@ namespace fCraft {
                     case EnvMapAppearanceExtName:
                         if (extVersion == EnvMapAppearanceExtVersion) {
                             addedExt = CpeExt.EnvMapAppearance;
+                        } else if (extVersion == EnvMapAppearance2ExtVersion) {
+                            addedExt = CpeExt.EnvMapAppearance2;
                         }
                         break;
                     case EnvWeatherTypeExtName:
@@ -2452,6 +2455,11 @@ namespace fCraft {
                     supportedExtensions.Add(addedExt);
                 }
             }
+            // Fix for ClassiCube Client which violates the spec -
+            // If server supports version 2 but client version 1, client should reply with version 1.
+            // ClassiCube just doesn't reply at all.
+            if (ClientName == "ClassiCube Client")
+            	supportedExtensions.Add(CpeExt.EnvMapAppearance);
 
             // log client's capabilities
             if (supportedExtensions.Count > 0)
