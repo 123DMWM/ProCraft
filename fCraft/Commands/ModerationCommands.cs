@@ -1118,7 +1118,7 @@ namespace fCraft {
 			Server.Players.CanSee(player).Message("&SPlayer {0}&S is now hidden. {1}", player.ClassyName, quitMessage);
 			Player.RaisePlayerHideChangedEvent(player, true, silent);
 			foreach (Player p1 in Server.Players) {
-				if (p1.Supports(CpeExtension.ExtPlayerList) || p1.Supports(CpeExtension.ExtPlayerList2)) {
+				if (p1.Supports(CpeExt.ExtPlayerList) || p1.Supports(CpeExt.ExtPlayerList2)) {
 					p1.Send(Packet.MakeExtRemovePlayerName(player.NameID));
 				}
 			}
@@ -1173,7 +1173,7 @@ namespace fCraft {
 
 			Player.RaisePlayerHideChangedEvent(player, false, silent);
 			foreach (Player p1 in Server.Players) {
-				if (p1.Supports(CpeExtension.ExtPlayerList) || p1.Supports(CpeExtension.ExtPlayerList2)) {
+				if (p1.Supports(CpeExt.ExtPlayerList) || p1.Supports(CpeExt.ExtPlayerList2)) {
 					p1.Send(Packet.MakeExtRemovePlayerName(player.NameID));
 				}
 			}

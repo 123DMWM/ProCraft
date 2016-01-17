@@ -4,7 +4,7 @@ namespace fCraft
 {
     /// <summary> Client Protocol Extension list.
     /// See http://wiki.vg/Classic_Protocol_Extension for details. </summary>
-    public enum CpeExtension
+    public enum CpeExt
     {
         none,
         /// <summary> Used to extend or restrict the distance at which client may click blocks,

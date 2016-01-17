@@ -783,7 +783,7 @@ namespace fCraft {
                 }
 
                 if( zones.Remove( zone.Name ) ) {
-                        foreach (Player p in player.World.Players.Where(a => a.Supports(CpeExtension.SelectionCuboid))) {
+                        foreach (Player p in player.World.Players.Where(a => a.Supports(CpeExt.SelectionCuboid))) {
                             p.Send(Packet.MakeRemoveSelection(zone.ZoneID));
                     }
                     Logger.Log( LogType.UserActivity,
@@ -998,14 +998,14 @@ namespace fCraft {
                     zone.ShowZone = true;
                     if (zone.Color != null) {
                         player.Message("Zone ({0}&s) will now show its bounderies", zone.ClassyName);
-                        player.World.Players.Where(p => p.Supports(CpeExtension.SelectionCuboid)).Send(Packet.MakeMakeSelection(zone.ZoneID, zone.Name, zone.Bounds,
+                        player.World.Players.Where(p => p.Supports(CpeExt.SelectionCuboid)).Send(Packet.MakeMakeSelection(zone.ZoneID, zone.Name, zone.Bounds,
                             zone.Color, zone.Alpha));
                     }
                     return;
                 } else if (color.ToLower().Equals("off") || color.ToLower().Equals("false") || color.ToLower().Equals("no")) {
                     zone.ShowZone = false;
                     player.Message("Zone ({0}&s) will no longer show its bounderies", zone.ClassyName);
-                    player.World.Players.Where(p => p.Supports(CpeExtension.SelectionCuboid)).Send(Packet.MakeRemoveSelection(zone.ZoneID));
+                    player.World.Players.Where(p => p.Supports(CpeExt.SelectionCuboid)).Send(Packet.MakeRemoveSelection(zone.ZoneID));
                     return;
                 } else {
                     player.Message("Error: \"#{0}\" is not a valid HEX color code.", color);
@@ -1047,7 +1047,7 @@ namespace fCraft {
             }
             if (zone != null) {
                 foreach (Player p in player.World.Players) {
-                    if (p.Supports(CpeExtension.SelectionCuboid)) {
+                    if (p.Supports(CpeExt.SelectionCuboid)) {
                         if (zone.ShowZone) {
                             p.Send(Packet.MakeMakeSelection(zone.ZoneID, zone.Name, zone.Bounds, zone.Color, alpha));
                         }

@@ -651,7 +651,7 @@ namespace fCraft
                 rCreate.addReport(getNewReportId(), player.Name, DateTime.Now, message);
                 player.Message("Report sent!");
 				foreach (Player p in Server.Players.Where(q => q.Info.Rank == RankManager.HighestRank)) {
-					if (p.Supports(CpeExtension.MessageType)) {
+					if (p.Supports(CpeExt.MessageType)) {
 						p.Send(Packet.Message((byte)MessageType.Announcement, String.Format("Player {0} has sent in a report!", player.Name)));
 					}
 					p.Message("Player {0} has sent in a report!", player.Name);
@@ -1197,7 +1197,7 @@ namespace fCraft
                     return;
                 }
             }
-            if (player.Supports(CpeExtension.TextHotKey)) {
+            if (player.Supports(CpeExt.TextHotKey)) {
                 player.Send(Packet.MakeSetTextHotKey(Label, Action, KeyCode, KeyMod));
             } else {
                 player.Message("You do not support TextHotKey");

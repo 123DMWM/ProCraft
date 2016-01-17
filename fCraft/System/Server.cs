@@ -943,7 +943,7 @@ namespace fCraft {
             for (int i = 0; i < tempPlayerList.Length; i++) {
                 Player player = tempPlayerList[i];
 
-				if (player.Supports(CpeExtension.MessageType)) {
+				if (player.Supports(CpeExt.MessageType)) {
                     player.Send(Packet.Message((byte)MessageType.BottomRight2,
                         player.Position.ToBlockCoordsExt().ToString() + "&s[" + compassString(player.Position.R) + "&s]"));
                     if (player.LastDrawOp != null && !player.IsPlayingCTF)
@@ -1168,7 +1168,7 @@ namespace fCraft {
             {
                 foreach (Player sendtome in Server.Players)
                 {
-                    if (sendtome.Supports(CpeExtension.MessageType))
+                    if (sendtome.Supports(CpeExt.MessageType))
                     {
                         if (line.StartsWith("&d", StringComparison.OrdinalIgnoreCase))
                         {
@@ -1200,7 +1200,7 @@ namespace fCraft {
             {
                 foreach (Player sendtome in Server.Players)
                 {
-                    if (sendtome.Supports(CpeExtension.MessageType))
+                    if (sendtome.Supports(CpeExt.MessageType))
                     {
                         sendtome.Send(Packet.Message((byte)MessageType.Announcement, " "));
                     }
@@ -1534,7 +1534,7 @@ namespace fCraft {
                 }
                 foreach (Player p1 in Players)
                 {
-                    if (p1.Supports(CpeExtension.ExtPlayerList) || p1.Supports(CpeExtension.ExtPlayerList2))
+                    if (p1.Supports(CpeExt.ExtPlayerList) || p1.Supports(CpeExt.ExtPlayerList2))
                     {
                         p1.Send(Packet.MakeExtRemovePlayerName(player.NameID));
                     }
@@ -1549,14 +1549,14 @@ namespace fCraft {
 
 		internal static void UpdateTabList() {
 			foreach (Player p1 in Players) {
-				if (p1.Supports(CpeExtension.MessageType)) {
+				if (p1.Supports(CpeExt.MessageType)) {
 					if (p1.World != null) {
 						p1.Send(Packet.Message((byte)MessageType.Status2, p1.ListName + " &son world " + p1.World.ClassyName));
 					} else {
 						p1.Send(Packet.Message((byte)MessageType.Status2, p1.ListName));
 					}
 				}
-				if (!p1.Supports(CpeExtension.ExtPlayerList) && !p1.Supports(CpeExtension.ExtPlayerList2))
+				if (!p1.Supports(CpeExt.ExtPlayerList) && !p1.Supports(CpeExt.ExtPlayerList2))
 					continue;
 				var canBeSeen = Players.Where(i => p1.CanSee(i)).ToArray();
 				var canBeSeenW = p1.World.Players.Where(i => p1.CanSee(i)).ToArray();

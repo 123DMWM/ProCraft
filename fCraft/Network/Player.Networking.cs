@@ -333,11 +333,11 @@ namespace fCraft {
             BytesReceived += 10;
             byte id = reader.ReadByte();
             Block failsafe;
-            if (Supports(CpeExtension.HeldBlock)) {
+            if (Supports(CpeExt.HeldBlock)) {
                 if (Map.GetBlockByName(id.ToString(), false, out failsafe)) {
                     if (Info.heldBlock != failsafe) {
                         Info.heldBlock = failsafe;
-                        if (Supports(CpeExtension.MessageType) && !IsPlayingCTF) {
+                        if (Supports(CpeExt.MessageType) && !IsPlayingCTF) {
                             Send(Packet.Message((byte)MessageType.BottomRight1, "&sBlock:&f" + Map.getBlockName(Info.heldBlock) + " &sID:&f" + (byte)Info.heldBlock));
                         }
                     }
@@ -525,7 +525,7 @@ namespace fCraft {
 
             // if a player is using InDev or SurvivalTest client, they may try to
             // place blocks that are not found in MC Classic. Convert them!
-            if( type > (byte)Map.MaxCustomBlockType && !Supports(CpeExtension.BlockDefinitions)) {
+            if( type > (byte)Map.MaxCustomBlockType && !Supports(CpeExt.BlockDefinitions)) {
                 type = MapDat.MapBlock( type );
             }
 
@@ -1009,7 +1009,7 @@ namespace fCraft {
             Server.UpdatePlayerList();
             RaisePlayerReadyEvent(this);
 
-			if (Supports(CpeExtension.MessageType)) {
+			if (Supports(CpeExt.MessageType)) {
 				Send(Packet.Message((byte)MessageType.Status1, ConfigKey.ServerName.GetString()));
 			}
 
@@ -1162,7 +1162,7 @@ namespace fCraft {
                 SendNow(Packet.MakeHandshake(this, textLine1, textLine2));
             }
             // needs to be sent before the client receives the map data
-            if (Supports(CpeExtension.BlockDefinitions)) {
+            if (Supports(CpeExt.BlockDefinitions)) {
                 BlockDefinition.SendGlobalDefinitions(this);
             }
 
@@ -1233,8 +1233,8 @@ namespace fCraft {
         }
         
         byte[] GetCompressedBlocks(Map map) {
-        	bool customBlocks = Supports(CpeExtension.CustomBlocks);
-        	if (customBlocks && Supports(CpeExtension.BlockDefinitions))
+        	bool customBlocks = Supports(CpeExt.CustomBlocks);
+        	if (customBlocks && Supports(CpeExt.BlockDefinitions))
         		return map.GetCompressedCopy(map.Blocks);
         	
         	byte[] blocks = customBlocks ? 
@@ -1274,19 +1274,19 @@ namespace fCraft {
         }
         
         void SendJoinCpeExtensions() {
-            if (Supports(CpeExtension.EnvMapAppearance)) {
+            if (Supports(CpeExt.EnvMapAppearance)) {
                 Send(Packet.MakeEnvSetMapAppearance(World.GetTexture(), World.EdgeBlock, World.HorizonBlock, World.GetEdgeLevel()));
             }
-            if (Supports(CpeExtension.ExtPlayerList2)) {
+            if (Supports(CpeExt.ExtPlayerList2)) {
                 Send(Packet.MakeExtAddEntity2(Packet.SelfId, Info.Rank.Color + Name, (Info.skinName == "" ? Name : Info.skinName), Position, this));
             } else {
                 Send(Packet.MakeAddEntity(Packet.SelfId, Info.Rank.Color + Name, Position));
             }
 
-            if (Supports(CpeExtension.ChangeModel)) {
+            if (Supports(CpeExt.ChangeModel)) {
                 Send(Packet.MakeChangeModel(255, !Info.IsAFK ? Info.Mob : AFKModel));
             }
-            if (Supports(CpeExtension.EnvColors))
+            if (Supports(CpeExt.EnvColors))
             {
                 Send(Packet.MakeEnvSetColor((byte)EnvVariable.SkyColor, World.SkyColor));
                 Send(Packet.MakeEnvSetColor((byte)EnvVariable.CloudColor, World.CloudColor));
@@ -1295,12 +1295,12 @@ namespace fCraft {
                 Send(Packet.MakeEnvSetColor((byte)EnvVariable.Sunlight, World.LightColor));
             }
             
-			if (Supports(CpeExtension.EnvWeatherType)) {
+			if (Supports(CpeExt.EnvWeatherType)) {
 				Send(Packet.SetWeather((byte)WeatherType.Sunny));
                 Send(Packet.SetWeather(World.Weather));
             }
 
-            if (Supports(CpeExtension.HackControl)) {
+            if (Supports(CpeExt.HackControl)) {
             	bool canFly, canNoClip, canSpeed, canRespawn;
                 bool useMotd = GetHacksFromMotd(out canFly, out canNoClip, out canSpeed, out canRespawn);
                 if (useMotd) {
@@ -1310,11 +1310,11 @@ namespace fCraft {
                 }
             }
 
-            if (Supports(CpeExtension.ClickDistance)) {
+            if (Supports(CpeExt.ClickDistance)) {
                 Send(Packet.MakeSetClickDistance((World.maxReach < Info.ReachDistance && !IsStaff) ? World.maxReach : Info.ReachDistance));
             }
 
-            if (Supports(CpeExtension.BlockPermissions)) {
+            if (Supports(CpeExt.BlockPermissions)) {
                 Send(Packet.MakeSetBlockPermission(Block.Admincrete, Can(Permission.PlaceAdmincrete), Can(Permission.PlaceAdmincrete)));
                 Send(Packet.MakeSetBlockPermission(Block.Water, Can(Permission.PlaceWater), true));
                 Send(Packet.MakeSetBlockPermission(Block.StillWater, Can(Permission.PlaceWater), true));
@@ -1323,26 +1323,26 @@ namespace fCraft {
                 Send(Packet.MakeSetBlockPermission(Block.Grass, Can(Permission.PlaceGrass), true));
             }
 
-            if (Supports(CpeExtension.MessageType) && !IsPlayingCTF) {
+            if (Supports(CpeExt.MessageType) && !IsPlayingCTF) {
                 Send(Packet.Message((byte)MessageType.BottomRight1, "&sBlock:&f" + Map.getBlockName(Info.heldBlock) + " &sID:&f" + (byte)Info.heldBlock));
             }
-            if (Supports(CpeExtension.MessageType)) {
+            if (Supports(CpeExt.MessageType)) {
 				Send(Packet.Message((byte)MessageType.Status1, ConfigKey.ServerName.GetString()));
 			}
             foreach (Bot bot in World.Bots) {
                 Send(Packet.MakeRemoveEntity(bot.ID));
                 if (bot.World == World) {
-                    if (Supports(CpeExtension.ExtPlayerList2)) {
+                    if (Supports(CpeExt.ExtPlayerList2)) {
                         Send(Packet.MakeExtAddEntity2(bot.ID, bot.Name, (bot.SkinName == "" ? bot.Name : bot.SkinName), bot.Position, this));
                     } else {
                         Send(Packet.MakeAddEntity(bot.ID, bot.Name, bot.Position));
                     }
-                    if (bot.Model != "humanoid" && Supports(CpeExtension.ChangeModel)) {
+                    if (bot.Model != "humanoid" && Supports(CpeExt.ChangeModel)) {
                         Send(Packet.MakeChangeModel((byte)bot.ID, bot.Model));
                     }
                 }
             }
-            if (Supports(CpeExtension.SelectionCuboid)) {
+            if (Supports(CpeExt.SelectionCuboid)) {
                 foreach (Zone z in WorldMap.Zones) {
                     if (z.ShowZone) {
                         Send(Packet.MakeMakeSelection(z.ZoneID, z.Name, z.Bounds, z.Color, z.Alpha));
@@ -1585,7 +1585,7 @@ namespace fCraft {
                     } else if( spectatePos != Position ) {
                         SendNow( Packet.MakeSelfTeleport( spectatePos ) );
                     }
-                    if (SpectatedPlayer.Info.heldBlock != Info.heldBlock && SpectatedPlayer.Supports(CpeExtension.HeldBlock))
+                    if (SpectatedPlayer.Info.heldBlock != Info.heldBlock && SpectatedPlayer.Supports(CpeExt.HeldBlock))
                     {
                         SendNow(Packet.MakeHoldThis(SpectatedPlayer.Info.heldBlock, false));
                     }
@@ -1596,11 +1596,11 @@ namespace fCraft {
             Player[] worldPlayerList = World.Players;
             Position pos = Position;
             foreach (Bot bot in World.Bots.Where(b => b.World == World)) {
-                if (!bot.oldModel.ToLower().Equals(bot.Model.ToLower()) && Supports(CpeExtension.ChangeModel)) {
+                if (!bot.oldModel.ToLower().Equals(bot.Model.ToLower()) && Supports(CpeExt.ChangeModel)) {
                     Send(Packet.MakeChangeModel((byte)bot.ID, bot.Model));
                     bot.oldModel = bot.Model;
                 }
-                if (bot.oldSkinName != bot.SkinName && Supports(CpeExtension.ExtPlayerList2)) {
+                if (bot.oldSkinName != bot.SkinName && Supports(CpeExt.ExtPlayerList2)) {
                     Send(Packet.MakeRemoveEntity(bot.ID));
 					Send(Packet.MakeExtAddEntity2(bot.ID, bot.Name, (bot.SkinName == "" ? bot.Name : bot.SkinName), bot.Position, this));
                     Send(Packet.MakeChangeModel((byte)bot.ID, bot.Model));
@@ -1623,7 +1623,7 @@ namespace fCraft {
                 } else {
                     entity = new VisibleEntity(Position, -1, Info.Rank);
                 }
-                if (Info.oldskinName != Info.skinName && otherPlayer.Supports(CpeExtension.ExtPlayerList2)) {
+                if (Info.oldskinName != Info.skinName && otherPlayer.Supports(CpeExt.ExtPlayerList2)) {
 					otherPlayer.Send(Packet.MakeExtAddEntity2(entity.Id, Info.Rank.Color + Name, 
 						(Info.skinName == "" ? Name : Info.skinName), WorldMap.Spawn, otherPlayer));
                     if (otherPlayer == this) {
@@ -1631,7 +1631,7 @@ namespace fCraft {
                     }
 
                 }
-                if ((Info.oldMob != Info.Mob || Info.oldafkMob != Info.afkMob) && otherPlayer.Supports(CpeExtension.ChangeModel)) {
+                if ((Info.oldMob != Info.Mob || Info.oldafkMob != Info.afkMob) && otherPlayer.Supports(CpeExt.ChangeModel)) {
 
                     string thisModel = Info.IsAFK ? AFKModel : Info.Mob;
                     if (otherPlayer.Info.Rank.CanSee(Info.Rank) && (thisModel.ToLower().Equals("air") || thisModel.ToLower().Equals("0"))) {
@@ -1724,7 +1724,7 @@ namespace fCraft {
 				if (player.World != null) {
 					pos = player.WorldMap.Spawn;
 				}
-                if (Supports(CpeExtension.ExtPlayerList2)) {
+                if (Supports(CpeExt.ExtPlayerList2)) {
                     Send(Packet.MakeExtAddEntity2(newEntity.Id, player.Info.Rank.Color + player.Name,
 						(player.Info.skinName == "" ? player.Name : player.Info.skinName), pos, this));
                     Send(Packet.MakeTeleport(newEntity.Id, player.Position));
@@ -1733,7 +1733,7 @@ namespace fCraft {
                         player.WorldMap.Spawn));
                     Send(Packet.MakeTeleport(newEntity.Id, player.Position));
                 }
-                if (Supports(CpeExtension.ChangeModel)) {
+                if (Supports(CpeExt.ChangeModel)) {
                     string addedModel = player.Info.IsAFK ? player.AFKModel : player.Info.Mob;
                     if (Info.Rank.CanSee(player.Info.Rank) && (addedModel.ToLower().Equals("air") || addedModel.ToLower().Equals("0"))) {
                         addedModel = "Humanoid";
@@ -1775,7 +1775,7 @@ namespace fCraft {
             Logger.Log( LogType.Debug, "ReAddEntity: {0} re-added {1} ({2})", Name, entity.Id, player.Name );
 #endif
             SendNow( Packet.MakeRemoveEntity( entity.Id ) );
-            if (Supports(CpeExtension.ExtPlayerList2)) {
+            if (Supports(CpeExt.ExtPlayerList2)) {
 				SendNow(Packet.MakeExtAddEntity2(entity.Id, player.Info.Rank.Color + player.Name, 
 					(player.Info.skinName == "" ? player.Name : player.Info.skinName),
                     player.WorldMap.Spawn, this));
@@ -1785,7 +1785,7 @@ namespace fCraft {
                 Send(Packet.MakeTeleport(entity.Id, player.Position));
             }
 
-            if (Supports(CpeExtension.ChangeModel)) {
+            if (Supports(CpeExt.ChangeModel)) {
                 string readdedModel = player.Info.IsAFK ? player.AFKModel : player.Info.Mob;
                 if (Info.Rank.CanSee(player.Info.Rank) && (readdedModel.ToLower().Equals("air") || readdedModel.ToLower().Equals("0"))) {
                     readdedModel = "Humanoid";

@@ -318,7 +318,7 @@ namespace fCraft {
                 if (target.PlayerObject != player) {
                     target.PlayerObject.Message("{0} has changed your {1} ability, use &h/Hacks &sto check them out.", player.Info.Name, hackStr);
                 }
-                if (target.PlayerObject.Supports(CpeExtension.HackControl)) {
+                if (target.PlayerObject.Supports(CpeExt.HackControl)) {
                     target.PlayerObject.Send(Packet.HackControl(
                         target.AllowFlying, target.AllowNoClip, target.AllowSpeedhack,
                         target.AllowRespawn, target.AllowThirdPerson, target.JumpHeight));
@@ -510,7 +510,7 @@ namespace fCraft {
             
             BlockDefinition.RemoveGlobalBlock(def);
             foreach (Player p in Server.Players ) {
-                if (p.Supports(CpeExtension.BlockDefinitions))
+                if (p.Supports(CpeExt.BlockDefinitions))
                     BlockDefinition.SendGlobalRemove(p, def);
             }
             BlockDefinition.SaveGlobalDefinitions();
@@ -582,7 +582,7 @@ namespace fCraft {
                     break;
                 case 8:
                     if (bool.TryParse(args, out boolVal)) {
-                        if (player.Supports(CpeExtension.BlockDefinitionsExt)) {
+                        if (player.Supports(CpeExt.BlockDefinitionsExt)) {
                             step = 16;
                         } else {
                             step++;
@@ -716,7 +716,7 @@ namespace fCraft {
                         BlockDefinition.DefineGlobalBlock(def);
 
                         foreach (Player p in Server.Players) {
-                            if (p.Supports(CpeExtension.BlockDefinitions) || p.Supports(CpeExtension.BlockDefinitionsExt))
+                            if (p.Supports(CpeExt.BlockDefinitions) || p.Supports(CpeExt.BlockDefinitionsExt))
                                 BlockDefinition.SendGlobalAdd(p, def);
                         }
 
@@ -768,7 +768,7 @@ namespace fCraft {
                            p.ClassyName, def.Name, def.BlockID);
             
             foreach (Player pl in Server.Players) {
-                if (pl.Supports(CpeExtension.BlockDefinitions))
+                if (pl.Supports(CpeExt.BlockDefinitions))
                     BlockDefinition.SendGlobalAdd(pl, def);
             }            
         }
@@ -1011,7 +1011,7 @@ namespace fCraft {
                 BlockDefinition.DefineGlobalBlock(newDef);
 
                 foreach (Player p in Server.Players) {
-                    if (p.Supports(CpeExtension.BlockDefinitions)) {
+                    if (p.Supports(CpeExt.BlockDefinitions)) {
                         BlockDefinition.SendGlobalRemove(p, def);
                         BlockDefinition.SendGlobalAdd(p, newDef);
                     }
@@ -1060,7 +1060,7 @@ namespace fCraft {
             for (int i = 0; i < cache.Length; i++) {
                 Player p = cache[i];
                 World world = p.World;
-                if (world == null || !p.Supports(CpeExtension.BlockDefinitions))
+                if (world == null || !p.Supports(CpeExt.BlockDefinitions))
                     continue;
                 p.JoinWorld(world, WorldChangeReason.Rejoin, p.Position);
             }

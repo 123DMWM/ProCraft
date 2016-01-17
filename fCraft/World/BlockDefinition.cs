@@ -83,7 +83,7 @@ namespace fCraft {
                 BlockDefinition def = GlobalDefinitions[i];
                 if (def == null) continue;
                 
-                if (p.Supports(CpeExtension.BlockDefinitionsExt) && def.Shape != 0)
+                if (p.Supports(CpeExt.BlockDefinitionsExt) && def.Shape != 0)
                     p.SendNow(Packet.MakeDefineBlockExt(def));
                 else
                     p.SendNow(Packet.MakeDefineBlock(def));
@@ -93,7 +93,7 @@ namespace fCraft {
         }
         
          public static void SendGlobalAdd(Player p, BlockDefinition def) {
-            if (p.Supports(CpeExtension.BlockDefinitionsExt) && def.Shape != 0)
+            if (p.Supports(CpeExt.BlockDefinitionsExt) && def.Shape != 0)
                 p.Send(Packet.MakeDefineBlockExt(def));
             else
                 p.Send(Packet.MakeDefineBlock(def));

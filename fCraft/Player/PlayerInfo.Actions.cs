@@ -789,11 +789,11 @@ namespace fCraft {
                 // ensure copy slot consistency
                 target.MaxCopySlots = target.Info.Rank.CopySlots;
 
-				if (target.Supports(CpeExtension.ClickDistance) && target.World != null) {
+				if (target.Supports(CpeExt.ClickDistance) && target.World != null) {
 					target.Send(Packet.MakeSetClickDistance((target.World.maxReach < ReachDistance 
 						&& !target.IsStaff) ? target.World.maxReach : ReachDistance));
                 }
-                if (target.Supports(CpeExtension.BlockPermissions)) {
+                if (target.Supports(CpeExt.BlockPermissions)) {
                     target.Send(Packet.MakeSetBlockPermission(Block.Admincrete, target.Can(Permission.PlaceAdmincrete), target.Can(Permission.PlaceAdmincrete)));
                     target.Send(Packet.MakeSetBlockPermission(Block.Water, target.Can(Permission.PlaceWater), true));
                     target.Send(Packet.MakeSetBlockPermission(Block.StillWater, target.Can(Permission.PlaceWater), true));

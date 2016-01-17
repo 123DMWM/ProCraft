@@ -83,14 +83,14 @@ namespace fCraft {
         /// </summary>
         public void createBot() {
             foreach (Player sendTo in World.Players) {
-                if (sendTo.Supports(CpeExtension.ExtPlayerList2)) {
+                if (sendTo.Supports(CpeExt.ExtPlayerList2)) {
 					sendTo.Send(Packet.MakeExtAddEntity2(ID, Name, (SkinName == "" ? Name : SkinName),
                         new Position(Position.X, Position.Y, Position.Z, Position.R, Position.L), sendTo));
                 } else {
                     sendTo.Send(Packet.MakeAddEntity(ID, Name,
                         new Position(Position.X, Position.Y, Position.Z, Position.R, Position.L)));
                 }
-                if (sendTo.Supports(CpeExtension.ChangeModel)) {
+                if (sendTo.Supports(CpeExt.ChangeModel)) {
                     sendTo.Send(Packet.MakeChangeModel((byte)ID, Model));
                 }
             }
@@ -130,7 +130,7 @@ namespace fCraft {
                 }
             }
 
-            World.Players.Where(p => p.Supports(CpeExtension.ChangeModel)).Send(Packet.MakeChangeModel((byte) ID, botModel));
+            World.Players.Where(p => p.Supports(CpeExt.ChangeModel)).Send(Packet.MakeChangeModel((byte) ID, botModel));
             Model = botModel;
             SkinName = skinName;
             Server.SaveEntity(this);

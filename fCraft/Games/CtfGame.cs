@@ -97,7 +97,7 @@ namespace fCraft.Games {
 		}
 		
 		public static void PrintCtfState(Player player) {
-			if (player.IsPlayingCTF && player.Supports(CpeExtension.MessageType)) {
+			if (player.IsPlayingCTF && player.Supports(CpeExt.MessageType)) {
 				player.Send(Packet.Message((byte)MessageType.BottomRight1, ""));
 				string op = "&d<=>";
 				if (CTF.RedTeam.TotalScore > CTF.BlueTeam.TotalScore) {
@@ -128,7 +128,7 @@ namespace fCraft.Games {
 				}
 			}
 			
-			if (player.IsPlayingCTF && player.Supports(CpeExtension.EnvColors)) {
+			if (player.IsPlayingCTF && player.Supports(CpeExt.EnvColors)) {
 				string color = null;
 				if (CTF.RedTeam.Score > CTF.BlueTeam.Score) {
 					color = CTF.RedTeam.EnvColor;
@@ -206,7 +206,7 @@ namespace fCraft.Games {
 			p.Team = team;
 			
 			p.IsPlayingCTF = true;
-			if (p.Supports(CpeExtension.HeldBlock))
+			if (p.Supports(CpeExt.HeldBlock))
 				p.Send(Packet.MakeHoldThis(Block.TNT, false));
 		}
 		
@@ -233,7 +233,7 @@ namespace fCraft.Games {
 		}
 
 		public static void RemovePlayer(Player player, World world) {
-			if (player.Supports(CpeExtension.MessageType))
+			if (player.Supports(CpeExt.MessageType))
 				player.Send(Packet.Message((byte)MessageType.Status3, ""));
 			
 			if (BlueTeam.Has(player))
@@ -242,7 +242,7 @@ namespace fCraft.Games {
 				RemovePlayerFromTeam(player, BlueTeam);
 			
 			foreach (Player p in world.Players) {
-				if (!p.Supports(CpeExtension.ExtPlayerList) && !p.Supports(CpeExtension.ExtPlayerList2))
+				if (!p.Supports(CpeExt.ExtPlayerList) && !p.Supports(CpeExt.ExtPlayerList2))
 					continue;
 				p.Send(Packet.MakeExtRemovePlayerName(player.NameID));
 			}
@@ -262,7 +262,7 @@ namespace fCraft.Games {
 			
 			p.IsPlayingCTF = false;
 			p.Team = null;		
-			if (p.Supports(CpeExtension.HeldBlock))
+			if (p.Supports(CpeExt.HeldBlock))
 				p.Send(Packet.MakeHoldThis(Block.Stone, false));
 		}
 		
@@ -387,9 +387,9 @@ namespace fCraft.Games {
 				p.IsPlayingCTF = false;
 				p.IsHoldingFlag = false;
 				
-				if (p.Supports(CpeExtension.MessageType))
+				if (p.Supports(CpeExt.MessageType))
 					p.Send(Packet.Message((byte)MessageType.Status3, " "));
-				if (p.Supports(CpeExtension.HeldBlock))
+				if (p.Supports(CpeExt.HeldBlock))
 					p.Send(Packet.MakeHoldThis(Block.Stone, false));
 			}
 			

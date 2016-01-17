@@ -678,7 +678,7 @@ namespace fCraft {
                         }
                     }
                     foreach (Player p in world.Players) {
-                        if (p.Supports(CpeExtension.EnvColors)) {
+                        if (p.Supports(CpeExt.EnvColors)) {
                             p.Send(Packet.MakeEnvSetColor((byte)EnvVariable.FogColor, world.FogColor));
                         }
                     }
@@ -701,7 +701,7 @@ namespace fCraft {
                         }
                     }
                     foreach (Player p in world.Players) {
-                        if (p.Supports(CpeExtension.EnvColors)) {
+                        if (p.Supports(CpeExt.EnvColors)) {
                             p.Send(Packet.MakeEnvSetColor((byte)EnvVariable.CloudColor, world.CloudColor));
                         }
                     }
@@ -723,7 +723,7 @@ namespace fCraft {
                     }
 
                     foreach (Player p in world.Players) {
-                        if (p.Supports(CpeExtension.EnvColors)) {
+                        if (p.Supports(CpeExt.EnvColors)) {
                             p.Send(Packet.MakeEnvSetColor((byte)EnvVariable.SkyColor, world.SkyColor));
                         }
                     }
@@ -746,7 +746,7 @@ namespace fCraft {
                         }
                     }
                     foreach (Player p in world.Players) {
-                        if (p.Supports(CpeExtension.EnvColors)) {
+                        if (p.Supports(CpeExt.EnvColors)) {
                             p.Send(Packet.MakeEnvSetColor((byte)EnvVariable.Shadow, world.ShadowColor));
                         }
                     }
@@ -769,7 +769,7 @@ namespace fCraft {
                         }
                     }
                     foreach (Player p in world.Players) {
-                        if (p.Supports(CpeExtension.EnvColors)) {
+                        if (p.Supports(CpeExt.EnvColors)) {
                             p.Send(Packet.MakeEnvSetColor((byte)EnvVariable.Sunlight, world.LightColor));
                         }
                     }
@@ -790,7 +790,7 @@ namespace fCraft {
                         }
                     }
                     foreach (Player p in world.Players) {
-                        if (p.Supports(CpeExtension.EnvMapAppearance)) {
+                        if (p.Supports(CpeExt.EnvMapAppearance)) {
                             p.Send(Packet.MakeEnvSetMapAppearance(world.GetTexture(), world.EdgeBlock, world.HorizonBlock, world.GetEdgeLevel()));
                         }
                     }
@@ -817,7 +817,7 @@ namespace fCraft {
                         //}
                     }
                     foreach (Player p in world.Players) {
-                        if (p.Supports(CpeExtension.EnvMapAppearance)) {
+                        if (p.Supports(CpeExt.EnvMapAppearance)) {
                             p.Send(Packet.MakeEnvSetMapAppearance(world.GetTexture(), world.EdgeBlock, world.HorizonBlock, world.GetEdgeLevel()));
                         }
                     }
@@ -844,7 +844,7 @@ namespace fCraft {
                         //}
                     }
                     foreach (Player p in world.Players) {
-                        if (p.Supports(CpeExtension.EnvMapAppearance)) {
+                        if (p.Supports(CpeExt.EnvMapAppearance)) {
                             p.Send(Packet.MakeEnvSetMapAppearance(world.GetTexture(), world.EdgeBlock, world.HorizonBlock, world.GetEdgeLevel()));
                         }
                     }
@@ -868,7 +868,7 @@ namespace fCraft {
                     }
                     world.Texture = value;
                     foreach (Player p in world.Players) {
-                        if (p.Supports(CpeExtension.EnvMapAppearance)) {
+                        if (p.Supports(CpeExt.EnvMapAppearance)) {
                             p.Send(Packet.MakeEnvSetMapAppearance(world.GetTexture(), world.EdgeBlock, world.HorizonBlock, world.GetEdgeLevel()));
                         }
                     }
@@ -897,7 +897,7 @@ namespace fCraft {
                         player.Message("&aSet weather for {0}&a to {1} ({2}&a)", world.ClassyName, weather, weather == 0 ? "&sSun" : (weather == 1 ? "&1Rain" : "&fSnow"));
                     }
                     foreach (Player p in world.Players) {
-                        if (p.Supports(CpeExtension.EnvWeatherType)) {
+                        if (p.Supports(CpeExt.EnvWeatherType)) {
                             p.Send(Packet.SetWeather(world.Weather));
                         }
                     }
@@ -1484,7 +1484,7 @@ namespace fCraft {
             if (distance != otherPlayer.ReachDistance) {
                 if (otherPlayer != player.Info) {
                     if (otherPlayer.IsOnline == true) {
-                        if (otherPlayer.PlayerObject.Supports(CpeExtension.ClickDistance)) {
+                        if (otherPlayer.PlayerObject.Supports(CpeExt.ClickDistance)) {
                             otherPlayer.PlayerObject.Message("{0} set your reach distance from {1} to {2} blocks [Units: {3}]", player.Name, otherPlayer.ReachDistance / 32, distance / 32, distance);
                             player.Message("Set reach distance for {0} from {1} to {2} blocks [Units: {3}]", otherPlayer.Name, otherPlayer.ReachDistance / 32, distance / 32, distance);
                             otherPlayer.ReachDistance = distance;
@@ -1497,7 +1497,7 @@ namespace fCraft {
                         otherPlayer.ReachDistance = distance;
                     }
                 } else {
-                    if (player.Supports(CpeExtension.ClickDistance)) {
+                    if (player.Supports(CpeExt.ClickDistance)) {
                         player.Message("Set own reach distance from {0} to {1} blocks [Units: {2}]", player.Info.ReachDistance / 32, distance / 32, distance);
                         player.Info.ReachDistance = distance;
                         player.Send(Packet.MakeSetClickDistance(distance));
@@ -2088,7 +2088,7 @@ namespace fCraft {
             }
             if (p != player.Info) {
                 if (p.IsOnline) {
-                    if (p.PlayerObject.Supports(CpeExtension.EnvWeatherType)) {
+                    if (p.PlayerObject.Supports(CpeExt.EnvWeatherType)) {
                         p.PlayerObject.Message("&a{0} set your weather to {1} ({2}&a)", player.Name, weather, weather == 0 ? "&sSun" : (weather == 1 ? "&1Rain" : "&fSnow"));
                         player.Message("&aSet weather for {0} to {1} ({2}&a)", p.Name, weather, weather == 0 ? "&sSun" : (weather == 1 ? "&1Rain" : "&fSnow"));
                         p.PlayerObject.Send(Packet.SetWeather((byte)weather));
@@ -2099,7 +2099,7 @@ namespace fCraft {
                     player.Message("That player is not online!");
                 }
             } else {
-                if (player.Supports(CpeExtension.EnvWeatherType)) {
+                if (player.Supports(CpeExt.EnvWeatherType)) {
                     player.Message("&aSet weather to {0} ({1}&a)", weather, weather == 0 ? "&sSun" : (weather == 1 ? "&1Rain" : "&fSnow"));
                     player.Send(Packet.SetWeather((byte)weather));
                 } else {

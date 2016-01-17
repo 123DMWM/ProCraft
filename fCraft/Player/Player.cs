@@ -650,11 +650,11 @@ namespace fCraft {
             if( this == Console ) {
                 Logger.LogToConsole( message );
             } else if( IsUsingWoM ) {
-                foreach (Packet p in LineWrapper.WrapPrefixed( WoMAlertPrefix, WoMAlertPrefix + Color.Sys + message, Supports(CpeExtension.EmoteFix), Supports(CpeExtension.FullCP437))) {
+                foreach (Packet p in LineWrapper.WrapPrefixed( WoMAlertPrefix, WoMAlertPrefix + Color.Sys + message, Supports(CpeExt.EmoteFix), Supports(CpeExt.FullCP437))) {
                     Send( p );
                 }
             } else {
-                foreach (Packet p in LineWrapper.Wrap( Color.Sys + message, Supports(CpeExtension.EmoteFix), Supports(CpeExtension.FullCP437))) {
+                foreach (Packet p in LineWrapper.Wrap( Color.Sys + message, Supports(CpeExt.EmoteFix), Supports(CpeExt.FullCP437))) {
                     Send( p );
                 }
             }
@@ -677,7 +677,7 @@ namespace fCraft {
             if( IsSuper ) {
                 Logger.LogToConsole( message );
             } else {
-                foreach (Packet p in LineWrapper.Wrap( Color.Sys + message, Supports(CpeExtension.EmoteFix), Supports(CpeExtension.FullCP437))) {
+                foreach (Packet p in LineWrapper.Wrap( Color.Sys + message, Supports(CpeExt.EmoteFix), Supports(CpeExt.FullCP437))) {
                     Send( p );
                 }
             }
@@ -705,7 +705,7 @@ namespace fCraft {
             }
             else
             {
-                foreach (Packet p in LineWrapper.Wrap( messageType, message, Supports(CpeExtension.EmoteFix), Supports(CpeExtension.FullCP437)))
+                foreach (Packet p in LineWrapper.Wrap( messageType, message, Supports(CpeExt.EmoteFix), Supports(CpeExt.FullCP437)))
                 {
                     Send(p);
                 }
@@ -730,7 +730,7 @@ namespace fCraft {
             if( this == Console ) {
                 Logger.LogToConsole( message );
             } else {
-                foreach (Packet p in LineWrapper.WrapPrefixed( prefix, message, Supports(CpeExtension.EmoteFix), Supports(CpeExtension.FullCP437))) {
+                foreach (Packet p in LineWrapper.WrapPrefixed( prefix, message, Supports(CpeExt.EmoteFix), Supports(CpeExt.FullCP437))) {
                     Send( p );
                 }
             }
@@ -1435,23 +1435,23 @@ namespace fCraft {
         }
 
         public Block getFallback(Block block) {
-            if ((Supports(CpeExtension.BlockDefinitions) 
-                || Supports(CpeExtension.BlockDefinitions))
-                && Supports(CpeExtension.CustomBlocks)) {
+            if ((Supports(CpeExt.BlockDefinitions) 
+                || Supports(CpeExt.BlockDefinitions))
+                && Supports(CpeExt.CustomBlocks)) {
 
                 return block; //No fallback block needed
 
-            } else if ((Supports(CpeExtension.BlockDefinitions) 
-                || Supports(CpeExtension.BlockDefinitions))
-                && !Supports(CpeExtension.CustomBlocks)) {
+            } else if ((Supports(CpeExt.BlockDefinitions) 
+                || Supports(CpeExt.BlockDefinitions))
+                && !Supports(CpeExt.CustomBlocks)) {
 
                 if (block > Map.MaxLegalBlockType && block < Map.MaxCustomBlockType) {
                     return Map.GetFallbackBlock(block); //Get fallback for just CustomBlocks
                 } else { return block; }
 
-            } else if (!(Supports(CpeExtension.BlockDefinitions) 
-                || Supports(CpeExtension.BlockDefinitions))
-                && Supports(CpeExtension.CustomBlocks)) {
+            } else if (!(Supports(CpeExt.BlockDefinitions) 
+                || Supports(CpeExt.BlockDefinitions))
+                && Supports(CpeExt.CustomBlocks)) {
 
                 if (block > Map.MaxCustomBlockType) {
                     return Map.GetFallbackBlock(block); //Get fallback block for Block Definition Blocks
@@ -2251,7 +2251,7 @@ namespace fCraft {
         #region CPE
         public string AFKModel = "Chicken";
 
-        readonly HashSet<CpeExtension> supportedExtensions = new HashSet<CpeExtension>();
+        readonly HashSet<CpeExt> supportedExtensions = new HashSet<CpeExt>();
 
         const string CustomBlocksExtName = "CustomBlocks";
         const int CustomBlocksExtVersion = 1;
@@ -2294,7 +2294,7 @@ namespace fCraft {
         const string BlockDefinitionsExtExtName = "BlockDefinitionsExt";
         const int BlockDefinitionsExtExtVersion = 1;
 
-        public bool Supports(CpeExtension extension) {
+        public bool Supports(CpeExt extension) {
             return supportedExtensions.Contains(extension);
         }
 
@@ -2354,94 +2354,94 @@ namespace fCraft {
                 string extName = reader.ReadString();
                 int extVersion = reader.ReadInt32();
                 bool addExt = true;
-                CpeExtension addedExt = CpeExtension.none;
+                CpeExt addedExt = CpeExt.none;
                 switch (extName) {
                     case CustomBlocksExtName:
                         if (extVersion == CustomBlocksExtVersion)
-                            addedExt = CpeExtension.CustomBlocks;
+                            addedExt = CpeExt.CustomBlocks;
                         break;
                     case BlockPermissionsExtName:
                         if (extVersion == BlockPermissionsExtVersion)
-                            addedExt = CpeExtension.BlockPermissions;
+                            addedExt = CpeExt.BlockPermissions;
                         break;
                     case ClickDistanceExtName:
                         if (extVersion == ClickDistanceExtVersion) {
-                            addedExt = CpeExtension.ClickDistance;
+                            addedExt = CpeExt.ClickDistance;
                         }
                         break;
                     case EnvColorsExtName:
                         if (extVersion == EnvColorsExtVersion)
-                            addedExt = CpeExtension.EnvColors;
+                            addedExt = CpeExt.EnvColors;
                         break;
                     case ChangeModelExtName:
                         if (extVersion == ChangeModelExtVersion)
-                            addedExt = CpeExtension.ChangeModel;
+                            addedExt = CpeExt.ChangeModel;
                         break;
                     case EnvMapAppearanceExtName:
                         if (extVersion == EnvMapAppearanceExtVersion) {
-                            addedExt = CpeExtension.EnvMapAppearance;
+                            addedExt = CpeExt.EnvMapAppearance;
                         }
                         break;
                     case EnvWeatherTypeExtName:
                         if (extVersion == EnvWeatherTypeExtVersion)
-                            addedExt = CpeExtension.EnvWeatherType;
+                            addedExt = CpeExt.EnvWeatherType;
                         break;
                     case HeldBlockExtName:
                         if (extVersion == HeldBlockExtVersion)
-                            addedExt = CpeExtension.HeldBlock;
+                            addedExt = CpeExt.HeldBlock;
                         break;
                     case ExtPlayerListExtName:
                         if (extVersion == ExtPlayerListExtVersion) {
-                            addedExt = CpeExtension.ExtPlayerList;
-                            if (Supports(CpeExtension.ExtPlayerList2)) {
-                                addedExt = CpeExtension.ExtPlayerList2;
+                            addedExt = CpeExt.ExtPlayerList;
+                            if (Supports(CpeExt.ExtPlayerList2)) {
+                                addedExt = CpeExt.ExtPlayerList2;
                             }
                         } else if (extVersion == ExtPlayerList2ExtVersion) {
-                            addedExt = CpeExtension.ExtPlayerList2;
-                            if (Supports(CpeExtension.ExtPlayerList)) {
-                                supportedExtensions.Remove(CpeExtension.ExtPlayerList);
+                            addedExt = CpeExt.ExtPlayerList2;
+                            if (Supports(CpeExt.ExtPlayerList)) {
+                                supportedExtensions.Remove(CpeExt.ExtPlayerList);
                             }
                         }
                         break;
                     case SelectionCuboidExtName:
                         if (extVersion == SelectionCuboidExtVersion)
-                            addedExt = CpeExtension.SelectionCuboid;
+                            addedExt = CpeExt.SelectionCuboid;
                         break;
                     case MessageTypesExtName:
                         if (extVersion == MessageTypesExtVersion)
-                            addedExt = CpeExtension.MessageType;
+                            addedExt = CpeExt.MessageType;
                         break;
                     case HackControlExtName:
                         if (extVersion == HackControlExtVersion)
-                            addedExt = CpeExtension.HackControl;
+                            addedExt = CpeExt.HackControl;
                         break;
                     case EmoteFixExtName:
                         if (extVersion == EmoteFixExtVersion)
-                            addedExt = CpeExtension.EmoteFix;
+                            addedExt = CpeExt.EmoteFix;
                         break;
                     case TextHotKeyExtName:
                         if (extVersion == TextHotKeyExtVersion)
-                            addedExt = CpeExtension.TextHotKey;
+                            addedExt = CpeExt.TextHotKey;
                         break;
                     case PlayerClickExtName:
                         if (extVersion == PlayerClickExtVersion)
-                            addedExt = CpeExtension.PlayerClick;
+                            addedExt = CpeExt.PlayerClick;
                         break;
                     case LongerMessagesExtName:
                         if (extVersion == LongerMessagesExtVersion)
-                            addedExt = CpeExtension.LongerMessages;
+                            addedExt = CpeExt.LongerMessages;
                         break;
                     case FullCP437ExtName:
                         if (extVersion == FullCP437ExtVersion)
-                            addedExt = CpeExtension.FullCP437;
+                            addedExt = CpeExt.FullCP437;
                         break;
                     case BlockDefinitionsExtName:
                         if (extVersion == BlockDefinitionsExtVersion)
-                        	addedExt = CpeExtension.BlockDefinitions;
+                        	addedExt = CpeExt.BlockDefinitions;
                         break;
                     case BlockDefinitionsExtExtName:
                         if (extVersion == BlockDefinitionsExtExtVersion)
-                            addedExt = CpeExtension.BlockDefinitionsExt;
+                            addedExt = CpeExt.BlockDefinitionsExt;
                         break;
                       
                     default:
@@ -2489,8 +2489,8 @@ namespace fCraft {
 
         // For non-extended players, use appropriate substitution
         public Packet ProcessOutgoingSetBlock(Packet packet) {
-        	bool supportsCustomBlocks = Supports(CpeExtension.CustomBlocks);
-        	bool supportsDefinitions = Supports(CpeExtension.BlockDefinitions);
+        	bool supportsCustomBlocks = Supports(CpeExt.CustomBlocks);
+        	bool supportsDefinitions = Supports(CpeExt.BlockDefinitions);
         	
         	if (packet.Bytes[7] > (byte) Map.MaxCustomBlockType && !supportsDefinitions) {
                 packet.Bytes[7] = (byte) Map.GetFallbackBlock((Block) packet.Bytes[7]);
