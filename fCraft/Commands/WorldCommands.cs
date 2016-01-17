@@ -653,6 +653,10 @@ namespace fCraft {
                                 player.Info.Rank.Name, player.Name, world.Name );
                     player.Message( "Enviroment settings for world {0} &swere reset.", world.ClassyName );
                     WorldManager.SaveWorldList();
+                    foreach (Player p in world.Players) {
+                        if (p.Supports(CpeExt.EnvMapAppearance) || p.Supports(CpeExt.EnvMapAppearance2))
+                            p.SendCurrentMapAppearance();
+                    }
                 } else {
                     Logger.Log( LogType.UserActivity,
                                 "Env: Asked {0} to confirm resetting enviroment settings for world {1}",
@@ -667,240 +671,52 @@ namespace fCraft {
                 return;
             }
             if (value.StartsWith("#"))
-            {
                 value = value.Remove(0, 1);
-            }
-
-            bool isValid = true;
 
             switch (variable.ToLower()) {
                 case "fog":
-                    if (value.Equals("-1") || value.Equals("normal", StringComparison.OrdinalIgnoreCase) || value.Equals("reset", StringComparison.OrdinalIgnoreCase) || value.Equals("default", StringComparison.OrdinalIgnoreCase)) {
-                        player.Message("Reset fog color for {0}&S to normal", world.ClassyName);
-                        world.FogColor = null;
-                    } else {
-                        isValid = IsValidHex(value);
-                        if (!isValid) {
-                            player.Message("Env: \"#{0}\" is not a valid HEX color code.", value);
-                            return;
-                        } else {
-                            world.FogColor = value;
-                            player.Message("Set fog color for {0}&S to #{1}", world.ClassyName, value);
-                        }
-                    }
-                    foreach (Player p in world.Players) {
-                        if (p.Supports(CpeExt.EnvColors)) {
-                            p.Send(Packet.MakeEnvSetColor((byte)EnvVariable.FogColor, world.FogColor));
-                        }
-                    }
+            		SetEnvColor( player, world, value, "fog color", EnvVariable.FogColor, ref world.FogColor );
                     break;
-
                 case "cloud":
                 case "clouds":
-                    if (value.Equals("-1") || value.Equals("normal", StringComparison.OrdinalIgnoreCase) || value.Equals("reset", StringComparison.OrdinalIgnoreCase) || value.Equals("default", StringComparison.OrdinalIgnoreCase)) {
-                        player.Message("Reset cloud color for {0}&S to normal", world.ClassyName);
-                        world.CloudColor = null;
-                    } else {
-                        isValid = IsValidHex(value);
-                        if (!isValid) {
-                            player.Message("Env: \"#{0}\" is not a valid HEX color code.", value);
-                            return;
-                        } else {
-                            world.CloudColor = value;
-                            player.Message("Set cloud color for {0}&S to #{1}", world.ClassyName, value);
-
-                        }
-                    }
-                    foreach (Player p in world.Players) {
-                        if (p.Supports(CpeExt.EnvColors)) {
-                            p.Send(Packet.MakeEnvSetColor((byte)EnvVariable.CloudColor, world.CloudColor));
-                        }
-                    }
+                    SetEnvColor( player, world, value, "cloud color", EnvVariable.CloudColor, ref world.CloudColor );
                     break;
-
                 case "sky":
-                    if (value.Equals("-1") || value.Equals("normal", StringComparison.OrdinalIgnoreCase) || value.Equals("reset", StringComparison.OrdinalIgnoreCase) || value.Equals("default", StringComparison.OrdinalIgnoreCase)) {
-                        player.Message("Reset sky color for {0}&S to normal", world.ClassyName);
-                        world.SkyColor = null;
-                    } else {
-                        isValid = IsValidHex(value);
-                        if (!isValid) {
-                            player.Message("Env: \"#{0}\" is not a valid HEX color code.", value);
-                            return;
-                        } else {
-                            world.SkyColor = value;
-                            player.Message("Set sky color for {0}&S to #{1}", world.ClassyName, value);
-                        }
-                    }
-
-                    foreach (Player p in world.Players) {
-                        if (p.Supports(CpeExt.EnvColors)) {
-                            p.Send(Packet.MakeEnvSetColor((byte)EnvVariable.SkyColor, world.SkyColor));
-                        }
-                    }
-
+                    SetEnvColor( player, world, value, "sky color", EnvVariable.SkyColor, ref world.SkyColor );
                     break;
-
                 case "dark":
                 case "shadow":
-                    if (value.Equals("-1") || value.Equals("normal", StringComparison.OrdinalIgnoreCase) || value.Equals("reset", StringComparison.OrdinalIgnoreCase) || value.Equals("default", StringComparison.OrdinalIgnoreCase)) {
-                        player.Message("Reset shadow color for {0}&S to normal", world.ClassyName);
-                        world.ShadowColor = null;
-                    } else {
-                        isValid = IsValidHex(value);
-                        if (!isValid) {
-                            player.Message("Env: \"#{0}\" is not a valid HEX color code.", value);
-                            return;
-                        } else {
-                            world.ShadowColor = value;
-                            player.Message("Set shadow color for {0}&S to #{1}", world.ClassyName, value);
-                        }
-                    }
-                    foreach (Player p in world.Players) {
-                        if (p.Supports(CpeExt.EnvColors)) {
-                            p.Send(Packet.MakeEnvSetColor((byte)EnvVariable.Shadow, world.ShadowColor));
-                        }
-                    }
+                    SetEnvColor( player, world, value, "shadow color", EnvVariable.Shadow, ref world.ShadowColor );
                     break;
-
                 case "sun":
                 case "light":
                 case "sunlight":
-                    if (value.Equals("-1") || value.Equals("normal", StringComparison.OrdinalIgnoreCase) || value.Equals("reset", StringComparison.OrdinalIgnoreCase) || value.Equals("default", StringComparison.OrdinalIgnoreCase)) {
-                        player.Message("Reset sunlight color for {0}&S to normal", world.ClassyName);
-                        world.LightColor = null;
-                    } else {
-                        isValid = IsValidHex(value);
-                        if (!isValid) {
-                            player.Message("Env: \"#{0}\" is not a valid HEX color code.", value);
-                            return;
-                        } else {
-                            world.LightColor = value;
-                            player.Message("Set sunlight color for {0}&S to #{1}", world.ClassyName, value);
-                        }
-                    }
-                    foreach (Player p in world.Players) {
-                        if (p.Supports(CpeExt.EnvColors)) {
-                            p.Send(Packet.MakeEnvSetColor((byte)EnvVariable.Sunlight, world.LightColor));
-                        }
-                    }
+                    SetEnvColor( player, world, value, "sunlight color", EnvVariable.Sunlight, ref world.LightColor );
                     break;
-
                 case "level":
-                    short level;
-                    if (value.Equals("normal", StringComparison.OrdinalIgnoreCase) || value.Equals("reset", StringComparison.OrdinalIgnoreCase) || value.Equals("default", StringComparison.OrdinalIgnoreCase) || value.Equals("middle", StringComparison.OrdinalIgnoreCase) || value.Equals("center", StringComparison.OrdinalIgnoreCase)) {
-                        player.Message("Reset water level for {0}&S to normal", world.ClassyName);
-                        world.EdgeLevel = (short)(world.map.Height / 2);
-                    } else {
-                        if (!short.TryParse(value, out level)) {
-                            player.Message("Env: \"{0}\" is not a valid integer.", value);
-                            return;
-                        } else {
-                            world.EdgeLevel = level;
-                            player.Message("Set water level for {0}&S to {1}", world.ClassyName, level);
-                        }
-                    }
-                    foreach (Player p in world.Players) {
-                        if (p.Supports(CpeExt.EnvMapAppearance) || p.Supports(CpeExt.EnvMapAppearance2))
-                            p.SendCurrentMapAppearance();
-                    }
-                    break;
-                
+                case "edgelevel":
+                case "waterlevel":
+                    SetEnvAppearanceShort( player, world, value, "water level", 0, ref world.EdgeLevel );
+                    break;               
                 case "cloudheight":                    
                 case "cloudsheight":
-                    short cloudsHeight;
-                    if (value.Equals("normal", StringComparison.OrdinalIgnoreCase) || value.Equals("reset", StringComparison.OrdinalIgnoreCase) || value.Equals("default", StringComparison.OrdinalIgnoreCase) || value.Equals("middle", StringComparison.OrdinalIgnoreCase) || value.Equals("center", StringComparison.OrdinalIgnoreCase)) {
-                        player.Message("Reset clouds height for {0}&S to normal", world.ClassyName);
-                        world.CloudsHeight = (short)(world.map.Height + 2);
-                    } else {
-                        if (!short.TryParse(value, out cloudsHeight)) {
-                            player.Message("Env: \"{0}\" is not a valid integer.", value);
-                            return;
-                        } else {
-                            world.CloudsHeight = cloudsHeight;
-                            player.Message("Set clouds height for {0}&S to {1}", world.ClassyName, cloudsHeight);
-                        }
-                    }
-                    foreach (Player p in world.Players) {
-                        if (p.Supports(CpeExt.EnvMapAppearance2))
-                            p.SendCurrentMapAppearance();
-                    }
-                    break;
-                
+                    SetEnvAppearanceShort( player, world, value, "clouds height", 0, ref world.CloudsHeight );
+                    break;              
                 case "fogdist":                    
                 case "maxfog":
                 case "maxdist":
-                    short fogDist;
-                    if (value.Equals("normal", StringComparison.OrdinalIgnoreCase) || value.Equals("reset", StringComparison.OrdinalIgnoreCase) || value.Equals("default", StringComparison.OrdinalIgnoreCase) || value.Equals("middle", StringComparison.OrdinalIgnoreCase) || value.Equals("center", StringComparison.OrdinalIgnoreCase)) {
-                        player.Message("Reset max fog distance for {0}&S to normal", world.ClassyName);
-                        world.MaxFogDistance = 0;
-                    } else {
-                        if (!short.TryParse(value, out fogDist)) {
-                            player.Message("Env: \"{0}\" is not a valid integer.", value);
-                            return;
-                        } else {
-                            world.MaxFogDistance = fogDist;
-                            player.Message("Set max fog distance for {0}&S to {1}", world.ClassyName, fogDist);
-                        }
-                    }
-                    foreach (Player p in world.Players) {
-                        if (p.Supports(CpeExt.EnvMapAppearance2))
-                            p.SendCurrentMapAppearance();
-                    }
+                    SetEnvAppearanceShort( player, world, value, "max fog distance", 0, ref world.MaxFogDistance );
                     break;
-
                 case "horizon":
                 case "edge":
                 case "water":
-                    Block block;
-                    if (!Map.GetBlockByName(value, false, out block) && !(value.Equals("normal", StringComparison.OrdinalIgnoreCase) || value.Equals("default", StringComparison.OrdinalIgnoreCase))) {
-                        CdEnv.PrintUsage(player);
-                        return;
-                    }
-                    if (block == Block.Water || value.Equals("normal", StringComparison.OrdinalIgnoreCase) || value.Equals("default", StringComparison.OrdinalIgnoreCase)) {
-                        player.Message("Reset water block for {0}&S to normal (Water)", world.ClassyName);
-                        world.HorizonBlock = Block.Water;
-                    } else {
-                        //if (block == Block.Air || block == Block.Sapling || block == Block.Glass || block == Block.YellowFlower || block == Block.RedFlower || block == Block.BrownMushroom || block == Block.RedMushroom || block == Block.Rope || block == Block.Fire) {
-                            //player.Message("Env: Cannot use {0} for water textures.", block);
-                            //return;
-                        //} else {
-                            world.HorizonBlock = block;
-                            player.Message("Set water block for {0}&S to {1}", world.ClassyName, block);
-                        //}
-                    }
-                    foreach (Player p in world.Players) {
-                        if (p.Supports(CpeExt.EnvMapAppearance) || p.Supports(CpeExt.EnvMapAppearance2))
-                            p.SendCurrentMapAppearance();
-                    }
+                    SetEnvAppearanceBlock( player, world, value, "water block", Block.StillWater, ref world.HorizonBlock );
                     break;
-
                 case "side":
                 case "border":
                 case "bedrock":
-                    Block blockhorizon;
-                    if (!Map.GetBlockByName(value, false, out blockhorizon) && !(value.Equals("normal", StringComparison.OrdinalIgnoreCase) || value.Equals("default", StringComparison.OrdinalIgnoreCase))) {
-                        CdEnv.PrintUsage(player);
-                        return;
-                    }
-                    if (blockhorizon == Block.Admincrete || value.Equals("normal", StringComparison.OrdinalIgnoreCase) || value.Equals("default", StringComparison.OrdinalIgnoreCase)) {
-                        player.Message("Reset bedrock block for {0}&S to normal (Bedrock)", world.ClassyName);
-                        world.EdgeBlock = Block.Admincrete;
-                    } else {
-                        //if (blockhorizon == Block.Air || blockhorizon == Block.Sapling || blockhorizon == Block.Glass || blockhorizon == Block.YellowFlower || blockhorizon == Block.RedFlower || blockhorizon == Block.BrownMushroom || blockhorizon == Block.RedMushroom || blockhorizon == Block.Rope || blockhorizon == Block.Fire) {
-                            //player.Message("Env: Cannot use {0} for bedrock textures.", blockhorizon);
-                            //return;
-                        //} else {
-                            world.EdgeBlock = blockhorizon;
-                            player.Message("Set bedrock block for {0}&S to {1}", world.ClassyName, blockhorizon);
-                        //}
-                    }
-                    foreach (Player p in world.Players) {
-                        if (p.Supports(CpeExt.EnvMapAppearance) || p.Supports(CpeExt.EnvMapAppearance2))
-                            p.SendCurrentMapAppearance();
-                    }
+                    SetEnvAppearanceBlock( player, world, value, "bedrock block", Block.Admincrete, ref world.EdgeBlock );
                     break;
-
                 case "tex":
                 case "terrain":
                 case "texture":
@@ -958,6 +774,69 @@ namespace fCraft {
                     return;
             }
             WorldManager.SaveWorldList();
+        }
+        
+        static void SetEnvColor( Player player, World world, string value, string name, EnvVariable variable, ref string target ) {
+            if (value.Equals("-1") || value.Equals("normal", StringComparison.OrdinalIgnoreCase) ||
+        	    value.Equals("reset", StringComparison.OrdinalIgnoreCase) || value.Equals("default", StringComparison.OrdinalIgnoreCase)) {
+                player.Message("Reset {0} for {1}&S to normal", name, world.ClassyName);
+                target = null;
+            } else {
+                if (!IsValidHex(value)) {
+                    player.Message("Env: \"#{0}\" is not a valid HEX color code.", value);
+                    return;
+                } else {
+                    target = value;
+                    player.Message("Set {0} for {1}&S to #{2}", name, world.ClassyName, value);
+                }
+            }
+        	
+            foreach (Player p in world.Players) {
+                if (p.Supports(CpeExt.EnvColors))
+                    p.Send(Packet.MakeEnvSetColor((byte)variable, target));
+            }
+        }
+        
+        static void SetEnvAppearanceShort( Player player, World world, string value, string name, short defValue, ref short target ) {
+            short amount;
+            if (value.Equals("-1") || value.Equals("normal", StringComparison.OrdinalIgnoreCase) ||
+        	    value.Equals("reset", StringComparison.OrdinalIgnoreCase) || value.Equals("default", StringComparison.OrdinalIgnoreCase)) {
+                player.Message("Reset {0} for {1}&S to normal", name, world.ClassyName);
+                target = defValue;
+            } else {
+                if (!short.TryParse(value, out amount)) {
+                    player.Message("Env: \"{0}\" is not a valid integer.", value);
+                    return;
+                } else {
+                    target = amount;
+                    player.Message("Set {0} for {1}&S to {2}", name, world.ClassyName, amount);
+                }
+            }
+            
+            foreach (Player p in world.Players) {
+                if (p.Supports(CpeExt.EnvMapAppearance) || p.Supports(CpeExt.EnvMapAppearance2))
+                    p.SendCurrentMapAppearance();
+            }
+        }
+        
+        static void SetEnvAppearanceBlock( Player player, World world, string value, string name, Block defValue, ref Block target ) {
+            if (value.Equals("normal", StringComparison.OrdinalIgnoreCase) || value.Equals("default", StringComparison.OrdinalIgnoreCase)) {
+            	player.Message("Reset {0} for {1}&S to normal ({2})", name, world.ClassyName, defValue);
+            	target = defValue;
+            } else {
+            	Block block;
+            	if (!Map.GetBlockByName(value, false, out block)) {
+            		CdEnv.PrintUsage(player);
+            		return;
+            	}
+            	target = block;
+            	player.Message("Set {0} for {1}&S to {2}", name, world.ClassyName, block);
+            }
+
+            foreach (Player p in world.Players) {
+                if (p.Supports(CpeExt.EnvMapAppearance) || p.Supports(CpeExt.EnvMapAppearance2))
+                    p.SendCurrentMapAppearance();
+            }
         }
 
         /// <summary> Ensures that the hex color has the correct length (1-6 characters)

@@ -259,56 +259,17 @@ namespace fCraft {
             // load environment settings
             XElement envEl = el.Element(EnvironmentXmlTagName);
             if (envEl != null) {
-                if ((tempAttr = envEl.Attribute("cloud")) != null) {
-                    try {
-                        world.CloudColor = tempAttr.Value;
-                    } catch {
-                        world.CloudColor = null;
-                        Logger.Log(LogType.Warning,
-                            "WorldManager: Could not parse \"cloud\" attribute of Environment settings for world \"{0}\", assuming default (normal).",
-                            worldName);
-                    }
-                }
-                if ((tempAttr = envEl.Attribute("fog")) != null) {
-                    try {
-                        world.FogColor = tempAttr.Value;
-                    } catch {
-                        world.FogColor = null;
-                        Logger.Log(LogType.Warning,
-                            "WorldManager: Could not parse \"fog\" attribute of Environment settings for world \"{0}\", assuming default (normal).",
-                            worldName);
-                    }
-                }
-                if ((tempAttr = envEl.Attribute("sky")) != null) {
-                    try {
-                        world.SkyColor = tempAttr.Value;
-                    } catch {
-                        world.SkyColor = null;
-                        Logger.Log(LogType.Warning,
-                            "WorldManager: Could not parse \"sky\" attribute of Environment settings for world \"{0}\", assuming default (normal).",
-                            worldName);
-                    }
-                }
-                if ((tempAttr = envEl.Attribute("shadow")) != null) {
-                    try {
-                        world.ShadowColor = tempAttr.Value;
-                    } catch {
-                        world.ShadowColor = null;
-                        Logger.Log(LogType.Warning,
-                            "WorldManager: Could not parse \"shadow\" attribute of Environment settings for world \"{0}\", assuming default (normal).",
-                            worldName);
-                    }
-                }
-                if ((tempAttr = envEl.Attribute("light")) != null) {
-                    try {
-                        world.LightColor = tempAttr.Value;
-                    } catch {
-                        world.LightColor = null;
-                        Logger.Log(LogType.Warning,
-                            "WorldManager: Could not parse \"light\" attribute of Environment settings for world \"{0}\", assuming default (normal).",
-                            worldName);
-                    }
-                }
+            	if ((tempAttr = envEl.Attribute("cloud")) != null)
+            		ParseColor(tempAttr, "cloud", worldName, ref world.CloudColor);
+                if ((tempAttr = envEl.Attribute("fog")) != null)
+                    ParseColor(tempAttr, "fog", worldName, ref world.FogColor);
+                if ((tempAttr = envEl.Attribute("sky")) != null)
+                    ParseColor(tempAttr, "sky", worldName, ref world.SkyColor);
+                if ((tempAttr = envEl.Attribute("shadow")) != null)
+                	ParseColor(tempAttr, "shadow", worldName, ref world.ShadowColor);
+                if ((tempAttr = envEl.Attribute("light")) != null)
+                	ParseColor(tempAttr, "light", worldName, ref world.LightColor);
+                
                 if ((tempAttr = envEl.Attribute("water")) != null) {
                     Block block;
                     try {
@@ -333,30 +294,13 @@ namespace fCraft {
                             worldName);
                     }
                 }
-                if ((tempAttr = envEl.Attribute("level")) != null) {
-                    if (!short.TryParse(tempAttr.Value, out world.EdgeLevel)) {
-                        world.EdgeLevel = -1;
-                        Logger.Log(LogType.Warning,
-                            "WorldManager: Could not parse \"level\" attribute of Environment settings for world \"{0}\", assuming default (normal height / 2).",
-                            worldName);
-                    }
-                }
-            	if ((tempAttr = envEl.Attribute("cloudsheight")) != null) {
-                    if (!short.TryParse(tempAttr.Value, out world.CloudsHeight)) {
-                        world.CloudsHeight = short.MinValue;
-                        Logger.Log(LogType.Warning,
-                            "WorldManager: Could not parse \"cloudsheight\" attribute of Environment settings for world \"{0}\", assuming default (normal height + 2).",
-                            worldName);
-                    }
-                }
-            	if ((tempAttr = envEl.Attribute("maxfog")) != null) {
-                    if (!short.TryParse(tempAttr.Value, out world.MaxFogDistance)) {
-                        world.MaxFogDistance = 0;
-                        Logger.Log(LogType.Warning,
-                            "WorldManager: Could not parse \"maxfog\" attribute of Environment settings for world \"{0}\", assuming default (0).",
-                            worldName);
-                    }
-                }
+                if ((tempAttr = envEl.Attribute("level")) != null)
+                	ParseShort(tempAttr, "level", worldName, -1, "normal height / 2", ref world.EdgeLevel);
+            	if ((tempAttr = envEl.Attribute("cloudsheight")) != null)
+            		ParseShort(tempAttr, "cloudsheight", worldName, short.MinValue, "normal height + 2", ref world.CloudsHeight);
+            	if ((tempAttr = envEl.Attribute("maxfog")) != null)
+            		ParseShort(tempAttr, "maxfog", worldName, 0, "no limit", ref world.MaxFogDistance);
+            	
                 if ((tempAttr = envEl.Attribute("terrain")) != null) {
                     try {
                         world.Texture = tempAttr.Value;
@@ -367,14 +311,8 @@ namespace fCraft {
                             worldName);
                     }
                 }
-                if ((tempAttr = envEl.Attribute("maxreach")) != null) {
-                    if (!short.TryParse(tempAttr.Value, out world.maxReach)) {
-                        world.maxReach = 160;
-                        Logger.Log(LogType.Warning,
-                            "WorldManager: Could not parse \"maxreach\" attribute of Environment settings for world \"{0}\", assuming default (normal 160).",
-                            worldName);
-                    }
-                }
+                if ((tempAttr = envEl.Attribute("maxreach")) != null)
+                	ParseShort(tempAttr, "maxreach", worldName, 160, "normal 160", ref world.maxReach);
                 if ((tempAttr = envEl.Attribute("weather")) != null) {
                     if (!byte.TryParse(tempAttr.Value, out world.Weather)) {
                         world.Weather = 0;
@@ -540,6 +478,26 @@ namespace fCraft {
             }
 
             CheckMapFile(world);
+        }
+        
+        static void ParseColor(XAttribute tempAttr, string name, string worldName, ref string target) {
+            try {
+                target = tempAttr.Value;
+            } catch {
+                target = null;
+                Logger.Log(LogType.Warning,
+                           "WorldManager: Could not parse \"{0}\" attribute of Environment settings for world \"{1}\", assuming default (normal).",
+                           name, worldName);
+            }
+        }
+        
+        static void ParseShort(XAttribute tempAttr, string name, string worldName, short defValue, string defValueName, ref short target) {
+        	if (!short.TryParse(tempAttr.Value, out target)) {
+        		target = defValue;
+        		Logger.Log(LogType.Warning,
+        		           "WorldManager: Could not parse \"{0}\" attribute of Environment settings for world \"{1}\", assuming default ({2}).",
+        		           name, worldName, defValueName);
+        	}
         }
 
         // Makes sure that the map file exists, is properly named, and is loadable.

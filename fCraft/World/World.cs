@@ -958,7 +958,7 @@ namespace fCraft {
         public short CloudsHeight = short.MinValue;
         
         public short GetCloudsHeight() {
-        	return (CloudsHeight == -1 && map != null) ? (short)(map.Height + 2) : CloudsHeight;
+        	return (CloudsHeight == short.MinValue && map != null) ? (short)(map.Height + 2) : CloudsHeight;
         }
         
         /// <summary> Maximum fog distance that can be seen by the player. The default value is 0. </summary>
