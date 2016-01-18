@@ -1154,14 +1154,6 @@ namespace fCraft {
 				  .Message("&SPlayer {0}&S is no longer hidden.",
 							player.ClassyName);
 
-			// for unaware players: fake a join message
-			if (!silent) {
-				if (ConfigKey.ShowConnectionMessages.Enabled()) {
-					player.Info.GeoipLogin();
-					string msg = Server.MakePlayerConnectedMessage(player, false, playerWorld);
-					Server.Players.CantSee(player).Message(msg);
-				}
-			}
 			player.Info.IsHidden = false;
 			player.quitmessage = "/Quit";
 			player.usedquit = false;
@@ -1170,6 +1162,14 @@ namespace fCraft {
 			} else {
 				player.Message("&8You are no longer hidden.");
 			}
+            // for unaware players: fake a join message
+            if (!silent) {
+                if (ConfigKey.ShowConnectionMessages.Enabled()) {
+                    player.Info.GeoipLogin();
+                    string msg = Server.MakePlayerConnectedMessage(player, false, playerWorld);
+                    Server.Players.CantSee(player).Message(msg);
+                }
+            }
 
 			Player.RaisePlayerHideChangedEvent(player, false, silent);
 			foreach (Player p1 in Server.Players) {
