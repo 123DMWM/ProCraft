@@ -1531,6 +1531,10 @@ namespace fCraft {
                     }
                 }
                 Player[] matches = Server.FindPlayers(player, name, SearchOptions.Default);
+                if (matches.Length == 0) {
+                    player.Message("&sNo player found by the name \"&f{0}&s\"", name);
+                    return;
+                }
                 if (matches.Length == 1) {
                     Player target = matches[0];
                     World targetWorld = target.World;
