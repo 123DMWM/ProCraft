@@ -126,6 +126,7 @@ namespace fCraft {
             
             try {
                 LoadGlobal();
+                int count = 0;
                 for (int i = (int)Map.MaxCustomBlockType + 1; i < GlobalDefinitions.Length; i++) {
                     if (GlobalDefinitions[i] == null) 
                         continue;
@@ -134,7 +135,9 @@ namespace fCraft {
                         GlobalDefinitions[i] = null; continue;
                     }
                     DefineGlobalBlock(GlobalDefinitions[i]);
+                    count++;
                 }
+                Logger.Log(LogType.SystemActivity, "BlockDefinitions.LoadGlobal: Loaded " + count + " blocks");
             } catch (Exception ex) {
                 GlobalDefinitions = new BlockDefinition[256];
                 Logger.Log(LogType.Error, "BlockDefinitions.LoadGlobal: " + ex);
