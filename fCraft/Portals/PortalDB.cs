@@ -75,16 +75,18 @@ namespace fCraft.Portals {
                         while ((line = fs.ReadLine()) != null) {
                             Portal portal = (Portal)JsonSerializer.DeserializeFromString(line, typeof(Portal));
                             World world = WorldManager.FindWorldExact(portal.Place);
+                            if (world != null) {
 
-                            if (world.Portals == null) {
-                                world.Portals = new ArrayList();
+                                if (world.Portals == null) {
+                                    world.Portals = new ArrayList();
+                                }
+
+                                lock (world.Portals.SyncRoot) {
+                                    world.Portals.Add(portal);
+                                }
+
+                                count++;
                             }
-
-                            lock (world.Portals.SyncRoot) {
-                                world.Portals.Add(portal);
-                            }
-
-                            count++;
                         }
 
                         if (count > 0) {
