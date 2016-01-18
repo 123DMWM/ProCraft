@@ -408,7 +408,6 @@ namespace fCraft {
             if( ConfigKey.AnnouncementInterval.GetInt() > 0 ) {
                 TimeSpan announcementInterval = TimeSpan.FromMinutes( ConfigKey.AnnouncementInterval.GetInt() );
                 Scheduler.NewTask( ShowRandomAnnouncement ).RunForever( announcementInterval );
-                Scheduler.NewTask( RemoveRandomAnnouncement ).RunForever( announcementInterval, new TimeSpan(0, 0, 5));
             }
 
             #region LoadTimers
@@ -1179,30 +1178,6 @@ namespace fCraft {
                     else
                     {
                         sendtome.Message("&d" + Chat.ReplaceTextKeywords(Player.Console, line));
-                    }
-                }
-            }
-        }
-
-        // removes announcements
-        static void RemoveRandomAnnouncement(SchedulerTask task)
-        {
-            if (!File.Exists(Paths.AnnouncementsFileName)) return;
-            string[] lines = File.ReadAllLines(Paths.AnnouncementsFileName);
-            if (lines.Length == 0) return;
-            string line = lines[new Random().Next(0, lines.Length)].Trim();
-            if (line.Length == 0) return;
-            var visiblePlayers = Server.Players
-                                            .Where(p => p.Info.IsHidden == false)
-                                            .OrderBy(p => p.Name)
-                                            .ToArray();
-            if (visiblePlayers.Count() > 0)
-            {
-                foreach (Player sendtome in Server.Players)
-                {
-                    if (sendtome.Supports(CpeExt.MessageType))
-                    {
-                        sendtome.Send(Packet.Message((byte)MessageType.Announcement, " "));
                     }
                 }
             }
