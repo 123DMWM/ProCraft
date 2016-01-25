@@ -940,16 +940,18 @@ namespace fCraft {
             short[,] shadows = new short[Width, Length];
             for( int x = 0; x < Width; x++ ) {
                 for( int y = 0; y < Length; y++ ) {
+                    int index = (Height * Length + y) * Width + x;
                     for( short z = (short)( Height - 1 ); z >= 0; z-- ) {
-                        switch( GetBlock( x, y, z ) ) {
-                            case Block.Air:
-                            case Block.BrownMushroom:
-                            case Block.Glass:
-                            case Block.Leaves:
-                            case Block.RedFlower:
-                            case Block.RedMushroom:
-                            case Block.Sapling:
-                            case Block.YellowFlower:
+                        index -= Length * Width;
+                        switch( Blocks[index] ) {
+                            case (byte)Block.Air:
+                            case (byte)Block.BrownMushroom:
+                            case (byte)Block.Glass:
+                            case (byte)Block.Leaves:
+                            case (byte)Block.RedFlower:
+                            case (byte)Block.RedMushroom:
+                            case (byte)Block.Sapling:
+                            case (byte)Block.YellowFlower:
                                 continue;
                             default:
                                 shadows[x, y] = z;

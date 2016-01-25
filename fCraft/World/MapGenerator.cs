@@ -299,8 +299,9 @@ namespace fCraft {
             int snowThreshold = args.SnowAltitude;
 
             ReportProgress( 10, "Filling" );
-            for( int x = heightmap.GetLength( 0 ) - 1; x >= 0; x-- ) {
-                for( int y = heightmap.GetLength( 1 ) - 1; y >= 0; y-- ) {
+            int width = map.Width, length = map.Length, mapHeight = map.Height;
+            for( int x = 0; x < heightmap.GetLength( 0 ); x++ ) {
+                for( int y = 0; y < heightmap.GetLength( 1 ); y++ ) {
                     int level;
                     float slope;
                     if( heightmap[x, y] < desiredWaterLevel ) {
@@ -312,45 +313,61 @@ namespace fCraft {
                         level = args.WaterLevel - (int)Math.Round( Math.Pow( 1 - heightmap[x, y] / desiredWaterLevel, args.BelowFuncExponent ) * depth );
 
                         if( args.AddWater ) {
-                            if( args.WaterLevel - level > 3 ) {
-                                map.SetBlock( x, y, args.WaterLevel, bDeepWaterSurface );
-                            } else {
-                                map.SetBlock( x, y, args.WaterLevel, bWaterSurface );
-                            }
-                            for( int i = args.WaterLevel; i > level; i-- ) {
-                                map.SetBlock( x, y, i, bWater );
-                            }
-                            for( int i = level; i >= 0; i-- ) {
-                                if( level - i < SeaFloorThickness ) {
-                                    map.SetBlock( x, y, i, bSeaFloor );
+                            int index = (args.WaterLevel * length + y) * width + x;
+                            if( args.WaterLevel >= 0 && args.WaterLevel < mapHeight ) {
+                                if( args.WaterLevel - level > 3 ) {
+                                    map.Blocks[index] = (byte)bDeepWaterSurface;
                                 } else {
-                                    map.SetBlock( x, y, i, bBedrock );
+                                    map.Blocks[index] = (byte)bWaterSurface;
+                                }
+                            }
+                            for( int zz = args.WaterLevel; zz > level; zz-- ) {
+                                if( zz >= 0 && zz < mapHeight )
+                                    map.Blocks[index] = (byte)bWater; // TODO: Might be a bug? Probably waterLevel - 1.
+                                index -= width * length;
+                            }
+                            
+                            index = ((level + 1) * length + y) * width + x;
+                            for( int zz = level; zz >= 0; zz-- ) {
+                                index -= length * width;
+                                if( zz >= mapHeight ) continue;
+                                
+                                if( level - zz < SeaFloorThickness ) {
+                                    map.Blocks[index] = (byte)bSeaFloor;
+                                } else {
+                                    map.Blocks[index] = (byte)bBedrock;
                                 }
                             }
                         } else {
-                            if( blendmap != null && blendmap[x, y] > .25 && blendmap[x, y] < .75 ) {
-                                map.SetBlock( x, y, level, bCliff );
-                            } else {
-                                if( slope < args.CliffThreshold ) {
-                                    map.SetBlock( x, y, level, bGroundSurface );
+                            int index = (level * length + y) * width + x;
+                            if( level >= 0 && level < mapHeight ) {
+                                if( blendmap != null && blendmap[x, y] > .25 && blendmap[x, y] < .75 ) {
+                                    map.Blocks[index] = (byte)bCliff;
                                 } else {
-                                    map.SetBlock( x, y, level, bCliff );
+                                    if( slope < args.CliffThreshold ) {
+                                        map.Blocks[index] = (byte)bGroundSurface;
+                                    } else {
+                                        map.Blocks[index] = (byte)bCliff;
+                                    }
                                 }
                             }
 
-                            for( int i = level - 1; i >= 0; i-- ) {
-                                if( level - i < groundThickness ) {
+                            for( int zz = level - 1; zz >= 0; zz-- ) {
+                                index -= length * width;
+                                if( zz >= mapHeight ) continue;
+                                
+                                if( level - zz < groundThickness ) {
                                     if( blendmap != null && blendmap[x, y] > CliffsideBlockThreshold && blendmap[x, y] < (1 - CliffsideBlockThreshold) ) {
-                                        map.SetBlock( x, y, i, bCliff );
+                                        map.Blocks[index] = (byte)bCliff;
                                     } else {
                                         if( slope < args.CliffThreshold ) {
-                                            map.SetBlock( x, y, i, bGround );
+                                            map.Blocks[index] = (byte)bGround;
                                         } else {
-                                            map.SetBlock( x, y, i, bCliff );
+                                            map.Blocks[index] = (byte)bCliff;
                                         }
                                     }
                                 } else {
-                                    map.SetBlock( x, y, i, bBedrock );
+                                    map.Blocks[index] = (byte)bBedrock;
                                 }
                             }
                         }
@@ -373,33 +390,39 @@ namespace fCraft {
                                     (level > snowThreshold ||
                                     (level > snowStartThreshold && rand.NextDouble() < (level - snowStartThreshold) / (double)(snowThreshold - snowStartThreshold)));
 
-                        if( blendmap != null && blendmap[x, y] > .25 && blendmap[x, y] < .75 ) {
-                            map.SetBlock( x, y, level, bCliff );
-                        } else {
-                            if( slope < args.CliffThreshold ) {
-                                map.SetBlock( x, y, level, (snow ? Block.White : bGroundSurface) );
+                        int index = (level * length + y) * width + x;
+                        if( level >= 0 && level < mapHeight ) {
+                            if( blendmap != null && blendmap[x, y] > .25 && blendmap[x, y] < .75 ) {
+                                map.Blocks[index] = (byte)bCliff;
                             } else {
-                                map.SetBlock( x, y, level, bCliff );
+                                if( slope < args.CliffThreshold ) {
+                                    map.Blocks[index] = (byte)(snow ? Block.White : bGroundSurface);
+                                } else {
+                                    map.Blocks[index] = (byte)bCliff;
+                                }
                             }
                         }
 
-                        for( int i = level - 1; i >= 0; i-- ) {
-                            if( level - i < groundThickness ) {
+                        for( int zz = level - 1; zz >= 0; zz-- ) {
+                            index -= length * width;
+                            if( zz >= mapHeight ) continue;
+                            
+                            if( level - zz < groundThickness ) {
                                 if( blendmap != null && blendmap[x, y] > CliffsideBlockThreshold && blendmap[x, y] < (1 - CliffsideBlockThreshold) ) {
-                                    map.SetBlock( x, y, i, bCliff );
+                                    map.Blocks[index] = (byte)bCliff;
                                 } else {
                                     if( slope < args.CliffThreshold ) {
                                         if( snow ) {
-                                            map.SetBlock( x, y, i, Block.White );
+                                           map.Blocks[index] = (byte)Block.White;
                                         } else {
-                                            map.SetBlock( x, y, i, bGround );
+                                            map.Blocks[index] = (byte)bGround;
                                         }
                                     } else {
-                                        map.SetBlock( x, y, i, bCliff );
+                                        map.Blocks[index] = (byte)bCliff;
                                     }
                                 }
                             } else {
-                                map.SetBlock( x, y, i, bBedrock );
+                                map.Blocks[index] = (byte)bBedrock;
                             }
                         }
                     }
