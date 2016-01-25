@@ -321,7 +321,7 @@ namespace fCraft {
                                     map.Blocks[index] = (byte)bWaterSurface;
                                 }
                             }
-                            for( int zz = args.WaterLevel; zz > level; zz-- ) {
+                            for( int zz = args.WaterLevel; zz > level && zz >= 0; zz-- ) {
                                 if( zz >= 0 && zz < mapHeight )
                                     map.Blocks[index] = (byte)bWater; // TODO: Might be a bug? Probably waterLevel - 1.
                                 index -= width * length;
