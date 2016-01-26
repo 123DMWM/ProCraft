@@ -162,35 +162,36 @@ namespace fCraft.ServerCLI {
         [DebuggerStepThrough]
         static void OnLogged( object sender, LogEventArgs e ) {
             if( !e.WriteToConsole ) return;
+            string text = Color.StripColors( e.Message );
             switch( e.MessageType ) {
                 case LogType.Error:
                     if( useColor ) Console.ForegroundColor = ConsoleColor.Red;
-                    Console.Error.WriteLine( e.Message );
+                    Console.Error.WriteLine( text );
                     if( useColor ) Console.ResetColor();
                     return;
 
                 case LogType.SeriousError:
                     if( useColor ) Console.ForegroundColor = ConsoleColor.White;
                     if( useColor ) Console.BackgroundColor = ConsoleColor.Red;
-                    Console.Error.WriteLine( e.Message );
+                    Console.Error.WriteLine( text );
                     if( useColor ) Console.ResetColor();
                     return;
 
                 case LogType.Warning:
                     if( useColor ) Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine( e.Message );
+                    Console.WriteLine( text );
                     if( useColor ) Console.ResetColor();
                     return;
 
                 case LogType.Debug:
                 case LogType.Trace:
                     if( useColor ) Console.ForegroundColor = ConsoleColor.DarkGray;
-                    Console.WriteLine( e.Message );
+                    Console.WriteLine( text );
                     if( useColor ) Console.ResetColor();
                     return;
 
                 default:
-                    Console.WriteLine( e.Message );
+                    Console.WriteLine( text );
                     return;
             }
         }

@@ -215,10 +215,10 @@ namespace fCraft {
             Logger.PrepareEventTracing();
 #endif
 
-            Logger.Log( LogType.Debug, "&3Working directory: {0}", Directory.GetCurrentDirectory() );
-            Logger.Log( LogType.Debug, "&3Log path: {0}", Path.GetFullPath( Paths.LogPath ) );
-            Logger.Log( LogType.Debug, "&3Map path: {0}", Path.GetFullPath( Paths.MapPath ) );
-            Logger.Log( LogType.Debug, "&3Config path: {0}", Path.GetFullPath( Paths.ConfigFileName ) );
+            Logger.Log( LogType.Debug, "Working directory: {0}", Directory.GetCurrentDirectory() );
+            Logger.Log( LogType.Debug, "Log path: {0}", Path.GetFullPath( Paths.LogPath ) );
+            Logger.Log( LogType.Debug, "Map path: {0}", Path.GetFullPath( Paths.MapPath ) );
+            Logger.Log( LogType.Debug, "Config path: {0}", Path.GetFullPath( Paths.ConfigFileName ) );
 
             libraryInitialized = true;
         }
@@ -368,21 +368,21 @@ namespace fCraft {
 
             if( ExternalIP == null ) {
                 Logger.Log( LogType.SystemActivity,
-                            "&3Server.Run: now accepting connections on port {0}", Port );
+                            "Server.Run: now accepting connections on port {0}", Port );
             } else {
                 Logger.Log( LogType.SystemActivity,
-                            "&3Server.Run: now accepting connections at {0}:{1}",
+                            "Server.Run: now accepting connections at {0}:{1}",
                             ExternalIP, Port );
             }
 
             // list loaded worlds
             WorldManager.UpdateWorldList();
             Logger.Log( LogType.SystemActivity,
-                        "&3All available worlds: {0}",
+                        "All available worlds: {0}",
                         WorldManager.Worlds.JoinToString( ", ", w => w.ClassyName ) );
 
             Logger.Log( LogType.SystemActivity,
-                        "&3Main world: {0}&3; default rank: {1}",
+                        "Main world: {0}&3; default rank: {1}",
                         WorldManager.MainWorld.ClassyName, RankManager.DefaultRank.ClassyName );
 
             // Check for incoming connections (every 250ms)
@@ -1276,7 +1276,7 @@ namespace fCraft {
                 }
             }
             Logger.Log( LogType.SystemActivity,
-                        "&3Backed up server data to \"{0}\"",
+                        "Backed up server data to \"{0}\"",
                         backupFileName );
         }
 

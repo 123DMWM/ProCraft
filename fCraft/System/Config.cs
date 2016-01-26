@@ -340,7 +340,7 @@ namespace fCraft {
                         file.Add( new XElement( ConfigXmlRootName ) );
                     } else {
                         Logger.Log( LogType.Debug,
-                                    "&3Config.Load: Config file {0} loaded succesfully.",
+                                    "Config.Load: Config file {0} loaded succesfully.",
                                     Paths.ConfigFileName );
                         fromFile = true;
                     }

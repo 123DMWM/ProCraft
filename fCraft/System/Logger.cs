@@ -69,7 +69,7 @@ namespace fCraft {
 
         internal static void MarkLogStart() {
             // Mark start of logging
-            Log( LogType.SystemActivity, "&3------ Log Starts {0} ({1}) ------",
+            Log( LogType.SystemActivity, "------ Log Starts {0} ({1}) ------",
                  DateTime.Now.ToLongDateString(), DateTime.Now.ToShortDateString() ); // localized
         }
 
@@ -115,7 +115,7 @@ namespace fCraft {
                 }
             }
             if( !Enabled ) return;
-            string line = DateTime.Now.ToString( TimeFormat ) + " > " + GetPrefix( type ) + message; // localized
+            string line = DateTime.Now.ToString( TimeFormat ) + " > " + GetPrefix( type ) + Color.StripColors( message ); // localized
 
             lock( LogLock ) {
                 RaiseLoggedEvent( message, line, type );
