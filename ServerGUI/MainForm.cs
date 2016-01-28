@@ -20,7 +20,6 @@ namespace fCraft.ServerGUI {
             Shown += BeginStartup;
         }
 
-
         #region Startup
         Thread startupThread;
 
@@ -190,61 +189,23 @@ namespace fCraft.ServerGUI {
                     char initialcolor = 'f';
                     switch( e.MessageType ) {
                         case LogType.Warning:
-                            initialcolor = 'e';
-                            break;
+                            initialcolor = 'e'; break;
                         case LogType.Debug:
-                            initialcolor = '8';
-                            break;
+                            initialcolor = '8'; break;
                         case LogType.Error:
                         case LogType.SeriousError:
-                            initialcolor = 'c';
-                            break;
+                            initialcolor = 'c'; break;
                         case LogType.ConsoleInput:
                         case LogType.ConsoleOutput:
-                            initialcolor = 'f';
-                            break;
+                            initialcolor = 'f'; break;
                         default:
-                            initialcolor = '7';
-                            break;
+                            initialcolor = '7'; break;
                     }
-                    foreach (string msgToAppend in Color.LogColors(e.Message, initialcolor)) {
-                        logBox.AppendText(msgToAppend.Remove(0, 2));
-                        logBox.Select(oldLength, msgToAppend.Length - 2);
-                        switch (msgToAppend.ToLower()[1]) {
-                            case '1':
-                            case '2':
-                            case '3':
-                            case '4':
-                            case '5':
-                            case '6':
-                            case '7':
-                            case '8':
-                            case '9':
-                            case 'a':
-                            case 'b':
-                            case 'c':
-                            case 'd':
-                            case 'e':
-                            case 's':
-                            case 'y':
-                            case 'p':
-                            case 'r':
-                            case 'h':
-                            case 'w':
-                            case 'm':
-                            case 'i':
-                                logBox.SelectionColor = System.Drawing.Color.FromName( Color.GetName( msgToAppend.ToLower()[1] ) );
-                                break;
-                            case '0':
-                                logBox.SelectionColor = System.Drawing.Color.FromArgb(64, 64, 64);
-                                break;
-                            default:
-                                logBox.SelectionColor = System.Drawing.Color.White;
-                                break;
-                        }
-                        oldLength = logBox.Text.Length;
-                    }
-                    logBox.AppendText(Environment.NewLine);
+                    
+                    int index = 0;
+                    while( index < e.Message.Length )
+                        AppendNextPart( ref initialcolor, ref index, e.Message, logBox );
+                    logBox.AppendText( Environment.NewLine );
 
                     // cut off the log, if too long
                     if( logBox.Lines.Length > MaxLinesInLog ) {
@@ -270,6 +231,36 @@ namespace fCraft.ServerGUI {
             } catch( InvalidOperationException ) { }
         }
 
+        static void AppendNextPart( ref char code, ref int start, string message, RichTextBox logBox ) {
+            int nextAnd = message.IndexOf( '&', start );
+            int total = logBox.Text.Length;
+            
+            if( nextAnd == -1 || nextAnd == (message.Length - 1) ) {
+                string part = message.Substring( start );
+                logBox.AppendText( part );
+                logBox.Select( total, part.Length );                
+                SetSelectionColor( code, logBox );
+                start = message.Length;
+            } else {
+                string part = message.Substring( start, nextAnd - start );
+                logBox.AppendText( part );
+                logBox.Select( total, part.Length );            
+                SetSelectionColor( code, logBox );
+                start = nextAnd + 2;                
+                code = message[nextAnd + 1];
+            }
+        }
+        
+        static void SetSelectionColor( char code, RichTextBox logBox ) {
+            string name = Color.GetName( code );
+            if( code == '0' ) {
+                logBox.SelectionColor = System.Drawing.Color.FromArgb( 64, 64, 64 );
+            } else if( name != null ) {
+                logBox.SelectionColor = System.Drawing.Color.FromName( name );
+            } else {
+                logBox.SelectionColor = System.Drawing.Color.White;
+            }            
+        }
 
         void OnHeartbeatUriChanged( object sender, UrlChangedEventArgs e ) {
             try {
