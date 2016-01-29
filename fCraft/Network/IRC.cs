@@ -273,15 +273,6 @@ namespace fCraft
                             ex.Message,
                             ReconnectDelay.TotalSeconds);
             }
-            public static string[] validCommands = 
-            {
-                "players",
-                "st",
-                "seen",
-                "commands",
-				"bd",
-				"time"
-            };
 
             void HandleMessage([NotNull] string message)
             {
@@ -352,79 +343,9 @@ namespace fCraft
                                         }
                                         Logger.Log(LogType.IrcChat, "{0}: * {1} {2}", msg.Channel, msg.Nick,
                                             IRCColorsAndNonStandardCharsExceptEmotes.Replace(rawMessage, ""));
-                                    } else if (rawMessage.ToLower().StartsWith("!") || (rawMessage.ToLower().StartsWith(botNick.ToLower()) && validCommands.Contains(rawMessage.Split()[1]))) {
-                                        if (DateTime.Now.Subtract(lastIrcCommand).TotalSeconds > 5) {
-                                            if (rawMessage.ToLower() == "!players" || rawMessage.ToLower() == ActualBotNick.ToLower() + " players") {
-                                                var visiblePlayers =
-                                                    Server.Players.Where(p => p.Info.IsHidden == false)
-                                                        .OrderBy(p => p.Name)
-                                                        .ToArray();
-                                                if (visiblePlayers.Any()) {
-                                                    SendChannelMessage("\u212CPlayers online: \u211C" +
-                                                                       visiblePlayers.JoinToRealString());
-                                                    lastIrcCommand = DateTime.Now;
-                                                } else {
-                                                    SendChannelMessage("\u212CThere are no players online.");
-                                                    lastIrcCommand = DateTime.Now;
-                                                }
-                                            } else if (rawMessage.ToLower().StartsWith("!st") || rawMessage.ToLower().StartsWith(ActualBotNick.ToLower() + " st")) {
-                                                if (rawMessage.Length > (rawMessage.ToLower().StartsWith("!") ? 4 : ActualBotNick.Length + 4)) {
-                                                    Chat.IRCSendStaff(msg.Nick, rawMessage.Remove(0, (rawMessage.ToLower().StartsWith("!") ? 4 : ActualBotNick.Length + 4)));
-                                                    lastIrcCommand = DateTime.Now;
-                                                }
-                                            } else if (rawMessage.ToLower().StartsWith("!seen") || rawMessage.ToLower().StartsWith(ActualBotNick.ToLower() + " seen")) {
-                                                if (rawMessage.Length > (rawMessage.ToLower().StartsWith("!") ? 6 : ActualBotNick.Length + 6)) {
-                                                    string findPlayer = rawMessage.Split()[(rawMessage.ToLower().StartsWith("!") ? 1 : 2)];
-                                                    PlayerInfo info = PlayerDB.FindPlayerInfoExact(findPlayer);
-                                                    if (info != null) {
-                                                        Player target = info.PlayerObject;
-                                                        if (target != null) {
-															SendChannelMessage("\u211CPlayer \u212C{0}\u211C has been \u212C&aOnline\u211C for \u212C{1}",
-																target.Info.Rank.Color + target.Name, target.Info.TimeSinceLastLogin.ToMiniNoColorString());
-                                                            if (target.World != null) {
-																SendChannelMessage("\u211CThey are currently on world \u212C{0}",
-                                                                    target.World.ClassyName);
-                                                            }
-                                                        } else {
-															SendChannelMessage("\u211CPlayer \u212C{0}\u211C is \u212C&cOffline",
-                                                                info.ClassyName);
-                                                            SendChannelMessage(
-																"\u211CThey were last seen \u212C{0}\u211C ago on world \u212C{1}",
-                                                                info.TimeSinceLastSeen.ToMiniNoColorString(),
-                                                                info.LastWorld);
-                                                        }
-                                                    } else {
-														SendChannelMessage("\u211CNo player found with name \"\u212C" +
-																		   findPlayer + "\u211C\"");
-                                                    }
-                                                } else {
-                                                    SendChannelMessage("Please specify a player name");
-                                                }
-                                                lastIrcCommand = DateTime.Now;
-											} else if (rawMessage.ToLower().StartsWith("!bd") || rawMessage.ToLower().StartsWith(ActualBotNick.ToLower() + " bd")) {
-												if (rawMessage.Length > (rawMessage.ToLower().StartsWith("!") ? 4 : ActualBotNick.Length + 4)) {
-													string findPlayer = rawMessage.Split()[(rawMessage.ToLower().StartsWith("!") ? 1 : 2)];
-													PlayerInfo info = PlayerDB.FindPlayerInfoExact(findPlayer);
-													if (info != null) {
-														SendChannelMessage("\u211CPlayer \u212C{0}\u211C has Built: \u212C{1}\u211C blocks Deleted: \u212C{2}\u211C blocks{3}", 
-																info.ClassyName,
-																info.BlocksBuilt,
-																info.BlocksDeleted,
-																(info.Can(Permission.Draw) ? " Drawn: \u212C" + info.BlocksDrawn + "\u211C blocks." : ""));
-													} else {
-														SendChannelMessage("No player found with name \"\u212C" + findPlayer + "\u211C\"");
-													}
-												} else {
-													SendChannelMessage("Please specify a player name.");
-												}
-												lastIrcCommand = DateTime.Now;
-											} else if (rawMessage.ToLower() == "!commands" || rawMessage.ToLower() == ActualBotNick.ToLower() + " commands") {
-                                                SendChannelMessage("\u212CList of commands: \u211CBD, Commands, Players, Seen, St");
-                                                    lastIrcCommand = DateTime.Now;
-                                            }
-                                        }
+                            		} else if (HandleIrcCommand(msg, rawMessage)) {                            			
                                     } else if (rawMessage.ToLower().StartsWith("@") || rawMessage.ToLower().StartsWith(ActualBotNick.ToLower() + " @")) {
-                                        if (DateTime.Now.Subtract(lastIrcCommand).TotalSeconds > 5) {
+                                        if (DateTime.UtcNow.Subtract(lastIrcCommand).TotalSeconds > 5) {
                                             string otherPlayerName = rawMessage.Split()[(rawMessage.ToLower().StartsWith("@") ? 0 : 1)].Remove(0,1);
                                             string messageText = rawMessage.ToLower().StartsWith("@") ? rawMessage.Remove(0, rawMessage.Split()[0].Length + 1) : rawMessage.Remove(0, rawMessage.Split()[0].Length + rawMessage.Split()[1].Length + 2);
 
@@ -442,14 +363,14 @@ namespace fCraft
                                                 Player target = allPlayers[0];
                                                 if (target.Info.ReadIRC == true && !target.IsDeaf) {
                                                     Chat.IRCSendPM(msg.Nick, target, messageText);
-                                                    lastIrcCommand = DateTime.Now;
+                                                    lastIrcCommand = DateTime.UtcNow;
                                                 }
 
                                                 if (target.Info.IsHidden == true) {
                                                     // message was sent to a hidden player
 													SendChannelMessage("\u211CNo players found matching \"\u212C" +
 																	   otherPlayerName + "\u211C\"");
-                                                    lastIrcCommand = DateTime.Now;
+                                                    lastIrcCommand = DateTime.UtcNow;
 
                                                 } else {
                                                     // message was sent normally
@@ -467,7 +388,7 @@ namespace fCraft
 														SendChannelMessage("\u211Cto \u212C" + target.Name + "\u211C: " +
                                                                            messageText);
                                                     }
-                                                    lastIrcCommand = DateTime.Now;
+                                                    lastIrcCommand = DateTime.UtcNow;
                                                 }
 
                                             } else if (allPlayers.Length == 0) {
@@ -486,7 +407,7 @@ namespace fCraft
                                                     SendChannelMessage(
 														"\u211CMore than one player matched: " + nameList);
                                                 }
-                                                lastIrcCommand = DateTime.Now;
+                                                lastIrcCommand = DateTime.UtcNow;
                                             }
                                         }
                                     } else
@@ -717,6 +638,120 @@ namespace fCraft
                         }
                         return;
                 }
+            }
+            
+            bool HandleIrcCommand(IRCMessage msg, string rawMessage) {
+                if (!(rawMessage[0] == '!' || rawMessage.StartsWith(ActualBotNick, StringComparison.OrdinalIgnoreCase)))
+                    return false;               
+                string rawCmd = rawMessage.ToLower();
+                string nick = ActualBotNick.ToLower();
+                bool elapsed = DateTime.UtcNow.Subtract(lastIrcCommand).TotalSeconds > 5;
+                
+                if (rawCmd == "!players" || rawCmd == rawCmd + " players") {
+                    if (!elapsed) return true;
+                    var visiblePlayers = Server.Players.Where(p => !p.Info.IsHidden)
+                        .OrderBy(p => p.Name).ToArray();
+                    
+                    if (visiblePlayers.Any()) {
+                        SendChannelMessage("\u212CPlayers online: \u211C" +
+                                           visiblePlayers.JoinToRealString());
+                        lastIrcCommand = DateTime.UtcNow;
+                    } else {
+                        SendChannelMessage("\u212CThere are no players online.");
+                        lastIrcCommand = DateTime.UtcNow;
+                    }
+                    return true;
+                } else if (rawCmd.StartsWith("!st") || rawCmd.StartsWith(nick + " st")) {
+                    if (!elapsed) return true;
+                    int messageStart = rawCmd[0] == '!' ? 4 : nick.Length + 4;
+                    if (rawCmd.Length > messageStart) {
+                        Chat.IRCSendStaff(msg.Nick, rawMessage.Remove(0, messageStart));
+                        lastIrcCommand = DateTime.UtcNow;
+                    }
+                    return true;
+                } else if (rawCmd.StartsWith("!seen") || rawCmd.StartsWith(nick + " seen")) {
+                    if (!elapsed) return true;
+                    int messageStart = rawCmd[0] == '!' ? 6 : nick.Length + 6;
+                    if (rawCmd.Length > messageStart) {
+                        string findPlayer = rawMessage.Remove(0, messageStart);
+                        PlayerInfo info = PlayerDB.FindPlayerInfoExact(findPlayer);
+                        if (info != null) {
+                            Player target = info.PlayerObject;
+                            if (target != null) {
+                                SendChannelMessage("\u211CPlayer \u212C{0}\u211C has been \u212C&aOnline\u211C for \u212C{1}",
+                                                   target.Info.Rank.Color + target.Name, target.Info.TimeSinceLastLogin.ToMiniNoColorString());
+                                if (target.World != null) {
+                                    SendChannelMessage("\u211CThey are currently on world \u212C{0}",
+                                                       target.World.ClassyName);
+                                }
+                            } else {
+                                SendChannelMessage("\u211CPlayer \u212C{0}\u211C is \u212C&cOffline",
+                                                   info.ClassyName);
+                                SendChannelMessage(
+                                    "\u211CThey were last seen \u212C{0}\u211C ago on world \u212C{1}",
+                                    info.TimeSinceLastSeen.ToMiniNoColorString(),
+                                    info.LastWorld);
+                            }
+                        } else {
+                            SendChannelMessage("\u211CNo player found with name \"\u212C" +
+                                               findPlayer + "\u211C\"");
+                        }
+                    } else {
+                        SendChannelMessage("Please specify a player name");
+                    }
+                    lastIrcCommand = DateTime.UtcNow;
+                    return true;
+                } else if (rawCmd.StartsWith("!bd") || rawCmd.StartsWith(nick + " bd")) {
+                    if (!elapsed) return true;
+                    int messageStart = rawCmd[0] == '!' ? 4 : nick.Length + 4;
+                    if (rawCmd.Length > messageStart) {
+                        string findPlayer = rawMessage.Remove(0, messageStart);
+                        PlayerInfo info = PlayerDB.FindPlayerInfoExact(findPlayer);
+                        if (info != null) {
+                            SendChannelMessage("\u211CPlayer \u212C{0}\u211C has Built: \u212C{1}\u211C blocks Deleted: \u212C{2}\u211C blocks{3}",
+                                               info.ClassyName,
+                                               info.BlocksBuilt,
+                                               info.BlocksDeleted,
+                                               (info.Can(Permission.Draw) ? " Drawn: \u212C" + info.BlocksDrawn + "\u211C blocks." : ""));
+                        } else {
+                            SendChannelMessage("No player found with name \"\u212C" + findPlayer + "\u211C\"");
+                        }
+                    } else {
+                        SendChannelMessage("Please specify a player name.");
+                    }
+                    lastIrcCommand = DateTime.UtcNow;
+                    return true;
+                } else if (rawCmd.StartsWith("!time") || rawCmd.StartsWith(nick + " time")) {
+                    if (!elapsed) return true;
+                    int messageStart = rawCmd[0] == '!' ? 6 : nick.Length + 6;
+                    if (rawCmd.Length > messageStart) {
+                        string findPlayer = rawMessage.Remove(0, messageStart);
+                        PlayerInfo info = PlayerDB.FindPlayerInfoExact(findPlayer);
+                        if (info != null && info.IsOnline) {
+                            SendChannelMessage("\u211CPlayer \u212C{0}\u211C has spent a total of: \u212C{1:F1}\u211C " +
+                                               "hours (\u212C{2:F1}\u211C hours this session)",
+                                               info.ClassyName,
+                                               (info.TotalTime + info.TimeSinceLastLogin).TotalHours,
+                                               info.TimeSinceLastLogin.TotalHours);
+                        } else if (info != null) {
+                            SendChannelMessage("\u211CPlayer \u212C{0}\u211C has spent a total of: \u212C{1:F1}\u211C hours",
+                                               info.ClassyName,
+                                               info.TotalTime.TotalHours);
+                        } else {
+                            SendChannelMessage("No player found with name \"\u212C" + findPlayer + "\u211C\"");
+                        }
+                    } else {
+                        SendChannelMessage("Please specify a player name.");
+                    }
+                    lastIrcCommand = DateTime.UtcNow;
+                    return true;
+                } else if (rawCmd == "!commands" || rawCmd == nick + " commands") {
+                    if (!elapsed) return true;
+                    SendChannelMessage("\u212CList of commands: \u211CBD, Commands, Players, Seen, St, Time");
+                    lastIrcCommand = DateTime.UtcNow;
+                    return true;
+                }
+                return rawCmd[0] == '!';
             }
 
             void AuthWithNickServ()
