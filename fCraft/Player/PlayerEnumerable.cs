@@ -491,7 +491,8 @@ namespace fCraft {
             }
             Player[] sourceArray = source.ToArray();
             foreach (Player player in sourceArray) {
-                foreach (Packet packet in LineWrapper.Wrap(message, player.Supports(CpeExt.EmoteFix), player.Supports(CpeExt.FullCP437))) {
+                foreach (Packet packet in LineWrapper.Wrap(message, player.Supports(CpeExt.EmoteFix), 
+            	                                           player.Supports(CpeExt.FullCP437), player.UseFallbackColors)) {
                     player.Send(packet);
                     i++;
                 }
@@ -520,7 +521,8 @@ namespace fCraft {
             int i = 0;
             Player[] sourceArray = source.ToArray();
             foreach (Player player in sourceArray) {
-                foreach (Packet packet in LineWrapper.Wrap(message, player.Supports(CpeExt.EmoteFix), player.Supports(CpeExt.FullCP437))) {
+                foreach (Packet packet in LineWrapper.Wrap(message, player.Supports(CpeExt.EmoteFix), 
+            	                                           player.Supports(CpeExt.FullCP437), player.UseFallbackColors)) {
                     if (player == except) continue;
                     player.Send(packet);
                     i++;
@@ -550,7 +552,8 @@ namespace fCraft {
             int i = 0;
             Player[] sourceArray = source.ToArray();
             foreach (Player player in sourceArray) {
-                foreach (Packet packet in LineWrapper.WrapPrefixed(prefix, message, player.Supports(CpeExt.EmoteFix), player.Supports(CpeExt.FullCP437))) {
+                foreach (Packet packet in LineWrapper.WrapPrefixed(prefix, message, player.Supports(CpeExt.EmoteFix), 
+            	                                                   player.Supports(CpeExt.FullCP437), player.UseFallbackColors)) {
                     player.Send(packet);
                     i++;
                 }

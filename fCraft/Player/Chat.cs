@@ -888,9 +888,7 @@ namespace fCraft {
             if (message == null) throw new ArgumentNullException("message");
             int startIndex = message.IndexOf('%');
             if (startIndex == -1)
-            {
                 return message; // break out early if there are no percent marks
-            }
 
             StringBuilder output = new StringBuilder(message.Length);
             int lastAppendedIndex = 0;

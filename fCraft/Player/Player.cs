@@ -650,11 +650,13 @@ namespace fCraft {
             if( this == Console ) {
                 Logger.LogToConsole( message );
             } else if( IsUsingWoM ) {
-                foreach (Packet p in LineWrapper.WrapPrefixed( WoMAlertPrefix, WoMAlertPrefix + Color.Sys + message, Supports(CpeExt.EmoteFix), Supports(CpeExt.FullCP437))) {
+                foreach (Packet p in LineWrapper.WrapPrefixed( WoMAlertPrefix, WoMAlertPrefix + Color.Sys + message, 
+            	                                              Supports(CpeExt.EmoteFix), Supports(CpeExt.FullCP437), UseFallbackColors)) {
                     Send( p );
                 }
             } else {
-                foreach (Packet p in LineWrapper.Wrap( Color.Sys + message, Supports(CpeExt.EmoteFix), Supports(CpeExt.FullCP437))) {
+                foreach (Packet p in LineWrapper.Wrap( Color.Sys + message, Supports(CpeExt.EmoteFix), 
+            	                                      Supports(CpeExt.FullCP437), UseFallbackColors)) {
                     Send( p );
                 }
             }
@@ -677,7 +679,8 @@ namespace fCraft {
             if( IsSuper ) {
                 Logger.LogToConsole( message );
             } else {
-                foreach (Packet p in LineWrapper.Wrap( Color.Sys + message, Supports(CpeExt.EmoteFix), Supports(CpeExt.FullCP437))) {
+                foreach (Packet p in LineWrapper.Wrap( Color.Sys + message, Supports(CpeExt.EmoteFix), 
+            	                                      Supports(CpeExt.FullCP437), UseFallbackColors)) {
                     Send( p );
                 }
             }
@@ -705,7 +708,8 @@ namespace fCraft {
             }
             else
             {
-                foreach (Packet p in LineWrapper.Wrap( messageType, message, Supports(CpeExt.EmoteFix), Supports(CpeExt.FullCP437)))
+                foreach (Packet p in LineWrapper.Wrap( messageType, message, Supports(CpeExt.EmoteFix), 
+            	                                      Supports(CpeExt.FullCP437), UseFallbackColors))
                 {
                     Send(p);
                 }
@@ -730,7 +734,8 @@ namespace fCraft {
             if( this == Console ) {
                 Logger.LogToConsole( message );
             } else {
-                foreach (Packet p in LineWrapper.WrapPrefixed( prefix, message, Supports(CpeExt.EmoteFix), Supports(CpeExt.FullCP437))) {
+                foreach (Packet p in LineWrapper.WrapPrefixed( prefix, message, Supports(CpeExt.EmoteFix), 
+            	                                              Supports(CpeExt.FullCP437), UseFallbackColors)) {
                     Send( p );
                 }
             }
@@ -2297,6 +2302,10 @@ namespace fCraft {
         const string TextColorsExtName = "TextColors";
         const int TextColorsExtVersion = 1;
         
+        public bool UseFallbackColors {
+            get { return !Supports(CpeExt.TextColors); }
+        }
+        
         public bool Supports(CpeExt extension) {
             return supportedExtensions.Contains(extension);
         }
@@ -2485,6 +2494,13 @@ namespace fCraft {
 
             // Send CustomBlockSupportLevel
             writer.Write(Packet.MakeCustomBlockSupportLevel(CustomBlocksLevel).Bytes);
+            
+            if (Supports(CpeExt.TextColors)) {
+                for (int i = 0; i < Color.ExtColors.Length; i++) {
+            		if (Color.ExtColors[i].Undefined) continue;
+            		writer.Write(Packet.MakeSetTextColor(Color.ExtColors[i]).Bytes);
+            	}
+            }
 
             // Expect CustomBlockSupportLevel reply
             OpCode customBlockSupportLevelReply = reader.ReadOpCode();

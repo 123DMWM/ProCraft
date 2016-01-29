@@ -172,11 +172,11 @@ namespace fCraft {
         /// <summary> Creates a new Message (0x0D) packet. </summary>
         /// <param name="type"> Message type. </param>
         /// <param name="message"> Message. </param>
-        public static Packet Message(byte type, string message)
-        {
+        public static Packet Message(byte type, string message, bool useFallbacks) {
             Packet packet = new Packet(OpCode.Message);
             packet.Bytes[1] = type;
-            Encoding.ASCII.GetBytes(Color.SubstituteSpecialColors(message).PadRight(64), 0, 64, packet.Bytes, 2);
+            message = Color.SubstituteSpecialColors(message, useFallbacks);
+            Encoding.ASCII.GetBytes(message.PadRight(64), 0, 64, packet.Bytes, 2);
             return packet;
         }
 
@@ -185,7 +185,7 @@ namespace fCraft {
         /// <exception cref="ArgumentNullException"> reason is null </exception>
         public static Packet MakeKick( [NotNull] string reason ) {
             if( reason == null ) throw new ArgumentNullException( "reason" );
-            reason = Color.SubstituteSpecialColors(reason);
+            reason = Color.SubstituteSpecialColors(reason, true);
             Packet packet = new Packet( OpCode.Kick );
             Encoding.ASCII.GetBytes( reason.PadRight( 64 ), 0, 64, packet.Bytes, 1 );
             return packet;
@@ -275,16 +275,16 @@ namespace fCraft {
 
         [Pure]
         public static Packet MakeExtAddPlayerName(short nameId, string playerName, string listName, string groupName,
-                                                   byte groupRank ) {
+                                                   byte groupRank, bool useFallbacks ) {
             if( playerName == null ) throw new ArgumentNullException( "playerName" );
             if( listName == null ) throw new ArgumentNullException( "listName" );
             if( groupName == null ) throw new ArgumentNullException( "groupName" );
             Packet packet = new Packet( OpCode.ExtAddPlayerName );
             //Logger.Log(LogType.Debug, "Send: MakeExtAddPlayerName({0}, {1}, {2}, {3}, {4})", nameId, playerName, listName, groupName, groupRank);
             ToNetOrder( nameId, packet.Bytes, 1 );
-            Encoding.ASCII.GetBytes( Color.SubstituteSpecialColors(playerName).PadRight( 64 ), 0, 64, packet.Bytes, 3 );
-            Encoding.ASCII.GetBytes( Color.SubstituteSpecialColors(listName).PadRight( 64 ), 0, 64, packet.Bytes, 67 );
-            Encoding.ASCII.GetBytes( Color.SubstituteSpecialColors(groupName).PadRight( 64 ), 0, 64, packet.Bytes, 131 );
+            Encoding.ASCII.GetBytes( Color.SubstituteSpecialColors(playerName, useFallbacks).PadRight( 64 ), 0, 64, packet.Bytes, 3 );
+            Encoding.ASCII.GetBytes( Color.SubstituteSpecialColors(listName, useFallbacks).PadRight( 64 ), 0, 64, packet.Bytes, 67 );
+            Encoding.ASCII.GetBytes( Color.SubstituteSpecialColors(groupName, useFallbacks).PadRight( 64 ), 0, 64, packet.Bytes, 131 );
             packet.Bytes[195] = groupRank;
             return packet;
         }

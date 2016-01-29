@@ -14,6 +14,7 @@ namespace fCraft {
             CommandManager.RegisterCommand( CdHackControl );
             CommandManager.RegisterCommand( CdChangeSkin );
             CommandManager.RegisterCommand( CdGlobalBlock );
+            CommandManager.RegisterCommand( CdCustomColors );
         }
         
         #region ChangeModel
@@ -1101,8 +1102,7 @@ namespace fCraft {
         };
             
         #endregion
-        
-       
+               
         #region CustomColors
         
         static readonly CommandDescriptor CdCustomColors = new CommandDescriptor

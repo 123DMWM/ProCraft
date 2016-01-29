@@ -338,7 +338,8 @@ namespace fCraft {
                     if (Info.heldBlock != failsafe) {
                         Info.heldBlock = failsafe;
                         if (Supports(CpeExt.MessageType) && !IsPlayingCTF) {
-                            Send(Packet.Message((byte)MessageType.BottomRight1, "&sBlock:&f" + Map.getBlockName(Info.heldBlock) + " &sID:&f" + (byte)Info.heldBlock));
+                            Send(Packet.Message((byte)MessageType.BottomRight1, "&sBlock:&f" + Map.getBlockName(Info.heldBlock) 
+                        	                    + " &sID:&f" + (byte)Info.heldBlock, true));
                         }
                     }
                 } else {
@@ -1009,9 +1010,8 @@ namespace fCraft {
             Server.UpdatePlayerList();
             RaisePlayerReadyEvent(this);
 
-			if (Supports(CpeExt.MessageType)) {
-				Send(Packet.Message((byte)MessageType.Status1, ConfigKey.ServerName.GetString()));
-			}
+			if (Supports(CpeExt.MessageType))
+				Send(Packet.Message((byte)MessageType.Status1, ConfigKey.ServerName.GetString(), UseFallbackColors));
 
             short NID = 1;
             this.NameID = NID;
@@ -1323,11 +1323,13 @@ namespace fCraft {
             }
 
             if (Supports(CpeExt.MessageType) && !IsPlayingCTF) {
-                Send(Packet.Message((byte)MessageType.BottomRight1, "&sBlock:&f" + Map.getBlockName(Info.heldBlock) + " &sID:&f" + (byte)Info.heldBlock));
+                Send(Packet.Message((byte)MessageType.BottomRight1, "&sBlock:&f" + Map.getBlockName(Info.heldBlock)
+            	                    + " &sID:&f" + (byte)Info.heldBlock, true));
             }
             if (Supports(CpeExt.MessageType)) {
-				Send(Packet.Message((byte)MessageType.Status1, ConfigKey.ServerName.GetString()));
+				Send(Packet.Message((byte)MessageType.Status1, ConfigKey.ServerName.GetString(), UseFallbackColors));
 			}
+            
             foreach (Bot bot in World.Bots) {
                 Send(Packet.MakeRemoveEntity(bot.ID));
                 if (bot.World == World) {
@@ -1336,16 +1338,14 @@ namespace fCraft {
                     } else {
                         Send(Packet.MakeAddEntity(bot.ID, bot.Name, bot.Position));
                     }
-                    if (bot.Model != "humanoid" && Supports(CpeExt.ChangeModel)) {
+                    if (bot.Model != "humanoid" && Supports(CpeExt.ChangeModel))
                         Send(Packet.MakeChangeModel((byte)bot.ID, bot.Model));
-                    }
                 }
             }
             if (Supports(CpeExt.SelectionCuboid)) {
                 foreach (Zone z in WorldMap.Zones) {
-                    if (z.ShowZone) {
+                    if (z.ShowZone)
                         Send(Packet.MakeMakeSelection(z.ZoneID, z.Name, z.Bounds, z.Color, z.Alpha));
-                    }
                 }
             }
         }

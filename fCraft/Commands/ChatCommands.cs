@@ -272,7 +272,7 @@ namespace fCraft
             byte type;
             byte.TryParse(cmd.Next(), out type);
             string message = cmd.NextAll();
-            player.Send(Packet.Message(type, message));
+            player.Send(Packet.Message(type, message, player.UseFallbackColors));
         }
 
         #endregion
@@ -652,7 +652,8 @@ namespace fCraft
                 player.Message("Report sent!");
 				foreach (Player p in Server.Players.Where(q => q.Info.Rank == RankManager.HighestRank)) {
 					if (p.Supports(CpeExt.MessageType)) {
-						p.Send(Packet.Message((byte)MessageType.Announcement, String.Format("Player {0} has sent in a report!", player.Name)));
+						p.Send(Packet.Message((byte)MessageType.Announcement, 
+                		                      String.Format("Player {0} has sent in a report!", player.Name), true));
 					}
 					p.Message("Player {0} has sent in a report!", player.Name);
 				}

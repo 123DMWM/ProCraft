@@ -38,8 +38,7 @@ namespace fCraft
              lastColor;     // used to detect duplicate color codes
 
         byte type = 0;        // messagetype cpe spec
-        bool emoteFix = false;        // wether or not the client supports emotefix
-        bool FullCP437 = false;        // wether or not the client supports emotefix
+        bool emoteFix = false, fullCP437 = false, useFallbacks = false;
 
         bool endsWithSymbol; // used to guarantee suffixes for symbols ("emotes")
 
@@ -64,28 +63,23 @@ namespace fCraft
         bool wrapEndsWithSymbol; // value of "endsWithSymbol" field at the wrapping point
 
 
-        LineWrapper( [NotNull] string message, bool emotefix, bool fullCP437 ) {
-            if (message == null)
-                throw new ArgumentNullException( "message" );
-            input = GetBytes(message, fullCP437);
-            prefix = DefaultPrefix;
-            emoteFix = emotefix;
-            FullCP437 = fullCP437;
-            Reset();
+        LineWrapper( [NotNull] string message, bool emotefix, bool fullCP437, bool fallbackCols )
+        	: this( 0, message, emotefix, fullCP437, fallbackCols ) {
         }
 
-        LineWrapper( [NotNull] byte messageType, [NotNull] string message, bool emotefix, bool fullCP437) {
+        LineWrapper( byte messageType, [NotNull] string message, bool emotefix, bool fullCP437, bool fallbackCols ) {
             if (message == null)
                 throw new ArgumentNullException( "message" );
             type = messageType;
             input = GetBytes(message, fullCP437);
             prefix = DefaultPrefix;
             emoteFix = emotefix;
-            FullCP437 = fullCP437;
+            this.fullCP437 = fullCP437;
+            this.useFallbacks = fallbackCols;
             Reset();
         }
 
-        LineWrapper( [NotNull] string prefixString, [NotNull] string message, bool emotefix, bool fullCP437) {
+        LineWrapper( [NotNull] string prefixString, [NotNull] string message, bool emotefix, bool fullCP437, bool fallbackCols ) {
             if (prefixString == null)
                 throw new ArgumentNullException( "prefixString" );
             prefix = Encoding.ASCII.GetBytes( prefixString );
@@ -95,7 +89,8 @@ namespace fCraft
                 throw new ArgumentNullException( "message" );
             input = GetBytes(message, fullCP437);
             emoteFix = emotefix;
-            FullCP437 = fullCP437;
+            this.fullCP437 = fullCP437;
+            this.useFallbacks = fallbackCols;
             Reset();
         }
         
@@ -441,54 +436,21 @@ namespace fCraft
         }
 
 
-        static bool ProcessColor(ref byte ch)
-        {
-            if (ch >= (byte)'A' && ch <= (byte)'Z')
-            {
+        bool ProcessColor(ref byte ch) {
+            if (ch >= (byte)'A' && ch <= (byte)'F')
                 ch += 32;
-            }
             if (ch >= (byte)'a' && ch <= (byte)'f' ||
                 ch >= (byte)'0' && ch <= (byte)'9')
-            {
                 return true;
-            }
-            switch (ch)
-            {
-                case (byte)'s':
-                    ch = (byte)Color.Sys[1];
-                    return true;
-
-                case (byte)'y':
-                    ch = (byte)Color.Say[1];
-                    return true;
-
-                case (byte)'p':
-                    ch = (byte)Color.PM[1];
-                    return true;
-
-                case (byte)'r':
-                    ch = (byte)Color.Announcement[1];
-                    return true;
-
-                case (byte)'h':
-                    ch = (byte)Color.Help[1];
-                    return true;
-
-                case (byte)'w':
-                    ch = (byte)Color.Warning[1];
-                    return true;
-
-                case (byte)'m':
-                    ch = (byte)Color.Me[1];
-                    return true;
-
-                case (byte)'i':
-                    ch = (byte)Color.IRC[1];
-					return true;
-
-				case (byte)'t':
-					ch = (byte)Color.White[1];
-					return true;
+            
+            char conv = Color.ConvertNonStandardRaw((char)ch);
+            if (ch != '\0') {
+            	ch = (byte)conv;
+            	if (!useFallbacks) return true;
+            	
+            	if (!Color.IsStandardColorCode(conv))
+            		ch = (byte)Color.GetFallback(conv);
+            	return true;
             }
             return false;
         }
@@ -520,21 +482,21 @@ namespace fCraft
 
         /// <summary> Creates a new line wrapper for a given raw string. </summary>
         /// <exception cref="ArgumentNullException"> message is null. </exception>
-        public static IEnumerable<Packet> Wrap( string message, bool emotefix, bool fullCP437 ) {
-            return new LineWrapper( message, emotefix, fullCP437);
+        public static IEnumerable<Packet> Wrap( string message, bool emotefix, bool fullCP437, bool fallbackCols ) {
+            return new LineWrapper( message, emotefix, fullCP437, fallbackCols );
         }
 
         /// <summary> Creates a new line wrapper for a given raw string. </summary>
         /// <exception cref="ArgumentNullException"> message is null. </exception>
-        public static IEnumerable<Packet> Wrap( byte messageType, string message, bool emotefix, bool fullCP437) {
-            return new LineWrapper( messageType, message, emotefix, fullCP437);
+        public static IEnumerable<Packet> Wrap( byte messageType, string message, bool emotefix, bool fullCP437, bool fallbackCols ) {
+            return new LineWrapper( messageType, message, emotefix, fullCP437, fallbackCols );
         }
         
         /// <summary> Creates a new line wrapper for a given raw string. </summary>
         /// <exception cref="ArgumentNullException"> prefix or message is null. </exception>
         /// <exception cref="ArgumentException"> prefix length exceeds maximum allowed value (48 characters). </exception>
-        public static IEnumerable<Packet> WrapPrefixed( string prefix, string message, bool emotefix, bool fullCP437) {
-            return new LineWrapper( prefix, message, emotefix, fullCP437);
+        public static IEnumerable<Packet> WrapPrefixed( string prefix, string message, bool emotefix, bool fullCP437, bool fallbackCols ) {
+            return new LineWrapper( prefix, message, emotefix, fullCP437, fallbackCols );
         }
     }
 }
