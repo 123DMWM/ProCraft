@@ -468,7 +468,7 @@ namespace fCraft {
         
         [Pure]
         public static Packet MakeDefineBlockExt(BlockDefinition def) {
-            Packet packet = new Packet( OpCode.DefineBlockExt );
+            Packet packet = new Packet(OpCode.DefineBlockExt);
             MakeDefineBlockStart(def, ref packet);
             packet.Bytes[74] = def.MinX;
             packet.Bytes[75] = def.MinZ;
@@ -503,6 +503,16 @@ namespace fCraft {
             packet.Bytes[offset + 2] = def.FogR;
             packet.Bytes[offset + 3] = def.FogG;
             packet.Bytes[offset + 4] = def.FogB;
+        }
+        
+        public static Packet MakeSetTextColor(CustomColor col) {
+            Packet packet = new Packet(OpCode.SetTextColor);
+            packet.Bytes[1] = col.R;
+            packet.Bytes[2] = col.G;
+            packet.Bytes[3] = col.B;
+            packet.Bytes[4] = col.A;
+            packet.Bytes[5] = (byte)col.Code;
+            return packet;
         }
 
         #endregion
@@ -560,6 +570,8 @@ namespace fCraft {
             80, // DefineBlock
             2, // RemoveBlockDefinition
             85, // DefineBlockExt
+            1282, // BulkBlockUpdate
+            6, // SetTextColor
         };
     }
 }

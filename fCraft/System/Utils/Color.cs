@@ -1,6 +1,7 @@
 ﻿// Part of fCraft | Copyright 2009-2015 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt //Copyright (c) 2011-2013 Jon Baker, Glenn Marien and Lao Tszy <Jonty800@gmail.com> //Copyright (c) <2012-2014> <LeChosenOne, DingusBungus> | ProCraft Copyright 2014-2016 Joseph Beauvais <123DMWM@gmail.com>
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using JetBrains.Annotations;
@@ -213,16 +214,12 @@ namespace fCraft
         public static string Parse([CanBeNull] string color)
         {
             if (color == null)
-            {
                 return null;
-            }
             switch (color.Length)
             {
                 case 2:
                     if (color[0] == '&')
-                    {
                         return Parse(color[1]);
-                    }
                     break;
 
                 case 1:
@@ -233,13 +230,9 @@ namespace fCraft
             }
             color = color.ToLower();
             if (ColorNames.ContainsValue(color))
-            {
                 return "&" + ColorNames.Keys[ColorNames.IndexOfValue(color)];
-            }
             else
-            {
                 return null;
-            }
         }
 
 
@@ -260,18 +253,12 @@ namespace fCraft
         [Pure]
         public static bool IsColorCode(char code)
         {
-            return (code >= '0' && code <= '9') ||
-                   (code >= 'a' && code <= 'f') ||
-                   (code >= 'A' && code <= 'F') ||
-                   code == 'H' || code == 'h' ||
-                   code == 'I' || code == 'i' ||
-                   code == 'M' || code == 'm' ||
-                   code == 'P' || code == 'p' ||
-                   code == 'R' || code == 'r' ||
-                   code == 'S' || code == 's' ||
-                   code == 'W' || code == 'w' ||
-				   code == 'Y' || code == 'y' ||
-				   code == 'T' || code == 't';
+            return (code >= '0' && code <= '9') || (code >= 'a' && code <= 'f') ||
+                   (code >= 'A' && code <= 'F') || code == 'H' || code == 'h' ||
+                   code == 'I' || code == 'i' || code == 'M' || code == 'm' ||
+                   code == 'P' || code == 'p' || code == 'R' || code == 'r' ||
+                   code == 'S' || code == 's' || code == 'W' || code == 'w' ||
+				   code == 'Y' || code == 'y' || code == 'T' || code == 't';
         }
 
 
@@ -457,5 +444,80 @@ namespace fCraft
         }
 
         #endregion
+        
+        
+        #region Custom colors
+        
+        
+        public static CustomColor[] ExtColors = new CustomColor[256];
+        
+        public static char GetFallback(char c) {
+            return (int)c >= 256 ? '\0' : ExtColors[c].Fallback;
+        }
+        
+        static string GetExtColor(string name) {
+            for (int i = 0; i < ExtColors.Length; i++) {
+                CustomColor col = ExtColors[i];
+                if (col.Undefined) continue;
+                if (col.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+                    return "&" + col.Code;
+            }
+            return "";
+        }
+        
+        public static void AddExtColor(CustomColor col) { SetExtCol(col); }
+        
+        public static void RemoveExtColor(char code) {
+            CustomColor col = default(CustomColor);
+            col.Code = code;
+            SetExtCol(col);
+        }
+        
+        static void SetExtCol(CustomColor col) {
+            ExtColors[col.Code] = col;
+            Player[] players = Server.Players;
+            foreach (Player p in players) {
+                if (!p.Supports(CpeExt.TextColors)) continue;
+                p.Send(Packet.MakeSetTextColor(col));
+            }
+            SaveExtColors();
+        }
+        
+        internal static void SaveExtColors() {
+            using (StreamWriter w = new StreamWriter("customcolors.txt")) {
+                foreach (CustomColor col in ExtColors) {
+                    if (col.Undefined) continue;
+                    w.WriteLine(col.Code + " " + col.Fallback + " " + col.Name + " " +
+                            col.R + " " + col.G + " " + col.B + " " + col.A);              
+                }
+            }
+        }
+        
+        internal static void LoadExtColors() {
+            if (!File.Exists("customcolors.txt")) return;
+            string[] lines = File.ReadAllLines("customcolors.txt");
+            CustomColor col = default(CustomColor);
+            
+            for (int i = 0; i < lines.Length; i++) {
+                string[] parts = lines[i].Split(' ');
+                if (parts.Length != 7) continue;
+                col.Code = parts[0][0]; col.Fallback = parts[1][0];
+                col.Name = parts[2];
+                
+                if (!Byte.TryParse(parts[3], out col.R) || !Byte.TryParse(parts[4], out col.G) ||
+                    !Byte.TryParse(parts[5], out col.B) || !Byte.TryParse(parts[6], out col.A))
+                    continue;
+                ExtColors[col.Code] = col;
+            }
+        }        
+        #endregion
+    }
+    
+     public struct CustomColor {
+        public char Code, Fallback;
+        public byte R, G, B, A;
+        public string Name;
+        
+        public bool Undefined { get { return Fallback == '\0'; } }
     }
 }

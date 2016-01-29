@@ -845,13 +845,11 @@ namespace fCraft {
             if( hex == null ) throw new ArgumentNullException( "hex" );
             if (hex.StartsWith("#")) hex = hex.Remove(0, 1);
             if( hex.Length != 6 ) return false;
+            
             for( int i = 0; i < hex.Length; i++ ) {
                 char ch = hex[i];
-                if( ch < '0' || ch > '9' && 
-                    ch < 'A' || ch > 'Z' && 
-                    ch < 'a' || ch > 'z' ) {
+                if( (ch < '0' || ch > '9') && (ch < 'A' || ch > 'F') && (ch < 'a' || ch > 'f') )
                     return false;
-                }
             }
             return true;
         }

@@ -271,6 +271,7 @@ namespace fCraft {
                             "Enable name verification as soon as possible." );
             }
 
+            Color.LoadExtColors();
             // load player DB
             PlayerDB.Load();
             IPBanList.Load();

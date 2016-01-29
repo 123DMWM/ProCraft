@@ -1101,5 +1101,139 @@ namespace fCraft {
         };
             
         #endregion
+        
+       
+        #region CustomColors
+        
+        static readonly CommandDescriptor CdCustomColors = new CommandDescriptor
+        {
+            Name = "CustomColors",
+            Aliases = new[] { "ccols" },
+            Category = CommandCategory.New | CommandCategory.Chat,
+            Permissions = new[] { Permission.Chat},
+            Usage = "/ccols [type] [args]",
+            IsConsoleSafe = true,
+            Help = "&sModifies the custom colors, or prints information about them.&n" +
+                "&sTypes are: add, list, remove&n" +
+                "&sSee &h/help ccols <type>&s for details about each type.",
+            HelpSections = new Dictionary<string, string>{
+                { "add",     "&h/ccols add [code] [name] [fallback] [hex]&n" +
+                        "&scode is in ASCII. You cannot replace the standard color codes.&n" +
+                        "&sfallback is a standard color code, shown to non-supporting clients.&n" },
+                { "list",    "&h/ccols list [offset]&n" +
+                        "&sPrints a list of the codes, names, and fallback codes of the custom colors. " },
+                { "remove",  "&h/ccols remove [code]&n" +
+                        "&sRemoves the custom color which has the given color code." }
+            },
+            Handler = CustomColorsHandler,
+        };
+        
+        static void CustomColorsHandler(Player p, CommandReader cmd) {
+            string type = cmd.Next();
+            if (type == null) { CdCustomColors.PrintUsage(p); return; }
+            type = type.ToLower();
+            
+            if (type == "add" || type == "create" || type == "new") {
+                AddCustomColorsHandler(p, cmd);
+            } else if (type == "delete" || type == "remove") {
+                RemoveCustomColorsHandler(p, cmd);
+            } else if (type == "list") {
+                ListCustomColorsHandler(p, cmd);
+            } else {
+                CdCustomColors.PrintUsage(p);
+            }
+        }
+        
+        static void AddCustomColorsHandler(Player p, CommandReader cmd) {
+            if (cmd.Count < 4) { p.Message("Usage: &H/ccols add [code] [name] [fallback] [hex]"); return; }
+            
+            char code = cmd.Next()[0];
+            if (Color.IsStandardColorCode(code)) {
+                p.Message(code + " is a standard color code, and thus cannot be removed."); return;
+            }
+            if (code <= ' ' || code > '~' || code == '%' || code == '&') {
+                p.Message(code + " must be a standard ASCII character.");
+                p.Message("It also cannot be a space, percentage, or ampersand.");
+                return;
+            }
+            
+            if (Color.IsColorCode(code)) {
+                p.Message("There is already a custom or server defined color with the code " + code +
+                                   ", you must either use a different code or use \"&h/ccols remove " + code + "&s\"");
+                return;
+            }
+            
+            string name = cmd.Next();
+            if (Color.Parse(name) != null) {
+                p.Message("There is already an existing standard or " +
+                                   "custom color with the name \"" + name + "\"."); return;
+            }
+            
+            char fallback = cmd.Next()[0];
+            if (!Color.IsStandardColorCode(fallback)) {
+                p.Message(fallback + " must be a standard color code."); return;
+            }
+            
+            string hex = cmd.Next();
+            if (hex.Length > 0 && hex[0] == '#')
+                hex = hex.Substring(1);
+            if (hex.Length != 6 || !WorldCommands.IsValidHex(hex)) {
+                p.Message("\"#" + hex + "\" is not a valid hex color."); return;
+            }
+            
+            CustomColor col = default(CustomColor);
+            col.Code = code; col.Fallback = fallback; col.A = 255;
+            col.Name = name;
+            System.Drawing.Color rgb = System.Drawing.ColorTranslator.FromHtml("#" + hex);
+            col.R = rgb.R; col.G = rgb.G; col.B = rgb.B;
+            Color.AddExtColor(col);
+            p.Message("Successfully added a custom color.");
+        }
+        
+        static void RemoveCustomColorsHandler(Player p, CommandReader cmd) {
+            if (cmd.Count < 2) { p.Message("Usage: &H/ccols remove [code]"); return; }
+            
+            char code = cmd.Next()[0];
+            if (Color.IsStandardColorCode(code)) {
+                p.Message(code + " is a standard color, and thus cannot be removed."); return;
+            }
+            
+            if ((int)code >= 256 || Color.ExtColors[code].Undefined) {
+                p.Message("There is no custom color with the code " + code + ".");
+                p.Message("Use \"&h/ccols list\" &Sto see a list of custom colors.");
+                return;
+            }
+            Color.RemoveExtColor(code);
+            p.Message("Successfully removed a custom color.");
+        }
+        
+        static void ListCustomColorsHandler(Player p, CommandReader reader) {
+            int offset = 0, index = 0, count = 0;
+            reader.NextInt(out offset);
+            CustomColor[] cols = Color.ExtColors;
+            
+            for( int i = 0; i < cols.Length; i++ ) {
+                CustomColor col = cols[i];
+                if (col.Undefined) continue;
+                
+                if (index >= offset) {
+                    count++;
+                    const string format = "{0} - %{1} displays as &{1}{2}&s, and falls back to {3}.";
+                    p.Message(format, col.Name, col.Code, Hex(col), col.Fallback);
+                    
+                    if (count >= 8) {
+                        const string helpFormat = "To see the next set of custom colors, type &h/ccols list {0}";
+                        p.Message(helpFormat, offset + 8);
+                        return;
+                    }
+                }
+                index++;
+            }
+        }
+        
+        static string Hex(CustomColor c) {
+            return "#" + c.R.ToString("X2") + c.G.ToString("X2") + c.B.ToString("X2");
+        }
+        #endregion
     }
 }

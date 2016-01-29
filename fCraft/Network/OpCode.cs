@@ -121,6 +121,12 @@ namespace fCraft
         
         /// <summary> Packet telling the client to create a new block as defined by the data in the packet. </summary>
         DefineBlockExt = 37,
+        
+        /// <summary> Packet telling the client to update a range of blocks, using less bandwidth than a number of SetBlock packets. </summary>
+        BulkBlockUpdate = 38,
+        
+        /// <summary> Packet telling the client to define or undefine a custom text color. </summary>
+        SetTextColor = 39,
     }
 }
 

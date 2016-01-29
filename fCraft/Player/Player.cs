@@ -2294,7 +2294,9 @@ namespace fCraft {
         const int BlockDefinitionsExtVersion = 1;
         const string BlockDefinitionsExtExtName = "BlockDefinitionsExt";
         const int BlockDefinitionsExtExtVersion = 1;
-
+        const string TextColorsExtName = "TextColors";
+        const int TextColorsExtVersion = 1;
+        
         public bool Supports(CpeExt extension) {
             return supportedExtensions.Contains(extension);
         }
@@ -2304,7 +2306,7 @@ namespace fCraft {
         bool NegotiateProtocolExtension()
         {
             // write our ExtInfo and ExtEntry packets
-            writer.Write(Packet.MakeExtInfo("ProCraft", 20).Bytes);
+            writer.Write(Packet.MakeExtInfo("ProCraft", 21).Bytes);
             writer.Write(Packet.MakeExtEntry(ClickDistanceExtName, ClickDistanceExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(CustomBlocksExtName, CustomBlocksExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(HeldBlockExtName, HeldBlockExtVersion).Bytes);
@@ -2331,7 +2333,8 @@ namespace fCraft {
             
             writer.Write(Packet.MakeExtEntry(BlockDefinitionsExtName, BlockDefinitionsExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(BlockDefinitionsExtExtName, BlockDefinitionsExtExtVersion).Bytes);
-
+            writer.Write(Packet.MakeExtEntry(TextColorsExtName, TextColorsExtVersion).Bytes);
+            
             // Expect ExtInfo reply from the client
             OpCode extInfoReply = reader.ReadOpCode();
             //Logger.Log(LogType.Debug, "Expected: {0} / Received: {1}", OpCode.ExtInfo, extInfoReply );
@@ -2446,7 +2449,11 @@ namespace fCraft {
                         if (extVersion == BlockDefinitionsExtExtVersion)
                             addedExt = CpeExt.BlockDefinitionsExt;
                         break;
-                      
+                    case TextColorsExtName:
+                        if (extVersion == TextColorsExtVersion)
+                            addedExt = CpeExt.TextColors;
+                        break;
+                        
                     default:
                         addExt = false;
                         break;
