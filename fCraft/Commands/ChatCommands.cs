@@ -39,7 +39,6 @@ namespace fCraft
             CommandManager.RegisterCommand(CdRBChat);
             CommandManager.RegisterCommand(CdGreeting);
             CommandManager.RegisterCommand(CdIRCStaff);
-            CommandManager.RegisterCommand(Cdchat);
             CommandManager.RegisterCommand(CdLdis);
             CommandManager.RegisterCommand(CdtextHotKey);
             CommandManager.RegisterCommand(Cdbrushes);
@@ -248,31 +247,6 @@ namespace fCraft
             } else {
                 player.Message("&SThere are no staff on! Sorry!");
             }
-        }
-
-        #endregion
-        #region chat
-
-        static readonly CommandDescriptor Cdchat = new CommandDescriptor
-        {
-            Name = "chat",
-            Category = CommandCategory.New | CommandCategory.Chat,
-            Permissions = new[] { Permission.ShutdownServer},
-            NotRepeatable = true,
-            DisableLogging = true,
-            IsHidden = true,
-            UsableByFrozenPlayers = false,
-            Usage = "/chat [type] [message]",
-            Help = "debug for message types",
-            Handler = chatHandler
-        };
-
-        static void chatHandler(Player player, CommandReader cmd)
-        {
-            byte type;
-            byte.TryParse(cmd.Next(), out type);
-            string message = cmd.NextAll();
-            player.Send(Packet.Message(type, message, player.UseFallbackColors));
         }
 
         #endregion
