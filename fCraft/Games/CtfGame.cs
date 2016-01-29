@@ -110,14 +110,19 @@ namespace fCraft.Games {
 				               CTF.BlueTeam.Color, CTF.BlueTeam.Name, CTF.BlueTeam.RoundsWon, CTF.BlueTeam.Score);
 				
 				var flagholder = player.World.Players.Where(p => p.IsHoldingFlag);
+				string bottomRight2 = null;
 				if (flagholder.FirstOrDefault() == null) {
-					player.Send(Packet.Message((byte)MessageType.BottomRight2, "&sNo one has the flag!", true));
+					bottomRight2 = "&sNo one has the flag!";
 				} else if (CTF.RedTeam.HasFlag) {
-					player.Message((byte)MessageType.BottomRight2, "{0} &shas the {1}&s flag!",
-					               flagholder.First().ClassyName, CTF.BlueTeam.ClassyName);
+					bottomRight2 = String.Format("{0} &shas the {1}&s flag!", 
+					                             flagholder.First().ClassyName, CTF.BlueTeam.ClassyName);
 				} else if (CTF.BlueTeam.HasFlag) {
-					player.Message((byte)MessageType.BottomRight2,"{0} &shas the {1}&s flag!",
-					               flagholder.First().ClassyName, CTF.RedTeam.ClassyName);
+					bottomRight2 = String.Format("{0} &shas the {1}&s flag!", 
+					                             flagholder.First().ClassyName, CTF.RedTeam.ClassyName);
+				}
+				if (bottomRight2 != null && bottomRight2 != player.lastBottomRight2) {
+					player.lastBottomRight2 = bottomRight2;
+					player.Message((byte)MessageType.BottomRight2, bottomRight2);
 				}
 				
 				if (player.Team != null) {

@@ -265,7 +265,7 @@ namespace fCraft
                     e.Player.Info.IsAFK = false;
                     e.Player.Info.oldafkMob = e.Player.Info.afkMob;
                     e.Player.Info.afkMob = e.Player.Info.Mob;
-                    Server.UpdateTabList();
+                    Server.UpdateTabList(true);
                 }
                 e.Player.ResetIdBotTimer();
             }
@@ -295,7 +295,7 @@ namespace fCraft
             player.Info.IsAFK = !player.Info.IsAFK;
             player.Info.oldafkMob = player.Info.afkMob;
             player.Info.afkMob = player.Info.IsAFK ? player.AFKModel : player.Info.Mob;
-            Server.UpdateTabList();
+            Server.UpdateTabList(true);
             player.ResetIdBotTimer();
         }
 

@@ -944,8 +944,12 @@ namespace fCraft {
                 Player player = tempPlayerList[i];
 
 				if (player.Supports(CpeExt.MessageType)) {
-                    player.Send(Packet.Message((byte)MessageType.BottomRight2,
-                        player.Position.ToBlockCoordsExt() + "&s[" + compassString(player.Position.R) + "&s]", true));
+                    string bottomRight2 = player.Position.ToBlockCoordsExt() + "&s[" + compassString(player.Position.R) + "&s]";
+                    if (bottomRight2 != player.lastBottomRight2) {
+                        player.lastBottomRight2 = bottomRight2;
+                        player.Send(Packet.Message((byte)MessageType.BottomRight2, bottomRight2, player.UseFallbackColors));
+                    }
+                	
                     if (player.LastDrawOp != null && !player.IsPlayingCTF)
                         if (player.LastDrawOp.PercentDone < 100) {
                             player.Send(Packet.Message((byte)MessageType.Status3, "&s" + player.LastDrawOp.Description + 
@@ -983,7 +987,7 @@ namespace fCraft {
                     player.ResetIdBotTimer(); // to prevent kick from firing more than once
                 }
 			}
-			UpdateTabList();
+			UpdateTabList(false);
         }
 		public static string compassString(int rot) {
 			if (rot > 240 || rot < 15) {
@@ -1446,7 +1450,7 @@ namespace fCraft {
                 }
                 PlayerIndex.Add( player );
                 player.HasRegistered = true;
-                UpdateTabList();              
+                UpdateTabList(true);              
                 return true;
             }
         }
@@ -1456,7 +1460,7 @@ namespace fCraft {
             if( player == null ) throw new ArgumentNullException( "player" );
             if (world == null)
                 throw new ArgumentNullException( "world" );
-            UpdateTabList();
+            UpdateTabList(true);
             if( firstTime ) {
                 return string.Format("&sPlease welcome {0}&S to the server!&n" + 
                                      "&sThis is their first visit",
@@ -1476,7 +1480,7 @@ namespace fCraft {
         {
 			if (player == null)
 				throw new ArgumentNullException("player");
-			UpdateTabList();
+			UpdateTabList(true);
             return String.Format("{0}&s left the server.", player.ClassyName);
 
         }
@@ -1520,42 +1524,60 @@ namespace fCraft {
                 PlayerIndex.Remove( player );
                 player.Info.IsAFK = false;
                 UpdatePlayerList();
-                UpdateTabList();
+                UpdateTabList(true);
             }
         }
-
-
-		internal static void UpdateTabList() {
-			foreach (Player p1 in Players) {
-				if (p1.Supports(CpeExt.MessageType)) {
-					if (p1.World != null) {
-						p1.Send(Packet.Message((byte)MessageType.Status2, p1.ListName + 
-        				                       " &son world " + p1.World.ClassyName, p1.UseFallbackColors));
-					} else {
-						p1.Send(Packet.Message((byte)MessageType.Status2, p1.ListName, p1.UseFallbackColors));
-					}
-				}
-				if (!p1.Supports(CpeExt.ExtPlayerList) && !p1.Supports(CpeExt.ExtPlayerList2))
-					continue;
-				
-				if (!p1.IsPlayingCTF) {
-				    var canBeSeen = Players.Where(i => p1.CanSee(i)).ToArray();
-                    foreach (Player p2 in canBeSeen) {
-                        p1.Send(Packet.MakeExtAddPlayerName(
-                            p2.NameID, p2.Name,
-                            p2.ListName + (p2.Info.DisplayedName != null && Color.StripColors(Chat.ReplacePercentColorCodes(p2.Info.DisplayedName, false)).ToLower() != p2.Info.Name.ToLower() ? " &e(&7" + Color.StripColors(Chat.ReplacePercentColorCodes(p2.Info.DisplayedName, false)) + "&e)" : ""),
-                            p2.Info.IsAFK ? "&e(&f" + canBeSeen.Where(p => p.Info.IsAFK).Count() + "&e) Away From Keyboard" : "&e(&f" + canBeSeen.Where(p => !p.Info.IsAFK && p.World == p2.World).Count() + "&e) " + p2.World.ClassyName,
-                            (byte)p2.Info.Rank.Index, p1.UseFallbackColors));
+        
+        internal static void UpdateTabList(bool force) {
+            foreach (Player p in Players) {
+                IEnumerable<Player> canSee = p.IsPlayingCTF ? null : Players.Where(pl => pl.CanSee(p)).ToArray();
+                string nick = GetNick(p), group = GetGroup(p, canSee);
+                
+                if (p.Supports(CpeExt.MessageType)) {
+                    string status2 = p.World == null ? p.ListName :
+                        p.ListName + " &son world " + p.World.ClassyName;
+                    if (status2 != p.lastStatus2) {
+                        p.lastStatus2 = status2;
+                        p.Send(Packet.Message((byte)MessageType.Status2, status2, p.UseFallbackColors));
                     }
-				} else {
-				    var canBeSeenW = p1.World.Players.Where(i => p1.CanSee(i)).ToArray();
-					foreach (Player p2 in canBeSeenW) {
-						if (p2.IsPlayingCTF)
-							p1.Send(Packet.MakeExtAddPlayerName(p2.NameID, p2.Name, "&f" + p2.Name, "&sTeam " + p2.Team.ClassyName, 0, p1.UseFallbackColors));
-					}
-				}
-			}
-		}
+                }
+                
+                if (!force && (nick == p.lastDisplayName && group == p.lastGroupName)) continue;
+                p.lastDisplayName = nick;
+                p.lastGroupName = group;
+                
+                if (!p.IsPlayingCTF) {
+                    foreach (Player pl in canSee) {
+                		Console.WriteLine( p.Name  + " ----> " + pl.Name );
+                        if (!pl.Supports(CpeExt.ExtPlayerList) && !pl.Supports(CpeExt.ExtPlayerList2)) continue;
+                        pl.Send(Packet.MakeExtAddPlayerName(
+                            p.NameID, p.Name, nick, group, (byte)p.Info.Rank.Index, pl.UseFallbackColors));
+                    }
+                } else {
+                    var canBeSeenW = p.World.Players.Where(pl => pl.CanSee(p)).ToArray();
+                    foreach (Player pl in canBeSeenW) {
+                        if (!pl.Supports(CpeExt.ExtPlayerList) && !pl.Supports(CpeExt.ExtPlayerList2)) continue;
+                        if (pl.IsPlayingCTF)
+                            pl.Send(Packet.MakeExtAddPlayerName(p.NameID, p.Name, nick, group, 0, p.UseFallbackColors));
+                    }
+                }
+            }
+        }
+        
+        static string GetNick(Player p) {
+            if (p.IsPlayingCTF) return "&f" + p.Name;
+            if (p.Info.DisplayedName == null) return p.ListName;
+            
+            string nick = Color.StripColors(Chat.ReplacePercentColorCodes(p.Info.DisplayedName, false));
+            bool nickSame = nick.Equals(p.Info.Name, StringComparison.OrdinalIgnoreCase);
+            return nickSame ? p.ListName : p.ListName + " &e(&7" + nick + "&e)";
+        }
+        
+        static string GetGroup(Player p, IEnumerable<Player> canBeSeen) {
+            if (p.IsPlayingCTF) return "&sTeam " + p.Team.ClassyName;
+            if (p.Info.IsAFK) return "&e(&f" + canBeSeen.Where(pl => pl.Info.IsAFK).Count() + "&e) Away From Keyboard";
+            return "&e(&f" + canBeSeen.Where(pl => !pl.Info.IsAFK && pl.World == p.World).Count() + "&e) " + p.World.ClassyName;
+        }
 
         internal static void UpdatePlayerList()
         {

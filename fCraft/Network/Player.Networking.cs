@@ -515,7 +515,7 @@ namespace fCraft {
                 Info.IsAFK = false;
                 Info.oldafkMob = Info.afkMob;
                 Info.afkMob = Info.Mob;
-                Server.UpdateTabList();
+                Server.UpdateTabList(true);
             }
             ResetIdBotTimer();
             short x = reader.ReadInt16();
@@ -1029,7 +1029,7 @@ namespace fCraft {
                 Info.skinName = Name;
             }
             Send(Packet.MakeSetPermission(this));
-            Server.UpdateTabList();
+            Server.UpdateTabList(true);
             System.Console.Beep();
             System.Console.Beep();
             return true;
@@ -1194,7 +1194,7 @@ namespace fCraft {
             SendJoinMessage(oldWorld, newWorld);
             RaisePlayerJoinedWorldEvent(this, oldWorld, reason);
 
-            Server.UpdateTabList();
+            Server.UpdateTabList(true);
             Server.RequestGC();
             return true;
         }

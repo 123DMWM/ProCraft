@@ -1122,7 +1122,7 @@ namespace fCraft {
 					p1.Send(Packet.MakeExtRemovePlayerName(player.NameID));
 				}
 			}
-			Server.UpdateTabList();
+			Server.UpdateTabList(true);
 		}
 
 
@@ -1177,7 +1177,7 @@ namespace fCraft {
 					p1.Send(Packet.MakeExtRemovePlayerName(player.NameID));
 				}
 			}
-			Server.UpdateTabList();
+			Server.UpdateTabList(true);
 		}
 
         #endregion

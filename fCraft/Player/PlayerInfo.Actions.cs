@@ -740,7 +740,7 @@ namespace fCraft {
 
             // Make necessary adjustments related to rank change
             Player target = PlayerObject;
-            Server.UpdateTabList();
+            Server.UpdateTabList(true);
             if( target == null ) {
                 if( raiseEvents ) RaiseRankChangedEvent( this, player, oldRank, reason, changeType, announce );
                 if( IsHidden && !Rank.Can( Permission.Hide ) ) {

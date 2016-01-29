@@ -285,6 +285,8 @@ namespace fCraft {
 
         [CanBeNull]
         string partialMessage;
+        
+        internal string lastStatus2, lastBottomRight2, lastDisplayName, lastGroupName;
 
 
         /// <summary> Parses a message on behalf of this player. </summary>
@@ -319,7 +321,7 @@ namespace fCraft {
                 Info.IsAFK = false;
                 Info.oldafkMob = Info.afkMob;
                 Info.afkMob = Info.Mob;
-                Server.UpdateTabList();
+                Server.UpdateTabList(true);
             }
 
             if( partialMessage != null ) {
