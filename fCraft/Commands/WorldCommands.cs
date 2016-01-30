@@ -4836,7 +4836,7 @@ namespace fCraft {
                                                 }
                                             }
                                         }
-                                        if (x < 1 || x >= 1024 || y < 1 || y >= 1024 || z < 1 || z >= 1024) {
+                                        if (x < 0 || x >= 1024 || y < 0 || y >= 1024 || z < 0 || z >= 1024) {
                                             player.Message("Coordinates are outside the valid range!");
                                             return;
                                         } else {

@@ -1548,7 +1548,6 @@ namespace fCraft {
                 
                 if (!p.IsPlayingCTF) {
                     foreach (Player pl in canSee) {
-                		Console.WriteLine( p.Name  + " ----> " + pl.Name );
                         if (!pl.Supports(CpeExt.ExtPlayerList) && !pl.Supports(CpeExt.ExtPlayerList2)) continue;
                         pl.Send(Packet.MakeExtAddPlayerName(
                             p.NameID, p.Name, nick, group, (byte)p.Info.Rank.Index, pl.UseFallbackColors));
