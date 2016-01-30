@@ -1115,7 +1115,7 @@ namespace fCraft {
 
         static readonly CommandDescriptor CdJoin = new CommandDescriptor {
             Name = "Join",
-            Aliases = new[] {"j", "load", "goto", "map"},
+            Aliases = new[] {"g", "j", "load", "goto", "map"},
             Category = CommandCategory.World,
             Usage = "/Join WorldName",
             Help =

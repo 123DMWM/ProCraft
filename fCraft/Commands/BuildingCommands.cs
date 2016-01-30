@@ -1323,7 +1323,6 @@ namespace fCraft {
         {
             Name = "Grass",
             Category = CommandCategory.New | CommandCategory.Building,
-            Aliases = new[] { "g" },
             Permissions = new[] { Permission.Build },
             Usage = "/Grass",
             Help = "Toggles the grass placement mode. When enabled, any dirt block you place is replaced with a grass block.",
