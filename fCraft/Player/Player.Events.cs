@@ -609,7 +609,7 @@ namespace fCraft.Events {
         public string TextLine1 { get; set; } // TODO
 
         /// <summary> First line of text that is shown to the player on the loading screen.
-        /// Defaults to world name or WoM cfg string. May be changed. </summary>
+        /// Defaults to world name. May be changed. </summary>
         public string TextLine2 { get; set; } // TODO
 
         public bool Cancel { get; set; }

@@ -280,7 +280,6 @@ namespace fCraft {
         #region Chat and Messaging
 
         static readonly TimeSpan ConfirmationTimeout = TimeSpan.FromSeconds( 60 );
-        const string WoMAlertPrefix = "^detail.user.alert=";
         int muteWarnings;
 
         [CanBeNull]
@@ -631,36 +630,6 @@ namespace fCraft {
             Player[] spectators = Server.Players.Where( p => p.spectatedPlayer == this ).ToArray();
             if( spectators.Length > 0 ) {
                 spectators.Message( "[Spectate]: &F" + message, args );
-            }
-        }
-
-
-        /// <summary> Sends a message as a WoM alert.
-        /// Players who use World of Minecraft client will see this message on the left side of the screen.
-        /// Other players will receive it as a normal message. </summary>
-        /// <param name="message"> A composite format string for the message. "System color" code will be prepended. </param>
-        /// <param name="args"> An object array that contains zero or more objects to format. </param>
-        /// <exception cref="ArgumentNullException"> If message is null. </exception>
-        /// <exception cref="FormatException"> If message format is invalid. </exception>
-        [StringFormatMethod( "message" )]
-        public void MessageWoMAlert( [NotNull] string message, [NotNull] params object[] args ) {
-            if( message == null ) throw new ArgumentNullException( "message" );
-            if( args == null ) throw new ArgumentNullException( "args" );
-            if( args.Length > 0 ) {
-                message = String.Format( message, args );
-            }
-            if( this == Console ) {
-                Logger.LogToConsole( message );
-            } else if( IsUsingWoM ) {
-                foreach (Packet p in LineWrapper.WrapPrefixed( WoMAlertPrefix, WoMAlertPrefix + Color.Sys + message, 
-            	                                              Supports(CpeExt.EmoteFix), Supports(CpeExt.FullCP437), UseFallbackColors)) {
-                    Send( p );
-                }
-            } else {
-                foreach (Packet p in LineWrapper.Wrap( Color.Sys + message, Supports(CpeExt.EmoteFix), 
-            	                                      Supports(CpeExt.FullCP437), UseFallbackColors)) {
-                    Send( p );
-                }
             }
         }
 

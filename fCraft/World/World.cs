@@ -930,7 +930,7 @@ namespace fCraft {
 
         #endregion*/
 
-        #region WoM Extensions
+        #region Environment settings
 
         /// <summary> Color of the clouds (RGB packed into an int). Set to -1 to use client defaults. </summary>
         public string CloudColor = null;
