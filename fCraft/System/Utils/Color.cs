@@ -232,15 +232,16 @@ namespace fCraft
                     case 'm': sb[i] = Me[1]; break;
                     case 'i': sb[i] = IRC[1]; break;
                     case 't': sb[i] = White[1]; break;
-                    default:
-                        char fallback = GetFallback(sb[i]);
-                        if (!IsStandardColorCode(sb[i]) && fallback == '\0') {
-                            sb.Remove(i - 1, 2);
-                            i--;
-                        } else if (!IsStandardColorCode(sb[i]) && useFallbacks) {
-                            sb[i] = fallback; break;
-                        }
-                        break;
+                }
+                
+                char fallback = GetFallback(sb[i]);
+                if (IsStandardColorCode(sb[i])) {
+                    sb[i] = Char.ToLower(sb[i]);
+                } else if (fallback == '\0') {
+                    sb.Remove(i - 1, 2);
+                    i--;
+                } else if (useFallbacks) {
+                    sb[i] = fallback;
                 }
             }
         }

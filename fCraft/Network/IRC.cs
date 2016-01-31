@@ -1107,13 +1107,9 @@ namespace fCraft
             bool useEmotes = ConfigKey.IRCShowEmotesFromServer.Enabled();
 
             if (useEmotes)
-            {
                 message = Chat.ReplaceEmotesWithUnicode(message);
-            }
             else
-            {
                 message = Chat.StripEmotes(message);
-            }
 
             message = Chat.ReplaceNewlines(message);
 
