@@ -204,9 +204,10 @@ namespace fCraft
             return (code >= '0' && code <= '9') || (code >= 'a' && code <= 'f') ||
                    (code >= 'A' && code <= 'F') || code == 'H' || code == 'h' ||
                    code == 'I' || code == 'i' || code == 'M' || code == 'm' ||
-                   code == 'P' || code == 'p' || code == 'R' || code == 'r' ||
-                   code == 'S' || code == 's' || code == 'W' || code == 'w' ||
-                   code == 'Y' || code == 'y' || code == 'T' || code == 't' || GetFallback(code) != '\0';
+                   code == 'N' || code == 'n' || code == 'P' || code == 'p' || 
+                   code == 'R' || code == 'r' || code == 'S' || code == 's' || 
+                   code == 'T' || code == 't' || code == 'W' || code == 'w' ||
+                   code == 'Y' || code == 'y' || GetFallback(code) != '\0';
         }
 
 
