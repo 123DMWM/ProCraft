@@ -390,7 +390,7 @@ namespace fCraft
             SaveExtColors();
         }
         
-        internal static void SaveExtColors() {
+        public static void SaveExtColors() {
             using (StreamWriter w = new StreamWriter("customcolors.txt")) {
                 foreach (CustomColor col in ExtColors) {
                     if (col.Undefined) continue;
@@ -400,7 +400,7 @@ namespace fCraft
             }
         }
         
-        internal static void LoadExtColors() {
+        public static void LoadExtColors() {
             if (!File.Exists("customcolors.txt")) return;
             string[] lines = File.ReadAllLines("customcolors.txt");
             CustomColor col = default(CustomColor);

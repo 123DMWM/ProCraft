@@ -31,6 +31,7 @@ namespace fCraft.ConfigGUI {
                 MessageBox.Show( missingFileMsg );
             }
 
+            Color.LoadExtColors();
             using( LogRecorder loadLogger = new LogRecorder() ) {
                 if( Config.Load( false, false ) ) {
                     if( loadLogger.HasMessages ) {

@@ -251,6 +251,7 @@ namespace fCraft {
                             "It is recommended that you upgrade to at least 2.8+",
                             MonoCompat.MonoVersion );
             }
+            Color.LoadExtColors();
 
 #if DEBUG
             Config.RunSelfTest();
@@ -271,7 +272,6 @@ namespace fCraft {
                             "Enable name verification as soon as possible." );
             }
 
-            Color.LoadExtColors();
             // load player DB
             PlayerDB.Load();
             IPBanList.Load();
