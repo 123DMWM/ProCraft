@@ -615,24 +615,21 @@ namespace fCraft
 
                     case IRCMessageType.QueryMessage:
                         // TODO: PMs
-                        Logger.Log(LogType.IrcStatus,
-                                    "QueryMessage: {0}",
-                                    msg.RawMessage);
+                        Logger.Log(LogType.IrcStatus, "QueryMessage: {0}", msg.RawMessage);
                         Server.Players.Where(p => p.IsStaff).Message("&i{0} -> {1}&f: {2}", msg.Nick, botNick, msg.Message);
                         break;
 
                     case IRCMessageType.Names:
-                        Logger.Log(LogType.IrcStatus,
-                                    "Name: {0}",
-                                    msg.Message);
-                        foreach (string u in msg.Message.Split()) {
-                            List<string> usingClient;
-                            if (!Users.TryGetValue(msg.Channel, out usingClient)) {
-                                usingClient = new List<string>();
-                                Users[msg.Channel] = usingClient;
-                            }
-                            usingClient.Add(u);
+                        Logger.Log(LogType.IrcStatus, "Name: {0}", msg.Message);
+                        List<string> chanUsers;
+                        if (!Users.TryGetValue(msg.Channel, out chanUsers)) {
+                            chanUsers = new List<string>();
+                            Users[msg.Channel] = chanUsers;
+                        } else {
+                            chanUsers.Clear();
                         }
+                        foreach (string u in msg.Message.Split())                     
+                            chanUsers.Add(u);
                         break;
                         
                     case IRCMessageType.Kill:
