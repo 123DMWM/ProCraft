@@ -114,16 +114,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\CpeCommands.cs" />
-    <Compile Include="Commands\NewFolder1\EqualityDrawOperation.cs" />
-    <Compile Include="Commands\NewFolder1\Expression.cs" />
-    <Compile Include="Commands\NewFolder1\FeedData.cs" />
-    <Compile Include="Commands\NewFolder1\FuncDrawOperation.cs" />
-    <Compile Include="Commands\NewFolder1\FuncDrawOperationPSF.cs" />
-    <Compile Include="Commands\NewFolder1\InequalityDrawOperation.cs" />
-    <Compile Include="Commands\NewFolder1\ManifoldDrawOperation.cs" />
-    <Compile Include="Commands\NewFolder1\PrepareParametrizedManifold.cs" />
-    <Compile Include="Commands\NewFolder1\Scaler.cs" />
-    <Compile Include="Commands\NewFolder1\SimpleParser.cs" />
     <Compile Include="Commands\System.Drawing\FontHandler.cs" />
     <Compile Include="Commands\System.Drawing\ShapesLib.cs" />
     <Compile Include="Drawing\Brushes\BWRainbowBrush.cs" />

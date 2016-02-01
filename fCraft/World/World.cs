@@ -57,10 +57,7 @@ namespace fCraft {
 
         /// <summary> Date (UTC) of the most recent map change. </summary>
         public DateTime MapChangedOn { get; internal set; }
-
-        //feeds
-        public Dictionary<int, FeedData> Feeds = new Dictionary<int, FeedData>();
-
+        
         /// <summary> Name of the player/entity who last loaded this map,
         /// Null if the player is unknown or if map has never been changed. </summary>
         [CanBeNull]
