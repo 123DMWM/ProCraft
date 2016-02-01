@@ -538,7 +538,7 @@ namespace fCraft
 
         private static void sendChannelUsers(Player p) {
             foreach (var chan in IRC.Users) {
-                Player.Console.Message(" -&s{0}: &f{1}",
+                p.Message(" -&s{0}: &f{1}",
                                chan.Key, chan.Value.JoinToString(", "));
             }
         }
