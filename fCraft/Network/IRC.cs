@@ -609,11 +609,12 @@ namespace fCraft
                         return;
 
 
-                    case IRCMessageType.QueryAction:
+                    case IRCMessageType.QueryMessage:
                         // TODO: PMs
                         Logger.Log(LogType.IrcStatus,
-                                    "Query: {0}",
+                                    "QueryMessage: {0}",
                                     msg.RawMessage);
+                        Server.Players.Where(p => p.IsStaff).Message("&i{0} -> {1}&f: {2}", msg.Nick, botNick, msg.Message);
                         break;
 
 
