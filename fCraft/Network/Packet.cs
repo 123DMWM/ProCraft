@@ -452,10 +452,11 @@ namespace fCraft {
         
         [Pure]
         public static Packet MakeDefineBlock(BlockDefinition def) {
-            Packet packet = new Packet( OpCode.DefineBlock );
-            MakeDefineBlockStart(def, ref packet);
-            packet.Bytes[74] = def.Shape;
-            MakeDefineBlockEnd(def, 75, ref packet);
+            Packet packet = new Packet(OpCode.DefineBlock);
+            int index = 1;
+            MakeDefineBlockStart(def, ref index, ref packet, false);
+            packet.Bytes[index++] = def.Shape;
+            MakeDefineBlockEnd(def, ref index, ref packet);
             return packet;
         }       
         
@@ -467,42 +468,55 @@ namespace fCraft {
         }
         
         [Pure]
-        public static Packet MakeDefineBlockExt(BlockDefinition def) {
-            Packet packet = new Packet(OpCode.DefineBlockExt);
-            MakeDefineBlockStart(def, ref packet);
-            packet.Bytes[74] = def.MinX;
-            packet.Bytes[75] = def.MinZ;
-            packet.Bytes[76] = def.MinY;
-            packet.Bytes[77] = def.MaxX;
-            packet.Bytes[78] = def.MaxZ;
-            packet.Bytes[79] = def.MaxY;
-            MakeDefineBlockEnd(def, 80, ref packet);
+        public static Packet MakeDefineBlockExt(BlockDefinition def, bool uniqueSideTexs) {
+        	byte[] bytes = new byte[uniqueSideTexs ? 88 : 85];
+            Packet packet = new Packet(bytes);
+            packet.Bytes[0] = (byte)OpCode.DefineBlockExt;
+            int index = 1;
+            
+            MakeDefineBlockStart(def, ref index, ref packet, uniqueSideTexs);
+            packet.Bytes[index++] = def.MinX;
+            packet.Bytes[index++] = def.MinZ;
+            packet.Bytes[index++] = def.MinY;
+            packet.Bytes[index++] = def.MaxX;
+            packet.Bytes[index++] = def.MaxZ;
+            packet.Bytes[index++] = def.MaxY;
+            MakeDefineBlockEnd(def, ref index, ref packet);
             return packet;
         }
         
-        static void MakeDefineBlockStart(BlockDefinition def, ref Packet packet) {
+        static void MakeDefineBlockStart(BlockDefinition def, ref int index, ref Packet packet, bool uniqueSideTexs) {
         	// speed = 2^((raw - 128) / 64);
             // therefore raw = 64log2(speed) + 128
             byte rawSpeed = (byte)(64 * Math.Log(def.Speed, 2) + 128);
             
-            packet.Bytes[1] = def.BlockID;
-            Encoding.ASCII.GetBytes(def.Name.PadRight(64), 0, 64, packet.Bytes, 2);
-            packet.Bytes[66] = def.CollideType;
-            packet.Bytes[67] = rawSpeed;
-            packet.Bytes[68] = def.TopTex;
-            packet.Bytes[69] = def.SideTex;
-            packet.Bytes[70] = def.BottomTex;
-            packet.Bytes[71] = (byte)(def.BlocksLight ? 0 : 1);
-            packet.Bytes[72] = def.WalkSound;
-            packet.Bytes[73] = (byte)(def.FullBright ? 1 : 0);
+            packet.Bytes[index++] = def.BlockID;
+            Encoding.ASCII.GetBytes(def.Name.PadRight(64), 0, 64, packet.Bytes, index);
+            index += 64;
+            packet.Bytes[index++] = def.CollideType;
+            packet.Bytes[index++] = rawSpeed;
+            packet.Bytes[index++] = def.TopTex;
+            if (uniqueSideTexs) {
+                packet.Bytes[index++] = def.LeftTex;
+                packet.Bytes[index++] = def.RightTex;
+                packet.Bytes[index++] = def.FrontTex;
+                packet.Bytes[index++] = def.BackTex;
+            } else {
+                packet.Bytes[index++] = def.SideTex;
+            }
+            
+            packet.Bytes[index++] = def.BottomTex;
+            packet.Bytes[index++] = (byte)(def.BlocksLight ? 0 : 1);
+            packet.Bytes[index++] = def.WalkSound;
+            packet.Bytes[index++] = (byte)(def.FullBright ? 1 : 0);
         }
         
-        static void MakeDefineBlockEnd(BlockDefinition def, int offset, ref Packet packet) {
-            packet.Bytes[offset + 0] = def.BlockDraw;
-            packet.Bytes[offset + 1] = def.FogDensity;
-            packet.Bytes[offset + 2] = def.FogR;
-            packet.Bytes[offset + 3] = def.FogG;
-            packet.Bytes[offset + 4] = def.FogB;
+        static void MakeDefineBlockEnd(BlockDefinition def, ref int index, ref Packet packet) {
+            packet.Bytes[index++] = def.BlockDraw;
+            packet.Bytes[index++] = def.FogDensity;
+            packet.Bytes[index++] = def.FogR;
+            packet.Bytes[index++] = def.FogG;
+            packet.Bytes[index++] = def.FogB;
         }
         
         public static Packet MakeSetTextColor(CustomColor col) {

@@ -417,8 +417,10 @@ namespace fCraft {
                         fallback.ToString(), block.Speed, block.CollideType);
                     player.Message("   &3Top ID: &a{0}&3, Side ID: &a{1}&3, Bottom ID: &a{2}",
                         block.TopTex, block.SideTex, block.BottomTex);
+                    player.Message("   &3Left ID: &a{0}&3, Right ID: &a{1}&3, Front ID: &a{2}&3, Back ID: &a{3}",
+                        block.LeftTex, block.RightTex, block.FrontTex, block.BackTex);
                     player.Message("   &3Block Light: &a{0}&3, Sound: &a{1}&3, FullBright: &a{2}",
-                        block.BlocksLight.ToString(), block.WalkSound, block.FullBright.ToString());
+                        block.BlocksLight, block.WalkSound, block.FullBright);
                     player.Message("   &3Shape: &a{0}&3, Draw: &a{1}&3, Fog Density: &a{2}",
                         block.Shape, block.BlockDraw, block.FogDensity);
                     player.Message("   &3Fog Red: &a{0}&3, Fog Green: &a{1}&3, Fog Blue: &a{2}",
@@ -465,6 +467,7 @@ namespace fCraft {
             
             player.currentGB = new BlockDefinition();
             player.currentGB.BlockID = (byte)blockId;
+            player.currentGB.Version2 = true;
             player.Message("   &bSet block id to: " + blockId);
             player.Message("&sFrom now on, use &h/gb [value]&s to enter arguments.");
             player.Message("&sYou can abort the currently partially " +
@@ -561,6 +564,8 @@ namespace fCraft {
                 case 4:
                     if (byte.TryParse(args, out value)) {
                         step++; def.SideTex = value;
+                        def.LeftTex = def.SideTex; def.RightTex = def.SideTex;
+                        def.FrontTex = def.SideTex; def.BackTex = def.SideTex;
                         player.Message("   &bSet sides texture index to: " + value);
                     }
                     break;
@@ -652,16 +657,12 @@ namespace fCraft {
                     if (args.ToLower().Equals("-1")) {
                         player.Message("   &bBlock will display as a Sprite");
                         def.Shape = 0;
-                        def.MinX = 0;
-                        def.MinY = 0;
-                        def.MinZ = 0;
-                        def.MaxX = 16;
-                        def.MaxY = 16;
-                        def.MaxZ = 16;
+                        def.MinX = 0; def.MinY = 0; def.MinZ = 0;
+                        def.MaxX = 16; def.MaxY = 16; def.MaxZ = 16;
                         step = 10;
                         break;
                     }
-                    if (args.Split().Count() != 3) {
+                    if (args.Split().Length != 3) {
                         player.Message("Please specify 3 coordinates");
                         return;
                     }
@@ -683,7 +684,7 @@ namespace fCraft {
                     player.Message("   &bSet minimum coords to X:{0} Y:{1} Z:{2}", minx, miny, minz);
                     break;
                 case 17:
-                    if (args.Split().Count() != 3) {
+                    if (args.Split().Length != 3) {
                         player.Message("Please specify 3 coordinates");
                         return;
                     }
@@ -787,7 +788,6 @@ namespace fCraft {
                 player.Message("There are no custom defined blocks by that ID");
                 return;
             }
-            BlockDefinition newDef = def;
             string option = cmd.Next() ?? "n/a";
             string args = cmd.NextAll();
             if (string.IsNullOrEmpty(args)) {
@@ -801,7 +801,7 @@ namespace fCraft {
             switch (option.ToLower()) {
                 case "name":
                     player.Message("&bChanged name of &a{0}&b to &A{1}", def.Name, args);
-                    newDef.Name = args;
+                    def.Name = args;
                     break;
                 case "solid":
                 case "solidity":
@@ -809,141 +809,159 @@ namespace fCraft {
                 case "collidetype":
                     if (byte.TryParse(args, out value) && value <= 2) {
                         player.Message("&bChanged solidity of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.CollideType, value);
-                        newDef.CollideType = value;
+                        def.CollideType = value;
                         hasChanged = true;
-                    }
-                    break;
+                    } break;
                 case "speed":
                     float speed;
                     if (float.TryParse(args, out speed)
                         && speed >= 0.25f && value <= 3.96f) {
                         player.Message("&bChanged speed of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.Speed, speed);
-                        newDef.Speed = speed;
+                        def.Speed = speed;
                         hasChanged = true;
-                    }
-                    break;
+                    } break;
                 case "allid":
                 case "alltex":
                 case "alltexture":
                     if (byte.TryParse(args, out value)) {
                         player.Message("&bChanged top, sides, and bottom texture index of &a{0}&b to &a{1}", def.Name, value);
-                        newDef.TopTex = value;
-                        newDef.SideTex = value;
-                        newDef.BottomTex = value;
+                        def.TopTex = value; def.SideTex = value; def.BottomTex = value;
+                        def.LeftTex = value; def.RightTex = value;
+                        def.FrontTex = value; def.BackTex = value;                       
                         hasChanged = true;
-                    }
-                    break;
+                    } break;
                 case "topid":
                 case "toptex":
                 case "toptexture":
                     if (byte.TryParse(args, out value)) {
                         player.Message("&bChanged top texture index of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.TopTex, value);
-                        newDef.TopTex = value;
+                        def.TopTex = value;
                         hasChanged = true;
-                    }
-                    break;
+                    } break;
+                case "leftid":
+                case "lefttex":
+                case "lefttexture":
+                    if (byte.TryParse(args, out value)) {
+                        player.Message("&bChanged left texture index of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.LeftTex, value);
+                        def.LeftTex = value;
+                        hasChanged = true;
+                    } break;
+                case "rightid":
+                case "righttex":
+                case "righttexture":
+                    if (byte.TryParse(args, out value)) {
+                        player.Message("&bChanged right texture index of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.RightTex, value);
+                        def.RightTex = value;
+                        hasChanged = true;
+                    } break;
+                case "frontid":
+                case "fronttex":
+                case "fronttexture":
+                    if (byte.TryParse(args, out value)) {
+                        player.Message("&bChanged front texture index of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.FrontTex, value);
+                        def.FrontTex = value;
+                        hasChanged = true;
+                    } break;
+                case "backid":
+                case "backtex":
+                case "backtexture":
+                    if (byte.TryParse(args, out value)) {
+                        player.Message("&bChanged back texture index of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.BackTex, value);
+                        def.BackTex = value;
+                        hasChanged = true;
+                    } break;             
                 case "sideid":
                 case "sidetex":
                 case "sidetexture":
                     if (byte.TryParse(args, out value)) {
                         player.Message("&bChanged sides texture index of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.SideTex, value);
-                        newDef.SideTex = value;
+                        def.SideTex = value;
+                        def.LeftTex = def.SideTex; def.RightTex = def.SideTex;
+                        def.FrontTex = def.SideTex; def.BackTex = def.SideTex;
                         hasChanged = true;
-                    }
-                    break;
+                    } break;
                 case "bottomid":
                 case "bottomtex":
                 case "bottomtexture":
                     if (byte.TryParse(args, out value)) {
                         player.Message("&bChanged bottom texture index of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.BottomTex, value);
-                        newDef.BottomTex = value;
+                        def.BottomTex = value;
                         hasChanged = true;
-                    }
-                    break;
+                    } break;
                 case "light":
                 case "blockslight":
                     if (bool.TryParse(args, out boolVal)) {
                         player.Message("&bChanged blocks light of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.BlocksLight, boolVal);
-                        newDef.BlocksLight = boolVal;
+                        def.BlocksLight = boolVal;
                         hasChanged = true;
-                    }
-                    break;
+                    } break;
                 case "sound":
                 case "walksound":
                     if (byte.TryParse(args, out value) && value <= 11) {
                         player.Message("&bChanged walk sound of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.WalkSound, value);
-                        newDef.WalkSound = value;
+                        def.WalkSound = value;
                         hasChanged = true;
-                    }
-                    break;
+                    } break;
                 case "fullbright":
                     if (bool.TryParse(args, out boolVal)) {
                         player.Message("&bChanged full bright of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.FullBright, boolVal);
-                        newDef.FullBright = boolVal;
+                        def.FullBright = boolVal;
                         hasChanged = true;
-                    }
-                    break;
+                    } break;
                 case "size":
                 case "shape":
                 case "height":
                     if (byte.TryParse(args, out value) && value <= 16) {
                         player.Message("&bChanged block shape of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.Shape, value);
-                        newDef.Shape = value;
+                        def.Shape = value;
                         hasChanged = true;
-                    }
-                    break;
+                    } break;
                 case "draw":
                 case "blockdraw":
                     if (byte.TryParse(args, out value) && value <= 4) {
                         player.Message("&bChanged block draw type of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.BlockDraw, value);
-                        newDef.BlockDraw = value;
+                        def.BlockDraw = value;
                         hasChanged = true;
-                    }
-                    break;
+                    } break;
                 case "fogdensity":
                 case "fogd":
                     if (byte.TryParse(args, out value)) {
                         player.Message("&bChanged density of fog of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.FogDensity, value);
-                        newDef.FogDensity = value;
+                        def.FogDensity = value;
                         hasChanged = true;
-                    }
-                    break;
+                    } break;
                 case "foghex":
                     if (WorldCommands.IsValidHex(args)) {
                         System.Drawing.Color col = System.Drawing.ColorTranslator.FromHtml("#" + args.ToUpper().Replace("#", ""));
                         player.Message("&bChanged red fog component of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.FogR, col.R);
-                        newDef.FogR = col.R;
+                        def.FogR = col.R;
                         player.Message("&bChanged green fog component of fog of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.FogG, col.G);
-                        newDef.FogG = col.G;
+                        def.FogG = col.G;
                         player.Message("&bChanged blue fog component of fog of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.FogB, col.B);
-                        newDef.FogB = col.B;
+                        def.FogB = col.B;
                         hasChanged = true;
-                    }
-                    break;
+                    } break;
                 case "fogr":
                 case "fogred":
                     if (byte.TryParse(args, out value)) {
                         player.Message("&bChanged red fog component of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.FogR, value);
                         def.FogG = value;
                         hasChanged = true;
-                    }
-                    break;
+                    } break;
                 case "fogg":
                 case "foggreen":
                     if (byte.TryParse(args, out value)) {
                         player.Message("&bChanged green fog component of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.FogG, value);
-                        newDef.FogG = value;
+                        def.FogG = value;
                         hasChanged = true;
-                    }
-                    break;
+                    } break;
                 case "fogb":
                 case "fogblue":
                     if (byte.TryParse(args, out value)) {
                         player.Message("&bChanged blue fog component of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.FogB, value);
-                        newDef.FogB = value;
+                        def.FogB = value;
                         hasChanged = true;
-                    }
-                    break;
+                    } break;
                 case "fallback":
                 case "block":
                     Block block;
@@ -956,66 +974,64 @@ namespace fCraft {
                             break;
                         }
                         player.Message("&bChanged fallback block of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.FallBack, block.ToString());
-                        newDef.FallBack = (byte)block;
+                        def.FallBack = (byte)block;
                         hasChanged = true;
-                    }
-                    break;
+                    } break;
                 case "min":
                     if (args.ToLower().Equals("-1")){
                         player.Message("Block will display as a sprite!");
-                        newDef.Shape = 0;
+                        def.Shape = 0;
                         hasChanged = true;
                         break;
                     }
-                    if (args.Split().Count() != 3) {
+                    if (args.Split().Length != 3) {
                         player.Message("Please specify 3 coordinates!");
                         break;
                     }
-                    newDef.MinX = EditCoord(player, "min X", def.Name, args.Split()[0], def.MinX, ref hasChanged);
-                    newDef.MinY = EditCoord(player, "min Y", def.Name, args.Split()[1], def.MinY, ref hasChanged);
-                    newDef.MinZ = EditCoord(player, "min Z", def.Name, args.Split()[2], def.MinZ, ref hasChanged);
+                    def.MinX = EditCoord(player, "min X", def.Name, args.Split()[0], def.MinX, ref hasChanged);
+                    def.MinY = EditCoord(player, "min Y", def.Name, args.Split()[1], def.MinY, ref hasChanged);
+                    def.MinZ = EditCoord(player, "min Z", def.Name, args.Split()[2], def.MinZ, ref hasChanged);
                     hasChanged = true;
                     break;
                 case "max":
-                    if (args.Split().Count() != 3) {
+                    if (args.Split().Length != 3) {
                         player.Message("Please specify 3 coordinates!");
                         break;
                     }
-                    newDef.MaxX = EditCoord(player, "max X", def.Name, args.Split()[0], def.MaxX, ref hasChanged);
-                    newDef.MaxY = EditCoord(player, "max Y", def.Name, args.Split()[1], def.MaxY, ref hasChanged);
-                    newDef.MaxZ = EditCoord(player, "max Z", def.Name, args.Split()[2], def.MaxZ, ref hasChanged);
+                    def.MaxX = EditCoord(player, "max X", def.Name, args.Split()[0], def.MaxX, ref hasChanged);
+                    def.MaxY = EditCoord(player, "max Y", def.Name, args.Split()[1], def.MaxY, ref hasChanged);
+                    def.MaxZ = EditCoord(player, "max Z", def.Name, args.Split()[2], def.MaxZ, ref hasChanged);
                     hasChanged = true;
                     break;
                 case "minx":
-                    newDef.MinX = EditCoord(player, "min X", def.Name, args, def.MinX, ref hasChanged); break;
+                    def.MinX = EditCoord(player, "min X", def.Name, args, def.MinX, ref hasChanged); break;
                 case "miny":
-                    newDef.MinY = EditCoord(player, "min Y", def.Name, args, def.MinY, ref hasChanged); break;
+                    def.MinY = EditCoord(player, "min Y", def.Name, args, def.MinY, ref hasChanged); break;
                 case "minz":
-                    newDef.MinZ = EditCoord(player, "min Z", def.Name, args, def.MinZ, ref hasChanged); break;
+                    def.MinZ = EditCoord(player, "min Z", def.Name, args, def.MinZ, ref hasChanged); break;
                 case "maxx":
-                    newDef.MaxX = EditCoord(player, "max X", def.Name, args, def.MaxX, ref hasChanged); break;
+                    def.MaxX = EditCoord(player, "max X", def.Name, args, def.MaxX, ref hasChanged); break;
                 case "maxy":
-                    newDef.MaxY = EditCoord(player, "max Y", def.Name, args, def.MaxY, ref hasChanged); break;
+                    def.MaxY = EditCoord(player, "max Y", def.Name, args, def.MaxY, ref hasChanged); break;
                 case "maxz":
-                    newDef.MaxZ = EditCoord(player, "max Z", def.Name, args, def.MaxZ, ref hasChanged);
+                    def.MaxZ = EditCoord(player, "max Z", def.Name, args, def.MaxZ, ref hasChanged);
                     if (byte.TryParse(args, out value)) {
-                        newDef.Shape = value;
-                    }
-                    break;
+                        def.Shape = value;
+                    } break;
                 default:
                     CdGlobalBlock.PrintUsage(player);
                     return;
             }
             if (hasChanged) {
                 Server.Message("{0} &sedited a global custom block &a{1} &swith ID &a{2}",
-                               player.ClassyName, newDef.Name, newDef.BlockID);
+                               player.ClassyName, def.Name, def.BlockID);
                 BlockDefinition.RemoveGlobalBlock(def);
-                BlockDefinition.DefineGlobalBlock(newDef);
+                BlockDefinition.DefineGlobalBlock(def);
 
                 foreach (Player p in Server.Players) {
                     if (p.Supports(CpeExt.BlockDefinitions)) {
                         BlockDefinition.SendGlobalRemove(p, def);
-                        BlockDefinition.SendGlobalAdd(p, newDef);
+                        BlockDefinition.SendGlobalAdd(p, def);
                     }
                 }
 

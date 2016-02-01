@@ -33,6 +33,12 @@ namespace fCraft {
         public byte MaxX { get; set; }
         public byte MaxY { get; set; }
         public byte MaxZ { get; set; }
+        // BlockDefinitionsExt v2 fields
+        public bool Version2 { get; set; }
+        public byte LeftTex { get; set; } 
+        public byte RightTex { get; set; } 
+        public byte FrontTex { get; set; } 
+        public byte BackTex { get; set; }         
         
         public BlockDefinition Copy() {
             BlockDefinition def = new BlockDefinition();
@@ -47,6 +53,9 @@ namespace fCraft {
             def.FallBack = FallBack;
             def.MinX = MinX; def.MinY = MinY; def.MinZ = MinZ;
             def.MaxX = MaxX; def.MaxY = MaxY; def.MaxZ = MaxZ;
+            def.Version2 = Version2;
+            def.LeftTex = LeftTex; def.RightTex = RightTex;
+            def.FrontTex = FrontTex; def.BackTex = BackTex;
             return def;
         }
         
@@ -54,12 +63,17 @@ namespace fCraft {
         
         public static void DefineGlobalBlock(BlockDefinition def) {
             // fixup for legacy files
-            if (def.MinX == 0 && def.MaxX == 0 ) 
+            if (def.MinX == 0 && def.MaxX == 0) 
                 def.MaxX = 16;
-            if (def.MinY == 0 && def.MaxY == 0 ) 
+            if (def.MinY == 0 && def.MaxY == 0) 
                 def.MaxY = 16;
-            if (def.MinZ == 0 && def.MaxZ == 0 )
+            if (def.MinZ == 0 && def.MaxZ == 0)
                 def.MaxZ = def.Shape == 0 ? (byte)16 : def.Shape;
+            if (!def.Version2) {
+                def.Version2 = true;
+                def.LeftTex = def.SideTex; def.RightTex = def.SideTex;
+                def.FrontTex = def.SideTex; def.BackTex = def.SideTex;
+            }
             
             string name = def.Name.ToLower().Replace(" ", "");         
             Map.BlockNames[name] = (Block)def.BlockID;
@@ -83,8 +97,10 @@ namespace fCraft {
                 BlockDefinition def = GlobalDefinitions[i];
                 if (def == null) continue;
                 
-                if (p.Supports(CpeExt.BlockDefinitionsExt) && def.Shape != 0)
-                    p.SendNow(Packet.MakeDefineBlockExt(def));
+                if (p.Supports(CpeExt.BlockDefinitionsExt2) && def.Shape != 0)
+                    p.SendNow(Packet.MakeDefineBlockExt(def, true));
+                else if (p.Supports(CpeExt.BlockDefinitionsExt) && def.Shape != 0)
+                    p.SendNow(Packet.MakeDefineBlockExt(def, false));
                 else
                     p.SendNow(Packet.MakeDefineBlock(def));
                 p.SendNow(Packet.MakeSetBlockPermission(
@@ -93,8 +109,10 @@ namespace fCraft {
         }
         
          public static void SendGlobalAdd(Player p, BlockDefinition def) {
-            if (p.Supports(CpeExt.BlockDefinitionsExt) && def.Shape != 0)
-                p.Send(Packet.MakeDefineBlockExt(def));
+            if (p.Supports(CpeExt.BlockDefinitionsExt2) && def.Shape != 0)
+                p.Send(Packet.MakeDefineBlockExt(def, true));
+            else if (p.Supports(CpeExt.BlockDefinitionsExt) && def.Shape != 0)
+                p.Send(Packet.MakeDefineBlockExt(def, false));
             else
                 p.Send(Packet.MakeDefineBlock(def));
             p.Send(Packet.MakeSetBlockPermission((Block)def.BlockID, true, true));

@@ -2270,6 +2270,7 @@ namespace fCraft {
         const int BlockDefinitionsExtVersion = 1;
         const string BlockDefinitionsExtExtName = "BlockDefinitionsExt";
         const int BlockDefinitionsExtExtVersion = 1;
+        const int BlockDefinitionsExtExt2Version = 2;        
         const string TextColorsExtName = "TextColors";
         const int TextColorsExtVersion = 1;
         
@@ -2312,7 +2313,7 @@ namespace fCraft {
             writer.Write(Packet.MakeExtEntry(FullCP437ExtName, FullCP437ExtVersion).Bytes);
             
             writer.Write(Packet.MakeExtEntry(BlockDefinitionsExtName, BlockDefinitionsExtVersion).Bytes);
-            writer.Write(Packet.MakeExtEntry(BlockDefinitionsExtExtName, BlockDefinitionsExtExtVersion).Bytes);
+            writer.Write(Packet.MakeExtEntry(BlockDefinitionsExtExtName, BlockDefinitionsExtExt2Version).Bytes);
             writer.Write(Packet.MakeExtEntry(TextColorsExtName, TextColorsExtVersion).Bytes);
             
             // Expect ExtInfo reply from the client
@@ -2428,6 +2429,8 @@ namespace fCraft {
                     case BlockDefinitionsExtExtName:
                         if (extVersion == BlockDefinitionsExtExtVersion)
                             addedExt = CpeExt.BlockDefinitionsExt;
+                        else if (extVersion == BlockDefinitionsExtExt2Version)
+                            addedExt = CpeExt.BlockDefinitionsExt2;
                         break;
                     case TextColorsExtName:
                         if (extVersion == TextColorsExtVersion)
