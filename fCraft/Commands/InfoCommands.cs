@@ -1776,8 +1776,7 @@ namespace fCraft {
         };
 
         static void ColorHandler(Player player, CommandReader cmd) {
-            string color = cmd.Next();
-            if (color == null) color = "";
+            string color = cmd.Next() ?? "";
             switch (color.ToLower()) {
                 case "black":
                 case "0":
@@ -1908,18 +1907,15 @@ namespace fCraft {
                     player.Message("    Example: &fThe quick brown fox jumps over the lazy dog");
                     break;
                 default:
-                    if (player.Supports(CpeExt.TextColors)) {
-                        foreach (CustomColor col in Color.ExtColors) {
-                            if (col.Undefined) continue;
-                            if (color.ToLower() == col.Name.ToLower() || color == col.Code.ToString()) {
-                                player.Message("&sColor: &{0}{1}", col.Code, col.Name);
-                                player.Message("    Color Code: &f%{0}", col.Code);
-                                player.Message("    Fallback Color Code: &f%{0}", col.Fallback);
-                                player.Message("    HEX Code: &f#{0}", string.Format("{0:X2}{1:X2}{2:X2}", col.R, col.G, col.B));
-                                player.Message("    RGB: &4R &f{0} &2G &f{1} &1B &f{2}", col.R, col.G, col.B);
-                                player.Message("    Example: &{0}The quick brown fox jumps over the lazy dog", col.Code);
-                                return;
-                            }
+                    foreach (CustomColor col in Color.ExtColors.Where(c => !c.Undefined)) {
+                        if (color.ToLower() == col.Name.ToLower() || color == col.Code.ToString()) {
+                            player.Message("&sColor: &{0}{1}", col.Code, col.Name);
+                            player.Message("    Color Code: &f%{0}", col.Code);
+                            player.Message("    Fallback Color Code: &f%{0}", col.Fallback);
+                            player.Message("    HEX Code: &f#{0}", string.Format("{0:X2}{1:X2}{2:X2}", col.R, col.G, col.B));
+                            player.Message("    RGB: &4R &f{0} &2G &f{1} &1B &f{2}", col.R, col.G, col.B);
+                            player.Message("    Example: &{0}The quick brown fox jumps over the lazy dog", col.Code);
+                            return;
                         }
                     }
                     player.Message("List of Colors:");
@@ -1931,15 +1927,13 @@ namespace fCraft {
                     player.Message(" &5%5 Purple &d%d Magenta");
                     player.Message(" &6%6 Olive &e%e Yellow");
                     player.Message(" &7%7 Silver &f%f White");
-                    if (player.Supports(CpeExt.TextColors)) {
-                        if (Color.ExtColors.Where(c => c.Fallback != '\0').Count() >= 1) {
-                            player.Message("List of Custom Colors:");
-                            string list = "";
-                            foreach (CustomColor col in Color.ExtColors.Where(c => c.Fallback != '\0')) {
-                                list = list + string.Format(" &{0} %{0} {1}", col.Code, col.Name.ToLower().UppercaseFirst());
-                            }
-                            player.Message(list);
+                    if (Color.ExtColors.Where(c => !c.Undefined).Count() >= 1) {
+                        player.Message("List of Custom Colors:");
+                        string list = "";
+                        foreach (CustomColor col in Color.ExtColors.Where(c => !c.Undefined)) {
+                            list = list + string.Format(" &{0}%{0}-{1}", col.Code, col.Name.ToLower().UppercaseFirst());
                         }
+                        player.Message(list);
                     }
                     if (player.IsStaff) {
                         player.Message("&SServer colors:");
