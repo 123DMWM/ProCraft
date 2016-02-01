@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace fCraft {
     
@@ -1114,16 +1115,16 @@ namespace fCraft {
             Usage = "/ccols [type] [args]",
             IsConsoleSafe = true,
             Help = "&sModifies the custom colors, or prints information about them.&n" +
-                "&sTypes are: add, list, open, remove&n" +
+                "&sTypes are: add, free, list, remove&n" +
                 "&sSee &h/help ccols <type>&s for details about each type.",
             HelpSections = new Dictionary<string, string>{
                 { "add",     "&h/ccols add [code] [name] [fallback] [hex]&n" +
                         "&scode is in ASCII. You cannot replace the standard color codes.&n" +
                         "&sfallback is a standard color code, shown to non-supporting clients.&n" },
+                { "free",    "&h/ccols free&n" +
+                        "&sPrints a list of free/unused available color codes." },           	
                 { "list",    "&h/ccols list [offset]&n" +
                         "&sPrints a list of the codes, names, and fallback codes of the custom colors. " },
-                { "open",    "&h/ccols open&n" +
-                        "&sPrints a list of unused available color codes. " },
                 { "remove",  "&h/ccols remove [code]&n" +
                         "&sRemoves the custom color which has the given color code." }
             },
@@ -1141,8 +1142,8 @@ namespace fCraft {
                 RemoveCustomColorsHandler(p, cmd);
             } else if (type == "list") {
                 ListCustomColorsHandler(p, cmd);
-            } else if (type == "open" || type == "available") {
-                OpenCustomColorsHandler(p);
+            } else if (type == "free" || type == "available") {
+                FreeCustomColorsHandler(p);
             } else {
                 CdCustomColors.PrintUsage(p);
             }
@@ -1150,25 +1151,23 @@ namespace fCraft {
         
         static void AddCustomColorsHandler(Player p, CommandReader cmd) {
             if (cmd.Count < 4) { p.Message("Usage: &H/ccols add [code] [name] [fallback] [hex]"); return; }
-            if (cmd.RawMessage.Split()[2].Contains("\"")) {
-                p.Message("Color code cannot be \"");
-                return;
-            }
             if (!p.Can(Permission.DefineCustomBlocks)) {
-                p.MessageNoAccess(Permission.DefineCustomBlocks);
-                return;
+                p.MessageNoAccess(Permission.DefineCustomBlocks); return;
             }
             
-            char code = cmd.Next()[0];
+            string rawCode = cmd.Next();
+            if (rawCode.Length > 1) {
+                p.Message("Color code must only be one character long."); return;
+            }
+            char code = rawCode[0];
             if (Color.IsStandardColorCode(code)) {
-                p.Message(code + " is a standard color code, and thus cannot be removed."); return;
+                p.Message(code + " is a standard color code, and thus cannot be replaced."); return;
             }
-            if (code <= ' ' || code > '~' || code == '%' || code == '&' || code == '\\' || code == '"') {
+            if (code <= ' ' || code > '~' || code == '%' || code == '&' || code == '\\' || code == '"' || code '@') {
                 p.Message(code + " must be a standard ASCII character.");
-                p.Message("It also cannot be a space, percentage, ampersand, backslash, or double quotes.");
+                p.Message("It also cannot be a space, percentage, ampersand, backslash, at symbol, or double quotes.");
                 return;
-            }
-            
+            }            
             if (Color.IsColorCode(code)) {
                 p.Message("There is already a custom or server defined color with the code " + code +
                                    ", you must either use a different code or use \"&h/ccols remove " + code + "&s\"");
@@ -1181,7 +1180,11 @@ namespace fCraft {
                                    "custom color with the name \"" + name + "\"."); return;
             }
             
-            char fallback = cmd.Next()[0];
+            string rawFallback = cmd.Next();
+            if (rawFallback.Length > 1) {
+                p.Message("Fallback color code must only be one character long."); return;
+            }
+            char fallback = rawFallback[0];
             if (!Color.IsStandardColorCode(fallback)) {
                 p.Message(fallback + " must be a standard color code."); return;
             }
@@ -1199,7 +1202,7 @@ namespace fCraft {
             System.Drawing.Color rgb = System.Drawing.ColorTranslator.FromHtml("#" + hex);
             col.R = rgb.R; col.G = rgb.G; col.B = rgb.B;
             Color.AddExtColor(col);
-            p.Message("Successfully added a custom color. " + string.Format("&{0} %{0} {1}", col.Code, col.Name.ToLower().UppercaseFirst()));
+            p.Message("Successfully added a custom color. &{0} %{0} {1}", col.Code, col.Name.ToLower().UppercaseFirst());
         }
         
         static void RemoveCustomColorsHandler(Player p, CommandReader cmd) {
@@ -1251,24 +1254,18 @@ namespace fCraft {
             }
         }
 
-        static void OpenCustomColorsHandler(Player p) {
-            string codes = "";
-            for (byte b = 0; b < 128; b++) {
-                if (isValidCode(b) && !codes.Contains(Convert.ToChar(b).ToString().ToUpper())) {
-                    codes = codes + Convert.ToChar(b).ToString().ToUpper() + " ";
-                }
+        static void FreeCustomColorsHandler(Player p) {
+        	StringBuilder codes = new StringBuilder();
+            for (char c = '!'; c <= '~'; c++) {
+        		if (IsValidCode(c)) codes.Append(c).Append(' ');
             }
-            p.Message("Open codes: &f" + codes);
+        	p.Message("Free codes: &f" + codes.ToString());
         }
-        static bool isValidCode(byte code) {
-            if (code == '%' || code == '&' || code == '\\' ||
-                code == 'n' || code == 'N' || code == '"') return false;
-            if (code <= 32 || code >= 127) return false;
-            if (code >= 47 && code <= 57) return false;
-            if (code >= 65 && code <= 70) return false;
-            if (code >= 97 && code <= 102) return false;
-            if (Color.IsColorCode(Convert.ToChar(code))) return false;
-            return true;
+        
+        static bool IsValidCode(char code) {
+            if (code == '%' || code == '&' || code == '\\' || code == '"' || code == '@') 
+                return false;
+            return !Color.IsColorCode(code);
         }
 
         static string Hex(CustomColor c) {

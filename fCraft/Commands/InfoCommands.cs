@@ -1775,144 +1775,143 @@ namespace fCraft {
             Handler = ColorHandler
         };
 
-		static void ColorHandler(Player player, CommandReader cmd) {
-			String color = cmd.Next();
-			if (color != null) {
-				color = color.ToLower();
-			}
-			switch (color) {
-				case "black":
-				case "0":
-					player.Message("&sColor: &fBlack");
-					player.Message("    Color Code: &f%0");
-					player.Message("    HEX Code: &f#000000");
-					player.Message("    RGB: &4R &f0 &2G &f0 &1B &f0");
-					player.Message("    Example: &0The quick brown fox jumps over the lazy dog");
-					break;
-				case "navy":
-				case "1":
-					player.Message("&sColor: &fNavy");
-					player.Message("    Color Code: &f%1");
-					player.Message("    HEX Code: &f#0000AA");
-					player.Message("    RGB: &4R &f0 &2G &f0 &1B &f170");
-					player.Message("    Example: &1The quick brown fox jumps over the lazy dog");
-					break;
-				case "green":
-				case "2":
-					player.Message("&sColor: &fGreen");
-					player.Message("    Color Code: &f%2");
-					player.Message("    HEX Code: &f#00AA00");
-					player.Message("    RGB: &4R &f0 &2G &f170 &1B &f0");
-					player.Message("    Example: &2The quick brown fox jumps over the lazy dog");
-					break;
-				case "teal":
-				case "3":
-					player.Message("&sColor: &fTeal");
-					player.Message("    Color Code: &f%3");
-					player.Message("    HEX Code: &f#00AAAA");
-					player.Message("    RGB: &4R &f0 &2G &f170 &1B &f170");
-					player.Message("    Example: &3The quick brown fox jumps over the lazy dog");
-					break;
-				case "gray":
-				case "8":
-					player.Message("&sColor: &fGray");
-					player.Message("    Color Code: &f%8");
-					player.Message("    HEX Code: &f#555555");
-					player.Message("    RGB: &4R &f85 &2G &f85 &1B &f85");
-					player.Message("    Example: &8The quick brown fox jumps over the lazy dog");
-					break;
-				case "blue":
-				case "9":
-					player.Message("&sColor: &fBlue");
-					player.Message("    Color Code: &f%9");
-					player.Message("    HEX Code: &f#55555FF");
-					player.Message("    RGB: &4R &f85 &2G &f85 &1B &f255");
-					player.Message("    Example: &9The quick brown fox jumps over the lazy dog");
-					break;
-				case "lime":
-				case "a":
-					player.Message("&sColor: &fLime");
-					player.Message("    Color Code: &f%a");
-					player.Message("    HEX Code: &f#55FF55");
-					player.Message("    RGB: &4R &f85 &2G &f255 &1B &f85");
-					player.Message("    Example: &aThe quick brown fox jumps over the lazy dog");
-					break;
-				case "aqua":
-				case "b":
-					player.Message("&sColor: &fAqua");
-					player.Message("    Color Code: &f%b");
-					player.Message("    HEX Code: &f#55FFFF");
-					player.Message("    RGB: &4R &f85 &2G &f255 &1B &f255");
-					player.Message("    Example: &bThe quick brown fox jumps over the lazy dog");
-					break;
-				case "maroon":
-				case "4":
-					player.Message("&sColor: &fMaroon");
-					player.Message("    Color Code: &f%4");
-					player.Message("    HEX Code: &f#AA0000");
-					player.Message("    RGB: &4R &f170 &2G &f0 &1B &f0");
-					player.Message("    Example: &4The quick brown fox jumps over the lazy dog");
-					break;
-				case "purple":
-				case "5":
-					player.Message("&sColor: &fPurple");
-					player.Message("    Color Code: &f%5");
-					player.Message("    HEX Code: &f#AA00AA");
-					player.Message("    RGB: &4R &f170 &2G &f0 &1B &f170");
-					player.Message("    Example: &5The quick brown fox jumps over the lazy dog");
-					break;
-				case "olive":
-				case "6":
-					player.Message("&sColor: &fOlive");
-					player.Message("    Color Code: &f%6");
-					player.Message("    HEX Code: &f#FFAA00");
-					player.Message("    RGB: &4R &f255 &2G &f170 &1B &f0");
-					player.Message("    Example: &6The quick brown fox jumps over the lazy dog");
-					break;
-				case "silver":
-				case "7":
-					player.Message("&sColor: &fSilver");
-					player.Message("    Color Code: &f%7");
-					player.Message("    HEX Code: &f#AAAAAA");
-					player.Message("    RGB: &4R &f170 &2G &f170 &1B &f170");
-					player.Message("    Example: &7The quick brown fox jumps over the lazy dog");
-					break;
-				case "red":
-				case "c":
-					player.Message("&sColor: &fRed");
-					player.Message("    Color Code: &f%c");
-					player.Message("    HEX Code: &f#FF5555");
-					player.Message("    RGB: &4R &f255 &2G &f85 &1B &f85");
-					player.Message("    Example: &cThe quick brown fox jumps over the lazy dog");
-					break;
-				case "magenta":
-				case "d":
-					player.Message("&sColor: &fMagenta");
-					player.Message("    Color Code: &f%d");
-					player.Message("    HEX Code: &f#FF55FF");
-					player.Message("    RGB: &4R &f255 &2G &f85 &1B &f255");
-					player.Message("    Example: &dThe quick brown fox jumps over the lazy dog");
-					break;
-				case "yellow":
-				case "e":
-					player.Message("&sColor: &fYellow");
-					player.Message("    Color Code: &f%e");
-					player.Message("    HEX Code: &f#FFFF55");
-					player.Message("    RGB: &4R &f255 &2G &f255 &1B &f85");
-					player.Message("    Example: &eThe quick brown fox jumps over the lazy dog");
-					break;
-				case "white":
-				case "f":
-					player.Message("&sColor: &fWhite");
-					player.Message("    Color Code: &f%f");
-					player.Message("    HEX Code: &f#FFFFFF");
-					player.Message("    RGB: &4R &f255 &2G &f255 &1B &f255");
-					player.Message("    Example: &fThe quick brown fox jumps over the lazy dog");
-					break;
-				default:
+        static void ColorHandler(Player player, CommandReader cmd) {
+            string color = cmd.Next();
+            if (color == null) color = "";
+            switch (color.ToLower()) {
+                case "black":
+                case "0":
+                    player.Message("&sColor: &fBlack");
+                    player.Message("    Color Code: &f%0");
+                    player.Message("    HEX Code: &f#000000");
+                    player.Message("    RGB: &4R &f0 &2G &f0 &1B &f0");
+                    player.Message("    Example: &0The quick brown fox jumps over the lazy dog");
+                    break;
+                case "navy":
+                case "1":
+                    player.Message("&sColor: &fNavy");
+                    player.Message("    Color Code: &f%1");
+                    player.Message("    HEX Code: &f#0000AA");
+                    player.Message("    RGB: &4R &f0 &2G &f0 &1B &f170");
+                    player.Message("    Example: &1The quick brown fox jumps over the lazy dog");
+                    break;
+                case "green":
+                case "2":
+                    player.Message("&sColor: &fGreen");
+                    player.Message("    Color Code: &f%2");
+                    player.Message("    HEX Code: &f#00AA00");
+                    player.Message("    RGB: &4R &f0 &2G &f170 &1B &f0");
+                    player.Message("    Example: &2The quick brown fox jumps over the lazy dog");
+                    break;
+                case "teal":
+                case "3":
+                    player.Message("&sColor: &fTeal");
+                    player.Message("    Color Code: &f%3");
+                    player.Message("    HEX Code: &f#00AAAA");
+                    player.Message("    RGB: &4R &f0 &2G &f170 &1B &f170");
+                    player.Message("    Example: &3The quick brown fox jumps over the lazy dog");
+                    break;
+                case "gray":
+                case "8":
+                    player.Message("&sColor: &fGray");
+                    player.Message("    Color Code: &f%8");
+                    player.Message("    HEX Code: &f#555555");
+                    player.Message("    RGB: &4R &f85 &2G &f85 &1B &f85");
+                    player.Message("    Example: &8The quick brown fox jumps over the lazy dog");
+                    break;
+                case "blue":
+                case "9":
+                    player.Message("&sColor: &fBlue");
+                    player.Message("    Color Code: &f%9");
+                    player.Message("    HEX Code: &f#55555FF");
+                    player.Message("    RGB: &4R &f85 &2G &f85 &1B &f255");
+                    player.Message("    Example: &9The quick brown fox jumps over the lazy dog");
+                    break;
+                case "lime":
+                case "a":
+                    player.Message("&sColor: &fLime");
+                    player.Message("    Color Code: &f%a");
+                    player.Message("    HEX Code: &f#55FF55");
+                    player.Message("    RGB: &4R &f85 &2G &f255 &1B &f85");
+                    player.Message("    Example: &aThe quick brown fox jumps over the lazy dog");
+                    break;
+                case "aqua":
+                case "b":
+                    player.Message("&sColor: &fAqua");
+                    player.Message("    Color Code: &f%b");
+                    player.Message("    HEX Code: &f#55FFFF");
+                    player.Message("    RGB: &4R &f85 &2G &f255 &1B &f255");
+                    player.Message("    Example: &bThe quick brown fox jumps over the lazy dog");
+                    break;
+                case "maroon":
+                case "4":
+                    player.Message("&sColor: &fMaroon");
+                    player.Message("    Color Code: &f%4");
+                    player.Message("    HEX Code: &f#AA0000");
+                    player.Message("    RGB: &4R &f170 &2G &f0 &1B &f0");
+                    player.Message("    Example: &4The quick brown fox jumps over the lazy dog");
+                    break;
+                case "purple":
+                case "5":
+                    player.Message("&sColor: &fPurple");
+                    player.Message("    Color Code: &f%5");
+                    player.Message("    HEX Code: &f#AA00AA");
+                    player.Message("    RGB: &4R &f170 &2G &f0 &1B &f170");
+                    player.Message("    Example: &5The quick brown fox jumps over the lazy dog");
+                    break;
+                case "olive":
+                case "6":
+                    player.Message("&sColor: &fOlive");
+                    player.Message("    Color Code: &f%6");
+                    player.Message("    HEX Code: &f#FFAA00");
+                    player.Message("    RGB: &4R &f255 &2G &f170 &1B &f0");
+                    player.Message("    Example: &6The quick brown fox jumps over the lazy dog");
+                    break;
+                case "silver":
+                case "7":
+                    player.Message("&sColor: &fSilver");
+                    player.Message("    Color Code: &f%7");
+                    player.Message("    HEX Code: &f#AAAAAA");
+                    player.Message("    RGB: &4R &f170 &2G &f170 &1B &f170");
+                    player.Message("    Example: &7The quick brown fox jumps over the lazy dog");
+                    break;
+                case "red":
+                case "c":
+                    player.Message("&sColor: &fRed");
+                    player.Message("    Color Code: &f%c");
+                    player.Message("    HEX Code: &f#FF5555");
+                    player.Message("    RGB: &4R &f255 &2G &f85 &1B &f85");
+                    player.Message("    Example: &cThe quick brown fox jumps over the lazy dog");
+                    break;
+                case "magenta":
+                case "d":
+                    player.Message("&sColor: &fMagenta");
+                    player.Message("    Color Code: &f%d");
+                    player.Message("    HEX Code: &f#FF55FF");
+                    player.Message("    RGB: &4R &f255 &2G &f85 &1B &f255");
+                    player.Message("    Example: &dThe quick brown fox jumps over the lazy dog");
+                    break;
+                case "yellow":
+                case "e":
+                    player.Message("&sColor: &fYellow");
+                    player.Message("    Color Code: &f%e");
+                    player.Message("    HEX Code: &f#FFFF55");
+                    player.Message("    RGB: &4R &f255 &2G &f255 &1B &f85");
+                    player.Message("    Example: &eThe quick brown fox jumps over the lazy dog");
+                    break;
+                case "white":
+                case "f":
+                    player.Message("&sColor: &fWhite");
+                    player.Message("    Color Code: &f%f");
+                    player.Message("    HEX Code: &f#FFFFFF");
+                    player.Message("    RGB: &4R &f255 &2G &f255 &1B &f255");
+                    player.Message("    Example: &fThe quick brown fox jumps over the lazy dog");
+                    break;
+                default:
                     if (player.Supports(CpeExt.TextColors)) {
-                        foreach (CustomColor col in Color.ExtColors.Where(c => c.Fallback != '\0')) {
-                            if (color == col.Name.ToLower() || color == col.Code.ToString().ToLower()) {
+                        foreach (CustomColor col in Color.ExtColors) {
+                            if (col.Undefined) continue;
+                            if (color.ToLower() == col.Name.ToLower() || color == col.Code.ToString()) {
                                 player.Message("&sColor: &{0}{1}", col.Code, col.Name);
                                 player.Message("    Color Code: &f%{0}", col.Code);
                                 player.Message("    Fallback Color Code: &f%{0}", col.Fallback);
@@ -1923,15 +1922,15 @@ namespace fCraft {
                             }
                         }
                     }
-					player.Message("List of Colors:");
-					player.Message(" &0%0 Black &8%8 Gray");
-					player.Message(" &1%1 Navy &9%9 Blue");
-					player.Message(" &2%2 Green &a%a Lime");
-					player.Message(" &3%3 Teal &b%b Aqua");
-					player.Message(" &4%4 Maroon &c%c Red");
-					player.Message(" &5%5 Purple &d%d Magenta");
-					player.Message(" &6%6 Olive &e%e Yellow");
-					player.Message(" &7%7 Silver &f%f White");
+                    player.Message("List of Colors:");
+                    player.Message(" &0%0 Black &8%8 Gray");
+                    player.Message(" &1%1 Navy &9%9 Blue");
+                    player.Message(" &2%2 Green &a%a Lime");
+                    player.Message(" &3%3 Teal &b%b Aqua");
+                    player.Message(" &4%4 Maroon &c%c Red");
+                    player.Message(" &5%5 Purple &d%d Magenta");
+                    player.Message(" &6%6 Olive &e%e Yellow");
+                    player.Message(" &7%7 Silver &f%f White");
                     if (player.Supports(CpeExt.TextColors)) {
                         if (Color.ExtColors.Where(c => c.Fallback != '\0').Count() >= 1) {
                             player.Message("List of Custom Colors:");
@@ -1943,22 +1942,22 @@ namespace fCraft {
                         }
                     }
                     if (player.IsStaff) {
-						player.Message("&SServer colors:");
-						player.Message(" &r%r Announcement &h%h Help &i%i IRC &m%m Me");
-						player.Message(" &p%p PM &y%y Say &s%s System &w%w Warning");
-					}
-					if (!player.Can(Permission.UseColorCodes)) {
-						Rank reqRank = RankManager.GetMinRankWithAllPermissions(Permission.UseColorCodes);
-						if (reqRank == null) {
-							player.Message("&SNone of the ranks have permission to use colors in chat.");
-						} else {
-							player.Message("&SOnly {0}+&S can use colors in chat.",
-									 reqRank.ClassyName);
-						}
-					}
-					break;
-			}
-		}
+                        player.Message("&SServer colors:");
+                        player.Message(" &r%r Announcement &h%h Help &i%i IRC &m%m Me");
+                        player.Message(" &p%p PM &y%y Say &s%s System &w%w Warning");
+                    }
+                    if (!player.Can(Permission.UseColorCodes)) {
+                        Rank reqRank = RankManager.GetMinRankWithAllPermissions(Permission.UseColorCodes);
+                        if (reqRank == null) {
+                            player.Message("&SNone of the ranks have permission to use colors in chat.");
+                        } else {
+                            player.Message("&SOnly {0}+&S can use colors in chat.",
+                                     reqRank.ClassyName);
+                        }
+                    }
+                    break;
+            }
+        }
 
 
         static readonly CommandDescriptor CdEmotes = new CommandDescriptor
