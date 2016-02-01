@@ -531,9 +531,15 @@ namespace fCraft
                 player.Message("&IInternet Relayed Chat information");
                 player.Message(" IRC Network: &f{0}", ConfigKey.IRCBotNetwork.GetString());
                 player.Message(" Network Channel/s: ");
-                for (int i = 0; i < ConfigKey.IRCBotChannels.GetString().Split(',').Count(); i++) {
-                    player.Message("  &f" + ConfigKey.IRCBotChannels.GetString().Split(',')[i]);
-                }
+                IRC.SendRawMessage(IRCCommands.Names(ConfigKey.IRCBotChannels.ToString()),"","");
+                Scheduler.NewTask(t => sendChannelUsers(player)).RunManual(TimeSpan.FromSeconds(1));
+            }
+        }
+
+        private static void sendChannelUsers(Player p) {
+            foreach (var chan in IRC.Users) {
+                Player.Console.Message(" -&s{0}: &f{1}",
+                               chan.Key, chan.Value.JoinToString(", "));
             }
         }
 

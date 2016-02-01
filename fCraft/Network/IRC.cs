@@ -62,6 +62,8 @@ namespace fCraft
 
         static DateTime lastIrcCommand;
 
+        public static Dictionary<string, List<string>> Users = new Dictionary<string, List<string>>();
+
         /// <summary> Class represents an IRC connection/thread.
         /// There is an undocumented option (IRCThreads) to "load balance" the outgoing
         /// messages between multiple bots. If that's the case, several IrcThread objects
@@ -174,6 +176,8 @@ namespace fCraft
                         Send(IRCCommands.User(ActualBotNick, 8, ConfigKey.ServerName.GetString()));
                         lastNickAttempt = DateTime.UtcNow;
                         nickTry = 0;
+
+                        Send(IRCCommands.Names(channelNames));
 
                         while (isConnected && !reconnect)
                         {
@@ -617,7 +621,20 @@ namespace fCraft
                         Server.Players.Where(p => p.IsStaff).Message("&i{0} -> {1}&f: {2}", msg.Nick, botNick, msg.Message);
                         break;
 
-
+                    case IRCMessageType.Names:
+                        Logger.Log(LogType.IrcStatus,
+                                    "Name: {0}",
+                                    msg.Message);
+                        foreach (string u in msg.Message.Split()) {
+                            List<string> usingClient;
+                            if (!Users.TryGetValue(msg.Channel, out usingClient)) {
+                                usingClient = new List<string>();
+                                Users[msg.Channel] = usingClient;
+                            }
+                            usingClient.Add(u);
+                        }
+                        break;
+                        
                     case IRCMessageType.Kill:
                         Logger.Log(LogType.IrcStatus,
                                     "Bot was killed from {0} by {1} ({2}), reconnecting.",
@@ -1347,8 +1364,9 @@ namespace fCraft
                     case IRCReplyCode.EndOfMotd:
                         return IRCMessageType.Motd;
                     case IRCReplyCode.NamesReply:
+                        return IRCMessageType.Names;
                     case IRCReplyCode.EndOfNames:
-                        return IRCMessageType.Name;
+                        return IRCMessageType.EndOfNames;
                     case IRCReplyCode.WhoReply:
                     case IRCReplyCode.EndOfWho:
                         return IRCMessageType.Who;
@@ -1605,7 +1623,8 @@ namespace fCraft
                 case IRCMessageType.ChannelMode:
                     channel = linear[3];
                     break;
-                case IRCMessageType.Name:
+                case IRCMessageType.Names:
+                case IRCMessageType.EndOfNames:
                     channel = linear[4];
                     break;
             }
@@ -1818,7 +1837,8 @@ namespace fCraft
         Who,
         WhoIs,
         WhoWas,
-        Name,
+        Names,
+        EndOfNames,
         Topic,
         BanList,
         NickChange,
