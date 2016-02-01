@@ -1163,7 +1163,7 @@ namespace fCraft {
             if (Color.IsStandardColorCode(code)) {
                 p.Message(code + " is a standard color code, and thus cannot be replaced."); return;
             }
-            if (code <= ' ' || code > '~' || code == '%' || code == '&' || code == '\\' || code == '"' || code '@') {
+            if (code <= ' ' || code > '~' || code == '%' || code == '&' || code == '\\' || code == '"' || code == '@') {
                 p.Message(code + " must be a standard ASCII character.");
                 p.Message("It also cannot be a space, percentage, ampersand, backslash, at symbol, or double quotes.");
                 return;
