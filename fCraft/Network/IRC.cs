@@ -647,7 +647,7 @@ namespace fCraft
                 string nick = ActualBotNick.ToLower();
                 bool elapsed = DateTime.UtcNow.Subtract(lastIrcCommand).TotalSeconds > 5;
                 
-                if (rawCmd == "!players" || rawCmd == rawCmd + " players") {
+                if (rawCmd == "!players" || rawCmd == nick + " players") {
                     if (!elapsed) return true;
                     var visiblePlayers = Server.Players.Where(p => !p.Info.IsHidden)
                         .OrderBy(p => p.Name).ToArray();
