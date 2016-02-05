@@ -14,6 +14,7 @@ using fCraft.Events;
 using fCraft.MapConversion;
 using JetBrains.Annotations;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 
 namespace fCraft {
     /// <summary> Represents a connection to a Minecraft client. Handles low-level interactions (e.g. networking). </summary>
@@ -21,9 +22,10 @@ namespace fCraft {
         public static int SocketTimeout { get; set; }
         public static bool RelayAllUpdates { get; set; }
         const int SleepDelay = 5; // milliseconds
-        const int SocketPollInterval = 200; // multiples of SleepDelay, approx. 1 second
-        const int PingInterval = 3; // multiples of SocketPollInterval, approx. 3 seconds
+        const int SocketPollInterval = 100; // multiples of SleepDelay, approx. 1 second
+        const int PingInterval = 1; // multiples of SocketPollInterval, approx. 3 seconds
         public DateTime LastZoneNotification = DateTime.UtcNow;
+        public Stopwatch pingTimer = new Stopwatch();
 
         const string NoSmpMessage = "Only ClassicalSharp clients work!";
 
@@ -155,6 +157,8 @@ namespace fCraft {
                         }
                         if( pingCounter > PingInterval ) {
                             writer.Write( OpCode.Ping );
+                            pingTimer.Reset();
+                            pingTimer.Start();
                             BytesSent++;
                             pingCounter = 0;
                             MeasureBandwidthUseRates();
@@ -251,7 +255,7 @@ namespace fCraft {
                                 break;
 
                             case OpCode.Ping:
-                                BytesReceived++;
+                                ProcessPingPacket();
                                 continue;
 
                             default:
@@ -289,6 +293,23 @@ namespace fCraft {
             }
         }
         #endregion
+
+        public void ProcessPingPacket() {
+            pingTimer.Stop();
+            int total = 0;
+            for( int i = 0; i < 10; i++) {
+                if (i == 9) {
+                    Info.PingList[i] = (int)pingTimer.ElapsedMilliseconds;
+                } else {
+                    Info.PingList[i] = Info.PingList[i + 1];
+                }
+                total += Info.PingList[i];
+            }
+            if (!IsPlayingCTF) {
+                Message((byte)MessageType.BottomRight3, "&sPing: &f{0}&sms Avg: &f{1}&fms", Info.PingList[9], Info.PingList.Average());
+            }
+            BytesReceived++;
+        }
 
         bool ProcessMessagePacket() {
             BytesReceived += 66;
