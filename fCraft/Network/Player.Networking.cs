@@ -306,7 +306,7 @@ namespace fCraft {
                 total += Info.PingList[i];
             }
             if (!IsPlayingCTF) {
-                Message((byte)MessageType.BottomRight3, "&sPing: &f{0}&sms Avg: &f{1}&fms", Info.PingList[9], Info.PingList.Average());
+                Message((byte)MessageType.BottomRight3, "&SPing: &f{0}&Sms Avg: &f{1}&Sms", Info.PingList[9], Info.PingList.Average());
             }
             BytesReceived++;
         }

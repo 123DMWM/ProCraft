@@ -2443,7 +2443,7 @@ namespace fCraft {
             int pad = string.Format("Ping: {0}ms Avg: {1:N0}ms", playerList[0].Info.PingList[9], playerList[0].Info.PingList.Average()).Length;
             player.Message("&SPing/Latency List:");
             for (int i = 0; i < playerList.Count(); i++) {
-                value = string.Format("Ping: {0}ms Avg: {1:N0}ms", playerList[0].Info.PingList[9], playerList[0].Info.PingList.Average());
+                value = string.Format("Ping: {0}ms Avg: {1:N0}ms", playerList[i].Info.PingList[9], playerList[i].Info.PingList.Average());
                 player.Message(" &7{1}&s - {0}", playerList[i].Info.ClassyName, value.PadLeft(pad, '0'));
             }
             player.Message("Showing players {0}-{1} (out of {2}).", offset + 1, offset + playerList.Length, visiblePlayers.Count());
