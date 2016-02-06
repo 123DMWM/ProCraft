@@ -530,7 +530,7 @@ namespace fCraft
             } else {
                 player.Message("&IInternet Relayed Chat information");
                 player.Message(" IRC Network: &f{0}", ConfigKey.IRCBotNetwork.GetString());
-                player.Message(" Network Channel/s: ");
+                player.Message(" Network Channel/s: (please wait 1 second for updates)");
                 IRC.SendRawMessage(IRCCommands.Names(ConfigKey.IRCBotChannels.GetString()),"","");
                 Scheduler.NewTask(t => sendChannelUsers(player)).RunManual(TimeSpan.FromSeconds(1));
             }
