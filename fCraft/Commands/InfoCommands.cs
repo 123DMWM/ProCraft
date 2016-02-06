@@ -44,8 +44,7 @@ namespace fCraft {
             CommandManager.RegisterCommand( Cdclp );
             CommandManager.RegisterCommand( CdGeoip );
             CommandManager.RegisterCommand( CdGeoipNp );
-            CommandManager.RegisterCommand( CdApiPlayer );
-            CommandManager.RegisterCommand( CdApiID );
+            CommandManager.RegisterCommand( CdApi );
             CommandManager.RegisterCommand( CdPlugin );
             CommandManager.RegisterCommand( CdPingList );
 
@@ -2184,24 +2183,49 @@ namespace fCraft {
 		}
 
         #endregion
-        #region API Player
+        #region API
 
-        static readonly CommandDescriptor CdApiPlayer = new CommandDescriptor {
-            Name = "apiplayer",
-            Aliases = new[] { "apip"},
+        static readonly CommandDescriptor CdApi = new CommandDescriptor {
+            Name = "classicubeapi",
+            Aliases = new[] { "ccapi", "api"},
             Category = CommandCategory.New | CommandCategory.Info,
             IsConsoleSafe = true,
-            Usage = "/apip playername",
-            Help = "Prints the api information about a player using classicube api",
+            Usage = "/api [(id/i)/(player/p)] [playername/id]",
+            Help = "Prints the api information about a player/id using classicube api" +
+                   "Examples: /api i 106, /api p 123DontMessWitMe",
             Handler = APIPInfoHandler
         };
 
         private static void APIPInfoHandler(Player player, CommandReader cmd) {
-            string name = cmd.Next();
-            if (name == null) {
-                name = player.Name;
+            string type = cmd.Next();
+            if (string.IsNullOrEmpty(type)) {
+                player.Message(CdApi.Usage);
+                return;
             }
-            string data = Server.downloadDatastring("http://www.classicube.net/api/player/" + name);
+            string value = cmd.Next();
+            if (value == null) {
+                value = "player/" + player.Name;
+            }
+            int id;
+            switch (type.ToLower()) {
+                case "id":
+                case "i":
+                    if (!int.TryParse(value, out id)) {
+                        player.Message("ID not valid integer!");
+                        return;
+                    } else {
+                        value = "id/" + id;
+                    }
+                    break;
+                case "player":
+                case "p":
+                    value = "player/" + value;
+                    break;
+                default:
+                    value = "player/" + player.Name;
+                    break;
+            }
+            string data = Server.downloadDatastring("http://www.classicube.net/api/" + value);
             if (string.IsNullOrEmpty(data) || !data.Contains("username")) {
                 player.Message("Player not found!");
                 return;
@@ -2228,8 +2252,8 @@ namespace fCraft {
                 flags2 = flags2 + "ClassiCube Blog Editor, ";
             }
             flags2 = flags2.Remove(flags2.Length - 2, 2);
-            string id;
-            result.TryGetValue("id", out id);
+            string uid;
+            result.TryGetValue("id", out uid);
             string premium;
             result.TryGetValue("premium", out premium);
             string registered1;
@@ -2249,82 +2273,7 @@ namespace fCraft {
             player.Message("API info about {0}", username);
             player.Message("  Flags: {0} {1}", flags2,
                 flags1.Replace("\n", "").Replace("\r", "").Replace("\"", "").Replace(" ", ""));
-            player.Message("  ID: {0}", id);
-            player.Message("  Premium*: {0}", premium);
-            player.Message("  Registered: {0} at {1} UTC", registered3.ToLongDateString(),
-                registered3.ToLongTimeString());
-            player.Message("* = Ignore for now ");
-        }
-
-        #endregion
-        #region API ID
-
-        static readonly CommandDescriptor CdApiID = new CommandDescriptor {
-            Name = "apiid",
-            Aliases = new[] { "apid" },
-            Category = CommandCategory.New | CommandCategory.Info,
-            IsConsoleSafe = true,
-            Usage = "/apid id",
-            Help = "Prints the api information about a player id using classicube api",
-            Handler = APIDInfoHandler
-        };
-
-        private static void APIDInfoHandler(Player player, CommandReader cmd) {
-            string id1 = cmd.Next();
-            int id2;
-            if (!int.TryParse(id1, out id2)) {
-                player.Message("ID not valid integer!");
-                return;
-            }
-            string data = Server.downloadDatastring("http://www.classicube.net/api/id/" + id2);
-            if (string.IsNullOrEmpty(data) || !data.Contains("username")) {
-                player.Message("ID not found!");
-                return;
-            }
-            JsonObject result = JsonObject.Parse(data);
-            string error;
-            result.TryGetValue("error", out error);
-            string flags1;
-            result.TryGetValue("flags", out flags1);
-            string flags2 = "ClassiCube User, ";
-            if (flags1.Contains('b')) {
-                flags2 = flags2 + "Banned from forums, ";
-            }
-            if (flags1.Contains('a')) {
-                flags2 = flags2 + "Forum Administrator, ";
-            }
-            if (flags1.Contains('m')) {
-                flags2 = flags2 + "Forum Moderator, ";
-            }
-            if (flags1.Contains('d')) {
-                flags2 = flags2 + "ClassiCube Developer, ";
-            }
-            if (flags1.Contains('e')) {
-                flags2 = flags2 + "ClassiCube Blog Editor, ";
-            }
-            flags2 = flags2.Remove(flags2.Length - 2, 2);
-            string id;
-            result.TryGetValue("id", out id);
-            string premium;
-            result.TryGetValue("premium", out premium);
-            string registered1;
-            result.TryGetValue("registered", out registered1);
-            double registered2;
-            double.TryParse(registered1, out registered2);
-            var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-            DateTime registered3 = epoch.AddSeconds(registered2);
-            string username;
-            result.TryGetValue("username", out username);
-
-            if (error.ToLower().Equals("user not found")) {
-                player.Message("User not found!");
-                return;
-            }
-
-            player.Message("API info about {0}", username);
-            player.Message("  Flags: {0} {1}", flags2,
-                flags1.Replace("\n", "").Replace("\r", "").Replace("\"", "").Replace(" ", ""));
-            player.Message("  ID: {0}", id);
+            player.Message("  ID: {0}", uid);
             player.Message("  Premium*: {0}", premium);
             player.Message("  Registered: {0} at {1} UTC", registered3.ToLongDateString(),
                 registered3.ToLongTimeString());
