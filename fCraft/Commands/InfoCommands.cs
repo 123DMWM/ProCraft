@@ -47,6 +47,7 @@ namespace fCraft {
             CommandManager.RegisterCommand( CdApiPlayer );
             CommandManager.RegisterCommand( CdApiID );
             CommandManager.RegisterCommand( CdPlugin );
+            CommandManager.RegisterCommand( CdPingList );
 
         }
         #region Debug
@@ -2059,6 +2060,7 @@ namespace fCraft {
                     player.Message("    (Use &h/TPP X Y Z R L&s)");
                 }
             }
+            player.Message("  &sPing: &f{0}&sms Avg: &f{1}&fms", info.PingList[9], info.PingList.Average());
         }
 
         #endregion
@@ -2413,8 +2415,43 @@ namespace fCraft {
 			player.Message(String.Join(", ", plugins));
 		}
 		#endregion
+        #region PingList
+
+        static readonly CommandDescriptor CdPingList = new CommandDescriptor {
+            Name = "PingList",
+            Aliases = new[] { "Ping", "Latency" },
+            Category = CommandCategory.New | CommandCategory.Info,
+            IsConsoleSafe = true,
+            Usage = "/PingList",
+            Help = "Lists all players and their ping latency value",
+            Handler = PingListHandler
+        };
+
+        static void PingListHandler(Player player, CommandReader cmd) {
+            string offsetStr = cmd.Next();
+            string value;
+            int offset = 0;
+            if (!int.TryParse(offsetStr, out offset)) {
+                offset = 0;
+            }
+            Player[] visiblePlayers = Server.Players.Where(p => p.Info.PingList.Average() != 0 && player.CanSee(p)).OrderBy(p => p.Info.PingList.Average()).Reverse().ToArray();
+            if (visiblePlayers.Count() < 1) {
+                player.Message("No players online right now");
+                return;
+            }
+            Player[] playerList = visiblePlayers.Skip(fixOffset(offset, visiblePlayers.Count())).Take(10).ToArray();
+            int pad = string.Format("Ping: {0}ms Avg: {1:N0}ms", playerList[0].Info.PingList[9], playerList[0].Info.PingList.Average()).Length;
+            player.Message("&SPing/Latency List:");
+            for (int i = 0; i < playerList.Count(); i++) {
+                value = string.Format("Ping: {0}ms Avg: {1:N0}ms", playerList[i].Info.PingList[9], playerList[i].Info.PingList.Average());
+                player.Message(" &7{1}&s - {0}", playerList[i].Info.ClassyName, value.PadLeft(pad, '0'));
+            }
+            player.Message("Showing players {0}-{1} (out of {2}).", offset + 1, offset + playerList.Length, visiblePlayers.Count());
+        }
+
+        #endregion
         #region FindPlayerInfo
-		public static PlayerInfo FindPlayerInfo(Player player, CommandReader cmd, [CanBeNull] String cname) {
+        public static PlayerInfo FindPlayerInfo(Player player, CommandReader cmd, [CanBeNull] String cname) {
 			string name = null;
 			if (cname != "") {
 				name = cname;

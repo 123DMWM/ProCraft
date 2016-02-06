@@ -161,6 +161,9 @@ namespace fCraft {
         public bool ClassicubeVerified = true;
 
 
+        public List<int> PingList = new List<int> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
+
         #region Rank
 
         /// <summary> Player's current rank. </summary>
