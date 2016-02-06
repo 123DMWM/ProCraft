@@ -589,7 +589,7 @@ namespace fCraft {
                     break;
                 case 8:
                     if (bool.TryParse(args, out boolVal)) {
-                        if (player.Supports(CpeExt.BlockDefinitionsExt)) {
+                        if (player.Supports(CpeExt.BlockDefinitionsExt) || player.Supports(CpeExt.BlockDefinitionsExt2)) {
                             step = 16;
                         } else {
                             step++;
