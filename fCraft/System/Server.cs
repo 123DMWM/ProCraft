@@ -1549,8 +1549,10 @@ namespace fCraft {
                 if (!p.IsPlayingCTF) {
                     foreach (Player pl in canSee) {
                         if (!pl.Supports(CpeExt.ExtPlayerList) && !pl.Supports(CpeExt.ExtPlayerList2)) continue;
+                        
+                        IEnumerable<Player> plCanSee = Players.Where(other => pl.CanSee(other)).ToArray();
                         pl.Send(Packet.MakeExtAddPlayerName(
-                            p.NameID, p.Name, nick, group, (byte)p.Info.Rank.Index, pl.UseFallbackColors));
+                            p.NameID, p.Name, nick, GetGroup(p, plCanSee), (byte)p.Info.Rank.Index, pl.UseFallbackColors));
                     }
                 } else {
                     var canBeSeenW = p.World.Players.Where(pl => pl.CanSee(p)).ToArray();
