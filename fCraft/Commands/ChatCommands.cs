@@ -919,14 +919,18 @@ namespace fCraft
             IsConsoleSafe = true,
             Permissions = new[] { Permission.ShutdownServer },
             Category = CommandCategory.Chat,
-            Usage = "/Filter <(add|create)|(remove|delete)> <Word> <Replacement>",
-            Help = "Adds or removes a word and it's replacement to the filter",
+            Usage = "/Filter {option} {args}",
+            Help = "Adds or removes a word and it's replacement to the filter" + 
+                "Options: Add, Edit, Remove",
             HelpSections = new Dictionary<string, string> {
                 { "add",  "&H/Filter add <Word> <Replacement>&n&S" +
                             "Adds a Word and it's replacement to the filter list. " },
+                { "edit",  "&H/Filter edit <filterID> [word/replacement] [new string]&n&S" +
+                            "Edits a filter with the given ID number. " +
+                            "To see a list of filters and their IDs, type &H/filters" },
                 { "remove",  "&H/Filter remove <filterID>&n&S" +
                             "Removes a filter with the given ID number. " +
-                            "To see a list of filters and their IDs, type &H/filterlist" }
+                            "To see a list of filters and their IDs, type &H/filters" }
             },
             Handler = SwearHandler
         };
@@ -990,6 +994,49 @@ namespace fCraft
                     } else {
                         player.Message("A filter with that world already exists!");
                     }
+                    break;
+                case "edit":
+                case "change":
+                    int eId;
+                    if (cmd.NextInt(out eId)) {
+                        string option = cmd.Next() ?? "n/a";
+                        string eString = cmd.NextAll();
+                        Filter newf = new Filter();
+                        string oldWord, oldReplacement;
+                        Filter[] oldFilter = Chat.Filters.Where(f => f.Id == eId).ToArray();
+                        if (oldFilter[0] != null) {
+                            if (oldFilter[0].Id == eId) {
+                                oldWord = oldFilter[0].Word;
+                                oldReplacement = oldFilter[0].Replacement;
+                                if (string.IsNullOrEmpty(eString)) {
+                                    CdSwear.PrintUsage(player);
+                                    break;
+                                }
+                                switch (option.ToLower()) {
+                                    case "word":
+                                    case "w":
+                                        Server.Message("&Y[Filters] {0}&Y edited a filter from &n(\"{1}\" -> \"{2}\") &nto (\"{3}\" -> \"{2}\")",
+                                            player.ClassyName, oldWord, oldReplacement, eString);
+                                        oldFilter[0].removeFilter();
+                                        newf.addFilter(eId, eString, oldReplacement);
+                                        break;
+                                    case "replacement":
+                                    case "r":
+                                        Server.Message("&Y[Filters] {0}&Y edited a filter from &n(\"{1}\" -> \"{2}\") &nto (\"{1}\" -> \"{3}\")",
+                                        player.ClassyName, oldWord, oldReplacement, eString);
+                                        oldFilter[0].removeFilter();
+                                        newf.addFilter(eId, oldWord, eString);
+                                        break;
+                                    default:
+                                        CdSwear.PrintUsage(player);
+                                        break;
+                                }
+                            }
+                        }
+                    } else {
+                        CdSwear.PrintUsage(player);
+                    }
+
                     break;
                 default:
                     CdSwear.PrintUsage(player);
