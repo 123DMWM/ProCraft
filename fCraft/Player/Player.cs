@@ -612,6 +612,9 @@ namespace fCraft {
 
 				case RawMessageType.LongerMessage:
 					partialMessage = rawMessage.Substring(0, rawMessage.Length - 1);
+                    if (!partialMessage.EndsWith(" ") && partialMessage.Length != 64) {
+                        partialMessage = partialMessage + " ";
+                    }
 					break;
 
                 case RawMessageType.Invalid:
