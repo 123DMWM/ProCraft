@@ -8,9 +8,9 @@ using System.Resources;
 [assembly: AssemblyTitle( "ProCraft HeartbeatSaver" )]
 [assembly: AssemblyDescription( "ProCraft standalone heartbeat sender" )]
 [assembly: AssemblyConfiguration( "" )]
-[assembly: AssemblyCompany( "fCraft.net" )]
+[assembly: AssemblyCompany("123DMWM.tk")]
 [assembly: AssemblyProduct( "ProCraft HeartbeatSaver" )]
-[assembly: AssemblyCopyright( "fCraft is Copyright © Matvei Stefarov 2009-2012 (matvei.org)" )]
+[assembly: AssemblyCopyright("ProCraft is Copyright © Joseph Beauvais 2014-2015")]
 [assembly: AssemblyTrademark( "" )]
 [assembly: AssemblyCulture( "" )]
 
@@ -32,6 +32,6 @@ using System.Resources;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion( "0.6.3.2" )]
-[assembly: AssemblyFileVersion( "0.6.3.2" )]
+[assembly: AssemblyVersion("0.1.2.3")]
+[assembly: AssemblyFileVersion("0.1.2.3")]
 [assembly: NeutralResourcesLanguageAttribute( "en-US" )]
