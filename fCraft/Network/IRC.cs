@@ -760,9 +760,34 @@ namespace fCraft
                     }
                     lastIrcCommand = DateTime.UtcNow;
                     return true;
+                } else if (rawCmd.StartsWith("!clients") || rawCmd.StartsWith(nick + " clients")) {
+                    if (!elapsed) return true;
+                    
+                    var visiblePlayers = Server.Players.Where(p => !p.Info.IsHidden).OrderBy(p => p, PlayerListSorter.Instance).ToArray();
+
+                    Dictionary<string, List<Player>> clients = new Dictionary<string, List<Player>>();
+                    foreach (var p in visiblePlayers) {
+                        string appName = p.ClientName;
+                        if (string.IsNullOrEmpty(appName)) {
+                            appName = "(unknown)";
+                        }
+
+                        List<Player> usingClient;
+                        if (!clients.TryGetValue(appName, out usingClient)) {
+                            usingClient = new List<Player>();
+                            clients[appName] = usingClient;
+                        }
+                        usingClient.Add(p);
+                    }
+                    SendChannelMessage("\u212CPlayers using:");
+                    foreach (var kvp in clients) {
+                        SendChannelMessage("  &s\u212C{0}:&f \u211C{1}",
+                                       kvp.Key, kvp.Value.JoinToClassyString());
+                    }
+                    return true;
                 } else if (rawCmd == "!commands" || rawCmd == nick + " commands") {
                     if (!elapsed) return true;
-                    SendChannelMessage("\u212CList of commands: \u211CBD, Commands, Players, Seen, St, Time");
+                    SendChannelMessage("\u212CList of commands: \u211CBD, Commands, Clients, Players, Seen, St, Time");
                     lastIrcCommand = DateTime.UtcNow;
                     return true;
                 }
