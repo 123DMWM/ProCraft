@@ -838,6 +838,11 @@ namespace fCraft {
                 return false;
             }
 
+            if (!ClientName.ToLower().Contains("classicalsharp")) {
+                Message("&bIt is recommended that you use the ClassicalSharp client!");
+                Message("&9http://123dmwm.tk/cs &bredirects to the official download.");
+            }
+
 
             // Register player for future block updates
             if (!Server.RegisterPlayer(this))
