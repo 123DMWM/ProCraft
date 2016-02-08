@@ -1501,14 +1501,8 @@ namespace fCraft {
                             "{0}&s left the server ({1}).", player.Name, player.LeaveReason );
                 if (player.HasFullyConnected && ConfigKey.ShowConnectionMessages.Enabled())
                 {
-                    if (player.usedquit == false)
-                    {
-                        Players.CanSee(player).Message("{0}&s left the server.", player.ClassyName);
-                    }
-                    else if (player.usedquit == true)
-                    {
-                        Players.CanSee(player).Message("{0}&s left the server (Reason: {1})", player.ClassyName, player.quitmessage);
-                    }
+                    Players.Where(p => !p.IsStaff).CanSee(player).Message("{0}&s left the server{1}", player.ClassyName, player.usedquit ? " (Reason: " + player.quitmessage + ")" : "");
+                    Players.Where(p => p.IsStaff).CanSee(player).Message("{0}&s left the server (Reason: {1})", player.ClassyName, player.usedquit ? player.quitmessage : player.LeaveReason.ToString());
                 }
 
                 if( player.World != null ) {
