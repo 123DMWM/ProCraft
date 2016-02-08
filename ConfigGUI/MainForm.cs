@@ -1444,11 +1444,9 @@ Your rank is {RANK}&S. Type &H/Help&S for help." );
         void UpdateChatPreview() {
             List<string> lines = new List<string>();
             if( xShowConnectionMessages.Checked ) {
-                lines.Add( String.Format( "&SPlayer {0}{1}Facepalmed&S connected, joined {2}{3}main",
+                lines.Add( String.Format( "&2+(&f{0}{1}Facepalmed&2) Connected. &aUsing: ClassicalSharp Client",
                                           xRankColorsInChat.Checked ? RankManager.HighestRank.Color : "",
-                                          xRankPrefixesInChat.Checked ? RankManager.HighestRank.Prefix : "",
-                                          xRankColorsInWorldNames.Checked ? RankManager.LowestRank.Color : "",
-                                          xRankPrefixesInChat.Checked ? RankManager.LowestRank.Prefix : "" ) );
+                                          xRankPrefixesInChat.Checked ? RankManager.HighestRank.Prefix : "" ));
             }
             lines.Add( "&R<*- This is a random announcement -*>" );
             lines.Add( "&YSomeone wrote this message with /Say" );
@@ -1486,7 +1484,7 @@ Your rank is {RANK}&S. Type &H/Help&S for help." );
                                           Color.White));
             }
             if( xShowConnectionMessages.Checked ) {
-                lines.Add( String.Format( "&S{0}{1}Facepalmed&S left the server.",
+                lines.Add( String.Format( "&4-(&f{0}{1}Facepalmed&4) Disconnected",
                                           xRankColorsInChat.Checked ? RankManager.HighestRank.Color : "",
                                           xRankPrefixesInChat.Checked ? RankManager.HighestRank.Prefix : "" ) );
             }

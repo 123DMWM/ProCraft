@@ -1456,21 +1456,13 @@ namespace fCraft {
         }
 
 
-        public static string MakePlayerConnectedMessage( [NotNull] Player player, bool firstTime, [NotNull] World world ) {
+        public static string MakePlayerConnectedMessage( [NotNull] Player player, bool firstTime) {
             if( player == null ) throw new ArgumentNullException( "player" );
-            if (world == null)
-                throw new ArgumentNullException( "world" );
             UpdateTabList(true);
             if( firstTime ) {
-                return string.Format("&sPlease welcome {0}&S to the server!&n" + 
-                                     "&sThis is their first visit",
-                                      player.ClassyName);
+                return string.Format("&2+(&f{0}&2) Connected for their first time. &a{1}", player.ClassyName, string.IsNullOrEmpty(player.ClientName) ? "" : "Using: " + player.ClientName);
             } else {
-                return string.Format("&sPlease welcome back {0}&S to the server!&n" +
-                                     "&sThey joined {1} times for a total of {2:F1}h",
-                                      player.ClassyName,
-                                      player.Info.TimesVisited,
-                                      player.Info.TotalTime.TotalHours );
+                return string.Format("&2+(&f{0}&2) Connected. &a{1}", player.ClassyName, string.IsNullOrEmpty(player.ClientName) ? "" : "Using: " + player.ClientName);
             }
 
 
@@ -1481,7 +1473,7 @@ namespace fCraft {
 			if (player == null)
 				throw new ArgumentNullException("player");
 			UpdateTabList(true);
-            return String.Format("{0}&s left the server.", player.ClassyName);
+            return string.Format("&4-(&f{0}&4) Disconnected.", player.ClassyName);
 
         }
 
@@ -1498,11 +1490,11 @@ namespace fCraft {
                 player.Info.ProcessLogout( player );
 
                 Logger.Log( LogType.UserActivity,
-                            "{0}&s left the server ({1}).", player.Name, player.LeaveReason );
+                            "{0} &4disconnected &s({1}).", player.Name, player.LeaveReason );
                 if (player.HasFullyConnected && ConfigKey.ShowConnectionMessages.Enabled())
                 {
-                    Players.Where(p => !p.IsStaff).CanSee(player).Message("{0}&s left the server{1}", player.ClassyName, player.usedquit ? " (Reason: " + player.quitmessage + ")" : "");
-                    Players.Where(p => p.IsStaff).CanSee(player).Message("{0}&s left the server (Reason: {1})", player.ClassyName, player.usedquit ? player.quitmessage : player.LeaveReason.ToString());
+                    Players.Where(p => !p.IsStaff).CanSee(player).Message("{0}{1}", MakePlayerDisconnectedMessage(player), player.usedquit ? " &cReason: " + player.quitmessage : "");
+                    Players.Where(p => p.IsStaff).CanSee(player).Message("{0} &cReason: {1}", MakePlayerDisconnectedMessage(player), player.usedquit ? player.quitmessage : player.LeaveReason.ToString());
                 }
 
                 if( player.World != null ) {

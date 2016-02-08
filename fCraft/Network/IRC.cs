@@ -1225,10 +1225,8 @@ namespace fCraft
             if (e == null) throw new ArgumentNullException("e");
             if (ConfigKey.IRCBotAnnounceServerJoins.Enabled() && !e.Player.Info.IsHidden)
             {
-                string message = String.Format("{0}&SPlayer {1}&S connected. On world {2}",
-                                                BoldCode,
-                                                e.Player.ClassyName,
-                                                e.Player.World.ClassyName);
+                string message = string.Format("{0}{1}", BoldCode, 
+                    Server.MakePlayerConnectedMessage(e.Player, (e.Player.Info.TimesVisited == 1)));
                 SendChannelMessage(message);
             }
         }
@@ -1288,9 +1286,9 @@ namespace fCraft
         static void ShowPlayerDisconnectedMsg([NotNull] Player player, LeaveReason leaveReason)
         {
             if (player == null) throw new ArgumentNullException("player");
-            string message = String.Format("{0}&SPlayer {1}&S left the server ({2})",
+            string message = string.Format("{0}{1} &c({2})",
                                             BoldCode,
-                                            player.ClassyName,
+                                            Server.MakePlayerDisconnectedMessage(player),
                                             (player.usedquit ? player.quitmessage : leaveReason.ToString()));
             SendChannelMessage(message);
         }

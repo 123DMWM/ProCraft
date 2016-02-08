@@ -1108,10 +1108,10 @@ namespace fCraft {
 			if (!silent && ConfigKey.ShowConnectionMessages.Enabled()) {
 				if (!quitMessage.Equals("")) {
 					player.quitmessage = quitMessage;
-					quitMessage = String.Format(" (Reason: {0})", player.quitmessage);
+					quitMessage = String.Format(" &s(Reason: {0})", player.quitmessage);
 					player.usedquit = true;
 				}
-				Server.Players.CantSee(player).Message("{0}&s left the server.{1}", player.ClassyName, quitMessage);
+				Server.Players.CantSee(player).Message(Server.MakePlayerDisconnectedMessage(player) + quitMessage);
 			}
 
 			// for aware players: notify
@@ -1166,7 +1166,7 @@ namespace fCraft {
             if (!silent) {
                 if (ConfigKey.ShowConnectionMessages.Enabled()) {
                     player.Info.GeoipLogin();
-                    string msg = Server.MakePlayerConnectedMessage(player, false, playerWorld);
+                    string msg = Server.MakePlayerConnectedMessage(player, false);
                     Server.Players.CantSee(player).Message(msg);
                 }
             }

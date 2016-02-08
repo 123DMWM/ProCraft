@@ -1031,7 +1031,7 @@ namespace fCraft
             player.quitmessage = (Msg.Length > 70 ? Msg.Remove(70) : Msg);
             player.SendNow(Packet.MakeKick(Msg));
             Logger.Log(LogType.UserActivity,
-                        "{0} left the server. Reason: {1}", player.Name, player.quitmessage);
+                        "{0} disconnected. Reason: {1}", player.Name, player.quitmessage);
         }
         #endregion
         #region RBChat
