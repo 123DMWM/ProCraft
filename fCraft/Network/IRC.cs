@@ -1225,8 +1225,7 @@ namespace fCraft
             if (e == null) throw new ArgumentNullException("e");
             if (ConfigKey.IRCBotAnnounceServerJoins.Enabled() && !e.Player.Info.IsHidden)
             {
-                string message = string.Format("{0}{1}", BoldCode, 
-                    Server.MakePlayerConnectedMessage(e.Player, (e.Player.Info.TimesVisited == 1)));
+                string message = string.Format("{0}&2+(&f{1}&2) Connected{2}.", BoldCode, e.Player.ClassyName, e.Player.Info.TimesVisited == 1 ? " for their first time" : "");
                 SendChannelMessage(message);
             }
         }
