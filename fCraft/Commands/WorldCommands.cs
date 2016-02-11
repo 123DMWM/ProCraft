@@ -2167,6 +2167,10 @@ namespace fCraft {
         };
 
         static void WorldAccessHandler( [NotNull] Player player, CommandReader cmd ) {
+            HandleWorldAccess( player, cmd, true );
+        }
+        
+        static void HandleWorldAccess( [NotNull] Player player, CommandReader cmd, bool checkSelf ) {
             if( player == null ) throw new ArgumentNullException( "player" );
             string worldName = cmd.Next();
 
@@ -2225,11 +2229,11 @@ namespace fCraft {
 
                 // Whitelisting individuals
                 if( nextToken.StartsWith( "+" ) ) {
-                    PlayerInfo info = PlayerDB.FindPlayerInfoOrPrintMatches( player, nextToken.Substring( 1 ), SearchOptions.Default );
+                    PlayerInfo info = PlayerDB.FindPlayerInfoOrPrintMatches( player, nextToken.Substring( 1 ), SearchOptions.IncludeSelf );
                     if( info == null ) return;
 
                     // prevent players from whitelisting themselves to bypass protection
-                    if (player.Info == info && !player.Info.Rank.AllowSecurityCircumvention)
+                    if (player.Info == info && checkSelf && !player.Info.Rank.AllowSecurityCircumvention)
                     {
                         switch( world.AccessSecurity.CheckDetailed( player.Info ) ) {
                             case SecurityCheckResult.RankTooLow:
@@ -2429,8 +2433,12 @@ namespace fCraft {
                    "To clear whitelist, use \"-*\". To clear blacklist use \"+*\"",
             Handler = WorldBuildHandler
         };
-
+        
         static void WorldBuildHandler( [NotNull] Player player, CommandReader cmd ) {
+            HandleWorldBuild( player, cmd, true );
+        }
+
+        static void HandleWorldBuild( [NotNull] Player player, CommandReader cmd, bool checkSelf ) {
             if( player == null ) throw new ArgumentNullException( "player" );
             string worldName = cmd.Next();
 
@@ -2493,11 +2501,11 @@ namespace fCraft {
 
                 // Whitelisting individuals
                 if( nextToken.StartsWith( "+" ) ) {
-                    PlayerInfo info = PlayerDB.FindPlayerInfoOrPrintMatches(player, nextToken.Substring(1), SearchOptions.Default);
+                    PlayerInfo info = PlayerDB.FindPlayerInfoOrPrintMatches(player, nextToken.Substring(1), SearchOptions.IncludeSelf);
                     if( info == null ) return;
 
                     // prevent players from whitelisting themselves to bypass protection
-                    if (player.Info == info && !player.Info.Rank.AllowSecurityCircumvention)
+                    if (player.Info == info && checkSelf && !player.Info.Rank.AllowSecurityCircumvention)
                     {
                         switch( world.BuildSecurity.CheckDetailed( player.Info ) ) {
                             case SecurityCheckResult.RankTooLow:
@@ -4112,588 +4120,206 @@ namespace fCraft {
 
         private static void MWHandler(Player player, CommandReader cmd) {
             switch (cmd.Next()) {
-                    #region Create
-
                 case "create":
                 case "c":
-                    string sizeStringc = cmd.Next();
-                    int sizec;
-                    if (sizeStringc == null) {
-                        sizeStringc = "Normal";
-                    }
-                    switch (sizeStringc.ToLower()) {
-                        case "64":
-                        case "tiny":
-                            sizec = 64;
-                            sizeStringc = "Tiny";
-                            break;
-                        case "128":
-                        case "normal":
-                            sizec = 128;
-                            sizeStringc = "Normal";
-                            break;
-                        case "256":
-                        case "large":
-                            sizec = 256;
-                            sizeStringc = "Large";
-                            break;
-                        case "512":
-                        case "huge":
-                            sizec = 512;
-                            sizeStringc = "Huge";
-                            break;
-                        default:
-                            sizec = 128;
-                            sizeStringc = "Normal";
-                            break;
-                    }
-                    World[] totalc = WorldManager.FindWorlds(Player.Console, "PW_" + player.Name + "_");
-                    if (totalc.Count() >= player.Info.Rank.MaxPersonalWorlds &&
-                        player.Info.Rank != RankManager.HighestRank) {
-                        player.Message("You can only have a maximum of {0} personal worlds. Sorry!",
-                            player.Info.Rank.MaxPersonalWorlds);
-                        break;
-                    }
-                    string worldNamec = string.Format("PW_{0}_{1}", player.Name,
-                        (totalc.Any()) ? "" + (totalc.Count() + 1) : "1");
-                    player.Message("Creating your {0}({1}) personal world: {2}", sizeStringc, sizec, worldNamec);
-                    Map map = MapGenerator.GenerateFlatgrass(sizec, sizec, sizec);
-                    Server.RequestGC();
-                    if (map.Save("./Maps/" + worldNamec + ".fcm")) {
-                        player.Message("Done!. Saved to {0}.fcm", worldNamec);
-                    } else {
-                        player.Message("&WAn error occurred while saving generated map to {0}.fcm", worldNamec);
-                    }
-                    Rank buildRank = RankManager.HighestRank;
-                    Rank accessRank = RankManager.HighestRank;
-                    lock (WorldManager.SyncRoot) {
-                        World newWorld;
-                        try {
-                            newWorld = WorldManager.AddWorld(player, worldNamec, map, false);
-                        } catch (WorldOpException ex) {
-                            player.Message("WLoad: {0}", ex.Message);
-                            break;
-                        }
-
-                        player.LastUsedWorldName = worldNamec;
-                        newWorld.BuildSecurity.MinRank = buildRank;
-                        if (accessRank == null) {
-                            newWorld.AccessSecurity.ResetMinRank();
-                        } else {
-                            newWorld.AccessSecurity.MinRank = accessRank;
-                        }
-                        newWorld.BlockDB.AutoToggleIfNeeded();
-                        newWorld.LoadedBy = player.Name;
-                        newWorld.LoadedOn = DateTime.UtcNow;
-                        newWorld.IsHidden = true;
-                        Logger.Log(LogType.UserActivity,
-                            "{0} {1} &screated a new world named \"{2}\" (loaded from \"{3}\")", player.Info.Rank.Name,
-                            player.Name, worldNamec, worldNamec);
-                        newWorld.AccessSecurity.Include(player.Info);
-                        newWorld.BuildSecurity.Include(player.Info);
-                        WorldManager.SaveWorldList();
-                    }
-                    Server.RequestGC();
-                    break;
-
-                    #endregion
-
-                    #region Reset
-
+                    MWCreate(player, cmd); break;
                 case "reset":
                 case "r":
-                    string wNumberStringr = cmd.Next();
-                    int wNumberr;
-                    if (!int.TryParse(wNumberStringr, out wNumberr)) {
-                        wNumberr = 1;
-                    }
-                    string mapFiler = WorldManager.FindMapFile(Player.Console, "PW_" + player.Name + "_" + wNumberr);
-                    if (mapFiler == null) {
-                        player.Message("You have no personal worlds by that number: {0}", wNumberr);
-                        break;
-                    }
-                    if (!cmd.IsConfirmed) {
-                        player.Confirm(cmd,
-                            "This will reset your personal world: " + "  PW_" + player.Name + "_" + wNumberr + "&n" +
-                            "&cThis cannot be undone!");
-                        break;
-                    }
-                    World worldr = WorldManager.FindWorldExact("PW_" + player.Name + "_" + wNumberr);
-                    map = MapGenerator.GenerateFlatgrass(worldr.map.Width, worldr.map.Length, worldr.map.Height);
-                    worldr.MapChangedBy = player.Name;
-                    worldr.ChangeMap(map);
-                    player.Message("Your personal world({0}) has been reset to flatgrass!", wNumberr);
-                    Server.RequestGC();
-                    break;
-
-                    #endregion
-
-                    #region Delete
-
+                    MWReset(player, cmd); break;
                 case "delete":
                 case "d":
                 case "remove":
-                    string wNumberStringd = cmd.Next();
-                    int wNumberd;
-                    if (!int.TryParse(wNumberStringd, out wNumberd)) {
-                        wNumberd = 1;
-                    }
-                    string mapFiled = WorldManager.FindMapFile(Player.Console, "PW_" + player.Name + "_" + wNumberd);
-                    if (mapFiled == null) {
-                        player.Message("You have no personal worlds by that number: {0}", wNumberd);
-                        break;
-                    }
-                    if (!cmd.IsConfirmed) {
-                        player.Confirm(cmd,
-                            "This will delete your personal world: " + "  PW_" + player.Name + "_" + wNumberd + "&n" +
-                            "&cThis cannot be undone!");
-                        break;
-                    }
-                    World worldd = WorldManager.FindWorldExact("PW_" + player.Name + "_" + wNumberd);
-                    if (worldd != null) WorldManager.RemoveWorld(worldd);
-                    if (File.Exists("./maps/PW_" + player.Name + "_" + wNumberd + ".fcm")) {
-                        File.Delete("./maps/PW_" + player.Name + "_" + wNumberd + ".fcm");
-                    }
-                    player.Message("Your personal world({0}) has been deleted!", wNumberd);
-                    Server.RequestGC();
-                    break;
-
-                    #endregion
-
-                    #region Join
-
+                    MWDelete(player, cmd); break;
                 case "j":
-                case "join":
-                    string wNumberStringj = cmd.Next();
-                    int wNumberj;
-                    if (!int.TryParse(wNumberStringj, out wNumberj)) {
-                        wNumberj = 1;
-                    }
-                    string playerStringj = cmd.Next();
-                    PlayerInfo playerj = null;
-                    if (playerStringj != null) {
-                        playerj = PlayerDB.FindPlayerInfoOrPrintMatches(player, playerStringj, SearchOptions.Default);
-                    }
-                    string mapFilej = WorldManager.FindMapFile(Player.Console,
-                        "PW_" + ((playerj == null) ? player.Name : playerj.Name) + "_" + wNumberj);
-                    if (mapFilej == null) {
-                        player.Message("{0} no personal worlds by that number: {1}",
-                            (playerj == null) ? "You have" : "There are", wNumberj);
-                        break;
-                    }
-                    World worldj =
-                        WorldManager.FindWorldExact("PW_" + ((playerj == null) ? player.Name : playerj.Name) + "_" +
-                                                    wNumberj);
-                    if (worldj != null && player.CanJoin(worldj)) {
-                        player.JoinWorld(worldj, WorldChangeReason.ManualJoin);
-                    } else {
-                        player.Message("You cannot join that world!");
-                    }
-
-                    break;
-
-                    #endregion
-
-                    #region BuildAccess
-
+                case "join":                    
+                    MWJoin(player, cmd); break;
                 case "buildaccess":
                 case "ba":
-                    string wNumberStringba = cmd.Next();
-                    string exceptionba = cmd.Next();
-                    int wNumberba;
-                    bool changesWereMade = false;
-                    if (!int.TryParse(wNumberStringba, out wNumberba)) {
-                        wNumberba = 1;
-                        exceptionba = wNumberStringba;
-                    }
-                    string mapFileba = WorldManager.FindMapFile(Player.Console, "PW_" + player.Name + "_" + wNumberba);
-                    if (mapFileba == null) {
-                        player.Message("You have no personal worlds by that number: {0}", wNumberba);
-                        break;
-                    }
-                    World worldba = WorldManager.FindWorldExact("PW_" + player.Name + "_" + wNumberba);
-                    if (exceptionba == null) {
-                        CdMyWorld.PrintUsage(player);
-                        break;
-                    }
-                    if (exceptionba.Equals("-*")) {
-                        PlayerInfo[] oldWhitelistba = worldba.BuildSecurity.ExceptionList.Included.ToArray();
-                        if (oldWhitelistba.Length > 0) {
-                            worldba.BuildSecurity.ResetIncludedList();
-                            player.Message("Build whitelist of personal world {0}&S cleared: {1}", worldba.ClassyName,
-                                oldWhitelistba.JoinToClassyString());
-                            Logger.Log(LogType.UserActivity,
-                                "{0} {1} &scleared build whitelist of personal world {2}: {3}", player.Info.Rank.Name,
-                                player.Name, worldba.Name, oldWhitelistba.JoinToString(pi => pi.Name));
-                            worldba.BuildSecurity.Include(player.Info);
-                        } else {
-                            player.Message("Build whitelist of personal world {0}&S is empty.", worldba.ClassyName);
-                        }
-                        goto saveba;
-                    }
-
-                    // Clear blacklist
-                    if (exceptionba.Equals("+*")) {
-                        PlayerInfo[] oldBlacklist = worldba.BuildSecurity.ExceptionList.Excluded.ToArray();
-                        if (oldBlacklist.Length > 0) {
-                            worldba.BuildSecurity.ResetExcludedList();
-                            player.Message("Build blacklist of personal world {0}&S cleared: {1}", worldba.ClassyName,
-                                oldBlacklist.JoinToClassyString());
-                            Logger.Log(LogType.UserActivity,
-                                "{0} {1} &scleared build blacklist of personal world {2}: {3}", player.Info.Rank.Name,
-                                player.Name, worldba.Name, oldBlacklist.JoinToString(pi => pi.Name));
-                        } else {
-                            player.Message("Build blacklist of personal world {0}&S is empty.", worldba.ClassyName);
-                        }
-                        goto saveba;
-                    }
-
-                    // Whitelisting individuals
-                    if (exceptionba.StartsWith("+")) {
-                        PlayerInfo info = PlayerDB.FindPlayerInfoOrPrintMatches(player, exceptionba.Substring(1),
-                            SearchOptions.Default);
-                        if (info == null) return;
-
-                        // prevent players from whitelisting themselves to bypass protection
-                        if (player.Info == info) {
-                            goto saveba;
-                        }
-
-                        if (worldba.BuildSecurity.Check(info)) {
-                            player.Message("{0}&S is already allowed to build in {1}", info.ClassyName,
-                                worldba.ClassyName);
-                            goto saveba;
-                        }
-
-                        Player target = info.PlayerObject;
-                        if (target == player) target = null; // to avoid duplicate messages
-
-                        switch (worldba.BuildSecurity.Include(info)) {
-                            case PermissionOverride.Deny:
-                                if (worldba.BuildSecurity.Check(info)) {
-                                    player.Message("{0}&S is no longer barred from building in {1}", info.ClassyName,
-                                        worldba.ClassyName);
-                                    if (target != null) {
-                                        target.Message(
-                                            "You can now build in personal world {0}&S (removed from blacklist by {1}&S).",
-                                            worldba.ClassyName, player.ClassyName);
-                                    }
-                                } else {
-                                    player.Message(
-                                        "{0}&S was removed from the build blacklist of {1}&S. " +
-                                        "Player is still NOT allowed to build.", info.ClassyName, worldba.ClassyName);
-                                    if (target != null) {
-                                        target.Message(
-                                            "You were removed from the build blacklist of world {0}&S by {1}&S. " +
-                                            "You are still NOT allowed to build.", worldba.ClassyName, player.ClassyName);
-                                    }
-                                }
-                                Logger.Log(LogType.UserActivity, "{0} removed {1} from the build blacklist of {2}",
-                                    player.Name, info.Name, worldba.Name);
-                                changesWereMade = true;
-                                break;
-
-                            case PermissionOverride.None:
-                                player.Message("{0}&S is now allowed to build in {1}", info.ClassyName,
-                                    worldba.ClassyName);
-                                if (target != null) {
-                                    target.Message("You can now build in world {0}&S (whitelisted by {1}&S).",
-                                        worldba.ClassyName, player.ClassyName);
-                                }
-                                Logger.Log(LogType.UserActivity,
-                                    "{0} added {1} to the build whitelist on personal world {2}", player.Name, info.Name,
-                                    worldba.Name);
-                                changesWereMade = true;
-                                break;
-
-                            case PermissionOverride.Allow:
-                                player.Message("{0}&S is already on the build whitelist of {1}", info.ClassyName,
-                                    worldba.ClassyName);
-                                break;
-                        }
-
-                        // Blacklisting individuals
-                    } else if (exceptionba.StartsWith("-")) {
-                        PlayerInfo info = PlayerDB.FindPlayerInfoOrPrintMatches(player, exceptionba.Substring(1),
-                            SearchOptions.Default);
-                        if (info == null) return;
-
-                        if (!worldba.BuildSecurity.Check(info)) {
-                            player.Message("{0}&S is already barred from building in {1}", info.ClassyName,
-                                worldba.ClassyName);
-                            goto saveba;
-                        }
-
-                        Player target = info.PlayerObject;
-                        if (target == player) target = null; // to avoid duplicate messages
-
-                        switch (worldba.BuildSecurity.Exclude(info)) {
-                            case PermissionOverride.Deny:
-                                player.Message("{0}&S is already on build blacklist of {1}", info.ClassyName,
-                                    worldba.ClassyName);
-                                break;
-
-                            case PermissionOverride.None:
-                                player.Message("{0}&S is now barred from building in {1}", info.ClassyName,
-                                    worldba.ClassyName);
-                                if (target != null) {
-                                    target.Message("&WYou were barred by {0}&W from building in personal world {1}",
-                                        player.ClassyName, worldba.ClassyName);
-                                }
-                                Logger.Log(LogType.UserActivity,
-                                    "{0} added {1} to the build blacklist on personal world {2}", player.Name, info.Name,
-                                    worldba.Name);
-                                changesWereMade = true;
-                                break;
-
-                            case PermissionOverride.Allow:
-                                if (worldba.BuildSecurity.Check(info)) {
-                                    player.Message(
-                                        "{0}&S is no longer on the build whitelist of {1}&S. " +
-                                        "Player is still allowed to build.", info.ClassyName, worldba.ClassyName);
-                                    if (target != null) {
-                                        target.Message(
-                                            "You were removed from the build whitelist of personal world {0}&S by {1}&S. " +
-                                            "You are still allowed to build.", worldba.ClassyName, player.ClassyName);
-                                    }
-                                } else {
-                                    player.Message("{0}&S is no longer allowed to build in {1}", info.ClassyName,
-                                        worldba.ClassyName);
-                                    if (target != null) {
-                                        target.Message(
-                                            "&WYou can no longer build in personal world {0}&W (removed from whitelist by {1}&W).",
-                                            worldba.ClassyName, player.ClassyName);
-                                    }
-                                }
-                                Logger.Log(LogType.UserActivity,
-                                    "{0} removed {1} from the build whitelist on personal world {2}", player.Name,
-                                    info.Name, worldba.Name);
-                                changesWereMade = true;
-                                break;
-                        }
-                    }
-                    saveba:
-                    if (changesWereMade) {
-                        WorldManager.SaveWorldList();
-                    }
-                    break;
-
-                    #endregion
-
-                    #region JoinAccess
-
+                    MWAccess(player, cmd, true); break;
                 case "ja":
                 case "joinaccess":
-                    string wNumberStringja = cmd.Next();
-                    string exceptionja = cmd.Next();
-                    int wNumberja;
-                    bool changesWereMadeja = false;
-                    if (!int.TryParse(wNumberStringja, out wNumberja)) {
-                        wNumberja = 1;
-                        exceptionja = wNumberStringja;
-                    }
-                    string mapFileja = WorldManager.FindMapFile(Player.Console, "PW_" + player.Name + "_" + wNumberja);
-                    if (mapFileja == null) {
-                        player.Message("You have no personal worlds by that number: {0}", wNumberja);
-                        goto saveWorldja;
-                    }
-                    World worldja = WorldManager.FindWorldExact("PW_" + player.Name + "_" + wNumberja);
-                    if (exceptionja == null) {
-                        CdMyWorld.PrintUsage(player);
-                        break;
-                    }
-                    if (exceptionja.Equals("-*")) {
-                        PlayerInfo[] oldWhitelist = worldja.AccessSecurity.ExceptionList.Included.ToArray();
-                        worldja.AccessSecurity.ResetIncludedList();
-                        player.Message("Access whitelist of {0}&S cleared: {1}", worldja.ClassyName,
-                            oldWhitelist.JoinToClassyString());
-                        Logger.Log(LogType.UserActivity, "{0} {1} &scleared access whitelist of personal world {2}: {3}",
-                            player.Info.Rank.Name, player.Name, worldja.Name, oldWhitelist.JoinToString(pi => pi.Name));
-                        worldja.AccessSecurity.Include(player.Info);
-                        goto saveWorldja;
-                    }
-
-                    // Clear blacklist
-                    if (exceptionja.Equals("+*")) {
-                        PlayerInfo[] oldBlacklist = worldja.AccessSecurity.ExceptionList.Excluded.ToArray();
-                        worldja.AccessSecurity.ResetExcludedList();
-                        player.Message("Access blacklist of {0}&S cleared: {1}", worldja.ClassyName,
-                            oldBlacklist.JoinToClassyString());
-                        Logger.Log(LogType.UserActivity, "{0} {1} &scleared access blacklist of personal world {2}: {3}",
-                            player.Info.Rank.Name, player.Name, worldja.Name, oldBlacklist.JoinToString(pi => pi.Name));
-                        goto saveWorldja;
-                    }
-
-                    // Whitelisting individuals
-                    if (exceptionja.StartsWith("+")) {
-                        PlayerInfo info = PlayerDB.FindPlayerInfoOrPrintMatches(player, exceptionja.Substring(1),
-                            SearchOptions.Default);
-                        if (info == null)
-                            goto saveWorldja;
-
-                        // prevent players from whitelisting themselves to bypass protection
-                        if (player.Info == info) {
-                            goto saveWorldja;
-                        }
-
-                        if (worldja.AccessSecurity.Check(info)) {
-                            player.Message("{0}&S is already allowed to access {1}", info.ClassyName, worldja.ClassyName);
-                            goto saveWorldja;
-                        }
-
-                        Player target = info.PlayerObject;
-                        if (target == player)
-                            target = null; // to avoid duplicate messages
-
-                        switch (worldja.AccessSecurity.Include(info)) {
-                            case PermissionOverride.Deny:
-                                if (worldja.AccessSecurity.Check(info)) {
-                                    player.Message("{0}&S is no longer barred from accessing {1}", info.ClassyName,
-                                        worldja.ClassyName);
-                                    if (target != null) {
-                                        target.Message(
-                                            "You can now access personal world {0}&S (removed from blacklist by {1}&S).",
-                                            worldja.ClassyName, player.ClassyName);
-                                    }
-                                } else {
-                                    player.Message(
-                                        "{0}&S was removed from the access blacklist of {1}&S. " +
-                                        "Player is still NOT allowed to join.", info.ClassyName, worldja.ClassyName);
-                                    if (target != null) {
-                                        target.Message(
-                                            "You were removed from the access blacklist of world {0}&S by {1}&S. " +
-                                            "You are still NOT allowed to join.", worldja.ClassyName, player.ClassyName);
-                                    }
-                                }
-                                Logger.Log(LogType.UserActivity, "{0} removed {1} from the access blacklist of {2}",
-                                    player.Name, info.Name, worldja.Name);
-                                changesWereMadeja = true;
-                                break;
-
-                            case PermissionOverride.None:
-                                player.Message("{0}&S is now allowed to access {1}", info.ClassyName, worldja.ClassyName);
-                                if (target != null) {
-                                    target.Message("You can now access personal world {0}&S (whitelisted by {1}&S).",
-                                        worldja.ClassyName, player.ClassyName);
-                                }
-                                Logger.Log(LogType.UserActivity,
-                                    "{0} added {1} to the access whitelist on personal world {2}", player.Name,
-                                    info.Name, worldja.Name);
-                                changesWereMadeja = true;
-                                break;
-
-                            case PermissionOverride.Allow:
-                                player.Message("{0}&S is already on the access whitelist of {1}", info.ClassyName,
-                                    worldja.ClassyName);
-                                break;
-                        }
-
-                        // Blacklisting individuals
-                    } else if (exceptionja.StartsWith("-")) {
-                        PlayerInfo info = PlayerDB.FindPlayerInfoOrPrintMatches(player, exceptionja.Substring(1),
-                            SearchOptions.Default);
-                        if (info == null)
-                            goto saveWorldja;
-
-                        if (!worldja.AccessSecurity.Check(info)) {
-                            player.Message("{0}&S is already barred from accessing {1}", info.ClassyName,
-                                worldja.ClassyName);
-                            goto saveWorldja;
-                        }
-
-                        Player target = info.PlayerObject;
-                        if (target == player)
-                            target = null; // to avoid duplicate messages
-
-                        switch (worldja.AccessSecurity.Exclude(info)) {
-                            case PermissionOverride.Deny:
-                                player.Message("{0}&S is already on access blacklist of {1}", info.ClassyName,
-                                    worldja.ClassyName);
-                                break;
-
-                            case PermissionOverride.None:
-                                player.Message("{0}&S is now barred from accessing {1}", info.ClassyName,
-                                    worldja.ClassyName);
-                                if (target != null) {
-                                    target.Message("&WYou were barred by {0}&W from accessing personal world {1}",
-                                        player.ClassyName, worldja.ClassyName);
-                                }
-                                Logger.Log(LogType.UserActivity,
-                                    "{0} added {1} to the access blacklist on personal world {2}", player.Name,
-                                    info.Name, worldja.Name);
-                                changesWereMadeja = true;
-                                break;
-
-                            case PermissionOverride.Allow:
-                                if (worldja.AccessSecurity.Check(info)) {
-                                    player.Message(
-                                        "{0}&S is no longer on the access whitelist of {1}&S. " +
-                                        "Player is still allowed to join.", info.ClassyName, worldja.ClassyName);
-                                    if (target != null) {
-                                        target.Message(
-                                            "You were removed from the access whitelist of personal world {0}&S by {1}&S. " +
-                                            "You are still allowed to join.", worldja.ClassyName, player.ClassyName);
-                                    }
-                                } else {
-                                    player.Message("{0}&S is no longer allowed to access {1}", info.ClassyName,
-                                        worldja.ClassyName);
-                                    if (target != null) {
-                                        target.Message(
-                                            "&WYou can no longer access personal world {0}&W (removed from whitelist by {1}&W).",
-                                            worldja.ClassyName, player.ClassyName);
-                                    }
-                                }
-                                Logger.Log(LogType.UserActivity,
-                                    "{0} removed {1} from the access whitelist on personal world {2}", player.Name,
-                                    info.Name, worldja.Name);
-                                changesWereMadeja = true;
-                                break;
-                        }
-                    }
-                    saveWorldja:
-                    if (changesWereMadeja) {
-                        worldja = WorldManager.FindWorldExact("PW_" + player.Name + "_" + wNumberja);
-                        var playersWhoCantStay = worldja.Players.Where(p => !p.CanJoin(worldja));
-                        foreach (Player p in playersWhoCantStay) {
-                            p.Message("&WYou are no longer allowed to join world {0}", worldja.ClassyName);
-                            p.JoinWorld(WorldManager.FindMainWorld(p), WorldChangeReason.PermissionChanged);
-                        }
-                        WorldManager.SaveWorldList();
-                    }
-                    break;
-
-                    #endregion
-
-                    #region List
-
+                    MWAccess(player, cmd, false); break;
                 case "l":
                 case "list":
-                    World[] worldsl =
-                        WorldManager.Worlds.Where(w => w.Name.StartsWith("PW_" + player.Name + "_")).ToArray();
-                    World[] otherworldsl =
-                        WorldManager.Worlds.Where(
-                            w =>
-                                w.Name.StartsWith("PW_") &&
-                                w.AccessSecurity.ExceptionList.Included.Contains(player.Info) &&
-                                !w.Name.StartsWith("PW_" + player.Name + "_")).ToArray();
-                    if (worldsl.Any()) {
-                        player.Message("Your personal worlds: {0}", worldsl.JoinToClassyString());
-                    }
-                    if (otherworldsl.Any()) {
-                        player.Message("Player personal worlds you have access to: {0}",
-                            otherworldsl.JoinToClassyString());
-                    }
-                    if (!worldsl.Any() && !otherworldsl.Any()) {
-                        player.Message("You do not have access to any personal worlds.");
-                    }
-                    break;
-
-                    #endregion
-
+                    MWList(player, cmd); break;
                 default:
-                    CdMyWorld.PrintUsage(player);
-                    break;
+                    CdMyWorld.PrintUsage(player); break;
             }
+        }
+        
+        static void MWCreate(Player player, CommandReader cmd) {
+            string sizeName = cmd.Next();
+            int size;
+            if (sizeName == null)
+                sizeName = "Normal";
+            switch (sizeName.ToLower()) {
+                case "64":
+                case "tiny":
+                    size = 64; sizeName = "Tiny"; break;
+                case "128":
+                case "normal":
+                    size = 128; sizeName = "Normal"; break;
+                case "256":
+                case "large":
+                    size = 256; sizeName = "Large"; break;
+                case "512":
+                case "huge":
+                    size = 512; sizeName = "Huge"; break;
+                default:
+                    size = 128; sizeName = "Normal"; break;
+            }
+            World[] existing = WorldManager.FindWorlds(Player.Console, "PW_" + player.Name + "_");
+            if (existing.Length >= player.Info.Rank.MaxPersonalWorlds &&
+                player.Info.Rank != RankManager.HighestRank) {
+                player.Message("You can only have a maximum of {0} personal worlds. Sorry!",
+                               player.Info.Rank.MaxPersonalWorlds);
+                return;
+            }
+            string mapNum = (existing.Any()) ? "" + (existing.Count() + 1) : "1";
+            string mapName = "PW_" + player.Name + "_" + mapNum;
+            player.Message("Creating your {0}({1}) personal world: {2}", sizeName, size, mapName);
+            Map map = MapGenerator.GenerateFlatgrass(size, size, size);
+            Server.RequestGC();
+            if (map.Save(Path.Combine(Paths.MapPath, mapName + ".fcm")))
+                player.Message("Done! Saved to {0}.fcm", mapName);
+            else
+                player.Message("&WAn error occurred while saving generated map to {0}.fcm", mapName);
+                
+            Rank buildRank = RankManager.HighestRank;
+            Rank accessRank = RankManager.HighestRank;
+            lock (WorldManager.SyncRoot) {
+                World newWorld;
+                try {
+                    newWorld = WorldManager.AddWorld(player, mapName, map, false);
+                } catch (WorldOpException ex) {
+                    player.Message("WLoad: {0}", ex.Message);
+                    return;
+                }
+
+                player.LastUsedWorldName = mapName;
+                newWorld.BuildSecurity.MinRank = buildRank;
+                if (accessRank == null) 
+                    newWorld.AccessSecurity.ResetMinRank();
+                else
+                    newWorld.AccessSecurity.MinRank = accessRank;
+                newWorld.BlockDB.AutoToggleIfNeeded();
+                newWorld.LoadedBy = player.Name;
+                newWorld.LoadedOn = DateTime.UtcNow;
+                newWorld.IsHidden = true;
+                Logger.Log(LogType.UserActivity,
+                           "{0} {1} &screated a new world named \"{2}\" (loaded from \"{3}\")", player.Info.Rank.Name,
+                           player.Name, mapName, mapName);
+                newWorld.AccessSecurity.Include(player.Info);
+                newWorld.BuildSecurity.Include(player.Info);
+                WorldManager.SaveWorldList();
+            }
+            Server.RequestGC();
+        }
+        
+        static void MWReset(Player player, CommandReader cmd) {
+            int num = 0; ReadMWNumber(cmd, out num);
+            string mapName = "PW_" + player.Name + "_" + num;
+            string map = WorldManager.FindMapFile(Player.Console, mapName);
+            if (map == null) {
+                player.Message("You have no personal worlds by that number: {0}", num); return;
+            }
+            if (!cmd.IsConfirmed) {
+                player.Confirm(cmd, "This will reset your personal world:   " + mapName +
+                               "&n&cThis cannot be undone!");
+                return;
+            }
+            
+            World world = WorldManager.FindWorldExact(mapName);
+            Map newMap = MapGenerator.GenerateFlatgrass(world.map.Width, world.map.Length, world.map.Height);
+            world.MapChangedBy = player.Name;
+            world.ChangeMap(newMap);
+            player.Message("Your personal world({0}) has been reset to flatgrass!", num);
+            Server.RequestGC();
+        }
+        
+        static void MWDelete(Player player, CommandReader cmd) {
+            int num = 0; ReadMWNumber(cmd, out num);
+            string mapName = "PW_" + player.Name + "_" + num;
+            string map = WorldManager.FindMapFile(Player.Console, mapName);
+            if (map == null) {
+                player.Message("You have no personal worlds by that number: {0}", num); return;
+            }
+            if (!cmd.IsConfirmed) {
+                player.Confirm(cmd, "This will delete your personal world:   " + mapName +
+                               "&n&cThis cannot be undone!");
+                return;
+            }
+            World world = WorldManager.FindWorldExact(mapName);
+            if (world != null) WorldManager.RemoveWorld(world);
+            
+            mapName = Path.Combine(Paths.MapPath, mapName + ".fcm");
+            if (File.Exists(mapName)) File.Delete(mapName);
+            player.Message("Your personal world({0}) has been deleted!", num);
+            Server.RequestGC();
+        }
+        
+        static void MWJoin(Player player, CommandReader cmd) {
+            int num = 0; ReadMWNumber(cmd, out num);
+            string name = cmd.Next();
+            PlayerInfo info = null;
+            if (name != null) {
+                info = PlayerDB.FindPlayerInfoOrPrintMatches(player, name, SearchOptions.Default);
+            }
+            string mapName = "PW_" + ((info == null) ? player.Name : info.Name) + "_" + num;
+            string map = WorldManager.FindMapFile(Player.Console, mapName);
+            
+            if (map == null) {
+                player.Message("{0} no personal worlds by that number: {1}", (info == null) ? "You have" : "There are", num);
+                return;
+            }
+            World world = WorldManager.FindWorldExact(mapName);
+            if (world != null && player.CanJoin(world)) {
+                player.JoinWorld(world, WorldChangeReason.ManualJoin);
+            } else {
+                player.Message("You cannot join that world!");
+            }
+        }
+        
+        static void MWList(Player player, CommandReader cmd) {
+            string mapName = "PW_" + player.Name + "_";
+            World[] own = WorldManager.Worlds.Where(w => w.Name.StartsWith(mapName)).ToArray();
+            World[] others =
+                WorldManager.Worlds.Where( w =>
+                    w.Name.StartsWith("PW_") && w.AccessSecurity.Check(player.Info) &&
+                    !w.Name.StartsWith(mapName)).ToArray();
+            if (own.Any()) {
+                player.Message("Your personal worlds: {0}", own.JoinToClassyString());
+            }
+            if (others.Any()) {
+                player.Message("Player personal worlds you have access to: {0}",
+                               others.JoinToClassyString());
+            }
+            if (!own.Any() && !others.Any()) {
+                player.Message("You do not have access to any personal worlds.");
+            }
+        }
+        
+        static void MWAccess(Player player, CommandReader cmd, bool build) {
+            int num = 0;
+            if (!ReadMWNumber(cmd, out num))
+                cmd.Rewind();
+            string mapName = "PW_" + player.Name + "_" + num;
+            
+            if (build) {
+                cmd = new CommandReader("/" + CdWorldBuild.Name + " " + mapName + " " + cmd.NextAll());
+                HandleWorldBuild(player, cmd, false);
+            } else {
+                cmd = new CommandReader("/" + CdWorldAccess.Name + " " + mapName + " " + cmd.NextAll());
+                HandleWorldAccess(player, cmd, false);
+            }
+        }
+        
+        static bool ReadMWNumber(CommandReader cmd, out int number) {
+            if (!int.TryParse(cmd.Next(), out number)) {
+                number = 1;
+                return false;
+            }
+            return true;
         }
 
         #endregion       
