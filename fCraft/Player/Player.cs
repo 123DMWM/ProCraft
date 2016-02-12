@@ -1219,7 +1219,7 @@ namespace fCraft {
                         Info.ProcessBlockPlaced((byte)Block.Dirt);
                         map.QueueUpdate(blockUpdate);
                         RaisePlayerPlacedBlockEvent(this, World.Map, coordBelow, Block.Grass, Block.Dirt, context);
-                        SendNow(Packet.MakeSetBlock(coordBelow, Block.Dirt, this));
+                        SendNow(Packet.MakeSetBlock(coordBelow, Block.Dirt));
                     }
                     // handle normal blocks
                     blockUpdate = new BlockUpdate(this, coord, type);
@@ -1227,7 +1227,7 @@ namespace fCraft {
                     Block old = map.GetBlock(coord);
                     map.QueueUpdate(blockUpdate);
                     RaisePlayerPlacedBlockEvent(this, World.Map, coord, old, type, context);
-                    SendNow(Packet.MakeSetBlock(coord, type, this));
+                    SendNow(Packet.MakeSetBlock(coord, type));
                     
                     break;
                     
@@ -1374,7 +1374,7 @@ namespace fCraft {
         /// <param name="block"> Block type to send. </param>
         public void SendBlock( Vector3I coords, Block block ) {
             if( !WorldMap.InBounds( coords ) ) throw new ArgumentOutOfRangeException( "coords" );
-            SendLowPriority( Packet.MakeSetBlock( coords, block, this) );
+            SendLowPriority( Packet.MakeSetBlock( coords, block ) );
         }
 
 
@@ -1382,7 +1382,7 @@ namespace fCraft {
         /// and sends it (async) to the player.
         /// Used to undo player's attempted block placement/deletion. </summary>
         public void RevertBlock( Vector3I coords ) {
-            SendLowPriority( Packet.MakeSetBlock( coords, WorldMap.GetBlock( coords ), this) );
+            SendLowPriority( Packet.MakeSetBlock( coords, WorldMap.GetBlock( coords ) ) );
         }
 
 
@@ -1390,7 +1390,7 @@ namespace fCraft {
         // Used to undo player's attempted block placement/deletion.
         // To avoid threading issues, only use this from this player's IoThread.
         void RevertBlockNow( Vector3I coords ) {
-            SendNow(Packet.MakeSetBlock(coords, WorldMap.GetBlock(coords), this));
+            SendNow(Packet.MakeSetBlock(coords, WorldMap.GetBlock(coords)));
         }
 
 
@@ -1411,33 +1411,6 @@ namespace fCraft {
             }
             spamBlockLog.Enqueue( DateTime.UtcNow );
             return false;
-        }
-
-        public Block getFallback(Block block) {
-            if ((Supports(CpeExt.BlockDefinitions) 
-                || Supports(CpeExt.BlockDefinitions))
-                && Supports(CpeExt.CustomBlocks)) {
-
-                return block; //No fallback block needed
-
-            } else if ((Supports(CpeExt.BlockDefinitions) 
-                || Supports(CpeExt.BlockDefinitions))
-                && !Supports(CpeExt.CustomBlocks)) {
-
-                if (block > Map.MaxLegalBlockType && block < Map.MaxCustomBlockType) {
-                    return Map.GetFallbackBlock(block); //Get fallback for just CustomBlocks
-                } else { return block; }
-
-            } else if (!(Supports(CpeExt.BlockDefinitions) 
-                || Supports(CpeExt.BlockDefinitions))
-                && Supports(CpeExt.CustomBlocks)) {
-
-                if (block > Map.MaxCustomBlockType) {
-                    return Map.GetFallbackBlock(block); //Get fallback block for Block Definition Blocks
-                } else { return block; }
-
-            }
-            return Map.GetFallbackBlock(Map.GetFallbackBlock(block)); //Get absolute FallBack Block (Doubled Just incase someone made a CustomBlock a fallback block)
         }
 
         #endregion
@@ -2276,6 +2249,7 @@ namespace fCraft {
         const int BlockDefinitionsExtExt2Version = 2;        
         const string TextColorsExtName = "TextColors";
         const int TextColorsExtVersion = 1;
+        bool supportsBlockDefs, supportsCustomBlocks;
         
         public bool UseFallbackColors {
             get { return !Supports(CpeExt.TextColors); }
@@ -2453,6 +2427,8 @@ namespace fCraft {
             // ClassiCube just doesn't reply at all.
             if (ClientName == "ClassiCube Client")
             	supportedExtensions.Add(CpeExt.EnvMapAppearance);
+            supportsCustomBlocks = Supports(CpeExt.CustomBlocks);
+            supportsBlockDefs = Supports(CpeExt.BlockDefinitions);
 
             // log client's capabilities
             if (supportedExtensions.Count > 0)
@@ -2497,10 +2473,7 @@ namespace fCraft {
 
         // For non-extended players, use appropriate substitution
         public Packet ProcessOutgoingSetBlock(Packet packet) {
-        	bool supportsCustomBlocks = Supports(CpeExt.CustomBlocks);
-        	bool supportsDefinitions = Supports(CpeExt.BlockDefinitions);
-        	
-        	if (packet.Bytes[7] > (byte) Map.MaxCustomBlockType && !supportsDefinitions) {
+        	if (packet.Bytes[7] > (byte) Map.MaxCustomBlockType && !supportsBlockDefs) {
                 packet.Bytes[7] = (byte) Map.GetFallbackBlock((Block) packet.Bytes[7]);
             }
         	if (packet.Bytes[7] > (byte) Map.MaxLegalBlockType && !supportsCustomBlocks) {

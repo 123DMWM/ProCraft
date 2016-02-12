@@ -60,14 +60,13 @@ namespace fCraft {
         /// <summary> Creates a new SetBlockServer (0x06) packet. </summary>
         /// <param name="coords"> Coordinates of the block. </param>
         /// <param name="type"> Block type to set at given coordinates. </param>
-        /// <param name="player"> Player packet is being sent to, used to get fallback block </param>
-        public static Packet MakeSetBlock( Vector3I coords, Block type, Player player ) {
+        public static Packet MakeSetBlock( Vector3I coords, Block type ) {
             Packet packet = new Packet( OpCode.SetBlockServer );
             //Logger.Log(LogType.Debug, "Send: MakeSetBlock({0})({1})", coords, type);
             ToNetOrder( (short)coords.X, packet.Bytes, 1 );
             ToNetOrder( (short)coords.Z, packet.Bytes, 3 );
             ToNetOrder( (short)coords.Y, packet.Bytes, 5 );
-            packet.Bytes[7] = (byte)player.getFallback(type);
+            packet.Bytes[7] = (byte)type;
             return packet;
         }
 

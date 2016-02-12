@@ -1444,7 +1444,9 @@ namespace fCraft {
         public void SendNow( Packet packet ) {
             if( Thread.CurrentThread != ioThread ) {
                 throw new InvalidOperationException( "SendNow may only be called from player's own thread." );
-            } 
+            }
+        	if (packet.OpCode == OpCode.SetBlockServer)
+                ProcessOutgoingSetBlock(packet);
             writer.Write( packet.Bytes );
             BytesSent += packet.Bytes.Length;
         }
@@ -1454,9 +1456,8 @@ namespace fCraft {
         /// This is used for most packets (movement, chat, etc). </summary>
         public void Send(Packet packet)
         {
-            if (packet.OpCode == OpCode.SetBlockServer) {
-                ProcessOutgoingSetBlock( packet);
-            }
+            if (packet.OpCode == OpCode.SetBlockServer)
+                ProcessOutgoingSetBlock(packet);
             if( canQueue ) priorityOutputQueue.Enqueue( packet );
         }
 
@@ -1465,9 +1466,8 @@ namespace fCraft {
         /// This is currently only used for block updates. </summary>
         public void SendLowPriority(Packet packet)
         {
-            if (packet.OpCode == OpCode.SetBlockServer) {
-                ProcessOutgoingSetBlock( packet);
-            }
+            if (packet.OpCode == OpCode.SetBlockServer)
+                ProcessOutgoingSetBlock(packet);
             if( canQueue ) outputQueue.Enqueue( packet );
         }
 
