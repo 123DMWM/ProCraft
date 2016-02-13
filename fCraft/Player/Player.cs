@@ -2222,7 +2222,9 @@ namespace fCraft {
         const int BlockDefinitionsExtVersion = 1;
         const string BlockDefinitionsExtExtName = "BlockDefinitionsExt";
         const int BlockDefinitionsExtExtVersion = 1;
-        const int BlockDefinitionsExtExt2Version = 2;        
+        const int BlockDefinitionsExtExt2Version = 2; 
+        const string BulkBlockUpdateExtName = "BulkBlockUpdate";
+        const int BulkBlockUpdateExtVersion = 1;        
         const string TextColorsExtName = "TextColors";
         const int TextColorsExtVersion = 1;
         bool supportsBlockDefs, supportsCustomBlocks;
@@ -2240,7 +2242,7 @@ namespace fCraft {
         bool NegotiateProtocolExtension()
         {
             // write our ExtInfo and ExtEntry packets
-            writer.Write(Packet.MakeExtInfo("ProCraft", 21).Bytes);
+            writer.Write(Packet.MakeExtInfo("ProCraft", 22).Bytes);
             writer.Write(Packet.MakeExtEntry(ClickDistanceExtName, ClickDistanceExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(CustomBlocksExtName, CustomBlocksExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(HeldBlockExtName, HeldBlockExtVersion).Bytes);
@@ -2267,6 +2269,8 @@ namespace fCraft {
             
             writer.Write(Packet.MakeExtEntry(BlockDefinitionsExtName, BlockDefinitionsExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(BlockDefinitionsExtExtName, BlockDefinitionsExtExt2Version).Bytes);
+            writer.Write(Packet.MakeExtEntry(BulkBlockUpdateExtName, BulkBlockUpdateExtVersion).Bytes);
+            
             writer.Write(Packet.MakeExtEntry(TextColorsExtName, TextColorsExtVersion).Bytes);
             
             // Expect ExtInfo reply from the client
@@ -2385,6 +2389,10 @@ namespace fCraft {
                         else if (extVersion == BlockDefinitionsExtExt2Version)
                             addedExt = CpeExt.BlockDefinitionsExt2;
                         break;
+                    case BulkBlockUpdateExtName:
+                        if (extVersion == BulkBlockUpdateExtVersion)
+                            addedExt = CpeExt.BulkBlockUpdate;
+                        break;                        
                     case TextColorsExtName:
                         if (extVersion == TextColorsExtVersion)
                             addedExt = CpeExt.TextColors;

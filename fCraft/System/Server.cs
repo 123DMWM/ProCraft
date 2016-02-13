@@ -47,7 +47,7 @@ namespace fCraft {
 
         internal static int MaxUploadSpeed, // set by Config.ApplyConfig
                             BlockUpdateThrottling; // used when there are no players in a world
-        internal const int MaxSessionPacketsPerTick = 128, // used when there are no players in a world
+        internal const int MaxSessionPacketsPerTick = 128, MaxBlockPacketsPerTick = 256,
                            MaxBlockUpdatesPerTick = 100000; // used when there are no players in a world
         internal static float TicksPerSecond;
 

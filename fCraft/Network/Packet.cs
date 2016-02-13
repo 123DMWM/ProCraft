@@ -530,12 +530,12 @@ namespace fCraft {
 
         #endregion
 
-        static void ToNetOrder( short number, [NotNull] byte[] arr, int offset ) {
+        internal static void ToNetOrder( short number, [NotNull] byte[] arr, int offset ) {
             arr[offset] = (byte)((number & 0xff00) >> 8);
             arr[offset + 1] = (byte)(number & 0x00ff);
         }
 
-        static void ToNetOrder( int number, [NotNull] byte[] arr, int offset ) {
+        internal static void ToNetOrder( int number, [NotNull] byte[] arr, int offset ) {
             arr[offset] = (byte)((number & 0xff000000) >> 24);
             arr[offset + 1] = (byte)((number & 0x00ff0000) >> 16);
             arr[offset + 2] = (byte)((number & 0x0000ff00) >> 8);

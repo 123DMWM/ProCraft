@@ -125,23 +125,26 @@ namespace fCraft {
                 Server.RaiseSessionConnectedEvent( this );
 
                 // try to log the player in, otherwise die.
-                if( !LoginSequence() ) {
-                    return;
-                }
-
+                if( !LoginSequence() ) return;
                 BandwidthUseMode = Info.BandwidthUseMode;
 
                 // set up some temp variables
                 Packet packet = new Packet();
-                SetBlockData blockPacket = new SetBlockData();
-                byte[] blockPacketData = new byte[8];
-                blockPacketData[0] = (byte)OpCode.SetBlockServer;
+                SetBlockData blockUpdate = new SetBlockData();
+                byte[] blockPacket = new byte[8];
+                blockPacket[0] = (byte)OpCode.SetBlockServer;
+                byte[] bulkBlockPacket = null;
+                if (Supports(CpeExt.BulkBlockUpdate)) {
+                    bulkBlockPacket = new byte[1282];
+                    bulkBlockPacket[0] = (byte)OpCode.BulkBlockUpdate;
+                }
+                
 
                 int pollCounter = 0, pingCounter = 0;
 
                 // main i/o loop
                 while( canSend ) {
-                    int packetsSent = 0;
+                    int packetsSent = 0, blockPacketsSent = 0;
 
                     // detect player disconnect
                     if( pollCounter > SocketPollInterval ) {
@@ -198,21 +201,30 @@ namespace fCraft {
                     }
                     
                     // send block updates output to player
-                    while (canSend && packetsSent < Server.MaxSessionPacketsPerTick) {
-                        if (!blockQueue.TryDequeue(out blockPacket)) break;
-
-                        blockPacketData[1] = (byte)(blockPacket.X >> 8);
-                        blockPacketData[2] = (byte)blockPacket.X;
-                        blockPacketData[3] = (byte)(blockPacket.Z >> 8);
-                        blockPacketData[4] = (byte)blockPacket.Z;
-                        blockPacketData[5] = (byte)(blockPacket.Y >> 8);
-                        blockPacketData[6] = (byte)blockPacket.Y;
-                        blockPacketData[7] = blockPacket.Block;
+                    bool useBulk = bulkBlockPacket != null && blockQueue.Count > 160;
+                    Map currentMap = WorldMap;
+                    while (canSend && blockPacketsSent < Server.MaxBlockPacketsPerTick) {
+                        if (!blockQueue.TryDequeue(out blockUpdate)) break;
+                        ProcessOutgoingSetBlock(ref blockUpdate.Block);
                         
-                        ProcessOutgoingSetBlock(ref blockPacketData[7]);
-                        writer.Write( blockPacketData );
-                        BytesSent += blockPacketData.Length;
-                        packetsSent++;
+                        if (!useBulk) {
+                            Packet.ToNetOrder(blockUpdate.X, blockPacket, 1);
+                            Packet.ToNetOrder(blockUpdate.Z, blockPacket, 3);
+                            Packet.ToNetOrder(blockUpdate.Y, blockPacket, 5);
+                            blockPacket[7] = blockUpdate.Block;
+                            writer.Write( blockPacket );
+                            BytesSent += blockPacket.Length;
+                        } else {
+                            int index = currentMap.Index(blockUpdate.X, blockUpdate.Y, blockUpdate.Z);
+                            Packet.ToNetOrder(index, bulkBlockPacket, 2 + 4 * blockPacketsSent);
+                            bulkBlockPacket[2 + 1024 + blockPacketsSent] = blockUpdate.Block;
+                        }
+                        blockPacketsSent++;
+                    }
+                    if (canSend && useBulk) {
+                        bulkBlockPacket[1] = (byte)(blockPacketsSent - 1);
+                        writer.Write( bulkBlockPacket );
+                        BytesSent += bulkBlockPacket.Length;
                     }
 
                     // check if player needs to change worlds
