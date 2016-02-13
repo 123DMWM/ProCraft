@@ -1368,31 +1368,7 @@ namespace fCraft {
                 IsCommandBlockRunnin = false;
             }
         }
-
-        /// <summary> Sends a block change to THIS PLAYER ONLY. Does not affect the map. </summary>
-        /// <param name="coords"> Coordinates of the block. </param>
-        /// <param name="block"> Block type to send. </param>
-        public void SendBlock( Vector3I coords, Block block ) {
-            if( !WorldMap.InBounds( coords ) ) throw new ArgumentOutOfRangeException( "coords" );
-            SendLowPriority( Packet.MakeSetBlock( coords, block ) );
-        }
-
-
-        /// <summary> Gets the block from given location in player's world,
-        /// and sends it (async) to the player.
-        /// Used to undo player's attempted block placement/deletion. </summary>
-        public void RevertBlock( Vector3I coords ) {
-            SendLowPriority( Packet.MakeSetBlock( coords, WorldMap.GetBlock( coords ) ) );
-        }
-
-
-        // Gets the block from given location in player's world, and sends it (sync) to the player.
-        // Used to undo player's attempted block placement/deletion.
-        // To avoid threading issues, only use this from this player's IoThread.
-        void RevertBlockNow( Vector3I coords ) {
-            SendNow(Packet.MakeSetBlock(coords, WorldMap.GetBlock(coords)));
-        }
-
+        
 
         // returns true if the player is spamming and should be kicked.
         bool CheckBlockSpam() {
@@ -2472,14 +2448,11 @@ namespace fCraft {
         }
 
         // For non-extended players, use appropriate substitution
-        public Packet ProcessOutgoingSetBlock(Packet packet) {
-        	if (packet.Bytes[7] > (byte) Map.MaxCustomBlockType && !supportsBlockDefs) {
-                packet.Bytes[7] = (byte) Map.GetFallbackBlock((Block) packet.Bytes[7]);
-            }
-        	if (packet.Bytes[7] > (byte) Map.MaxLegalBlockType && !supportsCustomBlocks) {
-                packet.Bytes[7] = (byte) Map.GetFallbackBlock((Block) packet.Bytes[7]);
-            }
-            return packet;
+        void ProcessOutgoingSetBlock(ref byte block) {
+            if (block > (byte) Map.MaxCustomBlockType && !supportsBlockDefs)
+                block = (byte) Map.GetFallbackBlock((Block)block);
+            if (block > (byte) Map.MaxLegalBlockType && !supportsCustomBlocks)
+                block = (byte) Map.GetFallbackBlock((Block)block);
         }
 
         #endregion

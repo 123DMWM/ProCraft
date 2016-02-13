@@ -315,8 +315,7 @@ namespace fCraft {
             	Block block = GetBlock(x, y, z);
             	for( int i = 0; i < players.Length; i++ ) {
             		// cannot reuse packet as each player may require different modifications to block field
-            		Packet packet = Packet.MakeSetBlock(new Vector3I(x, y, z), block);
-            		players[i].SendLowPriority( packet );
+            		players[i].SendBlock( new Vector3I( x, y, z ), block );
             	}
             }
             return true;
@@ -515,8 +514,7 @@ namespace fCraft {
                 		Player p = players[i];
                 		if (p == update.Origin) 
                 			continue;
-                		Packet packet = Packet.MakeSetBlock(new Vector3I(update.X, update.Y, update.Z), update.BlockType);
-                		p.SendLowPriority( packet );
+                		p.SendBlock( new Vector3I( update.X, update.Y, update.Z ), update.BlockType );
                 	}
                 }
                 packetsSent++;

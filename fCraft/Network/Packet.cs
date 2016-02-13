@@ -587,4 +587,19 @@ namespace fCraft {
             6, // SetTextColor
         };
     }
+    
+    public struct SetBlockData {
+        public short X, Y, Z;
+        public byte Block;
+        
+        public SetBlockData(int x, int y, int z, byte block) {
+            X = (short)x; Y = (short)y; Z = (short)z;
+            Block = block;
+        }
+        
+        public SetBlockData(Vector3I p, byte block) {
+            X = (short)p.X; Y = (short)p.Y; Z = (short)p.Z;
+            Block = block;
+        }
+    }
 }
