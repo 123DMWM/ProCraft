@@ -738,33 +738,34 @@ namespace fCraft {
         }
         
         static void GlobalBlockDuplicateHandler(Player p, CommandReader cmd) {
-            string input1 = cmd.Next() ?? "n/a";
-            string input2 = cmd.Next() ?? "n/a";
-            Block blockID1 = Block.None, blockID2 = Block.None;
-            if (!Map.GetBlockByName(input1, false, out blockID1) || blockID1 < Map.MaxCustomBlockType) {
-                p.Message("No blocks by that Name/ID!");
-                return;
-            }
-            if (!Map.GetBlockByName(input2, false, out blockID2) || blockID2 < Map.MaxCustomBlockType) {
-                p.Message("No blocks by that Name/ID!");
-                return;
-            }
+            string input1 = cmd.Next() ?? "n/a", input2 = cmd.Next() ?? "n/a";
+            Block srcBlock = Block.None;
+            byte dstBlock = (byte)Block.None;
 
-            BlockDefinition srcDef = BlockDefinition.GlobalDefinitions[(int)blockID1];
-            if (srcDef == null) {
-                p.Message("There is no custom block with the id: &a{0}", (byte)blockID1);
+            if (!Map.GetBlockByName(input1, false, out srcBlock) || srcBlock <= Map.MaxCustomBlockType) {
+                p.Message("There is no custom block with the id or name: &a{0}", input1);
                 p.Message("Use \"&h/gb list&s\" to see a list of global custom blocks.");
                 return;
             }
-            BlockDefinition dstDef = BlockDefinition.GlobalDefinitions[(int)blockID2];
+            if (!Byte.TryParse(input2, out dstBlock) || dstBlock <= (byte)Map.MaxCustomBlockType) {
+                p.Message("Destination must be a numerical id and greater than 65."); return;
+            }
+
+            BlockDefinition srcDef = BlockDefinition.GlobalDefinitions[(byte)srcBlock];
+            if (srcDef == null) {
+                p.Message("There is no custom block with the id: &a{0}", (byte)srcBlock);
+                p.Message("Use \"&h/gb list&s\" to see a list of global custom blocks.");
+                return;
+            }
+            BlockDefinition dstDef = BlockDefinition.GlobalDefinitions[dstBlock];
             if (dstDef != null) {
-                p.Message("There is already a custom block with the id: &a{0}", (byte)blockID2);
-                p.Message("Use \"&h/gb remove {0}&s\" on this block first.", (byte)blockID2);
+                p.Message("There is already a custom block with the id: &a{0}", dstBlock);
+                p.Message("Use \"&h/gb remove {0}&s\" on this block first.", dstBlock);
                 p.Message("Use \"&h/gb list&s\" to see a list of global custom blocks.");
                 return;
             }            
             BlockDefinition def = srcDef.Copy();
-            def.BlockID = (byte)blockID2;
+            def.BlockID = (byte)dstBlock;
             BlockDefinition.DefineGlobalBlock(def);
             BlockDefinition.SaveGlobalDefinitions();
             Server.Message("{0} &screated a new global custom block &h{1} &swith ID {2}",
@@ -773,7 +774,7 @@ namespace fCraft {
             foreach (Player pl in Server.Players) {
                 if (pl.Supports(CpeExt.BlockDefinitions))
                     BlockDefinition.SendGlobalAdd(pl, def);
-            }            
+            }
         }
         
         static void GlobalBlockEditHandler(Player player, CommandReader cmd) {

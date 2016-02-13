@@ -935,14 +935,7 @@ namespace fCraft {
             if (blockName == null) throw new ArgumentNullException("blockName");
             if (BlockNames.TryGetValue(blockName.ToLower(), out block))
             {
-                if (block == Block.None)
-                {
-                    return allowNoneBlock;
-                }
-                else
-                {
-                    return true;
-                }
+                return block == Block.None ? allowNoneBlock : true;
             }
             else
             {
