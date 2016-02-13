@@ -40,7 +40,6 @@ namespace fCraft
             CommandManager.RegisterCommand(CdGreeting);
             CommandManager.RegisterCommand(CdIRCStaff);
             CommandManager.RegisterCommand(CdLdis);
-            CommandManager.RegisterCommand(CdtextHotKey);
             CommandManager.RegisterCommand(Cdbrushes);
             CommandManager.RegisterCommand(CdIdea);
             CommandManager.RegisterCommand(CdAction);
@@ -1191,49 +1190,6 @@ namespace fCraft
         }
 
         #endregion
-        #region textHotKey
-
-        static readonly CommandDescriptor CdtextHotKey = new CommandDescriptor {
-            Name = "TextHotKey",
-            Aliases = new[] { "HotKey", "thk", "hk" },
-            Category = CommandCategory.New | CommandCategory.Chat,
-            Permissions = new[] { Permission.ReadStaffChat },
-            Usage = "/TextHotKey [Label] [Action] [KeyCode] [KeyMods]",
-            Help = "Sets up TextHotKeys. Use http://minecraftwiki.net/Key_Codes for keycodes",
-            Handler = textHotKeyHandler
-        };
-
-        private static void textHotKeyHandler(Player player, CommandReader cmd) {
-            string Label = cmd.Next();
-            string Action = cmd.Next();
-            string third = cmd.Next();
-            string fourth = cmd.Next();
-            if (Label == null || Action == null || third == null || fourth == null) {
-                CdtextHotKey.PrintUsage(player);
-                return;
-            }
-
-            int KeyCode;
-            if (!int.TryParse(third, out KeyCode)) {
-                player.Message("Error: Invalid Integer ({0})", third);
-                return;
-            }
-            byte KeyMod = 0;
-            if (null != fourth) {
-                if (!Byte.TryParse(fourth, out KeyMod)) {
-                    player.Message("Error: Invalid Byte ({0})", fourth);
-                    return;
-                }
-            }
-            if (player.Supports(CpeExt.TextHotKey)) {
-                player.Send(Packet.MakeSetTextHotKey(Label, Action, KeyCode, KeyMod));
-            } else {
-                player.Message("You do not support TextHotKey");
-                return;
-            }
-        }
-
-        #endregion
         #region brushes
 
         static readonly CommandDescriptor Cdbrushes = new CommandDescriptor {
@@ -1410,7 +1366,6 @@ namespace fCraft
         }
 
         #endregion
-
         #region CapColor
         static readonly CommandDescriptor CdCapColor = new CommandDescriptor
         {

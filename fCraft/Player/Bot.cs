@@ -122,7 +122,7 @@ namespace fCraft {
         /// </summary>
         public void changeBotModel(String botModel, String skinName) {
             Block blockModel;
-            if (!WorldCommands.validEntities.Contains(botModel)) {
+            if (!CpeCommands.validEntities.Contains(botModel)) {
                 if (Map.GetBlockByName(botModel, false, out blockModel)) {
                     botModel = blockModel.GetHashCode().ToString();
                 } else {

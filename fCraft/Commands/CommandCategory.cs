@@ -40,9 +40,6 @@ namespace fCraft {
         CPE = 512,
 
         /// <summary> Commands that are only used for diagnostics and debugging. </summary>
-        New = 1024,
-
-        /// <summary> Commands that are only used for diagnostics and debugging. </summary>
-        Math = 2048
+        New = 1024
     }
 }
