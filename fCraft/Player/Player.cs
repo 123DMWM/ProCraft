@@ -1219,7 +1219,7 @@ namespace fCraft {
                         Info.ProcessBlockPlaced((byte)Block.Dirt);
                         map.QueueUpdate(blockUpdate);
                         RaisePlayerPlacedBlockEvent(this, World.Map, coordBelow, Block.Grass, Block.Dirt, context);
-                        SendNow(Packet.MakeSetBlock(coordBelow, Block.Dirt, this));
+                        SendNow(Packet.MakeSetBlock(coordBelow, Block.Dirt));
                     }
                     // handle normal blocks
                     blockUpdate = new BlockUpdate(this, coord, type);
@@ -1227,7 +1227,7 @@ namespace fCraft {
                     Block old = map.GetBlock(coord);
                     map.QueueUpdate(blockUpdate);
                     RaisePlayerPlacedBlockEvent(this, World.Map, coord, old, type, context);
-                    SendNow(Packet.MakeSetBlock(coord, type, this));
+                    SendNow(Packet.MakeSetBlock(coord, type));
                     
                     break;
                     
@@ -1368,31 +1368,7 @@ namespace fCraft {
                 IsCommandBlockRunnin = false;
             }
         }
-
-        /// <summary> Sends a block change to THIS PLAYER ONLY. Does not affect the map. </summary>
-        /// <param name="coords"> Coordinates of the block. </param>
-        /// <param name="block"> Block type to send. </param>
-        public void SendBlock( Vector3I coords, Block block ) {
-            if( !WorldMap.InBounds( coords ) ) throw new ArgumentOutOfRangeException( "coords" );
-            SendLowPriority( Packet.MakeSetBlock( coords, block, this) );
-        }
-
-
-        /// <summary> Gets the block from given location in player's world,
-        /// and sends it (async) to the player.
-        /// Used to undo player's attempted block placement/deletion. </summary>
-        public void RevertBlock( Vector3I coords ) {
-            SendLowPriority( Packet.MakeSetBlock( coords, WorldMap.GetBlock( coords ), this) );
-        }
-
-
-        // Gets the block from given location in player's world, and sends it (sync) to the player.
-        // Used to undo player's attempted block placement/deletion.
-        // To avoid threading issues, only use this from this player's IoThread.
-        void RevertBlockNow( Vector3I coords ) {
-            SendNow(Packet.MakeSetBlock(coords, WorldMap.GetBlock(coords), this));
-        }
-
+        
 
         // returns true if the player is spamming and should be kicked.
         bool CheckBlockSpam() {
@@ -1411,33 +1387,6 @@ namespace fCraft {
             }
             spamBlockLog.Enqueue( DateTime.UtcNow );
             return false;
-        }
-
-        public Block getFallback(Block block) {
-            if ((Supports(CpeExt.BlockDefinitions) 
-                || Supports(CpeExt.BlockDefinitions))
-                && Supports(CpeExt.CustomBlocks)) {
-
-                return block; //No fallback block needed
-
-            } else if ((Supports(CpeExt.BlockDefinitions) 
-                || Supports(CpeExt.BlockDefinitions))
-                && !Supports(CpeExt.CustomBlocks)) {
-
-                if (block > Map.MaxLegalBlockType && block < Map.MaxCustomBlockType) {
-                    return Map.GetFallbackBlock(block); //Get fallback for just CustomBlocks
-                } else { return block; }
-
-            } else if (!(Supports(CpeExt.BlockDefinitions) 
-                || Supports(CpeExt.BlockDefinitions))
-                && Supports(CpeExt.CustomBlocks)) {
-
-                if (block > Map.MaxCustomBlockType) {
-                    return Map.GetFallbackBlock(block); //Get fallback block for Block Definition Blocks
-                } else { return block; }
-
-            }
-            return Map.GetFallbackBlock(Map.GetFallbackBlock(block)); //Get absolute FallBack Block (Doubled Just incase someone made a CustomBlock a fallback block)
         }
 
         #endregion
@@ -2273,9 +2222,12 @@ namespace fCraft {
         const int BlockDefinitionsExtVersion = 1;
         const string BlockDefinitionsExtExtName = "BlockDefinitionsExt";
         const int BlockDefinitionsExtExtVersion = 1;
-        const int BlockDefinitionsExtExt2Version = 2;        
+        const int BlockDefinitionsExtExt2Version = 2; 
+        const string BulkBlockUpdateExtName = "BulkBlockUpdate";
+        const int BulkBlockUpdateExtVersion = 1;        
         const string TextColorsExtName = "TextColors";
         const int TextColorsExtVersion = 1;
+        bool supportsBlockDefs, supportsCustomBlocks;
         
         public bool UseFallbackColors {
             get { return !Supports(CpeExt.TextColors); }
@@ -2290,7 +2242,7 @@ namespace fCraft {
         bool NegotiateProtocolExtension()
         {
             // write our ExtInfo and ExtEntry packets
-            writer.Write(Packet.MakeExtInfo("ProCraft", 21).Bytes);
+            writer.Write(Packet.MakeExtInfo("ProCraft", 22).Bytes);
             writer.Write(Packet.MakeExtEntry(ClickDistanceExtName, ClickDistanceExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(CustomBlocksExtName, CustomBlocksExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(HeldBlockExtName, HeldBlockExtVersion).Bytes);
@@ -2317,6 +2269,8 @@ namespace fCraft {
             
             writer.Write(Packet.MakeExtEntry(BlockDefinitionsExtName, BlockDefinitionsExtVersion).Bytes);
             writer.Write(Packet.MakeExtEntry(BlockDefinitionsExtExtName, BlockDefinitionsExtExt2Version).Bytes);
+            writer.Write(Packet.MakeExtEntry(BulkBlockUpdateExtName, BulkBlockUpdateExtVersion).Bytes);
+            
             writer.Write(Packet.MakeExtEntry(TextColorsExtName, TextColorsExtVersion).Bytes);
             
             // Expect ExtInfo reply from the client
@@ -2435,6 +2389,10 @@ namespace fCraft {
                         else if (extVersion == BlockDefinitionsExtExt2Version)
                             addedExt = CpeExt.BlockDefinitionsExt2;
                         break;
+                    case BulkBlockUpdateExtName:
+                        if (extVersion == BulkBlockUpdateExtVersion)
+                            addedExt = CpeExt.BulkBlockUpdate;
+                        break;                        
                     case TextColorsExtName:
                         if (extVersion == TextColorsExtVersion)
                             addedExt = CpeExt.TextColors;
@@ -2453,6 +2411,8 @@ namespace fCraft {
             // ClassiCube just doesn't reply at all.
             if (ClientName == "ClassiCube Client")
             	supportedExtensions.Add(CpeExt.EnvMapAppearance);
+            supportsCustomBlocks = Supports(CpeExt.CustomBlocks);
+            supportsBlockDefs = Supports(CpeExt.BlockDefinitions);
 
             // log client's capabilities
             if (supportedExtensions.Count > 0)
@@ -2496,17 +2456,11 @@ namespace fCraft {
         }
 
         // For non-extended players, use appropriate substitution
-        public Packet ProcessOutgoingSetBlock(Packet packet) {
-        	bool supportsCustomBlocks = Supports(CpeExt.CustomBlocks);
-        	bool supportsDefinitions = Supports(CpeExt.BlockDefinitions);
-        	
-        	if (packet.Bytes[7] > (byte) Map.MaxCustomBlockType && !supportsDefinitions) {
-                packet.Bytes[7] = (byte) Map.GetFallbackBlock((Block) packet.Bytes[7]);
-            }
-        	if (packet.Bytes[7] > (byte) Map.MaxLegalBlockType && !supportsCustomBlocks) {
-                packet.Bytes[7] = (byte) Map.GetFallbackBlock((Block) packet.Bytes[7]);
-            }
-            return packet;
+        void ProcessOutgoingSetBlock(ref byte block) {
+            if (block > (byte) Map.MaxCustomBlockType && !supportsBlockDefs)
+                block = (byte) Map.GetFallbackBlock((Block)block);
+            if (block > (byte) Map.MaxLegalBlockType && !supportsCustomBlocks)
+                block = (byte) Map.GetFallbackBlock((Block)block);
         }
 
         #endregion

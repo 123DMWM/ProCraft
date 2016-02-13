@@ -598,33 +598,35 @@ namespace fCraft {
         }
 
 
-        /// <summary> Broadcasts a packet with low priority. </summary>
+        /// <summary> Broadcasts a set-block packet with low priority. </summary>
         /// <param name="source"> List of players who will receive the packet. </param>
-        /// <param name="packet"> Packet to send. </param>
+        /// <param name="coords"> Coordinates of the modified block. </param>
+        /// <param name="block"> New type of the modified block. </param>
         /// <returns> Number of players who received the packet. </returns>
-        public static int SendLowPriority( [NotNull] this IEnumerable<Player> source, Packet packet ) {
+        public static int SendBlock( [NotNull] this IEnumerable<Player> source, Vector3I coords, Block block ) {
             if( source == null ) throw new ArgumentNullException( "source" );
             int i = 0;
             foreach( Player player in source ) {
-                player.SendLowPriority( packet );
+                player.SendBlock( coords, block );
                 i++;
             }
             return i;
         }
 
 
-        /// <summary> Broadcasts a packet with low priority. </summary>
+        /// <summary> Broadcasts a set-block packet with low priority. </summary>
         /// <param name="source"> List of players who will receive the packet. </param>
         /// <param name="except"> Player to exclude from the recepient list. </param>
-        /// <param name="packet"> Packet to send. </param>
+        /// <param name="coords"> Coordinates of the modified block. </param>
+        /// <param name="block"> New type of the modified block. </param>
         /// <returns> Number of players who received the packet. </returns>
-        public static int SendLowPriority( [NotNull] this IEnumerable<Player> source, [CanBeNull] Player except,
-                                           Packet packet ) {
+        public static int SendBlock( [NotNull] this IEnumerable<Player> source, [CanBeNull] Player except,
+                                           Vector3I coords, Block block ) {
             if( source == null ) throw new ArgumentNullException( "source" );
             int i = 0;
             foreach( Player player in source ) {
                 if( player == except ) continue;
-                player.SendLowPriority( packet );
+                player.SendBlock( coords, block );
                 i++;
             }
             return i;

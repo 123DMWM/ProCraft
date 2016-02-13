@@ -60,14 +60,13 @@ namespace fCraft {
         /// <summary> Creates a new SetBlockServer (0x06) packet. </summary>
         /// <param name="coords"> Coordinates of the block. </param>
         /// <param name="type"> Block type to set at given coordinates. </param>
-        /// <param name="player"> Player packet is being sent to, used to get fallback block </param>
-        public static Packet MakeSetBlock( Vector3I coords, Block type, Player player ) {
+        public static Packet MakeSetBlock( Vector3I coords, Block type ) {
             Packet packet = new Packet( OpCode.SetBlockServer );
             //Logger.Log(LogType.Debug, "Send: MakeSetBlock({0})({1})", coords, type);
             ToNetOrder( (short)coords.X, packet.Bytes, 1 );
             ToNetOrder( (short)coords.Z, packet.Bytes, 3 );
             ToNetOrder( (short)coords.Y, packet.Bytes, 5 );
-            packet.Bytes[7] = (byte)player.getFallback(type);
+            packet.Bytes[7] = (byte)type;
             return packet;
         }
 
@@ -531,12 +530,12 @@ namespace fCraft {
 
         #endregion
 
-        static void ToNetOrder( short number, [NotNull] byte[] arr, int offset ) {
+        internal static void ToNetOrder( short number, [NotNull] byte[] arr, int offset ) {
             arr[offset] = (byte)((number & 0xff00) >> 8);
             arr[offset + 1] = (byte)(number & 0x00ff);
         }
 
-        static void ToNetOrder( int number, [NotNull] byte[] arr, int offset ) {
+        internal static void ToNetOrder( int number, [NotNull] byte[] arr, int offset ) {
             arr[offset] = (byte)((number & 0xff000000) >> 24);
             arr[offset + 1] = (byte)((number & 0x00ff0000) >> 16);
             arr[offset + 2] = (byte)((number & 0x0000ff00) >> 8);
@@ -587,5 +586,20 @@ namespace fCraft {
             1282, // BulkBlockUpdate
             6, // SetTextColor
         };
+    }
+    
+    public struct SetBlockData {
+        public short X, Y, Z;
+        public byte Block;
+        
+        public SetBlockData(int x, int y, int z, byte block) {
+            X = (short)x; Y = (short)y; Z = (short)z;
+            Block = block;
+        }
+        
+        public SetBlockData(Vector3I p, byte block) {
+            X = (short)p.X; Y = (short)p.Y; Z = (short)p.Z;
+            Block = block;
+        }
     }
 }

@@ -55,8 +55,8 @@ namespace fCraft {
         readonly PacketReader reader;
         readonly PacketWriter writer;
 
-        readonly ConcurrentQueue<Packet> outputQueue = new ConcurrentQueue<Packet>(),
-                                         priorityOutputQueue = new ConcurrentQueue<Packet>();
+        readonly ConcurrentQueue<Packet> priorityOutputQueue = new ConcurrentQueue<Packet>();
+        readonly ConcurrentQueue<SetBlockData> blockQueue = new ConcurrentQueue<SetBlockData>();
 
 
         internal static Player StartSession( [NotNull] TcpClient tcpClient ) {
@@ -125,21 +125,26 @@ namespace fCraft {
                 Server.RaiseSessionConnectedEvent( this );
 
                 // try to log the player in, otherwise die.
-                if( !LoginSequence() ) {
-                    return;
-                }
-
+                if( !LoginSequence() ) return;
                 BandwidthUseMode = Info.BandwidthUseMode;
 
                 // set up some temp variables
                 Packet packet = new Packet();
+                SetBlockData blockUpdate = new SetBlockData();
+                byte[] blockPacket = new byte[8];
+                blockPacket[0] = (byte)OpCode.SetBlockServer;
+                byte[] bulkBlockPacket = null;
+                if (Supports(CpeExt.BulkBlockUpdate)) {
+                    bulkBlockPacket = new byte[1282];
+                    bulkBlockPacket[0] = (byte)OpCode.BulkBlockUpdate;
+                }
+                
 
-                int pollCounter = 0,
-                    pingCounter = 0;
+                int pollCounter = 0, pingCounter = 0;
 
                 // main i/o loop
                 while( canSend ) {
-                    int packetsSent = 0;
+                    int packetsSent = 0, blockPacketsSent = 0;
 
                     // detect player disconnect
                     if( pollCounter > SocketPollInterval ) {
@@ -174,16 +179,8 @@ namespace fCraft {
                     }
 
                     // send output to player
-                    while (canSend && packetsSent < Server.MaxSessionPacketsPerTick)
-                    {
-                        if (!priorityOutputQueue.TryDequeue(out packet))
-                        {
-                            if (!outputQueue.TryDequeue(out packet))
-                            {
-                                // nothing more to send!
-                                break;
-                            }
-                        }
+                    while (canSend && packetsSent < Server.MaxSessionPacketsPerTick) {
+                        if (!priorityOutputQueue.TryDequeue(out packet)) break;
 
                         if( IsDeaf && packet.OpCode == OpCode.Message ) continue;
 
@@ -201,6 +198,33 @@ namespace fCraft {
                             UpdateVisibleEntities();
                             lastMovementUpdate = DateTime.UtcNow;
                         }
+                    }
+                    
+                    // send block updates output to player
+                    bool useBulk = bulkBlockPacket != null && blockQueue.Count > 160;
+                    Map currentMap = WorldMap;
+                    while (canSend && blockPacketsSent < Server.MaxBlockPacketsPerTick) {
+                        if (!blockQueue.TryDequeue(out blockUpdate)) break;
+                        ProcessOutgoingSetBlock(ref blockUpdate.Block);
+                        
+                        if (!useBulk) {
+                            Packet.ToNetOrder(blockUpdate.X, blockPacket, 1);
+                            Packet.ToNetOrder(blockUpdate.Z, blockPacket, 3);
+                            Packet.ToNetOrder(blockUpdate.Y, blockPacket, 5);
+                            blockPacket[7] = blockUpdate.Block;
+                            writer.Write( blockPacket );
+                            BytesSent += blockPacket.Length;
+                        } else {
+                            int index = currentMap.Index(blockUpdate.X, blockUpdate.Y, blockUpdate.Z);
+                            Packet.ToNetOrder(index, bulkBlockPacket, 2 + 4 * blockPacketsSent);
+                            bulkBlockPacket[2 + 1024 + blockPacketsSent] = blockUpdate.Block;
+                        }
+                        blockPacketsSent++;
+                    }
+                    if (canSend && useBulk) {
+                        bulkBlockPacket[1] = (byte)(blockPacketsSent - 1);
+                        writer.Write( bulkBlockPacket );
+                        BytesSent += bulkBlockPacket.Length;
                     }
 
                     // check if player needs to change worlds
@@ -1166,7 +1190,7 @@ namespace fCraft {
             }
 
             ResetVisibleEntities();
-            ClearQueue(outputQueue);
+            ClearQueue(blockQueue);
             Map map;
 
             // try to join the new world
@@ -1444,7 +1468,9 @@ namespace fCraft {
         public void SendNow( Packet packet ) {
             if( Thread.CurrentThread != ioThread ) {
                 throw new InvalidOperationException( "SendNow may only be called from player's own thread." );
-            } 
+            }
+        	if (packet.OpCode == OpCode.SetBlockServer)
+        		ProcessOutgoingSetBlock(ref packet.Bytes[7]);
             writer.Write( packet.Bytes );
             BytesSent += packet.Bytes.Length;
         }
@@ -1452,32 +1478,48 @@ namespace fCraft {
 
         /// <summary> Send packet (thread-safe, async, priority queue).
         /// This is used for most packets (movement, chat, etc). </summary>
-        public void Send(Packet packet)
-        {
-            if (packet.OpCode == OpCode.SetBlockServer) {
-                ProcessOutgoingSetBlock( packet);
-            }
+        public void Send(Packet packet) {
+            if (packet.OpCode == OpCode.SetBlockServer)
+                ProcessOutgoingSetBlock(ref packet.Bytes[7]);
             if( canQueue ) priorityOutputQueue.Enqueue( packet );
+        }
+        
+        
+        /// <summary> Sends a block change to THIS PLAYER ONLY 
+        /// (thread-safe, asynchronous, delayed queue). Does not affect the map. </summary>
+        /// <param name="coords"> Coordinates of the block. </param>
+        /// <param name="block"> Block type to send. </param>
+        public void SendBlock( Vector3I coords, Block block ) {
+            if( !WorldMap.InBounds( coords ) ) throw new ArgumentOutOfRangeException( "coords" );
+            byte raw = (byte)block;
+            ProcessOutgoingSetBlock( ref raw );
+            if( canQueue ) blockQueue.Enqueue( new SetBlockData( coords, raw ) );
         }
 
 
-        /// <summary> Send packet (thread-safe, asynchronous, delayed queue).
-        /// This is currently only used for block updates. </summary>
-        public void SendLowPriority(Packet packet)
-        {
-            if (packet.OpCode == OpCode.SetBlockServer) {
-                ProcessOutgoingSetBlock( packet);
-            }
-            if( canQueue ) outputQueue.Enqueue( packet );
+        /// <summary> Gets the block from given location in player's world,
+        /// and sends it (thread-safe, asynchronous, delayed queue) to the player.
+        /// Used to undo player's attempted block placement/deletion. </summary>
+        public void RevertBlock( Vector3I coords ) {
+            byte raw = (byte)WorldMap.GetBlock( coords );
+            ProcessOutgoingSetBlock( ref raw );
+            if( canQueue ) blockQueue.Enqueue( new SetBlockData( coords, raw ) );
+        }
+
+
+        // Gets the block from given location in player's world, and sends it (sync) to the player.
+        // Used to undo player's attempted block placement/deletion.
+        // To avoid threading issues, only use this from this player's IoThread.
+        void RevertBlockNow( Vector3I coords ) {
+            SendNow( Packet.MakeSetBlock( coords, WorldMap.GetBlock( coords ) ));
         }
 
         #endregion
 
 
-        static void ClearQueue([NotNull] ConcurrentQueue<Packet> queue)
-        {
+        static void ClearQueue<T>([NotNull] ConcurrentQueue<T> queue) {
             if (queue == null) throw new ArgumentNullException("queue");
-            Packet ignored;
+            T ignored;
             while (queue.TryDequeue(out ignored)) { }
         }           
 
@@ -1499,7 +1541,7 @@ namespace fCraft {
             unregisterOnKick = unregister;
 
             // clear all pending output to be written to client (it won't matter after the kick)
-            ClearQueue(outputQueue);
+            ClearQueue(blockQueue);
             ClearQueue(priorityOutputQueue);
 
             // bypassing Send() because canQueue is false

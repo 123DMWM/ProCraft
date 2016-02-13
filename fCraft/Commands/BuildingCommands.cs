@@ -1023,7 +1023,7 @@ namespace fCraft {
                 world.map.QueueUpdate(blockUpdate);
                 player.RaisePlayerPlacedBlockEvent(player, world.map, coords, block, world.map.GetBlock(coords), BlockChangeContext.Manual, true);
             } else {
-                player.SendNow(Packet.MakeSetBlock(coords, block, player));
+                player.SendNow(Packet.MakeSetBlock(coords, block));
                 player.PlaceBlockWithEvents(coords, ClickAction.Build, block);
             }
             if (!isConsole) 

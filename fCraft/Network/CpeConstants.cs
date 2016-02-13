@@ -83,7 +83,10 @@ namespace fCraft
         BlockDefinitionsExt,
         
         /// <summary> This extension lets users define their own custom blocks. </summary>
-        BlockDefinitionsExt2,        
+        BlockDefinitionsExt2,
+        
+        /// <summary> This extension lets servers send multiple block updates much more efficiently. </summary>
+        BulkBlockUpdate,
         
         /// <summary> This extension allows users to define their own custom text colors displayed in chat. </summary>
         TextColors,
