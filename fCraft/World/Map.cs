@@ -66,41 +66,7 @@ namespace fCraft {
             FallbackBlocks[(int)Block.Crate] = Block.Wood;
             FallbackBlocks[(int)Block.StoneBrick] = Block.Stone;
         }
-
-
-        public static Block GetFallbackBlock(Block block) {
-            return FallbackBlocks[(int)block];
-        }
-
-
-        public unsafe byte[] GetFallbackMap() {
-            byte[] translatedBlocks = (byte[]) Blocks.Clone();
-            int volume = translatedBlocks.Length;
-            fixed (byte* ptr = translatedBlocks) {
-                for (int i = 0; i < volume; i++) {
-                    byte block = ptr[i];
-                    if (block > (byte) MaxLegalBlockType) {
-                        ptr[i] = (byte) FallbackBlocks[block];
-                    }
-                }
-            }
-            return translatedBlocks;
-        }
         
-        public unsafe byte[] GetCPEFallbackMap() {
-            byte[] translatedBlocks = (byte[]) Blocks.Clone();
-            int volume = translatedBlocks.Length;
-            fixed (byte* ptr = translatedBlocks) {
-                for (int i = 0; i < volume; i++) {
-                    byte block = ptr[i];
-                    if (block > (byte) MaxCustomBlockType) {
-                        ptr[i] = (byte) FallbackBlocks[block];
-                    }
-                }
-            }
-            return translatedBlocks;
-        }
-
         public unsafe byte[] GetFallbackMapRanderer() {
             BlockDefinition.LoadGlobalDefinitions();
             byte[] translatedBlocks = (byte[])Blocks.Clone();
@@ -947,26 +913,48 @@ namespace fCraft {
 
         /// <summary> Gets a compressed (GZip) copy of the map (raw block data with signed, 32bit, big-endian block count prepended).
         /// If the map has not been modified since last GetCompressedCopy call, returns a cached copy. </summary>
-        public byte[] GetCompressedCopy(byte[] array) {
+        public byte[] GetCompressedCopy(out int compressedLen) {
+            byte[] array = Blocks;
             byte[] currentCopy = compressedCopyCache;
             if (currentCopy == null) {
-            	currentCopy = MakeCompressedMap(array);
+                using (MemoryStream ms = new MemoryStream()) {
+                    using (GZipStream compressor = new GZipStream(ms, CompressionMode.Compress, true)) {
+                        // convert block count to big-endian
+                        int convertedBlockCount = IPAddress.HostToNetworkOrder(array.Length);
+                        // write block count to gzip stream
+                        compressor.Write(BitConverter.GetBytes(convertedBlockCount), 0, 4);
+                        compressor.Write(array, 0, array.Length);
+                    }
+                    currentCopy = ms.ToArray();
+                }
                 compressedCopyCache = currentCopy;
             }
+            compressedLen = currentCopy.Length;
             return currentCopy;
         }
         
-        public static byte[] MakeCompressedMap(byte[] array) {
-        	using (MemoryStream ms = new MemoryStream()) {
-        		using (GZipStream compressor = new GZipStream(ms, CompressionMode.Compress)) {
-        			// convert block count to big-endian
-        			int convertedBlockCount = IPAddress.HostToNetworkOrder(array.Length);
-        			// write block count to gzip stream
-        			compressor.Write(BitConverter.GetBytes(convertedBlockCount), 0, 4);
-        			compressor.Write(array, 0, array.Length);  			
-        		}
-        		return ms.ToArray();
-        	}
+        const int bufferSize = 64 * 1024;
+        public byte[] MakeCompressedMap(byte maxLegal, out int compressedLen) {
+            byte[] array = Blocks;
+            using (MemoryStream ms = new MemoryStream()) {
+                using (GZipStream compressor = new GZipStream(ms, CompressionMode.Compress, true)) {
+                    int count = IPAddress.HostToNetworkOrder(array.Length);
+                    compressor.Write(BitConverter.GetBytes(count), 0, 4);
+                    
+                    byte[] buffer = new byte[bufferSize];
+                    for (int i = 0; i < array.Length; i += bufferSize) {
+                        int len = Math.Min(bufferSize, array.Length - i);
+                        for (int j = 0; j < len; j++) {
+                            byte block = array[i + j];
+                            if (block > maxLegal) block = (byte)Map.FallbackBlocks[block];
+                            buffer[j] = block;
+                        }
+                        compressor.Write(buffer, 0, len);
+                    }
+                }
+                compressedLen = (int)ms.Length;
+                return ms.GetBuffer();
+            }
         }
 
         volatile byte[] compressedCopyCache;
@@ -976,7 +964,7 @@ namespace fCraft {
         /// <param name="x"> X coordinate (width). </param>
         /// <param name="y"> Y coordinate (length, Notch's Z). </param>
         /// <param name="id"> Block type to search for. </param>
-        /// <returns> Height (Z coordinate; Notch's X) of the blocktype's first appearance.
+        /// <returns> Height (Z coordinate; Notch's Y) of the blocktype's first appearance.
         /// -1 if given blocktype was not found. </returns>
         public int SearchColumn( int x, int y, Block id ) {
             return SearchColumn( x, y, id, Height - 1 );
@@ -988,7 +976,7 @@ namespace fCraft {
         /// <param name="y"> Y coordinate (length, Notch's Z). </param>
         /// <param name="id"> Block type to search for. </param>
         /// <param name="zStart"> Starting height. No blocks above this point will be checked. </param>
-        /// <returns> Height (Z coordinate; Notch's X) of the blocktype's first appearance.
+        /// <returns> Height (Z coordinate; Notch's Y) of the blocktype's first appearance.
         /// -1 if given blocktype was not found. </returns>
         public int SearchColumn( int x, int y, Block id, int zStart ) {
             for( int z = zStart; z > 0; z-- ) {

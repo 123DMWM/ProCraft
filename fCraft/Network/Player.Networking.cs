@@ -1250,46 +1250,34 @@ namespace fCraft {
         }
         
         void WriteWorldData(Map map) {
-        	 // Fetch compressed map copy
-        	byte[] buffer = new byte[1024];
-            int mapBytesSent = 0;
-            byte[] compressed = GetCompressedBlocks(map);
-            Logger.Log(LogType.Debug,
-                        "Player.JoinWorldNow: Sending compressed map ({0} bytes) to {1}.",
-                        compressed.Length, Name);
+             // Fetch compressed map copy
+            int mapBytesSent = 0, compressedLen = 0;
+            Block maxLegal = supportsCustomBlocks ? Map.MaxCustomBlockType : Map.MaxLegalBlockType;
+            byte[] compressed = (supportsCustomBlocks && supportsBlockDefs) ? 
+                map.GetCompressedCopy(out compressedLen) : map.MakeCompressedMap((byte)maxLegal, out compressedLen);
+            Logger.Log(LogType.Debug, "Player.JoinWorldNow: Sending compressed map ({0} bytes) to {1}.", compressedLen, Name);
 
             // Transfer the map copy
-            while (mapBytesSent < compressed.Length) {
-                int chunkSize = compressed.Length - mapBytesSent;
-                if (chunkSize > 1024) {
-                    chunkSize = 1024;
-                } else {
-                    // CRC fix for ManicDigger
-                    for (int i = 0; i < buffer.Length; i++) {
-                        buffer[i] = 0;
-                    }
-                }
-                Array.Copy(compressed, mapBytesSent, buffer, 0, chunkSize);
-                byte progress = (byte) (100*mapBytesSent/compressed.Length);
+            while (mapBytesSent < compressedLen) {
+                int chunkSize = compressedLen - mapBytesSent;
+                if (chunkSize > 1024) chunkSize = 1024;              
+                byte progress = (byte)(100 * mapBytesSent / compressedLen);
 
                 // write in chunks of 1024 bytes or less
                 writer.Write(OpCode.MapChunk);
-                writer.Write((short) chunkSize);
-                writer.Write(buffer, 0, 1024);
+                writer.Write((short)chunkSize);
+                if (chunkSize == 1024) {
+                    writer.Write(compressed, mapBytesSent, 1024);
+                } else {
+                    byte[] buffer = new byte[1024];
+                    Array.Copy(compressed, mapBytesSent, buffer, 0, chunkSize);
+                    writer.Write(buffer, 0, 1024);
+                }
+
                 writer.Write(progress);
                 BytesSent += 1028;
                 mapBytesSent += chunkSize;
             }
-        }
-        
-        byte[] GetCompressedBlocks(Map map) {
-        	bool customBlocks = Supports(CpeExt.CustomBlocks);
-        	if (customBlocks && Supports(CpeExt.BlockDefinitions))
-        		return map.GetCompressedCopy(map.Blocks);
-        	
-        	byte[] blocks = customBlocks ? 
-        		map.GetCPEFallbackMap() : map.GetFallbackMap();
-        	return Map.MakeCompressedMap(blocks);
         }
         
         void SendJoinMessage(World oldWorld, World newWorld) {
