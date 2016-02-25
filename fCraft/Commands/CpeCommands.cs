@@ -1,6 +1,8 @@
 ﻿// ProCraft Copyright 2014-2016 Joseph Beauvais <123DMWM@gmail.com>
+using JetBrains.Annotations;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -10,25 +12,318 @@ namespace fCraft {
     static class CpeCommands {
 
         internal static void Init() {
-            CommandManager.RegisterCommand( CdChangeModel );
-            CommandManager.RegisterCommand( CdAFKModel );
-            CommandManager.RegisterCommand( CdHackControl );
-            CommandManager.RegisterCommand( CdChangeSkin );
-            CommandManager.RegisterCommand( CdGlobalBlock );
-            CommandManager.RegisterCommand( CdCustomColors );
+            CommandManager.RegisterCommand(CdAFKModel);
+            CommandManager.RegisterCommand(CdChangeModel);
+            CommandManager.RegisterCommand(CdChangeSkin);
+            CommandManager.RegisterCommand(Cdclickdistance);
+            CommandManager.RegisterCommand(CdCustomColors);
+            CommandManager.RegisterCommand(CdEntity);
+            CommandManager.RegisterCommand(CdEnv);
+            CommandManager.RegisterCommand(CdGlobalBlock);
+            CommandManager.RegisterCommand(CdHackControl);
+            CommandManager.RegisterCommand(CdListClients);
+            CommandManager.RegisterCommand(CdMRD);
+            CommandManager.RegisterCommand(Cdtex);
+            CommandManager.RegisterCommand(CdtextHotKey);
+            CommandManager.RegisterCommand(Cdweather);
+            CommandManager.RegisterCommand(CdZoneShow);
         }
-        
-        #region ChangeModel
-        
-        internal static string[] validEntities =  { "chicken", "creeper", 
+
+        internal static string[] validEntities =  { "chicken", "creeper",
             "humanoid", "human", "pig", "sheep", "skeleton", "spider", "zombie"
         };
-        
-        static readonly CommandDescriptor CdChangeModel = new CommandDescriptor
-        {
+
+        /// <summary> Ensures that the hex color has the correct length (1-6 characters)
+        /// and character set (alphanumeric chars allowed). </summary>
+        public static bool IsValidHex(string hex) {
+            if (hex == null) throw new ArgumentNullException("hex");
+            if (hex.StartsWith("#")) hex = hex.Remove(0, 1);
+            if (hex.Length < 1 || hex.Length > 6) return false;
+            for (int i = 0; i < hex.Length; i++) {
+                char ch = hex[i];
+                if (ch < '0' || ch > '9' &&
+                    ch < 'A' || ch > 'F' &&
+                    ch < 'a' || ch > 'f') {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        #region AddEntity
+
+        static readonly CommandDescriptor CdEntity = new CommandDescriptor {
+            Name = "Entity",
+            Aliases = new[] { "AddEntity", "AddEnt", "Ent" },
+            Permissions = new[] { Permission.BringAll },
+            Category = CommandCategory.CPE | CommandCategory.World,
+            Usage = "/ent <create / remove / removeAll / model / list / bring>",
+            Help = "Commands for manipulating entities. For help and usage for the individual options, use /help ent <option>.",
+            HelpSections = new Dictionary<string, string>{
+                { "create", "&H/Ent create <entity name> <model> <skin>&n&S" +
+                                "Creates a new entity with the given name. Valid models are chicken, creeper, human, pig, sheep, skeleton, spider, zombie, or any block ID/Name." },
+                { "remove", "&H/Ent remove <entity name>&n&S" +
+                                "Removes the given entity." },
+                { "removeall", "&H/Ent removeAll&n&S" +
+                                "Removes all entities from the server."},
+                { "model", "&H/Ent model <entity name> <model>&n&S" +
+                                "Changes the model of an entity to the given model. Valid models are chicken, creeper, human, pig, sheep, skeleton, spider, zombie, or any block ID/Name."},
+                { "list", "&H/Ent list&n&S" +
+                                "Prints out a list of all the entites on the server."},
+                 { "bring", "&H/Ent bring <entity name>&n&S" +
+                                "Brings the given entity to you."}
+            },
+            Handler = BotHandler,
+        };
+
+        private static void BotHandler(Player player, CommandReader cmd) {
+            string option = cmd.Next();
+            if (string.IsNullOrEmpty(option)) {
+                CdEntity.PrintUsage(player);
+                return;
+            }
+
+            if (option.ToLower() == "list") {
+                player.Message("_Entities on {0}_", ConfigKey.ServerName.GetString());
+                foreach (Bot botCheck in World.Bots) {
+                    player.Message(botCheck.Name + " on " + botCheck.World.Name);
+                }
+                return;
+            }
+            if (option.ToLower() == "removeall") {
+                if (cmd.IsConfirmed) {
+                    foreach (Bot b in World.Bots) {
+                        b.World.Players.Send(Packet.MakeRemoveEntity(b.ID));
+                        if (File.Exists("./Entities/" + b.Name.ToLower() + ".txt")) {
+                            File.Delete("./Entities/" + b.Name.ToLower() + ".txt");
+                        }
+                    }
+                    World.Bots.Clear();
+                    player.Message("All entities removed.");
+                } else {
+                    player.Confirm(cmd, "This will remove all the entites everywhere, are you sure?");
+                }
+                return;
+            }
+
+            //finally away from the special cases
+            string botName = cmd.Next();
+            if (string.IsNullOrEmpty(botName)) {
+                CdEntity.PrintUsage(player);
+                return;
+            }
+
+            Bot bot = new Bot();
+            if (option != "create" && option != "add") {
+                bot = World.FindBot(botName.ToLower());
+                if (bot == null) {
+                    player.Message(
+                        "Could not find {0}! Please make sure you spelled the entities name correctly. To view all the entities, type /ent list.",
+                        botName);
+                    return;
+                }
+            }
+            Block blockmodel;
+
+            switch (option.ToLower()) {
+                case "create":
+                case "add":
+                    string requestedModel = "humanoid";
+                    if (cmd.HasNext) {
+                        requestedModel = cmd.Next().ToLower();
+                    }
+                    if (!validEntities.Contains(requestedModel)) {
+                        if (Map.GetBlockByName(requestedModel, false, out blockmodel)) {
+                            requestedModel = blockmodel.GetHashCode().ToString();
+                        } else {
+                            player.Message(
+                                "That wasn't a valid entity model! Valid models are chicken, creeper, human, pig, sheep, skeleton, spider, zombie, or any block ID/Name.");
+                            return;
+                        }
+                    }
+
+                    //if a botname has already been chosen, ask player for a new name
+                    var matchingNames = from b in World.Bots where b.Name.ToLower() == botName.ToLower() select b;
+
+                    if (matchingNames.Count() > 0) {
+                        player.Message("An entity with that name already exists! To view all entities, type /ent list.");
+                        return;
+                    }
+
+                    string skinString1 = (cmd.Next() ?? botName);
+                    if (skinString1 != null) {
+                        if (skinString1.StartsWith("--")) {
+                            skinString1 = string.Format("http://minecraft.net/skin/{0}.png", skinString1.Replace("--", ""));
+                        }
+                        if (skinString1.StartsWith("-+")) {
+                            skinString1 = string.Format("http://skins.minecraft.net/MinecraftSkins/{0}.png", skinString1.Replace("-+", ""));
+                        }
+                        if (skinString1.StartsWith("++")) {
+                            skinString1 = string.Format("http://i.imgur.com/{0}.png", skinString1.Replace("++", ""));
+                        }
+                    }
+                    Bot botCreate = new Bot();
+                    botCreate.setBot(botName, skinString1, requestedModel, player.World, player.Position, getNewID());
+                    botCreate.createBot();
+                    player.Message("Successfully created entity {0}&s with id:{1} and skin {2}.", botCreate.Name, botCreate.ID, skinString1 ?? bot.Name);
+                    break;
+                case "remove":
+                    player.Message("{0} was removed from the server.", bot.Name);
+                    bot.removeBot();
+                    break;
+                case "model":
+                    if (cmd.HasNext) {
+                        string model = cmd.Next().ToLower();
+                        string skinString2 = cmd.Next();
+                        if (skinString2 != null) {
+                            if (skinString2.StartsWith("--")) {
+                                skinString2 = string.Format("http://minecraft.net/skin/{0}.png", skinString2.Replace("--", ""));
+                            }
+                            if (skinString2.StartsWith("-+")) {
+                                skinString2 = string.Format("http://skins.minecraft.net/MinecraftSkins/{0}.png", skinString2.Replace("-+", ""));
+                            }
+                            if (skinString2.StartsWith("++")) {
+                                skinString2 = string.Format("http://i.imgur.com/{0}.png", skinString2.Replace("++", ""));
+                            }
+                        }
+                        if (string.IsNullOrEmpty(model)) {
+                            player.Message(
+                                "Usage is /Ent model <bot> <model>. Valid models are chicken, creeper, human, pig, sheep, skeleton, spider, zombie, or any block ID/Name.");
+                            break;
+                        }
+
+                        if (model == "human") {
+                            model = "humanoid";
+                        }
+                        if (!validEntities.Contains(model)) {
+                            if (Map.GetBlockByName(model, false, out blockmodel)) {
+                                model = blockmodel.GetHashCode().ToString();
+                            } else {
+                                player.Message(
+                                    "That wasn't a valid entity model! Valid models are chicken, creeper, human, pig, sheep, skeleton, spider, zombie, or any block ID/Name.");
+                                break;
+                            }
+                        }
+
+                        player.Message("Changed entity model to {0} with skin {1}.", model, skinString2 ?? bot.SkinName);
+                        bot.changeBotModel(model, skinString2 ?? bot.SkinName);
+                    } else
+                        player.Message(
+                            "Usage is /Ent model <bot> <model>. Valid models are chicken, creeper, human, pig, sheep, skeleton, spider, zombie, or any block ID/Name.");
+                    break;
+                case "bring":
+                    bot.teleportBot(player.Position);
+                    break;
+                case "tp":
+                case "teleport":
+                    World targetWorld = bot.World;
+                    Bot target = bot;
+                    if (targetWorld == player.World) {
+                        if (player.World != null) {
+                            player.LastWorld = player.World;
+                            player.LastPosition = player.Position;
+                        }
+                        player.TeleportTo(target.Position);
+
+                    } else {
+                        if (targetWorld.Name.StartsWith("PW_") &&
+                            !targetWorld.AccessSecurity.ExceptionList.Included.Contains(player.Info)) {
+                            player.Message(
+                                "You cannot join due to that Bot being in a personal world that you cannot access.");
+                            break;
+                        }
+                        switch (targetWorld.AccessSecurity.CheckDetailed(player.Info)) {
+                            case SecurityCheckResult.Allowed:
+                            case SecurityCheckResult.WhiteListed:
+                                if (player.Info.Rank.Name == "Banned") {
+                                    player.Message("&CYou can not change worlds while banned.");
+                                    player.Message("Cannot teleport to {0}&S.", target.Name,
+                                        targetWorld.ClassyName, targetWorld.AccessSecurity.MinRank.ClassyName);
+                                    break;
+                                }
+                                if (targetWorld.IsFull) {
+                                    player.Message("Cannot teleport to {0}&S because world {1}&S is full.",
+                                        target.Name, targetWorld.ClassyName);
+                                    player.Message("Cannot teleport to {0}&S.", target.Name,
+                                        targetWorld.ClassyName, targetWorld.AccessSecurity.MinRank.ClassyName);
+                                    break;
+                                }
+                                player.StopSpectating();
+                                player.JoinWorld(targetWorld, WorldChangeReason.Tp, target.Position);
+                                break;
+                            case SecurityCheckResult.BlackListed:
+                                player.Message("Cannot teleport to {0}&S because you are blacklisted on world {1}",
+                                    target.Name, targetWorld.ClassyName);
+                                break;
+                            case SecurityCheckResult.RankTooLow:
+                                if (player.Info.Rank.Name == "Banned") {
+                                    player.Message("&CYou can not change worlds while banned.");
+                                    player.Message("Cannot teleport to {0}&S.", target.Name,
+                                        targetWorld.ClassyName, targetWorld.AccessSecurity.MinRank.ClassyName);
+                                    break;
+                                }
+
+                                if (targetWorld.IsFull) {
+                                    if (targetWorld.IsFull) {
+                                        player.Message("Cannot teleport to {0}&S because world {1}&S is full.",
+                                            target.Name, targetWorld.ClassyName);
+                                        player.Message("Cannot teleport to {0}&S.", target.Name,
+                                            targetWorld.ClassyName, targetWorld.AccessSecurity.MinRank.ClassyName);
+                                        break;
+                                    }
+                                    player.StopSpectating();
+                                    player.JoinWorld(targetWorld, WorldChangeReason.Tp, target.Position);
+                                    break;
+                                }
+                                player.Message("Cannot teleport to {0}&S because world {1}&S requires {2}+&S to join.",
+                                    target.Name, targetWorld.ClassyName,
+                                    targetWorld.AccessSecurity.MinRank.ClassyName);
+                                break;
+                        }
+                    }
+                    break;
+                case "skin":
+                    string skinString3 = cmd.Next();
+                    if (skinString3 != null) {
+                        if (skinString3.StartsWith("--")) {
+                            skinString3 = string.Format("http://minecraft.net/skin/{0}.png", skinString3.Replace("--", ""));
+                        }
+                        if (skinString3.StartsWith("-+")) {
+                            skinString3 = string.Format("http://skins.minecraft.net/MinecraftSkins/{0}.png", skinString3.Replace("-+", ""));
+                        }
+                        if (skinString3.StartsWith("++")) {
+                            skinString3 = string.Format("http://i.imgur.com/{0}.png", skinString3.Replace("++", ""));
+                        }
+                    }
+                    player.Message("Changed entity skin to {0}.", skinString3 ?? bot.Name);
+                    bot.changeBotSkin(skinString3);
+                    break;
+                default:
+                    CdEntity.PrintUsage(player);
+                    break;
+            }
+        }
+
+        public static sbyte getNewID() {
+            sbyte i = 1;
+        go:
+            foreach (Bot bot in World.Bots) {
+                if (bot.ID == i) {
+                    i++;
+                    goto go;
+                }
+            }
+            return i;
+        }
+
+        #endregion
+
+        #region ChangeModel
+
+        static readonly CommandDescriptor CdChangeModel = new CommandDescriptor {
             Name = "Model",
             Aliases = new[] { "ChangeModel", "cm" },
-            Category = CommandCategory.New | CommandCategory.Moderation,
+            Category = CommandCategory.CPE | CommandCategory.Moderation,
             Permissions = new[] { Permission.ReadStaffChat },
             Usage = "/Model [Player] [Model]",
             IsConsoleSafe = true,
@@ -40,7 +335,7 @@ namespace fCraft {
         private static void ModelHandler(Player player, CommandReader cmd) {
             PlayerInfo otherPlayer = InfoCommands.FindPlayerInfo(player, cmd, cmd.Next() ?? player.Name);
             if (otherPlayer == null) return;
-             
+
             if (!player.IsStaff && otherPlayer != player.Info) {
                 Rank staffRank = RankManager.GetMinRankWithAnyPermission(Permission.ReadStaffChat);
                 if (staffRank != null) {
@@ -104,11 +399,11 @@ namespace fCraft {
         private static void AFKModelHandler(Player player, CommandReader cmd) {
             PlayerInfo otherPlayer = InfoCommands.FindPlayerInfo(player, cmd, cmd.Next() ?? player.Name);
             if (otherPlayer == null) return;
-            
+
             if (!player.IsStaff && otherPlayer != player.Info) {
                 Rank staffRank = RankManager.GetMinRankWithAnyPermission(Permission.ReadStaffChat);
                 if (staffRank != null) {
-                    player.Message("You must be {0}&s+ to change another players AFKModel", staffRank.ClassyName );
+                    player.Message("You must be {0}&s+ to change another players AFKModel", staffRank.ClassyName);
                 } else {
                     player.Message("No ranks have the ReadStaffChat permission so no one can change other players AFKModel, yell at the owner.");
                 }
@@ -187,7 +482,7 @@ namespace fCraft {
                 }
             }
             PlayerInfo p = InfoCommands.FindPlayerInfo(player, cmd, namePart);
-            if (p == null)  return;
+            if (p == null) return;
 
             if (p.skinName == skinString) {
                 player.Message("&f{0}&s's skin is already set to &f{1}", p.Name, skinString);
@@ -204,138 +499,567 @@ namespace fCraft {
         }
 
         #endregion 
-        
-        #region HackControl
-        
-        static readonly CommandDescriptor CdHackControl = new CommandDescriptor
-        {
-            Name = "HackControl",
-            Aliases = new[] { "hacks", "hack", "hax" },
-            Category = CommandCategory.New | CommandCategory.Moderation,
-            Permissions = new[] { Permission.Chat},
-            Usage = "/Hacks [Player] [Hack] [jumpheight(if needed)]",
+
+        #region ClickDistance
+
+        static readonly CommandDescriptor Cdclickdistance = new CommandDescriptor {
+            Name = "ReachDistance",
+            Aliases = new[] { "Reach", "rd" },
+            Permissions = new[] { Permission.DrawAdvanced },
             IsConsoleSafe = true,
-            Help = "Change the hacking abilities of [Player]&n" +
-            "Valid hacks: &aFlying&s, &aNoclip&s, &aSpeedhack&s, &aRespawn&s, &aThirdPerson&s and &aJumpheight",
-            Handler = HackControlHandler
+            Category = CommandCategory.CPE | CommandCategory.World,
+            Help = "Changes player reach distance. Every 32 is one block. Default: 160",
+            Usage = "/reach [Player] [distance or reset]",
+            Handler = ClickDistanceHandler
         };
 
-        static void HackControlHandler(Player player, CommandReader cmd) {
-            string first = cmd.Next();
+        static void ClickDistanceHandler(Player player, CommandReader cmd) {
+            PlayerInfo otherPlayer = InfoCommands.FindPlayerInfo(player, cmd, cmd.Next() ?? player.Name);
+            if (otherPlayer == null) return;
 
-            if (first == null || player.Info.Rank != RankManager.HighestRank) {
-                player.Message("&sCurrent Hacks for {0}", player.ClassyName);
-                player.Message("    &sFlying: &a{0} &sNoclip: &a{1} &sSpeedhack: &a{2}",
-                                player.Info.AllowFlying.ToString(),
-                                player.Info.AllowNoClip.ToString(),
-                                player.Info.AllowSpeedhack.ToString());
-                player.Message("    &sRespawn: &a{0} &sThirdPerson: &a{1} &sJumpHeight: &a{2}",
-                                player.Info.AllowRespawn.ToString(),
-                                player.Info.AllowThirdPerson.ToString(),
-                                player.Info.JumpHeight);
+            if (!player.IsStaff && otherPlayer != player.Info) {
+                Rank staffRank = RankManager.GetMinRankWithAnyPermission(Permission.ReadStaffChat);
+                if (staffRank != null) {
+                    player.Message("You must be {0}&s+ to change another players reach distance", staffRank.ClassyName);
+                } else {
+                    player.Message("No ranks have the ReadStaffChat permission so no one can change other players reachdistance, yell at the owner.");
+                }
+                return;
+            }
+            if (otherPlayer.Rank.Index < player.Info.Rank.Index) {
+                player.Message("Cannot change the Reach Distance of someone higher rank than you.");
+                return;
+            }
+            string second = cmd.Next();
+            if (string.IsNullOrEmpty(second)) {
+                if (otherPlayer == player.Info) {
+                    player.Message("Your current ReachDistance: {0} blocks [Units: {1}]", player.Info.ReachDistance / 32, player.Info.ReachDistance);
+                } else {
+                    player.Message("Current ReachDistance for {2}: {0} blocks [Units: {1}]", otherPlayer.ReachDistance / 32, otherPlayer.ReachDistance, otherPlayer.Name);
+                }
+                return;
+            }
+            short distance;
+            if (!short.TryParse(second, out distance)) {
+                if (second != "reset") {
+                    player.Message("Please try something inbetween 0 and 32767");
+                    return;
+                } else {
+                    distance = 160;
+                }
+            }
+            if (distance < 0 || distance > 32767) {
+                player.Message("Reach distance must be between 0 and 32767");
                 return;
             }
 
-            PlayerInfo target = InfoCommands.FindPlayerInfo(player, cmd, first);
-            if (target == null) return;
-
-            string hack = (cmd.Next() ?? "null");
-            string hackStr = "hack";
-
-            if (hack == "null") {
-                player.Message("&sCurrent Hacks for {0}", target.ClassyName);
-                player.Message("    &sFlying: &a{0} &sNoclip: &a{1} &sSpeedhack: &a{2}",
-                                target.AllowFlying.ToString(),
-                                target.AllowNoClip.ToString(),
-                                target.AllowSpeedhack.ToString());
-                player.Message("    &sRespawn: &a{0} &sThirdPerson: &a{1} &sJumpHeight: &a{2}",
-                                target.AllowRespawn.ToString(),
-                                target.AllowThirdPerson.ToString(),
-                                target.JumpHeight);
+            if (distance != otherPlayer.ReachDistance) {
+                if (otherPlayer != player.Info) {
+                    if (otherPlayer.IsOnline == true) {
+                        if (otherPlayer.PlayerObject.Supports(CpeExt.ClickDistance)) {
+                            otherPlayer.PlayerObject.Message("{0} set your reach distance from {1} to {2} blocks [Units: {3}]", player.Name, otherPlayer.ReachDistance / 32, distance / 32, distance);
+                            player.Message("Set reach distance for {0} from {1} to {2} blocks [Units: {3}]", otherPlayer.Name, otherPlayer.ReachDistance / 32, distance / 32, distance);
+                            otherPlayer.ReachDistance = distance;
+                            otherPlayer.PlayerObject.Send(Packet.MakeSetClickDistance(distance));
+                        } else {
+                            player.Message("This player does not support ReachDistance packet");
+                        }
+                    } else {
+                        player.Message("Set reach distance for {0} from {1} to {2} blocks [Units: {3}]", otherPlayer.Name, otherPlayer.ReachDistance / 32, distance / 32, distance);
+                        otherPlayer.ReachDistance = distance;
+                    }
+                } else {
+                    if (player.Supports(CpeExt.ClickDistance)) {
+                        player.Message("Set own reach distance from {0} to {1} blocks [Units: {2}]", player.Info.ReachDistance / 32, distance / 32, distance);
+                        player.Info.ReachDistance = distance;
+                        player.Send(Packet.MakeSetClickDistance(distance));
+                    } else {
+                        player.Message("You don't support ReachDistance packet");
+                    }
+                }
+            } else {
+                if (otherPlayer != player.Info) {
+                    player.Message("{0}'s reach distance is already set to {1}", otherPlayer.ClassyName, otherPlayer.ReachDistance);
+                } else {
+                    player.Message("Your reach distance is already set to {0}", otherPlayer.ReachDistance);
+                }
                 return;
-            }
-
-            switch (hack.ToLower()) {
-                case "flying":
-                case "fly":
-                case "f":
-                    player.Message("Hacks for {0}", target.ClassyName);
-                    player.Message("    Flying: &a{0} &s--> &a{1}", target.AllowFlying.ToString(), (!target.AllowFlying).ToString());
-                    target.AllowFlying = !target.AllowFlying;
-                    hackStr = "flying";
-                    goto sendPacket;
-                case "noclip":
-                case "clip":
-                case "nc":
-                    player.Message("Hacks for {0}", target.ClassyName);
-                    player.Message("    NoClip: &a{0} &s--> &a{1}", target.AllowNoClip.ToString(), (!target.AllowNoClip).ToString());
-                    target.AllowNoClip = !target.AllowNoClip;
-                    hackStr = "noclip";
-                    goto sendPacket;
-                case "speedhack":
-                case "speed":
-                case "sh":
-                    player.Message("Hacks for {0}", target.ClassyName);
-                    player.Message("    SpeedHack: &a{0} &s--> &a{1}", target.AllowSpeedhack.ToString(), (!target.AllowSpeedhack).ToString());
-                    target.AllowSpeedhack = !target.AllowSpeedhack;
-                    hackStr = "speedhack";
-                    goto sendPacket;
-                case "respawn":
-                case "spawn":
-                case "rs":
-                    player.Message("Hacks for {0}", target.ClassyName);
-                    player.Message("    Respawn: &a{0} &s--> &a{1}", target.AllowRespawn.ToString(), (!target.AllowRespawn).ToString());
-                    target.AllowRespawn = !target.AllowRespawn;
-                    hackStr = "respawn";
-                    goto sendPacket;
-                case "thirdperson":
-                case "third":
-                case "tp":
-                    player.Message("Hacks for {0}", target.ClassyName);
-                    player.Message("    ThirdPerson: &a{0} &s--> &a{1}", target.AllowThirdPerson.ToString(), (!target.AllowThirdPerson).ToString());
-                    target.AllowThirdPerson = !target.AllowThirdPerson;
-                    hackStr = "thirdperson";
-                    goto sendPacket;
-                case "jumpheight":
-                case "jump":
-                case "height":
-                case "jh":
-                    short height;
-                    string third = cmd.Next();
-                    if (short.TryParse(third, out height)) {
-                        player.Message("Hacks for {0}", target.ClassyName);
-                        player.Message("    JumpHeight: &a{0} &s--> &a{1}", target.JumpHeight, height);
-                        target.JumpHeight = height;
-                        hackStr = "jumpheight";
-                        goto sendPacket;
-                    } else  player.Message("Error: Could not parse \"&a{0}&s\" as a short. Try something between &a0&s and &a32767", third);
-                    break;
-                default:
-                    player.Message(CdHackControl.Help);
-                    break;
-            }
-            return;
-        sendPacket:
-            if (target.IsOnline) {
-                if (target.PlayerObject != player) {
-                    target.PlayerObject.Message("{0} has changed your {1} ability, use &h/Hacks &sto check them out.", player.Info.Name, hackStr);
-                }
-                if (target.PlayerObject.Supports(CpeExt.HackControl)) {
-                    target.PlayerObject.Send(Packet.HackControl(
-                        target.AllowFlying, target.AllowNoClip, target.AllowSpeedhack,
-                        target.AllowRespawn, target.AllowThirdPerson, target.JumpHeight));
-                }
             }
         }
-        
+
         #endregion
-        
-        #region Global block
+
+        #region CustomColors
+
+        static readonly CommandDescriptor CdCustomColors = new CommandDescriptor {
+            Name = "CustomColors",
+            Aliases = new[] { "ccols" },
+            Category = CommandCategory.CPE | CommandCategory.Chat,
+            Permissions = new[] { Permission.Chat },
+            Usage = "/ccols [type] [args]",
+            IsConsoleSafe = true,
+            Help = "&sModifies the custom colors, or prints information about them.&n" +
+                "&sTypes are: add, free, list, remove&n" +
+                "&sSee &h/help ccols <type>&s for details about each type.",
+            HelpSections = new Dictionary<string, string>{
+                { "add",     "&h/ccols add [code] [name] [fallback] [hex]&n" +
+                        "&scode is in ASCII. You cannot replace the standard color codes.&n" +
+                        "&sfallback is a standard color code, shown to non-supporting clients.&n" },
+                { "free",    "&h/ccols free&n" +
+                        "&sPrints a list of free/unused available color codes." },
+                { "list",    "&h/ccols list [offset]&n" +
+                        "&sPrints a list of the codes, names, and fallback codes of the custom colors. " },
+                { "remove",  "&h/ccols remove [code]&n" +
+                        "&sRemoves the custom color which has the given color code." }
+            },
+            Handler = CustomColorsHandler,
+        };
+
+        static void CustomColorsHandler(Player p, CommandReader cmd) {
+            string type = cmd.Next();
+            if (type == null) { CdCustomColors.PrintUsage(p); return; }
+            type = type.ToLower();
+
+            if (type == "add" || type == "create" || type == "new") {
+                AddCustomColorsHandler(p, cmd);
+            } else if (type == "delete" || type == "remove") {
+                RemoveCustomColorsHandler(p, cmd);
+            } else if (type == "list") {
+                ListCustomColorsHandler(p, cmd);
+            } else if (type == "free" || type == "available") {
+                FreeCustomColorsHandler(p);
+            } else {
+                CdCustomColors.PrintUsage(p);
+            }
+        }
+
+        static void AddCustomColorsHandler(Player p, CommandReader cmd) {
+            if (cmd.Count < 4) { p.Message("Usage: &H/ccols add [code] [name] [fallback] [hex]"); return; }
+            if (!p.Can(Permission.DefineCustomBlocks)) {
+                p.MessageNoAccess(Permission.DefineCustomBlocks); return;
+            }
+
+            string rawCode = cmd.Next();
+            if (rawCode.Length > 1) {
+                p.Message("Color code must only be one character long."); return;
+            }
+            char code = rawCode[0];
+            if (Color.IsStandardColorCode(code)) {
+                p.Message(code + " is a standard color code, and thus cannot be replaced."); return;
+            }
+            if (code <= ' ' || code > '~' || code == '%' || code == '&' || code == '\\' || code == '"' || code == '@') {
+                p.Message(code + " must be a standard ASCII character.");
+                p.Message("It also cannot be a space, percentage, ampersand, backslash, at symbol, or double quotes.");
+                return;
+            }
+            if (Color.IsColorCode(code)) {
+                p.Message("There is already a custom or server defined color with the code " + code +
+                                   ", you must either use a different code or use \"&h/ccols remove " + code + "&s\"");
+                return;
+            }
+
+            string name = cmd.Next();
+            if (Color.Parse(name) != null) {
+                p.Message("There is already an existing standard or " +
+                                   "custom color with the name \"" + name + "\"."); return;
+            }
+
+            string rawFallback = cmd.Next();
+            if (rawFallback.Length > 1) {
+                p.Message("Fallback color code must only be one character long."); return;
+            }
+            char fallback = rawFallback[0];
+            if (!Color.IsStandardColorCode(fallback)) {
+                p.Message(fallback + " must be a standard color code."); return;
+            }
+
+            string hex = cmd.Next();
+            if (hex.Length > 0 && hex[0] == '#')
+                hex = hex.Substring(1);
+            if (hex.Length != 6 || !IsValidHex(hex)) {
+                p.Message("\"#" + hex + "\" is not a valid hex color."); return;
+            }
+
+            CustomColor col = default(CustomColor);
+            col.Code = code; col.Fallback = fallback; col.A = 255;
+            col.Name = name;
+            System.Drawing.Color rgb = System.Drawing.ColorTranslator.FromHtml("#" + hex);
+            col.R = rgb.R; col.G = rgb.G; col.B = rgb.B;
+            Color.AddExtColor(col);
+            p.Message("Successfully added a custom color. &{0} %{0} {1}", col.Code, col.Name.ToLower().UppercaseFirst());
+        }
+
+        static void RemoveCustomColorsHandler(Player p, CommandReader cmd) {
+            if (cmd.Count < 2) { p.Message("Usage: &H/ccols remove [code]"); return; }
+            if (cmd.RawMessage.Split()[2].Contains("\"")) {
+                p.Message("Color code cannot be \"");
+                return;
+            }
+            if (!p.Can(Permission.DefineCustomBlocks)) {
+                p.MessageNoAccess(Permission.DefineCustomBlocks);
+                return;
+            }
+
+            char code = cmd.Next()[0];
+            if (Color.IsStandardColorCode(code)) {
+                p.Message(code + " is a standard color, and thus cannot be removed."); return;
+            }
+
+            if ((int)code >= 256 || Color.ExtColors[code].Undefined) {
+                p.Message("There is no custom color with the code " + code + ".");
+                p.Message("Use \"&h/ccols list\" &Sto see a list of custom colors.");
+                return;
+            }
+            Color.RemoveExtColor(code);
+            p.Message("Successfully removed a custom color. {0}", code);
+        }
+
+        static void ListCustomColorsHandler(Player p, CommandReader cmd) {
+            int offset = 0, index = 0, count = 0;
+            cmd.NextInt(out offset);
+            CustomColor[] cols = Color.ExtColors;
+
+            for (int i = 0; i < cols.Length; i++) {
+                CustomColor col = cols[i];
+                if (col.Undefined) continue;
+
+                if (index >= offset) {
+                    count++;
+                    const string format = "{0} - %{1} displays as &{1}{2}&s, and falls back to {3}.";
+                    p.Message(format, col.Name, col.Code, Hex(col), col.Fallback);
+
+                    if (count >= 8) {
+                        const string helpFormat = "To see the next set of custom colors, type &h/ccols list {0}";
+                        p.Message(helpFormat, offset + 8);
+                        return;
+                    }
+                }
+                index++;
+            }
+        }
+
+        static void FreeCustomColorsHandler(Player p) {
+            StringBuilder codes = new StringBuilder();
+            for (char c = '!'; c <= '~'; c++) {
+                if (IsValidCode(c)) codes.Append(c).Append(' ');
+            }
+            p.Message("Free codes: &f" + codes.ToString());
+        }
+
+        static bool IsValidCode(char code) {
+            if (code == '%' || code == '&' || code == '\\' || code == '"' || code == '@')
+                return false;
+            return !Color.IsColorCode(code);
+        }
+
+        static string Hex(CustomColor c) {
+            return "#" + c.R.ToString("X2") + c.G.ToString("X2") + c.B.ToString("X2");
+        }
+        #endregion
+
+        #region Env
+
+        static readonly CommandDescriptor CdEnv = new CommandDescriptor {
+            Name = "Env",
+            Category = CommandCategory.CPE | CommandCategory.World,
+            Permissions = new[] { Permission.ManageWorlds },
+            Help = "Prints or changes the environmental variables for a given world. " +
+                   "Variables are: border, clouds, edge, fog, level, cloudsheight, shadow, sky, sunlight, texture, weather, maxfog. " +
+                   "See &H/Help env <Variable>&S for details about each variable. " +
+                   "Type &H/Env <WorldName> normal&S to reset everything for a world.",
+            HelpSections = new Dictionary<string, string>{
+                { "normal",     "&H/Env <WorldName> normal&n&S" +
+                                "Resets all environment settings to their defaults for the given world." },
+                { "clouds",     "&H/Env <WorldName> clouds <Color>&n&S" +
+                                "Sets color of the clouds. Use \"normal\" instead of color to reset." },
+                { "fog",        "&H/Env <WorldName> fog <Color>&n&S" +
+                                "Sets color of the fog. Sky color blends with fog color in the distance. " +
+                                "Use \"normal\" instead of color to reset." },
+                { "shadow",     "&H/Env <WorldName> shadow <Color>&n&S" +
+                                "Sets color of the shadowed areas. Use \"normal\" instead of color to reset." },
+                { "sunlight",   "&H/Env <WorldName> sunlight <Color>&n&S" +
+                                "Sets color of the lighted areas. Use \"normal\" instead of color to reset." },
+                { "sky",        "&H/Env <WorldName> sky <Color>&n&S" +
+                                "Sets color of the sky. Sky color blends with fog color in the distance. " +
+                                "Use \"normal\" instead of color to reset." },
+                { "level",      "&H/Env <WorldName> level <#>&n&S" +
+                                "Sets height of the map edges/water level, in terms of blocks from the bottom of the map. " +
+                                "Use \"normal\" instead of a number to reset to default (middle of the map)." },
+                { "cloudsheight","&H/Env <WorldName> cloudsheight <#>&n&S" +
+                                "Sets height of the clouds, in terms of blocks from the bottom of the map. " +
+                                "Use \"normal\" instead of a number to reset to default (map height + 2)." },
+                { "edge",       "&H/Env <WorldName> edge <BlockType>&n&S" +
+                                "Changes the type of block that's visible beyond the map boundaries. "+
+                                "Use \"normal\" instead of a number to reset to default (water)." },
+                { "border",     "&H/Env <WorldName> border <BlockType>&n&S" +
+                                "Changes the type of block that's visible on sides the map boundaries. "+
+                                "Use \"normal\" instead of a number to reset to default (bedrock)." },
+                { "texture",    "&H/Env <WorldName> texture <Texture .PNG Url>&n&S" +
+                                "Changes the texture for all visible blocks on a map. "+
+                                "Use \"normal\" instead of a web link to reset to default (" + Server.DefaultTerrain + ")" },
+                { "weather",    "&H/Env <WorldName> weather <0,1,2/sun,rain,snow>&n&S" +
+                                "Changes the weather on a specified map. "+
+                                "Use \"normal\" instead to use default (0/sun)" },
+                { "maxfog",     "&H/Env <WorldName> maxfog <#>&n&S" +
+                                "Sets the maximum distance clients can see around them. " +
+                                "Use \"normal\" instead of a number to reset to default (0)." }
+            },
+            Usage = "/Env <WorldName> <Variable>",
+            IsConsoleSafe = true,
+            Handler = EnvHandler
+        };
+
+        static void EnvHandler(Player player, CommandReader cmd) {
+            string worldName = cmd.Next();
+            World world;
+            if (worldName == null) {
+                world = player.World;
+                if (world == null) {
+                    player.Message("When used from console, /Env requires a world name.");
+                    return;
+                }
+            } else {
+                world = WorldManager.FindWorldOrPrintMatches(player, worldName);
+                if (world == null) return;
+            }
+
+            string variable = cmd.Next();
+            string value = cmd.Next();
+            string maybe = cmd.Next();
+            if (variable == null) {
+                player.Message("Environment settings for world {0}&S:", world.ClassyName);
+                player.Message("  Cloud: {0}   Fog: {1}   Sky: {2}",
+                                world.CloudColor == null ? "normal" : '#' + world.CloudColor,
+                                world.FogColor == null ? "normal" : '#' + world.FogColor,
+                                world.SkyColor == null ? "normal" : '#' + world.SkyColor);
+                player.Message("  Shadow: {0}   Sunlight: {1}  Edge level: {2}",
+                                world.ShadowColor == null ? "normal" : '#' + world.ShadowColor,
+                                world.LightColor == null ? "normal" : '#' + world.LightColor,
+                                world.GetEdgeLevel() + " blocks");
+                player.Message("  Clouds height: {0}  Max fog distance: {1}",
+                                world.GetCloudsHeight() + " blocks",
+                                world.MaxFogDistance <= 0 ? "(no limit)" : world.MaxFogDistance.ToString());
+                player.Message("  Water block: {1}  Bedrock block: {0}",
+                                world.EdgeBlock, world.HorizonBlock);
+                player.Message("  Texture: {0}", world.GetTexture());
+                if (!player.IsUsingWoM) {
+                    player.Message("  You need ClassiCube or ClassicalSharp client to see the changes.");
+                }
+                return;
+            }
+
+            if (variable.Equals("normal", StringComparison.OrdinalIgnoreCase)) {
+                if (cmd.IsConfirmed) {
+                    world.FogColor = null;
+                    world.CloudColor = null;
+                    world.SkyColor = null;
+                    world.ShadowColor = null;
+                    world.LightColor = null;
+                    world.EdgeLevel = -1;
+                    world.CloudsHeight = short.MinValue;
+                    world.MaxFogDistance = 0;
+                    world.EdgeBlock = Block.Admincrete;
+                    world.HorizonBlock = Block.Water;
+                    world.Texture = "Default";
+                    Logger.Log(LogType.UserActivity,
+                                "Env: {0} {1} reset environment settings for world {2}",
+                                player.Info.Rank.Name, player.Name, world.Name);
+                    player.Message("Enviroment settings for world {0} &swere reset.", world.ClassyName);
+                    WorldManager.SaveWorldList();
+                    foreach (Player p in world.Players) {
+                        if (p.Supports(CpeExt.EnvMapAppearance) || p.Supports(CpeExt.EnvMapAppearance2))
+                            p.SendCurrentMapAppearance();
+                    }
+                } else {
+                    Logger.Log(LogType.UserActivity,
+                                "Env: Asked {0} to confirm resetting enviroment settings for world {1}",
+                                player.Name, world.Name);
+                    player.Confirm(cmd, "Reset enviroment settings for world {0}&S?", world.ClassyName);
+                }
+                return;
+            }
+
+            if (value == null) {
+                CdEnv.PrintUsage(player);
+                return;
+            }
+            if (value.StartsWith("#"))
+                value = value.Remove(0, 1);
+
+            switch (variable.ToLower()) {
+                case "fog":
+                    SetEnvColor(player, world, value, "fog color", EnvVariable.FogColor, ref world.FogColor);
+                    break;
+                case "cloud":
+                case "clouds":
+                    SetEnvColor(player, world, value, "cloud color", EnvVariable.CloudColor, ref world.CloudColor);
+                    break;
+                case "sky":
+                    SetEnvColor(player, world, value, "sky color", EnvVariable.SkyColor, ref world.SkyColor);
+                    break;
+                case "dark":
+                case "shadow":
+                    SetEnvColor(player, world, value, "shadow color", EnvVariable.Shadow, ref world.ShadowColor);
+                    break;
+                case "sun":
+                case "light":
+                case "sunlight":
+                    SetEnvColor(player, world, value, "sunlight color", EnvVariable.Sunlight, ref world.LightColor);
+                    break;
+                case "level":
+                case "edgelevel":
+                case "waterlevel":
+                    SetEnvAppearanceShort(player, world, value, "water level", 0, ref world.EdgeLevel);
+                    break;
+                case "cloudheight":
+                case "cloudsheight":
+                    SetEnvAppearanceShort(player, world, value, "clouds height", 0, ref world.CloudsHeight);
+                    break;
+                case "fogdist":
+                case "maxfog":
+                case "maxdist":
+                    SetEnvAppearanceShort(player, world, value, "max fog distance", 0, ref world.MaxFogDistance);
+                    break;
+                case "horizon":
+                case "edge":
+                case "water":
+                    SetEnvAppearanceBlock(player, world, value, "water block", Block.StillWater, ref world.HorizonBlock);
+                    break;
+                case "side":
+                case "border":
+                case "bedrock":
+                    SetEnvAppearanceBlock(player, world, value, "bedrock block", Block.Admincrete, ref world.EdgeBlock);
+                    break;
+                case "tex":
+                case "terrain":
+                case "texture":
+                    if (value.ToLower() == "default") {
+                        player.Message("Reset texture for {0}&S to {1}", world.ClassyName, Server.DefaultTerrain);
+                        value = "Default";
+                    } else if (!value.EndsWith(".png") && !value.EndsWith(".zip")) {
+                        player.Message("Env Texture: Invalid image type. Please use a \".png\" or \".zip\"", world.ClassyName);
+                        return;
+                    } else if (!(value.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+                                 value.StartsWith("https://", StringComparison.OrdinalIgnoreCase))) {
+                        player.Message("Env Texture: Invalid URL. Please use a \"http://\" or \"https://\" type url.", world.ClassyName);
+                        return;
+                    } else {
+                        player.Message("Set texture for {0}&S to {1}", world.ClassyName, value);
+                    }
+                    world.Texture = value;
+                    foreach (Player p in world.Players) {
+                        if (p.Supports(CpeExt.EnvMapAppearance) || p.Supports(CpeExt.EnvMapAppearance2))
+                            p.SendCurrentMapAppearance();
+                    }
+                    break;
+
+                case "weather":
+                    byte weather = 0;
+                    if (value.Equals("normal", StringComparison.OrdinalIgnoreCase)) {
+                        player.Message("Reset weather for {0}&S to normal(0) ", world.ClassyName);
+                        world.Weather = 0;
+                    } else {
+                        if (!byte.TryParse(value, out weather)) {
+                            if (value.Equals("sun", StringComparison.OrdinalIgnoreCase)) {
+                                weather = 0;
+                            } else if (value.Equals("rain", StringComparison.OrdinalIgnoreCase)) {
+                                weather = 1;
+                            } else if (value.Equals("snow", StringComparison.OrdinalIgnoreCase)) {
+                                weather = 2;
+                            }
+                        }
+                        if (weather < 0 || weather > 2) {
+                            player.Message("Please use a valid integer(0,1,2) or string(sun,rain,snow)");
+                            return;
+                        }
+                        world.Weather = weather;
+                        player.Message("&aSet weather for {0}&a to {1} ({2}&a)", world.ClassyName, weather, weather == 0 ? "&sSun" : (weather == 1 ? "&1Rain" : "&fSnow"));
+                    }
+                    foreach (Player p in world.Players) {
+                        if (p.Supports(CpeExt.EnvWeatherType)) {
+                            p.Send(Packet.SetWeather(world.Weather));
+                        }
+                    }
+                    break;
+
+                default:
+                    CdEnv.PrintUsage(player);
+                    return;
+            }
+            WorldManager.SaveWorldList();
+        }
+
+        static void SetEnvColor(Player player, World world, string value, string name, EnvVariable variable, ref string target) {
+            if (value.Equals("-1") || value.Equals("normal", StringComparison.OrdinalIgnoreCase) ||
+                value.Equals("reset", StringComparison.OrdinalIgnoreCase) || value.Equals("default", StringComparison.OrdinalIgnoreCase)) {
+                player.Message("Reset {0} for {1}&S to normal", name, world.ClassyName);
+                target = null;
+            } else {
+                if (!IsValidHex(value)) {
+                    player.Message("Env: \"#{0}\" is not a valid HEX color code.", value);
+                    return;
+                } else {
+                    target = value;
+                    player.Message("Set {0} for {1}&S to #{2}", name, world.ClassyName, value);
+                }
+            }
+
+            foreach (Player p in world.Players) {
+                if (p.Supports(CpeExt.EnvColors))
+                    p.Send(Packet.MakeEnvSetColor((byte)variable, target));
+            }
+        }
+
+        static void SetEnvAppearanceShort(Player player, World world, string value, string name, short defValue, ref short target) {
+            short amount;
+            if (value.Equals("-1") || value.Equals("normal", StringComparison.OrdinalIgnoreCase) ||
+                value.Equals("reset", StringComparison.OrdinalIgnoreCase) || value.Equals("default", StringComparison.OrdinalIgnoreCase)) {
+                player.Message("Reset {0} for {1}&S to normal", name, world.ClassyName);
+                target = defValue;
+            } else {
+                if (!short.TryParse(value, out amount)) {
+                    player.Message("Env: \"{0}\" is not a valid integer.", value);
+                    return;
+                } else {
+                    target = amount;
+                    player.Message("Set {0} for {1}&S to {2}", name, world.ClassyName, amount);
+                }
+            }
+
+            foreach (Player p in world.Players) {
+                if (p.Supports(CpeExt.EnvMapAppearance) || p.Supports(CpeExt.EnvMapAppearance2))
+                    p.SendCurrentMapAppearance();
+            }
+        }
+
+        static void SetEnvAppearanceBlock(Player player, World world, string value, string name, Block defValue, ref Block target) {
+            if (value.Equals("normal", StringComparison.OrdinalIgnoreCase) || value.Equals("default", StringComparison.OrdinalIgnoreCase)) {
+                player.Message("Reset {0} for {1}&S to normal ({2})", name, world.ClassyName, defValue);
+                target = defValue;
+            } else {
+                Block block;
+                if (!Map.GetBlockByName(value, false, out block)) {
+                    CdEnv.PrintUsage(player);
+                    return;
+                }
+                target = block;
+                player.Message("Set {0} for {1}&S to {2}", name, world.ClassyName, block);
+            }
+
+            foreach (Player p in world.Players) {
+                if (p.Supports(CpeExt.EnvMapAppearance) || p.Supports(CpeExt.EnvMapAppearance2))
+                    p.SendCurrentMapAppearance();
+            }
+        }
+
+        #endregion
+
+        #region GlobalBlocks
 
         static readonly CommandDescriptor CdGlobalBlock = new CommandDescriptor {
             Name = "GlobalBlock",
             Aliases = new string[] { "global", "block", "gb" },
-            Category = CommandCategory.World,
+            Category = CommandCategory.CPE | CommandCategory.World,
             IsConsoleSafe = true,
             Permissions = new[] { Permission.DefineCustomBlocks },
             Usage = "/gb [type/value] {args}",
@@ -451,12 +1175,12 @@ namespace fCraft {
                     break;
             }
         }
-        
+
         static void GlobalBlockAddHandler(Player player, CommandReader cmd) {
             int blockId = 0;
             if (!CheckBlockId(player, cmd, out blockId))
                 return;
-            
+
             BlockDefinition def = BlockDefinition.GlobalDefinitions[blockId];
             if (def != null) {
                 player.Message("There is already a globally defined custom block with that block id.");
@@ -464,7 +1188,7 @@ namespace fCraft {
                 player.Message("Use \"&h/gb list&s\" to see a list of global custom blocks.");
                 return;
             }
-            
+
             player.currentGB = new BlockDefinition();
             player.currentGB.BlockID = (byte)blockId;
             player.currentGB.Version2 = true;
@@ -472,24 +1196,24 @@ namespace fCraft {
             player.Message("&sFrom now on, use &h/gb [value]&s to enter arguments.");
             player.Message("&sYou can abort the currently partially " +
                            "created custom block at any time by typing \"&h/gb abort&s\"");
-            
+
             player.currentGBStep = 0;
             PrintStepHelp(player);
         }
-        
+
         static void GlobalBlockListHandler(Player player, CommandReader cmd) {
             int offset = 0, index = 0, count = 0;
-            cmd.NextInt( out offset );
+            cmd.NextInt(out offset);
             BlockDefinition[] defs = BlockDefinition.GlobalDefinitions;
-            for( int i = 0; i < defs.Length; i++ ) {
+            for (int i = 0; i < defs.Length; i++) {
                 BlockDefinition def = defs[i];
                 if (def == null) continue;
-                
+
                 if (index >= offset) {
                     count++;
                     player.Message("&sCustom block &h{0} &shas name &h{1}", def.BlockID, def.Name);
-                    
-                    if(count >= 8) {
+
+                    if (count >= 8) {
                         player.Message("To see the next set of global definitions, " +
                                        "type /gb list {0}", offset + 8);
                         return;
@@ -498,7 +1222,7 @@ namespace fCraft {
                 index++;
             }
         }
-        
+
         static void GlobalBlockRemoveHandler(Player player, CommandReader cmd) {
             string input = cmd.Next() ?? "n/a";
             Block blockID;
@@ -512,16 +1236,16 @@ namespace fCraft {
                 player.Message("Use \"&h/gb list\" &sto see a list of global custom blocks.");
                 return;
             }
-            
+
             BlockDefinition.RemoveGlobalBlock(def);
-            foreach (Player p in Server.Players ) {
+            foreach (Player p in Server.Players) {
                 if (p.Supports(CpeExt.BlockDefinitions))
                     BlockDefinition.SendGlobalRemove(p, def);
             }
             BlockDefinition.SaveGlobalDefinitions();
-            
-            Server.Message( "{0} &sremoved the global custom block &h{1} &swith ID {2}",
-                                   player.ClassyName, def.Name, def.BlockID );
+
+            Server.Message("{0} &sremoved the global custom block &h{1} &swith ID {2}",
+                                   player.ClassyName, def.Name, def.BlockID);
             ReloadAllPlayers();
         }
 
@@ -625,7 +1349,7 @@ namespace fCraft {
                     }
                     break;
                 case 12:
-                    if (WorldCommands.IsValidHex(args)) {
+                    if (IsValidHex(args)) {
                         System.Drawing.Color col = System.Drawing.ColorTranslator.FromHtml("#" + args.ToUpper().Replace("#", ""));
                         def.FogR = col.R;
                         player.Message("   &bSet red component of fog to: " + col.R);
@@ -736,7 +1460,7 @@ namespace fCraft {
             player.currentGBStep = step;
             PrintStepHelp(player);
         }
-        
+
         static void GlobalBlockDuplicateHandler(Player p, CommandReader cmd) {
             string input1 = cmd.Next() ?? "n/a", input2 = cmd.Next() ?? "n/a";
             Block srcBlock = Block.None;
@@ -763,20 +1487,20 @@ namespace fCraft {
                 p.Message("Use \"&h/gb remove {0}&s\" on this block first.", dstBlock);
                 p.Message("Use \"&h/gb list&s\" to see a list of global custom blocks.");
                 return;
-            }            
+            }
             BlockDefinition def = srcDef.Copy();
             def.BlockID = (byte)dstBlock;
             BlockDefinition.DefineGlobalBlock(def);
             BlockDefinition.SaveGlobalDefinitions();
             Server.Message("{0} &screated a new global custom block &h{1} &swith ID {2}",
                            p.ClassyName, def.Name, def.BlockID);
-            
+
             foreach (Player pl in Server.Players) {
                 if (pl.Supports(CpeExt.BlockDefinitions))
                     BlockDefinition.SendGlobalAdd(pl, def);
             }
         }
-        
+
         static void GlobalBlockEditHandler(Player player, CommandReader cmd) {
             string input = cmd.Next() ?? "n/a";
             Block blockID;
@@ -812,7 +1536,8 @@ namespace fCraft {
                         player.Message("&bChanged solidity of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.CollideType, value);
                         def.CollideType = value;
                         hasChanged = true;
-                    } break;
+                    }
+                    break;
                 case "speed":
                     float speed;
                     if (float.TryParse(args, out speed)
@@ -820,7 +1545,8 @@ namespace fCraft {
                         player.Message("&bChanged speed of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.Speed, speed);
                         def.Speed = speed;
                         hasChanged = true;
-                    } break;
+                    }
+                    break;
                 case "allid":
                 case "alltex":
                 case "alltexture":
@@ -828,9 +1554,10 @@ namespace fCraft {
                         player.Message("&bChanged top, sides, and bottom texture index of &a{0}&b to &a{1}", def.Name, value);
                         def.TopTex = value; def.SideTex = value; def.BottomTex = value;
                         def.LeftTex = value; def.RightTex = value;
-                        def.FrontTex = value; def.BackTex = value;                       
+                        def.FrontTex = value; def.BackTex = value;
                         hasChanged = true;
-                    } break;
+                    }
+                    break;
                 case "topid":
                 case "toptex":
                 case "toptexture":
@@ -838,7 +1565,8 @@ namespace fCraft {
                         player.Message("&bChanged top texture index of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.TopTex, value);
                         def.TopTex = value;
                         hasChanged = true;
-                    } break;
+                    }
+                    break;
                 case "leftid":
                 case "lefttex":
                 case "lefttexture":
@@ -846,7 +1574,8 @@ namespace fCraft {
                         player.Message("&bChanged left texture index of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.LeftTex, value);
                         def.LeftTex = value;
                         hasChanged = true;
-                    } break;
+                    }
+                    break;
                 case "rightid":
                 case "righttex":
                 case "righttexture":
@@ -854,7 +1583,8 @@ namespace fCraft {
                         player.Message("&bChanged right texture index of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.RightTex, value);
                         def.RightTex = value;
                         hasChanged = true;
-                    } break;
+                    }
+                    break;
                 case "frontid":
                 case "fronttex":
                 case "fronttexture":
@@ -862,7 +1592,8 @@ namespace fCraft {
                         player.Message("&bChanged front texture index of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.FrontTex, value);
                         def.FrontTex = value;
                         hasChanged = true;
-                    } break;
+                    }
+                    break;
                 case "backid":
                 case "backtex":
                 case "backtexture":
@@ -870,7 +1601,8 @@ namespace fCraft {
                         player.Message("&bChanged back texture index of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.BackTex, value);
                         def.BackTex = value;
                         hasChanged = true;
-                    } break;             
+                    }
+                    break;
                 case "sideid":
                 case "sidetex":
                 case "sidetexture":
@@ -880,7 +1612,8 @@ namespace fCraft {
                         def.LeftTex = def.SideTex; def.RightTex = def.SideTex;
                         def.FrontTex = def.SideTex; def.BackTex = def.SideTex;
                         hasChanged = true;
-                    } break;
+                    }
+                    break;
                 case "bottomid":
                 case "bottomtex":
                 case "bottomtexture":
@@ -888,27 +1621,31 @@ namespace fCraft {
                         player.Message("&bChanged bottom texture index of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.BottomTex, value);
                         def.BottomTex = value;
                         hasChanged = true;
-                    } break;
+                    }
+                    break;
                 case "light":
                 case "blockslight":
                     if (bool.TryParse(args, out boolVal)) {
                         player.Message("&bChanged blocks light of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.BlocksLight, boolVal);
                         def.BlocksLight = boolVal;
                         hasChanged = true;
-                    } break;
+                    }
+                    break;
                 case "sound":
                 case "walksound":
                     if (byte.TryParse(args, out value) && value <= 11) {
                         player.Message("&bChanged walk sound of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.WalkSound, value);
                         def.WalkSound = value;
                         hasChanged = true;
-                    } break;
+                    }
+                    break;
                 case "fullbright":
                     if (bool.TryParse(args, out boolVal)) {
                         player.Message("&bChanged full bright of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.FullBright, boolVal);
                         def.FullBright = boolVal;
                         hasChanged = true;
-                    } break;
+                    }
+                    break;
                 case "size":
                 case "shape":
                 case "height":
@@ -916,23 +1653,26 @@ namespace fCraft {
                         player.Message("&bChanged block shape of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.Shape, value);
                         def.Shape = value;
                         hasChanged = true;
-                    } break;
+                    }
+                    break;
                 case "draw":
                 case "blockdraw":
                     if (byte.TryParse(args, out value) && value <= 4) {
                         player.Message("&bChanged block draw type of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.BlockDraw, value);
                         def.BlockDraw = value;
                         hasChanged = true;
-                    } break;
+                    }
+                    break;
                 case "fogdensity":
                 case "fogd":
                     if (byte.TryParse(args, out value)) {
                         player.Message("&bChanged density of fog of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.FogDensity, value);
                         def.FogDensity = value;
                         hasChanged = true;
-                    } break;
+                    }
+                    break;
                 case "foghex":
-                    if (WorldCommands.IsValidHex(args)) {
+                    if (IsValidHex(args)) {
                         System.Drawing.Color col = System.Drawing.ColorTranslator.FromHtml("#" + args.ToUpper().Replace("#", ""));
                         player.Message("&bChanged red fog component of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.FogR, col.R);
                         def.FogR = col.R;
@@ -941,28 +1681,32 @@ namespace fCraft {
                         player.Message("&bChanged blue fog component of fog of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.FogB, col.B);
                         def.FogB = col.B;
                         hasChanged = true;
-                    } break;
+                    }
+                    break;
                 case "fogr":
                 case "fogred":
                     if (byte.TryParse(args, out value)) {
                         player.Message("&bChanged red fog component of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.FogR, value);
                         def.FogG = value;
                         hasChanged = true;
-                    } break;
+                    }
+                    break;
                 case "fogg":
                 case "foggreen":
                     if (byte.TryParse(args, out value)) {
                         player.Message("&bChanged green fog component of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.FogG, value);
                         def.FogG = value;
                         hasChanged = true;
-                    } break;
+                    }
+                    break;
                 case "fogb":
                 case "fogblue":
                     if (byte.TryParse(args, out value)) {
                         player.Message("&bChanged blue fog component of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.FogB, value);
                         def.FogB = value;
                         hasChanged = true;
-                    } break;
+                    }
+                    break;
                 case "fallback":
                 case "block":
                     Block block;
@@ -977,9 +1721,10 @@ namespace fCraft {
                         player.Message("&bChanged fallback block of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.FallBack, block.ToString());
                         def.FallBack = (byte)block;
                         hasChanged = true;
-                    } break;
+                    }
+                    break;
                 case "min":
-                    if (args.ToLower().Equals("-1")){
+                    if (args.ToLower().Equals("-1")) {
                         player.Message("Block will display as a sprite!");
                         def.Shape = 0;
                         hasChanged = true;
@@ -1018,7 +1763,8 @@ namespace fCraft {
                     def.MaxZ = EditCoord(player, "max Z", def.Name, args, def.MaxZ, ref hasChanged);
                     if (byte.TryParse(args, out value)) {
                         def.Shape = value;
-                    } break;
+                    }
+                    break;
                 default:
                     CdGlobalBlock.PrintUsage(player);
                     return;
@@ -1040,7 +1786,7 @@ namespace fCraft {
                 ReloadAllPlayers();
             }
         }
-        
+
         static byte EditCoord(Player player, string coord, string name, string args, byte origValue, ref bool hasChanged) {
             byte value;
             if (byte.TryParse(args, out value) && value <= 16) {
@@ -1060,7 +1806,7 @@ namespace fCraft {
             if (!cmd.NextInt(out blockId)) {
                 player.Message("Provided block id is not a number.");
                 return false;
-            }           
+            }
             if (blockId <= 65 || blockId >= 255) {
                 player.Message("Block id must be between 65-254");
                 return false;
@@ -1085,7 +1831,7 @@ namespace fCraft {
             }
         }
 
-        static string[][] globalBlockSteps = new [] {
+        static string[][] globalBlockSteps = new[] {
             new [] { "&sEnter the name of the block. You can include spaces." },
             new [] { "&sEnter the solidity of the block (0-2)",
                 "&s0 = walk through(air), 1 = swim through (water), 2 = solid" },
@@ -1118,176 +1864,442 @@ namespace fCraft {
             new [] { "Enter the max X Y Z coords of this block,",
                 "Min = 1 Max = 16 Example: &h/gb 16 16 16" },
         };
-            
+
         #endregion
-               
-        #region CustomColors
-        
-        static readonly CommandDescriptor CdCustomColors = new CommandDescriptor
-        {
-            Name = "CustomColors",
-            Aliases = new[] { "ccols" },
-            Category = CommandCategory.New | CommandCategory.Chat,
-            Permissions = new[] { Permission.Chat},
-            Usage = "/ccols [type] [args]",
+
+        #region HackControl
+
+        static readonly CommandDescriptor CdHackControl = new CommandDescriptor {
+            Name = "HackControl",
+            Aliases = new[] { "hacks", "hack", "hax" },
+            Category = CommandCategory.CPE | CommandCategory.Moderation,
+            Permissions = new[] { Permission.Chat },
+            Usage = "/Hacks [Player] [Hack] [jumpheight(if needed)]",
             IsConsoleSafe = true,
-            Help = "&sModifies the custom colors, or prints information about them.&n" +
-                "&sTypes are: add, free, list, remove&n" +
-                "&sSee &h/help ccols <type>&s for details about each type.",
-            HelpSections = new Dictionary<string, string>{
-                { "add",     "&h/ccols add [code] [name] [fallback] [hex]&n" +
-                        "&scode is in ASCII. You cannot replace the standard color codes.&n" +
-                        "&sfallback is a standard color code, shown to non-supporting clients.&n" },
-                { "free",    "&h/ccols free&n" +
-                        "&sPrints a list of free/unused available color codes." },           	
-                { "list",    "&h/ccols list [offset]&n" +
-                        "&sPrints a list of the codes, names, and fallback codes of the custom colors. " },
-                { "remove",  "&h/ccols remove [code]&n" +
-                        "&sRemoves the custom color which has the given color code." }
-            },
-            Handler = CustomColorsHandler,
+            Help = "Change the hacking abilities of [Player]&n" +
+            "Valid hacks: &aFlying&s, &aNoclip&s, &aSpeedhack&s, &aRespawn&s, &aThirdPerson&s and &aJumpheight",
+            Handler = HackControlHandler
         };
-        
-        static void CustomColorsHandler(Player p, CommandReader cmd) {
-            string type = cmd.Next();
-            if (type == null) { CdCustomColors.PrintUsage(p); return; }
-            type = type.ToLower();
-            
-            if (type == "add" || type == "create" || type == "new") {
-                AddCustomColorsHandler(p, cmd);
-            } else if (type == "delete" || type == "remove") {
-                RemoveCustomColorsHandler(p, cmd);
-            } else if (type == "list") {
-                ListCustomColorsHandler(p, cmd);
-            } else if (type == "free" || type == "available") {
-                FreeCustomColorsHandler(p);
+
+        static void HackControlHandler(Player player, CommandReader cmd) {
+            string first = cmd.Next();
+
+            if (first == null || player.Info.Rank != RankManager.HighestRank) {
+                player.Message("&sCurrent Hacks for {0}", player.ClassyName);
+                player.Message("    &sFlying: &a{0} &sNoclip: &a{1} &sSpeedhack: &a{2}",
+                                player.Info.AllowFlying.ToString(),
+                                player.Info.AllowNoClip.ToString(),
+                                player.Info.AllowSpeedhack.ToString());
+                player.Message("    &sRespawn: &a{0} &sThirdPerson: &a{1} &sJumpHeight: &a{2}",
+                                player.Info.AllowRespawn.ToString(),
+                                player.Info.AllowThirdPerson.ToString(),
+                                player.Info.JumpHeight);
+                return;
+            }
+
+            PlayerInfo target = InfoCommands.FindPlayerInfo(player, cmd, first);
+            if (target == null) return;
+
+            string hack = (cmd.Next() ?? "null");
+            string hackStr = "hack";
+
+            if (hack == "null") {
+                player.Message("&sCurrent Hacks for {0}", target.ClassyName);
+                player.Message("    &sFlying: &a{0} &sNoclip: &a{1} &sSpeedhack: &a{2}",
+                                target.AllowFlying.ToString(),
+                                target.AllowNoClip.ToString(),
+                                target.AllowSpeedhack.ToString());
+                player.Message("    &sRespawn: &a{0} &sThirdPerson: &a{1} &sJumpHeight: &a{2}",
+                                target.AllowRespawn.ToString(),
+                                target.AllowThirdPerson.ToString(),
+                                target.JumpHeight);
+                return;
+            }
+
+            switch (hack.ToLower()) {
+                case "flying":
+                case "fly":
+                case "f":
+                    player.Message("Hacks for {0}", target.ClassyName);
+                    player.Message("    Flying: &a{0} &s--> &a{1}", target.AllowFlying.ToString(), (!target.AllowFlying).ToString());
+                    target.AllowFlying = !target.AllowFlying;
+                    hackStr = "flying";
+                    goto sendPacket;
+                case "noclip":
+                case "clip":
+                case "nc":
+                    player.Message("Hacks for {0}", target.ClassyName);
+                    player.Message("    NoClip: &a{0} &s--> &a{1}", target.AllowNoClip.ToString(), (!target.AllowNoClip).ToString());
+                    target.AllowNoClip = !target.AllowNoClip;
+                    hackStr = "noclip";
+                    goto sendPacket;
+                case "speedhack":
+                case "speed":
+                case "sh":
+                    player.Message("Hacks for {0}", target.ClassyName);
+                    player.Message("    SpeedHack: &a{0} &s--> &a{1}", target.AllowSpeedhack.ToString(), (!target.AllowSpeedhack).ToString());
+                    target.AllowSpeedhack = !target.AllowSpeedhack;
+                    hackStr = "speedhack";
+                    goto sendPacket;
+                case "respawn":
+                case "spawn":
+                case "rs":
+                    player.Message("Hacks for {0}", target.ClassyName);
+                    player.Message("    Respawn: &a{0} &s--> &a{1}", target.AllowRespawn.ToString(), (!target.AllowRespawn).ToString());
+                    target.AllowRespawn = !target.AllowRespawn;
+                    hackStr = "respawn";
+                    goto sendPacket;
+                case "thirdperson":
+                case "third":
+                case "tp":
+                    player.Message("Hacks for {0}", target.ClassyName);
+                    player.Message("    ThirdPerson: &a{0} &s--> &a{1}", target.AllowThirdPerson.ToString(), (!target.AllowThirdPerson).ToString());
+                    target.AllowThirdPerson = !target.AllowThirdPerson;
+                    hackStr = "thirdperson";
+                    goto sendPacket;
+                case "jumpheight":
+                case "jump":
+                case "height":
+                case "jh":
+                    short height;
+                    string third = cmd.Next();
+                    if (short.TryParse(third, out height)) {
+                        player.Message("Hacks for {0}", target.ClassyName);
+                        player.Message("    JumpHeight: &a{0} &s--> &a{1}", target.JumpHeight, height);
+                        target.JumpHeight = height;
+                        hackStr = "jumpheight";
+                        goto sendPacket;
+                    } else player.Message("Error: Could not parse \"&a{0}&s\" as a short. Try something between &a0&s and &a32767", third);
+                    break;
+                default:
+                    player.Message(CdHackControl.Help);
+                    break;
+            }
+            return;
+        sendPacket:
+            if (target.IsOnline) {
+                if (target.PlayerObject != player) {
+                    target.PlayerObject.Message("{0} has changed your {1} ability, use &h/Hacks &sto check them out.", player.Info.Name, hackStr);
+                }
+                if (target.PlayerObject.Supports(CpeExt.HackControl)) {
+                    target.PlayerObject.Send(Packet.HackControl(
+                        target.AllowFlying, target.AllowNoClip, target.AllowSpeedhack,
+                        target.AllowRespawn, target.AllowThirdPerson, target.JumpHeight));
+                }
+            }
+        }
+
+        #endregion
+
+        #region ListClients
+
+        static readonly CommandDescriptor CdListClients = new CommandDescriptor {
+            Name = "ListClients",
+            Aliases = new[] { "pclients", "clients", "whoisanewb" },
+            Category = CommandCategory.CPE | CommandCategory.Info,
+            IsConsoleSafe = true,
+            Help = "Shows a list of currently clients users are using.",
+            Handler = ListClientsHandler
+        };
+
+        static void ListClientsHandler(Player player, CommandReader cmd) {
+            Player[] players = Server.Players;
+            var visiblePlayers = players.Where(player.CanSee).OrderBy(p => p, PlayerListSorter.Instance).ToArray();
+
+            Dictionary<string, List<Player>> clients = new Dictionary<string, List<Player>>();
+            foreach (var p in visiblePlayers) {
+                string appName = p.ClientName;
+                if (string.IsNullOrEmpty(appName)) {
+                    appName = "(unknown)";
+                }
+
+                List<Player> usingClient;
+                if (!clients.TryGetValue(appName, out usingClient)) {
+                    usingClient = new List<Player>();
+                    clients[appName] = usingClient;
+                }
+                usingClient.Add(p);
+            }
+            player.Message("Players using:");
+            foreach (var kvp in clients) {
+                player.Message("  &s{0}:&f {1}",
+                               kvp.Key, kvp.Value.JoinToClassyString());
+            }
+        }
+
+        #endregion
+
+        #region MaxReachDistance
+
+        static readonly CommandDescriptor CdMRD = new CommandDescriptor {
+            Name = "MaxReachDistance",
+            Aliases = new[] { "MaxReach", "MRD" },
+            Category = CommandCategory.CPE | CommandCategory.World,
+            Permissions = new[] { Permission.ManageWorlds },
+            Help = "Changes the max reachdistance for a world",
+            Usage = "/MRD [Distance] (world)",
+            Handler = MRDHandler
+        };
+
+        private static void MRDHandler([NotNull] Player player, [NotNull] CommandReader cmd) {
+            string disString = cmd.Next();
+            if (disString == null) {
+                player.Message(CdMRD.Usage);
+                return;
+            }
+            string worldString = cmd.Next();
+            short distance = 160;
+            World world = player.World;
+            if (!short.TryParse(disString, out distance)) {
+                if (disString.ToLower().Equals("normal") || disString.ToLower().Equals("reset") ||
+                    disString.ToLower().Equals("default")) {
+                    distance = 160;
+                } else {
+                    player.Message("Invalid distance!");
+                    return;
+                }
+            }
+            if (worldString != null) {
+                world = WorldManager.FindWorldOrPrintMatches(player, worldString);
+                if (world == null) {
+                    return;
+                }
+            }
+            player.Message("&sSet max reach distance for world &f{0}&s to &f{1} &s(&f{2}&s blocks)", world.ClassyName, distance, distance / 32);
+            world.maxReach = distance;
+
+        }
+
+        #endregion
+
+        #region TextHotKey
+
+        static readonly CommandDescriptor CdtextHotKey = new CommandDescriptor {
+            Name = "TextHotKey",
+            Aliases = new[] { "HotKey", "thk", "hk" },
+            Category = CommandCategory.CPE | CommandCategory.Chat,
+            Permissions = new[] { Permission.ReadStaffChat },
+            Usage = "/TextHotKey [Label] [Action] [KeyCode] [KeyMods]",
+            Help = "Sets up TextHotKeys. Use http://minecraftwiki.net/Key_Codes for keycodes",
+            Handler = textHotKeyHandler
+        };
+
+        private static void textHotKeyHandler(Player player, CommandReader cmd) {
+            string Label = cmd.Next();
+            string Action = cmd.Next();
+            string third = cmd.Next();
+            string fourth = cmd.Next();
+            if (Label == null || Action == null || third == null || fourth == null) {
+                CdtextHotKey.PrintUsage(player);
+                return;
+            }
+
+            int KeyCode;
+            if (!int.TryParse(third, out KeyCode)) {
+                player.Message("Error: Invalid Integer ({0})", third);
+                return;
+            }
+            byte KeyMod = 0;
+            if (null != fourth) {
+                if (!Byte.TryParse(fourth, out KeyMod)) {
+                    player.Message("Error: Invalid Byte ({0})", fourth);
+                    return;
+                }
+            }
+            if (player.Supports(CpeExt.TextHotKey)) {
+                player.Send(Packet.MakeSetTextHotKey(Label, Action, KeyCode, KeyMod));
             } else {
-                CdCustomColors.PrintUsage(p);
+                player.Message("You do not support TextHotKey");
+                return;
             }
         }
-        
-        static void AddCustomColorsHandler(Player p, CommandReader cmd) {
-            if (cmd.Count < 4) { p.Message("Usage: &H/ccols add [code] [name] [fallback] [hex]"); return; }
-            if (!p.Can(Permission.DefineCustomBlocks)) {
-                p.MessageNoAccess(Permission.DefineCustomBlocks); return;
+
+        #endregion
+
+        #region Texture
+
+        static readonly CommandDescriptor Cdtex = new CommandDescriptor {
+            Name = "texture",
+            Aliases = new[] { "texturepack", "tex" },
+            Permissions = new[] { Permission.Chat },
+            Category = CommandCategory.CPE | CommandCategory.Chat,
+            Help = "Tells you information about our custom texture pack.",
+            Handler = textureHandler
+        };
+
+        static void textureHandler(Player player, CommandReader cmd) {
+            if (player.World != null && !string.IsNullOrEmpty(player.World.Texture)) {
+                player.Message("This world uses a custom texture pack");
+                player.Message("A preview can be found here: ");
+                player.Message("  " + (player.World.Texture == "Default" ? Server.DefaultTerrain : player.World.Texture));
+            } else {
+                player.Message("You are not in a world with a custom texturepack.");
             }
-            
-            string rawCode = cmd.Next();
-            if (rawCode.Length > 1) {
-                p.Message("Color code must only be one character long."); return;
-            }
-            char code = rawCode[0];
-            if (Color.IsStandardColorCode(code)) {
-                p.Message(code + " is a standard color code, and thus cannot be replaced."); return;
-            }
-            if (code <= ' ' || code > '~' || code == '%' || code == '&' || code == '\\' || code == '"' || code == '@') {
-                p.Message(code + " must be a standard ASCII character.");
-                p.Message("It also cannot be a space, percentage, ampersand, backslash, at symbol, or double quotes.");
+        }
+
+        #endregion
+
+        #region Weather
+
+        static readonly CommandDescriptor Cdweather = new CommandDescriptor {
+            Name = "weather",
+            Permissions = new[] { Permission.ReadStaffChat },
+            Category = CommandCategory.CPE | CommandCategory.World,
+            Help = "Changes player weather ingame 0(sun) 1(rain) 2(snow)",
+            Usage = "/weather [Player] [weather]",
+            Handler = WeatherHandler
+        };
+
+        static void WeatherHandler(Player player, CommandReader cmd) {
+            if (cmd.Count == 1) {
+                player.Message(Cdweather.Usage);
                 return;
-            }            
-            if (Color.IsColorCode(code)) {
-                p.Message("There is already a custom or server defined color with the code " + code +
-                                   ", you must either use a different code or use \"&h/ccols remove " + code + "&s\"");
-                return;
             }
-            
             string name = cmd.Next();
-            if (Color.Parse(name) != null) {
-                p.Message("There is already an existing standard or " +
-                                   "custom color with the name \"" + name + "\"."); return;
+            PlayerInfo p = PlayerDB.FindPlayerInfoOrPrintMatches(player, name, SearchOptions.IncludeSelf);
+            if (p == null) {
+                return;
             }
-            
-            string rawFallback = cmd.Next();
-            if (rawFallback.Length > 1) {
-                p.Message("Fallback color code must only be one character long."); return;
+            string valueText = cmd.Next();
+            byte weather;
+            if (!byte.TryParse(valueText, out weather)) {
+                if (valueText.Equals("sun", StringComparison.OrdinalIgnoreCase)) {
+                    weather = 0;
+                } else if (valueText.Equals("rain", StringComparison.OrdinalIgnoreCase)) {
+                    weather = 1;
+                } else if (valueText.Equals("snow", StringComparison.OrdinalIgnoreCase)) {
+                    weather = 2;
+                }
             }
-            char fallback = rawFallback[0];
-            if (!Color.IsStandardColorCode(fallback)) {
-                p.Message(fallback + " must be a standard color code."); return;
+            if (weather < 0 || weather > 2) {
+                player.Message("Please use a valid integer(0,1,2) or string(sun,rain,snow)");
+                return;
             }
-            
-            string hex = cmd.Next();
-            if (hex.Length > 0 && hex[0] == '#')
-                hex = hex.Substring(1);
-            if (hex.Length != 6 || !WorldCommands.IsValidHex(hex)) {
-                p.Message("\"#" + hex + "\" is not a valid hex color."); return;
+            if (p != player.Info) {
+                if (p.IsOnline) {
+                    if (p.PlayerObject.Supports(CpeExt.EnvWeatherType)) {
+                        p.PlayerObject.Message("&a{0} set your weather to {1} ({2}&a)", player.Name, weather, weather == 0 ? "&sSun" : (weather == 1 ? "&1Rain" : "&fSnow"));
+                        player.Message("&aSet weather for {0} to {1} ({2}&a)", p.Name, weather, weather == 0 ? "&sSun" : (weather == 1 ? "&1Rain" : "&fSnow"));
+                        p.PlayerObject.Send(Packet.SetWeather((byte)weather));
+                    } else {
+                        player.Message("That player does not support WeatherType packet");
+                    }
+                } else if (p.IsOnline == false || !player.CanSee(p.PlayerObject)) {
+                    player.Message("That player is not online!");
+                }
+            } else {
+                if (player.Supports(CpeExt.EnvWeatherType)) {
+                    player.Message("&aSet weather to {0} ({1}&a)", weather, weather == 0 ? "&sSun" : (weather == 1 ? "&1Rain" : "&fSnow"));
+                    player.Send(Packet.SetWeather((byte)weather));
+                } else {
+                    player.Message("You don't support WeatherType packet");
+                }
             }
-            
-            CustomColor col = default(CustomColor);
-            col.Code = code; col.Fallback = fallback; col.A = 255;
-            col.Name = name;
-            System.Drawing.Color rgb = System.Drawing.ColorTranslator.FromHtml("#" + hex);
-            col.R = rgb.R; col.G = rgb.G; col.B = rgb.B;
-            Color.AddExtColor(col);
-            p.Message("Successfully added a custom color. &{0} %{0} {1}", col.Code, col.Name.ToLower().UppercaseFirst());
         }
-        
-        static void RemoveCustomColorsHandler(Player p, CommandReader cmd) {
-            if (cmd.Count < 2) { p.Message("Usage: &H/ccols remove [code]"); return; }
-            if (cmd.RawMessage.Split()[2].Contains("\"")) {
-                p.Message("Color code cannot be \"");
+
+        #endregion
+
+        #region ZoneShow
+
+        static readonly CommandDescriptor CdZoneShow = new CommandDescriptor {
+            Name = "ZoneSelection",
+            Aliases = new[] { "zselection", "zbox", "zshow", "zs" },
+            Permissions = new[] { Permission.ManageZones },
+            Category = CommandCategory.CPE | CommandCategory.Zone,
+            Help = "Lets you configure zone selections.",
+            Usage = "/ZShow [Zone Name] [Color or On/Off] [Alpha] [On/Off]",
+            Handler = zshowHandler
+        };
+
+        private static void zshowHandler(Player player, CommandReader cmd) {
+            if (cmd.Count <= 1) {
+                CdZoneShow.PrintUsage(player);
                 return;
             }
-            if (!p.Can(Permission.DefineCustomBlocks)) {
-                p.MessageNoAccess(Permission.DefineCustomBlocks);
+            string zonea = cmd.Next();
+            string color = cmd.Next();
+            string alp = cmd.Next();
+            string bol = cmd.Next();
+            short alpha;
+            Zone zone = player.World.Map.Zones.Find(zonea);
+            if (zone == null) {
+                player.Message("Error: Zone not found");
                 return;
             }
-            
-            char code = cmd.Next()[0];
-            if (Color.IsStandardColorCode(code)) {
-                p.Message(code + " is a standard color, and thus cannot be removed."); return;
+            if (color == null) {
+                player.Message("Error: Missing a Hex Color code");
+                player.Message(CdZoneShow.Usage);
+                return;
+            } else {
+                color = color.ToUpper();
             }
-            
-            if ((int)code >= 256 || Color.ExtColors[code].Undefined) {
-                p.Message("There is no custom color with the code " + code + ".");
-                p.Message("Use \"&h/ccols list\" &Sto see a list of custom colors.");
+            if (color.StartsWith("#")) {
+                color = color.ToUpper().Remove(0, 1);
+            }
+            if (!IsValidHex(color)) {
+                if (color.ToLower().Equals("on") || color.ToLower().Equals("true") || color.ToLower().Equals("yes")) {
+                    zone.ShowZone = true;
+                    if (zone.Color != null) {
+                        player.Message("Zone ({0}&s) will now show its bounderies", zone.ClassyName);
+                        player.World.Players.Where(p => p.Supports(CpeExt.SelectionCuboid)).Send(Packet.MakeMakeSelection(zone.ZoneID, zone.Name, zone.Bounds,
+                            zone.Color, zone.Alpha));
+                    }
+                    return;
+                } else if (color.ToLower().Equals("off") || color.ToLower().Equals("false") || color.ToLower().Equals("no")) {
+                    zone.ShowZone = false;
+                    player.Message("Zone ({0}&s) will no longer show its bounderies", zone.ClassyName);
+                    player.World.Players.Where(p => p.Supports(CpeExt.SelectionCuboid)).Send(Packet.MakeRemoveSelection(zone.ZoneID));
+                    return;
+                } else {
+                    player.Message("Error: \"#{0}\" is not a valid HEX color code.", color);
+                    return;
+                }
+            } else {
+                zone.Color = color.ToUpper();
+            }
+
+            if (alp == null) {
+                player.Message("Error: Missing an Alpha integer");
+                player.Message(CdZoneShow.Usage);
                 return;
             }
-            Color.RemoveExtColor(code);
-            p.Message("Successfully removed a custom color. {0}", code);
-        }
-        
-        static void ListCustomColorsHandler(Player p, CommandReader cmd) {
-            int offset = 0, index = 0, count = 0;
-            cmd.NextInt(out offset);
-            CustomColor[] cols = Color.ExtColors;
-            
-            for( int i = 0; i < cols.Length; i++ ) {
-                CustomColor col = cols[i];
-                if (col.Undefined) continue;
-                
-                if (index >= offset) {
-                    count++;
-                    const string format = "{0} - %{1} displays as &{1}{2}&s, and falls back to {3}.";
-                    p.Message(format, col.Name, col.Code, Hex(col), col.Fallback);
-                    
-                    if (count >= 8) {
-                        const string helpFormat = "To see the next set of custom colors, type &h/ccols list {0}";
-                        p.Message(helpFormat, offset + 8);
-                        return;
+            if (!short.TryParse(alp, out alpha)) {
+                player.Message("Error: \"{0}\" is not a valid integer for Alpha.", alp);
+                return;
+            } else {
+                zone.Alpha = alpha;
+            }
+            if (bol != null) {
+                if (!bol.ToLower().Equals("on") && !bol.ToLower().Equals("off") && !bol.ToLower().Equals("true") &&
+                    !bol.ToLower().Equals("false") && !bol.ToLower().Equals("0") && !bol.ToLower().Equals("1") &&
+                    !bol.ToLower().Equals("yes") && !bol.ToLower().Equals("no")) {
+                    zone.ShowZone = false;
+                    player.Message("({0}) is not a valid bool statement", bol);
+                } else if (bol.ToLower().Equals("on") || bol.ToLower().Equals("true") || bol.ToLower().Equals("1") ||
+                           bol.ToLower().Equals("yes")) {
+                    zone.ShowZone = true;
+                    player.Message("Zone ({0}&s) color set! Bounderies: ON", zone.ClassyName);
+                } else if (bol.ToLower().Equals("off") || bol.ToLower().Equals("false") || bol.ToLower().Equals("0") ||
+                           bol.ToLower().Equals("no")) {
+                    zone.ShowZone = false;
+                    player.Message("Zone ({0}&s) color set! Bounderies: OFF", zone.ClassyName);
+                }
+            } else {
+                zone.ShowZone = false;
+                player.Message("Zone ({0}&s) color set!", zone.ClassyName);
+            }
+            if (zone != null) {
+                foreach (Player p in player.World.Players) {
+                    if (p.Supports(CpeExt.SelectionCuboid)) {
+                        if (zone.ShowZone) {
+                            p.Send(Packet.MakeMakeSelection(zone.ZoneID, zone.Name, zone.Bounds, zone.Color, alpha));
+                        }
                     }
                 }
-                index++;
             }
         }
 
-        static void FreeCustomColorsHandler(Player p) {
-        	StringBuilder codes = new StringBuilder();
-            for (char c = '!'; c <= '~'; c++) {
-        		if (IsValidCode(c)) codes.Append(c).Append(' ');
-            }
-        	p.Message("Free codes: &f" + codes.ToString());
-        }
-        
-        static bool IsValidCode(char code) {
-            if (code == '%' || code == '&' || code == '\\' || code == '"' || code == '@') 
-                return false;
-            return !Color.IsColorCode(code);
-        }
-
-        static string Hex(CustomColor c) {
-            return "#" + c.R.ToString("X2") + c.G.ToString("X2") + c.B.ToString("X2");
-        }
         #endregion
+
     }
 }

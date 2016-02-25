@@ -22,7 +22,6 @@ namespace fCraft {
             CommandManager.RegisterCommand( CdSignRemove );
             CommandManager.RegisterCommand( CdZoneRename );
             CommandManager.RegisterCommand( CdZoneTest );
-            CommandManager.RegisterCommand( CdZoneShow );
             CommandManager.RegisterCommand( cdDoor );
             openDoors = new List<Zone>();
         }
@@ -956,107 +955,6 @@ namespace fCraft {
         }
 
         #endregion
-        #region ZoneShow
-        static readonly CommandDescriptor CdZoneShow = new CommandDescriptor
-        {
-            Name = "ZoneSelection",
-            Aliases = new[] { "zselection", "zbox", "zshow", "zs" },
-            Permissions = new[] { Permission.ManageZones },
-            Category = CommandCategory.New | CommandCategory.Zone,
-            Help = "Lets you configure zone selections.",
-            Usage = "/ZShow [Zone Name] [Color or On/Off] [Alpha] [On/Off]",
-            Handler = zshowHandler
-        };
-
-        private static void zshowHandler(Player player, CommandReader cmd) {
-			if (cmd.Count <= 1) {
-				CdZoneShow.PrintUsage(player);
-				return;
-			}
-            string zonea = cmd.Next();
-            string color = cmd.Next();
-            string alp = cmd.Next();
-            string bol = cmd.Next();
-            short alpha;
-            Zone zone = player.World.Map.Zones.Find(zonea);
-            if (zone == null) {
-                player.Message("Error: Zone not found");
-                return;
-            }
-            if (color == null) {
-                player.Message("Error: Missing a Hex Color code");
-                player.Message(CdZoneShow.Usage);
-                return;
-            } else {
-                color = color.ToUpper();
-            }
-            if (color.StartsWith("#")) {
-                color = color.ToUpper().Remove(0, 1);
-            }
-            if (!IsValidHex(color)) {
-                if (color.ToLower().Equals("on") || color.ToLower().Equals("true") || color.ToLower().Equals("yes")) {
-                    zone.ShowZone = true;
-                    if (zone.Color != null) {
-                        player.Message("Zone ({0}&s) will now show its bounderies", zone.ClassyName);
-                        player.World.Players.Where(p => p.Supports(CpeExt.SelectionCuboid)).Send(Packet.MakeMakeSelection(zone.ZoneID, zone.Name, zone.Bounds,
-                            zone.Color, zone.Alpha));
-                    }
-                    return;
-                } else if (color.ToLower().Equals("off") || color.ToLower().Equals("false") || color.ToLower().Equals("no")) {
-                    zone.ShowZone = false;
-                    player.Message("Zone ({0}&s) will no longer show its bounderies", zone.ClassyName);
-                    player.World.Players.Where(p => p.Supports(CpeExt.SelectionCuboid)).Send(Packet.MakeRemoveSelection(zone.ZoneID));
-                    return;
-                } else {
-                    player.Message("Error: \"#{0}\" is not a valid HEX color code.", color);
-                    return;
-                }
-            } else {
-                zone.Color = color.ToUpper();
-            }
-
-            if (alp == null) {
-                player.Message("Error: Missing an Alpha integer");
-                player.Message(CdZoneShow.Usage);
-                return;
-            }
-            if (!short.TryParse(alp, out alpha)) {
-                player.Message("Error: \"{0}\" is not a valid integer for Alpha.", alp);
-                return;
-            } else {
-                zone.Alpha = alpha;
-            }
-            if (bol != null) {
-                if (!bol.ToLower().Equals("on") && !bol.ToLower().Equals("off") && !bol.ToLower().Equals("true") &&
-                    !bol.ToLower().Equals("false") && !bol.ToLower().Equals("0") && !bol.ToLower().Equals("1") &&
-                    !bol.ToLower().Equals("yes") && !bol.ToLower().Equals("no")) {
-                    zone.ShowZone = false;
-                    player.Message("({0}) is not a valid bool statement", bol);
-                } else if (bol.ToLower().Equals("on") || bol.ToLower().Equals("true") || bol.ToLower().Equals("1") ||
-                           bol.ToLower().Equals("yes")) {
-                    zone.ShowZone = true;
-                    player.Message("Zone ({0}&s) color set! Bounderies: ON", zone.ClassyName);
-                } else if (bol.ToLower().Equals("off") || bol.ToLower().Equals("false") || bol.ToLower().Equals("0") ||
-                           bol.ToLower().Equals("no")) {
-                    zone.ShowZone = false;
-                    player.Message("Zone ({0}&s) color set! Bounderies: OFF", zone.ClassyName);
-                }
-            } else {
-                zone.ShowZone = false;
-                player.Message("Zone ({0}&s) color set!", zone.ClassyName);
-            }
-            if (zone != null) {
-                foreach (Player p in player.World.Players) {
-                    if (p.Supports(CpeExt.SelectionCuboid)) {
-                        if (zone.ShowZone) {
-                            p.Send(Packet.MakeMakeSelection(zone.ZoneID, zone.Name, zone.Bounds, zone.Color, alpha));
-                        }
-                    }
-                }
-            }
-        }
-
-        #endregion
         #region Doors
         static readonly CommandDescriptor cdDoor = new CommandDescriptor
         {
@@ -1237,22 +1135,6 @@ namespace fCraft {
         static string[] specialZoneNames = { "checkpoint_", "death_", "deny_", "message_", "respawn_", "text_" };
         static string[] specialOwnerZoneNames = { "c_command_", "command_" };
         #endregion
-        /// <summary> Ensures that the hex color has the correct length (1-6 characters)
-        /// and character set (alphanumeric chars allowed). </summary>
-        public static bool IsValidHex( string hex ) {
-            if( hex == null ) throw new ArgumentNullException( "hex" );
-            if (hex.StartsWith("#")) hex = hex.Remove(0, 1);
-            if( hex.Length < 1 || hex.Length > 6 ) return false;
-            for( int i = 0; i < hex.Length; i++ ) {
-                char ch = hex[i];
-                if( ch < '0' || ch > '9' && 
-                    ch < 'A' || ch > 'F' && 
-                    ch < 'a' || ch > 'f' ) {
-                    return false;
-                }
-            }
-            return true;
-        }
         /// <summary> Checks if a zone name makes it a special zone </summary>
         public static bool canManageSpecialZone(string name, Player player) {
             if (name == null) return false;

@@ -23,7 +23,6 @@ namespace fCraft {
             CommandManager.RegisterCommand( CdRanks );
             CommandManager.RegisterCommand( CdListStaff );
             CommandManager.RegisterCommand( CdOnlineStaff);
-            CommandManager.RegisterCommand( CdListClients);
             CommandManager.RegisterCommand( CdRules );
             CommandManager.RegisterCommand( CdMeasure );
             CommandManager.RegisterCommand( CdPlayers );
@@ -38,7 +37,6 @@ namespace fCraft {
             CommandManager.RegisterCommand( cdTaskDebug );
             CommandManager.RegisterCommand( CdMost );
             CommandManager.RegisterCommand( CdLRP );
-            CommandManager.RegisterCommand( CdLPR );
             CommandManager.RegisterCommand( CdIPInfo );
             CommandManager.RegisterCommand( CdSeen );
             CommandManager.RegisterCommand( Cdclp );
@@ -933,43 +931,6 @@ namespace fCraft {
         }
 
         #endregion
-        #region ListClients
-
-        static readonly CommandDescriptor CdListClients = new CommandDescriptor {
-            Name = "ListClients",
-            Aliases = new[] { "pclients", "clients", "whoisanewb" },
-            Category = CommandCategory.New | CommandCategory.Info,
-            IsConsoleSafe = true,
-            Help = "Shows a list of currently clients users are using.",
-            Handler = ListClientsHandler
-        };
-
-        static void ListClientsHandler(Player player, CommandReader cmd) {
-            Player[] players = Server.Players;
-            var visiblePlayers = players.Where(player.CanSee).OrderBy(p => p, PlayerListSorter.Instance).ToArray();
-
-            Dictionary<string, List<Player>> clients = new Dictionary<string, List<Player>>();
-            foreach (var p in visiblePlayers) {
-                string appName = p.ClientName;
-                if (string.IsNullOrEmpty(appName)) {
-                    appName = "(unknown)";
-                }
-
-                List<Player> usingClient;
-                if (!clients.TryGetValue(appName, out usingClient)) {
-                    usingClient = new List<Player>();
-                    clients[appName] = usingClient;
-                }
-                usingClient.Add(p);
-            }
-            player.Message("Players using:");
-            foreach (var kvp in clients) {
-                player.Message("  &s{0}:&f {1}",
-                               kvp.Key, kvp.Value.JoinToClassyString());
-            }
-        }
-
-        #endregion
         #region Rules
 
         const string DefaultRules = "Rules: Use common sense!";
@@ -1417,14 +1378,15 @@ namespace fCraft {
             string prefix;
             if (param == null) {
                 player.Message("&sCommand Categories:");
+                player.Message("&h  /cmds All");
                 player.Message("&h  /cmds Building");
                 player.Message("&h  /cmds Chat");
+                player.Message("&h  /cmds CPE");
                 player.Message("&h  /cmds Info");
                 player.Message("&h  /cmds Maintenance");
                 player.Message("&h  /cmds Moderation");
-                player.Message("&h  /cmds World");
                 player.Message("&h  /cmds New");
-                player.Message("&h  /cmds All");
+                player.Message("&h  /cmds World");
                 return;
 			}
 			Array items = CommandManager.GetCommands(player.Info.Rank, false);
@@ -1439,7 +1401,7 @@ namespace fCraft {
 				if (output.EndsWith(", ")) {
 					player.Message(output.Remove(output.Length - 2) + ".");
 				} else {
-					player.Message("There are no commands containing \"{0}\"", param.Trim('*'));
+					player.Message("&cThere are no commands containing \"{0}\"", param.Trim('*'));
 				}
                 return;
             } else if (param.EndsWith("*")) {
@@ -1452,7 +1414,7 @@ namespace fCraft {
 				if (output.EndsWith(", ")) {
 					player.Message(output.Remove(output.Length - 2) + ".");
 				} else {
-					player.Message("There are no commands starting with \"{0}\"", param.Trim('*'));
+					player.Message("&cThere are no commands starting with \"{0}\"", param.Trim('*'));
 				}
                 return;
 			} else if (param.StartsWith("*")) {
@@ -1465,7 +1427,7 @@ namespace fCraft {
 				if (output.EndsWith(", ")) {
 					player.Message(output.Remove(output.Length - 2) + ".");
 				} else {
-					player.Message("There are no commands ending with \"{0}\"", param.Trim('*'));
+					player.Message("&cThere are no commands ending with \"{0}\"", param.Trim('*'));
 				}
 				return;
 			} else if (param.StartsWith("@")) {
@@ -1475,7 +1437,7 @@ namespace fCraft {
                     player.MessageNoRank(rankName);
                     return;
                 }
-                prefix = String.Format("Commands available to {0}&S", rank.ClassyName);
+                prefix = string.Format("Commands available to {0}&S", rank.ClassyName);
                 cd = CommandManager.GetCommands(rank, false);
             } else if (param.Equals("all", StringComparison.OrdinalIgnoreCase)) {
                 prefix = "All commands";
@@ -1484,13 +1446,13 @@ namespace fCraft {
                 prefix = "Hidden commands";
                 cd = CommandManager.GetCommands(true);
             } else if (EnumUtil.TryComplete(param, out category, true)) {
-                prefix = String.Format("{0} commands", category);
+                prefix = string.Format("{0} commands", category);
                 cd = CommandManager.GetCommands(category, false);
             } else {
                 CdCommands.PrintUsage(player);
                 return;
             }
-            player.MessagePrefixed("&S  ", "{0}: {1}", prefix, cd.JoinToClassyString());
+            player.Message("&S{0}: {1}", prefix, cd.JoinToClassyString());
         }
 
         #endregion

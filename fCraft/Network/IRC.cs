@@ -781,7 +781,7 @@ namespace fCraft
                     }
                     SendChannelMessage("\u212CPlayers using:");
                     foreach (var kvp in clients) {
-                        SendChannelMessage("  &s\u212C{0}:&f \u211C{1}",
+                        SendChannelMessage("  \u212C{0}\u211C: {1}",
                                        kvp.Key, kvp.Value.JoinToClassyString());
                     }
                     return true;
