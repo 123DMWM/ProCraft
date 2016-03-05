@@ -665,7 +665,7 @@ namespace fCraft
                 if (rawCmd == "!players" || rawCmd == nick + " players") {
                     if (!elapsed) return true;
                     var visiblePlayers = Server.Players.Where(p => !p.Info.IsHidden)
-                        .OrderBy(p => p.Name).ToArray();
+                        .OrderBy(p => p, PlayerListSorter.Instance).ToArray();
                     
                     if (visiblePlayers.Any()) {
                         SendChannelMessage("\u212CPlayers online: \u211C" +

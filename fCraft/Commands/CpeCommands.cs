@@ -29,8 +29,8 @@ namespace fCraft {
             CommandManager.RegisterCommand(CdZoneShow);
         }
 
-        internal static string[] validEntities =  { "chicken", "creeper",
-            "humanoid", "human", "pig", "sheep", "skeleton", "spider", "zombie"
+        internal static string[] validEntities =  { "chicken", "creeper", "humanoid", 
+    	    "human", "pig", "sheep", "skeleton", "spider", "zombie", "chibi",
         };
 
         /// <summary> Ensures that the hex color has the correct length (1-6 characters)
@@ -328,7 +328,7 @@ namespace fCraft {
             Usage = "/Model [Player] [Model]",
             IsConsoleSafe = true,
             Help = "Change the Model or Skin of [Player]!&n" +
-            "Valid models: &s [Any Block Name or ID#], Chicken, Creeper, Humanoid, Pig, Sheep, Skeleton, Spider, Zombie!",
+            "Valid models: &s [Any Block Name or ID#], Chicken, Creeper, Humanoid, Pig, Sheep, Skeleton, Spider, Zombie, Chibi!",
             Handler = ModelHandler
         };
 
