@@ -2113,7 +2113,7 @@ namespace fCraft {
 
 		public static void GetGeoip(PlayerInfo info) {
 			string ip = info.LastIP.ToString();
-			if (IPAddress.Parse(ip).IsLocal()) {
+			if (IPAddress.Parse(ip).IsLocal() && Server.ExternalIP != null) {
 				ip = Server.ExternalIP.ToString();
 			}
 			if (ip == info.GeoIP && info.Accuracy != 0) {

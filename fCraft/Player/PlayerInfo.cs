@@ -121,9 +121,9 @@ namespace fCraft {
         /// <summary> Begins to asynchronously check player's account type. </summary>
         public void GeoipLogin() {
             String ip = LastIP.ToString();
-            if (IPAddress.Parse(ip).IsLocal()) {
+            if (IPAddress.Parse(ip).IsLocal() && Server.ExternalIP != null)
                 ip = Server.ExternalIP.ToString();
-            }
+
 			if (ip != GeoIP || Accuracy == 0) {
                 Scheduler.NewBackgroundTask(GeoipLoginCallback).RunOnce(this, TimeSpan.Zero);
             } else {
