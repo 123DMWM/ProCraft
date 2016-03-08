@@ -22,7 +22,7 @@ namespace fCraft.Drawing {
 
         public string Help {
             get {
-                return "ReplaceNotBrush brush: Replaces all blocks except the given type with output of another brush. " +
+                return "Replaces all blocks except the given type with output of another brush. " +
                        "Usage: &H/Brush rnb <Block> <BrushName>";
             }
         }

@@ -26,7 +26,7 @@ namespace fCraft.Drawing {
         }
 
         public string Help {
-            get { return "BWRainbow brush: Creates a diagonal 8-color black and white rainbow pattern."; }
+            get { return "Creates a diagonal 8-color black and white rainbow pattern."; }
         }
 
         public string Description {

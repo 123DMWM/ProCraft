@@ -15,7 +15,7 @@ namespace fCraft.Drawing {
 
         public string Help {
             get {
-                return "Striped brush: Fills the area with alternating Striped pattern. " +
+                return "Fills the area with alternating Striped pattern. " +
                        "If only one block name is given, leaves every other block untouched.";
             }
         }

@@ -27,7 +27,7 @@ namespace fCraft.Drawing {
         }
 
         public string Help {
-            get { return Name + " brush: Makes a tiled pattern out of copied blocks."; }
+            get { return "Makes a tiled pattern out of copied blocks."; }
         }
 
 

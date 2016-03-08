@@ -12,7 +12,7 @@ namespace fCraft.Drawing {
 
         public string Help {
             get {
-                return "Normal brush: Fills the area with solid color. " +
+                return "Fills the area with solid color. " +
                        "If no block name is given, uses the last block that player has placed.";
             }
         }

@@ -15,7 +15,7 @@ namespace fCraft.Drawing {
 
         public string Help {
             get {
-                return "Checkered brush: Fills the area with alternating checkered pattern. " +
+                return "Fills the area with alternating checkered pattern. " +
                        "If only one block name is given, leaves every other block untouched.";
             }
         }

@@ -22,7 +22,7 @@ namespace fCraft.Drawing {
 
         public string Help {
             get {
-                return "ReplaceBrush brush: Replaces blocks of a given type with output of another brush. " +
+                return "Replaces blocks of a given type with output of another brush. " +
                        "Usage: &H/Brush rb <Block> <BrushName>";
             }
         }

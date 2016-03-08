@@ -24,7 +24,7 @@ namespace fCraft.Drawing {
 
         public string Help {
             get {
-                return "Random brush: Chaotic pattern of two or more random block types. " +
+                return "Chaotic pattern of two or more random block types. " +
                        "If only one block name is given, leaves every other block untouched.";
             }
         }
