@@ -88,7 +88,7 @@ namespace fCraft {
                     for ( int x = 0; x < img.Width; x++ ) {
                         for ( int z = 0; z < img.Height; z++ ) {
                             if ( img.GetPixel( x, z ).ToArgb() != System.Drawing.Color.White.ToArgb() ) {
-                                DrawOneBlock( player, player.World.Map, PixelData.BlockColor,
+                                BuildingCommands.DrawOneBlock( player, player.World.Map, PixelData.BlockColor,
                                       new Vector3I( ( PixelData.X + x ), PixelData.Y, ( PixelData.Z + z ) ), BlockChangeContext.Drawn,
                                       ref blocks, ref blocksDenied, undoState );
                                 blockCount++;
@@ -100,7 +100,7 @@ namespace fCraft {
                     for ( int x = 0; x < img.Width; x++ ) {
                         for ( int z = 0; z < img.Height; z++ ) {
                             if ( img.GetPixel( x, z ).ToArgb() != System.Drawing.Color.White.ToArgb() ) {
-                                DrawOneBlock( player, player.World.Map, PixelData.BlockColor,
+                                BuildingCommands.DrawOneBlock( player, player.World.Map, PixelData.BlockColor,
                                       new Vector3I( ( PixelData.X - x ), PixelData.Y, ( PixelData.Z + z ) ), BlockChangeContext.Drawn,
                                       ref blocks, ref blocksDenied, undoState );
                                 blockCount++;
@@ -112,7 +112,7 @@ namespace fCraft {
                     for ( int y = 0; y < img.Width; y++ ) {
                         for ( int z = 0; z < img.Height; z++ ) {
                             if ( img.GetPixel( y, z ).ToArgb() != System.Drawing.Color.White.ToArgb() ) {
-                                DrawOneBlock( player, player.World.Map, PixelData.BlockColor,
+                                BuildingCommands.DrawOneBlock( player, player.World.Map, PixelData.BlockColor,
                                       new Vector3I( PixelData.X, ( PixelData.Y + y ), ( PixelData.Z + z ) ), BlockChangeContext.Drawn,
                                       ref blocks, ref blocksDenied, undoState );
                                 blockCount++;
@@ -124,7 +124,7 @@ namespace fCraft {
                     for ( int y = 0; y < img.Width; y++ ) {
                         for ( int z = 0; z < img.Height; z++ ) {
                             if ( img.GetPixel( y, z ).ToArgb() != System.Drawing.Color.White.ToArgb() ) {
-                                DrawOneBlock( player, player.World.Map, PixelData.BlockColor,
+                                BuildingCommands.DrawOneBlock( player, player.World.Map, PixelData.BlockColor,
                                       new Vector3I( PixelData.X, ( ( PixelData.Y ) - y ), ( PixelData.Z + z ) ), BlockChangeContext.Drawn,
                                       ref blocks, ref blocksDenied, undoState );
                                 blockCount++;
@@ -218,35 +218,6 @@ namespace fCraft {
             public static int Z;
             public static Block BlockColor;
         }
-
-        //stolen from BuildingCommands
-        #region DrawOneBlock
-        static void DrawOneBlock ( Player player, Map map, Block drawBlock, Vector3I coord,
-                                 BlockChangeContext context, ref int blocks, ref int blocksDenied, fCraft.Drawing.UndoState undoState ) {
-            if ( map == null ) return;
-            if ( player == null ) throw new ArgumentNullException( "player" );
-
-            if ( !map.InBounds( coord ) ) return;
-            Block block = map.GetBlock( coord );
-            if ( block == drawBlock ) return;
-
-            if ( player.CanPlace( map, coord, drawBlock, context ) != CanPlaceResult.Allowed ) {
-                blocksDenied++;
-                return;
-            }
-
-            map.QueueUpdate( new BlockUpdate( null, coord, drawBlock ) );
-            Player.RaisePlayerPlacedBlockEvent( player, map, coord, block, drawBlock, context );
-
-            if ( !undoState.IsTooLargeToUndo ) {
-                if ( !undoState.Add( coord, block ) ) {
-                    player.Message( "NOTE: This draw command is too massive to undo." );
-                    player.LastDrawOp = null;
-                }
-            }
-            blocks++;
-        }
-        #endregion
         #endregion
     }
 }

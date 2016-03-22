@@ -3039,23 +3039,17 @@ namespace fCraft {
         }
         #endregion
         #region drawoneblock
-        static void DrawOneBlock([NotNull] Player player, [NotNull] Map map, Block drawBlock, Vector3I coord,
+        internal static void DrawOneBlock([NotNull] Player player, [NotNull] Map map, Block drawBlock, Vector3I coord,
                                  BlockChangeContext context, ref int blocks, ref int blocksDenied, UndoState undoState) {
-            if (player == null)
-                throw new ArgumentNullException("player");
-
-            if (!map.InBounds(coord)) {
-                return;
-            }
+            if (player == null) throw new ArgumentNullException("player");
+            if (map == null) return;
+            if (!map.InBounds(coord)) return;
             Block block = map.GetBlock(coord);
-            if (block == drawBlock) {
-                return;
-            }
+            if (block == drawBlock) return;
 
             if (player.CanPlace(map, coord, drawBlock, context) != CanPlaceResult.Allowed) {
                 blocksDenied++;
                 return;
-
             }
 
             map.QueueUpdate(new BlockUpdate(null, coord, drawBlock));
