@@ -424,58 +424,23 @@ namespace fCraft {
                                                player.Info.Rank.DrawLimit, Count ) );
                 return;
             }
-            //check direction and draw
-            switch ( direction ) {
-                case Direction.one:
-                    for ( int x = 0; x < img.Width; x++ ) {
-                        for ( int z = 0; z < img.Height; z++ ) {
-                            if ( img.GetPixel( x, z ).ToArgb() != System.Drawing.Color.White.ToArgb() ) {
-                                BuildingCommands.DrawOneBlock( player, player.World.Map, PixelData.BlockColor,
-                                      new Vector3I( ( PixelData.X + x ), PixelData.Y, ( PixelData.Z + z ) ), BlockChangeContext.Drawn,
-                                      ref blocks, ref blocksDenied, undoState );
-                                blockCount++;
-                            }
-                        }
-                    }
-                    break;
-                case Direction.two:
-                    for ( int x = 0; x < img.Width; x++ ) {
-                        for ( int z = 0; z < img.Height; z++ ) {
-                            if ( img.GetPixel( x, z ).ToArgb() != System.Drawing.Color.White.ToArgb() ) {
-                                BuildingCommands.DrawOneBlock( player, player.World.Map, PixelData.BlockColor,
-                                      new Vector3I( ( PixelData.X - x ), PixelData.Y, ( PixelData.Z + z ) ), BlockChangeContext.Drawn,
-                                      ref blocks, ref blocksDenied, undoState );
-                                blockCount++;
-                            }
-                        }
-                    }
-                    break;
-                case Direction.three:
-                    for ( int y = 0; y < img.Width; y++ ) {
-                        for ( int z = 0; z < img.Height; z++ ) {
-                            if ( img.GetPixel( y, z ).ToArgb() != System.Drawing.Color.White.ToArgb() ) {
-                                BuildingCommands.DrawOneBlock( player, player.World.Map, PixelData.BlockColor,
-                                      new Vector3I( PixelData.X, ( PixelData.Y + y ), ( PixelData.Z + z ) ), BlockChangeContext.Drawn,
-                                      ref blocks, ref blocksDenied, undoState );
-                                blockCount++;
-                            }
-                        }
-                    }
-                    break;
-                case Direction.four:
-                    for ( int y = 0; y < img.Width; y++ ) {
-                        for ( int z = 0; z < img.Height; z++ ) {
-                            if ( img.GetPixel( y, z ).ToArgb() != System.Drawing.Color.White.ToArgb() ) {
-                                BuildingCommands.DrawOneBlock( player, player.World.Map, PixelData.BlockColor,
-                                      new Vector3I( PixelData.X, ( ( PixelData.Y ) - y ), ( PixelData.Z + z ) ), BlockChangeContext.Drawn,
-                                      ref blocks, ref blocksDenied, undoState );
-                                blockCount++;
-                            }
-                        }
-                    }
-                    break;
-                default:
-                    break; //if blockcount = 0, message is shown and returned
+            
+            int dirX = 0, dirY = 0;
+            if (direction == Direction.one) dirX = 1;
+            if (direction == Direction.two) dirX = -1;
+            if (direction == Direction.three) dirY = 1;
+            if (direction == Direction.four) dirY = -1;            
+            if (dirX == 0 && dirY == 0) return; //if blockcount = 0, message is shown and returned
+
+            for ( int z = 0; z < img.Height; z++ ) {
+                for ( int i = 0; i < img.Width; i++ ) {  
+            		if ( img.GetPixel( i, z ).ToArgb() != System.Drawing.Color.White.ToArgb() ) {
+            			BuildingCommands.DrawOneBlock( player, player.World.Map, PixelData.BlockColor,
+            			      new Vector3I( PixelData.X + dirX * i, PixelData.Y + dirY * i, PixelData.Z + z ), BlockChangeContext.Drawn,
+            			      ref blocks, ref blocksDenied, undoState );
+            			blockCount++;
+            		}
+            	}
             }
         }
         #endregion
