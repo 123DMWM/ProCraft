@@ -13,11 +13,14 @@ namespace fCraft.Drawing {
         public readonly List<UndoBlock> Buffer;
         public bool IsTooLargeToUndo;
         public readonly object SyncRoot = new object();
+        public int Width, Height, Length;
 
-        public bool Add( Vector3I coord, Block block ) {
+        public bool Add( Vector3I coord, Map map, Block block ) {
+            if (Width == 0) { Width = map.Width; Height = map.Height; Length = map.Length; }
             lock( SyncRoot ) {
                 if( BuildingCommands.MaxUndoCount < 1 || Buffer.Count <= BuildingCommands.MaxUndoCount ) {
-                    Buffer.Add( new UndoBlock( coord, block ) );
+                    int index = coord.X + Width * (coord.Y + Length * coord.Z);
+                    Buffer.Add( new UndoBlock( index, block ) );
                     return true;
                 } else if( !IsTooLargeToUndo ) {
                     IsTooLargeToUndo = true;
@@ -38,29 +41,33 @@ namespace fCraft.Drawing {
                 if( Buffer.Count == 0 ) return BoundingBox.Empty;
                 Vector3I min = new Vector3I( int.MaxValue, int.MaxValue, int.MaxValue );
                 Vector3I max = new Vector3I( int.MinValue, int.MinValue, int.MinValue );
+                int x, y, z;
                 for( int i = 0; i < Buffer.Count; i++ ) {
-                    if( Buffer[i].X < min.X ) min.X = Buffer[i].X;
-                    if( Buffer[i].Y < min.Y ) min.Y = Buffer[i].Y;
-                    if( Buffer[i].Z < min.Z ) min.Z = Buffer[i].Z;
-                    if( Buffer[i].X > max.X ) max.X = Buffer[i].X;
-                    if( Buffer[i].Y > max.Y ) max.Y = Buffer[i].Y;
-                    if( Buffer[i].Z > max.Z ) max.Z = Buffer[i].Z;
+                    int index = Buffer[i].Index;
+                    x = index % Width;
+                    y = (index / Width) % Length;
+                    z = (index / Width) / Length;
+                    
+                    if( x < min.X ) min.X = x;
+                    if( y < min.Y ) min.Y = y;
+                    if( z < min.Z ) min.Z = z;
+                    if( x > max.X ) max.X = x;
+                    if( y > max.Y ) max.Y = y;
+                    if( z > max.Z ) max.Z = z;
                 }
                 return new BoundingBox( min, max );
             }
         }
     }
 
-    [StructLayout( LayoutKind.Sequential, Pack = 2 )]
+    [StructLayout( LayoutKind.Sequential, Pack = 1 )]
     public struct UndoBlock {
-        public UndoBlock( Vector3I coord, Block block ) {
-            X = (short)coord.X;
-            Y = (short)coord.Y;
-            Z = (short)coord.Z;
+        public UndoBlock( int index, Block block ) {
+            Index = index;
             Block = block;
         }
 
-        public readonly short X, Y, Z;
+        public readonly int Index;
         public readonly Block Block;
     }
 }

@@ -250,7 +250,7 @@ namespace fCraft.Drawing {
             Player.RaisePlayerPlacedBlockEvent(Player, Map, Coords, oldBlock, newBlock, Context);
 
             if (!UndoState.IsTooLargeToUndo) {
-                if (!UndoState.Add(Coords, oldBlock)) {
+                if (!UndoState.Add(Coords, Map, oldBlock)) {
                     Player.LastDrawOp = null;
                     Player.Message("{0}: Too many blocks to undo.", Description);
                 }

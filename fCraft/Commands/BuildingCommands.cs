@@ -3056,7 +3056,7 @@ namespace fCraft {
             Player.RaisePlayerPlacedBlockEvent(player, map, coord, block, drawBlock, context);
 
             if (!undoState.IsTooLargeToUndo) {
-                if (!undoState.Add(coord, block)) {
+                if (!undoState.Add(coord, map, block)) {
                     player.Message("NOTE: This draw command is too massive to undo.");
                     player.LastDrawOp = null;
                 }

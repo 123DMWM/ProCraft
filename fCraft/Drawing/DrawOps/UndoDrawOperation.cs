@@ -71,9 +71,11 @@ namespace fCraft.Drawing {
         public override int DrawBatch( int maxBlocksToDraw ) {
             int blocksDone = 0;
             for( ; undoBufferIndex < State.Buffer.Count; undoBufferIndex++ ) {
-                UndoBlock blockUpdate = State.Get( undoBufferIndex );
-                Coords = new Vector3I( blockUpdate.X, blockUpdate.Y, blockUpdate.Z );
-                block = blockUpdate.Block;
+                UndoBlock update = State.Get( undoBufferIndex );
+                Coords.X = update.Index % State.Width;
+                Coords.Y = (update.Index / State.Width) % State.Length;
+                Coords.Z = (update.Index / State.Width) / State.Length;
+                block = update.Block;
                 if( DrawOneBlock() ) {
                     blocksDone++;
                     if( blocksDone >= maxBlocksToDraw || TimeToEndBatch ) {

@@ -541,7 +541,7 @@ Your rank is {RANK}&S. Type &H/Help&S for help." );
 
         private void nMaxUndo_ValueChanged( object sender, EventArgs e ) {
             if( xMaxUndo.Checked ) {
-                decimal maxMemUsage = Math.Ceiling( nMaxUndoStates.Value * (nMaxUndo.Value * 8) / (1024 * 1024) );
+                decimal maxMemUsage = Math.Ceiling( nMaxUndoStates.Value * (nMaxUndo.Value * 5) / (1024 * 1024) );
                 lMaxUndoUnits.Text = String.Format( "blocks each (up to {0} MB of RAM per player)", maxMemUsage );
             } else {
                 lMaxUndoUnits.Text = "blocks each";
