@@ -612,9 +612,8 @@ namespace fCraft {
 
 				case RawMessageType.LongerMessage:
 					partialMessage = rawMessage.Substring(0, rawMessage.Length - 1);
-                    if (!partialMessage.EndsWith(" ") && partialMessage.Length != 64) {
-                        partialMessage = partialMessage + " ";
-                    }
+					// Spaces at the end are trimmed by default, so we need to insert one.
+                    if (partialMessage.Length != 64) partialMessage += " ";
 					break;
 
                 case RawMessageType.Invalid:
@@ -2227,6 +2226,7 @@ namespace fCraft {
         const int BulkBlockUpdateExtVersion = 1;        
         const string TextColorsExtName = "TextColors";
         const int TextColorsExtVersion = 1;
+        
         bool supportsBlockDefs, supportsCustomBlocks;
         
         public bool UseFallbackColors {
