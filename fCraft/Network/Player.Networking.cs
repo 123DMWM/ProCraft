@@ -1616,61 +1616,13 @@ namespace fCraft {
             if( World == null ) PlayerOpException.ThrowNoWorld( this );
 
             // handle following the spectatee
-            if( spectatedPlayer != null ) {
-                if( !spectatedPlayer.IsOnline || !CanSee( spectatedPlayer ) ) {
-                    Message( "Stopped spectating {0}&S (disconnected)", spectatedPlayer.ClassyName );
-                    spectatedPlayer = null;
-                } else {
-                    Position spectatePos = spectatedPlayer.Position;
-                    World spectateWorld = spectatedPlayer.World;
-                    if( spectateWorld == null ) {
-                        throw new InvalidOperationException( "Trying to spectate player without a world." );
-                    }
-                    if( spectateWorld != World ) {
-                        if( CanJoin( spectateWorld ) ) {
-                            postJoinPosition = spectatePos;
-                            if( JoinWorldNow( spectateWorld, false, WorldChangeReason.SpectateTargetJoined ) ) {
-                                Message( "Joined {0}&S to continue spectating {1}",
-                                         spectateWorld.ClassyName,
-                                         spectatedPlayer.ClassyName );
-                            } else {
-                                Message( "Stopped spectating {0}&S (cannot join {1}&S)",
-                                         spectatedPlayer.ClassyName,
-                                         spectateWorld.ClassyName );
-                                spectatedPlayer = null;
-                            }
-                        } else {
-                            Message( "Stopped spectating {0}&S (cannot join {1}&S)",
-                                     spectatedPlayer.ClassyName,
-                                     spectateWorld.ClassyName );
-                            spectatedPlayer = null;
-                        }
-                    } else if( spectatePos != Position ) {
-                        SendNow( Packet.MakeSelfTeleport( spectatePos ) );
-                    }
-                    if (SpectatedPlayer.Info.heldBlock != Info.heldBlock && SpectatedPlayer.Supports(CpeExt.HeldBlock))
-                    {
-                        SendNow(Packet.MakeHoldThis(SpectatedPlayer.Info.heldBlock, false));
-                    }
-                }
-            }
+            if( spectatedPlayer != null ) FollowSpectatedEntity();
 
             // check every player on the current world
             Player[] worldPlayerList = World.Players;
             Position pos = Position;
-            foreach (Bot bot in World.Bots.Where(b => b.World == World)) {
-                if (!bot.oldModel.ToLower().Equals(bot.Model.ToLower()) && Supports(CpeExt.ChangeModel)) {
-                    Send(Packet.MakeChangeModel((byte)bot.ID, bot.Model));
-                    bot.oldModel = bot.Model;
-                }
-                if (bot.oldSkinName != bot.SkinName && Supports(CpeExt.ExtPlayerList2)) {
-                    Send(Packet.MakeRemoveEntity(bot.ID));
-					Send(Packet.MakeExtAddEntity2(bot.ID, bot.Name, (bot.SkinName == "" ? bot.Name : bot.SkinName), bot.Position, this));
-                    Send(Packet.MakeChangeModel((byte)bot.ID, bot.Model));
-                    bot.oldSkinName = bot.SkinName;
-                }
-                
-            }
+            CheckBotChanges();
+            
             for( int i = 0; i < worldPlayerList.Length; i++ ) {
                 Player otherPlayer = worldPlayerList[i];
                 // Fetch or create a VisibleEntity object for the player
@@ -1686,29 +1638,10 @@ namespace fCraft {
                 } else {
                     entity = new VisibleEntity(Position, -1, Info.Rank);
                 }
-                if (Info.oldskinName != Info.skinName && otherPlayer.Supports(CpeExt.ExtPlayerList2)) {
-					otherPlayer.Send(Packet.MakeExtAddEntity2(entity.Id, Info.Rank.Color + Name, 
-						(Info.skinName == "" ? Name : Info.skinName), WorldMap.Spawn, otherPlayer));
-                    if (otherPlayer == this) {
-                        otherPlayer.Send(Packet.MakeTeleport(entity.Id, Position));
-                    }
-
-                }
-                if ((Info.oldMob != Info.Mob || Info.oldafkMob != Info.afkMob) && otherPlayer.Supports(CpeExt.ChangeModel)) {
-
-                    string thisModel = Info.IsAFK ? AFKModel : Info.Mob;
-                    if (otherPlayer.Info.Rank.CanSee(Info.Rank) && (thisModel.ToLower().Equals("air") || thisModel.ToLower().Equals("0"))) {
-                        thisModel = "Humanoid";
-                    }
-                    otherPlayer.Send(Packet.MakeChangeModel((byte)entity.Id, thisModel));
-                }
+                CheckOwnChange(entity.Id, otherPlayer);
+                
             skip:
-
-                if (otherPlayer == this) {
-                    continue;
-                }
-                if (!CanSee(otherPlayer))
-                    continue;
+                if (otherPlayer == this || !CanSee(otherPlayer)) continue;
                 if (entities.TryGetValue(otherPlayer, out entity)) {
                     entity.MarkedForRetention = true;
                 } else {
@@ -1774,7 +1707,79 @@ namespace fCraft {
             }
         }
 
+        void FollowSpectatedEntity() {
+            if( !spectatedPlayer.IsOnline || !CanSee( spectatedPlayer ) ) {
+                Message( "Stopped spectating {0}&S (disconnected)", spectatedPlayer.ClassyName );
+                spectatedPlayer = null;
+                return;
+            }
+            
+            Position spectatePos = spectatedPlayer.Position;
+            World spectateWorld = spectatedPlayer.World;
+            if( spectateWorld == null ) {
+                throw new InvalidOperationException( "Trying to spectate player without a world." );
+            }
+            if( spectateWorld != World ) {
+                if( CanJoin( spectateWorld ) ) {
+                    postJoinPosition = spectatePos;
+                    if( JoinWorldNow( spectateWorld, false, WorldChangeReason.SpectateTargetJoined ) ) {
+                        Message( "Joined {0}&S to continue spectating {1}",
+                                spectateWorld.ClassyName,
+                                spectatedPlayer.ClassyName );
+                    } else {
+                        Message( "Stopped spectating {0}&S (cannot join {1}&S)",
+                                spectatedPlayer.ClassyName,
+                                spectateWorld.ClassyName );
+                        spectatedPlayer = null;
+                    }
+                } else {
+                    Message( "Stopped spectating {0}&S (cannot join {1}&S)",
+                            spectatedPlayer.ClassyName,
+                            spectateWorld.ClassyName );
+                    spectatedPlayer = null;
+                }
+            } else if( spectatePos != Position ) {
+                SendNow( Packet.MakeSelfTeleport( spectatePos ) );
+            }
+            if (SpectatedPlayer.Info.heldBlock != Info.heldBlock && SpectatedPlayer.Supports(CpeExt.HeldBlock))
+            {
+                SendNow(Packet.MakeHoldThis(SpectatedPlayer.Info.heldBlock, false));
+            }
+        }
+        
+        void CheckBotChanges() {
+            foreach (Bot bot in World.Bots.Where(b => b.World == World)) {
+                if (!bot.oldModel.ToLower().Equals(bot.Model.ToLower()) && Supports(CpeExt.ChangeModel)) {
+                    Send(Packet.MakeChangeModel((byte)bot.ID, bot.Model));
+                    bot.oldModel = bot.Model;
+                }
+                if (bot.oldSkinName != bot.SkinName && Supports(CpeExt.ExtPlayerList2)) {
+                    Send(Packet.MakeRemoveEntity(bot.ID));
+                    Send(Packet.MakeExtAddEntity2(bot.ID, bot.Name, (bot.SkinName == "" ? bot.Name : bot.SkinName), bot.Position, this));
+                    Send(Packet.MakeChangeModel((byte)bot.ID, bot.Model));
+                    bot.oldSkinName = bot.SkinName;
+                }                
+            }
+        }
+        
+        void CheckOwnChange(sbyte id, Player otherPlayer) {
+            if (Info.oldskinName != Info.skinName && otherPlayer.Supports(CpeExt.ExtPlayerList2)) {
+                otherPlayer.Send(Packet.MakeExtAddEntity2(id, Info.Rank.Color + Name,
+                                                          (Info.skinName == "" ? Name : Info.skinName), WorldMap.Spawn, otherPlayer));
+                if (otherPlayer == this) {
+                    otherPlayer.Send(Packet.MakeTeleport(id, Position));
+                }
 
+            }
+            if ((Info.oldMob != Info.Mob || Info.oldafkMob != Info.afkMob) && otherPlayer.Supports(CpeExt.ChangeModel)) {
+                string thisModel = Info.IsAFK ? AFKModel : Info.Mob;
+                if (otherPlayer.Info.Rank.CanSee(Info.Rank) && (thisModel.ToLower().Equals("air") || thisModel.ToLower().Equals("0"))) {
+                    thisModel = "Humanoid";
+                }
+                otherPlayer.Send(Packet.MakeChangeModel((byte)id, thisModel));
+            }
+        }
+        
         VisibleEntity AddEntity( [NotNull] Player player ) {
             if( player == null ) throw new ArgumentNullException( "player" );
             if (freePlayerIDs.Count > 0) {
