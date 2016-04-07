@@ -410,6 +410,9 @@ namespace fCraft {
                 TimeSpan announcementInterval = TimeSpan.FromMinutes( ConfigKey.AnnouncementInterval.GetInt() );
                 Scheduler.NewTask( ShowRandomAnnouncement ).RunForever( announcementInterval );
             }
+            if (ConfigKey.IRCBotEnabled.Enabled() || ConfigKey.IRCBotChannels.GetString().Length >= 1 || ConfigKey.IRCBotNetwork.GetString().Length >= 1) {
+                Scheduler.NewTask(t => IRC.SendRawMessage(IRCCommands.Ping(ConfigKey.IRCBotChannels.GetString()), "", "")).RunForever(TimeSpan.FromMinutes(15));
+            }
 
             #region LoadTimers
             try
