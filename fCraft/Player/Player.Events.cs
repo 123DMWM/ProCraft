@@ -154,14 +154,12 @@ namespace fCraft {
             }
         }
 
-        internal void RaisePlayerPlacedBlockEvent(Player player, Map map, Vector3I coords,
-                                                  Block oldBlock, Block newBlock, BlockChangeContext context, bool nothing) {
+        internal static void RaisePlayerPlacedBlockEvent( PlayerPlacedBlockEventArgs args ) {
             var handler = PlacedBlock;
-            if (handler != null) {
-                handler(null, new PlayerPlacedBlockEventArgs(player, map, coords, oldBlock, newBlock, context));
+            if( handler != null ) {
+                handler( null, args );
             }
         }
-
 
         static void RaisePlayerBeingKickedEvent( [NotNull] PlayerBeingKickedEventArgs e ) {
             if( e == null ) throw new ArgumentNullException( "e" );
@@ -466,13 +464,13 @@ namespace fCraft.Events {
         public Map Map { get; private set; }
 
         /// <summary> Coordinates at which the block was placed. </summary>
-        public Vector3I Coords { get; private set; }
+        public Vector3I Coords { get; internal set; }
 
         /// <summary> Previous blocktype at this coordinate. </summary>
-        public Block OldBlock { get; private set; }
+        public Block OldBlock { get; internal set; }
 
         /// <summary> Current (placed) blocktype at this location. </summary>
-        public Block NewBlock { get; private set; }
+        public Block NewBlock { get; internal set; }
 
         /// <summary> Context in which the block was placed. </summary>
         public BlockChangeContext Context { get; private set; }

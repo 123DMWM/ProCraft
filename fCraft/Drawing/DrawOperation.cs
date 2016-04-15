@@ -119,6 +119,7 @@ namespace fCraft.Drawing {
 
         const int MaxBlocksToProcessPerBatch = 25000;
         int batchStartProcessedCount;
+        PlayerPlacedBlockEventArgs placeArgs;
 
         protected bool TimeToEndBatch {
             get { return (BlocksProcessed - batchStartProcessedCount) > MaxBlocksToProcessPerBatch; }
@@ -247,7 +248,12 @@ namespace fCraft.Drawing {
             		players[i].SendBlock(Coords, newBlock);
             }
 
-            Player.RaisePlayerPlacedBlockEvent(Player, Map, Coords, oldBlock, newBlock, Context);
+            if (placeArgs == null)
+                placeArgs = new PlayerPlacedBlockEventArgs(Player, Map, Vector3I.Zero, Block.Air, Block.Air, Context);
+            placeArgs.Coords = Coords;
+            placeArgs.OldBlock = oldBlock;
+            placeArgs.NewBlock = newBlock;
+            Player.RaisePlayerPlacedBlockEvent(placeArgs);
 
             if (!UndoState.IsTooLargeToUndo) {
                 if (!UndoState.Add(Coords, Map, oldBlock)) {

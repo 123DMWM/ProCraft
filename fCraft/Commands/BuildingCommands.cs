@@ -1021,7 +1021,7 @@ namespace fCraft {
                 BlockUpdate blockUpdate = new BlockUpdate(player, coords, block);
                 player.Info.ProcessBlockPlaced((byte)block);
                 world.map.QueueUpdate(blockUpdate);
-                player.RaisePlayerPlacedBlockEvent(player, world.map, coords, block, world.map.GetBlock(coords), BlockChangeContext.Manual, true);
+                Player.RaisePlayerPlacedBlockEvent(player, world.map, coords, block, world.map.GetBlock(coords), BlockChangeContext.Manual);
             } else {
                 player.SendNow(Packet.MakeSetBlock(coords, block));
                 player.PlaceBlockWithEvents(coords, ClickAction.Build, block);
