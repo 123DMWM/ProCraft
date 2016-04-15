@@ -26,6 +26,7 @@ namespace fCraft.Drawing {
 
         public Block SourceBlock { get; private set; }
         public Vector3I Origin { get; private set; }
+        int width, length, height;
 
         public Fill3DDrawOperation(Player player) : base(player) {
             SourceBlock = Block.None;
@@ -59,6 +60,7 @@ namespace fCraft.Drawing {
 
             // Set everything up for filling
             Coords = Origin;
+            width = Map.Width; length = Map.Length; height = Map.Height;
 
             StartTime = DateTime.UtcNow;
             Context = BlockChangeContext.Drawn | BlockChangeContext.Filled;
@@ -136,32 +138,25 @@ namespace fCraft.Drawing {
         private int blocksProcessed;
 
         private IEnumerable<Vector3I> BlockEnumerator() {
-            Stack<Vector3I> stack = new Stack<Vector3I>();
-            stack.Push(Origin);
+            Stack<int> stack = new Stack<int>();
+            stack.Push(Map.Index(Origin));
+            Vector3I coords;
 
             while (stack.Count > 0) {
-                Vector3I coords = stack.Pop();
+                int index = stack.Pop();
+                coords.X = index % width;
+                coords.Y = (index / width) % length;
+                coords.Z = (index / width) / length;
+                
                 blocksProcessed++;
                 if (CanPlace(coords)) {
                     yield return coords;
-                    if (coords.X - 1 >= Bounds.XMin) {
-                        stack.Push(new Vector3I(coords.X - 1, coords.Y, coords.Z));
-                    }
-                    if (coords.X + 1 <= Bounds.XMax) {
-                        stack.Push(new Vector3I(coords.X + 1, coords.Y, coords.Z));
-                    }
-                    if (coords.Y - 1 >= Bounds.YMin) {
-                        stack.Push(new Vector3I(coords.X, coords.Y - 1, coords.Z));
-                    }
-                    if (coords.Y + 1 <= Bounds.YMax) {
-                        stack.Push(new Vector3I(coords.X, coords.Y + 1, coords.Z));
-                    }
-                    if (coords.Z - 1 >= Bounds.ZMin) {
-                        stack.Push(new Vector3I(coords.X, coords.Y, coords.Z - 1));
-                    }
-                    if (coords.Z + 1 <= Bounds.ZMax) {
-                        stack.Push(new Vector3I(coords.X, coords.Y, coords.Z + 1));
-                    }
+                    if (coords.X - 1 >= Bounds.XMin) stack.Push(index - 1);
+                    if (coords.X + 1 <= Bounds.XMax) stack.Push(index + 1);
+                    if (coords.Y - 1 >= Bounds.YMin) stack.Push(index + width);
+                    if (coords.Y + 1 <= Bounds.YMax) stack.Push(index - width);
+                    if (coords.Z - 1 >= Bounds.ZMin) stack.Push(index - width * length);
+                    if (coords.Z + 1 <= Bounds.ZMax) stack.Push(index + width * length);
                 }
             }
         }
