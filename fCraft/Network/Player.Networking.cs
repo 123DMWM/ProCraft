@@ -384,7 +384,7 @@ namespace fCraft {
                         Info.heldBlock = failsafe;
                         if (Supports(CpeExt.MessageType) && !IsPlayingCTF) {
                             Send(Packet.Message((byte)MessageType.BottomRight1, "&sBlock:&f" + Map.getBlockName(Info.heldBlock) 
-                        	                    + " &sID:&f" + (byte)Info.heldBlock, true));
+                                                + " &sID:&f" + (byte)Info.heldBlock, true));
                         }
                     }
                 } else {
@@ -582,7 +582,7 @@ namespace fCraft {
             // like at map transitions or at the top layer of the world.
             // Those clicks should be simply ignored.
             if( World.Map.InBounds( coords ) )
-            	PlaceBlockWithEvents( coords, action, (Block)type );
+                PlaceBlockWithEvents( coords, action, (Block)type );
         }
 
         void ProcessPlayerClickPacket() {
@@ -817,7 +817,7 @@ namespace fCraft {
                 Logger.Log(LogType.SuspiciousActivity,
                             "{0} tried to log in from a banned IP.", Name);
                 string bannedMessage = String.Format("IP-banned {0} ago by {1}: {2}",
-													  DateTime.UtcNow.Subtract(ipBanInfo.BanDate).ToMiniNoColorString(),
+                                                      DateTime.UtcNow.Subtract(ipBanInfo.BanDate).ToMiniNoColorString(),
                                                       ipBanInfo.BannedBy,
                                                       ipBanInfo.BanReason);
                 KickNow(bannedMessage, LeaveReason.LoginFailed);
@@ -893,7 +893,7 @@ namespace fCraft {
 
             // Send server information
             string serverName = ConfigKey.ServerName.GetString();
-			string motd = "Welcome to our server!";
+            string motd = "Welcome to our server!";
             FileInfo MOTDInfo = new FileInfo("./MOTDList.txt");
             if (MOTDInfo.Exists)
             {
@@ -902,12 +902,12 @@ namespace fCraft {
                 Random random = new Random();
                 int index = random.Next(0, MOTDlist.Length);
                 motd = MOTDlist[index];
-				if (motd.Length > 64) {
-					motd = "&0=&c=&e= Welcome to our server! &e=&c=&0=";
-				} else {
-					Info.LastMotdMessage = motd;
-					motd = "&0=&c=&e= " + motd + " &e=&c=&0=";
-				}
+                if (motd.Length > 64) {
+                    motd = "&0=&c=&e= Welcome to our server! &e=&c=&0=";
+                } else {
+                    Info.LastMotdMessage = motd;
+                    motd = "&0=&c=&e= " + motd + " &e=&c=&0=";
+                }
             }
             SendNow(Packet.MakeHandshake(this, serverName, motd));
 
@@ -1038,11 +1038,11 @@ namespace fCraft {
                 Message("Your rank is {0}&S. Type &H/Help&S for help.",
                             Info.Rank.ClassyName);
             }
-			if (Info.Rank == RankManager.HighestRank) {
-				if (Chat.Reports.Count() >= 1) {
-					Message(Chat.Reports.Count() + " unread /Reports");
-				}
-			}
+            if (Info.Rank == RankManager.HighestRank) {
+                if (Chat.Reports.Count() >= 1) {
+                    Message(Chat.Reports.Count() + " unread /Reports");
+                }
+            }
 
             // A reminder for first-time users
             if (PlayerDB.Size == 1 && Info.Rank != RankManager.HighestRank)
@@ -1060,8 +1060,8 @@ namespace fCraft {
             Server.UpdatePlayerList();
             RaisePlayerReadyEvent(this);
 
-			if (Supports(CpeExt.MessageType))
-				Send(Packet.Message((byte)MessageType.Status1, ConfigKey.ServerName.GetString(), UseFallbackColors));
+            if (Supports(CpeExt.MessageType))
+                Send(Packet.Message((byte)MessageType.Status1, ConfigKey.ServerName.GetString(), UseFallbackColors));
 
             short NID = 1;
             this.NameID = NID;
@@ -1189,7 +1189,8 @@ namespace fCraft {
                 }
             }
 
-            ResetVisibleEntities();
+            lock (entitiesLock)
+                ResetVisibleEntities();
             ClearQueue(blockQueue);
             Map map;
 
@@ -1281,7 +1282,7 @@ namespace fCraft {
         }
         
         void SendJoinMessage(World oldWorld, World newWorld) {
-        	if (oldWorld == newWorld)
+            if (oldWorld == newWorld)
             {
                 Message("&sRejoined world {0}", newWorld.ClassyName);
             }
@@ -1312,8 +1313,8 @@ namespace fCraft {
         }
         
         void SendJoinCpeExtensions() {
-        	if (Supports(CpeExt.EnvMapAppearance) || Supports(CpeExt.EnvMapAppearance2))
-        		SendCurrentMapAppearance();
+            if (Supports(CpeExt.EnvMapAppearance) || Supports(CpeExt.EnvMapAppearance2))
+                SendCurrentMapAppearance();
             if (Supports(CpeExt.ExtPlayerList2)) {
                 Send(Packet.MakeExtAddEntity2(Packet.SelfId, Info.Rank.Color + Name, (Info.skinName == "" ? Name : Info.skinName), Position, this));
             } else {
@@ -1332,13 +1333,13 @@ namespace fCraft {
                 Send(Packet.MakeEnvSetColor((byte)EnvVariable.Sunlight, World.LightColor));
             }
             
-			if (Supports(CpeExt.EnvWeatherType)) {
-				Send(Packet.SetWeather((byte)WeatherType.Sunny));
+            if (Supports(CpeExt.EnvWeatherType)) {
+                Send(Packet.SetWeather((byte)WeatherType.Sunny));
                 Send(Packet.SetWeather(World.Weather));
             }
 
             if (Supports(CpeExt.HackControl)) {
-            	bool canFly, canNoClip, canSpeed, canRespawn;
+                bool canFly, canNoClip, canSpeed, canRespawn;
                 bool useMotd = GetHacksFromMotd(out canFly, out canNoClip, out canSpeed, out canRespawn);
                 if (useMotd) {
                     Send(Packet.HackControl(canFly, canNoClip, canSpeed, canRespawn, canNoClip, 40));
@@ -1362,11 +1363,11 @@ namespace fCraft {
 
             if (Supports(CpeExt.MessageType) && !IsPlayingCTF) {
                 Send(Packet.Message((byte)MessageType.BottomRight1, "&sBlock:&f" + Map.getBlockName(Info.heldBlock)
-            	                    + " &sID:&f" + (byte)Info.heldBlock, true));
+                                    + " &sID:&f" + (byte)Info.heldBlock, true));
             }
             if (Supports(CpeExt.MessageType)) {
-				Send(Packet.Message((byte)MessageType.Status1, ConfigKey.ServerName.GetString(), UseFallbackColors));
-			}
+                Send(Packet.Message((byte)MessageType.Status1, ConfigKey.ServerName.GetString(), UseFallbackColors));
+            }
             
             foreach (Bot bot in World.Bots) {
                 Send(Packet.MakeRemoveEntity(bot.ID));
@@ -1391,16 +1392,16 @@ namespace fCraft {
         internal void SendCurrentMapAppearance() {
             if (Supports(CpeExt.EnvMapAppearance2))
                 Send(Packet.MakeEnvSetMapAppearance2(World.GetTexture(), World.EdgeBlock, World.HorizonBlock, World.GetEdgeLevel(),
-            	                                     World.GetCloudsHeight(), World.MaxFogDistance));
+                                                     World.GetCloudsHeight(), World.MaxFogDistance));
             else
                 Send(Packet.MakeEnvSetMapAppearance(World.GetTexture(), World.EdgeBlock, World.HorizonBlock, World.GetEdgeLevel()));
         }
         
         bool GetHacksFromMotd(out bool canFly, out bool canNoClip, out bool canSpeed, out bool canRespawn) {
-        	bool useMotd = false;
-        	canFly = false; canNoClip = false; canSpeed = false; canRespawn = false;
-        	if (String.IsNullOrEmpty(World.MOTD)) return false;
-        	
+            bool useMotd = false;
+            canFly = false; canNoClip = false; canSpeed = false; canRespawn = false;
+            if (String.IsNullOrEmpty(World.MOTD)) return false;
+            
             foreach (string s in World.MOTD.ToLower().Split()) {
                 switch (s) {
                     case "-fly":
@@ -1457,8 +1458,8 @@ namespace fCraft {
             if( Thread.CurrentThread != ioThread ) {
                 throw new InvalidOperationException( "SendNow may only be called from player's own thread." );
             }
-        	if (packet.OpCode == OpCode.SetBlockServer)
-        		ProcessOutgoingSetBlock(ref packet.Bytes[7]);
+            if (packet.OpCode == OpCode.SetBlockServer)
+                ProcessOutgoingSetBlock(ref packet.Bytes[7]);
             writer.Write( packet.Bytes );
             BytesSent += packet.Bytes.Length;
         }
@@ -1573,6 +1574,7 @@ namespace fCraft {
         #region Movement
 
         // visible entities
+        public readonly object entitiesLock = new object();
         public readonly Dictionary<Player, VisibleEntity> entities = new Dictionary<Player, VisibleEntity>();
         readonly Stack<Player> playersToRemove = new Stack<Player>( 127 );
         readonly Stack<sbyte> freePlayerIDs = new Stack<sbyte>( 127 );
@@ -1611,109 +1613,37 @@ namespace fCraft {
             entities.Clear();
         }
 
-
+        
         void UpdateVisibleEntities() {
             if( World == null ) PlayerOpException.ThrowNoWorld( this );
 
             // handle following the spectatee
-            if( spectatedPlayer != null ) {
-                if( !spectatedPlayer.IsOnline || !CanSee( spectatedPlayer ) ) {
-                    Message( "Stopped spectating {0}&S (disconnected)", spectatedPlayer.ClassyName );
-                    spectatedPlayer = null;
-                } else {
-                    Position spectatePos = spectatedPlayer.Position;
-                    World spectateWorld = spectatedPlayer.World;
-                    if( spectateWorld == null ) {
-                        throw new InvalidOperationException( "Trying to spectate player without a world." );
-                    }
-                    if( spectateWorld != World ) {
-                        if( CanJoin( spectateWorld ) ) {
-                            postJoinPosition = spectatePos;
-                            if( JoinWorldNow( spectateWorld, false, WorldChangeReason.SpectateTargetJoined ) ) {
-                                Message( "Joined {0}&S to continue spectating {1}",
-                                         spectateWorld.ClassyName,
-                                         spectatedPlayer.ClassyName );
-                            } else {
-                                Message( "Stopped spectating {0}&S (cannot join {1}&S)",
-                                         spectatedPlayer.ClassyName,
-                                         spectateWorld.ClassyName );
-                                spectatedPlayer = null;
-                            }
-                        } else {
-                            Message( "Stopped spectating {0}&S (cannot join {1}&S)",
-                                     spectatedPlayer.ClassyName,
-                                     spectateWorld.ClassyName );
-                            spectatedPlayer = null;
-                        }
-                    } else if( spectatePos != Position ) {
-                        SendNow( Packet.MakeSelfTeleport( spectatePos ) );
-                    }
-                    if (SpectatedPlayer.Info.heldBlock != Info.heldBlock && SpectatedPlayer.Supports(CpeExt.HeldBlock))
-                    {
-                        SendNow(Packet.MakeHoldThis(SpectatedPlayer.Info.heldBlock, false));
-                    }
-                }
-            }
+            if( spectatedPlayer != null ) FollowSpectatedEntity();
 
             // check every player on the current world
             Player[] worldPlayerList = World.Players;
             Position pos = Position;
-            foreach (Bot bot in World.Bots.Where(b => b.World == World)) {
-                if (!bot.oldModel.ToLower().Equals(bot.Model.ToLower()) && Supports(CpeExt.ChangeModel)) {
-                    Send(Packet.MakeChangeModel((byte)bot.ID, bot.Model));
-                    bot.oldModel = bot.Model;
-                }
-                if (bot.oldSkinName != bot.SkinName && Supports(CpeExt.ExtPlayerList2)) {
-                    Send(Packet.MakeRemoveEntity(bot.ID));
-					Send(Packet.MakeExtAddEntity2(bot.ID, bot.Name, (bot.SkinName == "" ? bot.Name : bot.SkinName), bot.Position, this));
-                    Send(Packet.MakeChangeModel((byte)bot.ID, bot.Model));
-                    bot.oldSkinName = bot.SkinName;
-                }
-                
-            }
+            CheckBotChanges();
+            
             for( int i = 0; i < worldPlayerList.Length; i++ ) {
                 Player otherPlayer = worldPlayerList[i];
+                if (otherPlayer.World == null) continue; 
+                // rarely occurs when player has been added to the list, but has not yet had their World field set.
+                
                 // Fetch or create a VisibleEntity object for the player
                 VisibleEntity entity;
                 if (!otherPlayer.CanSee(this))
                     goto skip;
                 if (otherPlayer != this) {
-                    if (otherPlayer.entities.TryGetValue(this, out entity)) {
-                        entity.MarkedForRetention = true;
-                    } else {
-                        entity = otherPlayer.AddEntity(this);
-                    }
+                    entity = CheckEntity(this, otherPlayer);
                 } else {
                     entity = new VisibleEntity(Position, -1, Info.Rank);
                 }
-                if (Info.oldskinName != Info.skinName && otherPlayer.Supports(CpeExt.ExtPlayerList2)) {
-					otherPlayer.Send(Packet.MakeExtAddEntity2(entity.Id, Info.Rank.Color + Name, 
-						(Info.skinName == "" ? Name : Info.skinName), WorldMap.Spawn, otherPlayer));
-                    if (otherPlayer == this) {
-                        otherPlayer.Send(Packet.MakeTeleport(entity.Id, Position));
-                    }
-
-                }
-                if ((Info.oldMob != Info.Mob || Info.oldafkMob != Info.afkMob) && otherPlayer.Supports(CpeExt.ChangeModel)) {
-
-                    string thisModel = Info.IsAFK ? AFKModel : Info.Mob;
-                    if (otherPlayer.Info.Rank.CanSee(Info.Rank) && (thisModel.ToLower().Equals("air") || thisModel.ToLower().Equals("0"))) {
-                        thisModel = "Humanoid";
-                    }
-                    otherPlayer.Send(Packet.MakeChangeModel((byte)entity.Id, thisModel));
-                }
+                CheckOwnChange(entity.Id, otherPlayer);
+                
             skip:
-
-                if (otherPlayer == this) {
-                    continue;
-                }
-                if (!CanSee(otherPlayer))
-                    continue;
-                if (entities.TryGetValue(otherPlayer, out entity)) {
-                    entity.MarkedForRetention = true;
-                } else {
-                    entity = AddEntity(otherPlayer);
-                }
+                if (otherPlayer == this || !CanSee(otherPlayer)) continue;
+                entity = CheckEntity(otherPlayer, this);
 
                 Position otherPos = otherPlayer.Position;
                 int distance = pos.DistanceSquaredTo( otherPos );
@@ -1753,7 +1683,27 @@ namespace fCraft {
             Info.oldskinName = Info.skinName;
             Info.oldMob = Info.Mob;
             Info.oldafkMob = Info.afkMob;
+            lock (entitiesLock)
+                RemoveNonRetainedEntities();
 
+            fullUpdateCounter++;
+            if( fullUpdateCounter >= FullPositionUpdateInterval ) {
+                fullUpdateCounter = 0;
+            }
+        }
+        
+        VisibleEntity CheckEntity(Player src, Player other) {
+            VisibleEntity entity;
+            lock (other.entitiesLock) {
+                if (other.entities.TryGetValue(src, out entity))
+                    entity.MarkedForRetention = true;
+                else
+                    entity = other.AddEntity(src);
+            }
+            return entity;
+        }
+        
+        void RemoveNonRetainedEntities() {
             // Find entities to remove (not marked for retention).
             foreach( var pair in entities ) {
                 if( pair.Value.MarkedForRetention ) {
@@ -1767,14 +1717,81 @@ namespace fCraft {
             while( playersToRemove.Count > 0 ) {
                 RemoveEntity( playersToRemove.Pop() );
             }
-
-            fullUpdateCounter++;
-            if( fullUpdateCounter >= FullPositionUpdateInterval ) {
-                fullUpdateCounter = 0;
-            }
         }
 
+        void FollowSpectatedEntity() {
+            if( !spectatedPlayer.IsOnline || !CanSee( spectatedPlayer ) ) {
+                Message( "Stopped spectating {0}&S (disconnected)", spectatedPlayer.ClassyName );
+                spectatedPlayer = null;
+                return;
+            }
+            
+            Position spectatePos = spectatedPlayer.Position;
+            World spectateWorld = spectatedPlayer.World;
+            if( spectateWorld == null ) {
+                throw new InvalidOperationException( "Trying to spectate player without a world." );
+            }
+            if( spectateWorld != World ) {
+                if( CanJoin( spectateWorld ) ) {
+                    postJoinPosition = spectatePos;
+                    if( JoinWorldNow( spectateWorld, false, WorldChangeReason.SpectateTargetJoined ) ) {
+                        Message( "Joined {0}&S to continue spectating {1}",
+                                spectateWorld.ClassyName,
+                                spectatedPlayer.ClassyName );
+                    } else {
+                        Message( "Stopped spectating {0}&S (cannot join {1}&S)",
+                                spectatedPlayer.ClassyName,
+                                spectateWorld.ClassyName );
+                        spectatedPlayer = null;
+                    }
+                } else {
+                    Message( "Stopped spectating {0}&S (cannot join {1}&S)",
+                            spectatedPlayer.ClassyName,
+                            spectateWorld.ClassyName );
+                    spectatedPlayer = null;
+                }
+            } else if( spectatePos != Position ) {
+                SendNow( Packet.MakeSelfTeleport( spectatePos ) );
+            }
+            if (SpectatedPlayer.Info.heldBlock != Info.heldBlock && SpectatedPlayer.Supports(CpeExt.HeldBlock))
+            {
+                SendNow(Packet.MakeHoldThis(SpectatedPlayer.Info.heldBlock, false));
+            }
+        }
+        
+        void CheckBotChanges() {
+            foreach (Bot bot in World.Bots.Where(b => b.World == World)) {
+                if (!bot.oldModel.ToLower().Equals(bot.Model.ToLower()) && Supports(CpeExt.ChangeModel)) {
+                    Send(Packet.MakeChangeModel((byte)bot.ID, bot.Model));
+                    bot.oldModel = bot.Model;
+                }
+                if (bot.oldSkinName != bot.SkinName && Supports(CpeExt.ExtPlayerList2)) {
+                    Send(Packet.MakeRemoveEntity(bot.ID));
+                    Send(Packet.MakeExtAddEntity2(bot.ID, bot.Name, (bot.SkinName == "" ? bot.Name : bot.SkinName), bot.Position, this));
+                    Send(Packet.MakeChangeModel((byte)bot.ID, bot.Model));
+                    bot.oldSkinName = bot.SkinName;
+                }                
+            }
+        }
+        
+        void CheckOwnChange(sbyte id, Player otherPlayer) {
+            if (Info.oldskinName != Info.skinName && otherPlayer.Supports(CpeExt.ExtPlayerList2)) {
+                otherPlayer.Send(Packet.MakeExtAddEntity2(id, Info.Rank.Color + Name,
+                                                          (Info.skinName == "" ? Name : Info.skinName), WorldMap.Spawn, otherPlayer));
+                if (otherPlayer == this) {
+                    otherPlayer.Send(Packet.MakeTeleport(id, Position));
+                }
 
+            }
+            if ((Info.oldMob != Info.Mob || Info.oldafkMob != Info.afkMob) && otherPlayer.Supports(CpeExt.ChangeModel)) {
+                string thisModel = Info.IsAFK ? AFKModel : Info.Mob;
+                if (otherPlayer.Info.Rank.CanSee(Info.Rank) && (thisModel.ToLower().Equals("air") || thisModel.ToLower().Equals("0"))) {
+                    thisModel = "Humanoid";
+                }
+                otherPlayer.Send(Packet.MakeChangeModel((byte)id, thisModel));
+            }
+        }
+        
         VisibleEntity AddEntity( [NotNull] Player player ) {
             if( player == null ) throw new ArgumentNullException( "player" );
             if (freePlayerIDs.Count > 0) {
@@ -1783,13 +1800,13 @@ namespace fCraft {
 #if DEBUG_MOVEMENT
                 Logger.Log( LogType.Debug, "AddEntity: {0} added {1} ({2})", Name, newEntity.Id, player.Name );
 #endif
-				Position pos = new Position(0, 0, 0);
-				if (player.World != null) {
-					pos = player.WorldMap.Spawn;
-				}
+                Position pos = new Position(0, 0, 0);
+                if (player.World != null) {
+                    pos = player.WorldMap.Spawn;
+                }
                 if (Supports(CpeExt.ExtPlayerList2)) {
                     Send(Packet.MakeExtAddEntity2(newEntity.Id, player.Info.Rank.Color + player.Name,
-						(player.Info.skinName == "" ? player.Name : player.Info.skinName), pos, this));
+                        (player.Info.skinName == "" ? player.Name : player.Info.skinName), pos, this));
                     Send(Packet.MakeTeleport(newEntity.Id, player.Position));
                 } else {
                     Send(Packet.MakeAddEntity(newEntity.Id, player.Info.Rank.Color + player.Name,
@@ -1839,8 +1856,8 @@ namespace fCraft {
 #endif
             SendNow( Packet.MakeRemoveEntity( entity.Id ) );
             if (Supports(CpeExt.ExtPlayerList2)) {
-				SendNow(Packet.MakeExtAddEntity2(entity.Id, player.Info.Rank.Color + player.Name, 
-					(player.Info.skinName == "" ? player.Name : player.Info.skinName),
+                SendNow(Packet.MakeExtAddEntity2(entity.Id, player.Info.Rank.Color + player.Name, 
+                    (player.Info.skinName == "" ? player.Name : player.Info.skinName),
                     player.WorldMap.Spawn, this));
                 Send(Packet.MakeTeleport(entity.Id, player.Position));
             } else {

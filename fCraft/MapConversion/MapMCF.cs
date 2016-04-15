@@ -2,18 +2,15 @@
 using System.IO;
 using System.IO.Compression;
 
-namespace fCraft.MapConversion
-{
+namespace fCraft.MapConversion {
     /// <summary> .mcf map conversion implementation, for converting .mcf map format into fCraft's default map format. </summary>
-    public class MapMCF : MapMCSharp
-    {
+    public class MapMCF : MapMCSharp {
         public override string ServerName {
             get { return "MCForge-Redux"; }
         }
 
         public override string FileExtension {
-            get { return "mcf"; }
-             
+            get { return "mcf"; }             
         }
 
         public override MapFormat Format {
@@ -22,7 +19,6 @@ namespace fCraft.MapConversion
 
         public override bool ClaimsName( string fileName ) {
             if ( fileName == null ) throw new ArgumentNullException( "fileName" );
-
             return fileName.EndsWith( "mcf", StringComparison.OrdinalIgnoreCase );
         }
 
@@ -30,36 +26,19 @@ namespace fCraft.MapConversion
             if ( fileName == null ) throw new ArgumentNullException( "fileName" );
             using ( FileStream mapStream = File.OpenRead( fileName ) ) {
                 using ( var gs = new GZipStream( mapStream, CompressionMode.Decompress ) ) {
-
                     Map map = LoadHeaderInternal(gs);
-
                     map.Blocks = new byte[map.Volume];
 
-                    int i = 0, b, s;
-                    while ((b = gs.ReadByte()) != -1)
-                    {
-                        s = gs.ReadByte();
+                    int i = 0, lo, hi;
+                    while ((lo = gs.ReadByte()) != -1) {
+                        hi = gs.ReadByte();
+                        int id = lo | (hi << 8);
 
-                        short val = BitConverter.ToInt16( new[] { ( byte ) b, ( byte ) s }, 0 );
-
-                        if (val <= 65)
-                        {
-                            map.Blocks[i] = ( byte ) val;
-                        }
-                        else
-                        {
-                            map.Blocks[i] = Mapping[val];
-                        }
+                        if (id <= (byte)Block.StoneBrick) map.Blocks[i] = (byte)id;
+                        else map.Blocks[i] = Mapping[id & 0xFF]; 
+                        // NOTE: This breaks the 5 block ids past 255, but I doubt they really had much use.
+                        i++;
                     }
-
-
-
-                    // Read in the map data
-                    map.Blocks = new byte[map.Volume];
-                    BufferUtil.ReadAll(gs, map.Blocks);
-
-                    map.ConvertBlockTypes(Mapping);
-
                     return map;
                 }
             }
@@ -95,13 +74,11 @@ namespace fCraft.MapConversion
                     bs.Write((byte)0);
 
                     // Convert byte array to short array, as the MCF file stores an array of shorts for blocks
-                    short[] blocks = Array.ConvertAll(mapToSave.Blocks, b => (short) b);
-
-                    // Write blocks to file
-                    foreach (short val in blocks)
-                    {
-                        bs.Write(val);
-                    }
+                    byte[] src = mapToSave.Blocks;
+                    byte[] blocks = new byte[src.Length * 2];                   
+                    for (int i = 0; i < src.Length; i++)
+                    	blocks[i * 2] = src[i];
+                    bs.Write(blocks);
 
                     bs.Close();
                 }

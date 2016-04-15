@@ -29,8 +29,8 @@ namespace fCraft {
             CommandManager.RegisterCommand(CdZoneShow);
         }
 
-        internal static string[] validEntities =  { "chicken", "creeper", "humanoid", 
-    	    "human", "pig", "sheep", "skeleton", "spider", "zombie", "chibi",
+        internal static string[] validEntities =  { "chibi", "chicken", "creeper", "giant", "humanoid", 
+    	    "human", "pig", "sheep", "skeleton", "spider", "zombie"
         };
 
         /// <summary> Ensures that the hex color has the correct length (1-6 characters)
@@ -61,13 +61,13 @@ namespace fCraft {
             Help = "Commands for manipulating entities. For help and usage for the individual options, use /help ent <option>.",
             HelpSections = new Dictionary<string, string>{
                 { "create", "&H/Ent create <entity name> <model> <skin>&n&S" +
-                                "Creates a new entity with the given name. Valid models are chicken, creeper, human, pig, sheep, skeleton, spider, zombie, or any block ID/Name." },
+                                "Creates a new entity with the given name. Valid models are chibi, chicken, creeper, giant, human, pig, sheep, skeleton, spider, zombie, or any block ID/Name." },
                 { "remove", "&H/Ent remove <entity name>&n&S" +
                                 "Removes the given entity." },
                 { "removeall", "&H/Ent removeAll&n&S" +
                                 "Removes all entities from the server."},
                 { "model", "&H/Ent model <entity name> <model>&n&S" +
-                                "Changes the model of an entity to the given model. Valid models are chicken, creeper, human, pig, sheep, skeleton, spider, zombie, or any block ID/Name."},
+                                "Changes the model of an entity to the given model. Valid models are chibi, chicken, creeper, giant, human, pig, sheep, skeleton, spider, zombie, or any block ID/Name."},
                 { "list", "&H/Ent list&n&S" +
                                 "Prints out a list of all the entites on the server."},
                  { "bring", "&H/Ent bring <entity name>&n&S" +
@@ -137,7 +137,7 @@ namespace fCraft {
                             requestedModel = blockmodel.GetHashCode().ToString();
                         } else {
                             player.Message(
-                                "That wasn't a valid entity model! Valid models are chicken, creeper, human, pig, sheep, skeleton, spider, zombie, or any block ID/Name.");
+                                "That wasn't a valid entity model! Valid models are chibi, chicken, creeper, giant, human, pig, sheep, skeleton, spider, zombie, or any block ID/Name.");
                             return;
                         }
                     }
@@ -188,7 +188,7 @@ namespace fCraft {
                         }
                         if (string.IsNullOrEmpty(model)) {
                             player.Message(
-                                "Usage is /Ent model <bot> <model>. Valid models are chicken, creeper, human, pig, sheep, skeleton, spider, zombie, or any block ID/Name.");
+                                "Usage is /Ent model <bot> <model>. Valid models are chibi, chicken, creeper, giant, human, pig, sheep, skeleton, spider, zombie, or any block ID/Name.");
                             break;
                         }
 
@@ -200,7 +200,7 @@ namespace fCraft {
                                 model = blockmodel.GetHashCode().ToString();
                             } else {
                                 player.Message(
-                                    "That wasn't a valid entity model! Valid models are chicken, creeper, human, pig, sheep, skeleton, spider, zombie, or any block ID/Name.");
+                                    "That wasn't a valid entity model! Valid models are chibi, chicken, creeper, giant, human, pig, sheep, skeleton, spider, zombie, or any block ID/Name.");
                                 break;
                             }
                         }
@@ -209,7 +209,7 @@ namespace fCraft {
                         bot.changeBotModel(model, skinString2 ?? bot.SkinName);
                     } else
                         player.Message(
-                            "Usage is /Ent model <bot> <model>. Valid models are chicken, creeper, human, pig, sheep, skeleton, spider, zombie, or any block ID/Name.");
+                            "Usage is /Ent model <bot> <model>. Valid models are chibi, chicken, creeper, giant, human, pig, sheep, skeleton, spider, zombie, or any block ID/Name.");
                     break;
                 case "bring":
                     bot.teleportBot(player.Position);
@@ -328,7 +328,7 @@ namespace fCraft {
             Usage = "/Model [Player] [Model]",
             IsConsoleSafe = true,
             Help = "Change the Model or Skin of [Player]!&n" +
-            "Valid models: &s [Any Block Name or ID#], Chicken, Creeper, Humanoid, Pig, Sheep, Skeleton, Spider, Zombie, Chibi!",
+            "Valid models: &s [Any Block Name or ID#], Chibi, Chicken, Creeper, Giant, Humanoid, Pig, Sheep, Skeleton, Spider, Zombie",
             Handler = ModelHandler
         };
 
@@ -392,7 +392,7 @@ namespace fCraft {
             Usage = "/AFKModel [Player] [Model]",
             IsConsoleSafe = true,
             Help = "Change your own model for when you are AFK!&n" +
-    "Valid models: &s [Any Block Name or ID#], Chicken, Creeper, Croc, Humanoid, Pig, Printer, Sheep, Skeleton, Spider, Zombie!",
+    "Valid models: &s [Any Block Name or ID#], Chibi, Chicken, Creeper, Giant, Humanoid, Pig, Sheep, Skeleton, Spider, Zombie!",
             Handler = AFKModelHandler
         };
 
