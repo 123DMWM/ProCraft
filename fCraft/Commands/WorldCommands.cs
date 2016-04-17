@@ -1004,6 +1004,7 @@ namespace fCraft {
 
         static void SuicideHandler(Player player, CommandReader cmd)
         {
+            if (player.Info.IsMuted) { player.MessageMuted(); return; }        	
             string note = cmd.NextAll();
             if (player.World == null) PlayerOpException.ThrowNoWorld(player);
             if (player.Info.TimeSinceLastServerMessage.TotalSeconds < 10) {
