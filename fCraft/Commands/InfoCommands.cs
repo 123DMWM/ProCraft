@@ -1569,7 +1569,6 @@ namespace fCraft {
             
             offset = offset < all.Length ? offset : Math.Max(0, all.Length - 10);
             int count = Math.Min(offset + 10, all.Length) - offset;
-            Console.WriteLine( offset + ":" + count + "_" + all.Length);
             int pad = formatter(all[offset]).Length;
             
             player.Message("&STop Players ({0}):", stat);
