@@ -57,7 +57,7 @@ namespace fCraft {
             Aliases = new[] { "AddEntity", "AddEnt", "Ent" },
             Permissions = new[] { Permission.BringAll },
             Category = CommandCategory.CPE | CommandCategory.World,
-            Usage = "/ent <create / remove / removeAll / model / list / bring>",
+            Usage = "/ent <create / remove / removeAll / model / list / bring / skin>",
             Help = "Commands for manipulating entities. For help and usage for the individual options, use /help ent <option>.",
             HelpSections = new Dictionary<string, string>{
                 { "create", "&H/Ent create <entity name> <model> <skin>&n&S" +
@@ -71,7 +71,9 @@ namespace fCraft {
                 { "list", "&H/Ent list&n&S" +
                                 "Prints out a list of all the entites on the server."},
                  { "bring", "&H/Ent bring <entity name>&n&S" +
-                                "Brings the given entity to you."}
+                                "Brings the given entity to you."},
+                 { "skin", "&H/Ent skin <entity name> <skin url or name>&n&S" +
+                                "Changes the skin of a bot."}
             },
             Handler = BotHandler,
         };
@@ -174,18 +176,6 @@ namespace fCraft {
                 case "model":
                     if (cmd.HasNext) {
                         string model = cmd.Next().ToLower();
-                        string skinString2 = cmd.Next();
-                        if (skinString2 != null) {
-                            if (skinString2.StartsWith("--")) {
-                                skinString2 = string.Format("http://minecraft.net/skin/{0}.png", skinString2.Replace("--", ""));
-                            }
-                            if (skinString2.StartsWith("-+")) {
-                                skinString2 = string.Format("http://skins.minecraft.net/MinecraftSkins/{0}.png", skinString2.Replace("-+", ""));
-                            }
-                            if (skinString2.StartsWith("++")) {
-                                skinString2 = string.Format("http://i.imgur.com/{0}.png", skinString2.Replace("++", ""));
-                            }
-                        }
                         if (string.IsNullOrEmpty(model)) {
                             player.Message(
                                 "Usage is /Ent model <bot> <model>. Valid models are chibi, chicken, creeper, giant, human, pig, sheep, skeleton, spider, zombie, or any block ID/Name.");
@@ -205,8 +195,8 @@ namespace fCraft {
                             }
                         }
 
-                        player.Message("Changed entity model to {0} with skin {1}.", model, skinString2 ?? bot.SkinName);
-                        bot.changeBotModel(model, skinString2 ?? bot.SkinName);
+                        player.Message("Changed entity model to {0}.", model);
+                        bot.changeBotModel(model);
                     } else
                         player.Message(
                             "Usage is /Ent model <bot> <model>. Valid models are chibi, chicken, creeper, giant, human, pig, sheep, skeleton, spider, zombie, or any block ID/Name.");
@@ -284,7 +274,10 @@ namespace fCraft {
                     break;
                 case "skin":
                     string skinString3 = cmd.Next();
-                    if (skinString3 != null) {
+                    if (string.IsNullOrEmpty(skinString3)) {
+                        player.Message("Please specify a skin URL/Name.");
+                        break;
+                    } else { 
                         if (skinString3.StartsWith("--")) {
                             skinString3 = string.Format("http://minecraft.net/skin/{0}.png", skinString3.Replace("--", ""));
                         }

@@ -17,13 +17,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.*/
 
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Diagnostics;
 
 namespace fCraft {
     public class Bot {
@@ -31,13 +26,13 @@ namespace fCraft {
         /// <summary>
         /// Name of the bot. 
         /// </summary>
-        public String Name;
+        public string Name;
 
         /// <summary>
         /// Name of the bot. 
         /// </summary>
-        public String SkinName;
-        public String oldSkinName;
+        public string SkinName;
+        public string oldSkinName;
 
         /// <summary>
         /// Current world the bot is on.
@@ -57,8 +52,8 @@ namespace fCraft {
         /// <summary>
         /// Current model of the bot
         /// </summary>
-        public String oldModel = "humanoid";
-        public String Model = "humanoid";
+        public string oldModel = "humanoid";
+        public string Model = "humanoid";
 
 
         #region Public Methods
@@ -66,7 +61,7 @@ namespace fCraft {
         /// <summary>
         /// Sets a bot, as well as the bot values. Must be called before any other bot classes.
         /// </summary>
-        public void setBot(String botName, String skinName, String modelName, World botWorld, Position pos, sbyte entityID) {
+        public void setBot(string botName, string skinName, string modelName, World botWorld, Position pos, sbyte entityID) {
             Name = botName;
             SkinName =  (skinName ?? SkinName);
             Model =  (modelName ?? Model);
@@ -84,7 +79,7 @@ namespace fCraft {
         public void createBot() {
             foreach (Player sendTo in World.Players) {
                 if (sendTo.Supports(CpeExt.ExtPlayerList2)) {
-					sendTo.Send(Packet.MakeExtAddEntity2(ID, Name, (SkinName == "" ? Name : SkinName),
+					sendTo.Send(Packet.MakeExtAddEntity2(ID, Name, (SkinName ?? Name),
                         new Position(Position.X, Position.Y, Position.Z, Position.R, Position.L), sendTo));
                 } else {
                     sendTo.Send(Packet.MakeAddEntity(ID, Name,
@@ -120,7 +115,7 @@ namespace fCraft {
         /// <summary>
         /// Changes the model of the bot
         /// </summary>
-        public void changeBotModel(String botModel, String skinName) {
+        public void changeBotModel(string botModel) {
             Block blockModel;
             if (!CpeCommands.validEntities.Contains(botModel)) {
                 if (Map.GetBlockByName(botModel, false, out blockModel)) {
@@ -132,16 +127,16 @@ namespace fCraft {
 
             World.Players.Where(p => p.Supports(CpeExt.ChangeModel)).Send(Packet.MakeChangeModel((byte) ID, botModel));
             Model = botModel;
-            SkinName = skinName;
             Server.SaveEntity(this);
         }
 
         /// <summary>
         /// Changes the skin of the bot
         /// </summary>
-        public void changeBotSkin(String skinName) {
+        public void changeBotSkin(string skinName) {
             SkinName = skinName;
-            Server.SaveEntity(this);
+            World.Players.Send(Packet.MakeRemoveEntity(ID));
+            createBot();
         }
 
         #endregion

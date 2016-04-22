@@ -1373,7 +1373,7 @@ namespace fCraft {
                 Send(Packet.MakeRemoveEntity(bot.ID));
                 if (bot.World == World) {
                     if (Supports(CpeExt.ExtPlayerList2)) {
-                        Send(Packet.MakeExtAddEntity2(bot.ID, bot.Name, (bot.SkinName == "" ? bot.Name : bot.SkinName), bot.Position, this));
+                        Send(Packet.MakeExtAddEntity2(bot.ID, bot.Name, (bot.SkinName ?? bot.Name), bot.Position, this));
                     } else {
                         Send(Packet.MakeAddEntity(bot.ID, bot.Name, bot.Position));
                     }
