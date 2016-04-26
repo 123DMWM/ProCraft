@@ -281,7 +281,6 @@ namespace fCraft {
                     }
                 }
                 if ((tempAttr = envEl.Attribute("bedrock")) != null) {
-                    Logger.Log(LogType.Debug, "{0}: Loading bedrock: " + tempAttr.Value, world.Name);
                     try {
                         world.EdgeBlock = byte.Parse(tempAttr.Value);
                     } catch {
@@ -611,7 +610,6 @@ namespace fCraft {
                     elEnv.Add(new XAttribute("level", world.EdgeLevel));
                     elEnv.Add(new XAttribute("water", world.HorizonBlock.GetHashCode()));
                     elEnv.Add(new XAttribute("bedrock", world.EdgeBlock.GetHashCode()));
-                    Logger.Log(LogType.Debug, "{0}: Saving bedrock: " + world.EdgeBlock.GetHashCode(), world.Name);
                     if (world.Texture != null) elEnv.Add(new XAttribute("terrain", world.Texture));
                     elEnv.Add(new XAttribute("maxreach", world.maxReach));
                     elEnv.Add(new XAttribute("weather", world.Weather));
