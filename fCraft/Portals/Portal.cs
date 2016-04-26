@@ -32,29 +32,14 @@ namespace fCraft.Portals {
         public byte TeleportPosR { get; set; }
         public byte TeleportPosL { get; set; }
 
-        public Portal(string world, Vector3I[] affectedBlocks, string name, string creator, string place, Position teleportPos) {
+        public Portal(string world, Vector3I[] affectedBlocks, PortalRange range,  string name, string creator, string place, Position teleportPos) {
             World = world;
             AffectedBlocks = affectedBlocks;
-            Range = CalculateRange(this);
+            Range = range;
             Name = name;
             Creator = creator;
             Created = DateTime.Now;
             Place = place;
-            TeleportPosX = teleportPos.X;
-            TeleportPosY = teleportPos.Y;
-            TeleportPosZ = teleportPos.Z;
-            TeleportPosR = teleportPos.R;
-            TeleportPosL = teleportPos.L;
-        }
-
-        public Portal(string world, Vector3I[] affectedBlocks, string name, string creator, DateTime created, string place, Position teleportPos) {
-            World = world;
-            AffectedBlocks = affectedBlocks;
-            Range = CalculateRange(this);
-            Name = Name;
-            Creator = Creator;
-            Created = Created;
-            Place = Place;
             TeleportPosX = teleportPos.X;
             TeleportPosY = teleportPos.Y;
             TeleportPosZ = teleportPos.Z;
@@ -67,61 +52,6 @@ namespace fCraft.Portals {
         }
         public Position tpPosition() {
             return new Position(TeleportPosX, TeleportPosY, (short)(TeleportPosZ + 64), TeleportPosR, TeleportPosL);
-        }
-        public static PortalRange CalculateRange(Portal portal) {
-            PortalRange range = new PortalRange(0, 0, 0, 0, 0, 0);
-
-            foreach (Vector3I block in portal.AffectedBlocks) {
-                if (range.Xmin == 0) {
-                    range.Xmin = block.X;
-                } else {
-                    if (block.X < range.Xmin) {
-                        range.Xmin = block.X;
-                    }
-                }
-
-                if (range.Xmax == 0) {
-                    range.Xmax = block.X;
-                } else {
-                    if (block.X > range.Xmax) {
-                        range.Xmax = block.X;
-                    }
-                }
-
-                if (range.Ymin == 0) {
-                    range.Ymin = block.Y;
-                } else {
-                    if (block.Y < range.Ymin) {
-                        range.Ymin = block.Y;
-                    }
-                }
-
-                if (range.Ymax == 0) {
-                    range.Ymax = block.Y;
-                } else {
-                    if (block.Y > range.Ymax) {
-                        range.Ymax = block.Y;
-                    }
-                }
-
-                if (range.Zmin == 0) {
-                    range.Zmin = block.Z;
-                } else {
-                    if (block.Z < range.Zmin) {
-                        range.Zmin = block.Z;
-                    }
-                }
-
-                if (range.Zmax == 0) {
-                    range.Zmax = block.Z;
-                } else {
-                    if (block.Z > range.Zmax) {
-                        range.Zmax = block.Z;
-                    }
-                }
-            }
-
-            return range;
         }
 
         public bool IsInRange(Player player) {

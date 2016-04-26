@@ -3582,7 +3582,7 @@ namespace fCraft {
             Help = "Controls portals, options are: create, remove, list, info, enable, disable&n&S" +
                    "See &H/Help portal <option>&S for details about each option.",
             HelpSections = new Dictionary<string, string>() {
-                { "create",     "&H/portal create [world] [liquid] [portal name] [x y z]&n&S" +
+                { "create",     "&H/portal create [world] [liquid] [portal name] [x y z r l]&n&S" +
                                 "Creates a portal with specified options"},
                 { "remove",     "&H/portal remove [portal name]&n&S" +
                                 "Removes specified portal."},
@@ -3842,7 +3842,7 @@ namespace fCraft {
                         player.PortalName = Portal.GenerateName(player.World);
                     }
 
-                    Portal portal = new Portal(player.PortalWorld, marks, player.PortalName, player.Name, player.World.Name, player.PortalTPPos);
+                    Portal portal = new Portal(player.PortalWorld, marks, new PortalRange(Xmin, Xmax, Ymin, Ymax, Zmin, Zmax), player.PortalName, player.Name, player.World.Name, player.PortalTPPos);
                     PortalHandler.CreatePortal(portal, player.World);
                     op.AnnounceCompletion = false;
                     op.Context = BlockChangeContext.Portal;
