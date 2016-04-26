@@ -1834,17 +1834,15 @@ namespace fCraft {
                     break;
                 case "fallback":
                 case "block":
-                    Block block;
-                    Map.GetBlockByName(def.FallBack.ToString(), false, out block);
                     Block newBlock;
                     if (Map.GetBlockByName(args, false, out newBlock)) {
-                        if (block > Map.MaxCustomBlockType) {
+                        if (newBlock > Map.MaxCustomBlockType) {
                             player.Message("&cThe fallback block must be an original block, " +
                                            "or a block defined in the CustomBlocks extension.");
                             break;
                         }
-                        player.Message("&bChanged fallback block of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.FallBack, block.ToString());
-                        def.FallBack = (byte)block;
+                        player.Message("&bChanged fallback block of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.FallBack, newBlock.ToString());
+                        def.FallBack = (byte)newBlock;
                         hasChanged = true;
                     }
                     break;
@@ -1904,6 +1902,8 @@ namespace fCraft {
                     if (p.Supports(CpeExt.BlockDefinitions)) {
                         BlockDefinition.SendGlobalRemove(p, def);
                         BlockDefinition.SendGlobalAdd(p, def);
+                    } else if (option.ToLower().Equals("block") || option.ToLower().Equals("fallback")) {
+                        p.JoinWorld(p.World, WorldChangeReason.Rejoin, p.Position);
                     }
                 }
 
