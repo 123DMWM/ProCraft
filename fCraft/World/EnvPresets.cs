@@ -83,8 +83,8 @@ namespace fCraft {
             if (Border == Block.None) Border = Block.Admincrete;
             Map.GetBlockByName(preset.HorizonBlock.ToString(), false, out Horizon);
             if (Horizon == Block.None) Horizon = Block.Water;
-            world.EdgeBlock = Border;
-            world.HorizonBlock = Horizon;
+            world.EdgeBlock = (byte)Border;
+            world.HorizonBlock = (byte)Horizon;
             world.EdgeLevel = preset.HorizonLevel;
             world.CloudsHeight = preset.CloudLevel;
             world.MaxFogDistance = preset.MaxViewDistance;

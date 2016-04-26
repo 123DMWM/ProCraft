@@ -383,26 +383,26 @@ namespace fCraft {
         }
 
         [Pure]
-        public static Packet MakeEnvSetMapAppearance( [NotNull] string textureUrl, Block sideBlock, Block edgeBlock,
+        public static Packet MakeEnvSetMapAppearance( [NotNull] string textureUrl, byte sideBlock, byte edgeBlock,
                                                       short sideLevel ) {
             if( textureUrl == null ) throw new ArgumentNullException( "textureUrl" );
             Packet packet = new Packet( OpCode.EnvMapAppearance );
             Encoding.ASCII.GetBytes( textureUrl.PadRight( 64 ), 0, 64, packet.Bytes, 1 );
-            packet.Bytes[65] = (byte)sideBlock;
-            packet.Bytes[66] = (byte)edgeBlock;
+            packet.Bytes[65] = sideBlock;
+            packet.Bytes[66] = edgeBlock;
             ToNetOrder( sideLevel, packet.Bytes, 67 );
             return packet;
         }
         
         [Pure]
-        public static Packet MakeEnvSetMapAppearance2( [NotNull] string textureUrl, Block sideBlock, Block edgeBlock,
+        public static Packet MakeEnvSetMapAppearance2( [NotNull] string textureUrl, byte sideBlock, byte edgeBlock,
                                                       short sideLevel, short cloudsHeight, short maxFog ) {
             if( textureUrl == null ) throw new ArgumentNullException( "textureUrl" );
             byte[] packet = new byte[73];
             packet[0] = (byte)OpCode.EnvMapAppearance;
             Encoding.ASCII.GetBytes( textureUrl.PadRight( 64 ), 0, 64, packet, 1 );
-            packet[65] = (byte)sideBlock;
-            packet[66] = (byte)edgeBlock;
+            packet[65] = sideBlock;
+            packet[66] = edgeBlock;
             ToNetOrder( sideLevel, packet, 67 );
             ToNetOrder( cloudsHeight, packet, 69 );
             ToNetOrder( maxFog, packet, 71 );

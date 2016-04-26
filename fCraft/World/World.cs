@@ -964,10 +964,10 @@ namespace fCraft {
         public short MaxFogDistance = 0;
 
         /// <summary> The block which will be displayed on the horizon. </summary>
-        public Block HorizonBlock = Block.Water;
+        public byte HorizonBlock = (byte)Block.Water;
 
         /// <summary> The block which will be displayed on the edge of the map. </summary>
-        public Block EdgeBlock = Block.Admincrete;
+        public byte EdgeBlock = (byte)Block.Admincrete;
 
         /// <summary> The texture that will be used for the blocks. </summary>
         public string Texture = "default";

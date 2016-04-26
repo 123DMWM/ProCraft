@@ -271,24 +271,21 @@ namespace fCraft {
                 	ParseColor(tempAttr, "light", worldName, ref world.LightColor);
                 
                 if ((tempAttr = envEl.Attribute("water")) != null) {
-                    Block block;
                     try {
-                        Map.GetBlockByName(tempAttr.Value, false, out block);
-                        world.HorizonBlock = block;
+                        world.HorizonBlock = byte.Parse(tempAttr.Value);
                     } catch {
-                        world.HorizonBlock = Block.Water;
+                        world.HorizonBlock = (byte)Block.Water;
                         Logger.Log(LogType.Warning,
                             "WorldManager: Could not parse \"Water\" attribute of Environment settings for world \"{0}\", assuming default (water).",
                             worldName);
                     }
                 }
                 if ((tempAttr = envEl.Attribute("bedrock")) != null) {
-                    Block block;
+                    Logger.Log(LogType.Debug, "{0}: Loading bedrock: " + tempAttr.Value, world.Name);
                     try {
-                        Map.GetBlockByName(tempAttr.Value, false, out block);
-                        world.EdgeBlock = block;
+                        world.EdgeBlock = byte.Parse(tempAttr.Value);
                     } catch {
-                        world.EdgeBlock = Block.Admincrete;
+                        world.EdgeBlock = (byte)Block.Admincrete;
                         Logger.Log(LogType.Warning,
                             "WorldManager: Could not parse \"bedrock\" attribute of Environment settings for world \"{0}\", assuming default (admincrete).",
                             worldName);
@@ -612,8 +609,9 @@ namespace fCraft {
                     if (world.ShadowColor != null) elEnv.Add(new XAttribute("shadow", world.ShadowColor));
                     if (world.LightColor != null) elEnv.Add(new XAttribute("light", world.LightColor));
                     elEnv.Add(new XAttribute("level", world.EdgeLevel));
-                    if (world.HorizonBlock != Block.Water) elEnv.Add(new XAttribute("water", world.HorizonBlock));
-                    if (world.EdgeBlock != Block.Admincrete) elEnv.Add(new XAttribute("bedrock", world.EdgeBlock));
+                    elEnv.Add(new XAttribute("water", world.HorizonBlock.GetHashCode()));
+                    elEnv.Add(new XAttribute("bedrock", world.EdgeBlock.GetHashCode()));
+                    Logger.Log(LogType.Debug, "{0}: Saving bedrock: " + world.EdgeBlock.GetHashCode(), world.Name);
                     if (world.Texture != null) elEnv.Add(new XAttribute("terrain", world.Texture));
                     elEnv.Add(new XAttribute("maxreach", world.maxReach));
                     elEnv.Add(new XAttribute("weather", world.Weather));

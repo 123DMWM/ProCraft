@@ -852,8 +852,8 @@ namespace fCraft {
                     world.EdgeLevel = -1;
                     world.CloudsHeight = short.MinValue;
                     world.MaxFogDistance = 0;
-                    world.EdgeBlock = Block.Admincrete;
-                    world.HorizonBlock = Block.Water;
+                    world.EdgeBlock = (byte)Block.Admincrete;
+                    world.HorizonBlock = (byte)Block.Water;
                     world.Texture = "Default";
                     Logger.Log(LogType.UserActivity,
                                 "Env: {0} {1} reset environment settings for world {2}",
@@ -1026,17 +1026,17 @@ namespace fCraft {
             }
         }
 
-        static void SetEnvAppearanceBlock(Player player, World world, string value, string name, Block defValue, ref Block target) {
+        static void SetEnvAppearanceBlock(Player player, World world, string value, string name, Block defValue, ref byte target) {
             if (value.Equals("normal", StringComparison.OrdinalIgnoreCase) || value.Equals("default", StringComparison.OrdinalIgnoreCase)) {
                 player.Message("Reset {0} for {1}&S to normal ({2})", name, world.ClassyName, defValue);
-                target = defValue;
+                target = (byte)defValue;
             } else {
                 Block block;
                 if (!Map.GetBlockByName(value, false, out block)) {
                     CdEnv.PrintUsage(player);
                     return;
                 }
-                target = block;
+                target = (byte)block;
                 player.Message("Set {0} for {1}&S to {2}", name, world.ClassyName, block);
             }
 
