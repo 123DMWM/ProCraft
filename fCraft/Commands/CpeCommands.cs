@@ -19,6 +19,7 @@ namespace fCraft {
             CommandManager.RegisterCommand(CdCustomColors);
             CommandManager.RegisterCommand(CdEntity);
             CommandManager.RegisterCommand(CdEnv);
+            CommandManager.RegisterCommand(CdEnvPreset);
             CommandManager.RegisterCommand(CdGlobalBlock);
             CommandManager.RegisterCommand(CdHackControl);
             CommandManager.RegisterCommand(CdListClients);
@@ -861,7 +862,7 @@ namespace fCraft {
                     WorldManager.SaveWorldList();
                     foreach (Player p in world.Players) {
                         if (p.Supports(CpeExt.EnvMapAppearance) || p.Supports(CpeExt.EnvMapAppearance2))
-                            p.SendCurrentMapAppearance();
+                            p.SendEnvSettings();
                     }
                 } else {
                     Logger.Log(LogType.UserActivity,
@@ -942,7 +943,7 @@ namespace fCraft {
                     world.Texture = value;
                     foreach (Player p in world.Players) {
                         if (p.Supports(CpeExt.EnvMapAppearance) || p.Supports(CpeExt.EnvMapAppearance2))
-                            p.SendCurrentMapAppearance();
+                            p.SendEnvSettings();
                     }
                     break;
 
@@ -1021,7 +1022,7 @@ namespace fCraft {
 
             foreach (Player p in world.Players) {
                 if (p.Supports(CpeExt.EnvMapAppearance) || p.Supports(CpeExt.EnvMapAppearance2))
-                    p.SendCurrentMapAppearance();
+                    p.SendEnvSettings();
             }
         }
 
@@ -1041,7 +1042,140 @@ namespace fCraft {
 
             foreach (Player p in world.Players) {
                 if (p.Supports(CpeExt.EnvMapAppearance) || p.Supports(CpeExt.EnvMapAppearance2))
-                    p.SendCurrentMapAppearance();
+                    p.SendEnvSettings();
+            }
+        }
+
+        #endregion
+
+        #region EnvPreset
+
+        static readonly CommandDescriptor CdEnvPreset = new CommandDescriptor {
+            Name = "EnvPreset",
+            Aliases = new[] { "EnvPresets", "EnvP" },
+            Category = CommandCategory.CPE | CommandCategory.World,
+            Permissions = new[] { Permission.ManageWorlds },
+            Help = "Environment preset commands" +
+                   "Options are: Delete, Edit, Info, List, Load, Save" +
+                   "See &H/Help EnvPreset <option>&S for details about each variable. ",
+            HelpSections = new Dictionary<string, string>{
+                { "save",   "&H/EnvPreset Save <PresetName> &n&S" +
+                            "Saves Env settings to a defined preset name." },
+                { "load",   "&H/EnvPreset Load <PresetName>&n&S" +
+                            "Loads an Env preset to a specified world." },
+                { "delete", "&H/EnvPreset Delete <PresetName>&n&S" +
+                            "Deleted a defined Env preset." },
+                { "info",   "&H/EnvPreset Info <PresetName>&n&S" +
+                            "Displays Env settings of a defined Preset." },
+                { "list",   "&H/EnvPreset List&n&S" +
+                            "Lists all Env presets by name."},
+                { "update", "&H/EnvPreset Update <PresetName>&n&S" +
+                            "Updates an Env preset with the current world settings."}
+            },
+            Usage = "/EnvPreset <Option> [Args]",
+            Handler = EnvPresetHandler
+        };
+
+        static void EnvPresetHandler(Player player, CommandReader cmd) {
+            string option = cmd.Next();
+            string args = cmd.NextAll();
+            World world = player.World;
+            EnvPresets preset;
+            if (string.IsNullOrEmpty(option)) {
+                CdEnvPreset.PrintUsage(player);
+                return;
+            }
+            if (!option.ToLower().Equals("list") && !option.ToLower().Equals("reload") && string.IsNullOrEmpty(args)) {
+                CdEnvPreset.PrintUsage(player);
+                return;
+            }
+
+            string name = args.Split()[0];
+            switch (option.ToLower()) {
+                case "save":
+                    if (!EnvPresets.exists(name)) {
+                        EnvPresets.CreateEnvPreset(world, name);
+                        player.Message("Saved Env settings from world \"{0}\" to preset named \"{1}\"", world.Name, name);
+                        break;
+                    } else {
+                        player.Message("A preset with the name \"{0}\" already exists", name);
+                        break;
+                    }
+                case "load":
+                    if (EnvPresets.exists(name)) {
+                        EnvPresets.LoadupEnvPreset(world, name);
+                        player.Message("Loaded Env settings from preset named \"{0}\"", name);
+                    } else {
+                        player.Message("A preset with the name \"{0}\" does not exist", name);
+                        break;
+                    }
+                    break;
+                case "remove":
+                    if (cmd.IsConfirmed) {
+                        if (EnvPresets.exists(name)) {
+                            EnvPresets.RemoveEnvPreset(name);
+                            player.Message("Deleted Env preset named \"{0}\"", name);
+                        } else {
+                            player.Message("A preset with the name \"{0}\" does not exist", name);
+                            break;
+                        }
+                    } else {
+                        player.Confirm(cmd, "This will delete the preset permanently");
+                        break;
+                    }
+                    break;
+                case "update":
+                    if (cmd.IsConfirmed) {
+                        if (EnvPresets.exists(name)) {
+                            EnvPresets.RemoveEnvPreset(name);
+                            EnvPresets.CreateEnvPreset(world, name);
+                            player.Message("Updated the preset \"{1}\" to the current worlds env settings", world.Name, name);
+                        } else {
+                            player.Message("A preset with the name \"{0}\" does not exist", name);
+                            break;
+                        }
+                    } else {
+                        player.Confirm(cmd, "This will erase and update the specified Env Preset");
+                        break;
+                    }
+                    break;
+                case "info":
+                    if ((preset = EnvPresets.Find(args)) != null) {
+                        player.Message("Environment settings for Preset {0}&S:", preset.Name);
+                        player.Message("  Cloud: {0}   Fog: {1}   Sky: {2}",
+                                        preset.CloudColor == null ? "normal" : '#' + preset.CloudColor,
+                                        preset.FogColor == null ? "normal" : '#' + preset.FogColor,
+                                        preset.SkyColor == null ? "normal" : '#' + preset.SkyColor);
+                        player.Message("  Shadow: {0}   Light: {1}  Horizon level: {2}",
+                                        preset.ShadowColor == null ? "normal" : '#' + preset.ShadowColor,
+                                        preset.LightColor == null ? "normal" : '#' + preset.LightColor,
+                                        preset.HorizonLevel <= 0 ? "normal" : preset.HorizonLevel + " blocks");
+                        player.Message("  Clouds height: {0}  Max fog distance: {1}",
+                                        preset.CloudLevel == short.MinValue ? "normal" : preset.CloudLevel + " blocks",
+                                        preset.MaxViewDistance <= 0 ? "(no limit)" : preset.MaxViewDistance.ToString());
+                        player.Message("  Horizon  block: {0}  Border block: {1}",
+                                        preset.HorizonBlock, preset.BorderBlock);
+                        player.Message("  Texture: {0}", preset.TextureURL);
+                    }
+                    break;
+                case "list":
+                    string list = "Presets: &n";
+                    foreach (EnvPresets env in EnvPresets.Presets.OrderBy(p => p.Name)) {
+                        list = list + env.Name + ", ";
+                    }
+                    player.Message(list.Remove(list.Length - 2, 2));
+                    break;
+                case "reload":
+                    if (player.Info.Rank == RankManager.HighestRank) {
+                        EnvPresets.ReloadAll();
+                        player.Message("Reloaded presets from file");
+                    } else {
+                        player.Message(CdEnvPreset.Help);
+                    }
+                    break;
+                default:
+                    player.Message(CdEnvPreset.Help);
+                    break;
             }
         }
 

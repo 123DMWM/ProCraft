@@ -1313,8 +1313,7 @@ namespace fCraft {
         }
         
         void SendJoinCpeExtensions() {
-            if (Supports(CpeExt.EnvMapAppearance) || Supports(CpeExt.EnvMapAppearance2))
-                SendCurrentMapAppearance();
+            SendEnvSettings();
             if (Supports(CpeExt.ExtPlayerList2)) {
                 Send(Packet.MakeExtAddEntity2(Packet.SelfId, Info.Rank.Color + Name, (Info.skinName == "" ? Name : Info.skinName), Position, this));
             } else {
@@ -1323,19 +1322,6 @@ namespace fCraft {
 
             if (Supports(CpeExt.ChangeModel)) {
                 Send(Packet.MakeChangeModel(255, !Info.IsAFK ? Info.Mob : AFKModel));
-            }
-            if (Supports(CpeExt.EnvColors))
-            {
-                Send(Packet.MakeEnvSetColor((byte)EnvVariable.SkyColor, World.SkyColor));
-                Send(Packet.MakeEnvSetColor((byte)EnvVariable.CloudColor, World.CloudColor));
-                Send(Packet.MakeEnvSetColor((byte)EnvVariable.FogColor, World.FogColor));
-                Send(Packet.MakeEnvSetColor((byte)EnvVariable.Shadow, World.ShadowColor));
-                Send(Packet.MakeEnvSetColor((byte)EnvVariable.Sunlight, World.LightColor));
-            }
-            
-            if (Supports(CpeExt.EnvWeatherType)) {
-                Send(Packet.SetWeather((byte)WeatherType.Sunny));
-                Send(Packet.SetWeather(World.Weather));
             }
 
             if (Supports(CpeExt.HackControl)) {
@@ -1389,12 +1375,26 @@ namespace fCraft {
             }
         }
         
-        internal void SendCurrentMapAppearance() {
-            if (Supports(CpeExt.EnvMapAppearance2))
+        internal void SendEnvSettings() {
+            if (Supports(CpeExt.EnvMapAppearance2)) {
                 Send(Packet.MakeEnvSetMapAppearance2(World.GetTexture(), World.EdgeBlock, World.HorizonBlock, World.GetEdgeLevel(),
                                                      World.GetCloudsHeight(), World.MaxFogDistance));
-            else
+            } else if (Supports(CpeExt.EnvMapAppearance)) {
                 Send(Packet.MakeEnvSetMapAppearance(World.GetTexture(), World.EdgeBlock, World.HorizonBlock, World.GetEdgeLevel()));
+            }
+
+            if (Supports(CpeExt.EnvColors)) {
+                Send(Packet.MakeEnvSetColor((byte)EnvVariable.SkyColor, World.SkyColor));
+                Send(Packet.MakeEnvSetColor((byte)EnvVariable.CloudColor, World.CloudColor));
+                Send(Packet.MakeEnvSetColor((byte)EnvVariable.FogColor, World.FogColor));
+                Send(Packet.MakeEnvSetColor((byte)EnvVariable.Shadow, World.ShadowColor));
+                Send(Packet.MakeEnvSetColor((byte)EnvVariable.Sunlight, World.LightColor));
+            }
+
+            if (Supports(CpeExt.EnvWeatherType)) {
+                Send(Packet.SetWeather((byte)WeatherType.Sunny));
+                Send(Packet.SetWeather(World.Weather));
+            }
         }
         
         bool GetHacksFromMotd(out bool canFly, out bool canNoClip, out bool canSpeed, out bool canRespawn) {

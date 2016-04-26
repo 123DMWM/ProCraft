@@ -970,10 +970,10 @@ namespace fCraft {
         public Block EdgeBlock = Block.Admincrete;
 
         /// <summary> The texture that will be used for the blocks. </summary>
-        public string Texture = "Default";
+        public string Texture = "default";
 
         public string GetTexture() {
-            return Texture == "Default" ? Server.DefaultTerrain : Texture;
+            return Texture.ToLower() == "default" ? Server.DefaultTerrain : Texture;
         }
 
         /// <summary> The current weather in this world. </summary>

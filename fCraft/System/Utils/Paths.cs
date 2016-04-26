@@ -127,6 +127,8 @@ namespace fCraft {
 
         public const string GlobalDefinitionsFileName = "GlobalBlocks.txt";
 
+        public const string EnvPresetsFileName = "EnvPresets.txt";
+
 
         /// <summary> Directory where block database files (.fbdb) are stored. </summary>
         public static string BlockDBPath {

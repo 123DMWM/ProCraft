@@ -662,6 +662,7 @@ namespace fCraft {
             PortalHandler.GetInstance();
             PortalDB.Load();
             BlockDefinition.LoadGlobalDefinitions();
+            EnvPresets.LoadAll();
 
             // garbage collection (every 60s)
             gcTask = Scheduler.NewTask( DoGC ).RunForever( GCInterval, TimeSpan.FromSeconds( 45 ) );
