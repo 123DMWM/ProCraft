@@ -272,7 +272,9 @@ namespace fCraft {
                 
                 if ((tempAttr = envEl.Attribute("water")) != null) {
                     try {
-                        world.HorizonBlock = byte.Parse(tempAttr.Value);
+                        Block block;
+                        Map.GetBlockByName(tempAttr.Value, false, out block);
+                        world.HorizonBlock = (byte)block;
                     } catch {
                         world.HorizonBlock = (byte)Block.Water;
                         Logger.Log(LogType.Warning,
@@ -282,7 +284,9 @@ namespace fCraft {
                 }
                 if ((tempAttr = envEl.Attribute("bedrock")) != null) {
                     try {
-                        world.EdgeBlock = byte.Parse(tempAttr.Value);
+                        Block block;
+                        Map.GetBlockByName(tempAttr.Value, false, out block);
+                        world.EdgeBlock = (byte)block;
                     } catch {
                         world.EdgeBlock = (byte)Block.Admincrete;
                         Logger.Log(LogType.Warning,
