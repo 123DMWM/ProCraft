@@ -124,7 +124,7 @@ namespace fCraft {
             UpdatePlayerList();
             BlockDefs = new BlockDefinition[256];
             for (int i = 0; i < BlockDefs.Length; i++)
-                BlockDefs[i] = BlockDefinition.GlobalDefinitions[i];
+                BlockDefs[i] = BlockDefinition.GlobalDefs[i];
         }
 
 

@@ -72,7 +72,7 @@ namespace fCraft {
             byte[] translatedBlocks = (byte[])Blocks.Clone();
             int volume = translatedBlocks.Length;
             
-            BlockDefinition[] defs = BlockDefinition.GlobalDefinitions;
+            BlockDefinition[] defs = BlockDefinition.GlobalDefs;
             byte* fallback = stackalloc byte[256];
             for (int i = 0; i < 256; i++) {
                 fallback[i] = (byte)FallbackBlocks[i];
@@ -342,7 +342,7 @@ namespace fCraft {
             Block outBlock;
             if (GetBlockByName(block.ToString(), false, out outBlock)) {
                 if (outBlock > MaxCustomBlockType) {
-                    return BlockDefinition.GlobalDefinitions[(int)outBlock].Name;
+                    return BlockDefinition.GlobalDefs[(int)outBlock].Name;
                 }
                 return outBlock.ToString();
             } else {
@@ -961,7 +961,7 @@ namespace fCraft {
                         int len = Math.Min(bufferSize, array.Length - i);
                         for (int j = 0; j < len; j++) {
                             byte block = array[i + j];
-                            if (block > maxLegal) block = (byte)fallback[block];
+                            if (block > maxLegal) block = fallback[block];
                             buffer[j] = block;
                         }
                         compressor.Write(buffer, 0, len);

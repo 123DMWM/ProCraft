@@ -1214,7 +1214,9 @@ namespace fCraft {
             }
             // needs to be sent before the client receives the map data
             if (Supports(CpeExt.BlockDefinitions)) {
-                BlockDefinition.SendGlobalDefinitions(this);
+            	if (oldWorld != null)
+            	    BlockDefinition.SendRemoveOldCustomBlocks(this, oldWorld);
+                BlockDefinition.SendCustomBlocks(this);
             }
 
             writer.Write(OpCode.MapBegin);

@@ -1284,7 +1284,7 @@ namespace fCraft {
                         p.Message("No blocks by that name or id!");
                         return;
                     }
-                    BlockDefinition block = BlockDefinition.GlobalDefinitions[(byte)def];
+                    BlockDefinition block = BlockDefinition.GlobalDefs[(byte)def];
                     if (block == null) {
                         p.Message("No {0} custom block by the Name/ID", scope);
                         p.Message("Use \"&h{1} list\" &sto see a list of {0} custom blocks.", scope, name);
@@ -1336,7 +1336,7 @@ namespace fCraft {
             string scope = global ? "global" : "level";
             string name = global ? "/gb" : "/lb";
 
-            BlockDefinition def = BlockDefinition.GlobalDefinitions[blockId];
+            BlockDefinition def = BlockDefinition.GlobalDefs[blockId];
             if (def != null) {
                 p.Message("There is already a {0} custom block with that id.", scope);
                 p.Message("Use \"&h/{1} remove {0}&s\" this block first.", blockId, name);
@@ -1362,7 +1362,7 @@ namespace fCraft {
             string scope = global ? "global" : "level";
             string name = global ? "/gb" : "/lb";
             
-            BlockDefinition[] defs = BlockDefinition.GlobalDefinitions;
+            BlockDefinition[] defs = BlockDefinition.GlobalDefs;
             for (int i = 0; i < defs.Length; i++) {
                 BlockDefinition def = defs[i];
                 if (def == null) continue;
@@ -1390,20 +1390,15 @@ namespace fCraft {
                 p.Message("No blocks by that Name/ID!");
                 return;
             }
-            BlockDefinition def = BlockDefinition.GlobalDefinitions[(byte)blockID];
+            BlockDefinition[] defs = global ? BlockDefinition.GlobalDefs : p.World.BlockDefs;
+            BlockDefinition def = defs[(byte)blockID];
             if (def == null) {
                 p.Message("There is no {0} custom block with that name/id.", scope);
                 p.Message("Use \"&h/{1} list\" &sto see a list of {0} custom blocks.", scope, name);
                 return;
             }
 
-            BlockDefinition.RemoveGlobalBlock(def);
-            foreach (Player pl in Server.Players) {
-                if (p.Supports(CpeExt.BlockDefinitions))
-                    BlockDefinition.SendGlobalRemove(p, def);
-            }
-            BlockDefinition.SaveGlobalDefinitions();
-
+            BlockDefinition.Remove(def, defs, p.World);
             if (global) {
                 Server.Message("{0} &sremoved the {3} custom block &h{1} &swith ID {2}",
                                    p.ClassyName, def.Name, def.BlockID, scope);
@@ -1601,14 +1596,8 @@ namespace fCraft {
                         }
                         def.FallBack = (byte)block;
                         p.Message("   &bSet fallback block to: " + block);
-                        BlockDefinition.DefineGlobalBlock(def);
-
-                        foreach (Player pl in Server.Players) {
-                            if (pl.Supports(CpeExt.BlockDefinitions) || pl.Supports(CpeExt.BlockDefinitionsExt))
-                                BlockDefinition.SendGlobalAdd(pl, def);
-                        }
-
-                        BlockDefinition.SaveGlobalDefinitions();
+                        BlockDefinition[] defs = global ? BlockDefinition.GlobalDefs : p.World.BlockDefs;
+                        BlockDefinition.Add(def, defs, p.World);
                         p.currentBDStep = -1;
                         p.currentBD = null;
 
@@ -1642,34 +1631,30 @@ namespace fCraft {
                 p.Message("Destination must be a numerical id and greater than 65."); return;
             }
 
-            BlockDefinition srcDef = BlockDefinition.GlobalDefinitions[(byte)srcBlock];
+            BlockDefinition srcDef = BlockDefinition.GlobalDefs[(byte)srcBlock];
             if (srcDef == null) {
                 p.Message("There is no {1} custom block with the id: &a{0}", (byte)srcBlock, scope);
                 p.Message("Use \"&h/{1} list&s\" to see a list of {0} custom blocks.", scope, name);
                 return;
             }
-            BlockDefinition dstDef = BlockDefinition.GlobalDefinitions[dstBlock];
+            BlockDefinition dstDef = BlockDefinition.GlobalDefs[dstBlock];
             if (dstDef != null) {
                 p.Message("There is already a {1} custom block with the id: &a{0}", dstBlock, scope);
                 p.Message("Use \"&h/{1} remove {0}&s\" on this block first.", dstBlock, name);
                 p.Message("Use \"&h/{1} list&s\" to see a list of {0} custom blocks.", scope, name);
                 return;
             }
+            
             BlockDefinition def = srcDef.Copy();
             def.BlockID = (byte)dstBlock;
-            BlockDefinition.DefineGlobalBlock(def);
-            BlockDefinition.SaveGlobalDefinitions();
+            BlockDefinition[] defs = global ? BlockDefinition.GlobalDefs : p.World.BlockDefs;
+            BlockDefinition.Add(def, defs, p.World);
             if (global) {
                 Server.Message("{0} &screated a new {3} custom block &h{1} &swith ID {2}",
                            p.ClassyName, def.Name, def.BlockID, scope);
             } else {
                 p.World.Players.Message("{0} &screated a new {3} custom block &h{1} &swith ID {2}",
                            p.ClassyName, def.Name, def.BlockID, scope);            
-            }
-
-            foreach (Player pl in Server.Players) {
-                if (pl.Supports(CpeExt.BlockDefinitions))
-                    BlockDefinition.SendGlobalAdd(pl, def);
             }
         }
 
@@ -1680,7 +1665,7 @@ namespace fCraft {
                 p.Message("No blocks by that Name/ID!");
                 return;
             }
-            BlockDefinition def = BlockDefinition.GlobalDefinitions[(byte)blockID];
+            BlockDefinition def = BlockDefinition.GlobalDefs[(byte)blockID];
             string scope = global ? "global" : "level";
             string name = global ? "/gb" : "/lb";
             if (def == null) {
@@ -1941,27 +1926,23 @@ namespace fCraft {
                     p.Message("Usage: &H" + name + " [type/value] {args}");
                     return;
             }
-            if (hasChanged) {
+            if (!hasChanged) return;
+            
             if (global) {
-            Server.Message("{0} &sedited a {3} custom block &a{1} &swith ID &a{2}",
+                Server.Message("{0} &sedited a {3} custom block &a{1} &swith ID &a{2}",
                                p.ClassyName, def.Name, def.BlockID, scope);
             } else {
-            p.World.Players.Message("{0} &sedited a {3} custom block &a{1} &swith ID &a{2}",
-                               p.ClassyName, def.Name, def.BlockID, scope);
+                p.World.Players.Message("{0} &sedited a {3} custom block &a{1} &swith ID &a{2}",
+                                        p.ClassyName, def.Name, def.BlockID, scope);
             }
-                BlockDefinition.RemoveGlobalBlock(def);
-                BlockDefinition.DefineGlobalBlock(def);
+            BlockDefinition[] defs = global ? BlockDefinition.GlobalDefs : p.World.BlockDefs;
+            BlockDefinition.Add(def, defs, p.World);
 
-                foreach (Player pl in Server.Players) {
-                    if (p.Supports(CpeExt.BlockDefinitions)) {
-                        BlockDefinition.SendGlobalRemove(p, def);
-                        BlockDefinition.SendGlobalAdd(p, def);
-                    } else if (option.ToLower().Equals("block") || option.ToLower().Equals("fallback")) {
-                        p.JoinWorld(p.World, WorldChangeReason.Rejoin, p.Position);
-                    }
+            foreach (Player pl in Server.Players) {
+                if (!p.Supports(CpeExt.BlockDefinitions) && 
+                    (option.ToLower().Equals("block") || option.ToLower().Equals("fallback"))) {
+                    p.JoinWorld(p.World, WorldChangeReason.Rejoin, p.Position);
                 }
-
-                BlockDefinition.SaveGlobalDefinitions();
             }
         }
 

@@ -331,6 +331,7 @@ namespace fCraft {
             }
 
             // Load the world list
+            BlockDefinition.LoadGlobalDefinitions();
             if( !WorldManager.LoadWorldList() ) return false;
             WorldManager.SaveWorldList();
 
@@ -661,7 +662,6 @@ namespace fCraft {
 
             PortalHandler.GetInstance();
             PortalDB.Load();
-            BlockDefinition.LoadGlobalDefinitions();
             EnvPresets.LoadAll();
 
             // garbage collection (every 60s)
