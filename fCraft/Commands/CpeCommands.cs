@@ -1252,14 +1252,15 @@ namespace fCraft {
                 opt = opt.ToLower();
             string scope = global ? "global" : "level";
             string name = global ? "/gb" : "/lb";
+            BlockDefinition[] defs = global ? BlockDefinition.GlobalDefs : p.World.BlockDefs;
             
             switch (opt) {
                 case "create":
                 case "add":
                     if (p.currentBD != null)
-                        CustomBlockDefineHandler(p, cmd.NextAll(), global);
+                        CustomBlockDefineHandler(p, cmd.NextAll(), global, defs);
                     else
-                        CustomBlockAddHandler(p, cmd, global);
+                        CustomBlockAddHandler(p, cmd, global, defs);
                     break;
                 case "nvm":
                 case "abort":
@@ -1272,19 +1273,19 @@ namespace fCraft {
                     } break;
                 case "edit":
                 case "change":
-                    CustomBlockEditHandler(p, cmd, global); break;
+                    CustomBlockEditHandler(p, cmd, global, defs); break;
                 case "copy":
                 case "duplicate":
-                    CustomBlockDuplicateHandler(p, cmd, global); break;
+                    CustomBlockDuplicateHandler(p, cmd, global, defs); break;
                 case "i":
                 case "info":
                     string input = cmd.Next() ?? "n/a";
-                    Block def;
-                    if (!Map.GetBlockByName(input, false, out def) || def < Map.MaxCustomBlockType) {
+                    Block infoID;
+                    if (!Map.GetBlockByName(input, false, out infoID) || infoID < Map.MaxCustomBlockType) {
                         p.Message("No blocks by that name or id!");
                         return;
                     }
-                    BlockDefinition block = BlockDefinition.GlobalDefs[(byte)def];
+                    BlockDefinition block = GetCustomBlock(global, defs, (byte)infoID);
                     if (block == null) {
                         p.Message("No {0} custom block by the Name/ID", scope);
                         p.Message("Use \"&h{1} list\" &sto see a list of {0} custom blocks.", scope, name);
@@ -1309,10 +1310,10 @@ namespace fCraft {
                         block.MinX, block.MaxX, block.MinY, block.MaxY);
                     break;
                 case "list":
-                    CustomBlockListHandler(p, cmd, global); break;
+                    CustomBlockListHandler(p, cmd, global, defs); break;
                 case "remove":
                 case "delete":
-                    CustomBlockRemoveHandler(p, cmd, global); break;
+                    CustomBlockRemoveHandler(p, cmd, global, defs); break;
                 case "tex":
                 case "texture":
                 case "terrain":
@@ -1322,7 +1323,7 @@ namespace fCraft {
                 default:
                     if (p.currentBD != null) {
                         cmd.Rewind();
-                        CustomBlockDefineHandler(p, cmd.NextAll(), global);
+                        CustomBlockDefineHandler(p, cmd.NextAll(), global, defs);
                     } else {
                         p.Message("Usage: &H" + name + " [type/value] {args}");
                     }
@@ -1330,17 +1331,17 @@ namespace fCraft {
             }
         }
 
-        static void CustomBlockAddHandler(Player p, CommandReader cmd, bool global) {
+        static void CustomBlockAddHandler(Player p, CommandReader cmd, bool global, BlockDefinition[] defs) {
             int blockId = 0;
             if (!CheckBlockId(p, cmd, out blockId)) return;
             string scope = global ? "global" : "level";
             string name = global ? "/gb" : "/lb";
 
-            BlockDefinition def = BlockDefinition.GlobalDefs[blockId];
+            BlockDefinition def = GetCustomBlock(global, defs, (byte)blockId);
             if (def != null) {
                 p.Message("There is already a {0} custom block with that id.", scope);
-                p.Message("Use \"&h/{1} remove {0}&s\" this block first.", blockId, name);
-                p.Message("Use \"&h/{1} list&s\" to see a list of {0} custom blocks.", scope, name);
+                p.Message("Use \"&h{1} remove {0}&s\" this block first.", blockId, name);
+                p.Message("Use \"&h{1} list&s\" to see a list of {0} custom blocks.", scope, name);
                 return;
             }
 
@@ -1356,13 +1357,12 @@ namespace fCraft {
             PrintStepHelp(p);
         }
 
-        static void CustomBlockListHandler(Player p, CommandReader cmd, bool global) {
+        static void CustomBlockListHandler(Player p, CommandReader cmd, bool global, BlockDefinition[] defs) {
             int offset = 0, index = 0, count = 0;
             cmd.NextInt(out offset);
             string scope = global ? "global" : "level";
             string name = global ? "/gb" : "/lb";
             
-            BlockDefinition[] defs = BlockDefinition.GlobalDefs;
             for (int i = 0; i < defs.Length; i++) {
                 BlockDefinition def = defs[i];
                 if (def == null) continue;
@@ -1381,7 +1381,7 @@ namespace fCraft {
             }
         }
 
-        static void CustomBlockRemoveHandler(Player p, CommandReader cmd, bool global) {
+        static void CustomBlockRemoveHandler(Player p, CommandReader cmd, bool global, BlockDefinition[] defs) {
             string input = cmd.Next() ?? "n/a";
             Block blockID;
             string scope = global ? "global" : "level";
@@ -1390,11 +1390,10 @@ namespace fCraft {
                 p.Message("No blocks by that Name/ID!");
                 return;
             }
-            BlockDefinition[] defs = global ? BlockDefinition.GlobalDefs : p.World.BlockDefs;
-            BlockDefinition def = defs[(byte)blockID];
+            BlockDefinition def = GetCustomBlock(global, defs, (byte)blockID);
             if (def == null) {
                 p.Message("There is no {0} custom block with that name/id.", scope);
-                p.Message("Use \"&h/{1} list\" &sto see a list of {0} custom blocks.", scope, name);
+                p.Message("Use \"&h{1} list\" &sto see a list of {0} custom blocks.", scope, name);
                 return;
             }
 
@@ -1408,7 +1407,7 @@ namespace fCraft {
             }
         }
 
-        static void CustomBlockDefineHandler(Player p, string args, bool global) {
+        static void CustomBlockDefineHandler(Player p, string args, bool global, BlockDefinition[] defs) {
             // print the current step help if no args given
             if (string.IsNullOrWhiteSpace(args)) {
                 PrintStepHelp(p); return;
@@ -1596,7 +1595,6 @@ namespace fCraft {
                         }
                         def.FallBack = (byte)block;
                         p.Message("   &bSet fallback block to: " + block);
-                        BlockDefinition[] defs = global ? BlockDefinition.GlobalDefs : p.World.BlockDefs;
                         BlockDefinition.Add(def, defs, p.World);
                         p.currentBDStep = -1;
                         p.currentBD = null;
@@ -1615,7 +1613,7 @@ namespace fCraft {
             PrintStepHelp(p);
         }
 
-        static void CustomBlockDuplicateHandler(Player p, CommandReader cmd, bool global) {
+        static void CustomBlockDuplicateHandler(Player p, CommandReader cmd, bool global, BlockDefinition[] defs) {
             string input1 = cmd.Next() ?? "n/a", input2 = cmd.Next() ?? "n/a";
             Block srcBlock = Block.None;
             byte dstBlock = (byte)Block.None;
@@ -1631,23 +1629,22 @@ namespace fCraft {
                 p.Message("Destination must be a numerical id and greater than 65."); return;
             }
 
-            BlockDefinition srcDef = BlockDefinition.GlobalDefs[(byte)srcBlock];
+            BlockDefinition srcDef = GetCustomBlock(global, defs, (byte)srcBlock);
             if (srcDef == null) {
                 p.Message("There is no {1} custom block with the id: &a{0}", (byte)srcBlock, scope);
-                p.Message("Use \"&h/{1} list&s\" to see a list of {0} custom blocks.", scope, name);
+                p.Message("Use \"&h{1} list&s\" to see a list of {0} custom blocks.", scope, name);
                 return;
             }
-            BlockDefinition dstDef = BlockDefinition.GlobalDefs[dstBlock];
+            BlockDefinition dstDef = GetCustomBlock(global, defs, (byte)dstBlock);
             if (dstDef != null) {
                 p.Message("There is already a {1} custom block with the id: &a{0}", dstBlock, scope);
-                p.Message("Use \"&h/{1} remove {0}&s\" on this block first.", dstBlock, name);
-                p.Message("Use \"&h/{1} list&s\" to see a list of {0} custom blocks.", scope, name);
+                p.Message("Use \"&h{1} remove {0}&s\" on this block first.", dstBlock, name);
+                p.Message("Use \"&h{1} list&s\" to see a list of {0} custom blocks.", scope, name);
                 return;
             }
             
             BlockDefinition def = srcDef.Copy();
             def.BlockID = (byte)dstBlock;
-            BlockDefinition[] defs = global ? BlockDefinition.GlobalDefs : p.World.BlockDefs;
             BlockDefinition.Add(def, defs, p.World);
             if (global) {
                 Server.Message("{0} &screated a new {3} custom block &h{1} &swith ID {2}",
@@ -1658,14 +1655,15 @@ namespace fCraft {
             }
         }
 
-        static void CustomBlockEditHandler(Player p, CommandReader cmd, bool global) {
+        static void CustomBlockEditHandler(Player p, CommandReader cmd, bool global, BlockDefinition[] defs) {
             string input = cmd.Next() ?? "n/a";
             Block blockID;
             if (!Map.GetBlockByName(input, false, out blockID) || blockID < Map.MaxCustomBlockType) {
                 p.Message("No blocks by that Name/ID!");
                 return;
             }
-            BlockDefinition def = BlockDefinition.GlobalDefs[(byte)blockID];
+            
+            BlockDefinition def = GetCustomBlock(global, defs, (byte)blockID);
             string scope = global ? "global" : "level";
             string name = global ? "/gb" : "/lb";
             if (def == null) {
@@ -1935,7 +1933,6 @@ namespace fCraft {
                 p.World.Players.Message("{0} &sedited a {3} custom block &a{1} &swith ID &a{2}",
                                         p.ClassyName, def.Name, def.BlockID, scope);
             }
-            BlockDefinition[] defs = global ? BlockDefinition.GlobalDefs : p.World.BlockDefs;
             BlockDefinition.Add(def, defs, p.World);
 
             foreach (Player pl in Server.Players) {
@@ -2013,6 +2010,11 @@ namespace fCraft {
             new [] { "Enter the max X Y Z coords of this block,",
                 "Min = 1 Max = 16 Example: &h16 16 16" },
         };
+        
+        static BlockDefinition GetCustomBlock(bool global, BlockDefinition[] defs, byte id) {
+            if (global) return defs[id];
+            return defs[id] == BlockDefinition.GlobalDefs[id] ? null : defs[id];
+        }
 
         #endregion
 

@@ -331,6 +331,14 @@ namespace fCraft {
             }
 
             // Load the world list
+            string dstPath = Path.Combine(Paths.BlockDefsDirectory, Paths.GlobalDefsFile);
+            if (!Directory.Exists(Paths.BlockDefsDirectory))
+                Directory.CreateDirectory(Paths.BlockDefsDirectory);
+            if (File.Exists(Paths.GlobalDefsFile)) {
+                File.Copy(Paths.GlobalDefsFile, dstPath, true);
+                File.Delete(Paths.GlobalDefsFile);
+            }
+            
             BlockDefinition.LoadGlobalDefinitions();
             if( !WorldManager.LoadWorldList() ) return false;
             WorldManager.SaveWorldList();

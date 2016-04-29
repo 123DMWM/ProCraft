@@ -458,8 +458,16 @@ namespace fCraft {
                     }
                 }
             }*/
-
-
+            
+            string blockDefPath = Path.Combine(Paths.BlockDefsDirectory, world.Name + ".txt");
+            if (File.Exists(blockDefPath)) {
+                int count;
+                BlockDefinition[] defs = BlockDefinition.Load(blockDefPath, out count);
+                for (int i = 0; i < defs.Length; i++) {
+                    if (defs[i] == null) defs[i] = BlockDefinition.GlobalDefs[i];
+                }
+                world.BlockDefs = defs;
+            }
 
             foreach (XElement mainedRankEl in el.Elements(RankMainXmlTagName))
             {

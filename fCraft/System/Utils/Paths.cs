@@ -45,7 +45,7 @@ namespace fCraft {
                 WorldListFileName,
                 AutoRankFileName,
                 PortalDBFileName,
-                GlobalDefinitionsFileName
+                GlobalDefsFile
             };
 
             DataFilesToBackup = new[] {
@@ -54,7 +54,7 @@ namespace fCraft {
                 IPBanListFileName,
                 WorldListFileName,
                 ConfigFileName,
-                GlobalDefinitionsFileName
+                GlobalDefsFile
             };
         }
 
@@ -125,7 +125,8 @@ namespace fCraft {
 
         public const string BlockDBDirectory = "blockdb";
 
-        public const string GlobalDefinitionsFileName = "GlobalBlocks.txt";
+        public const string BlockDefsDirectory = "blockdefs";
+        public const string GlobalDefsFile = "GlobalBlocks.txt";
 
         public const string EnvPresetsFileName = "EnvPresets.txt";
 
