@@ -985,7 +985,7 @@ namespace fCraft
                         Server.Message("&Y[Filters] \"{0}\" is now replaced by \"{1}\"", word, replacement);
                         fCreate.addFilter(getNewFilterId(), word, replacement);
                     } else {
-                        player.Message("A filter with that ID already exists!");
+                        player.Message("A filter with that word already exists!");
                     }
                     break;
                 case "edit":
