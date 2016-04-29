@@ -91,6 +91,8 @@ namespace fCraft {
         public int portalID = 1;
 
         public static List<Bot> Bots = new List<Bot>();
+        
+        public BlockDefinition[] BlockDefs;
 
         /// <summary>
         /// Find bot by name. Returns either the bot by exact name, or null.
@@ -120,6 +122,9 @@ namespace fCraft {
             BuildSecurity = new SecurityController();
             Name = name;
             UpdatePlayerList();
+            BlockDefs = new BlockDefinition[256];
+            for (int i = 0; i < BlockDefs.Length; i++)
+                BlockDefs[i] = BlockDefinition.GlobalDefinitions[i];
         }
 
 

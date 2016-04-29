@@ -140,9 +140,9 @@ namespace fCraft {
         public DateTime LastWarnedPortal;
         public bool PortalsEnabled = true;
         public readonly object PortalLock = new object();
-        // GlobalBlocks
-        internal int currentGBStep = -1;
-        internal BlockDefinition currentGB;
+        // BlockDefinitions
+        internal int currentBDStep = -1;
+        internal BlockDefinition currentBD;
 
         /// <summary> The world that the player is currently on. May be null.
         /// Use .JoinWorld() to make players teleport to another world. </summary>
