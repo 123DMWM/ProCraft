@@ -71,13 +71,20 @@ namespace fCraft {
             BlockDefinition.LoadGlobalDefinitions();
             byte[] translatedBlocks = (byte[])Blocks.Clone();
             int volume = translatedBlocks.Length;
-            fixed (byte* ptr = translatedBlocks)
-            {
+            
+            BlockDefinition[] defs = BlockDefinition.GlobalDefinitions;
+            byte* fallback = stackalloc byte[256];
+            for (int i = 0; i < 256; i++) {
+                fallback[i] = (byte)FallbackBlocks[i];
+                if (defs[i] == null) continue;
+                fallback[i] = defs[i].FallBack;
+            }
+            
+            fixed (byte* ptr = translatedBlocks) {
                 for (int i = 0; i < volume; i++) {
                     byte block = ptr[i];
-                    if (block > (byte)MaxCustomBlockType) {
-                        ptr[i] = (byte)FallbackBlocks[block];
-                    }
+                    if (block > (byte)MaxCustomBlockType)
+                        ptr[i] = fallback[block];
                 }
             }
             return translatedBlocks;
@@ -277,12 +284,12 @@ namespace fCraft {
 
             if (HasChangedSinceSave)
             {
-            	Player[] players = World.Players;
-            	Block block = GetBlock(x, y, z);
-            	for( int i = 0; i < players.Length; i++ ) {
-            		// cannot reuse packet as each player may require different modifications to block field
-            		players[i].SendBlock( new Vector3I( x, y, z ), block );
-            	}
+                Player[] players = World.Players;
+                Block block = GetBlock(x, y, z);
+                for( int i = 0; i < players.Length; i++ ) {
+                    // cannot reuse packet as each player may require different modifications to block field
+                    players[i].SendBlock( new Vector3I( x, y, z ), block );
+                }
             }
             return true;
         }
@@ -474,14 +481,14 @@ namespace fCraft {
                 Blocks[blockIndex] = (byte)update.BlockType;
 
                 if( !World.IsFlushing ) {
-                	Player[] players = World.Players;
-                	for( int i = 0; i < players.Length; i++ ) {
-                		// cannot reuse packet as each player may require different modifications to block field
-                		Player p = players[i];
-                		if (p == update.Origin) 
-                			continue;
-                		p.SendBlock( new Vector3I( update.X, update.Y, update.Z ), update.BlockType );
-                	}
+                    Player[] players = World.Players;
+                    for( int i = 0; i < players.Length; i++ ) {
+                        // cannot reuse packet as each player may require different modifications to block field
+                        Player p = players[i];
+                        if (p == update.Origin) 
+                            continue;
+                        p.SendBlock( new Vector3I( update.X, update.Y, update.Z ), update.BlockType );
+                    }
                 }
                 packetsSent++;
             }
@@ -936,6 +943,14 @@ namespace fCraft {
         const int bufferSize = 64 * 1024;
         public byte[] MakeCompressedMap(byte maxLegal, out int compressedLen) {
             byte[] array = Blocks;
+            BlockDefinition[] defs = World.BlockDefs;
+            byte* fallback = stackalloc byte[256];
+            for (int i = 0; i < 256; i++) {
+                fallback[i] = (byte)FallbackBlocks[i];
+                if (defs[i] == null) continue;
+                fallback[i] = defs[i].FallBack;
+            }
+                        
             using (MemoryStream ms = new MemoryStream()) {
                 using (GZipStream compressor = new GZipStream(ms, CompressionMode.Compress, true)) {
                     int count = IPAddress.HostToNetworkOrder(array.Length);
@@ -946,7 +961,7 @@ namespace fCraft {
                         int len = Math.Min(bufferSize, array.Length - i);
                         for (int j = 0; j < len; j++) {
                             byte block = array[i + j];
-                            if (block > maxLegal) block = (byte)Map.FallbackBlocks[block];
+                            if (block > maxLegal) block = (byte)fallback[block];
                             buffer[j] = block;
                         }
                         compressor.Write(buffer, 0, len);
