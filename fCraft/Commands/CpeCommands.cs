@@ -21,6 +21,7 @@ namespace fCraft {
             CommandManager.RegisterCommand(CdEnv);
             CommandManager.RegisterCommand(CdEnvPreset);
             CommandManager.RegisterCommand(CdGlobalBlock);
+            CommandManager.RegisterCommand(CdLevelBlock);
             CommandManager.RegisterCommand(CdHackControl);
             CommandManager.RegisterCommand(CdListClients);
             CommandManager.RegisterCommand(CdMRD);
@@ -1190,42 +1191,67 @@ namespace fCraft {
             IsConsoleSafe = true,
             Permissions = new[] { Permission.DefineCustomBlocks },
             Usage = "/gb [type/value] {args}",
-            Help = "&sModifies the global custom blocks, or prints information about them.&n" +
-                "&sTypes are: add, abort, duplicate, edit, info, list, remove, texture&n" +
-                "&sSee &h/help gb <type>&s for details about each type.",
-            HelpSections = new Dictionary<string, string>{
-                { "add",     "&h/gb add [id]&n" +
-                        "&sBegins the process of defining a global custom block with the given block id." },
-                { "abort",   "&h/gb abort&n" +
-                        "&sAborts the custom block that was currently in the process of being " +
-                        "defined from the last /gb add call." },
-                { "duplicate",     "&h/gb duplicate [source id] [new id]&n" +
-                        "&sCreates a new custom block, using all the global custom block data of the given existing custom block id. " },
-                { "edit",     "&h/gb edit [id] [option] {args}&n" +
-                        "&sEdits already defined blocks so you don't have to re-add them to change something. " +
-                        "Options: Name, Solidity, Speed, AllId, TopId, SideID, BottomID, Light, Sound, FullBright, Shape, Draw, FogDensity, (FogHex or FogR, FogG, FogB), FallBack"},
-                { "info",     "&h/gb info [id]&n" +
-                        "&sDisplays custom block information for specified ID." },
-                { "list",    "&h/gb list [offset]&n" +
-                        "&sPrints a list of the names of the global custom blocks, " +
-                        "along with their corresponding block ids. " },
-                { "remove",  "&h/gb remove [id]&n" +
-                        "&sRemoves the global custom block associated which has the numerical block id." },
-                { "texture",  "&h/gb tex&n" +
-                        "&sShows you the terrain link of the current world and a link of the default with ID's overlayed." },
-            },
+            Help = MakeHelp("global", "gb"),
+            HelpSections = MakeHelpSections("global", "/gb"),
             Handler = GlobalBlockHandler
         };
-
+        
         static void GlobalBlockHandler(Player player, CommandReader cmd) {
             CustomBlockHandler(player, cmd, true);
         }
+        
+        static readonly CommandDescriptor CdLevelBlock = new CommandDescriptor {
+            Name = "LevelBlock",
+            Aliases = new string[] { "lb" },
+            Category = CommandCategory.CPE | CommandCategory.World,
+            IsConsoleSafe = true,
+            Permissions = new[] { Permission.DefineCustomBlocks },
+            Usage = "/lb [type/value] {args}",
+            Help = MakeHelp("level's", "lb"),
+            HelpSections = MakeHelpSections("level", "/lb"),
+            Handler = LevelBlockHandler
+        };
+        
+        static void LevelBlockHandler(Player player, CommandReader cmd) {
+            CustomBlockHandler(player, cmd, false);
+        }
+        
+        static string MakeHelp(string scope, string name) {
+            return "&sModifies the " + scope + " custom blocks, or prints information about them.&n" +
+                   "&sTypes are: add, abort, duplicate, edit, info, list, remove, texture&n" +
+                   "&sSee &h/help " + name + " <type>&s for details about each type.";
+        }
+        
+        static Dictionary<string, string> MakeHelpSections(string scope, string name) {
+            return new Dictionary<string, string>{
+                { "add",     "&h" + name + " add [id]&n" +
+                        "&sBegins the process of defining a " + scope + " custom block with the given block id." },
+                { "abort",   "&h" + name + " abort&n" +
+                        "&sAborts the custom block that was currently in the process of being " +
+                        "defined from the last &h" + name + " add &scall." },
+                { "duplicate",     "&h" + name + " duplicate [source id] [new id]&n" +
+                        "&sCreates a new custom block, using all the data of the given existing " + scope + " custom block. " },
+                { "edit",     "&h" + name + " edit [id] [option] {args}&n" +
+                        "&sEdits already defined blocks so you don't have to re-add them to change something. " +
+                        "Options: Name, Solidity, Speed, AllId, TopId, SideID, BottomID, Light, Sound, FullBright, Shape, Draw, FogDensity, (FogHex or FogR, FogG, FogB), FallBack"},
+                { "info",     "&h" + name + " info [id]&n" +
+                        "&sDisplays information about the given " + scope + " custom block." },
+                { "list",    "&h" + name + " list [offset]&n" +
+                        "&sPrints a list of the names of the " + scope + " custom blocks, " +
+                        "along with their corresponding block ids. " },
+                { "remove",  "&h" + name + " remove [id]&n" +
+                        "&sRemoves the " + scope + " custom block which as the given block id." },
+                { "texture",  "&h" + name + " tex&n" +
+                        "&sShows you the terrain link of the current world and a link of the default with ID's overlayed." },
+            };          
+        } 
         
         static void CustomBlockHandler(Player p, CommandReader cmd, bool global) {
             string opt = cmd.Next();
             if (opt != null)
                 opt = opt.ToLower();
             string scope = global ? "global" : "level";
+            string name = global ? "/gb" : "/lb";
             
             switch (opt) {
                 case "create":
@@ -1238,11 +1264,11 @@ namespace fCraft {
                 case "nvm":
                 case "abort":
                     if (p.currentBD == null) {
-                        p.Message("You weren't creating a " + scope + " custom block.");
+                        p.Message("You weren't creating a {0} custom block.", scope);
                     } else {
                         p.currentBD = null;
                         p.currentBDStep = -1;
-                        p.Message("Discarded the " + scope + " custom block that was being created.");
+                        p.Message("Discarded the {0} custom block that was being created.", scope);
                     } break;
                 case "edit":
                 case "change":
@@ -1260,8 +1286,8 @@ namespace fCraft {
                     }
                     BlockDefinition block = BlockDefinition.GlobalDefinitions[(byte)def];
                     if (block == null) {
-                        p.Message("No " + scope + " custom block by the Name/ID");
-                        p.Message("Use \"&h/gb list\" &sto see a list of " + scope + " custom blocks.");
+                        p.Message("No {0} custom block by the Name/ID", scope);
+                        p.Message("Use \"&h{1} list\" &sto see a list of {0} custom blocks.", scope, name);
                         return;
                     }
                     Block fallback;
@@ -1298,7 +1324,7 @@ namespace fCraft {
                         cmd.Rewind();
                         CustomBlockDefineHandler(p, cmd.NextAll(), global);
                     } else {
-                        CdGlobalBlock.PrintUsage(p);
+                        p.Message("Usage: &H" + name + " [type/value] {args}");
                     }
                     break;
             }
@@ -1322,9 +1348,9 @@ namespace fCraft {
             p.currentBD.BlockID = (byte)blockId;
             p.currentBD.Version2 = true;
             p.Message("   &bSet block id to: " + blockId);
-            p.Message("&sFrom now on, use &h/gb [value]&s to enter arguments.");
+            p.Message("&sFrom now on, use &h{0} [value]&s to enter arguments.", name);
             p.Message("&sYou can abort the currently partially " +
-                           "created custom block at any time by typing \"&h/gb abort&s\"");
+                           "created custom block at any time by typing \"&h{0} abort&s\"", name);
 
             p.currentBDStep = 0;
             PrintStepHelp(p);
@@ -1372,7 +1398,7 @@ namespace fCraft {
             }
 
             BlockDefinition.RemoveGlobalBlock(def);
-            foreach (Player p in Server.Players) {
+            foreach (Player pl in Server.Players) {
                 if (p.Supports(CpeExt.BlockDefinitions))
                     BlockDefinition.SendGlobalRemove(p, def);
             }
@@ -1397,6 +1423,7 @@ namespace fCraft {
             int step = p.currentBDStep;
             byte value = 0; // as we can't pass properties by reference, make a temp var.
             bool boolVal = true;
+            string scope = global ? "global" : "level";
 
             switch (step) {
                 case 0:
@@ -1573,20 +1600,25 @@ namespace fCraft {
                             break;
                         }
                         def.FallBack = (byte)block;
-                        p.Message("   &bSet fallback block to: " + block.ToString());
+                        p.Message("   &bSet fallback block to: " + block);
                         BlockDefinition.DefineGlobalBlock(def);
 
-                        foreach (Player p in Server.Players) {
-                            if (p.Supports(CpeExt.BlockDefinitions) || p.Supports(CpeExt.BlockDefinitionsExt))
-                                BlockDefinition.SendGlobalAdd(p, def);
+                        foreach (Player pl in Server.Players) {
+                            if (pl.Supports(CpeExt.BlockDefinitions) || pl.Supports(CpeExt.BlockDefinitionsExt))
+                                BlockDefinition.SendGlobalAdd(pl, def);
                         }
 
                         BlockDefinition.SaveGlobalDefinitions();
                         p.currentBDStep = -1;
                         p.currentBD = null;
 
-                        Server.Message("{0} &screated a new global custom block &h{1} &swith ID {2}",
-                                       p.ClassyName, def.Name, def.BlockID);
+                        if (global) {
+                            Server.Message("{0} &screated a new {3} custom block &h{1} &swith ID {2}",
+                                       p.ClassyName, def.Name, def.BlockID, scope);
+                        } else {
+                            p.World.Players.Message("{0} &screated a new {3} custom block &h{1} &swith ID {2}",
+                                       p.ClassyName, def.Name, def.BlockID, scope);
+                        }
                     }
                     return;
             }
@@ -1650,10 +1682,11 @@ namespace fCraft {
             }
             BlockDefinition def = BlockDefinition.GlobalDefinitions[(byte)blockID];
             string scope = global ? "global" : "level";
+            string name = global ? "/gb" : "/lb";
             if (def == null) {
-                p.Message("There is no {0} custom block with that Name/ID", scope);
-                return;
+                p.Message("There is no {0} custom block with that Name/ID", scope); return;
             }
+            
             string option = cmd.Next() ?? "n/a";
             string args = cmd.NextAll();
             if (string.IsNullOrEmpty(args)) {
@@ -1905,7 +1938,7 @@ namespace fCraft {
                     }
                     break;
                 default:
-                    CdGlobalBlock.PrintUsage(p);
+                    p.Message("Usage: &H" + name + " [type/value] {args}");
                     return;
             }
             if (hasChanged) {
@@ -1919,7 +1952,7 @@ namespace fCraft {
                 BlockDefinition.RemoveGlobalBlock(def);
                 BlockDefinition.DefineGlobalBlock(def);
 
-                foreach (Player p in Server.Players) {
+                foreach (Player pl in Server.Players) {
                     if (p.Supports(CpeExt.BlockDefinitions)) {
                         BlockDefinition.SendGlobalRemove(p, def);
                         BlockDefinition.SendGlobalAdd(p, def);
@@ -1994,10 +2027,10 @@ namespace fCraft {
             new [] { "Enter the fallback block for this block.",
                 "This block is shown to clients that don't support BlockDefinitions." },
             new [] { "Enter the min X Y Z coords of this block,",
-                "Min = 0 Max = 15 Example: &h/gb 0 0 0",
-                "&h/gb -1&s to make it a sprite" },
+                "Min = 0 Max = 15 Example: &h0 0 0",
+                "&h-1&s to make it a sprite" },
             new [] { "Enter the max X Y Z coords of this block,",
-                "Min = 1 Max = 16 Example: &h/gb 16 16 16" },
+                "Min = 1 Max = 16 Example: &h16 16 16" },
         };
 
         #endregion
