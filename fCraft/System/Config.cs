@@ -1083,6 +1083,7 @@ namespace fCraft {
             owner.Add( new XElement( Permission.ReloadConfig.ToString() ) );
             owner.Add( new XElement( Permission.ShutdownServer.ToString() ) );
             owner.Add( new XElement( Permission.UseBot.ToString() ) );
+            owner.Add( new XElement( Permission.DefineCustomBlocks.ToString() ) );
             permissions.Add( owner );
             try {
                 RankManager.AddRank( new Rank( owner ) );
@@ -1123,6 +1124,7 @@ namespace fCraft {
             op.Add( new XElement( Permission.Say.ToString() ) );
             op.Add( new XElement( Permission.UseTimers.ToString() ) );
             op.Add( new XElement( Permission.ReadStaffChat.ToString() ) );
+            op.Add( new XElement( Permission.DefineLevelCustomBlocks.ToString() ) );
             temp = new XElement( Permission.Kick.ToString() );
             temp.Add( new XAttribute( "max", "OP" ) );
             op.Add( temp );

@@ -2456,9 +2456,11 @@ namespace fCraft {
         }
 
         // For non-extended players, use appropriate substitution
-        void ProcessOutgoingSetBlock(ref byte block) {
-            if (block > (byte) Map.MaxCustomBlockType && !supportsBlockDefs)
-            	block = (byte) Map.FallbackBlocks[block];
+        internal void CheckBlock(ref byte block) {
+        	if (block > (byte) Map.MaxCustomBlockType && !supportsBlockDefs) {
+        		BlockDefinition def = World.BlockDefs[block];
+        		block = def == null ? (byte)Map.FallbackBlocks[block] : def.FallBack;
+        	}
             if (block > (byte) Map.MaxLegalBlockType && !supportsCustomBlocks)
             	block = (byte) Map.FallbackBlocks[block];
         }

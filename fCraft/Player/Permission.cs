@@ -184,8 +184,11 @@ namespace fCraft {
         /// <summary> Ability to use the bot function</summary>
         UseBot,
         
-        /// <summary> Ability to define and modify custom global blocks. </summary>
+        /// <summary> Ability to define and modify global custom blocks. </summary>
         DefineCustomBlocks,
+        
+        /// <summary> Ability to define and modify level custom blocks. </summary>
+        DefineLevelCustomBlocks,        
 
         /// <summary> Ability to create portals. </summary>
         CreatePortals,

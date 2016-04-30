@@ -1205,7 +1205,7 @@ namespace fCraft {
             Aliases = new string[] { "lb" },
             Category = CommandCategory.CPE | CommandCategory.World,
             IsConsoleSafe = false,
-            Permissions = new[] { Permission.DefineCustomBlocks },
+            Permissions = new[] { Permission.DefineLevelCustomBlocks },
             Usage = "/lb [type/value] {args}",
             Help = MakeHelp("level's", "lb"),
             HelpSections = MakeHelpSections("level", "/lb"),

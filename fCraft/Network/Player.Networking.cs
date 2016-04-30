@@ -205,7 +205,7 @@ namespace fCraft {
                     Map currentMap = WorldMap;
                     while (canSend && blockPacketsSent < Server.MaxBlockPacketsPerTick) {
                         if (!blockQueue.TryDequeue(out blockUpdate)) break;
-                        ProcessOutgoingSetBlock(ref blockUpdate.Block);
+                        CheckBlock(ref blockUpdate.Block);
                         
                         if (!useBulk) {
                             Packet.ToNetOrder(blockUpdate.X, blockPacket, 1);
@@ -1378,11 +1378,15 @@ namespace fCraft {
         }
         
         internal void SendEnvSettings() {
+            byte edgeBlock = World.EdgeBlock, horBlock = World.HorizonBlock;
+            CheckBlock(ref edgeBlock);
+            CheckBlock(ref horBlock);
+        	
             if (Supports(CpeExt.EnvMapAppearance2)) {
-                Send(Packet.MakeEnvSetMapAppearance2(World.GetTexture(), World.EdgeBlock, World.HorizonBlock, World.GetEdgeLevel(),
+                Send(Packet.MakeEnvSetMapAppearance2(World.GetTexture(), edgeBlock, horBlock, World.GetEdgeLevel(),
                                                      World.GetCloudsHeight(), World.MaxFogDistance));
             } else if (Supports(CpeExt.EnvMapAppearance)) {
-                Send(Packet.MakeEnvSetMapAppearance(World.GetTexture(), World.EdgeBlock, World.HorizonBlock, World.GetEdgeLevel()));
+                Send(Packet.MakeEnvSetMapAppearance(World.GetTexture(), edgeBlock, horBlock, World.GetEdgeLevel()));
             }
 
             if (Supports(CpeExt.EnvColors)) {
@@ -1461,7 +1465,7 @@ namespace fCraft {
                 throw new InvalidOperationException( "SendNow may only be called from player's own thread." );
             }
             if (packet.OpCode == OpCode.SetBlockServer)
-                ProcessOutgoingSetBlock(ref packet.Bytes[7]);
+                CheckBlock(ref packet.Bytes[7]);
             writer.Write( packet.Bytes );
             BytesSent += packet.Bytes.Length;
         }
@@ -1471,7 +1475,7 @@ namespace fCraft {
         /// This is used for most packets (movement, chat, etc). </summary>
         public void Send(Packet packet) {
             if (packet.OpCode == OpCode.SetBlockServer)
-                ProcessOutgoingSetBlock(ref packet.Bytes[7]);
+                CheckBlock(ref packet.Bytes[7]);
             if( canQueue ) priorityOutputQueue.Enqueue( packet );
         }
         
@@ -1483,7 +1487,7 @@ namespace fCraft {
         public void SendBlock( Vector3I coords, Block block ) {
             if( !WorldMap.InBounds( coords ) ) throw new ArgumentOutOfRangeException( "coords" );
             byte raw = (byte)block;
-            ProcessOutgoingSetBlock( ref raw );
+            CheckBlock( ref raw );
             if( canQueue ) blockQueue.Enqueue( new SetBlockData( coords, raw ) );
         }
 
@@ -1493,7 +1497,7 @@ namespace fCraft {
         /// Used to undo player's attempted block placement/deletion. </summary>
         public void RevertBlock( Vector3I coords ) {
             byte raw = (byte)WorldMap.GetBlock( coords );
-            ProcessOutgoingSetBlock( ref raw );
+            CheckBlock( ref raw );
             if( canQueue ) blockQueue.Enqueue( new SetBlockData( coords, raw ) );
         }
 
@@ -1757,7 +1761,9 @@ namespace fCraft {
             }
             if (SpectatedPlayer.Info.heldBlock != Info.heldBlock && SpectatedPlayer.Supports(CpeExt.HeldBlock))
             {
-                SendNow(Packet.MakeHoldThis(SpectatedPlayer.Info.heldBlock, false));
+            	byte block = (byte)SpectatedPlayer.Info.heldBlock;
+                CheckBlock(ref block);
+                SendNow(Packet.MakeHoldThis((Block)block, false));
             }
         }
         
