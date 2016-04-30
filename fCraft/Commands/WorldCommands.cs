@@ -519,16 +519,16 @@ namespace fCraft {
 
                     if( entry.OldBlock == (byte)Block.Air ) {
 						args.Player.Message(" {0} ago {1} placed &f{2} &s{3}",
-                                             date, playerName, Map.getBlockName(entry.NewBlock), 
+                                             date, playerName, Map.GetBlockName(args.World, entry.NewBlock), 
                                              contextString);
                     } else if( entry.NewBlock == (byte)Block.Air ) {
 						args.Player.Message(" {0} ago {1} deleted &f{2} &s{3}",
-                                             date, playerName, Map.getBlockName(entry.OldBlock), 
+                                             date, playerName, Map.GetBlockName(args.World, entry.OldBlock), 
                                              contextString);
                     } else {
                         args.Player.Message(" {0} ago {1} replaced &f{2} &swith &f{3} &s{4}",
-                                             date, playerName, Map.getBlockName(entry.OldBlock), 
-                                             Map.getBlockName(entry.NewBlock), contextString);
+                                             date, playerName, Map.GetBlockName(args.World, entry.OldBlock), 
+                                             Map.GetBlockName(args.World, entry.NewBlock), contextString);
                     }
                 }
             } else {
@@ -3616,7 +3616,7 @@ namespace fCraft {
 
                                 string blockTypeOrName = cmd.Next();
                                 Block pblock;
-                                if (blockTypeOrName != null && Map.GetBlockByName(blockTypeOrName, false, out pblock)) {
+                                if (blockTypeOrName != null && Map.GetBlockByName(player.World, blockTypeOrName, false, out pblock)) {
                                     if ((!validPBlocks.Contains(pblock) && pblock <= Block.StoneBrick) || (pblock == Block.Air && player.Info.Rank != RankManager.HighestRank)) {
                                         player.Message("Invalid block, choose a non-solid block");
                                         return;

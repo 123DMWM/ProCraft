@@ -233,23 +233,17 @@ namespace fCraft
         {
             string blockName = Next();
             block = Block.None;
-            if (blockName != null)
-            {
-                if (Map.GetBlockByName(blockName, true, out block))
-                {
-                    if (block != Block.None || allowNoneBlock)
-                    {
-                        return true;
-                    }
-                    else if (player != null)
-                    {
-                        player.Message("The \"none\" block is not allowed here");
-                    }
+            if (blockName == null) return false;
+            
+            World world = player == null ? null : player.World;
+            if (Map.GetBlockByName(world, blockName, true, out block)) {
+                if (block != Block.None || allowNoneBlock) {
+                    return true;
+                } else if (player != null) {
+                    player.Message("The \"none\" block is not allowed here");
                 }
-                else if (player != null)
-                {
-                    player.Message("Unrecognized blocktype \"{0}\"", blockName);
-                }
+            } else if (player != null) {
+                player.Message("Unrecognized blocktype \"{0}\"", blockName);
             }
             return false;
         }
@@ -274,10 +268,8 @@ namespace fCraft
             param = 1;
 
             string jointString = Next();
-            if (jointString == null)
-            {
-                return false;
-            }
+            if (jointString == null) return false;
+            World world = player == null ? null : player.World;
 
             int slashIndex = jointString.IndexOf('/');
             if (slashIndex != -1)
@@ -285,7 +277,8 @@ namespace fCraft
                 string blockName = jointString.Substring(0, slashIndex);
                 string paramString = jointString.Substring(slashIndex + 1);
 
-                if (Map.GetBlockByName(blockName, true, out block))
+                
+                if (Map.GetBlockByName(world, blockName, true, out block))
                 {
                     if (block == Block.None && !allowNoneBlock)
                     {
@@ -311,7 +304,7 @@ namespace fCraft
             }
             else
             {
-                if (Map.GetBlockByName(jointString, true, out block))
+                if (Map.GetBlockByName(world, jointString, true, out block))
                 {
                     if (block != Block.None || allowNoneBlock)
                     {

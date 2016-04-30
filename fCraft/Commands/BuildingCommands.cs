@@ -815,7 +815,7 @@ namespace fCraft {
                 return;
             }
             string tryBlock = cmd.Next();
-            if (!Map.GetBlockByName(tryBlock, false, out block)) {
+            if (!Map.GetBlockByName(player.World, tryBlock, false, out block)) {
                 player.Message("Invalid block name/id: {0}", tryBlock);
                 return;
             }
@@ -976,7 +976,7 @@ namespace fCraft {
             if (cmd.NextInt(out x) && cmd.NextInt(out y) && cmd.NextInt(out z)) {
                 if (cmd.HasNext) {
                     string last = cmd.Next();
-                    if (!Map.GetBlockByName(last, false, out block)) {
+                    if (!Map.GetBlockByName(player.World, last, false, out block)) {
                         player.Message("\"{0}\" is not a valid block type", last);
                         return;
                     }
@@ -989,7 +989,7 @@ namespace fCraft {
                 cmd.Rewind();
                 if (cmd.HasNext) {
                     string last = cmd.Next();
-                    if (!Map.GetBlockByName(last, false, out block)) {
+                    if (!Map.GetBlockByName(player.World, last, false, out block)) {
                         player.Message("\"{0}\" is not a valid block type", last);
                         return;
                     }
@@ -3003,7 +3003,7 @@ namespace fCraft {
                     return;
                 }
             } else {
-                if (!Map.GetBlockByName(sblock, false, out newBlock)) {
+                if (!Map.GetBlockByName(player.World, sblock, false, out newBlock)) {
                     if (player.LastUsedBlockType != Block.None) {
                         player.Message("No block specified, Using last used block ({0})", player.LastUsedBlockType.ToString());
                         newBlock = player.LastUsedBlockType;

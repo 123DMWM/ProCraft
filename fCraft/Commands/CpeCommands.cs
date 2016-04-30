@@ -1033,7 +1033,7 @@ namespace fCraft {
                 target = (byte)defValue;
             } else {
                 Block block;
-                if (!Map.GetBlockByName(value, false, out block)) {
+                if (!Map.GetBlockByName(world, value, false, out block)) {
                     CdEnv.PrintUsage(player);
                     return;
                 }
@@ -1204,7 +1204,7 @@ namespace fCraft {
             Name = "LevelBlock",
             Aliases = new string[] { "lb" },
             Category = CommandCategory.CPE | CommandCategory.World,
-            IsConsoleSafe = true,
+            IsConsoleSafe = false,
             Permissions = new[] { Permission.DefineCustomBlocks },
             Usage = "/lb [type/value] {args}",
             Help = MakeHelp("level's", "lb"),
@@ -1281,7 +1281,7 @@ namespace fCraft {
                 case "info":
                     string input = cmd.Next() ?? "n/a";
                     Block infoID;
-                    if (!Map.GetBlockByName(input, false, out infoID) || infoID < Map.MaxCustomBlockType) {
+                    if (!Map.GetBlockByName(p.World, input, false, out infoID) || infoID < Map.MaxCustomBlockType) {
                         p.Message("No blocks by that name or id!");
                         return;
                     }
@@ -1386,7 +1386,7 @@ namespace fCraft {
             Block blockID;
             string scope = global ? "global" : "level";
             string name = global ? "/gb" : "/lb";
-            if (!Map.GetBlockByName(input, false, out blockID) || blockID < Map.MaxCustomBlockType) {
+            if (!Map.GetBlockByName(p.World, input, false, out blockID) || blockID < Map.MaxCustomBlockType) {
                 p.Message("No blocks by that Name/ID!");
                 return;
             }
@@ -1421,7 +1421,7 @@ namespace fCraft {
 
             switch (step) {
                 case 0:
-                    step++; def.Name = args;
+            		step++; def.Name = args; def.BlockName = args.ToLower().Replace(" ", "");
                     p.Message("   &bSet name to: " + def.Name);
                     break;
                 case 1:
@@ -1620,7 +1620,7 @@ namespace fCraft {
             string scope = global ? "global" : "level";
             string name = global ? "/gb" : "/lb";
 
-            if (!Map.GetBlockByName(input1, false, out srcBlock) || srcBlock <= Map.MaxCustomBlockType) {
+            if (!Map.GetBlockByName(p.World, input1, false, out srcBlock) || srcBlock <= Map.MaxCustomBlockType) {
                 p.Message("There is no {1} custom block with the id or name: &a{0}", input1, scope);
                 p.Message("Use \"&h{1} list&s\" to see a list of {0} custom blocks.", scope, name);
                 return;
@@ -1658,7 +1658,7 @@ namespace fCraft {
         static void CustomBlockEditHandler(Player p, CommandReader cmd, bool global, BlockDefinition[] defs) {
             string input = cmd.Next() ?? "n/a";
             Block blockID;
-            if (!Map.GetBlockByName(input, false, out blockID) || blockID < Map.MaxCustomBlockType) {
+            if (!Map.GetBlockByName(p.World, input, false, out blockID) || blockID < Map.MaxCustomBlockType) {
                 p.Message("No blocks by that Name/ID!");
                 return;
             }
@@ -1683,7 +1683,7 @@ namespace fCraft {
             switch (option.ToLower()) {
                 case "name":
                     p.Message("&bChanged name of &a{0}&b to &A{1}", def.Name, args);
-                    def.Name = args;
+                    def.Name = args; def.BlockName = args.ToLower().Replace(" ", "");
                     break;
                 case "solid":
                 case "solidity":

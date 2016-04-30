@@ -40,9 +40,12 @@ namespace fCraft {
         public byte FrontTex { get; set; }
         public byte BackTex { get; set; }
         
+        /// <summary> Name used in commands. (e.g. "Mossy Slabs" becomes "mossyslabs")"</summary>
+        public string BlockName;
+        
         public BlockDefinition Copy() {
             BlockDefinition def = new BlockDefinition();
-            def.BlockID = BlockID; def.Name = Name;
+            def.BlockID = BlockID; def.Name = Name; def.BlockName = BlockName;
             def.CollideType = CollideType; def.Speed = Speed;
             def.TopTex = TopTex; def.SideTex = SideTex;
             def.BottomTex = BottomTex; def.BlocksLight = BlocksLight;
@@ -201,13 +204,6 @@ namespace fCraft {
             
             int count;
             GlobalDefs = Load(path, out count);
-            
-            foreach (BlockDefinition def in GlobalDefs) {
-                if (def == null) continue;
-                string name = def.Name.ToLower().Replace(" ", "");
-                Map.BlockNames[name] = (Block)def.BlockID;
-                Map.BlockNames[def.BlockID.ToString()] = (Block)def.BlockID;
-            }
             Logger.Log(LogType.SystemActivity, "BlockDefinitions.LoadGlobal: Loaded " + count + " blocks");
         }
         
@@ -226,8 +222,10 @@ namespace fCraft {
                 if (defs[i] == null) continue;
                 // fixup for servicestack not writing out null entries
                 if (defs[i].Name == null) { defs[i] = null; continue; }
+                
                 FixupLegacy(defs[i]);
                 count++;
+                defs[i].BlockName = defs[i].Name.ToLower().Replace(" ", "");
             }
             return defs;
         }

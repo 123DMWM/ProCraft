@@ -338,11 +338,11 @@ namespace fCraft {
         }
 
         /// <summary> Get the name of the block, used when blockdefinition blocks should show their Name instead of ID .</summary>
-        public static string getBlockName(Block block) {
+        public static string GetBlockName(World world, Block block) {
             Block outBlock;
-            if (GetBlockByName(block.ToString(), false, out outBlock)) {
+            if (GetBlockByName(world, block.ToString(), false, out outBlock)) {
                 if (outBlock > MaxCustomBlockType) {
-                    return BlockDefinition.GlobalDefs[(int)outBlock].Name;
+                    return world.BlockDefs[(int)outBlock].Name;
                 }
                 return outBlock.ToString();
             } else {
@@ -906,14 +906,34 @@ namespace fCraft {
         public static bool GetBlockByName([NotNull] string blockName, bool allowNoneBlock, out Block block)
         {
             if (blockName == null) throw new ArgumentNullException("blockName");
-            if (BlockNames.TryGetValue(blockName.ToLower(), out block))
-            {
+            if (BlockNames.TryGetValue(blockName.ToLower(), out block)) {
                 return block == Block.None ? allowNoneBlock : true;
-            }
-            else
-            {
+            } else {
                 block = Block.None;
                 return false;
+            }
+        }
+        
+        const StringComparison comp = StringComparison.OrdinalIgnoreCase;
+        public static bool GetBlockByName([CanBeNull] World world, [NotNull] string blockName, 
+                                          bool allowNoneBlock, out Block block) {
+            if (blockName == null) throw new ArgumentNullException("blockName");
+            if (BlockNames.TryGetValue(blockName.ToLower(), out block)) {
+                return block == Block.None ? allowNoneBlock : true;
+            } else {
+                if (world == null) { block = Block.None; return false; }
+                byte id;
+                
+                if (Byte.TryParse(blockName, out id)) {
+                    BlockDefinition def = world.BlockDefs[id];
+                    if (def != null) { block = (Block)id; return true; }
+                } else {
+                    foreach (BlockDefinition def in world.BlockDefs) {
+                        if (def == null || !def.BlockName.Equals(blockName, comp)) continue;
+                        block = (Block)def.BlockID; return true;
+                    }
+                }
+                block = Block.None; return false;
             }
         }
 

@@ -255,6 +255,17 @@ namespace fCraft {
             {
                 world.BlockDB.LoadSettings(blockEl);
             }
+            
+            // Load CustomBlock settings
+            string blockDefPath = Path.Combine(Paths.BlockDefsDirectory, world.Name + ".txt");
+            if (File.Exists(blockDefPath)) {
+                int count;
+                BlockDefinition[] defs = BlockDefinition.Load(blockDefPath, out count);
+                for (int i = 0; i < defs.Length; i++) {
+                    if (defs[i] == null) defs[i] = BlockDefinition.GlobalDefs[i];
+                }
+                world.BlockDefs = defs;
+            }
 
             // load environment settings
             XElement envEl = el.Element(EnvironmentXmlTagName);
@@ -273,7 +284,7 @@ namespace fCraft {
                 if ((tempAttr = envEl.Attribute("water")) != null) {
                     try {
                         Block block;
-                        Map.GetBlockByName(tempAttr.Value, false, out block);
+                        Map.GetBlockByName(world, tempAttr.Value, false, out block);
                         world.HorizonBlock = (byte)block;
                     } catch {
                         world.HorizonBlock = (byte)Block.Water;
@@ -285,7 +296,7 @@ namespace fCraft {
                 if ((tempAttr = envEl.Attribute("bedrock")) != null) {
                     try {
                         Block block;
-                        Map.GetBlockByName(tempAttr.Value, false, out block);
+                        Map.GetBlockByName(world, tempAttr.Value, false, out block);
                         world.EdgeBlock = (byte)block;
                     } catch {
                         world.EdgeBlock = (byte)Block.Admincrete;
@@ -458,16 +469,6 @@ namespace fCraft {
                     }
                 }
             }*/
-            
-            string blockDefPath = Path.Combine(Paths.BlockDefsDirectory, world.Name + ".txt");
-            if (File.Exists(blockDefPath)) {
-                int count;
-                BlockDefinition[] defs = BlockDefinition.Load(blockDefPath, out count);
-                for (int i = 0; i < defs.Length; i++) {
-                    if (defs[i] == null) defs[i] = BlockDefinition.GlobalDefs[i];
-                }
-                world.BlockDefs = defs;
-            }
 
             foreach (XElement mainedRankEl in el.Elements(RankMainXmlTagName))
             {

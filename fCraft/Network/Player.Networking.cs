@@ -379,11 +379,11 @@ namespace fCraft {
             byte id = reader.ReadByte();
             Block failsafe;
             if (Supports(CpeExt.HeldBlock)) {
-                if (Map.GetBlockByName(id.ToString(), false, out failsafe)) {
+                if (Map.GetBlockByName(World, id.ToString(), false, out failsafe)) {
                     if (Info.heldBlock != failsafe) {
                         Info.heldBlock = failsafe;
                         if (Supports(CpeExt.MessageType) && !IsPlayingCTF) {
-                            Send(Packet.Message((byte)MessageType.BottomRight1, "&sBlock:&f" + Map.getBlockName(Info.heldBlock) 
+                            Send(Packet.Message((byte)MessageType.BottomRight1, "&sBlock:&f" + Map.GetBlockName(World, Info.heldBlock) 
                                                 + " &sID:&f" + (byte)Info.heldBlock, true));
                         }
                     }
@@ -1350,7 +1350,7 @@ namespace fCraft {
             }
 
             if (Supports(CpeExt.MessageType) && !IsPlayingCTF) {
-                Send(Packet.Message((byte)MessageType.BottomRight1, "&sBlock:&f" + Map.getBlockName(Info.heldBlock)
+                Send(Packet.Message((byte)MessageType.BottomRight1, "&sBlock:&f" + Map.GetBlockName(World, Info.heldBlock)
                                     + " &sID:&f" + (byte)Info.heldBlock, true));
             }
             if (Supports(CpeExt.MessageType)) {

@@ -79,9 +79,9 @@ namespace fCraft {
             world.LightColor = preset.LightColor;
             world.Texture = preset.TextureURL;
             Block Border, Horizon;
-            Map.GetBlockByName(preset.BorderBlock.ToString(), false, out Border);
+            Map.GetBlockByName(world, preset.BorderBlock.ToString(), false, out Border);
             if (Border == Block.None) Border = Block.Admincrete;
-            Map.GetBlockByName(preset.HorizonBlock.ToString(), false, out Horizon);
+            Map.GetBlockByName(world, preset.HorizonBlock.ToString(), false, out Horizon);
             if (Horizon == Block.None) Horizon = Block.Water;
             world.EdgeBlock = (byte)Border;
             world.HorizonBlock = (byte)Horizon;
