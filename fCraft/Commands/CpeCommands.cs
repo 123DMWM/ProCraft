@@ -355,8 +355,10 @@ namespace fCraft {
             }
             if (otherPlayer.IsOnline && otherPlayer.Rank.Index >= player.Info.Rank.Index) {
                 if (!validEntities.Contains(model.ToLower())) {
+                    byte blockId;
                     Block block;
-                    if (Map.GetBlockByName(model, false, out block)) {
+                    if (byte.TryParse(model, out blockId)) {
+                    } else if (Map.GetBlockByName(model, false, out block)) {
                         model = block.GetHashCode().ToString();
                     } else {
                         player.Message("Model not valid, see &h/Help Model&s.");
@@ -419,9 +421,11 @@ namespace fCraft {
             }
             if (otherPlayer != null && otherPlayer.IsOnline && otherPlayer.Rank.Index >= player.Info.Rank.Index) {
                 if (!validEntities.Contains(model.ToLower())) {
+                    byte blockId;
                     Block block;
-                    if (Map.GetBlockByName(model, false, out block)) {
-                        model = block.GetHashCode().ToString();
+                    if (byte.TryParse(model, out blockId)) {
+                    } else if (Map.GetBlockByName(model, false, out block)) {
+                        model = ((byte)block).ToString();
                     } else {
                         player.Message("Model not valid, see &h/Help AFKModel&s.");
                         return;
@@ -1421,7 +1425,7 @@ namespace fCraft {
 
             switch (step) {
                 case 0:
-            		step++; def.Name = args; def.BlockName = args.ToLower().Replace(" ", "");
+                    step++; def.Name = args; def.BlockName = args.ToLower().Replace(" ", "");
                     p.Message("   &bSet name to: " + def.Name);
                     break;
                 case 1:
