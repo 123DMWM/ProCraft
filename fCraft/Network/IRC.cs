@@ -655,6 +655,13 @@ namespace fCraft
                 }
             }
             
+            static string Formatter(Player p) {
+                string value = p.Info.Rank.Color + p.Info.Name;
+                if (p.World != null)
+                    value += " &S[" + p.World.ClassyName + "&S]" + ResetCode;
+                return value;
+            }
+            
             bool HandleIrcCommand(IRCMessage msg, string rawMessage) {
                 if (!(rawMessage[0] == '!' || rawMessage.StartsWith(ActualBotNick, StringComparison.OrdinalIgnoreCase)))
                     return false;               
@@ -669,7 +676,7 @@ namespace fCraft
                     
                     if (visiblePlayers.Any()) {
                         SendChannelMessage("\u212CPlayers online: \u211C" +
-                                           visiblePlayers.JoinToRealString());
+                    	                   visiblePlayers.JoinToString(Formatter));
                         lastIrcCommand = DateTime.UtcNow;
                     } else {
                         SendChannelMessage("\u212CThere are no players online.");
@@ -1207,10 +1214,6 @@ namespace fCraft
             bool enabled = ConfigKey.IRCBotForwardFromServer.Enabled();
             switch (args.MessageType) {
                 case ChatMessageType.Global:
-                    string worldName = "";
-                    if (args.Player.World != null) {
-                        worldName = String.Format( "&S[\u211C{0}&S]\u211C ", args.Player.World.ClassyName );
-                    }
                     string ignoreIRC = "";
                     if (args.Player.Info.ReadIRC == false) {
                         if (args.Player != Player.Console) {
@@ -1218,12 +1221,12 @@ namespace fCraft
                         }
                     }
                     if (enabled) {
-                        string formattedMessage = String.Format("{4}{0}{1}: {2}{3}", args.Player.ClassyName, ResetCode,
-                            args.Message, ignoreIRC, worldName);
+                        string formattedMessage = String.Format("{0}{1}: {2}{3}", args.Player.ClassyName, ResetCode,
+                            args.Message, ignoreIRC);
                         SendChannelMessage(formattedMessage);
                     } else if (args.Message.StartsWith("#")) {
-                        string formattedMessage = String.Format("{4}{0}{1}: {2}{3}", args.Player.ClassyName, ResetCode,
-                            args.Message.Substring(1), ignoreIRC, worldName);
+                        string formattedMessage = String.Format("{0}{1}: {2}{3}", args.Player.ClassyName, ResetCode,
+                            args.Message.Substring(1), ignoreIRC);
                         SendChannelMessage(formattedMessage);
                     }
                     break;
