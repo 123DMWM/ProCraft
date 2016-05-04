@@ -9,7 +9,6 @@ using fCraft.Drawing;
 using fCraft.MapConversion;
 using JetBrains.Annotations;
 using System.Diagnostics;
-using System.Collections.Concurrent;
 
 namespace fCraft {
     /// <summary> Represents a map file (associated with a world or not).
@@ -377,7 +376,7 @@ namespace fCraft {
 
         /// <summary> Number of blocks that are waiting to be processed. </summary>
         public int UpdateQueueLength {
-            get { return updates.Count; }
+            get { return updates.Length; }
         }
 
         readonly Queue<PhysicsUpdate> tickQueue = new Queue<PhysicsUpdate>();

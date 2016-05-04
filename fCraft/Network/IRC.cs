@@ -37,7 +37,6 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using fCraft.Events;
 using JetBrains.Annotations;
-using System.Collections.Concurrent;
 
 namespace fCraft
 {

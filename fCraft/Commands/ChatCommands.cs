@@ -1,15 +1,10 @@
 ﻿// Part of fCraft | Copyright 2009-2015 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt //Copyright (c) 2011-2013 Jon Baker, Glenn Marien and Lao Tszy <Jonty800@gmail.com> //Copyright (c) <2012-2014> <LeChosenOne, DingusBungus> | ProCraft Copyright 2014-2016 Joseph Beauvais <123DMWM@gmail.com>
 using System;
-using System.CodeDom;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Configuration;
-using System.Runtime.ExceptionServices;
 using fCraft;
 using fCraft.Drawing;
-using fCraft.Events;
-using Microsoft.Win32;
 
 namespace fCraft
 {

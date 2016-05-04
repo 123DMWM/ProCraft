@@ -165,6 +165,7 @@
     <Compile Include="Portals\PortalHandler.cs" />
     <Compile Include="Portals\PortalRange.cs" />
     <Compile Include="System\Utils\BitMap3D.cs" />
+    <Compile Include="System\Utils\ConcurrentQueue.cs" />
     <Compile Include="System\Utils\Direction.cs" />
     <Compile Include="System\Utils\Paths.cs" />
     <Compile Include="System\Scheduler.cs" />

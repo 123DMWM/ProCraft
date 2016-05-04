@@ -1,7 +1,6 @@
 ﻿// Part of fCraft | Copyright 2009-2015 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt //Copyright (c) 2011-2013 Jon Baker, Glenn Marien and Lao Tszy <Jonty800@gmail.com> //Copyright (c) <2012-2014> <LeChosenOne, DingusBungus> | ProCraft Copyright 2014-2016 Joseph Beauvais <123DMWM@gmail.com>
 using System;
 using System.Collections.Generic;
-using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
 using System.Drawing;
@@ -150,7 +149,8 @@ namespace fCraft {
         public World World { get; private set; }
 
         #region General purpose state storage for plugins
-        private readonly ConcurrentDictionary<string, object> _publicAuxStateObjects = new ConcurrentDictionary<string, object>();
+        private readonly System.Collections.Concurrent.ConcurrentDictionary<string, object> _publicAuxStateObjects
+        	= new System.Collections.Concurrent.ConcurrentDictionary<string, object>();
         public IDictionary<string, object> PublicAuxStateObjects { get { return _publicAuxStateObjects; } }
         #endregion
 
@@ -194,14 +194,6 @@ namespace fCraft {
 
         /// <summary> Last time when this player was patrolled by someone. </summary>
         public DateTime LastPatrolTime { get; set; }
-
-        #region Flying
-
-        public bool IsFlying = false;
-        public ConcurrentDictionary<String, Vector3I> FlyCache;
-        public readonly object FlyLock = new object();
-
-        #endregion Flying
 
         /// <summary> Last command called by the player. </summary>
         [CanBeNull]

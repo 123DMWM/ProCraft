@@ -13,7 +13,6 @@ using fCraft.AutoRank;
 using fCraft.Events;
 using fCraft.MapConversion;
 using JetBrains.Annotations;
-using System.Collections.Concurrent;
 using System.Diagnostics;
 
 namespace fCraft {
@@ -201,7 +200,7 @@ namespace fCraft {
                     }
                     
                     // send block updates output to player
-                    bool useBulk = bulkBlockPacket != null && blockQueue.Count > 160;
+                    bool useBulk = bulkBlockPacket != null && blockQueue.Length > 160;
                     Map currentMap = WorldMap;
                     while (canSend && blockPacketsSent < Server.MaxBlockPacketsPerTick) {
                         if (!blockQueue.TryDequeue(out blockUpdate)) break;

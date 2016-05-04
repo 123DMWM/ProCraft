@@ -7,7 +7,6 @@ using System.Text;
 using fCraft.MapConversion;
 using JetBrains.Annotations;
 using System.Collections;
-using System.Collections.Concurrent;
 using System.Threading;
 
 namespace fCraft {
