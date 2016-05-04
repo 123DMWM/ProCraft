@@ -1413,7 +1413,7 @@ namespace fCraft {
 
         static void CustomBlockDefineHandler(Player p, string args, bool global, BlockDefinition[] defs) {
             // print the current step help if no args given
-            if (string.IsNullOrWhiteSpace(args)) {
+            if (args.NullOrWhiteSpace()) {
                 PrintStepHelp(p); return;
             }
 

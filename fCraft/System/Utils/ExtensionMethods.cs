@@ -180,6 +180,14 @@ namespace fCraft {
             }
             return list.Substring(2);
         }
+        
+        public static bool NullOrWhiteSpace(this string value) {
+            if (value == null) return true;
+            foreach (char c in value) {
+                if (!Char.IsWhiteSpace(c)) return false;
+            }
+            return true;
+        }
     }
 
 

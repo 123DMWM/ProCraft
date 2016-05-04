@@ -1332,7 +1332,7 @@ namespace fCraft
                                             target.ClassyName,
                                             action,
                                             player.ClassyName);
-            if (!String.IsNullOrWhiteSpace(reason))
+            if (!reason.NullOrWhiteSpace())
             {
                 message += " Reason: " + reason;
             }

@@ -2255,7 +2255,7 @@ namespace fCraft {
 		};
 
 		static void PluginsHandler(Player player, CommandReader cmd) {
-			List<String> plugins = new List<String>();
+			List<string> plugins = new List<string>();
 			player.Message("&c_Current plugins on {0}&c_", ConfigKey.ServerName.GetString());
 
 			//Sloppy :P, PluginManager.Plugins adds ".Init", so this should split the ".Init" from the plugin name
@@ -2264,7 +2264,7 @@ namespace fCraft {
 				string[] splitPluginString = pluginString.Split('.');
 				plugins.Add(splitPluginString[0]);
 			}
-			player.Message(String.Join(", ", plugins));
+			player.Message(String.Join(", ", plugins.ToArray()));
 		}
 		#endregion
         #region PingList
