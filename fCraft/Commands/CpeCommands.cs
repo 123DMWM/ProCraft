@@ -1368,7 +1368,7 @@ namespace fCraft {
             string name = global ? "/gb" : "/lb";
             
             for (int i = 0; i < defs.Length; i++) {
-                BlockDefinition def = defs[i];
+                BlockDefinition def = GetCustomBlock(global, defs, (byte)i);
                 if (def == null) continue;
 
                 if (index >= offset) {
