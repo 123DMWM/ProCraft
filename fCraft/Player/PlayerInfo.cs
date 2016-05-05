@@ -535,7 +535,7 @@ namespace fCraft {
 
         #region Loading
 
-        internal static PlayerInfo LoadFormat2( string[] fields ) {
+        internal static PlayerInfo LoadFormat2( string[] fields, int count ) {
             PlayerInfo info = new PlayerInfo { Name = fields[0] };
 
             if( fields[1].Length == 0 || !IPAddress.TryParse( fields[1], out info.LastIP ) ) {
@@ -639,20 +639,20 @@ namespace fCraft {
                 info.BandwidthUseMode = BandwidthUseMode.Default;
             }
 
-            if( fields.Length > 45 ) {
+            if( count > 45 ) {
                 if( fields[45].Length == 0 ) {
                     info.IsHidden = false;
                 } else {
                     info.IsHidden = info.Rank.Can( Permission.Hide );
                 }
             }
-            if( fields.Length > 46 ) {
+            if( count > 46 ) {
                 fields[46].ToDateTime( ref info.LastModified );
             }
-            if( fields.Length > 47 && fields[47].Length > 0 ) {
+            if( count > 47 && fields[47].Length > 0 ) {
                 info.DisplayedName = PlayerDB.Unescape( fields[47] );
             }
-            if( fields.Length > 48 ) {
+            if( count > 48 ) {
                 byte accountTypeCode;
                 if( Byte.TryParse( fields[48], out accountTypeCode ) ) {
                     info.AccountType = (AccountType)accountTypeCode;
@@ -661,7 +661,7 @@ namespace fCraft {
                     }
                 }
             }
-            if (fields.Length > 49)
+            if (count > 49)
             {
                 double donatedammount;
                 if (Double.TryParse(fields[49], out donatedammount))
@@ -670,139 +670,139 @@ namespace fCraft {
                 }
                 else info.Donated = 0;
             }
-            if (fields.Length > 50)
+            if (count > 50)
             {
                 if (!Boolean.TryParse(fields[50], out info.ReadIRC))
                 {
                     info.ReadIRC = true;
                 }
             }
-            if (fields.Length > 51)
+            if (count > 51)
             {
                 Int32.TryParse(fields[51], out info.PromoCount);
             }
-            if (fields.Length > 52)
+            if (count > 52)
             {
                 Int32.TryParse(fields[52], out info.TimesUsedBot);
             }
-            if (fields.Length > 53)
+            if (count > 53)
             {
                 //Int32.TryParse(fields[53], out info.TimesUsedUseless);
             }
-            if (fields.Length > 54)
+            if (count > 54)
             {
                 if (!Boolean.TryParse(fields[54], out info.HasRTR))
                 {
                     info.HasRTR = false;
                 }
             }
-            if (fields.Length > 55)
+            if (count > 55)
             {
                 if (!Boolean.TryParse(fields[55], out info.TPDeny))
                 {
                     info.TPDeny = false;
                 }
             }
-            if (fields.Length > 56)
+            if (count > 56)
             {
                 if (!Boolean.TryParse(fields[56], out info.JoinOnRankWorld))
                 {
                     info.JoinOnRankWorld = false;
                 }
             }
-            if (fields.Length > 57) info.LastWorld = fields[57];
+            if (count > 57) info.LastWorld = fields[57];
 
-            if (fields.Length > 58) info.LastWorldPos = fields[58];
+            if (count > 58) info.LastWorldPos = fields[58];
 
-            if (fields.Length > 59)
+            if (count > 59)
             {
                 Int32.TryParse(fields[59], out info.DemoCount);
             }
 
-            if (fields.Length > 60) info.Mob = fields[60];
+            if (count > 60) info.Mob = fields[60];
 
-            if (fields.Length > 61)
+            if (count > 61)
             {
                 if (!short.TryParse(fields[61], out info.ReachDistance))
                 {
                     info.ReachDistance = 160;
                 }
             }
-            if (fields.Length > 62 && fields[62].Length > 0)
+            if (count > 62 && fields[62].Length > 0)
             {
                 info.Email = PlayerDB.Unescape(fields[62]);
             }
-            if (fields.Length > 63)
+            if (count > 63)
             {
                 if (!Boolean.TryParse(fields[63], out info.AllowFlying))
                 {
                     info.AllowFlying = true;
                 }
             }
-            if (fields.Length > 64)
+            if (count > 64)
             {
                 if (!Boolean.TryParse(fields[64], out info.AllowNoClip))
                 {
                     info.AllowNoClip = true;
                 }
             }
-            if (fields.Length > 65)
+            if (count > 65)
             {
                 if (!Boolean.TryParse(fields[65], out info.AllowSpeedhack))
                 {
                     info.AllowSpeedhack = true;
                 }
             }
-            if (fields.Length > 66)
+            if (count > 66)
             {
                 if (!Boolean.TryParse(fields[66], out info.AllowRespawn))
                 {
                     info.AllowRespawn = true;
                 }
             }
-            if (fields.Length > 67)
+            if (count > 67)
             {
                 if (!Boolean.TryParse(fields[67], out info.AllowThirdPerson))
                 {
                     info.AllowThirdPerson = true;
                 }
             }
-            if (fields.Length > 68)
+            if (count > 68)
             {
                 short.TryParse(fields[68], out info.JumpHeight);
             }
 
-            if (fields.Length > 69)
+            if (count > 69)
                 info.GeoIP = fields[69];
-            if (fields.Length > 70)
+            if (count > 70)
                 info.CountryCode = fields[70];
-            if (fields.Length > 71)
+            if (count > 71)
                 info.CountryName = fields[71];
-            //if (fields.Length > 72) info.RegionCode = fields[72];
-            //if (fields.Length > 73) info.RegionName = fields[73];
-            //if (fields.Length > 74) info.City = fields[74];
-            //if (fields.Length > 75) info.ZipCode = fields[75];
-            if (fields.Length > 76)
+            //if (count > 72) info.RegionCode = fields[72];
+            //if (count > 73) info.RegionName = fields[73];
+            //if (count > 74) info.City = fields[74];
+            //if (count > 75) info.ZipCode = fields[75];
+            if (count > 76)
                 info.Latitude = fields[76];
-            if (fields.Length > 77)
+            if (count > 77)
                 info.Longitude = fields[77];
-            //if (fields.Length > 78) info.MetroCode = fields[78];
-            //if (fields.Length > 79) info.AreaCode = fields[79];
-            if (fields.Length > 80)
+            //if (count > 78) info.MetroCode = fields[78];
+            //if (count > 79) info.AreaCode = fields[79];
+            if (count > 80)
                 info.TimeZone = fields[80];
 
-            if (fields.Length > 81)
+            if (count > 81)
 				info.skinName = fields[81];
 
-			if (fields.Length > 82)
+			if (count > 82)
 				info.Subdivision = PlayerDB.Unescape(fields[82]).Split();
-			if (fields.Length > 83)
+			if (count > 83)
 				byte.TryParse(fields[83], out info.Accuracy);
-			if (fields.Length > 84)
+			if (count > 84)
 				info.Hostname = fields[84];
-			if (fields.Length > 85)
+			if (count > 85)
 				info.Continent = fields[85];
-			if (fields.Length > 86) {
+			if (count > 86) {
 				if (!bool.TryParse(fields[86], out info.ClassicubeVerified))
 					info.ClassicubeVerified = true;
 			}
@@ -818,7 +818,7 @@ namespace fCraft {
         }
 
 
-        internal static PlayerInfo LoadFormat1( string[] fields ) {
+        internal static PlayerInfo LoadFormat1( string[] fields, int count ) {
             PlayerInfo info = new PlayerInfo { Name = fields[0] };
 
             if( fields[1].Length == 0 || !IPAddress.TryParse( fields[1], out info.LastIP ) ) {
@@ -921,7 +921,7 @@ namespace fCraft {
                 info.BandwidthUseMode = BandwidthUseMode.Default;
             }
 
-            if( fields.Length > 45 ) {
+            if( count > 45 ) {
                 if( fields[45].Length == 0 ) {
                     info.IsHidden = false;
                 } else {
@@ -940,7 +940,7 @@ namespace fCraft {
         }
 
 
-        internal static PlayerInfo LoadFormat0( string[] fields, bool convertDatesToUtc ) {
+        internal static PlayerInfo LoadFormat0( string[] fields, int count, bool convertDatesToUtc ) {
             PlayerInfo info = new PlayerInfo { Name = fields[0] };
 
             if( fields[1].Length == 0 || !IPAddress.TryParse( fields[1], out info.LastIP ) ) {
@@ -1005,13 +1005,13 @@ namespace fCraft {
             if( fields[20].Length > 0 ) Int32.TryParse( fields[21], out info.MessagesWritten );
             // fields 22-23 are no longer in use
 
-            if( fields.Length > MinFieldCount ) {
+            if( count > MinFieldCount ) {
                 if( fields[24].Length > 0 ) info.PreviousRank = Rank.Parse( fields[24] );
                 if( fields[25].Length > 0 ) info.RankChangeReason = PlayerDB.UnescapeOldFormat( fields[25] );
                 Int32.TryParse( fields[26], out info.TimesKicked );
                 Int32.TryParse( fields[27], out info.TimesKickedOthers );
                 Int32.TryParse( fields[28], out info.TimesBannedOthers );
-                if( fields.Length > 29 ) {
+                if( count > 29 ) {
                     info.ID = Int32.Parse( fields[29] );
                     if( info.ID < 256 )
                         info.ID = PlayerDB.GetNextID();
@@ -1039,7 +1039,7 @@ namespace fCraft {
                     info.LastSeen = info.LastLoginDate;
                 }
 
-                if( fields.Length > 36 ) {
+                if( count > 36 ) {
                     DateTimeUtil.TryParseLocalDate( fields[36], out info.BannedUntil );
                     info.IsFrozen = (fields[37] == "f");
                     if( fields[38].Length > 0 ) info.FrozenBy = PlayerDB.UnescapeOldFormat( fields[38] );
@@ -1050,7 +1050,7 @@ namespace fCraft {
                     // fields[43] is "online", and is ignored
                 }
 
-                if( fields.Length > 44 ) {
+                if( count > 44 ) {
                     if( fields[44].Length != 0 ) {
                         info.BandwidthUseMode = (BandwidthUseMode)Int32.Parse( fields[44] );
                     }

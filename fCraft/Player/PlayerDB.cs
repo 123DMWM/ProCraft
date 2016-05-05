@@ -138,11 +138,13 @@ namespace fCraft {
                             version, FormatVersion );
             }
 
-            int emptyRecords = 0;
+            int emptyRecords = 0, count = 0;
+            string[] fields = new string[100];
             while( true ) {
                 string line = reader.ReadLine();
                 if( line == null ) break;
-                string[] fields = line.Split( ',' );
+                Split(line, ref fields, out count);
+
                 if( fields.Length >= PlayerInfo.MinFieldCount ) {
 #if !DEBUG
                     try {
@@ -150,14 +152,14 @@ namespace fCraft {
                         PlayerInfo info;
                         switch( version ) {
                             case 0:
-                                info = PlayerInfo.LoadFormat0( fields, true );
+                                info = PlayerInfo.LoadFormat0( fields, count, true );
                                 break;
                             case 1:
-                                info = PlayerInfo.LoadFormat1( fields );
+                                info = PlayerInfo.LoadFormat1( fields, count );
                                 break;
                             default:
                                 // Versions 2-5 differ in semantics only, not in actual serialization format.
-                                info = PlayerInfo.LoadFormat2( fields );
+                                info = PlayerInfo.LoadFormat2( fields, count );
                                 break;
                         }
 
@@ -204,13 +206,37 @@ namespace fCraft {
                                 fields.Length, PlayerInfo.MinFieldCount );
                 }
             }
-
+            
+            for (int i = 0; i < fields.Length; i++)
+                fields[i] = null;
             if( emptyRecords > 0 ) {
                 Logger.Log( LogType.Warning,
                             "PlayerDB.Load: Skipped {0} empty records.", emptyRecords );
             }
 
             RunCompatibilityChecks( version );
+        }
+        
+        unsafe static void Split(string line, ref string[] fields, out int count) {
+        	// Effectively string.split(',') but without the two passes and memory allocations.
+            count = 0;
+            fixed (char* ptr = line) {
+                int start = 0, len = 0;
+                for (int i = 0; i < line.Length; i++) {
+                    if (ptr[i] != ',') { len++; continue; }
+                    if (count == fields.Length)
+                        Array.Resize(ref fields, count + 10);
+                    fields[count] = len == 0 ? "" : new String(ptr, start, len); count++;
+                    // Start next string at character after the ,
+                    start = i + 1;
+                    len = 0;
+                }
+                
+                // We will always have at least one string, even if it just empty.
+                if (count == fields.Length)
+                    Array.Resize(ref fields, count + 10);
+                fields[count] = len == 0 ? "" : new String(ptr, start, len); count++;
+            }
         }
 
 
