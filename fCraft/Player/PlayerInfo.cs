@@ -1325,7 +1325,7 @@ namespace fCraft {
 
 
 			sb.Append(',');
-			sb.AppendEscaped(Subdivision.JoinToString() ?? "NA"); // 82
+			sb.AppendEscaped(String.Join(", ", Subdivision)); // 82
 			sb.Append(',');
 			sb.Append(Accuracy); // 83
 			sb.Append(',');
