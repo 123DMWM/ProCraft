@@ -489,7 +489,7 @@ namespace fCraft
                             player.ClassyName, Color.Silver, num, min, max);            
             player.Message("{0}You rolled {1} ({2}...{3})",
                             Color.Silver, num, min, max);
-            player.LastServerMessageDate = DateTime.Now;
+            player.LastServerMessageDate = DateTime.UtcNow;
             if (min == 1 && max == 100)
             {
                 if (num == 69)
@@ -1132,7 +1132,7 @@ namespace fCraft
                 }
                 string message = "Welcome to " + Color.StripColors(ConfigKey.ServerName.GetString()) + ", " + last.Name + "!";
                 player.ParseMessage(message, false);
-                player.LastServerMessageDate = DateTime.Now;
+                player.LastServerMessageDate = DateTime.UtcNow;
                 player.LastPlayerGreeted = last;
             } else {
                 player.Message("Error: No one else on!");
@@ -1258,7 +1258,7 @@ namespace fCraft
                 }
                 player.Message("&sIdea&f: Build " + ana + " " + adjective + " " + noun);
             }
-            player.LastServerMessageDate = DateTime.Now;
+            player.LastServerMessageDate = DateTime.UtcNow;
         }
 
         #endregion

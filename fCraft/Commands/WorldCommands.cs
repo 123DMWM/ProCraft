@@ -1024,7 +1024,7 @@ namespace fCraft {
             {
                 Server.Message("&s{0}&s took the easy way out", player.ClassyName);
                 player.TeleportTo(player.World.LoadMap().Spawn);
-                player.LastServerMessageDate = DateTime.Now;
+                player.LastServerMessageDate = DateTime.UtcNow;
                 return;
             }
             else
@@ -1032,7 +1032,7 @@ namespace fCraft {
                 Server.Message("&s{0}&s took the easy way out and left a note", player.ClassyName);
                 Server.Message("&s[&fNote&s] {0}", note);
 				player.TeleportTo(player.World.LoadMap().Spawn);
-                player.LastServerMessageDate = DateTime.Now;
+                player.LastServerMessageDate = DateTime.UtcNow;
                 return;
             }
         }

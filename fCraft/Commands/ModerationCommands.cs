@@ -464,7 +464,7 @@ namespace fCraft {
 					break;
 			}
             if (sentMessage) {
-                player.LastServerMessageDate = DateTime.Now;
+                player.LastServerMessageDate = DateTime.UtcNow;
                 player.Info.TimesUsedBot++;
             }
 		}

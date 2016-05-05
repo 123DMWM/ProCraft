@@ -150,7 +150,7 @@ namespace fCraft {
         public DateTime LastServerMessageDate;
         
         public TimeSpan TimeSinceLastServerMessage {
-        	get { return IsSuper ? TimeSpan.MaxValue :  DateTime.Now.Subtract(LastServerMessageDate); }
+        	get { return IsSuper ? TimeSpan.MaxValue :  DateTime.UtcNow.Subtract(LastServerMessageDate); }
         }
 
         public void getLeftOverTime(Double maxTime, CommandReader cmd) {

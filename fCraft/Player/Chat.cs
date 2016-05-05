@@ -124,7 +124,7 @@ namespace fCraft {
                     || LDistance(rawMessage.ToLower(), "how do we rank up") <= 0.25) {
                     if (BotTime > 5) {
                         Server.BotMessage("You rank up by building something nice, preferably big. Then ask a staff member for a review.");
-                        player.LastServerMessageDate = DateTime.Now;
+                        player.LastServerMessageDate = DateTime.UtcNow;
                         player.Info.TimesUsedBot++;
                     }
                 }
@@ -136,7 +136,7 @@ namespace fCraft {
                         } else {
                             Server.BotMessage("The owner is {0}", RankManager.HighestRank.Color + ConfigKey.ServerOwner.GetString());
                         }
-                        player.LastServerMessageDate = DateTime.Now;
+                        player.LastServerMessageDate = DateTime.UtcNow;
                         player.Info.TimesUsedBot++;
                     }
                 }
@@ -144,7 +144,7 @@ namespace fCraft {
                     || LDistance(rawMessage.ToLower(), "what is the name of this server?") <= 0.25) {
                     if (BotTime > 5) {
                         Server.BotMessage("The server name is: " + ConfigKey.ServerName.GetString());
-                        player.LastServerMessageDate = DateTime.Now;
+                        player.LastServerMessageDate = DateTime.UtcNow;
                         player.Info.TimesUsedBot++;
                     }
                 }
@@ -152,7 +152,7 @@ namespace fCraft {
                     || LDistance(rawMessage.ToLower(), "where do we build") <= 0.25) {
                     if (BotTime > 5) {
                         Server.BotMessage("You can build anywhere outside of spawn. Just not on another persons build unless they say you can. ");
-                        player.LastServerMessageDate = DateTime.Now;
+                        player.LastServerMessageDate = DateTime.UtcNow;
                         player.Info.TimesUsedBot++;
                     }
                 }
@@ -166,12 +166,12 @@ namespace fCraft {
                             goto tryagain;
                         }
                         Server.BotMessage("Your next rank is: " + meh.ClassyName);
-                        player.LastServerMessageDate = DateTime.Now;
-                        player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
+                        player.LastServerMessageDate = DateTime.UtcNow;
+                        player.Info.TimesUsedBot++;
                     } else if (player.Info.Rank == RankManager.HighestRank) {
                         Server.BotMessage("You are already the highest rank.");
-                        player.LastServerMessageDate = DateTime.Now;
-                        player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
+                        player.LastServerMessageDate = DateTime.UtcNow;
+                        player.Info.TimesUsedBot++;
                     }
                 }
             }
