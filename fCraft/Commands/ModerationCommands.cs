@@ -327,8 +327,8 @@ namespace fCraft {
 				player.ParseMessage(string.Format("Bot {0} {1}", option ?? "", helper ?? ""), (player == Player.Console));
                 return;
 			}
-			if (player.Info.TimeSinceLastServerMessage.TotalSeconds < 5) {
-				player.Info.getLeftOverTime(5, cmd);
+			if (player.TimeSinceLastServerMessage.TotalSeconds < 5) {
+				player.getLeftOverTime(5, cmd);
 				return;
 			}
 			if (option == null) {
@@ -464,8 +464,8 @@ namespace fCraft {
 					break;
 			}
             if (sentMessage) {
-                player.Info.LastServerMessageDate = DateTime.Now;
-                player.Info.TimesUsedBot = (player.Info.TimesUsedBot + 1);
+                player.LastServerMessageDate = DateTime.Now;
+                player.Info.TimesUsedBot++;
             }
 		}
 

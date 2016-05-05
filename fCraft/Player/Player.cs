@@ -144,6 +144,22 @@ namespace fCraft {
         internal BlockDefinition currentBD;
         
         public int[] PingList = new int[10];
+        public string LastMotdMessage;
+        public Player LastPlayerGreeted = Player.Console;
+        
+        public DateTime LastServerMessageDate;
+        
+        public TimeSpan TimeSinceLastServerMessage {
+        	get { return IsSuper ? TimeSpan.MaxValue :  DateTime.Now.Subtract(LastServerMessageDate); }
+        }
+
+        public void getLeftOverTime(Double maxTime, CommandReader cmd) {
+            double timeLeft = maxTime - Math.Round(TimeSinceLastServerMessage.TotalSeconds);
+            if (timeLeft == 1) {
+                Message("&WYou can use /" + cmd.Name + "again in 1 second."); return;
+            }
+            Message("&WYou can use /" + cmd.Name + " again in " + timeLeft + " seconds");
+        }
 
         /// <summary> The world that the player is currently on. May be null.
         /// Use .JoinWorld() to make players teleport to another world. </summary>

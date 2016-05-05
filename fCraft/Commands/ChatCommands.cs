@@ -457,8 +457,8 @@ namespace fCraft
                 player.MessageMuted();
                 return;
             }
-            if (player.Info.TimeSinceLastServerMessage.TotalSeconds < 5) {
-                player.Info.getLeftOverTime(5, cmd);
+            if (player.TimeSinceLastServerMessage.TotalSeconds < 5) {
+                player.getLeftOverTime(5, cmd);
                 return;
             }
 
@@ -489,7 +489,7 @@ namespace fCraft
                             player.ClassyName, Color.Silver, num, min, max);            
             player.Message("{0}You rolled {1} ({2}...{3})",
                             Color.Silver, num, min, max);
-            player.Info.LastServerMessageDate = DateTime.Now;
+            player.LastServerMessageDate = DateTime.Now;
             if (min == 1 && max == 100)
             {
                 if (num == 69)
@@ -1126,14 +1126,14 @@ namespace fCraft
                     player.Message("You were the last player to join silly");
                     return;
                 }
-                if (player.Info.LastPlayerGreeted == last) {
+                if (player.LastPlayerGreeted == last) {
                     player.Message("You have to greet someone else before you can greet {0} again.", last.Name);
                     return;
                 }
                 string message = "Welcome to " + Color.StripColors(ConfigKey.ServerName.GetString()) + ", " + last.Name + "!";
                 player.ParseMessage(message, false);
-                player.Info.LastServerMessageDate = DateTime.Now;
-                player.Info.LastPlayerGreeted = last;
+                player.LastServerMessageDate = DateTime.Now;
+                player.LastPlayerGreeted = last;
             } else {
                 player.Message("Error: No one else on!");
             }
@@ -1223,8 +1223,8 @@ namespace fCraft
             string noun;
             int amount;
             string ana = "a";
-            if (player.Info.TimeSinceLastServerMessage.TotalSeconds < 5) {
-                player.Info.getLeftOverTime(5, cmd);
+            if (player.TimeSinceLastServerMessage.TotalSeconds < 5) {
+                player.getLeftOverTime(5, cmd);
                 return;
             }
 
@@ -1258,7 +1258,7 @@ namespace fCraft
                 }
                 player.Message("&sIdea&f: Build " + ana + " " + adjective + " " + noun);
             }
-            player.Info.LastServerMessageDate = DateTime.Now;
+            player.LastServerMessageDate = DateTime.Now;
         }
 
         #endregion

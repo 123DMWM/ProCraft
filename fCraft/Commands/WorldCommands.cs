@@ -1007,8 +1007,8 @@ namespace fCraft {
             if (player.Info.IsMuted) { player.MessageMuted(); return; }        	
             string note = cmd.NextAll();
             if (player.World == null) PlayerOpException.ThrowNoWorld(player);
-            if (player.Info.TimeSinceLastServerMessage.TotalSeconds < 10) {
-                player.Info.getLeftOverTime(10, cmd);
+            if (player.TimeSinceLastServerMessage.TotalSeconds < 10) {
+                player.getLeftOverTime(10, cmd);
                 return;
             }
             if (note.Length > 64)
@@ -1024,7 +1024,7 @@ namespace fCraft {
             {
                 Server.Message("&s{0}&s took the easy way out", player.ClassyName);
                 player.TeleportTo(player.World.LoadMap().Spawn);
-                player.Info.LastServerMessageDate = DateTime.Now;
+                player.LastServerMessageDate = DateTime.Now;
                 return;
             }
             else
@@ -1032,7 +1032,7 @@ namespace fCraft {
                 Server.Message("&s{0}&s took the easy way out and left a note", player.ClassyName);
                 Server.Message("&s[&fNote&s] {0}", note);
 				player.TeleportTo(player.World.LoadMap().Spawn);
-                player.Info.LastServerMessageDate = DateTime.Now;
+                player.LastServerMessageDate = DateTime.Now;
                 return;
             }
         }
