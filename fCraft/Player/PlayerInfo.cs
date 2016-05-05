@@ -160,8 +160,7 @@ namespace fCraft {
         /// where the older account has not signed in before Jan 1 2014. Minmises chance of impersonation. </summary>
         public bool ClassicubeVerified = true;
 
-
-        public List<int> PingList = new List<int> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+        public int[] PingList = new int[10];
 
 
         #region Rank
@@ -1107,13 +1106,13 @@ namespace fCraft {
 
         #region Saving
 
-        internal void Serialize( StringBuilder sb ) {
+        internal void Serialize( StringBuffer sb ) {
             sb.Append( Name ).Append( ',' ); // 0
             if( !LastIP.Equals( IPAddress.None ) ) sb.Append( LastIP ); // 1
             sb.Append( ',' );
 
             sb.Append( Rank.FullName ).Append( ',' ); // 2
-            RankChangeDate.ToUnixTimeString( sb ).Append( ',' ); // 3
+            sb.AppendUnixTime( RankChangeDate ).Append( ',' ); // 3
 
             sb.AppendEscaped( RankChangedBy ).Append( ',' ); // 4
 
@@ -1127,38 +1126,38 @@ namespace fCraft {
             }
             sb.Append( ',' ); // 5
 
-            BanDate.ToUnixTimeString( sb ).Append( ',' ); // 6
+            sb.AppendUnixTime( BanDate ).Append( ',' ); // 6
             sb.AppendEscaped( BannedBy ).Append( ',' ); // 7
-            UnbanDate.ToUnixTimeString( sb ).Append( ',' ); // 8
+            sb.AppendUnixTime( UnbanDate ).Append( ',' ); // 8
             sb.AppendEscaped( UnbannedBy ).Append( ',' ); // 9
             sb.AppendEscaped( BanReason ).Append( ',' ); // 10
             sb.AppendEscaped( UnbanReason ).Append( ',' ); // 11
 
-            LastFailedLoginDate.ToUnixTimeString( sb ).Append( ',' ); // 12
+            sb.AppendUnixTime( LastFailedLoginDate ).Append( ',' ); // 12
 
             if( !LastFailedLoginIP.Equals( IPAddress.None ) ) sb.Append( LastFailedLoginIP ); // 13
             sb.Append( ',', 2 ); // skip 14
 
-            FirstLoginDate.ToUnixTimeString( sb ).Append( ',' ); // 15
-            LastLoginDate.ToUnixTimeString( sb ).Append( ',' ); // 16
+            sb.AppendUnixTime( FirstLoginDate ).Append( ',' ); // 15
+            sb.AppendUnixTime( LastLoginDate ).Append( ',' ); // 16
 
             Player pObject = PlayerObject;
             if( pObject != null ) {
-                (TotalTime.Add( TimeSinceLastLogin )).ToTickString( sb ).Append( ',' ); // 17
+            	sb.AppendTicks( TotalTime.Add( TimeSinceLastLogin ) ).Append( ',' ); // 17
             } else {
-                TotalTime.ToTickString( sb ).Append( ',' ); // 17
+                sb.AppendTicks( TotalTime ).Append( ',' ); // 17
             }
 
-            if( BlocksBuilt > 0 ) sb.Digits( BlocksBuilt ); // 18
+            if( BlocksBuilt > 0 ) sb.Append( BlocksBuilt ); // 18
             sb.Append( ',' );
 
-            if( BlocksDeleted > 0 ) sb.Digits( BlocksDeleted ); // 19
+            if( BlocksDeleted > 0 ) sb.Append( BlocksDeleted ); // 19
             sb.Append( ',' );
 
             sb.Append( TimesVisited ).Append( ',' ); // 20
 
 
-            if( MessagesWritten > 0 ) sb.Digits( MessagesWritten ); // 21
+            if( MessagesWritten > 0 ) sb.Append( MessagesWritten ); // 21
             sb.Append( ',', 3 ); // 22-23 no longer in use
 
             if( PreviousRank != null ) sb.Append( PreviousRank.FullName ); // 24
@@ -1167,25 +1166,25 @@ namespace fCraft {
             sb.AppendEscaped( RankChangeReason ).Append( ',' ); // 25
 
 
-            if( TimesKicked > 0 ) sb.Digits( TimesKicked ); // 26
+            if( TimesKicked > 0 ) sb.Append( TimesKicked ); // 26
             sb.Append( ',' );
 
-            if( TimesKickedOthers > 0 ) sb.Digits( TimesKickedOthers ); // 27
+            if( TimesKickedOthers > 0 ) sb.Append( TimesKickedOthers ); // 27
             sb.Append( ',' );
 
-            if( TimesBannedOthers > 0 ) sb.Digits( TimesBannedOthers ); // 28
+            if( TimesBannedOthers > 0 ) sb.Append( TimesBannedOthers ); // 28
             sb.Append( ',' );
 
 
-            sb.Digits( ID ).Append( ',' ); // 29
+            sb.Append( ID ).Append( ',' ); // 29
 
-            sb.Digits( (int)RankChangeType ).Append( ',' ); // 30
+            sb.Append( (int)RankChangeType ).Append( ',' ); // 30
 
 
-            LastKickDate.ToUnixTimeString( sb ).Append( ',' ); // 31
+            sb.AppendUnixTime( LastKickDate ).Append( ',' ); // 31
 
-            if( IsOnline ) DateTime.UtcNow.ToUnixTimeString( sb ); // 32
-            else LastSeen.ToUnixTimeString( sb );
+            if( IsOnline ) sb.AppendUnixTime( DateTime.UtcNow ); // 32
+            else sb.AppendUnixTime( LastSeen );
             sb.Append( ',' );
 
             if( BlocksDrawn > 0 ) sb.Append( BlocksDrawn ); // 33
@@ -1194,21 +1193,18 @@ namespace fCraft {
             sb.AppendEscaped( LastKickBy ).Append( ',' ); // 34
             sb.AppendEscaped( LastKickReason ).Append( ',' ); // 35
 
-            BannedUntil.ToUnixTimeString(sb); // 36
+            sb.AppendUnixTime( BannedUntil ); // 36
 
-            if (IsFrozen)
-            {
+            if (IsFrozen) {
                 sb.Append(',').Append('f').Append(','); // 37
                 sb.AppendEscaped(FrozenBy).Append(','); // 38
-                FrozenOn.ToUnixTimeString(sb).Append(','); // 39
-            }
-            else
-            {
+                sb.AppendUnixTime( FrozenOn ).Append(','); // 39
+            } else {
                 sb.Append(',', 4); // 37-39
             }
 
             if( MutedUntil > DateTime.UtcNow ) {
-                MutedUntil.ToUnixTimeString( sb ).Append( ',' ); // 40
+                sb.AppendUnixTime( MutedUntil ).Append( ',' ); // 40
                 sb.AppendEscaped( MutedBy ).Append( ',' ); // 41
             } else {
                 sb.Append( ',', 2 ); // 40-41
@@ -1225,7 +1221,7 @@ namespace fCraft {
             if( IsHidden ) sb.Append( 'h' ); // 45
             sb.Append( ',' );
 
-            LastModified.ToUnixTimeString( sb ); // 46
+            sb.AppendUnixTime( LastModified ); // 46
             sb.Append( ',' );
 
             sb.AppendEscaped( DisplayedName ); // 47
@@ -1240,7 +1236,7 @@ namespace fCraft {
             sb.Append((bool)ReadIRC); // 50            
             sb.Append(',');
 
-            sb.Append(PromoCount); //51            
+            sb.Append(PromoCount); //51
             sb.Append(',');
 
             sb.Append(TimesUsedBot); //52
@@ -1267,7 +1263,7 @@ namespace fCraft {
             sb.Append(DemoCount); // 59
             sb.Append(',');
 
-            sb.Append(Mob); // 60            
+            sb.Append(Mob); // 60
             sb.Append(',');
 
             sb.Append(ReachDistance); // 61
@@ -1325,7 +1321,10 @@ namespace fCraft {
 
 
 			sb.Append(',');
-			sb.AppendEscaped(String.Join(", ", Subdivision)); // 82
+			string divs = "";
+			if (Subdivision.Length == 1) divs = Subdivision[0];
+			else if(Subdivision.Length > 1) divs = String.Join(", ", Subdivision);
+			sb.AppendEscaped(divs); // 82
 			sb.Append(',');
 			sb.Append(Accuracy); // 83
 			sb.Append(',');

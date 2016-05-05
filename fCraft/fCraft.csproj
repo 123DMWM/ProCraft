@@ -169,6 +169,7 @@
     <Compile Include="System\Utils\Direction.cs" />
     <Compile Include="System\Utils\Paths.cs" />
     <Compile Include="System\Scheduler.cs" />
+    <Compile Include="System\Utils\StringBuffer.cs" />
     <Compile Include="System\Utils\Updater.cs" />
     <Compile Include="System\Utils\Vector3F.cs" />
     <Compile Include="Commands\CommandDescriptor.cs" />

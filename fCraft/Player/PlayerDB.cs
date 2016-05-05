@@ -305,11 +305,11 @@ namespace fCraft {
                     using( StreamWriter writer = new StreamWriter( fs, Encoding.UTF8, BufferSize ) ) {
                         writer.WriteLine( "{0} {1} {2}", maxID, FormatVersion, Header );
 
-                        StringBuilder sb = new StringBuilder();
+                        StringBuffer sb = new StringBuffer(2048);
                         for( int i = 0; i < listCopy.Length; i++ ) {
                             listCopy[i].Serialize( sb );
-                            writer.WriteLine( sb.ToString() );
-                            sb.Length = 0;
+                            writer.WriteLine( sb.value, 0, sb.length );
+                            sb.length = 0;
                         }
                     }
                 }
