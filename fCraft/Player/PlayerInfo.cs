@@ -160,9 +160,6 @@ namespace fCraft {
         /// where the older account has not signed in before Jan 1 2014. Minmises chance of impersonation. </summary>
         public bool ClassicubeVerified = true;
 
-        public int[] PingList = new int[10];
-
-
         #region Rank
 
         /// <summary> Player's current rank. </summary>

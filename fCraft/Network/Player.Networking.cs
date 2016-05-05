@@ -322,14 +322,14 @@ namespace fCraft {
             int total = 0;
             for( int i = 0; i < 10; i++) {
                 if (i == 9) {
-                    Info.PingList[i] = (int)pingTimer.ElapsedMilliseconds;
+                    PingList[i] = (int)pingTimer.ElapsedMilliseconds;
                 } else {
-                    Info.PingList[i] = Info.PingList[i + 1];
+                    PingList[i] = PingList[i + 1];
                 }
-                total += Info.PingList[i];
+                total += PingList[i];
             }
             if (!IsPlayingCTF) {
-                Message((byte)MessageType.BottomRight3, "&SPing: &f{0}&Sms Avg: &f{1}&Sms", Info.PingList[9], Info.PingList.Average());
+                Message((byte)MessageType.BottomRight3, "&SPing: &f{0}&Sms Avg: &f{1}&Sms", PingList[9], PingList.Average());
             }
             BytesReceived++;
         }

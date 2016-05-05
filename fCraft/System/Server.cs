@@ -780,7 +780,6 @@ namespace fCraft {
 
                 if( IsRunning ) {
                     Logger.Log( LogType.SystemActivity, "Shutdown: Saving databases..." );
-                    var sw = System.Diagnostics.Stopwatch.StartNew();
                     if( PlayerDB.IsLoaded ) PlayerDB.Save();
                     if( IPBanList.IsLoaded ) IPBanList.Save();
                 }

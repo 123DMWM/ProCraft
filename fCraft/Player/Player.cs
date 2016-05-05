@@ -142,6 +142,8 @@ namespace fCraft {
         // BlockDefinitions
         internal int currentBDStep = -1;
         internal BlockDefinition currentBD;
+        
+        public int[] PingList = new int[10];
 
         /// <summary> The world that the player is currently on. May be null.
         /// Use .JoinWorld() to make players teleport to another world. </summary>
