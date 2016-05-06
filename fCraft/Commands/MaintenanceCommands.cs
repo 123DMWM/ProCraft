@@ -617,7 +617,6 @@ namespace fCraft {
                 { "unbanreason",    "&H/SetInfo <PlayerName> UnbanReason <Reason>&n&S" +
                                     "Changes unban reason for the given player. " +
                                     "Original unban reason is preserved in the logs." },
-                                    }
             },
             Usage = "/SetInfo <PlayerName> <Property> <Value>",
             Handler = SetInfoHandler
