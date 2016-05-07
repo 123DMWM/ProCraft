@@ -101,41 +101,35 @@ namespace fCraft.Drawing
         // CIE76 formula for Delta-E, over CIELAB color space
         static double ColorDifference(LabColor color1, LabColor color2)
         {
-            return
-                Math.Sqrt((color2.L - color1.L) * (color2.L - color1.L) * 1.2 +
-                           (color2.a - color1.a) * (color2.a - color1.a) +
-                           (color2.b - color1.b) * (color2.b - color1.b));
+            return (color2.L - color1.L) * (color2.L - color1.L) * 1.2 +
+            	   (color2.a - color1.a) * (color2.a - color1.a) +
+            	   (color2.b - color1.b) * (color2.b - color1.b);
         }
 
 
         // Conversion from RGB to CIELAB, using illuminant D65.
-        static LabColor RgbToLab(RgbColor color, bool adjustContrast)
+        static LabColor RgbToLab(RgbColor col, bool adjustContrast)
         {
             // RGB are assumed to be in [0...255] range
-            double R = color.R / 255d;
-            double G = color.G / 255d;
-            double B = color.B / 255d;
+            double R = col.R / 255d, G = col.G / 255d, B = col.B / 255d;
 
             // CIEXYZ coordinates are normalized to [0...1]
             double x = 0.4124564 * R + 0.3575761 * G + 0.1804375 * B;
             double y = 0.2126729 * R + 0.7151522 * G + 0.0721750 * B;
             double z = 0.0193339 * R + 0.1191920 * G + 0.9503041 * B;
 
-            double xRatio = x / XN;
-            double yRatio = y / YN;
-            double zRatio = z / ZN;
+            x /= XN; y /= YN; z /= ZN;
+            x = XyzToLab(x); y = XyzToLab(y); z = XyzToLab(z);
 
             LabColor result = new LabColor
             {
                 // L is normalized to [0...100]
-                L = 116 * XyzToLab(yRatio) - 16,
-                a = 500 * (XyzToLab(xRatio) - XyzToLab(yRatio)),
-                b = 200 * (XyzToLab(yRatio) - XyzToLab(zRatio))
+                L = 116 * y - 16,
+                a = 500 * (x - y),
+                b = 200 * (y - z)
             };
-            if (adjustContrast)
-            {
-                result.L *= .75;
-            }
+            
+            if (adjustContrast) result.L *= .75;
             return result;
         }
 
@@ -143,13 +137,9 @@ namespace fCraft.Drawing
         static double XyzToLab(double ratio)
         {
             if (ratio > LinearThreshold)
-            {
                 return Math.Pow(ratio, 1 / 3d);
-            }
             else
-            {
                 return LinearMultiplier * ratio + LinearConstant;
-            }
         }
 
 
