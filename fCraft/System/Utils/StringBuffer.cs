@@ -45,6 +45,7 @@ namespace fCraft {
         }
         
         public StringBuffer Append( long num ) {
+            if( num < 0 ) { Append( '-' ); num = -num; }
             int numLen = MakeNum( num );
             CheckAdd( numLen );
             
@@ -64,6 +65,7 @@ namespace fCraft {
         }
         
         public StringBuffer Append( int num ) {
+            if( num < 0 ) { Append( '-' ); num = -num; }
             int numLen = MakeNum( num );
             CheckAdd( numLen );
             
