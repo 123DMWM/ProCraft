@@ -328,74 +328,7 @@ namespace fCraft {
         };
 
         private static void ModelHandler(Player player, CommandReader cmd) {
-            PlayerInfo otherPlayer = InfoCommands.FindPlayerInfo(player, cmd);
-            if (otherPlayer == null) return;
-
-            if (!player.IsStaff && otherPlayer != player.Info) {
-                Rank staffRank = RankManager.GetMinRankWithAnyPermission(Permission.ReadStaffChat);
-                if (staffRank != null) {
-                    player.Message("You must be {0}&s+ to change another players Model", staffRank.ClassyName);
-                } else {
-                    player.Message("No ranks have the ReadStaffChat permission so no one can change other players Model, yell at the owner.");
-                }
-                return;
-            }
-            if (otherPlayer.Rank.Index < player.Info.Rank.Index) {
-                player.Message("Cannot change the Model of someone higher rank than you.");
-                return;
-            }
-            if (otherPlayer == null) {
-                player.Message("Your current Model: &f" + player.Info.Mob);
-                return;
-            }
-            string model = cmd.Next();
-            string scalestr = "";
-            float scale = 0.0f;
-            if (string.IsNullOrEmpty(model)) {
-                player.Message("Current Model for {0}: &f{1}", otherPlayer.Name, otherPlayer.Mob);
-                return;
-            }
-            if (model.Contains('|')) {
-                scalestr = model.Split('|')[1];
-                model = model.Split('|')[0];
-            }
-            if(float.TryParse(scalestr, out scale)) {
-                if (scale < 0.25f) scale = 0.25f;
-                if (scale > 2f) scale = 2f;
-
-            }
-            if (otherPlayer.IsOnline && otherPlayer.Rank.Index >= player.Info.Rank.Index) {
-                if (!validEntities.Contains(model.ToLower()) && !model.ToLower().StartsWith("dev:")) {
-                    byte blockId;
-                    Block block;
-                    if (byte.TryParse(model, out blockId)) {
-                    } else if (Map.GetBlockByName(model, false, out block)) {
-                        model = block.GetHashCode().ToString();
-                    } else {
-                        player.Message("Model not valid, see &h/Help Model&s.");
-                        return;
-                    }
-                }
-                if (model.ToLower().StartsWith("dev:")) {
-                    player.Message("&cBe careful with development models as they could crash others");
-                    model = model.Remove(0, 4);
-                }
-                model = model + (scale == 0 ? "" : "|" + scale.ToString());
-                if (otherPlayer.Mob.ToLower() == model.ToLower()) {
-                    player.Message("&f{0}&s's model is already set to &f{1}", otherPlayer.Name, model);
-                    return;
-                }
-                if (otherPlayer.IsOnline) {
-                    otherPlayer.PlayerObject.Message("&f{0}&shanged your model from &f{1} &sto &f{2}", (otherPlayer.PlayerObject == player ? "&sC" : player.Name + " &sc"), otherPlayer.Mob, model);
-                }
-                if (otherPlayer.PlayerObject != player) {
-                    player.Message("&sChanged model of &f{0} &sfrom &f{1} &sto &f{2}", otherPlayer.Name, otherPlayer.Mob, model);
-                }
-                otherPlayer.oldMob = otherPlayer.Mob;
-                otherPlayer.Mob = model;
-            } else {
-                player.Message("Player not found/online or higher rank than you");
-            }
+            SetModel(player, cmd, "", p => p.Mob, (p, value) => p.Mob = value);
         }
 
         static readonly CommandDescriptor CdAFKModel = new CommandDescriptor {
@@ -410,57 +343,86 @@ namespace fCraft {
         };
 
         private static void AFKModelHandler(Player player, CommandReader cmd) {
-            PlayerInfo otherPlayer = InfoCommands.FindPlayerInfo(player, cmd);
-            if (otherPlayer == null) return;
+            SetModel(player, cmd, "AFK ", 
+                    p => p.PlayerObject.AFKModel, 
+                    (p, value) => p.PlayerObject.AFKModel = value);
+        }
+        
+        static void SetModel(Player player, CommandReader cmd, string prefix,
+                             Func<PlayerInfo, string> getter, Action<PlayerInfo, string> setter) {
+            PlayerInfo target = InfoCommands.FindPlayerInfo(player, cmd);
+            if (target == null) return;
 
-            if (!player.IsStaff && otherPlayer != player.Info) {
+            if (!player.IsStaff && target != player.Info) {
                 Rank staffRank = RankManager.GetMinRankWithAnyPermission(Permission.ReadStaffChat);
                 if (staffRank != null) {
-                    player.Message("You must be {0}&s+ to change another players AFKModel", staffRank.ClassyName);
+                    player.Message("You must be {0}&s+ to change another player's {1}Model", 
+                                  staffRank.ClassyName, prefix);
                 } else {
-                    player.Message("No ranks have the ReadStaffChat permission so no one can change other players AFKModel, yell at the owner.");
+                    player.Message("No ranks have the ReadStaffChat permission," +
+                                  "so no one can change other player's {0}Model, yell at the owner.", prefix);
                 }
                 return;
             }
-            if (otherPlayer.Rank.Index < player.Info.Rank.Index) {
-                player.Message("Cannot change the AFKModel of someone higher rank than you.");
-                return;
+            if (target.Rank.Index < player.Info.Rank.Index) {
+                player.Message("Cannot change the {0}Model of someone higher rank than you.", prefix); return;
             }
-            if (otherPlayer == null) {
-                player.Message("Your current AFK Model: &f" + player.AFKModel);
-                return;
+            if (target != null && !target.IsOnline) {
+                player.Message("Player is not currently online."); return;
             }
-            string model = cmd.Next();
+            if (target == null) {
+               player.Message("Your current {0}Model: &f{1}", prefix, getter(player.Info)); return;
+            }
+            
+            string model = cmd.Next(), scalestr = "";
+            float scale = 0.0f;
             if (string.IsNullOrEmpty(model)) {
-                CdAFKModel.PrintUsage(player);
-                return;
+               player.Message("Current {2}Model for {0}: &f{1}", target.Name, getter(target), prefix); 
+               return;
             }
-            if (otherPlayer != null && otherPlayer.IsOnline && otherPlayer.Rank.Index >= player.Info.Rank.Index) {
-                if (!validEntities.Contains(model.ToLower())) {
-                    byte blockId;
-                    Block block;
-                    if (byte.TryParse(model, out blockId)) {
-                    } else if (Map.GetBlockByName(model, false, out block)) {
-                        model = ((byte)block).ToString();
-                    } else {
-                        player.Message("Model not valid, see &h/Help AFKModel&s.");
-                        return;
-                    }
-                }
-                if (otherPlayer.PlayerObject.AFKModel.ToLower() == model.ToLower()) {
-                    player.Message("&f{0}&s's AFKmodel is already set to &f{1}", otherPlayer.Name, model);
-                    return;
-                }
-                if (otherPlayer.IsOnline) {
-                    otherPlayer.PlayerObject.Message("&f{0}&shanged your AFKmodel from &f{1} &sto &f{2}", (otherPlayer.PlayerObject == player ? "&sC" : player.Name + " &sc"), otherPlayer.PlayerObject.AFKModel, model);
-                }
-                if (otherPlayer.PlayerObject != player) {
-                    player.Message("&sChanged AFKmodel of &f{0} &sfrom &f{1} &sto &f{2}", otherPlayer.Name, otherPlayer.PlayerObject.AFKModel, model);
-                }
-                otherPlayer.PlayerObject.AFKModel = model;
-            } else {
-                player.Message("Player not found/online or lower rank than you");
+            
+            if (model.Contains('|')) {
+                scalestr = model.Split('|')[1];
+                model = model.Split('|')[0];
             }
+            if (float.TryParse(scalestr, out scale)) {
+                if (scale < 0.25f) scale = 0.25f;
+                if (scale > 2f) scale = 2f;
+            }
+            
+            if (!validEntities.Contains(model.ToLower()) && !model.ToLower().StartsWith("dev:")) {
+               byte blockId;
+               Block block;
+               if (byte.TryParse(model, out blockId)) {
+               } else if (Map.GetBlockByName(model, false, out block)) {
+                  model = block.GetHashCode().ToString();
+               } else {
+                  player.Message("Model not valid, see &h/Help {0}Model&s.", prefix.TrimEnd()); 
+                  return;
+               }
+            }
+            
+            if (model.ToLower().StartsWith("dev:")) {
+               player.Message("&cBe careful with development models, as they could crash others.");
+               model = model.Remove(0, 4);
+            }
+            model = model + (scale == 0 ? "" : "|" + scale);
+            if (getter(target).ToLower() == model.ToLower()) {
+               player.Message("&f{0}&s's {0}model is already set to &f{1}", target.Name, model, prefix); 
+               return;
+            }
+            
+            if (target.IsOnline) {
+               target.PlayerObject.Message("&f{0}&shanged your {3}model from &f{1} &sto &f{2}", 
+                                           (target.PlayerObject == player ? "&sC" : player.Name + " &sC"), 
+                                           getter(target), model, prefix);
+            }
+            if (target.PlayerObject != player) {
+               player.Message("&sChanged {3}model of &f{0} &sfrom &f{1} &sto &f{2}", 
+                              target.Name, getter(target), model, prefix);
+            }
+            target.oldMob = target.Mob;
+            setter(target, model);
         }
 
         static readonly CommandDescriptor CdChangeSkin = new CommandDescriptor {
