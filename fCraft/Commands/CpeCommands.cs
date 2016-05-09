@@ -323,12 +323,12 @@ namespace fCraft {
             Usage = "/Model [Player] [Model]",
             IsConsoleSafe = true,
             Help = "Change the Model or Skin of [Player]!&n" +
-            "Valid models: &s [Any Block Name or ID#], Chibi, Chicken, Creeper, Giant, Humanoid, Pig, Sheep, Skeleton, Spider, Zombie",
+            "Valid models: &s[Any Block Name or ID#], Chibi, Chicken, Creeper, Giant, Humanoid, Pig, Sheep, Skeleton, Spider, Zombie",
             Handler = ModelHandler
         };
 
         private static void ModelHandler(Player player, CommandReader cmd) {
-            PlayerInfo otherPlayer = InfoCommands.FindPlayerInfo(player, cmd, cmd.Next() ?? player.Name);
+            PlayerInfo otherPlayer = InfoCommands.FindPlayerInfo(player, cmd);
             if (otherPlayer == null) return;
 
             if (!player.IsStaff && otherPlayer != player.Info) {
@@ -349,12 +349,23 @@ namespace fCraft {
                 return;
             }
             string model = cmd.Next();
+            string scalestr = "";
+            float scale = 0.0f;
             if (string.IsNullOrEmpty(model)) {
                 player.Message("Current Model for {0}: &f{1}", otherPlayer.Name, otherPlayer.Mob);
                 return;
             }
+            if (model.Contains('|')) {
+                scalestr = model.Split('|')[1];
+                model = model.Split('|')[0];
+            }
+            if(float.TryParse(scalestr, out scale)) {
+                if (scale < 0.25f) scale = 0.25f;
+                if (scale > 2f) scale = 2f;
+
+            }
             if (otherPlayer.IsOnline && otherPlayer.Rank.Index >= player.Info.Rank.Index) {
-                if (!validEntities.Contains(model.ToLower())) {
+                if (!validEntities.Contains(model.ToLower()) && !model.ToLower().StartsWith("dev:")) {
                     byte blockId;
                     Block block;
                     if (byte.TryParse(model, out blockId)) {
@@ -365,6 +376,11 @@ namespace fCraft {
                         return;
                     }
                 }
+                if (model.ToLower().StartsWith("dev:")) {
+                    player.Message("&cBe careful with development models as they could crash others");
+                    model = model.Remove(0, 4);
+                }
+                model = model + (scale == 0 ? "" : "|" + scale.ToString());
                 if (otherPlayer.Mob.ToLower() == model.ToLower()) {
                     player.Message("&f{0}&s's model is already set to &f{1}", otherPlayer.Name, model);
                     return;
@@ -378,7 +394,7 @@ namespace fCraft {
                 otherPlayer.oldMob = otherPlayer.Mob;
                 otherPlayer.Mob = model;
             } else {
-                player.Message("Player not found/online or lower rank than you");
+                player.Message("Player not found/online or higher rank than you");
             }
         }
 
@@ -394,7 +410,7 @@ namespace fCraft {
         };
 
         private static void AFKModelHandler(Player player, CommandReader cmd) {
-            PlayerInfo otherPlayer = InfoCommands.FindPlayerInfo(player, cmd, cmd.Next() ?? player.Name);
+            PlayerInfo otherPlayer = InfoCommands.FindPlayerInfo(player, cmd);
             if (otherPlayer == null) return;
 
             if (!player.IsStaff && otherPlayer != player.Info) {
@@ -463,7 +479,10 @@ namespace fCraft {
                 CdChangeSkin.PrintUsage(player);
                 return;
             }
-            string namePart = cmd.Next();
+
+            PlayerInfo p = InfoCommands.FindPlayerInfo(player, cmd);
+            if (p == null) return;
+
             if (!cmd.HasNext) {
                 CdChangeSkin.PrintUsage(player);
                 return;
@@ -480,8 +499,6 @@ namespace fCraft {
                     skinString = string.Format("http://i.imgur.com/{0}.png", skinString.Replace("++", ""));
                 }
             }
-            PlayerInfo p = InfoCommands.FindPlayerInfo(player, cmd, namePart);
-            if (p == null) return;
 
             if (p.skinName == skinString) {
                 player.Message("&f{0}&s's skin is already set to &f{1}", p.Name, skinString);
@@ -513,7 +530,7 @@ namespace fCraft {
         };
 
         static void ClickDistanceHandler(Player player, CommandReader cmd) {
-            PlayerInfo otherPlayer = InfoCommands.FindPlayerInfo(player, cmd, cmd.Next() ?? player.Name);
+            PlayerInfo otherPlayer = InfoCommands.FindPlayerInfo(player, cmd);
             if (otherPlayer == null) return;
 
             if (!player.IsStaff && otherPlayer != player.Info) {
@@ -2037,9 +2054,9 @@ namespace fCraft {
         };
 
         static void HackControlHandler(Player player, CommandReader cmd) {
-            string first = cmd.Next();
 
-            if (first == null || player.Info.Rank != RankManager.HighestRank) {
+            PlayerInfo target = InfoCommands.FindPlayerInfo(player, cmd);
+            if (target == null || player.Info.Rank != RankManager.HighestRank) {
                 player.Message("&sCurrent Hacks for {0}", player.ClassyName);
                 player.Message("    &sFlying: &a{0} &sNoclip: &a{1} &sSpeedhack: &a{2}",
                                 player.Info.AllowFlying.ToString(),
@@ -2052,8 +2069,6 @@ namespace fCraft {
                 return;
             }
 
-            PlayerInfo target = InfoCommands.FindPlayerInfo(player, cmd, first);
-            if (target == null) return;
 
             string hack = (cmd.Next() ?? "null");
             string hackStr = "hack";

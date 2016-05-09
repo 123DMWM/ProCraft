@@ -141,7 +141,7 @@ namespace fCraft {
 
         static void InfoHandler( Player player, CommandReader cmd ) {
             if( player == null ) throw new ArgumentNullException( "player" );
-            PlayerInfo info = FindPlayerInfo(player, cmd, "");
+            PlayerInfo info = FindPlayerInfo(player, cmd);
             if (info == null) return;
             Player target = info.PlayerObject;
 
@@ -1935,7 +1935,7 @@ namespace fCraft {
 
         private static void ExtraInfoHandler(Player player, CommandReader cmd) {
             if (player == null) throw new ArgumentNullException("player");
-			PlayerInfo info = FindPlayerInfo(player, cmd, "");
+			PlayerInfo info = FindPlayerInfo(player, cmd);
             if (info == null) return;
             Player target = info.PlayerObject;
 
@@ -1988,7 +1988,7 @@ namespace fCraft {
 			if (!player.Can(Permission.ViewPlayerIPs)) { 
 				info = player.Info;
 			} else {
-				info = FindPlayerInfo(player, cmd, "");
+				info = FindPlayerInfo(player, cmd);
 			}
             if (info == null) return;
 			if (info.GeoIP != info.LastIP.ToString() || info.Accuracy == 0) {
@@ -2199,7 +2199,7 @@ namespace fCraft {
         };
 
         static void SeenHandler(Player player, CommandReader cmd) {
-			PlayerInfo info = FindPlayerInfo(player, cmd, "");
+			PlayerInfo info = FindPlayerInfo(player, cmd);
             if (info == null) return;
             Player target = info.PlayerObject;
 
@@ -2311,24 +2311,21 @@ namespace fCraft {
 
         #endregion
         #region FindPlayerInfo
-        public static PlayerInfo FindPlayerInfo(Player player, CommandReader cmd, [CanBeNull] String cname) {
-			string name = null;
-			if (cname != "") {
-				name = cname;
-			} else {
-				name = cmd.Next();
-			}
-            if (name == null) {
+        public static PlayerInfo FindPlayerInfo(Player player, CommandReader cmd) {
+			string name = cmd.Next();
+
+            if (string.IsNullOrEmpty(name)) {
                 // no name given, print own info
                 return player.Info;
-
             }
-            if (name.Equals(player.Name, StringComparison.OrdinalIgnoreCase)) {
+
+            if (name.ToLower().Equals(player.Name.ToLower())) {
                 // own name given
                 player.LastUsedPlayerName = player.Name;
                 return player.Info;
 
             }
+
             if (!player.Can(Permission.ViewOthersInfo)) {
                 // someone else's name or IP given, permission required.
                 player.MessageNoAccess(Permission.ViewOthersInfo);
