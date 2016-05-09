@@ -15,6 +15,7 @@ namespace fCraft {
         }
         
         public StringBuffer Append( string s ) {
+            if (s == null) return this;
             CheckAdd( s.Length );
             for( int i = 0; i < s.Length; i++ )
                 value[length++] = s[i];
@@ -38,12 +39,9 @@ namespace fCraft {
             return Append( value ? "True" : "False" );
         }
         
-        public StringBuffer Append( double value ) {
-        	return Append( value.ToString() );
-        }
-        
         public StringBuffer Append( object value ) {
-        	return Append( value.ToString() );
+            if (value == null) return this;
+            return Append( value.ToString() );
         }
         
         public StringBuffer Append( long num ) {

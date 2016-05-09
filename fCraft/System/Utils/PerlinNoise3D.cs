@@ -108,15 +108,15 @@ namespace fCraft {
 
 
         private float Noise( float x, float y, float z ) {
+            int xF = x >= 0 ? (int)x : (int)x - 1; // Floor the values
+            int yF = y >= 0 ? (int)y : (int)y - 1;
+            int zF = z >= 0 ? (int)z : (int)z - 1;
+            
             // Find unit cube that contains point
-            int iX = (int)Math.Floor( x ) & 255;
-            int iY = (int)Math.Floor( y ) & 255;
-            int iZ = (int)Math.Floor( z ) & 255;
+            int iX = xF & 255, iY = yF & 255, iZ = zF & 255;
 
             // Find relative x, y, z of the point in the cube.
-            x -= (float)Math.Floor( x );
-            y -= (float)Math.Floor( y );
-            z -= (float)Math.Floor( z );
+            x -= xF; y -= yF; z -= zF;
 
             // Compute fade curves for each of x, y, z
             float u = Fade( x );
@@ -124,12 +124,8 @@ namespace fCraft {
             float w = Fade( z );
 
             // Hash coordinates of the 8 cube corners
-            int a = p[iX] + iY;
-            int aa = p[a] + iZ;
-            int ab = p[a + 1] + iZ;
-            int b = p[iX + 1] + iY;
-            int ba = p[b] + iZ;
-            int bb = p[b + 1] + iZ;
+            int a = p[iX] + iY, aa = p[a] + iZ, ab = p[a + 1] + iZ;
+            int b = p[iX + 1] + iY, ba = p[b] + iZ, bb = p[b + 1] + iZ;
 
             // And add blended results from 8 corners of cube.
             return Lerp( w, Lerp( v, Lerp( u, Grad( p[aa], x, y, z ),
@@ -157,10 +153,25 @@ namespace fCraft {
 
         private static float Grad( int hashCode, float x, float y, float z ) {
             // Convert lower 4 bits of hash code into 12 gradient directions
-            int h = hashCode & 15;
-            float u = h < 8 ? x : y;
-            float v = h < 4 ? y : h == 12 || h == 14 ? x : z;
-            return (((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v));
+            switch( hashCode & 0xF ) {
+                case 0x0: return  x + y;
+                case 0x1: return -x + y;
+                case 0x2: return  x - y;
+                case 0x3: return -x - y;
+                case 0x4: return  x + z;
+                case 0x5: return -x + z;
+                case 0x6: return  x - z;
+                case 0x7: return -x - z;
+                case 0x8: return  y + z;
+                case 0x9: return -y + z;
+                case 0xA: return  y - z;
+                case 0xB: return -y - z;
+                case 0xC: return  y + x;
+                case 0xD: return -y + z;
+                case 0xE: return  y - x;
+                case 0xF: return -y - z;
+                default: return 0; // never happens
+            }
         }
 
         #endregion

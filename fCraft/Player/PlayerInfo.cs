@@ -274,12 +274,6 @@ namespace fCraft {
         /// <summary> Number of bans issued by this player. </summary>
         public int TimesBannedOthers;
 
-        /// <summary> How much money the player has donated to the server. </summary>
-        public double Donated { get; set; }
-
-        /// <summary> How Many Blocks player has placed this session. </summary>
-        public bool SecurityTrip { get; set; }
-
         #endregion
 
 
@@ -646,12 +640,7 @@ namespace fCraft {
             }
             if (count > 49)
             {
-                double donatedammount;
-                if (Double.TryParse(fields[49], out donatedammount))
-                {
-                    info.Donated = donatedammount;
-                }
-                else info.Donated = 0;
+                //Double.TryParse(fields[49], out info.DonatedAmount);
             }
             if (count > 50)
             {
@@ -1214,7 +1203,7 @@ namespace fCraft {
             sb.Append( (byte)AccountType ); // 48
             sb.Append(',');
 
-            sb.Append((double)Donated); // 49
+            sb.Append(""); // 49, donated
             sb.Append(',');
 
             sb.Append((bool)ReadIRC); // 50            
@@ -1226,7 +1215,7 @@ namespace fCraft {
             sb.Append(TimesUsedBot); //52
             sb.Append(',');
 
-            sb.Append(""); //53
+            sb.Append(""); //53, times used useless
             sb.Append(',');
 
             sb.Append(HasRTR); //54

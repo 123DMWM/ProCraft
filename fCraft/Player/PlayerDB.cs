@@ -45,7 +45,7 @@ namespace fCraft {
                               "TimesBannedOthers,ID,RankChangeType,LastKickDate,LastSeen,BlocksDrawn," +
                               "LastKickBy,LastKickReason,BannedUntil,IsFrozen,FrozenBy,FrozenOn,MutedUntil,MutedBy," +
                               "Password,IsOnline,BandwidthUseMode,IsHidden,LastModified,DisplayedName,AccountType," +
-                              "DonatedAmmount,ReadIRC,PromoCount,TimesUseLeBot,TimesUsedUseless,HasRTR,TPDeny,JoinOnRankWorld" + 
+                              "UNUSED,ReadIRC,PromoCount,TimesUseLeBot,UNUSED,HasRTR,TPDeny,JoinOnRankWorld" + 
                               "LastWorld, LastWorldPos, DemoCount";
 
 

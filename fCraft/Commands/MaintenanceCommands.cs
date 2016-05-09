@@ -617,10 +617,6 @@ namespace fCraft {
                 { "unbanreason",    "&H/SetInfo <PlayerName> UnbanReason <Reason>&n&S" +
                                     "Changes unban reason for the given player. " +
                                     "Original unban reason is preserved in the logs." },
-                { "donatedammount", "&H/Setinfo <PlayerName> DonatedAmmount <Ammount>&n" +
-                                    "&SChanges the ammount a player has donated to the server.&n" +
-                                    "&SThis is only usable via Console."
-                                    }
             },
             Usage = "/SetInfo <PlayerName> <Property> <Value>",
             Handler = SetInfoHandler
@@ -717,29 +713,6 @@ namespace fCraft {
                         break;
                     } else {
                         player.Message( "SetInfo: Could not parse value given for TotalTime." );
-                        return;
-                    }
-
-                case "donatedammount":
-                case "da":
-                    if (player != Player.Console) {
-                        player.Message("&WYou are not able to Set a players Donated Ammount.");
-                        return;
-                    }
-                    double old = info.Donated;
-                    double result;
-                    bool parsed = Double.TryParse(valName, out result);
-                    if (parsed) {
-                        info.Donated = result;
-                        player.Message("SetInfo: DonatedAmmount for {0}&S changed from {1} to {2}",
-                                        info.ClassyName,
-                                        old.ToString(),
-                                        info.Donated.ToString());
-                        break;
-                    }
-                    else
-                    {
-                        player.Message("SetInfo: Could not parse value given for DonatedAmmount.");
                         return;
                     }
 
