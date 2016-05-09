@@ -956,6 +956,8 @@ namespace fCraft {
                 Player player = tempPlayerList[i];
 
 				if (player.Supports(CpeExt.MessageType)) {
+                    //double speed = (Math.Sqrt(player.Position.DistanceSquaredTo(player.lastSolidPos)) / 32);
+                    //player.Send(Packet.Message((byte)MessageType.Announcement, string.Format("&eSpeed: &f{0:N2} &eBlocks/s", speed), player.UseFallbackColors));
                     string bottomRight2 = player.Position.ToBlockCoordsExt() + "&s[" + compassString(player.Position.R) + "&s]";
                     if (bottomRight2 != player.lastBottomRight2) {
                         player.lastBottomRight2 = bottomRight2;

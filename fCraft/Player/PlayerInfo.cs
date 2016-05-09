@@ -20,10 +20,14 @@ namespace fCraft {
         public string ClassyName {
             get {
                 StringBuilder sb = new StringBuilder();
-                if( ConfigKey.RankColorsInChat.Enabled() ) {
+                string newPlayer = (TimeSinceFirstLogin <= TimeSpan.FromDays(1) ? "&2+&f" : "");
+                if (!string.IsNullOrEmpty(newPlayer)) {
+                    sb.Append(newPlayer);
+                }
+                if ( ConfigKey.RankColorsInChat.Enabled() ) {
                     sb.Append( Rank.Color );
                 }
-                if( DisplayedName != null ) {
+                if ( DisplayedName != null ) {
                     sb.Append( DisplayedName );
                 } else {
                     if( ConfigKey.RankPrefixesInChat.Enabled() ) {
