@@ -388,7 +388,7 @@ namespace fCraft {
             IsConsoleSafe = false,
             Help = "Sets the properties for /Write, such as: font and size",
             Handler = SetFontHandler,
-            Usage = "/SetFont < Font | Size | Reset > <Variable>"
+            Usage = "/SetFont < Font | Size | Reset | Style> <Variable>"
         };
 
         static void SetFontHandler(Player player, CommandReader cmd) {
@@ -415,6 +415,20 @@ namespace fCraft {
                     player.font = new System.Drawing.Font(player.font.FontFamily, size);
                 } else {
                     player.Message("&WInvalid size, use /SetFont Size FontSize. Example: /SetFont Size 14");
+                }
+            } else if (arg.ToLower() == "style") {
+                string style = cmd.Next();
+                if (style == null) {
+                    CdSetFont.PrintUsage(player);
+                } else if (style.ToLower() == "italic") {
+                    player.font = new System.Drawing.Font(player.font, FontStyle.Italic);
+                    player.Message("SetFont: Style set to Italic ({0})", player.font.FontFamily.Name);
+                } else if (style.ToLower() == "bold") {
+                    player.font = new System.Drawing.Font(player.font, FontStyle.Bold);
+                    player.Message("SetFont: Style set to Bold ({0})", player.font.FontFamily.Name);
+                } else if (style.ToLower() == "regular") {
+                    player.font = new System.Drawing.Font(player.font, FontStyle.Regular);
+                    player.Message("SetFont: Style set to Regular ({0})", player.font.FontFamily.Name);
                 }
             } else {
                 CdSetFont.PrintUsage(player);
