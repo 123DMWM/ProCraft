@@ -1339,7 +1339,7 @@ namespace fCraft {
                 case "texture":
                 case "terrain":
                     p.Message("Terrain IDs: &9http://123dmwm.tk/ID-Overlay.png");
-                    p.Message("Current world terrain: &9{0}", p.World.Texture == "Default" ? Server.DefaultTerrain : p.World.Texture);
+                    p.Message("Current world terrain: &9{0}", p.World.Texture.ToLower().Equals("default") ? Server.DefaultTerrain : p.World.Texture);
                     break;
                 default:
                     if (p.currentBD != null) {
@@ -2301,7 +2301,7 @@ namespace fCraft {
             if (player.World != null && !string.IsNullOrEmpty(player.World.Texture)) {
                 player.Message("This world uses a custom texture pack");
                 player.Message("A preview can be found here: ");
-                player.Message("  " + (player.World.Texture == "Default" ? Server.DefaultTerrain : player.World.Texture));
+                player.Message("  " + (player.World.Texture.ToLower().Equals("default") ? Server.DefaultTerrain : player.World.Texture));
             } else {
                 player.Message("You are not in a world with a custom texturepack.");
             }

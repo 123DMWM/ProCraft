@@ -977,7 +977,7 @@ namespace fCraft {
         public string Texture = "default";
 
         public string GetTexture() {
-            return Texture.ToLower() == "default" ? Server.DefaultTerrain : Texture;
+            return Texture.ToLower().Equals("default") ? Server.DefaultTerrain : Texture;
         }
 
         /// <summary> The current weather in this world. </summary>
