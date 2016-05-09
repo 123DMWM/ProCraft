@@ -86,9 +86,9 @@ namespace fCraft {
                     player.Message("Max uppercase letters reached. Message set to lowercase");
                 }
             }
-            if (player.Info.ChatRainbows) {
+            if (player.ChatRainbows) {
                 rawMessage = Rainbow.Rainbowize(rawMessage);
-            } else if (player.Info.ChatBWRainbows) {
+            } else if (player.ChatBWRainbows) {
                 rawMessage = Rainbow.BWRainbowize(rawMessage);
             }
 

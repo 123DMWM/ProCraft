@@ -399,15 +399,6 @@ namespace fCraft {
         /// <summary> Control player jump height using HackControl packet. </summary>
         public short JumpHeight = 40;
 
-        /// <summary> Whether when placing tnt explodes or not. </summary>
-        public bool BlowTNT;
-
-        /// <summary> Whether the player's chat is rainbow. </summary>
-		public bool ChatRainbows;
-
-		/// <summary> Whether the player's chat is bwrainbow. </summary>
-		public bool ChatBWRainbows;
-
         /// <summary> Whether player has read the rules or not.</summary>
         public bool HasRTR;
 

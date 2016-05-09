@@ -126,7 +126,13 @@ namespace fCraft {
         public double BlocksPlacedDeletedMixed { get; set; }
 
         /// <summary> The Time that has passed since the last block change.</summary>
-        public DateTime TimeLastBlockChange { get; set; }
+        public DateTime TimeLastBlockChange { get; set; }        
+
+        /// <summary> Whether the player's chat is rainbow. </summary>
+        public bool ChatRainbows;
+
+		/// <summary> Whether the player's chat is bwrainbow. </summary>
+        public bool ChatBWRainbows;
 
         //Portals
         public bool StandingInPortal = false;
