@@ -674,6 +674,15 @@ namespace fCraft {
                 case ConfigKey.DefaultTerrain:
                     Server.DefaultTerrain = key.GetString();
                     break;
+
+                case ConfigKey.NewPlayerPrefix:
+                    char prefix;
+                    if (char.TryParse(key.GetString(), out prefix) && (prefix < 256 && prefix >= 0)) {
+                        Chat.newPlayerPrefix = prefix;
+                    } else {
+                        Chat.newPlayerPrefix = '+';
+                    }
+                    break;
             }
         }
 

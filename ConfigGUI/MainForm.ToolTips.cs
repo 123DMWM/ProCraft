@@ -80,8 +80,6 @@ You can use any color codes, and these special variables:
 
             toolTip.SetToolTip( xRankPrefixesInChat, ConfigKey.RankPrefixesInChat.GetDescription() );
 
-            toolTip.SetToolTip( xRankPrefixesInList, ConfigKey.RankPrefixesInList.GetDescription() );
-
             toolTip.SetToolTip( xShowConnectionMessages, ConfigKey.ShowConnectionMessages.GetDescription() );
 
             toolTip.SetToolTip( xShowJoinedWorldMessages, ConfigKey.ShowJoinedWorldMessages.GetDescription() );

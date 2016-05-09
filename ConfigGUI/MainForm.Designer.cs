@@ -32,11 +32,12 @@ namespace fCraft.ConfigGUI {
         private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             this.tabs = new System.Windows.Forms.TabControl();
             this.tabGeneral = new System.Windows.Forms.TabPage();
             this.gHeartbeatUrl = new System.Windows.Forms.GroupBox();
+            this.xUptime = new System.Windows.Forms.CheckBox();
             this.lHeartbeatUrlWarning = new System.Windows.Forms.Label();
             this.cHeartbeatUrl = new System.Windows.Forms.ComboBox();
             this.lHeartbeatUrl = new System.Windows.Forms.Label();
@@ -88,10 +89,12 @@ namespace fCraft.ConfigGUI {
             this.xShowConnectionMessages = new System.Windows.Forms.CheckBox();
             this.xShowJoinedWorldMessages = new System.Windows.Forms.CheckBox();
             this.xRankColorsInWorldNames = new System.Windows.Forms.CheckBox();
-            this.xRankPrefixesInList = new System.Windows.Forms.CheckBox();
             this.xRankPrefixesInChat = new System.Windows.Forms.CheckBox();
             this.xRankColorsInChat = new System.Windows.Forms.CheckBox();
+            this.chatPreview = new fCraft.ConfigGUI.ChatPreview();
             this.tabWorlds = new System.Windows.Forms.TabPage();
+            this.tDefaultTerrain = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
             this.xWoMEnableEnvExtensions = new System.Windows.Forms.CheckBox();
             this.bMapPath = new System.Windows.Forms.Button();
             this.xMapPath = new System.Windows.Forms.CheckBox();
@@ -287,10 +290,8 @@ namespace fCraft.ConfigGUI {
             this.bResetAll = new System.Windows.Forms.Button();
             this.bApply = new System.Windows.Forms.Button();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.xUptime = new System.Windows.Forms.CheckBox();
-            this.chatPreview = new fCraft.ConfigGUI.ChatPreview();
-            this.label1 = new System.Windows.Forms.Label();
-            this.tDefaultTerrain = new System.Windows.Forms.TextBox();
+            this.tNewPlayerPrefix = new System.Windows.Forms.TextBox();
+            this.lNewPlayerPrefix = new System.Windows.Forms.Label();
             this.tabs.SuspendLayout();
             this.tabGeneral.SuspendLayout();
             this.gHeartbeatUrl.SuspendLayout();
@@ -401,6 +402,16 @@ namespace fCraft.ConfigGUI {
             this.gHeartbeatUrl.TabIndex = 6;
             this.gHeartbeatUrl.TabStop = false;
             this.gHeartbeatUrl.Text = "Heartbeat Service Provider";
+            // 
+            // xUptime
+            // 
+            this.xUptime.AutoSize = true;
+            this.xUptime.Location = new System.Drawing.Point(24, 48);
+            this.xUptime.Name = "xUptime";
+            this.xUptime.Size = new System.Drawing.Size(100, 19);
+            this.xUptime.TabIndex = 3;
+            this.xUptime.Text = "Show Uptime";
+            this.xUptime.UseVisualStyleBackColor = true;
             // 
             // lHeartbeatUrlWarning
             // 
@@ -979,10 +990,11 @@ namespace fCraft.ConfigGUI {
             // 
             // gAppearence
             // 
+            this.gAppearence.Controls.Add(this.tNewPlayerPrefix);
+            this.gAppearence.Controls.Add(this.lNewPlayerPrefix);
             this.gAppearence.Controls.Add(this.xShowConnectionMessages);
             this.gAppearence.Controls.Add(this.xShowJoinedWorldMessages);
             this.gAppearence.Controls.Add(this.xRankColorsInWorldNames);
-            this.gAppearence.Controls.Add(this.xRankPrefixesInList);
             this.gAppearence.Controls.Add(this.xRankPrefixesInChat);
             this.gAppearence.Controls.Add(this.xRankColorsInChat);
             this.gAppearence.Location = new System.Drawing.Point(7, 153);
@@ -1022,16 +1034,6 @@ namespace fCraft.ConfigGUI {
             this.xRankColorsInWorldNames.Text = "Color world names based on build rank.";
             this.xRankColorsInWorldNames.UseVisualStyleBackColor = true;
             // 
-            // xRankPrefixesInList
-            // 
-            this.xRankPrefixesInList.AutoSize = true;
-            this.xRankPrefixesInList.Location = new System.Drawing.Point(44, 70);
-            this.xRankPrefixesInList.Name = "xRankPrefixesInList";
-            this.xRankPrefixesInList.Size = new System.Drawing.Size(219, 19);
-            this.xRankPrefixesInList.TabIndex = 2;
-            this.xRankPrefixesInList.Text = "Prefixes in player list (breaks skins).";
-            this.xRankPrefixesInList.UseVisualStyleBackColor = true;
-            // 
             // xRankPrefixesInChat
             // 
             this.xRankPrefixesInChat.AutoSize = true;
@@ -1052,6 +1054,14 @@ namespace fCraft.ConfigGUI {
             this.xRankColorsInChat.TabIndex = 0;
             this.xRankColorsInChat.Text = "Show rank colors.";
             this.xRankColorsInChat.UseVisualStyleBackColor = true;
+            // 
+            // chatPreview
+            // 
+            this.chatPreview.Location = new System.Drawing.Point(7, 256);
+            this.chatPreview.Margin = new System.Windows.Forms.Padding(4);
+            this.chatPreview.Name = "chatPreview";
+            this.chatPreview.Size = new System.Drawing.Size(637, 241);
+            this.chatPreview.TabIndex = 2;
             // 
             // tabWorlds
             // 
@@ -1076,6 +1086,23 @@ namespace fCraft.ConfigGUI {
             this.tabWorlds.TabIndex = 9;
             this.tabWorlds.Text = "Worlds";
             this.tabWorlds.UseVisualStyleBackColor = true;
+            // 
+            // tDefaultTerrain
+            // 
+            this.tDefaultTerrain.Location = new System.Drawing.Point(97, 455);
+            this.tDefaultTerrain.Name = "tDefaultTerrain";
+            this.tDefaultTerrain.Size = new System.Drawing.Size(547, 21);
+            this.tDefaultTerrain.TabIndex = 24;
+            this.tDefaultTerrain.Text = "http://123dmwm.tk/terrain/64xDefault.png";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(5, 458);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(88, 15);
+            this.label1.TabIndex = 23;
+            this.label1.Text = "Default Terrain";
             // 
             // xWoMEnableEnvExtensions
             // 
@@ -1217,8 +1244,8 @@ namespace fCraft.ConfigGUI {
             this.dgvWorlds.MultiSelect = false;
             this.dgvWorlds.Name = "dgvWorlds";
             this.dgvWorlds.RowHeadersVisible = false;
-            dataGridViewCellStyle6.Padding = new System.Windows.Forms.Padding(0, 1, 0, 1);
-            this.dgvWorlds.RowsDefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle4.Padding = new System.Windows.Forms.Padding(0, 1, 0, 1);
+            this.dgvWorlds.RowsDefaultCellStyle = dataGridViewCellStyle4;
             this.dgvWorlds.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dgvWorlds.Size = new System.Drawing.Size(636, 325);
             this.dgvWorlds.TabIndex = 0;
@@ -1276,8 +1303,8 @@ namespace fCraft.ConfigGUI {
             // dgvcBlockDB
             // 
             this.dgvcBlockDB.DataPropertyName = "BlockDBEnabled";
-            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.dgvcBlockDB.DefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.dgvcBlockDB.DefaultCellStyle = dataGridViewCellStyle3;
             this.dgvcBlockDB.HeaderText = "BlockDB";
             this.dgvcBlockDB.Name = "dgvcBlockDB";
             this.dgvcBlockDB.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
@@ -3369,40 +3396,22 @@ namespace fCraft.ConfigGUI {
             this.toolTip.IsBalloon = true;
             this.toolTip.ReshowDelay = 100;
             // 
-            // xUptime
+            // tNewPlayerPrefix
             // 
-            this.xUptime.AutoSize = true;
-            this.xUptime.Location = new System.Drawing.Point(24, 48);
-            this.xUptime.Name = "xUptime";
-            this.xUptime.Size = new System.Drawing.Size(100, 19);
-            this.xUptime.TabIndex = 3;
-            this.xUptime.Text = "Show Uptime";
-            this.xUptime.UseVisualStyleBackColor = true;
+            this.tNewPlayerPrefix.Location = new System.Drawing.Point(25, 68);
+            this.tNewPlayerPrefix.MaxLength = 1;
+            this.tNewPlayerPrefix.Name = "tNewPlayerPrefix";
+            this.tNewPlayerPrefix.Size = new System.Drawing.Size(35, 21);
+            this.tNewPlayerPrefix.TabIndex = 7;
             // 
-            // chatPreview
+            // lNewPlayerPrefix
             // 
-            this.chatPreview.Location = new System.Drawing.Point(7, 256);
-            this.chatPreview.Margin = new System.Windows.Forms.Padding(4);
-            this.chatPreview.Name = "chatPreview";
-            this.chatPreview.Size = new System.Drawing.Size(637, 241);
-            this.chatPreview.TabIndex = 2;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(5, 458);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(88, 15);
-            this.label1.TabIndex = 23;
-            this.label1.Text = "Default Terrain";
-            // 
-            // tDefaultTerrain
-            // 
-            this.tDefaultTerrain.Location = new System.Drawing.Point(97, 455);
-            this.tDefaultTerrain.Name = "tDefaultTerrain";
-            this.tDefaultTerrain.Size = new System.Drawing.Size(547, 21);
-            this.tDefaultTerrain.TabIndex = 24;
-            this.tDefaultTerrain.Text = "http://123dmwm.tk/terrain/64xDefault.png";
+            this.lNewPlayerPrefix.AutoSize = true;
+            this.lNewPlayerPrefix.Location = new System.Drawing.Point(66, 71);
+            this.lNewPlayerPrefix.Name = "lNewPlayerPrefix";
+            this.lNewPlayerPrefix.Size = new System.Drawing.Size(220, 15);
+            this.lNewPlayerPrefix.TabIndex = 6;
+            this.lNewPlayerPrefix.Text = "Prefix for less than 24 hour new players";
             // 
             // MainForm
             // 
@@ -3694,7 +3703,6 @@ namespace fCraft.ConfigGUI {
         private Button bColorSay;
         private Button bColorHelp;
         private Button bColorSys;
-        private CheckBox xRankPrefixesInList;
         private CheckBox xRankPrefixesInChat;
         private CheckBox xRankColorsInChat;
         private Label lColorSay;
@@ -3767,5 +3775,7 @@ namespace fCraft.ConfigGUI {
         private CheckBox xUptime;
         private TextBox tDefaultTerrain;
         private Label label1;
+        private TextBox tNewPlayerPrefix;
+        private Label lNewPlayerPrefix;
     }
 }

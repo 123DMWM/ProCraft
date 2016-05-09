@@ -149,7 +149,6 @@ namespace fCraft.ConfigGUI {
         void ApplyTabChat() {
             xRankColorsInChat.Checked = ConfigKey.RankColorsInChat.Enabled();
             xRankPrefixesInChat.Checked = ConfigKey.RankPrefixesInChat.Enabled();
-            xRankPrefixesInList.Checked = ConfigKey.RankPrefixesInList.Enabled();
             xRankColorsInWorldNames.Checked = ConfigKey.RankColorsInWorldNames.Enabled();
             xShowJoinedWorldMessages.Checked = ConfigKey.ShowJoinedWorldMessages.Enabled();
             xShowConnectionMessages.Checked = ConfigKey.ShowConnectionMessages.Enabled();
@@ -181,6 +180,8 @@ namespace fCraft.ConfigGUI {
             colorMe = ParseToIndex( ConfigKey.MeColor.GetString() );
             ApplyColor( bColorMe, colorMe );
             Color.Me = Parse( colorMe );
+
+            tNewPlayerPrefix.Text = ConfigKey.NewPlayerPrefix.GetString();
 
             UpdateChatPreview();
         }
@@ -478,12 +479,11 @@ namespace fCraft.ConfigGUI {
             ConfigKey.RankColorsInWorldNames.TrySetValue( xRankColorsInWorldNames.Checked );
             ConfigKey.RankColorsInChat.TrySetValue( xRankColorsInChat.Checked );
             ConfigKey.RankPrefixesInChat.TrySetValue( xRankPrefixesInChat.Checked );
-            ConfigKey.RankPrefixesInList.TrySetValue( xRankPrefixesInList.Checked );
-            ConfigKey.ShowConnectionMessages.TrySetValue( xShowConnectionMessages.Checked );
+            ConfigKey.NewPlayerPrefix.TrySetValue( tNewPlayerPrefix.Text );
 
 
             // Worlds
-            if( cDefaultBuildRank.SelectedIndex == 0 ) {
+            if ( cDefaultBuildRank.SelectedIndex == 0 ) {
                 ConfigKey.DefaultBuildRank.TrySetValue( "" );
             } else {
                 ConfigKey.DefaultBuildRank.TrySetValue( RankManager.DefaultBuildRank.FullName );

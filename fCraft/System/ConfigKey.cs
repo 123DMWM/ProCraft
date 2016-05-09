@@ -102,11 +102,6 @@ This config key is added in case alternative login/heartbeat services arise.")]
 used to set up IRC-style ""+"" and ""@"" prefixes for ops." )]
         RankPrefixesInChat,
 
-        [BoolKey( ConfigSection.Chat, false,
-@"Show prefixes in the player list. As a side-effect, Minecraft client
-will not show custom skins for players with prefixed names." )]
-        RankPrefixesInList,
-
         [BoolKey( ConfigSection.Chat, true,
 @"Announce players joining or leaving the server in chat." )]
         ShowConnectionMessages,
@@ -169,6 +164,10 @@ make sure to move the map files before starting the server again." )]
         [StringKey(ConfigSection.Worlds, "http://123dmwm.tk/terrain/64xDefault.png",
 @"Custom URL for world terrain")]
         DefaultTerrain,
+
+        [StringKey(ConfigSection.Chat, "+",
+@"Custom prefix for players who have first joined int he last 24 hours")]
+        NewPlayerPrefix,
 
         #endregion
 

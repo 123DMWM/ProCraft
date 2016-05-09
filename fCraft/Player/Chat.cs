@@ -14,6 +14,7 @@ namespace fCraft {
     public static class Chat
     {
         static readonly Regex RegexIPMatcher = new Regex(@"\d{1,3}(\.\d{1,3}){3}(:?(\d{0,5})?)");
+        public static char newPlayerPrefix = '+';
         #region Filters/Reports
         public static List<Filter> Filters = new List<Filter>();
         public static List<Report> Reports = new List<Report>();
