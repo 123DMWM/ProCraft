@@ -391,111 +391,84 @@ namespace fCraft {
             Usage = "/SetFont < Font | Size | Reset > <Variable>"
         };
 
-        static void SetFontHandler(Player player, CommandReader cmd)
-        {
-            string Param = cmd.Next();
-            if (Param == null)
-            {
-                CdSetFont.PrintUsage(player);
-                return;
+        static void SetFontHandler(Player player, CommandReader cmd) {
+            string arg = cmd.Next();
+            if (arg == null) {
+                CdSetFont.PrintUsage(player); return;
             }
-            if (Param.ToLower() == "reset")
-            {
+            
+            if (arg.ToLower() == "reset") {
                 player.font = new Font("Times New Roman", 20, FontStyle.Regular);
                 player.Message("SetFont: Font reverted back to default ({0} size {1})",
                     player.font.FontFamily.Name, player.font.Size);
-                return;
-            }
-            if (Param.ToLower() == "font")
-            {
-                string sectionName = cmd.NextAll();
-                if (!Directory.Exists(Paths.FontsPath))
-                {
-                    Directory.CreateDirectory(Paths.FontsPath);
-                    player.Message("There are no fonts available for this server. Font is set to default: {0}", player.font.FontFamily.Name);
-                    return;
-                }
-                string fontFileName = null;
-                string[] sectionFiles = Directory.GetFiles(Paths.FontsPath, "*.ttf", SearchOption.TopDirectoryOnly);
-                if (sectionName.Length < 1)
-                {
-                    var sectionList = GetFontSectionList();
-                    player.Message("{0} fonts Available: {1}", sectionList.Length, sectionList.JoinToString()); //print the folder contents
-                    return;
-                }
-                for (int i = 0; i < sectionFiles.Length; i++)
-                {
-                    string sectionFullName = System.IO.Path.GetFileNameWithoutExtension(sectionFiles[i]);
-                    if (sectionFullName == null) continue;
-                    if (sectionFullName.StartsWith(sectionName, StringComparison.OrdinalIgnoreCase))
-                    {
-                        if (sectionFullName.Equals(sectionName, StringComparison.OrdinalIgnoreCase))
-                        {
-                            fontFileName = sectionFiles[i];
-                            break;
-                        }
-                        else if (fontFileName == null)
-                        {
-                            fontFileName = sectionFiles[i];
-                        }
-                        else
-                        {
-                            var matches = sectionFiles.Select(f => System.IO.Path.GetFileNameWithoutExtension(f))
-                                                      .Where(sn => sn != null && sn.StartsWith(sectionName, StringComparison.OrdinalIgnoreCase));
-                            player.Message("Multiple font files matched \"{0}\": {1}",
-                                            sectionName, matches.JoinToString());
-                            return;
-                        }
-                    }
-                }
-                if (fontFileName != null)
-                {
-                    string sectionFullName = System.IO.Path.GetFileNameWithoutExtension(fontFileName);
-                    player.Message("Your font has changed to \"{0}\":", sectionFullName);
-                    //change font here
-                    player.font = new System.Drawing.Font(player.LoadFontFamily(fontFileName), player.font.Size);
-                    return;
-                }
-                else
-                {
-                    var sectionList = GetFontSectionList();
-                    if (sectionList == null)
-                    {
-                        player.Message("No fonts have been found.");
-                    }
-                    else
-                    {
-                        player.Message("No fonts found for \"{0}\". Available fonts: {1}",
-                                        sectionName, sectionList.JoinToString());
-                    }
-                }
-            }
-            if (Param.ToLower() == "size")
-            {
-                int Size = -1;
-                if (cmd.NextInt(out Size))
-                {
-                    if (Size < 5)
-                    {
-                        player.Message("&WIncorrect font size ({0}): Size needs to be at least 5(which is ideal for minecraft font, not the others)", Size);
+            } else if (arg.ToLower() == "font") {
+                HandleFont(player, cmd);
+            } else if (arg.ToLower() == "size") {
+                int size = -1;
+                if (cmd.NextInt(out size)) {
+                    if (size < 5) {
+                        player.Message("&WIncorrect font size ({0}): Size needs to be at least 5" +
+                                       "(which is ideal for minecraft font, not the others)", size);
                         return;
                     }
-                    player.Message("SetFont: Size changed from {0} to {1} ({2})", player.font.Size, Size, player.font.FontFamily.Name);
-                    player.font = new System.Drawing.Font(player.font.FontFamily, Size);
-                }
-                else
-                {
+                    player.Message("SetFont: Size changed from {0} to {1} ({2})", player.font.Size, size, player.font.FontFamily.Name);
+                    player.font = new System.Drawing.Font(player.font.FontFamily, size);
+                } else {
                     player.Message("&WInvalid size, use /SetFont Size FontSize. Example: /SetFont Size 14");
-                    return;
                 }
-                return;
-            }
-            else
-            {
+            } else {
                 CdSetFont.PrintUsage(player);
-                return;
             }
         }
+        
+        static void HandleFont(Player player, CommandReader cmd) {
+            string name = cmd.NextAll();
+            if (!Directory.Exists(Paths.FontsPath)) {
+                Directory.CreateDirectory(Paths.FontsPath);
+                player.Message("There are no fonts available for this server. " +
+                               "Font is set to default: {0}", player.font.FontFamily.Name);
+                return;
+            }
+            
+            string[] available = GetAvailableFonts();
+            if (available == null) {
+                player.Message("No fonts have been found."); return;
+            }
+            if (String.IsNullOrEmpty(name)) {
+                player.Message("{0} fonts Available: {1}", 
+                               available.Length, available.JoinToString());
+                return;
+            }
+            
+            string match = null;
+            const StringComparison comp = StringComparison.OrdinalIgnoreCase;
+            for (int i = 0; i < available.Length; i++) {
+                string font = available[i];
+                if (font == null) continue;
+                if (!font.StartsWith(name, comp)) continue;
+                
+                if (font.Equals(name, comp)) {
+                    match = font; break;
+                } else if (match == null) {
+                    match = font;
+                } else {
+                    var matches = available.Where(f => f.StartsWith(name, comp));
+                    player.Message("Multiple font files matched \"{0}\": {1}",
+                                   name, matches.JoinToString());
+                    return;
+                }
+            }
+            
+            if (match != null) {
+                player.Message("Your font has changed to \"{0}\":", match);
+                string path = System.IO.Path.Combine(Paths.FontsPath, match + ".ttf");
+                player.font = new System.Drawing.Font(player.LoadFontFamily(path), player.font.Size);
+            } else {
+                player.Message("No fonts found for \"{0}\". Available fonts: {1}",
+                               name, available.JoinToString());
+            }
+        }
+        
         #endregion
         #region Draw2d
         static readonly CommandDescriptor CdDraw2D = new CommandDescriptor
@@ -668,20 +641,14 @@ namespace fCraft {
             }
         }
 
-        static string[] GetFontSectionList()
-        {
-            if (Directory.Exists(Paths.FontsPath))
-            {
-                string[] sections = Directory.GetFiles(Paths.FontsPath, "*.ttf", SearchOption.TopDirectoryOnly)
-                                             .Select(name => System.IO.Path.GetFileNameWithoutExtension(name))
-                                             .Where(name => !String.IsNullOrEmpty(name))
-                                             .ToArray();
-                if (sections.Length != 0)
-                {
-                    return sections;
-                }
-            }
-            return null;
+        static string[] GetAvailableFonts() {
+            if (!Directory.Exists(Paths.FontsPath)) return null;
+            
+            string[] files = Directory.GetFiles(Paths.FontsPath, "*.ttf", SearchOption.TopDirectoryOnly)
+                .Select(name => System.IO.Path.GetFileNameWithoutExtension(name))
+                .Where(name => !String.IsNullOrEmpty(name))
+                .ToArray();
+            return files.Length == 0 ? null : files;
         }
         #endregion
         #region Tree
