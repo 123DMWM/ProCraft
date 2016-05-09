@@ -1784,8 +1784,15 @@ namespace fCraft {
         void CheckOwnChange(sbyte id, Player otherPlayer) {
             if (Info.oldskinName != Info.skinName && otherPlayer.Supports(CpeExt.ExtPlayerList2)) {
                 otherPlayer.Send(Packet.MakeExtAddEntity2(id, Info.Rank.Color + Name,
-                                                          (Info.skinName == "" ? Name : Info.skinName), WorldMap.Spawn, otherPlayer));
-                otherPlayer.Send(Packet.MakeTeleport(id, Position));
+                                                          (Info.skinName == "" ? Name : Info.skinName), Position, otherPlayer));
+                //otherPlayer.Send(Packet.MakeTeleport(id, Position));
+                if (otherPlayer.Supports(CpeExt.ChangeModel)) {
+                    string thisModel = Info.IsAFK ? AFKModel : Info.Mob;
+                    if (otherPlayer.Info.Rank.CanSee(Info.Rank) && (thisModel.ToLower().Equals("air") || thisModel.ToLower().Equals("0"))) {
+                        thisModel = "Humanoid";
+                    }
+                    otherPlayer.Send(Packet.MakeChangeModel((byte)id, thisModel));
+                }
             }
             if ((Info.oldMob != Info.Mob || Info.oldafkMob != Info.afkMob) && otherPlayer.Supports(CpeExt.ChangeModel)) {
                 string thisModel = Info.IsAFK ? AFKModel : Info.Mob;
