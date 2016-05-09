@@ -634,55 +634,35 @@ namespace fCraft {
             Handler = WriteHandler,
         };
 
-        static void WriteHandler(Player player, CommandReader cmd)
-        {
+        static void WriteHandler(Player player, CommandReader cmd) {
             string sentence = cmd.NextAll();
-            if (sentence.Length < 1)
-            {
+            if (String.IsNullOrEmpty(sentence)) {
                 CdWrite.PrintUsage(player);
                 return;
             }
-            else
-            {
-                player.Message("Write: Click 2 blocks or use &H/Mark&S to set direction.");
-                player.SelectionStart(2, WriteCallback, sentence, Permission.DrawAdvanced);
-            }
+            player.Message("Write: Click 2 blocks or use &H/Mark&S to set direction.");
+            player.SelectionStart(2, WriteCallback, sentence, Permission.DrawAdvanced);
         }
 
-        static void WriteCallback(Player player, Vector3I[] marks, object tag)
-        {
-            Block block = new Block();
-            string sentence = (string)tag;
-            //block bugfix kinda
-            if (player.LastUsedBlockType == Block.None)
-            {
-                block = Block.Stone;
-            }
-            else
-            {
-                block = player.LastUsedBlockType;
-            }
+        static void WriteCallback(Player player, Vector3I[] marks, object tag) {
+            Block block = player.LastUsedBlockType;
+            if (block == Block.None) block = Block.Stone;
             Direction direction = DirectionFinder.GetDirection(marks);
-            try
-            {
-                FontHandler render = new FontHandler(block, marks, player, direction); //create new instance
-                render.CreateGraphicsAndDraw(sentence); //render the sentence
-                if (render.blockCount > 0)
-                {
+            string sentence = (string)tag;
+            
+            try {
+                FontHandler render = new FontHandler(block, marks, player, direction);
+                render.CreateGraphicsAndDraw(sentence);
+                if (render.blockCount > 0) {
                     player.Message("/Write (Size {0}, {1}: Writing '{2}' using {3} blocks of {4}",
                         player.font.Size,
                         player.font.FontFamily.Name,
                         sentence, render.blockCount,
                         block.ToString());
-                }
-                else
-                {
+                } else {
                     player.Message("&WNo direction was set");
                 }
-                render = null; //get lost
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 player.Message(e.Message);
                 Logger.Log(LogType.Error, "WriteCommand: " + e);
             }
