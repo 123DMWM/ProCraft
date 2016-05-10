@@ -590,14 +590,9 @@ namespace fCraft {
                             string nameString = entityData[0];
                             string skinString = entityData[1];
                             string modelString = entityData[2];
-                            if (!CpeCommands.validEntities.Contains(modelString)) {
-                                Block block;
-                                if (Map.GetBlockByName(modelString, false, out block)) {
-                                    modelString = block.GetHashCode().ToString();
-                                } else {
-                                    modelString = "humanoid";
-                                }
-                            }
+                            modelString = CpeCommands.ParseModel(null, modelString);
+                            if (modelString == null) modelString = "humanoid";
+
                             if (!sbyte.TryParse(entityData[3], out idString)) { }
                             World worldString = WorldManager.FindWorldExact(entityData[4]) ??
                                                 WorldManager.FindMainWorld(RankManager.LowestRank);

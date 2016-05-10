@@ -127,7 +127,6 @@ namespace fCraft {
                     return;
                 }
             }
-            Block blockmodel;
 
             switch (option.ToLower()) {
                 case "create":
@@ -135,12 +134,9 @@ namespace fCraft {
                     string requestedModel = "humanoid";
                     if (cmd.HasNext) {
                         requestedModel = cmd.Next().ToLower();
-                    }
-                    if (!validEntities.Contains(requestedModel)) {
-                        if (Map.GetBlockByName(requestedModel, false, out blockmodel)) {
-                            requestedModel = blockmodel.GetHashCode().ToString();
-                        } else {
-                            player.Message(
+                        requestedModel = ParseModel(player, requestedModel);
+                        if (requestedModel == null) {
+                        	player.Message(
                                 "That wasn't a valid entity model! Valid models are chibi, chicken, creeper, giant, human, pig, sheep, skeleton, spider, zombie, or any block ID/Name.");
                             return;
                         }
@@ -183,25 +179,18 @@ namespace fCraft {
                                 "Usage is /Ent model <bot> <model>. Valid models are chibi, chicken, creeper, giant, human, pig, sheep, skeleton, spider, zombie, or any block ID/Name.");
                             break;
                         }
-
-                        if (model == "human") {
-                            model = "humanoid";
+                        model = ParseModel(player, model);
+                        if (model == null) {
+                            player.Message(
+                                "That wasn't a valid entity model! Valid models are chibi, chicken, creeper, giant, human, pig, sheep, skeleton, spider, zombie, or any block ID/Name.");
+                            break;
                         }
-                        if (!validEntities.Contains(model)) {
-                            if (Map.GetBlockByName(model, false, out blockmodel)) {
-                                model = blockmodel.GetHashCode().ToString();
-                            } else {
-                                player.Message(
-                                    "That wasn't a valid entity model! Valid models are chibi, chicken, creeper, giant, human, pig, sheep, skeleton, spider, zombie, or any block ID/Name.");
-                                break;
-                            }
-                        }
-
                         player.Message("Changed entity model to {0}.", model);
                         bot.changeBotModel(model);
-                    } else
+                    } else {
                         player.Message(
                             "Usage is /Ent model <bot> <model>. Valid models are chibi, chicken, creeper, giant, human, pig, sheep, skeleton, spider, zombie, or any block ID/Name.");
+                    }
                     break;
                 case "bring":
                     bot.teleportBot(player.Position);
@@ -374,39 +363,16 @@ namespace fCraft {
                player.Message("Your current {0}Model: &f{1}", prefix, getter(player.Info)); return;
             }
             
-            string model = cmd.Next(), scalestr = "";
-            float scale = 0.0f;
+            string model = cmd.Next();
             if (string.IsNullOrEmpty(model)) {
                player.Message("Current {2}Model for {0}: &f{1}", target.Name, getter(target), prefix); 
                return;
             }
-            
-            if (model.Contains('|')) {
-                scalestr = model.Split('|')[1];
-                model = model.Split('|')[0];
+            model = ParseModel(player, model);
+            if (model == null) {
+                player.Message("Model not valid, see &h/Help {0}Model&s.", prefix.TrimEnd());
+                return;
             }
-            if (float.TryParse(scalestr, out scale)) {
-                if (scale < 0.25f) scale = 0.25f;
-                if (scale > 2f) scale = 2f;
-            }
-            
-            if (!validEntities.Contains(model.ToLower()) && !model.ToLower().StartsWith("dev:")) {
-               byte blockId;
-               Block block;
-               if (byte.TryParse(model, out blockId)) {
-               } else if (Map.GetBlockByName(model, false, out block)) {
-                  model = block.GetHashCode().ToString();
-               } else {
-                  player.Message("Model not valid, see &h/Help {0}Model&s.", prefix.TrimEnd()); 
-                  return;
-               }
-            }
-            
-            if (model.ToLower().StartsWith("dev:")) {
-               player.Message("&cBe careful with development models, as they could crash others.");
-               model = model.Remove(0, 4);
-            }
-            model = model + (scale == 0 ? "" : "|" + scale);
             if (getter(target).ToLower() == model.ToLower()) {
                player.Message("&f{0}&s's {0}model is already set to &f{1}", target.Name, model, prefix); 
                return;
@@ -423,6 +389,38 @@ namespace fCraft {
             }
             target.oldMob = target.Mob;
             setter(target, model);
+        }
+        
+        internal static string ParseModel(Player player, string model) {
+            float scale = 0.0f;
+            string scalestr = "";
+            int sepIndex = model.IndexOf('|');
+            if (sepIndex >= 0) {
+            	scalestr = model.Substring(sepIndex + 1);
+            	model = model.Substring(0, sepIndex);
+            }
+            if (float.TryParse(scalestr, out scale)) {
+                if (scale < 0.25f) scale = 0.25f;
+                if (scale > 3f) scale = 3f;
+            }
+            
+            if (!validEntities.Contains(model.ToLower()) && !model.ToLower().StartsWith("dev:")) {
+                byte blockId;
+                Block block;
+                if (byte.TryParse(model, out blockId)) {
+                } else if (Map.GetBlockByName(model, false, out block)) {
+                    model = block.GetHashCode().ToString();
+                } else {
+                    return null;
+                }
+            }
+            
+            if (model.ToLower().StartsWith("dev:")) {
+            	if (player != null)
+                    player.Message("&cBe careful with development models, as they could crash others.");
+                model = model.Remove(0, 4);
+            }
+            return scale == 0 ? model : model + "|" + scale;
         }
 
         static readonly CommandDescriptor CdChangeSkin = new CommandDescriptor {
