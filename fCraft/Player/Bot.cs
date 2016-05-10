@@ -116,15 +116,6 @@ namespace fCraft {
         /// Changes the model of the bot
         /// </summary>
         public void changeBotModel(string botModel) {
-            Block blockModel;
-            if (!CpeCommands.validEntities.Contains(botModel)) {
-                if (Map.GetBlockByName(botModel, false, out blockModel)) {
-                    botModel = blockModel.GetHashCode().ToString();
-                } else {
-                    return; //something went wrong, model does not exist
-                }
-            }
-
             World.Players.Where(p => p.Supports(CpeExt.ChangeModel)).Send(Packet.MakeChangeModel((byte) ID, botModel));
             Model = botModel;
             Server.SaveEntity(this);
