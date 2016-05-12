@@ -90,6 +90,10 @@ namespace fCraft
         
         /// <summary> This extension allows users to define their own custom text colors displayed in chat. </summary>
         TextColors,
+        
+        /// <summary> This extension allows the server to specify custom terrain textures,
+        /// and various aspects of the map's environment. </summary>
+        EnvMapAppearance3,
     }
 
 

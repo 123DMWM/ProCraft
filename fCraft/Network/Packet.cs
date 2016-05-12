@@ -538,7 +538,6 @@ namespace fCraft {
         
         [Pure]
         public static Packet MakeEnvSetMapAppearance( EnvProperty prop, int value ) {
-            if( textureUrl == null ) throw new ArgumentNullException( "textureUrl" );
             Packet packet = new Packet( OpCode.SetEnvMapProperty );
             packet.Bytes[1] = (byte)prop;
             ToNetOrder( value, packet.Bytes, 2 );

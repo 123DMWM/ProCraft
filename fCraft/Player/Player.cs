@@ -2197,51 +2197,27 @@ namespace fCraft {
         readonly HashSet<CpeExt> supportedExtensions = new HashSet<CpeExt>();
 
         const string CustomBlocksExtName = "CustomBlocks";
-        const int CustomBlocksExtVersion = 1;
         const byte CustomBlocksLevel = 1;
-        const string BlockPermissionsExtName = "BlockPermissions";
-        const int BlockPermissionsExtVersion = 1;    
+        const string BlockPermissionsExtName = "BlockPermissions";  
         const string ClickDistanceExtName = "ClickDistance";
-        const int ClickDistanceExtVersion = 1;
         const string EnvColorsExtName = "EnvColors";
-        const int EnvColorsExtVersion = 1;
         const string ChangeModelExtName = "ChangeModel";
-        const int ChangeModelExtVersion = 1;
         const string EnvMapAppearanceExtName = "EnvMapAppearance";
-        const int EnvMapAppearanceExtVersion = 1;
-        const int EnvMapAppearance2ExtVersion = 2;
         const string EnvWeatherTypeExtName = "EnvWeatherType";
-        const int EnvWeatherTypeExtVersion = 1;
         const string HeldBlockExtName = "HeldBlock";
-        const int HeldBlockExtVersion = 1;
         const string ExtPlayerListExtName = "ExtPlayerList";
-        const int ExtPlayerListExtVersion = 1;
-        const int ExtPlayerList2ExtVersion = 2;
         const string SelectionCuboidExtName = "SelectionCuboid";
-        const int SelectionCuboidExtVersion = 1;
         const string MessageTypesExtName = "MessageTypes";
-        const int MessageTypesExtVersion = 1;
         const string HackControlExtName = "HackControl";
-        const int HackControlExtVersion = 1;
         const string EmoteFixExtName = "EmoteFix";
-        const int EmoteFixExtVersion = 1;
         const string TextHotKeyExtName = "TextHotKey";
-        const int TextHotKeyExtVersion = 1;
         const string PlayerClickExtName = "PlayerClick";
-        const int PlayerClickExtVersion = 1;
         const string LongerMessagesExtName = "LongerMessages";
-        const int LongerMessagesExtVersion = 1;
         const string FullCP437ExtName = "FullCP437";
-        const int FullCP437ExtVersion = 1;
         const string BlockDefinitionsExtName = "BlockDefinitions";
-        const int BlockDefinitionsExtVersion = 1;
         const string BlockDefinitionsExtExtName = "BlockDefinitionsExt";
-        const int BlockDefinitionsExtExtVersion = 1;
-        const int BlockDefinitionsExtExt2Version = 2; 
-        const string BulkBlockUpdateExtName = "BulkBlockUpdate";
-        const int BulkBlockUpdateExtVersion = 1;        
+        const string BulkBlockUpdateExtName = "BulkBlockUpdate";        
         const string TextColorsExtName = "TextColors";
-        const int TextColorsExtVersion = 1;
         
         bool supportsBlockDefs, supportsCustomBlocks;
         
@@ -2259,35 +2235,35 @@ namespace fCraft {
         {
             // write our ExtInfo and ExtEntry packets
             writer.Write(Packet.MakeExtInfo("ProCraft", 22).Bytes);
-            writer.Write(Packet.MakeExtEntry(ClickDistanceExtName, ClickDistanceExtVersion).Bytes);
-            writer.Write(Packet.MakeExtEntry(CustomBlocksExtName, CustomBlocksExtVersion).Bytes);
-            writer.Write(Packet.MakeExtEntry(HeldBlockExtName, HeldBlockExtVersion).Bytes);
+            writer.Write(Packet.MakeExtEntry(ClickDistanceExtName, 1).Bytes);
+            writer.Write(Packet.MakeExtEntry(CustomBlocksExtName, 1).Bytes);
+            writer.Write(Packet.MakeExtEntry(HeldBlockExtName, 1).Bytes);
             
-            writer.Write(Packet.MakeExtEntry(TextHotKeyExtName, TextHotKeyExtVersion).Bytes);
-            writer.Write(Packet.MakeExtEntry(ExtPlayerListExtName, ExtPlayerListExtVersion).Bytes);
-            writer.Write(Packet.MakeExtEntry(EnvColorsExtName, EnvColorsExtVersion).Bytes);
+            writer.Write(Packet.MakeExtEntry(TextHotKeyExtName, 1).Bytes);
+            writer.Write(Packet.MakeExtEntry(ExtPlayerListExtName, 1).Bytes);
+            writer.Write(Packet.MakeExtEntry(EnvColorsExtName, 1).Bytes);
             
-            writer.Write(Packet.MakeExtEntry(SelectionCuboidExtName, SelectionCuboidExtVersion).Bytes);
-            writer.Write(Packet.MakeExtEntry(BlockPermissionsExtName, BlockPermissionsExtVersion).Bytes);
-            writer.Write(Packet.MakeExtEntry(ChangeModelExtName, ChangeModelExtVersion).Bytes);
+            writer.Write(Packet.MakeExtEntry(SelectionCuboidExtName, 1).Bytes);
+            writer.Write(Packet.MakeExtEntry(BlockPermissionsExtName, 1).Bytes);
+            writer.Write(Packet.MakeExtEntry(ChangeModelExtName, 1).Bytes);
             
-            writer.Write(Packet.MakeExtEntry(EnvMapAppearanceExtName, EnvMapAppearance2ExtVersion).Bytes);
-            writer.Write(Packet.MakeExtEntry(EnvWeatherTypeExtName, EnvWeatherTypeExtVersion).Bytes);
-            writer.Write(Packet.MakeExtEntry(HackControlExtName, HackControlExtVersion).Bytes);
+            writer.Write(Packet.MakeExtEntry(EnvMapAppearanceExtName, 3).Bytes);
+            writer.Write(Packet.MakeExtEntry(EnvWeatherTypeExtName, 1).Bytes);
+            writer.Write(Packet.MakeExtEntry(HackControlExtName, 1).Bytes);
             
-            writer.Write(Packet.MakeExtEntry(ExtPlayerListExtName, ExtPlayerList2ExtVersion).Bytes);
-            writer.Write(Packet.MakeExtEntry(PlayerClickExtName, PlayerClickExtVersion).Bytes);
-            writer.Write(Packet.MakeExtEntry(MessageTypesExtName, MessageTypesExtVersion).Bytes);
+            writer.Write(Packet.MakeExtEntry(ExtPlayerListExtName, 2).Bytes);
+            writer.Write(Packet.MakeExtEntry(PlayerClickExtName, 1).Bytes);
+            writer.Write(Packet.MakeExtEntry(MessageTypesExtName, 1).Bytes);
             
-            writer.Write(Packet.MakeExtEntry(EmoteFixExtName, EmoteFixExtVersion).Bytes);
-            writer.Write(Packet.MakeExtEntry(LongerMessagesExtName, LongerMessagesExtVersion).Bytes);
-            writer.Write(Packet.MakeExtEntry(FullCP437ExtName, FullCP437ExtVersion).Bytes);
+            writer.Write(Packet.MakeExtEntry(EmoteFixExtName, 1).Bytes);
+            writer.Write(Packet.MakeExtEntry(LongerMessagesExtName, 1).Bytes);
+            writer.Write(Packet.MakeExtEntry(FullCP437ExtName, 1).Bytes);
             
-            writer.Write(Packet.MakeExtEntry(BlockDefinitionsExtName, BlockDefinitionsExtVersion).Bytes);
-            writer.Write(Packet.MakeExtEntry(BlockDefinitionsExtExtName, BlockDefinitionsExtExt2Version).Bytes);
-            writer.Write(Packet.MakeExtEntry(BulkBlockUpdateExtName, BulkBlockUpdateExtVersion).Bytes);
+            writer.Write(Packet.MakeExtEntry(BlockDefinitionsExtName, 1).Bytes);
+            writer.Write(Packet.MakeExtEntry(BlockDefinitionsExtExtName, 2).Bytes);
+            writer.Write(Packet.MakeExtEntry(BulkBlockUpdateExtName, 1).Bytes);
             
-            writer.Write(Packet.MakeExtEntry(TextColorsExtName, TextColorsExtVersion).Bytes);
+            writer.Write(Packet.MakeExtEntry(TextColorsExtName, 1).Bytes);
             
             // Expect ExtInfo reply from the client
             OpCode extInfoReply = reader.ReadOpCode();
@@ -2315,48 +2291,50 @@ namespace fCraft {
                 CpeExt addedExt = CpeExt.None;
                 switch (extName) {
                     case CustomBlocksExtName:
-                        if (extVersion == CustomBlocksExtVersion)
+                        if (extVersion == 1)
                             addedExt = CpeExt.CustomBlocks;
                         break;
                     case BlockPermissionsExtName:
-                        if (extVersion == BlockPermissionsExtVersion)
+                        if (extVersion == 1)
                             addedExt = CpeExt.BlockPermissions;
                         break;
                     case ClickDistanceExtName:
-                        if (extVersion == ClickDistanceExtVersion) {
+                        if (extVersion == 1) {
                             addedExt = CpeExt.ClickDistance;
                         }
                         break;
                     case EnvColorsExtName:
-                        if (extVersion == EnvColorsExtVersion)
+                        if (extVersion == 1)
                             addedExt = CpeExt.EnvColors;
                         break;
                     case ChangeModelExtName:
-                        if (extVersion == ChangeModelExtVersion)
+                        if (extVersion == 1)
                             addedExt = CpeExt.ChangeModel;
                         break;
                     case EnvMapAppearanceExtName:
-                        if (extVersion == EnvMapAppearanceExtVersion) {
+                        if (extVersion == 1) {
                             addedExt = CpeExt.EnvMapAppearance;
-                        } else if (extVersion == EnvMapAppearance2ExtVersion) {
+                        } else if (extVersion == 2) {
                             addedExt = CpeExt.EnvMapAppearance2;
+                        } else if (extVersion == 3) {
+                            addedExt = CpeExt.EnvMapAppearance3;
                         }
                         break;
                     case EnvWeatherTypeExtName:
-                        if (extVersion == EnvWeatherTypeExtVersion)
+                        if (extVersion == 1)
                             addedExt = CpeExt.EnvWeatherType;
                         break;
                     case HeldBlockExtName:
-                        if (extVersion == HeldBlockExtVersion)
+                        if (extVersion == 1)
                             addedExt = CpeExt.HeldBlock;
                         break;
                     case ExtPlayerListExtName:
-                        if (extVersion == ExtPlayerListExtVersion) {
+                        if (extVersion == 1) {
                             addedExt = CpeExt.ExtPlayerList;
                             if (Supports(CpeExt.ExtPlayerList2)) {
                                 addedExt = CpeExt.ExtPlayerList2;
                             }
-                        } else if (extVersion == ExtPlayerList2ExtVersion) {
+                        } else if (extVersion == 2) {
                             addedExt = CpeExt.ExtPlayerList2;
                             if (Supports(CpeExt.ExtPlayerList)) {
                                 supportedExtensions.Remove(CpeExt.ExtPlayerList);
@@ -2364,53 +2342,53 @@ namespace fCraft {
                         }
                         break;
                     case SelectionCuboidExtName:
-                        if (extVersion == SelectionCuboidExtVersion)
+                        if (extVersion == 1)
                             addedExt = CpeExt.SelectionCuboid;
                         break;
                     case MessageTypesExtName:
-                        if (extVersion == MessageTypesExtVersion)
+                        if (extVersion == 1)
                             addedExt = CpeExt.MessageType;
                         break;
                     case HackControlExtName:
-                        if (extVersion == HackControlExtVersion)
+                        if (extVersion == 1)
                             addedExt = CpeExt.HackControl;
                         break;
                     case EmoteFixExtName:
-                        if (extVersion == EmoteFixExtVersion)
+                        if (extVersion == 1)
                             addedExt = CpeExt.EmoteFix;
                         break;
                     case TextHotKeyExtName:
-                        if (extVersion == TextHotKeyExtVersion)
+                        if (extVersion == 1)
                             addedExt = CpeExt.TextHotKey;
                         break;
                     case PlayerClickExtName:
-                        if (extVersion == PlayerClickExtVersion)
+                        if (extVersion == 1)
                             addedExt = CpeExt.PlayerClick;
                         break;
                     case LongerMessagesExtName:
-                        if (extVersion == LongerMessagesExtVersion)
+                        if (extVersion == 1)
                             addedExt = CpeExt.LongerMessages;
                         break;
                     case FullCP437ExtName:
-                        if (extVersion == FullCP437ExtVersion)
+                        if (extVersion == 1)
                             addedExt = CpeExt.FullCP437;
                         break;
                     case BlockDefinitionsExtName:
-                        if (extVersion == BlockDefinitionsExtVersion)
+                        if (extVersion == 1)
                         	addedExt = CpeExt.BlockDefinitions;
                         break;
                     case BlockDefinitionsExtExtName:
-                        if (extVersion == BlockDefinitionsExtExtVersion)
+                        if (extVersion == 1)
                             addedExt = CpeExt.BlockDefinitionsExt;
-                        else if (extVersion == BlockDefinitionsExtExt2Version)
+                        else if (extVersion == 2)
                             addedExt = CpeExt.BlockDefinitionsExt2;
                         break;
                     case BulkBlockUpdateExtName:
-                        if (extVersion == BulkBlockUpdateExtVersion)
+                        if (extVersion == 1)
                             addedExt = CpeExt.BulkBlockUpdate;
                         break;                        
                     case TextColorsExtName:
-                        if (extVersion == TextColorsExtVersion)
+                        if (extVersion == 1)
                             addedExt = CpeExt.TextColors;
                         break;
                         
