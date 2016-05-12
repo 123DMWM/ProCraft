@@ -843,8 +843,7 @@ namespace fCraft {
                     player.Message("Enviroment settings for world {0} &swere reset.", world.ClassyName);
                     WorldManager.SaveWorldList();
                     foreach (Player p in world.Players) {
-                        if (p.Supports(CpeExt.EnvMapAppearance) 
-                            || p.Supports(CpeExt.EnvMapAppearance2) 
+                        if (p.Supports(CpeExt.EnvMapAppearance) || p.Supports(CpeExt.EnvMapAppearance2) 
                             || p.Supports(CpeExt.EnvMapAppearance3))
                             p.SendEnvSettings();
                     }
@@ -931,10 +930,10 @@ namespace fCraft {
                     }
                     world.Texture = value;
                     foreach (Player p in world.Players) {
-                        if (p.Supports(CpeExt.EnvMapAppearance) || p.Supports(CpeExt.EnvMapAppearance2))
-                            p.SendEnvSettings();
-                        else if (p.Supports(CpeExt.EnvMapAppearance3))
+                    	if (p.Supports(CpeExt.EnvMapAppearance3))
                             p.Send(Packet.MakeEnvSetMapUrl(world.GetTexture()));
+                        else if (p.Supports(CpeExt.EnvMapAppearance) || p.Supports(CpeExt.EnvMapAppearance2))
+                            p.SendEnvSettings();
                     }
                     break;
 
@@ -1014,10 +1013,10 @@ namespace fCraft {
             }
 
             foreach (Player p in world.Players) {
-                if (p.Supports(CpeExt.EnvMapAppearance) || p.Supports(CpeExt.EnvMapAppearance2))
-                    p.SendEnvSettings();
-                else if (p.Supports(CpeExt.EnvMapAppearance3))
+            	if (p.Supports(CpeExt.EnvMapAppearance3))
                     p.Send(Packet.MakeEnvSetMapProperty(prop, target));
+                else if (p.Supports(CpeExt.EnvMapAppearance) || p.Supports(CpeExt.EnvMapAppearance2))
+                    p.SendEnvSettings();
             }
         }
 
@@ -1038,10 +1037,10 @@ namespace fCraft {
             }
 
             foreach (Player p in world.Players) {
-                if (p.Supports(CpeExt.EnvMapAppearance) || p.Supports(CpeExt.EnvMapAppearance2))
-                    p.SendEnvSettings();
-                else if (p.Supports(CpeExt.EnvMapAppearance3))
+        		if (p.Supports(CpeExt.EnvMapAppearance3))
                     p.Send(Packet.MakeEnvSetMapProperty(prop, target));
+                else if (p.Supports(CpeExt.EnvMapAppearance) || p.Supports(CpeExt.EnvMapAppearance2))
+                    p.SendEnvSettings();
             }
         }
 

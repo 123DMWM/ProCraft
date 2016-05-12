@@ -2234,7 +2234,7 @@ namespace fCraft {
         bool NegotiateProtocolExtension()
         {
             // write our ExtInfo and ExtEntry packets
-            writer.Write(Packet.MakeExtInfo("ProCraft", 22).Bytes);
+            writer.Write(Packet.MakeExtInfo("ProCraft", 23).Bytes);
             writer.Write(Packet.MakeExtEntry(ClickDistanceExtName, 1).Bytes);
             writer.Write(Packet.MakeExtEntry(CustomBlocksExtName, 1).Bytes);
             writer.Write(Packet.MakeExtEntry(HeldBlockExtName, 1).Bytes);
@@ -2247,7 +2247,7 @@ namespace fCraft {
             writer.Write(Packet.MakeExtEntry(BlockPermissionsExtName, 1).Bytes);
             writer.Write(Packet.MakeExtEntry(ChangeModelExtName, 1).Bytes);
             
-            writer.Write(Packet.MakeExtEntry(EnvMapAppearanceExtName, 3).Bytes);
+            writer.Write(Packet.MakeExtEntry(EnvMapAppearanceExtName, 1).Bytes);
             writer.Write(Packet.MakeExtEntry(EnvWeatherTypeExtName, 1).Bytes);
             writer.Write(Packet.MakeExtEntry(HackControlExtName, 1).Bytes);
             
@@ -2264,6 +2264,10 @@ namespace fCraft {
             writer.Write(Packet.MakeExtEntry(BulkBlockUpdateExtName, 1).Bytes);
             
             writer.Write(Packet.MakeExtEntry(TextColorsExtName, 1).Bytes);
+            // Fix for ClassiCube Client which violates the spec -
+            // If server supports version > 1 but client version 1, client should reply with version 1.
+            // ClassiCube just doesn't reply at all.
+            writer.Write(Packet.MakeExtEntry(EnvMapAppearanceExtName, 3).Bytes);
             
             // Expect ExtInfo reply from the client
             OpCode extInfoReply = reader.ReadOpCode();
@@ -2394,11 +2398,6 @@ namespace fCraft {
                 if (addedExt != CpeExt.None)
                     supportedExtensions.Add(addedExt);
             }
-            // Fix for ClassiCube Client which violates the spec -
-            // If server supports version 2 but client version 1, client should reply with version 1.
-            // ClassiCube just doesn't reply at all.
-            if (ClientName == "ClassiCube Client")
-            	supportedExtensions.Add(CpeExt.EnvMapAppearance);
             supportsCustomBlocks = Supports(CpeExt.CustomBlocks);
             supportsBlockDefs = Supports(CpeExt.BlockDefinitions);
 
