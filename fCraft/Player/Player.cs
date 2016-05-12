@@ -2218,6 +2218,7 @@ namespace fCraft {
         const string BlockDefinitionsExtExtName = "BlockDefinitionsExt";
         const string BulkBlockUpdateExtName = "BulkBlockUpdate";        
         const string TextColorsExtName = "TextColors";
+        const string EnvMapAspectExtName = "EnvMapAspect";
         
         bool supportsBlockDefs, supportsCustomBlocks;
         
@@ -2234,7 +2235,7 @@ namespace fCraft {
         bool NegotiateProtocolExtension()
         {
             // write our ExtInfo and ExtEntry packets
-            writer.Write(Packet.MakeExtInfo("ProCraft", 23).Bytes);
+            writer.Write(Packet.MakeExtInfo("ProCraft", 24).Bytes);
             writer.Write(Packet.MakeExtEntry(ClickDistanceExtName, 1).Bytes);
             writer.Write(Packet.MakeExtEntry(CustomBlocksExtName, 1).Bytes);
             writer.Write(Packet.MakeExtEntry(HeldBlockExtName, 1).Bytes);
@@ -2264,10 +2265,11 @@ namespace fCraft {
             writer.Write(Packet.MakeExtEntry(BulkBlockUpdateExtName, 1).Bytes);
             
             writer.Write(Packet.MakeExtEntry(TextColorsExtName, 1).Bytes);
+            writer.Write(Packet.MakeExtEntry(EnvMapAspectExtName, 1).Bytes);
             // Fix for ClassiCube Client which violates the spec -
             // If server supports version > 1 but client version 1, client should reply with version 1.
-            // ClassiCube just doesn't reply at all.
-            writer.Write(Packet.MakeExtEntry(EnvMapAppearanceExtName, 3).Bytes);
+            // ClassiCube just doesn't reply at all in that case.
+            writer.Write(Packet.MakeExtEntry(EnvMapAppearanceExtName, 2).Bytes);
             
             // Expect ExtInfo reply from the client
             OpCode extInfoReply = reader.ReadOpCode();
@@ -2292,6 +2294,7 @@ namespace fCraft {
                 string extName = reader.ReadString();
                 int extVersion = reader.ReadInt32();
                 CpeExt addedExt = CpeExt.None;
+                
                 switch (extName) {
                     case CustomBlocksExtName:
                         if (extVersion == 1)
@@ -2319,8 +2322,6 @@ namespace fCraft {
                             addedExt = CpeExt.EnvMapAppearance;
                         } else if (extVersion == 2) {
                             addedExt = CpeExt.EnvMapAppearance2;
-                        } else if (extVersion == 3) {
-                            addedExt = CpeExt.EnvMapAppearance3;
                         }
                         break;
                     case EnvWeatherTypeExtName:
@@ -2393,6 +2394,10 @@ namespace fCraft {
                     case TextColorsExtName:
                         if (extVersion == 1)
                             addedExt = CpeExt.TextColors;
+                        break;
+                    case EnvMapAspectExtName:
+                        if (extVersion == 1)
+                            addedExt = CpeExt.EnvMapAspect;
                         break;
                 }
                 if (addedExt != CpeExt.None)

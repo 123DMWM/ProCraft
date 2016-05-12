@@ -844,7 +844,7 @@ namespace fCraft {
                     WorldManager.SaveWorldList();
                     foreach (Player p in world.Players) {
                         if (p.Supports(CpeExt.EnvMapAppearance) || p.Supports(CpeExt.EnvMapAppearance2) 
-                            || p.Supports(CpeExt.EnvMapAppearance3))
+                            || p.Supports(CpeExt.EnvMapAspect))
                             p.SendEnvSettings();
                     }
                 } else {
@@ -930,7 +930,7 @@ namespace fCraft {
                     }
                     world.Texture = value;
                     foreach (Player p in world.Players) {
-                    	if (p.Supports(CpeExt.EnvMapAppearance3))
+                    	if (p.Supports(CpeExt.EnvMapAspect))
                             p.Send(Packet.MakeEnvSetMapUrl(world.GetTexture()));
                         else if (p.Supports(CpeExt.EnvMapAppearance) || p.Supports(CpeExt.EnvMapAppearance2))
                             p.SendEnvSettings();
@@ -1013,7 +1013,7 @@ namespace fCraft {
             }
 
             foreach (Player p in world.Players) {
-            	if (p.Supports(CpeExt.EnvMapAppearance3))
+            	if (p.Supports(CpeExt.EnvMapAspect))
                     p.Send(Packet.MakeEnvSetMapProperty(prop, target));
                 else if (p.Supports(CpeExt.EnvMapAppearance) || p.Supports(CpeExt.EnvMapAppearance2))
                     p.SendEnvSettings();
@@ -1037,7 +1037,7 @@ namespace fCraft {
             }
 
             foreach (Player p in world.Players) {
-        		if (p.Supports(CpeExt.EnvMapAppearance3))
+        		if (p.Supports(CpeExt.EnvMapAspect))
                     p.Send(Packet.MakeEnvSetMapProperty(prop, target));
                 else if (p.Supports(CpeExt.EnvMapAppearance) || p.Supports(CpeExt.EnvMapAppearance2))
                     p.SendEnvSettings();

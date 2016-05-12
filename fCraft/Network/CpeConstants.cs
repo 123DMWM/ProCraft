@@ -93,7 +93,7 @@ namespace fCraft
         
         /// <summary> This extension allows the server to specify custom terrain textures,
         /// and various aspects of the map's environment. </summary>
-        EnvMapAppearance3,
+        EnvMapAspect,
     }
 
 

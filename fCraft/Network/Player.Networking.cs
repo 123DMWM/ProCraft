@@ -1381,7 +1381,7 @@ namespace fCraft {
             CheckBlock(ref side);
             CheckBlock(ref edge);
             
-            if (Supports(CpeExt.EnvMapAppearance3)) {
+            if (Supports(CpeExt.EnvMapAspect)) {
                 Send(Packet.MakeEnvSetMapUrl(World.GetTexture()));
                 Send(Packet.MakeEnvSetMapProperty(EnvProp.SidesBlock, side));
                 Send(Packet.MakeEnvSetMapProperty(EnvProp.EdgeBlock, edge));
