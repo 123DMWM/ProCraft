@@ -537,7 +537,7 @@ namespace fCraft {
         }
         
         [Pure]
-        public static Packet MakeEnvSetMapAppearance( EnvProperty prop, int value ) {
+        public static Packet MakeEnvSetMapProperty( EnvProp prop, int value ) {
             Packet packet = new Packet( OpCode.SetEnvMapProperty );
             packet.Bytes[1] = (byte)prop;
             ToNetOrder( value, packet.Bytes, 2 );

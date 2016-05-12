@@ -1377,15 +1377,22 @@ namespace fCraft {
         }
         
         internal void SendEnvSettings() {
-            byte edgeBlock = World.EdgeBlock, horBlock = World.HorizonBlock;
-            CheckBlock(ref edgeBlock);
-            CheckBlock(ref horBlock);
-        	
+            byte side = World.EdgeBlock, edge = World.HorizonBlock;
+            CheckBlock(ref side);
+            CheckBlock(ref edge);
+            
             if (Supports(CpeExt.EnvMapAppearance2)) {
-                Send(Packet.MakeEnvSetMapAppearance2(World.GetTexture(), edgeBlock, horBlock, World.GetEdgeLevel(),
+                Send(Packet.MakeEnvSetMapAppearance2(World.GetTexture(), side, edge, World.GetEdgeLevel(),
                                                      World.GetCloudsHeight(), World.MaxFogDistance));
             } else if (Supports(CpeExt.EnvMapAppearance)) {
-                Send(Packet.MakeEnvSetMapAppearance(World.GetTexture(), edgeBlock, horBlock, World.GetEdgeLevel()));
+                Send(Packet.MakeEnvSetMapAppearance(World.GetTexture(), side, edge, World.GetEdgeLevel()));
+            } else if (Supports(CpeExt.EnvMapAppearance3)) {
+                Send(Packet.MakeEnvSetMapUrl(World.GetTexture()));
+                Send(Packet.MakeEnvSetMapProperty(EnvProp.SidesBlock, side));
+                Send(Packet.MakeEnvSetMapProperty(EnvProp.EdgeBlock, edge));
+                Send(Packet.MakeEnvSetMapProperty(EnvProp.EdgeLevel, World.GetEdgeLevel()));
+                Send(Packet.MakeEnvSetMapProperty(EnvProp.CloudsLevel, World.GetCloudsHeight()));
+                Send(Packet.MakeEnvSetMapProperty(EnvProp.MaxFog, World.MaxFogDistance));
             }
 
             if (Supports(CpeExt.EnvColors)) {

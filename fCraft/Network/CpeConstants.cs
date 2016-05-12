@@ -122,7 +122,7 @@ namespace fCraft
         Announcement = 100
     }
     
-    public enum EnvProperty : byte {
+    public enum EnvProp : byte {
         SidesBlock = 0,
         EdgeBlock = 1,
         EdgeLevel = 2,

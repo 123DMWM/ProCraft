@@ -2287,7 +2287,6 @@ namespace fCraft {
                 }
                 string extName = reader.ReadString();
                 int extVersion = reader.ReadInt32();
-                bool addExt = true;
                 CpeExt addedExt = CpeExt.None;
                 switch (extName) {
                     case CustomBlocksExtName:
@@ -2386,19 +2385,14 @@ namespace fCraft {
                     case BulkBlockUpdateExtName:
                         if (extVersion == 1)
                             addedExt = CpeExt.BulkBlockUpdate;
-                        break;                        
+                        break;
                     case TextColorsExtName:
                         if (extVersion == 1)
                             addedExt = CpeExt.TextColors;
                         break;
-                        
-                    default:
-                        addExt = false;
-                        break;
                 }
-                if (addExt) {
+                if (addedExt != CpeExt.None)
                     supportedExtensions.Add(addedExt);
-                }
             }
             // Fix for ClassiCube Client which violates the spec -
             // If server supports version 2 but client version 1, client should reply with version 1.
@@ -2409,15 +2403,12 @@ namespace fCraft {
             supportsBlockDefs = Supports(CpeExt.BlockDefinitions);
 
             // log client's capabilities
-            if (supportedExtensions.Count > 0)
-            {
+            if (supportedExtensions.Count > 0) {
                 Logger.Log(LogType.Debug, "Player {0} is using \"{1}\", supporting: {2}",
                             Info.Name,
                             ClientName,
                             supportedExtensions.JoinToString(", "));
-            }
-            if (supportedExtensions.Count == 0)
-            {
+            } else if (supportedExtensions.Count == 0) {
                 Kick("Please use the ClassicalSharp client", LeaveReason.InvalidOpcodeKick);
             }
 

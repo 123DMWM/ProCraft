@@ -136,7 +136,7 @@ namespace fCraft {
                         requestedModel = cmd.Next().ToLower();
                         requestedModel = ParseModel(player, requestedModel);
                         if (requestedModel == null) {
-                        	player.Message(
+                            player.Message(
                                 "That wasn't a valid entity model! Valid models are chibi, chicken, creeper, giant, human, pig, sheep, skeleton, spider, zombie, or any block ID/Name.");
                             return;
                         }
@@ -396,8 +396,8 @@ namespace fCraft {
             string scalestr = "";
             int sepIndex = model.IndexOf('|');
             if (sepIndex >= 0) {
-            	scalestr = model.Substring(sepIndex + 1);
-            	model = model.Substring(0, sepIndex);
+                scalestr = model.Substring(sepIndex + 1);
+                model = model.Substring(0, sepIndex);
             }
             if (float.TryParse(scalestr, out scale)) {
                 if (scale < 0.25f) scale = 0.25f;
@@ -416,7 +416,7 @@ namespace fCraft {
             }
             
             if (model.ToLower().StartsWith("dev:")) {
-            	if (player != null)
+                if (player != null)
                     player.Message("&cBe careful with development models, as they could crash others.");
                 model = model.Remove(0, 4);
             }
@@ -843,7 +843,9 @@ namespace fCraft {
                     player.Message("Enviroment settings for world {0} &swere reset.", world.ClassyName);
                     WorldManager.SaveWorldList();
                     foreach (Player p in world.Players) {
-                        if (p.Supports(CpeExt.EnvMapAppearance) || p.Supports(CpeExt.EnvMapAppearance2))
+                        if (p.Supports(CpeExt.EnvMapAppearance) 
+                            || p.Supports(CpeExt.EnvMapAppearance2) 
+                            || p.Supports(CpeExt.EnvMapAppearance3))
                             p.SendEnvSettings();
                     }
                 } else {
@@ -885,26 +887,31 @@ namespace fCraft {
                 case "level":
                 case "edgelevel":
                 case "waterlevel":
-                    SetEnvAppearanceShort(player, world, value, "water level", 0, ref world.EdgeLevel);
+                    SetEnvAppearanceShort(player, world, value, EnvProp.EdgeLevel,
+                                          "water level", 0, ref world.EdgeLevel);
                     break;
                 case "cloudheight":
                 case "cloudsheight":
-                    SetEnvAppearanceShort(player, world, value, "clouds height", 0, ref world.CloudsHeight);
+                    SetEnvAppearanceShort(player, world, value, EnvProp.CloudsLevel,
+                                          "clouds height", 0, ref world.CloudsHeight);
                     break;
                 case "fogdist":
                 case "maxfog":
                 case "maxdist":
-                    SetEnvAppearanceShort(player, world, value, "max fog distance", 0, ref world.MaxFogDistance);
+                    SetEnvAppearanceShort(player, world, value, EnvProp.MaxFog,
+                                          "max fog distance", 0, ref world.MaxFogDistance);
                     break;
                 case "horizon":
                 case "edge":
                 case "water":
-                    SetEnvAppearanceBlock(player, world, value, "water block", Block.StillWater, ref world.HorizonBlock);
+                    SetEnvAppearanceBlock(player, world, value, EnvProp.EdgeBlock,
+                                          "water block", Block.StillWater, ref world.HorizonBlock);
                     break;
                 case "side":
                 case "border":
                 case "bedrock":
-                    SetEnvAppearanceBlock(player, world, value, "bedrock block", Block.Admincrete, ref world.EdgeBlock);
+                    SetEnvAppearanceBlock(player, world, value, EnvProp.SidesBlock,
+                                          "bedrock block", Block.Admincrete, ref world.EdgeBlock);
                     break;
                 case "tex":
                 case "terrain":
@@ -926,6 +933,8 @@ namespace fCraft {
                     foreach (Player p in world.Players) {
                         if (p.Supports(CpeExt.EnvMapAppearance) || p.Supports(CpeExt.EnvMapAppearance2))
                             p.SendEnvSettings();
+                        else if (p.Supports(CpeExt.EnvMapAppearance3))
+                            p.Send(Packet.MakeEnvSetMapUrl(world.GetTexture()));
                     }
                     break;
 
@@ -986,10 +995,12 @@ namespace fCraft {
             }
         }
 
-        static void SetEnvAppearanceShort(Player player, World world, string value, string name, short defValue, ref short target) {
+        static void SetEnvAppearanceShort(Player player, World world, string value, EnvProp prop,
+                                          string name, short defValue, ref short target) {
             short amount;
             if (value.Equals("-1") || value.Equals("normal", StringComparison.OrdinalIgnoreCase) ||
-                value.Equals("reset", StringComparison.OrdinalIgnoreCase) || value.Equals("default", StringComparison.OrdinalIgnoreCase)) {
+                value.Equals("reset", StringComparison.OrdinalIgnoreCase) 
+                || value.Equals("default", StringComparison.OrdinalIgnoreCase)) {
                 player.Message("Reset {0} for {1}&S to normal", name, world.ClassyName);
                 target = defValue;
             } else {
@@ -1005,11 +1016,15 @@ namespace fCraft {
             foreach (Player p in world.Players) {
                 if (p.Supports(CpeExt.EnvMapAppearance) || p.Supports(CpeExt.EnvMapAppearance2))
                     p.SendEnvSettings();
+                else if (p.Supports(CpeExt.EnvMapAppearance3))
+                    p.Send(Packet.MakeEnvSetMapProperty(prop, target));
             }
         }
 
-        static void SetEnvAppearanceBlock(Player player, World world, string value, string name, Block defValue, ref byte target) {
-            if (value.Equals("normal", StringComparison.OrdinalIgnoreCase) || value.Equals("default", StringComparison.OrdinalIgnoreCase)) {
+        static void SetEnvAppearanceBlock(Player player, World world, string value, EnvProp prop,
+                                          string name, Block defValue, ref byte target) {
+            if (value.Equals("normal", StringComparison.OrdinalIgnoreCase) 
+                || value.Equals("default", StringComparison.OrdinalIgnoreCase)) {
                 player.Message("Reset {0} for {1}&S to normal ({2})", name, world.ClassyName, defValue);
                 target = (byte)defValue;
             } else {
@@ -1025,6 +1040,8 @@ namespace fCraft {
             foreach (Player p in world.Players) {
                 if (p.Supports(CpeExt.EnvMapAppearance) || p.Supports(CpeExt.EnvMapAppearance2))
                     p.SendEnvSettings();
+                else if (p.Supports(CpeExt.EnvMapAppearance3))
+                    p.Send(Packet.MakeEnvSetMapProperty(prop, target));
             }
         }
 
