@@ -957,8 +957,8 @@ namespace fCraft {
                            world.GetCloudsHeight() + " blocks",
                            world.MaxFogDistance <= 0 ? "(no limit)" : world.MaxFogDistance.ToString());
             player.Message("  Cloud speed: {0}  Weather speed: {1}",
-                           (world.CloudsSpeed / 256f) + " %",
-                           (world.WeatherSpeed / 256f) + " %");
+                           (world.CloudsSpeed / 256f).ToString("F2") + " %",
+                           (world.WeatherSpeed / 256f).ToString("F2") + " %");
             player.Message("  Water block: {1}  Bedrock block: {0}",
                            world.EdgeBlock, world.HorizonBlock);
             player.Message("  Texture: {0}", world.GetTexture());
