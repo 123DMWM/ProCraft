@@ -527,6 +527,23 @@ namespace fCraft {
             packet.Bytes[5] = (byte)col.Code;
             return packet;
         }
+        
+        [Pure]
+        public static Packet MakeEnvSetMapUrl( [NotNull] string textureUrl ) {
+            if( textureUrl == null ) throw new ArgumentNullException( "textureUrl" );
+            Packet packet = new Packet( OpCode.SetEnvMapUrl );
+            Encoding.ASCII.GetBytes( textureUrl.PadRight( 64 ), 0, 64, packet.Bytes, 1 );
+            return packet;
+        }
+        
+        [Pure]
+        public static Packet MakeEnvSetMapAppearance( EnvProperty prop, int value ) {
+            if( textureUrl == null ) throw new ArgumentNullException( "textureUrl" );
+            Packet packet = new Packet( OpCode.SetEnvMapProperty );
+            packet.Bytes[1] = (byte)prop;
+            ToNetOrder( value, packet.Bytes, 2 );
+            return packet;
+        }
 
         #endregion
 
@@ -585,6 +602,8 @@ namespace fCraft {
             85, // DefineBlockExt
             1282, // BulkBlockUpdate
             6, // SetTextColor
+            65, // SetEnvMapUrl
+            6, // SetEnvMapProperty
         };
     }
     

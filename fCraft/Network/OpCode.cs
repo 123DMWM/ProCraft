@@ -127,6 +127,12 @@ namespace fCraft
         
         /// <summary> Packet telling the client to define or undefine a custom text color. </summary>
         SetTextColor = 39,
+        
+        /// <summary> Packet telling to the client about the custom texture pack used. </summary>
+        SetEnvMapUrl = 40,
+        
+        /// <summary> Packet telling the client to update an environmental aspect of the current map. </summary>
+        SetEnvMapProperty = 41,
     }
 }
 

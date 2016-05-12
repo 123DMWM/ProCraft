@@ -93,8 +93,7 @@ namespace fCraft
     }
 
 
-    public enum EnvVariable : byte
-    {
+    public enum EnvVariable : byte {
         SkyColor = 0,
         CloudColor = 1,
         FogColor = 2,
@@ -102,8 +101,7 @@ namespace fCraft
         Sunlight = 4
     }
 
-    public enum WeatherType : byte
-    {
+    public enum WeatherType : byte {
         Sunny = 0,
         Raining = 1,
         Snowing = 2
@@ -118,5 +116,16 @@ namespace fCraft
         BottomRight2 = 12,
         BottomRight3 = 13,
         Announcement = 100
+    }
+    
+    public enum EnvProperty : byte {
+        SidesBlock = 0,
+        EdgeBlock = 1,
+        EdgeLevel = 2,
+        CloudsLevel = 3,
+        MaxFog = 4,
+        CloudsSpeed = 5,
+        WeatherSpeed = 6,
+        WeatherFade = 7,
     }
 }
