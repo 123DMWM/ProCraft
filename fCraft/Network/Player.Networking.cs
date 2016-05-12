@@ -1388,6 +1388,8 @@ namespace fCraft {
                 Send(Packet.MakeEnvSetMapProperty(EnvProp.EdgeLevel, World.GetEdgeLevel()));
                 Send(Packet.MakeEnvSetMapProperty(EnvProp.CloudsLevel, World.GetCloudsHeight()));
                 Send(Packet.MakeEnvSetMapProperty(EnvProp.MaxFog, World.MaxFogDistance));
+                Send(Packet.MakeEnvSetMapProperty(EnvProp.CloudsSpeed, World.CloudsSpeed));
+                Send(Packet.MakeEnvSetMapProperty(EnvProp.WeatherSpeed, World.WeatherSpeed));                
             } else if (Supports(CpeExt.EnvMapAppearance2)) {
                 Send(Packet.MakeEnvSetMapAppearance2(World.GetTexture(), side, edge, World.GetEdgeLevel(),
                                                      World.GetCloudsHeight(), World.MaxFogDistance));

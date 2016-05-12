@@ -799,54 +799,15 @@ namespace fCraft {
                 if (world == null) return;
             }
 
-            string variable = cmd.Next();
-            string value = cmd.Next();
-            string maybe = cmd.Next();
+            string variable = cmd.Next(), value = cmd.Next();
             if (variable == null) {
-                player.Message("Environment settings for world {0}&S:", world.ClassyName);
-                player.Message("  Cloud: {0}   Fog: {1}   Sky: {2}",
-                                world.CloudColor == null ? "normal" : '#' + world.CloudColor,
-                                world.FogColor == null ? "normal" : '#' + world.FogColor,
-                                world.SkyColor == null ? "normal" : '#' + world.SkyColor);
-                player.Message("  Shadow: {0}   Sunlight: {1}  Edge level: {2}",
-                                world.ShadowColor == null ? "normal" : '#' + world.ShadowColor,
-                                world.LightColor == null ? "normal" : '#' + world.LightColor,
-                                world.GetEdgeLevel() + " blocks");
-                player.Message("  Clouds height: {0}  Max fog distance: {1}",
-                                world.GetCloudsHeight() + " blocks",
-                                world.MaxFogDistance <= 0 ? "(no limit)" : world.MaxFogDistance.ToString());
-                player.Message("  Water block: {1}  Bedrock block: {0}",
-                                world.EdgeBlock, world.HorizonBlock);
-                player.Message("  Texture: {0}", world.GetTexture());
-                if (!player.IsUsingWoM) {
-                    player.Message("  You need ClassiCube or ClassicalSharp client to see the changes.");
-                }
+                ShowEnvSettings(player, world);
                 return;
             }
 
             if (variable.Equals("normal", StringComparison.OrdinalIgnoreCase)) {
                 if (cmd.IsConfirmed) {
-                    world.FogColor = null;
-                    world.CloudColor = null;
-                    world.SkyColor = null;
-                    world.ShadowColor = null;
-                    world.LightColor = null;
-                    world.EdgeLevel = -1;
-                    world.CloudsHeight = short.MinValue;
-                    world.MaxFogDistance = 0;
-                    world.EdgeBlock = (byte)Block.Admincrete;
-                    world.HorizonBlock = (byte)Block.Water;
-                    world.Texture = "Default";
-                    Logger.Log(LogType.UserActivity,
-                                "Env: {0} {1} reset environment settings for world {2}",
-                                player.Info.Rank.Name, player.Name, world.Name);
-                    player.Message("Enviroment settings for world {0} &swere reset.", world.ClassyName);
-                    WorldManager.SaveWorldList();
-                    foreach (Player p in world.Players) {
-                        if (p.Supports(CpeExt.EnvMapAppearance) || p.Supports(CpeExt.EnvMapAppearance2) 
-                            || p.Supports(CpeExt.EnvMapAspect))
-                            p.SendEnvSettings();
-                    }
+            		ResetEnv(player, world);
                 } else {
                     Logger.Log(LogType.UserActivity,
                                 "Env: Asked {0} to confirm resetting enviroment settings for world {1}",
@@ -899,6 +860,15 @@ namespace fCraft {
                 case "maxdist":
                     SetEnvAppearanceShort(player, world, value, EnvProp.MaxFog,
                                           "max fog distance", 0, ref world.MaxFogDistance);
+                    break;
+                case "weatherspeed":
+                    SetEnvAppearanceShort(player, world, value, EnvProp.WeatherSpeed,
+                                          "weather speed", 256, ref world.WeatherSpeed);
+                    break;
+                case "cloudspeed":
+                case "cloudsspeed":
+                    SetEnvAppearanceShort(player, world, value, EnvProp.CloudsSpeed,
+                                          "clouds speed", 256, ref world.CloudsSpeed);
                     break;
                 case "horizon":
                 case "edge":
@@ -971,6 +941,57 @@ namespace fCraft {
                     return;
             }
             WorldManager.SaveWorldList();
+        }
+        
+        static void ShowEnvSettings(Player player, World world) {
+            player.Message("Environment settings for world {0}&S:", world.ClassyName);
+            player.Message("  Cloud: {0}   Fog: {1}   Sky: {2}",
+                           world.CloudColor == null ? "normal" : '#' + world.CloudColor,
+                           world.FogColor == null ? "normal" : '#' + world.FogColor,
+                           world.SkyColor == null ? "normal" : '#' + world.SkyColor);
+            player.Message("  Shadow: {0}   Sunlight: {1}  Edge level: {2}",
+                           world.ShadowColor == null ? "normal" : '#' + world.ShadowColor,
+                           world.LightColor == null ? "normal" : '#' + world.LightColor,
+                           world.GetEdgeLevel() + " blocks");
+            player.Message("  Clouds height: {0}  Max fog distance: {1}",
+                           world.GetCloudsHeight() + " blocks",
+                           world.MaxFogDistance <= 0 ? "(no limit)" : world.MaxFogDistance.ToString());
+            player.Message("  Cloud speed: {0}  Weather speed: {1}",
+                           (world.CloudsSpeed / 256f) + " %",
+                           (world.WeatherSpeed / 256f) + " %");
+            player.Message("  Water block: {1}  Bedrock block: {0}",
+                           world.EdgeBlock, world.HorizonBlock);
+            player.Message("  Texture: {0}", world.GetTexture());
+            if (!player.IsUsingWoM) {
+                player.Message("  You need ClassiCube or ClassicalSharp client to see the changes.");
+            }
+        }
+        
+        static void ResetEnv(Player player, World world) {
+            world.FogColor = null;
+            world.CloudColor = null;
+            world.SkyColor = null;
+            world.ShadowColor = null;
+            world.LightColor = null;
+            world.EdgeLevel = -1;
+            world.CloudsHeight = short.MinValue;
+            world.MaxFogDistance = 0;
+            world.EdgeBlock = (byte)Block.Admincrete;
+            world.HorizonBlock = (byte)Block.Water;
+            world.Texture = "Default";
+            world.WeatherSpeed = 256;
+            world.CloudsSpeed = 256;
+            
+            Logger.Log(LogType.UserActivity,
+                       "Env: {0} {1} reset environment settings for world {2}",
+                       player.Info.Rank.Name, player.Name, world.Name);
+            player.Message("Enviroment settings for world {0} &swere reset.", world.ClassyName);
+            WorldManager.SaveWorldList();
+            foreach (Player p in world.Players) {
+                if (p.Supports(CpeExt.EnvMapAppearance) || p.Supports(CpeExt.EnvMapAppearance2)
+                    || p.Supports(CpeExt.EnvMapAspect))
+                    p.SendEnvSettings();
+            }
         }
 
         static void SetEnvColor(Player player, World world, string value, string name, EnvVariable variable, ref string target) {

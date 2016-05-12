@@ -307,6 +307,10 @@ namespace fCraft {
             		ParseShort(tempAttr, "cloudsheight", worldName, short.MinValue, "normal height + 2", ref world.CloudsHeight);
             	if ((tempAttr = envEl.Attribute("maxfog")) != null)
             		ParseShort(tempAttr, "maxfog", worldName, 0, "no limit", ref world.MaxFogDistance);
+            	if ((tempAttr = envEl.Attribute("weatherspeed")) != null)
+            		ParseShort(tempAttr, "weatherspeed", worldName, 256, "normal speed", ref world.WeatherSpeed);
+            	if ((tempAttr = envEl.Attribute("cloudsspeed")) != null)
+            		ParseShort(tempAttr, "cloudsspeed", worldName, 256, "normal speed", ref world.CloudsSpeed);
             	
                 if ((tempAttr = envEl.Attribute("terrain")) != null) {
                     try {
@@ -624,6 +628,8 @@ namespace fCraft {
                     elEnv.Add(new XAttribute("weather", world.Weather));
                     if (world.CloudsHeight != short.MinValue) elEnv.Add(new XAttribute("cloudsheight", world.CloudsHeight));
                     elEnv.Add(new XAttribute("maxfog", world.MaxFogDistance));
+                    elEnv.Add(new XAttribute("weatherspeed", world.WeatherSpeed));
+                    elEnv.Add(new XAttribute("cloudsspeed", world.CloudsSpeed));
                     if( elEnv.HasAttributes ) {
                         temp.Add( elEnv );
                     }

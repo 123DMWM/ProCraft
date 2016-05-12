@@ -263,7 +263,9 @@ namespace fCraft {
                     LightColor = LightColor,
                     ShadowColor = ShadowColor,
                     Weather = Weather,
-                    Texture = Texture
+                    Texture = Texture,
+                    CloudsSpeed = CloudsSpeed,
+                    WeatherSpeed = WeatherSpeed,
                 };
                 newMap.World = newWorld;
                 newWorld.Map = newMap;
@@ -966,6 +968,12 @@ namespace fCraft {
         
         /// <summary> Maximum fog distance that can be seen by the player. The default value is 0. </summary>
         public short MaxFogDistance = 0;
+        
+        /// <summary> Clouds speed as seen by the player, in units of 256ths. The default value is 256 (1 speed). </summary>
+        public short CloudsSpeed = 256;
+        
+        /// <summary> Rain/Snow speed as seen by the player, in units of 256ths. The default value is 256 (1 speed). </summary>
+        public short WeatherSpeed = 256;
 
         /// <summary> The block which will be displayed on the horizon. </summary>
         public byte HorizonBlock = (byte)Block.Water;
