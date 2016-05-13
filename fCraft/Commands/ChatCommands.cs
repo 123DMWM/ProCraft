@@ -218,7 +218,6 @@ namespace fCraft
             Category = CommandCategory.New | CommandCategory.Chat,
             Permissions = new[] { Permission.Chat },
             NotRepeatable = true,
-            DisableLogging = true,
             UsableByFrozenPlayers = false,
             Usage = "/Review",
             Help = "Asks available Moderators for a review of your build.",
@@ -1141,7 +1140,6 @@ namespace fCraft
             Category = CommandCategory.New | CommandCategory.Chat,
             Permissions = new[] { Permission.Chat },
             IsConsoleSafe = true,
-            DisableLogging = true,
             UsableByFrozenPlayers = true,
             Usage = "/Compare [Word1] [Word2]",
             Help = "Tells you how similar two words are as a percentage",
@@ -1263,8 +1261,6 @@ namespace fCraft
             Permissions = new[] { Permission.Chat },
             IsConsoleSafe = true,
             NotRepeatable = true,
-            DisableLogging = true,
-            UsableByFrozenPlayers = true,
             Usage = "/Action [Player] [Action]",
             Help = "Displays you doing an action to a player. Example: \"/action Facepalmed high fived\" would show up as \"123DontMessWitMe has high fived Facepalmed",
             Handler = ActionHandler
@@ -1307,7 +1303,6 @@ namespace fCraft
             Permissions = new[] { Permission.Kick },
             IsConsoleSafe = true,
             NotRepeatable = true,
-            DisableLogging = true,
             Usage = "/Warn [Player] [warning]",
             Help = "Warns a player about a specified message. Example: \"/Warn Facepalmed stop griefing\" would show up as \"123DontMessWitMe has warned Facepalmed to stop griefing",
             Handler = WarningHandler
