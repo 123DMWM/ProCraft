@@ -920,14 +920,14 @@ namespace fCraft {
             if (BlockNames.TryGetValue(blockName.ToLower(), out block)) {
                 return block == Block.None ? allowNoneBlock : true;
             } else {
-                if (world == null) { block = Block.None; return false; }
+                BlockDefinition[] defs = world == null ? 
+                    BlockDefinition.GlobalDefs : world.BlockDefs;
                 byte id;
-                
                 if (Byte.TryParse(blockName, out id)) {
-                    BlockDefinition def = world.BlockDefs[id];
+                    BlockDefinition def = defs[id];
                     if (def != null) { block = (Block)id; return true; }
                 } else {
-                    foreach (BlockDefinition def in world.BlockDefs) {
+                    foreach (BlockDefinition def in defs) {
                         if (def == null || !def.BlockName.Equals(blockName, comp)) continue;
                         block = (Block)def.BlockID; return true;
                     }
