@@ -1039,7 +1039,7 @@ namespace fCraft
         static readonly CommandDescriptor CdQuit = new CommandDescriptor
         {
             Name = "Quit",
-            Aliases = new[] { "quitmessage", "quitmsg", "qm" },
+            Aliases = new[] { "quitmessage", "quitmsg", "qm", "rq", "ragequit" },
             Category = CommandCategory.New | CommandCategory.Chat,
             IsConsoleSafe = false,
             Permissions = new[] { Permission.Chat },
