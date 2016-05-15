@@ -739,46 +739,59 @@ namespace fCraft {
             Name = "Env",
             Category = CommandCategory.CPE | CommandCategory.World,
             Permissions = new[] { Permission.ManageWorlds },
-            Help = "Prints or changes the environmental variables for a given world. " +
-                   "Variables are: border, clouds, edge, fog, level, cloudsheight, shadow, sky, sunlight, texture, weather, maxfog. " +
-                   "See &H/Help env <Variable>&S for details about each variable. " +
-                   "Type &H/Env <WorldName> normal&S to reset everything for a world.",
+            Help = "Prints or changes environmental variables for a world.&n" +
+                   "Variables are: border, clouds, edge, fog, level, cloudsheight, shadow, sky, sunlight, " +
+            	   "texture, weather, maxfog, cloudspeed, weatherspeed, weatherfade.&n" +
+                   "See &H/Help env <Variable>&S for details about each variable.&n" +
+                   "Type &H/Env <WorldName> normal&S to reset everything.",
             HelpSections = new Dictionary<string, string>{
                 { "normal",     "&H/Env <WorldName> normal&n&S" +
                                 "Resets all environment settings to their defaults for the given world." },
                 { "clouds",     "&H/Env <WorldName> clouds <Color>&n&S" +
-                                "Sets color of the clouds. Use \"normal\" instead of color to reset." },
+                                "Sets color of the clouds." +
+                                "&nUse \"normal\" instead of color to reset." },
                 { "fog",        "&H/Env <WorldName> fog <Color>&n&S" +
                                 "Sets color of the fog. Sky color blends with fog color in the distance. " +
-                                "Use \"normal\" instead of color to reset." },
+                                "&nUse \"normal\" instead of color to reset." },
                 { "shadow",     "&H/Env <WorldName> shadow <Color>&n&S" +
-                                "Sets color of the shadowed areas. Use \"normal\" instead of color to reset." },
+                                "Sets color of the shadowed areas. " +
+                                "&nUse \"normal\" instead of color to reset." },
                 { "sunlight",   "&H/Env <WorldName> sunlight <Color>&n&S" +
-                                "Sets color of the lighted areas. Use \"normal\" instead of color to reset." },
+                                "Sets color of the lighted areas. " +
+                                "&nUse \"normal\" instead of color to reset." },
                 { "sky",        "&H/Env <WorldName> sky <Color>&n&S" +
                                 "Sets color of the sky. Sky color blends with fog color in the distance. " +
-                                "Use \"normal\" instead of color to reset." },
+                                "&nUse \"normal\" instead of color to reset." },
                 { "level",      "&H/Env <WorldName> level <#>&n&S" +
                                 "Sets height of the map edges/water level, in terms of blocks from the bottom of the map. " +
-                                "Use \"normal\" instead of a number to reset to default (middle of the map)." },
+                                "&nUse \"normal\" instead of a number to reset to default (middle of the map)." },
                 { "cloudsheight","&H/Env <WorldName> cloudsheight <#>&n&S" +
                                 "Sets height of the clouds, in terms of blocks from the bottom of the map. " +
-                                "Use \"normal\" instead of a number to reset to default (map height + 2)." },
+                                "&nUse \"normal\" instead of a number to reset to default (map height + 2)." },
                 { "edge",       "&H/Env <WorldName> edge <BlockType>&n&S" +
                                 "Changes the type of block that's visible beyond the map boundaries. "+
-                                "Use \"normal\" instead of a number to reset to default (water)." },
+                                "&nUse \"normal\" instead of a number to reset to default (water)." },
                 { "border",     "&H/Env <WorldName> border <BlockType>&n&S" +
                                 "Changes the type of block that's visible on sides the map boundaries. "+
-                                "Use \"normal\" instead of a number to reset to default (bedrock)." },
+                                "&nUse \"normal\" instead of a number to reset to default (bedrock)." },
                 { "texture",    "&H/Env <WorldName> texture <Texture .PNG Url>&n&S" +
                                 "Changes the texture for all visible blocks on a map. "+
-                                "Use \"normal\" instead of a web link to reset to default (" + Server.DefaultTerrain + ")" },
+                                "&nUse \"normal\" instead of a web link to reset to default (" + Server.DefaultTerrain + ")" },
                 { "weather",    "&H/Env <WorldName> weather <0,1,2/sun,rain,snow>&n&S" +
                                 "Changes the weather on a specified map. "+
-                                "Use \"normal\" instead to use default (0/sun)" },
+                                "&nUse \"normal\" instead to use default (0/sun)" },
                 { "maxfog",     "&H/Env <WorldName> maxfog <#>&n&S" +
                                 "Sets the maximum distance clients can see around them. " +
-                                "Use \"normal\" instead of a number to reset to default (0)." }
+                                "&nUse \"normal\" instead of a number to reset to default (0)." },
+                { "cloudspeed", "&H/Env <WorldName> cloudspeed <#>&n&S" +
+                                "Sets how fast clouds travel across the sky, relative to normal speed. Can be negative." +
+                                "&nUse \"normal\" instead of a number to reset to default (0)." },
+                { "weatherspeed","&H/Env <WorldName> weatherspeed <#>&n&S" +
+                                "Sets how fast rain/snow falls, relative to normal speed. Can be negative." +
+                                "&nUse \"normal\" instead of a number to reset to default (0)." },
+                { "weatherfade","&H/Env <WorldName> weatherfade <#>&n&S" +
+                                "Sets how quickly rain/snow fades, relative to normal rate." +
+                                "&nUse \"normal\" instead of a number to reset to default (0)." }
             },
             Usage = "/Env <WorldName> <Variable>",
             IsConsoleSafe = true,
