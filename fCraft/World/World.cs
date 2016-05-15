@@ -266,6 +266,7 @@ namespace fCraft {
                     Texture = Texture,
                     CloudsSpeed = CloudsSpeed,
                     WeatherSpeed = WeatherSpeed,
+                    WeatherFade = WeatherFade,
                 };
                 newMap.World = newWorld;
                 newWorld.Map = newMap;
@@ -974,6 +975,9 @@ namespace fCraft {
         
         /// <summary> Rain/Snow speed as seen by the player, in units of 256ths. The default value is 256 (1 speed). </summary>
         public short WeatherSpeed = 256;
+        
+        /// <summary> Rain/Snow fade speed as seen by the player, in units of 128ths. The default value is 128 (1 speed). </summary>
+        public short WeatherFade = 128;
 
         /// <summary> The block which will be displayed on the horizon. </summary>
         public byte HorizonBlock = (byte)Block.Water;

@@ -311,6 +311,8 @@ namespace fCraft {
             		ParseShort(tempAttr, "weatherspeed", worldName, 256, "normal speed", ref world.WeatherSpeed);
             	if ((tempAttr = envEl.Attribute("cloudsspeed")) != null)
             		ParseShort(tempAttr, "cloudsspeed", worldName, 256, "normal speed", ref world.CloudsSpeed);
+            	if ((tempAttr = envEl.Attribute("weatherfade")) != null)
+            		ParseShort(tempAttr, "weatherfade", worldName, 128, "normal rate", ref world.WeatherFade);
             	
                 if ((tempAttr = envEl.Attribute("terrain")) != null) {
                     try {
@@ -630,6 +632,7 @@ namespace fCraft {
                     elEnv.Add(new XAttribute("maxfog", world.MaxFogDistance));
                     elEnv.Add(new XAttribute("weatherspeed", world.WeatherSpeed));
                     elEnv.Add(new XAttribute("cloudsspeed", world.CloudsSpeed));
+                    elEnv.Add(new XAttribute("weatherfade", world.WeatherFade));
                     if( elEnv.HasAttributes ) {
                         temp.Add( elEnv );
                     }

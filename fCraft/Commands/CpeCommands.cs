@@ -874,14 +874,18 @@ namespace fCraft {
                     SetEnvAppearanceShort(player, world, value, EnvProp.MaxFog,
                                           "max fog distance", 0, ref world.MaxFogDistance);
                     break;
+                case "weatherfade":
+                    SetEnvAppearanceFloat(player, world, value, EnvProp.WeatherFade, "weather fade rate", 
+                                          0, 255, 128, 128, ref world.WeatherFade);
+                    break;
                 case "weatherspeed":
-                    SetEnvAppearanceShort(player, world, value, EnvProp.WeatherSpeed,
-                                          "weather speed", 256, ref world.WeatherSpeed);
+                    SetEnvAppearanceFloat(player, world, value, EnvProp.WeatherSpeed, "weather speed", 
+                                          -32767, 32767, 256, 256, ref world.WeatherSpeed);
                     break;
                 case "cloudspeed":
                 case "cloudsspeed":
-                    SetEnvAppearanceShort(player, world, value, EnvProp.CloudsSpeed,
-                                          "clouds speed", 256, ref world.CloudsSpeed);
+                    SetEnvAppearanceFloat(player, world, value, EnvProp.CloudsSpeed, "clouds speed", 
+                                          -32767, 32767, 256, 256, ref world.CloudsSpeed);
                     break;
                 case "horizon":
                 case "edge":
@@ -970,8 +974,10 @@ namespace fCraft {
                            world.GetCloudsHeight() + " blocks",
                            world.MaxFogDistance <= 0 ? "(no limit)" : world.MaxFogDistance.ToString());
             player.Message("  Cloud speed: {0}  Weather speed: {1}",
-                           (world.CloudsSpeed / 256f).ToString("F2") + " %",
-                           (world.WeatherSpeed / 256f).ToString("F2") + " %");
+                           (world.CloudsSpeed / 256f).ToString("F2") + "%",
+                           (world.WeatherSpeed / 256f).ToString("F2") + "%");
+            player.Message("  Weather fade rate: {0}",
+                           (world.WeatherFade / 128f).ToString("F2") + "%");
             player.Message("  Water block: {1}  Bedrock block: {0}",
                            world.EdgeBlock, world.HorizonBlock);
             player.Message("  Texture: {0}", world.GetTexture());
@@ -994,6 +1000,7 @@ namespace fCraft {
             world.Texture = "Default";
             world.WeatherSpeed = 256;
             world.CloudsSpeed = 256;
+            world.WeatherFade = 128;
             
             Logger.Log(LogType.UserActivity,
                        "Env: {0} {1} reset environment settings for world {2}",
@@ -1007,19 +1014,17 @@ namespace fCraft {
             }
         }
 
-        static void SetEnvColor(Player player, World world, string value, string name, EnvVariable variable, ref string target) {
-            if (value.Equals("-1") || value.Equals("normal", StringComparison.OrdinalIgnoreCase) ||
-                value.Equals("reset", StringComparison.OrdinalIgnoreCase) || value.Equals("default", StringComparison.OrdinalIgnoreCase)) {
+        static void SetEnvColor(Player player, World world, string value,
+                                string name, EnvVariable variable, ref string target) {
+            if (IsReset(value)) {
                 player.Message("Reset {0} for {1}&S to normal", name, world.ClassyName);
                 target = null;
+            } else if (!IsValidHex(value)) {
+                player.Message("Env: \"#{0}\" is not a valid HEX color code.", value);
+                return;
             } else {
-                if (!IsValidHex(value)) {
-                    player.Message("Env: \"#{0}\" is not a valid HEX color code.", value);
-                    return;
-                } else {
-                    target = value;
-                    player.Message("Set {0} for {1}&S to #{2}", name, world.ClassyName, value);
-                }
+                target = value;
+                player.Message("Set {0} for {1}&S to #{2}", name, world.ClassyName, value);
             }
 
             foreach (Player p in world.Players) {
@@ -1027,37 +1032,48 @@ namespace fCraft {
                     p.Send(Packet.MakeEnvSetColor((byte)variable, target));
             }
         }
+        
+        static void SetEnvAppearanceFloat(Player player, World world, string value, EnvProp prop,
+                                          string name, float min, float max, int scale,
+                                          short defValue, ref short target) {
+            float amount;
+            min /= scale; max /= scale;
+            if (IsReset(value)) {
+                player.Message("Reset {0} for {1}&S to normal", name, world.ClassyName);
+                target = defValue;
+            } else if (!float.TryParse(value, out amount)) {
+                player.Message("Env: \"{0}\" is not a valid decimal.", value);
+                return;
+            } else if (amount < min || amount > max) {
+                player.Message("Env: \"{0}\" must be between {1} and {2}.",
+                               value, min.ToString("F2"), max.ToString("F2"));
+                return;
+            } else {
+                target = (short)(amount * scale);
+                player.Message("Set {0} for {1}&S to {2}", name, world.ClassyName, amount);
+            }
+            UpdateAppearance(world, prop, target);
+        }
 
         static void SetEnvAppearanceShort(Player player, World world, string value, EnvProp prop,
                                           string name, short defValue, ref short target) {
             short amount;
-            if (value.Equals("-1") || value.Equals("normal", StringComparison.OrdinalIgnoreCase) ||
-                value.Equals("reset", StringComparison.OrdinalIgnoreCase) 
-                || value.Equals("default", StringComparison.OrdinalIgnoreCase)) {
+            if (IsReset(value)) {
                 player.Message("Reset {0} for {1}&S to normal", name, world.ClassyName);
                 target = defValue;
+            } else if (!short.TryParse(value, out amount)) {
+                player.Message("Env: \"{0}\" is not a valid integer.", value);
+                return;
             } else {
-                if (!short.TryParse(value, out amount)) {
-                    player.Message("Env: \"{0}\" is not a valid integer.", value);
-                    return;
-                } else {
-                    target = amount;
-                    player.Message("Set {0} for {1}&S to {2}", name, world.ClassyName, amount);
-                }
+                target = amount;
+                player.Message("Set {0} for {1}&S to {2}", name, world.ClassyName, amount);
             }
-
-            foreach (Player p in world.Players) {
-            	if (p.Supports(CpeExt.EnvMapAspect))
-                    p.Send(Packet.MakeEnvSetMapProperty(prop, target));
-                else if (p.Supports(CpeExt.EnvMapAppearance) || p.Supports(CpeExt.EnvMapAppearance2))
-                    p.SendEnvSettings();
-            }
+            UpdateAppearance(world, prop, target);
         }
 
         static void SetEnvAppearanceBlock(Player player, World world, string value, EnvProp prop,
                                           string name, Block defValue, ref byte target) {
-            if (value.Equals("normal", StringComparison.OrdinalIgnoreCase) 
-                || value.Equals("default", StringComparison.OrdinalIgnoreCase)) {
+        	if (IsReset(value)) {
                 player.Message("Reset {0} for {1}&S to normal ({2})", name, world.ClassyName, defValue);
                 target = (byte)defValue;
             } else {
@@ -1069,8 +1085,17 @@ namespace fCraft {
                 target = (byte)block;
                 player.Message("Set {0} for {1}&S to {2}", name, world.ClassyName, block);
             }
-
-            foreach (Player p in world.Players) {
+        	UpdateAppearance(world, prop, target);
+        }
+        
+        static bool IsReset(string value) {
+        	return value.Equals("-1") || value.Equals("normal", StringComparison.OrdinalIgnoreCase) 
+        		|| value.Equals("reset", StringComparison.OrdinalIgnoreCase)
+        		|| value.Equals("default", StringComparison.OrdinalIgnoreCase);
+        }
+        
+        static void UpdateAppearance(World world, EnvProp prop, int target) {
+        	foreach (Player p in world.Players) {
         		if (p.Supports(CpeExt.EnvMapAspect))
                     p.Send(Packet.MakeEnvSetMapProperty(prop, target));
                 else if (p.Supports(CpeExt.EnvMapAppearance) || p.Supports(CpeExt.EnvMapAppearance2))
