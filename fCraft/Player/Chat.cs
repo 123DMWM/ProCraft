@@ -87,9 +87,9 @@ namespace fCraft {
                 }
             }
             if (player.ChatRainbows) {
-                rawMessage = Rainbow.Rainbowize(rawMessage);
+                rawMessage = Colorize(rawMessage, RainbowChars);
             } else if (player.ChatBWRainbows) {
-                rawMessage = Rainbow.BWRainbowize(rawMessage);
+                rawMessage = Colorize(rawMessage, BWRainbowChars);
             }
 
             var recipientList = Server.Players.NotIgnoring(player);
@@ -115,6 +115,27 @@ namespace fCraft {
             return true;
         }
 
+        static readonly char[] RainbowChars = { 'c', '4', '6', 'e', 'a', '2', 'b', '3', '9', '1', 'd', '5' };
+        static readonly char[] BWRainbowChars = { '0', '8', '7', 'f', '7', '8' };
+
+        // Adds a table of colors to given input string.
+        // Note that there is no trailing color code! Add one if
+        // you don't want color to "leak" past the end of this string.
+        static string Colorize(string str, char[] table) {
+            if (str == null) throw new ArgumentNullException("str");
+            StringBuilder sb = new StringBuilder();
+            int i = 0;
+            
+            foreach (char c in Color.StripColors(str)) {
+                if (!Char.IsWhiteSpace(c)) {
+                    sb.Append('&').Append(table[i % table.Length]);
+                    i++;
+                }
+                sb.Append(c);
+            }
+            return sb.ToString();
+        }
+        
         static void checkBotResponses(Player player, string rawMessage) {
             if (player.Can(Permission.UseBot)) {
                 if (rawMessage.StartsWith("Bot ", StringComparison.OrdinalIgnoreCase) && rawMessage.Length < 17) {
