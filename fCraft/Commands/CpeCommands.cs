@@ -27,7 +27,6 @@ namespace fCraft {
             CommandManager.RegisterCommand(CdMRD);
             CommandManager.RegisterCommand(Cdtex);
             CommandManager.RegisterCommand(CdtextHotKey);
-            CommandManager.RegisterCommand(Cdweather);
             CommandManager.RegisterCommand(CdZoneShow);
         }
 
@@ -742,7 +741,7 @@ namespace fCraft {
             Help = "Prints or changes environmental variables for a world.&n" +
                    "Variables are: border, clouds, edge, fog, level, cloudsheight, shadow, sky, sunlight, " +
             	   "texture, weather, maxfog, cloudspeed, weatherspeed, weatherfade.&n" +
-                   "See &H/Help env <Variable>&S for details about each variable.&n" +
+                   "See &H/Help env <Variable>&S for details about a variable.&n" +
                    "Type &H/Env <WorldName> normal&S to reset everything.",
             HelpSections = new Dictionary<string, string>{
                 { "normal",     "&H/Env <WorldName> normal&n&S" +
@@ -2249,7 +2248,7 @@ namespace fCraft {
         private static void MRDHandler([NotNull] Player player, [NotNull] CommandReader cmd) {
             string disString = cmd.Next();
             if (disString == null) {
-                player.Message(CdMRD.Usage);
+                CdMRD.PrintUsage(player);
                 return;
             }
             string worldString = cmd.Next();
@@ -2373,7 +2372,7 @@ namespace fCraft {
             }
             if (color == null) {
                 player.Message("Error: Missing a Hex Color code");
-                player.Message(CdZoneShow.Usage);
+                CdZoneShow.PrintUsage(player);
                 return;
             } else {
                 color = color.ToUpper();
@@ -2405,7 +2404,7 @@ namespace fCraft {
 
             if (alp == null) {
                 player.Message("Error: Missing an Alpha integer");
-                player.Message(CdZoneShow.Usage);
+                CdZoneShow.PrintUsage(player);
                 return;
             }
             if (!short.TryParse(alp, out alpha)) {

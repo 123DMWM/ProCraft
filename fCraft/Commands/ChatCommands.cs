@@ -1262,7 +1262,8 @@ namespace fCraft
             IsConsoleSafe = true,
             NotRepeatable = true,
             Usage = "/Action [Player] [Action]",
-            Help = "Displays you doing an action to a player. Example: \"/action Facepalmed high fived\" would show up as \"123DontMessWitMe has high fived Facepalmed",
+            Help = "Displays you doing an action to a player. " +
+            	"Example: \"/action Facepalmed high fived\" would show up as \"123DontMessWitMe has high fived Facepalmed",
             Handler = ActionHandler
         };
 

@@ -1322,12 +1322,12 @@ namespace fCraft {
                     }
                 } else {
                     StringBuilder sb = new StringBuilder( Color.Help );
-                    sb.Append( descriptor.Usage ).Append( "&N" );
+                    sb.Append( descriptor.Usage ).Append( "&N&S" );
 
                     if( descriptor.Aliases != null ) {
                         sb.Append( "Aliases: &H" );
                         sb.Append( descriptor.Aliases.JoinToString() );
-                        sb.Append( "&n&S" );
+                        sb.Append( "&N&S" );
                     }
 
                     if( String.IsNullOrEmpty( descriptor.Help ) ) {
@@ -2021,7 +2021,7 @@ namespace fCraft {
 			string ipString = cmd.Next();
 			IPAddress ip;
 			if (ipString == null) {
-				player.Message(CdGeoipNp.Usage);
+				CdGeoipNp.PrintUsage(player);
 				return;
 			}
 			if (!(IPAddressUtil.IsIP(ipString) && IPAddress.TryParse(ipString, out ip))) {
@@ -2103,7 +2103,7 @@ namespace fCraft {
         private static void APIPInfoHandler(Player player, CommandReader cmd) {
             string type = cmd.Next();
             if (string.IsNullOrEmpty(type)) {
-                player.Message(CdApi.Usage);
+                CdApi.PrintUsage(player);
                 return;
             }
             string value = cmd.Next();

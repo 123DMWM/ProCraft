@@ -772,7 +772,7 @@ namespace fCraft {
         private static void DisPlace(Player player, CommandReader cmd) {
             Block block;
             if (cmd.Count <= 2) {
-                player.Message(CdDisPlace.Usage);
+                CdDisPlace.PrintUsage(player);
                 return;
             }
             string tryBlock = cmd.Next();
@@ -2946,7 +2946,7 @@ namespace fCraft {
             string slength = cmd.Next();
             int length;
             if (slength == null) {
-                player.Message(CdSnake.Usage);
+                CdSnake.PrintUsage(player);
                 return;
             }
             if (!int.TryParse(slength, out length)) {

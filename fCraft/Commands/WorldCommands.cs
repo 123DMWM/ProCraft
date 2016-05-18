@@ -3546,7 +3546,7 @@ namespace fCraft {
                 }
                 int max;
                 if (!int.TryParse(rmax, out max)) {
-                    player.Message(CdMaxPW.Usage);
+                    CdMaxPW.PrintUsage(player);
                     return;
                 }
                 if (rank != null) {

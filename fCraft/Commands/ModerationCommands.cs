@@ -1813,7 +1813,7 @@ namespace fCraft {
                 int mcaps;
                 if (!int.TryParse(rmax, out mcaps))
                 {
-                    player.Message(CdMaxCaps.Usage);
+                    CdMaxCaps.PrintUsage(player);
                     return;
                 }
                 if (rank != null)
