@@ -2344,66 +2344,6 @@ namespace fCraft {
 
         #endregion
 
-        #region Weather
-
-        static readonly CommandDescriptor Cdweather = new CommandDescriptor {
-            Name = "weather",
-            Permissions = new[] { Permission.ReadStaffChat },
-            Category = CommandCategory.CPE | CommandCategory.World,
-            Help = "Changes player weather ingame 0(sun) 1(rain) 2(snow)",
-            Usage = "/weather [Player] [weather]",
-            Handler = WeatherHandler
-        };
-
-        static void WeatherHandler(Player player, CommandReader cmd) {
-            if (cmd.Count == 1) {
-                player.Message(Cdweather.Usage);
-                return;
-            }
-            string name = cmd.Next();
-            PlayerInfo p = PlayerDB.FindPlayerInfoOrPrintMatches(player, name, SearchOptions.IncludeSelf);
-            if (p == null) {
-                return;
-            }
-            string valueText = cmd.Next();
-            byte weather;
-            if (!byte.TryParse(valueText, out weather)) {
-                if (valueText.Equals("sun", StringComparison.OrdinalIgnoreCase)) {
-                    weather = 0;
-                } else if (valueText.Equals("rain", StringComparison.OrdinalIgnoreCase)) {
-                    weather = 1;
-                } else if (valueText.Equals("snow", StringComparison.OrdinalIgnoreCase)) {
-                    weather = 2;
-                }
-            }
-            if (weather < 0 || weather > 2) {
-                player.Message("Please use a valid integer(0,1,2) or string(sun,rain,snow)");
-                return;
-            }
-            if (p != player.Info) {
-                if (p.IsOnline) {
-                    if (p.PlayerObject.Supports(CpeExt.EnvWeatherType)) {
-                        p.PlayerObject.Message("&a{0} set your weather to {1} ({2}&a)", player.Name, weather, weather == 0 ? "&sSun" : (weather == 1 ? "&1Rain" : "&fSnow"));
-                        player.Message("&aSet weather for {0} to {1} ({2}&a)", p.Name, weather, weather == 0 ? "&sSun" : (weather == 1 ? "&1Rain" : "&fSnow"));
-                        p.PlayerObject.Send(Packet.SetWeather((byte)weather));
-                    } else {
-                        player.Message("That player does not support WeatherType packet");
-                    }
-                } else if (p.IsOnline == false || !player.CanSee(p.PlayerObject)) {
-                    player.Message("That player is not online!");
-                }
-            } else {
-                if (player.Supports(CpeExt.EnvWeatherType)) {
-                    player.Message("&aSet weather to {0} ({1}&a)", weather, weather == 0 ? "&sSun" : (weather == 1 ? "&1Rain" : "&fSnow"));
-                    player.Send(Packet.SetWeather((byte)weather));
-                } else {
-                    player.Message("You don't support WeatherType packet");
-                }
-            }
-        }
-
-        #endregion
-
         #region ZoneShow
 
         static readonly CommandDescriptor CdZoneShow = new CommandDescriptor {
