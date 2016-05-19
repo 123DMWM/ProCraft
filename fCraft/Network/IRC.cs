@@ -45,8 +45,8 @@ namespace fCraft
     {
         const string ResetReplacement = "\u0003\u000F",
                      BoldReplacement = "\u0002",
-                     ResetCode = "\u211C",
-                     BoldCode = "\u212C";
+                     Reset = "\u211C",
+                     Bold = "\u212C";
 
         static readonly Regex IrcNickRegex = new Regex(@"\A[a-z_\-\[\]\\^{}|`][a-z0-9_\-\[\]\\^{}|`]*\z",
                                                         RegexOptions.IgnoreCase),
@@ -371,32 +371,32 @@ namespace fCraft
 
                                                 if (target.Info.IsHidden == true) {
                                                     // message was sent to a hidden player
-													SendChannelMessage("\u211CNo players found matching \"\u212C" +
-																	   otherPlayerName + "\u211C\"");
+													SendChannelMessage("No players found matching \"" +
+																	   Bold + otherPlayerName + Reset + "\"");
                                                     lastIrcCommand = DateTime.UtcNow;
 
                                                 } else {
                                                     // message was sent normally
                                                     if (target.Info.ReadIRC == false) {
                                                         if (target.Info.IsHidden == false) {
-															SendChannelMessage("\u211C&WCannot PM \u212C" +
-                                                                               target.ClassyName +
-																			   "\u211C&W: they have IRC ignored.");
+															SendChannelMessage("&WCannot PM " + Bold + 
+                                                    		                   target.ClassyName + Reset +
+																			   "&W: they have IRC ignored.");
                                                         }
                                                     } else if (target.IsDeaf) {
-														SendChannelMessage("\u211C&WCannot PM \u212C" +
+														SendChannelMessage("&WCannot PM " + Bold +
                                                                            target.ClassyName +
-																		   "\u211C&W: they are currently deaf.");
+																		   Reset + "&W: they are currently deaf.");
                                                     } else {
-														SendChannelMessage("\u211Cto \u212C" + target.Name + "\u211C: " +
+														SendChannelMessage("to " + Bold + target.Name + Reset + ": " +
                                                                            messageText);
                                                     }
                                                     lastIrcCommand = DateTime.UtcNow;
                                                 }
 
                                             } else if (allPlayers.Length == 0) {
-												SendChannelMessage("\u211CNo players found matching \"\u212C" +
-																   otherPlayerName + "\u211C\"");
+												SendChannelMessage("No players found matching \"" +
+																   Bold + otherPlayerName + Reset + "\"");
 
                                             } else {
                                                 IClassy[] itemsEnumerated = allPlayers.ToArray();
@@ -404,11 +404,10 @@ namespace fCraft
                                                     .JoinToString(", ", p => p.ClassyName);
                                                 int count = itemsEnumerated.Length;
                                                 if (count > 15) {
-													SendChannelMessage("\u211CMore than \u212C" + count +
-																	   " \u211Cplayers matched: " + nameList);
+													SendChannelMessage("More than " + Bold + count + Reset +
+																	   " players matched: " + nameList);
                                                 } else {
-                                                    SendChannelMessage(
-														"\u211CMore than one player matched: " + nameList);
+                                                    SendChannelMessage("More than one player matched: " + nameList);
                                                 }
                                                 lastIrcCommand = DateTime.UtcNow;
                                             }
@@ -657,7 +656,7 @@ namespace fCraft
             static string Formatter(Player p) {
                 string value = p.Info.Rank.Color + p.Info.Name;
                 if (p.World != null)
-                    value += " &S[" + p.World.ClassyName + "&S]" + ResetCode;
+                    value += " &S[" + p.World.ClassyName + "&S]" + Reset;
                 return value;
             }
             
@@ -674,11 +673,11 @@ namespace fCraft
                         .OrderBy(p => p, PlayerListSorter.Instance).ToArray();
                     
                     if (visiblePlayers.Any()) {
-                        SendChannelMessage("\u212CPlayers online: \u211C" +
+                        SendChannelMessage(Bold + "Players online: " + Reset +
                     	                   visiblePlayers.JoinToString(Formatter));
                         lastIrcCommand = DateTime.UtcNow;
                     } else {
-                        SendChannelMessage("\u212CThere are no players online.");
+                        SendChannelMessage(Bold + "There are no players online.");
                         lastIrcCommand = DateTime.UtcNow;
                     }
                     return true;
@@ -699,23 +698,23 @@ namespace fCraft
                         if (info != null) {
                             Player target = info.PlayerObject;
                             if (target != null) {
-                                SendChannelMessage("\u211CPlayer \u212C{0}\u211C has been \u212C&aOnline\u211C for \u212C{1}",
+                                SendChannelMessage("Player " + Bold + "{0}" + Reset + " has been " + 
+                            	                   Bold + "&aOnline" + Reset + " for " + Bold + "{1}",
                                                    target.Info.Rank.Color + target.Name, target.Info.TimeSinceLastLogin.ToMiniNoColorString());
                                 if (target.World != null) {
-                                    SendChannelMessage("\u211CThey are currently on world \u212C{0}",
+                                    SendChannelMessage("They are currently on world " + Bold + "{0}",
                                                        target.World.ClassyName);
                                 }
                             } else {
-                                SendChannelMessage("\u211CPlayer \u212C{0}\u211C is \u212C&cOffline",
+                                SendChannelMessage("Player " + Bold + "{0}" + Reset + " is " + Bold + "&cOffline",
                                                    info.ClassyName);
                                 SendChannelMessage(
-                                    "\u211CThey were last seen \u212C{0}\u211C ago on world \u212C{1}",
+                                    "They were last seen " + Bold + "{0}" + Reset + " ago on world " + Bold + "{1}",
                                     info.TimeSinceLastSeen.ToMiniNoColorString(),
                                     info.LastWorld);
                             }
                         } else {
-                            SendChannelMessage("\u211CNo player found with name \"\u212C" +
-                                               findPlayer + "\u211C\"");
+                            SendChannelMessage("No player found with name \"" + Bold + findPlayer + Reset + "\"");
                         }
                     } else {
                         SendChannelMessage("Please specify a player name");
@@ -729,13 +728,13 @@ namespace fCraft
                         string findPlayer = rawMessage.Remove(0, messageStart);
                         PlayerInfo info = PlayerDB.FindPlayerInfoExact(findPlayer);
                         if (info != null) {
-                            SendChannelMessage("\u211CPlayer \u212C{0}\u211C has Built: \u212C{1}\u211C blocks Deleted: \u212C{2}\u211C blocks{3}",
-                                               info.ClassyName,
-                                               info.BlocksBuilt,
-                                               info.BlocksDeleted,
-                                               (info.Can(Permission.Draw) ? " Drawn: \u212C" + info.BlocksDrawn + "\u211C blocks." : ""));
+                            SendChannelMessage("Player " + Bold + "{0}" + Reset + 
+                        	                   " has Built: " + Bold + "{1}" + Reset +
+                        	                   " blocks Deleted: " + Bold + "{2}" + Reset + " blocks{3}",
+                                               info.ClassyName, info.BlocksBuilt, info.BlocksDeleted,
+                                               (info.Can(Permission.Draw) ? " Drawn: " + Bold + info.BlocksDrawn + Reset + " blocks." : ""));
                         } else {
-                            SendChannelMessage("No player found with name \"\u212C" + findPlayer + "\u211C\"");
+                            SendChannelMessage("No player found with name \"" + Bold + findPlayer + Reset + "\"");
                         }
                     } else {
                         SendChannelMessage("Please specify a player name.");
@@ -750,19 +749,20 @@ namespace fCraft
                         PlayerInfo info = PlayerDB.FindPlayerInfoExact(findPlayer);
                         if (info != null && info.IsOnline) {
                             TimeSpan idle = info.PlayerObject.IdBotTime;
-                            SendChannelMessage("\u211CPlayer \u212C{0}\u211C has spent a total of: \u212C{1:F1}\u211C " +
-                                               "hours (\u212C{2:F1}\u211C hours this session){3}",
+                            SendChannelMessage("Player " + Bold + "{0}" + Reset + " has spent a total of: " + Bold + "{1:F1}" + Reset +
+                                               " hours (" + Bold + "{2:F1}" + Reset + " hours this session{3}",
                                                info.ClassyName,
                                                (info.TotalTime + info.TimeSinceLastLogin).TotalHours,
                                                info.TimeSinceLastLogin.TotalHours, 
-                                               idle > TimeSpan.FromMinutes(1) ?  "(Has been idle for \u212C" + 
-                                               string.Format("{0:F2}", idle.TotalMinutes) + "\u211C minutes)" : "");
+                                               idle > TimeSpan.FromMinutes(1) ?  ", been idle for " + Bold + 
+                                               string.Format("{0:F2}", idle.TotalMinutes) + Reset + " minutes)" : ")");
                         } else if (info != null) {
-                            SendChannelMessage("\u211CPlayer \u212C{0}\u211C has spent a total of: \u212C{1:F1}\u211C hours",
+                            SendChannelMessage("Player " + Bold + "{0}" + Reset + " has spent a total of: " 
+                        	                   + Bold + "{1:F1}" + Reset + " hours",
                                                info.ClassyName,
                                                info.TotalTime.TotalHours);
                         } else {
-                            SendChannelMessage("No player found with name \"\u212C" + findPlayer + "\u211C\"");
+                            SendChannelMessage("No player found with name \"" + Bold + findPlayer + Reset + "\"");
                         }
                     } else {
                         SendChannelMessage("Please specify a player name.");
@@ -772,14 +772,14 @@ namespace fCraft
                 } else if (rawCmd.StartsWith("!clients") || rawCmd.StartsWith(nick + " clients")) {
                     if (!elapsed) return true;
                     
-                    var visiblePlayers = Server.Players.Where(p => !p.Info.IsHidden).OrderBy(p => p, PlayerListSorter.Instance).ToArray();
+                    var visiblePlayers = Server.Players.Where(p => !p.Info.IsHidden)
+                        .OrderBy(p => p, PlayerListSorter.Instance).ToArray();
 
                     Dictionary<string, List<Player>> clients = new Dictionary<string, List<Player>>();
                     foreach (var p in visiblePlayers) {
                         string appName = p.ClientName;
-                        if (string.IsNullOrEmpty(appName)) {
+                        if (string.IsNullOrEmpty(appName))
                             appName = "(unknown)";
-                        }
 
                         List<Player> usingClient;
                         if (!clients.TryGetValue(appName, out usingClient)) {
@@ -788,15 +788,15 @@ namespace fCraft
                         }
                         usingClient.Add(p);
                     }
-                    SendChannelMessage("\u212CPlayers using:");
+                    SendChannelMessage(Bold + "Players using:");
                     foreach (var kvp in clients) {
-                        SendChannelMessage("  \u212C{0}\u211C: {1}",
+                        SendChannelMessage("  " + Bold + "{0}" + Reset + ": {1}",
                                        kvp.Key, kvp.Value.JoinToClassyString());
                     }
                     return true;
                 } else if (rawCmd == "!commands" || rawCmd == nick + " commands") {
                     if (!elapsed) return true;
-                    SendChannelMessage("\u212CList of commands: \u211CBD, Commands, Clients, Players, Seen, St, Time");
+                    SendChannelMessage(Bold + "List of commands: " + Reset + "BD, Commands, Clients, Players, Seen, St, Time");
                     lastIrcCommand = DateTime.UtcNow;
                     return true;
                 }
@@ -1166,13 +1166,13 @@ namespace fCraft
 				message = message.Replace("&t", ResetReplacement);
 				message = message.Replace("&T", ResetReplacement);
 				message = Color.MinecraftToIrcColors(message);
-                message = message.Replace(BoldCode, BoldReplacement);
-                message = message.Replace(ResetCode, ResetReplacement);
+                message = message.Replace(Bold, BoldReplacement);
+                message = message.Replace(Reset, ResetReplacement);
             }
             else
             {
-                message = message.Replace(BoldCode, "");
-                message = message.Replace(ResetCode, "");
+                message = message.Replace(Bold, "");
+                message = message.Replace(Reset, "");
                 message = Color.StripColors(message);
             }
             return message.Trim();
@@ -1223,11 +1223,11 @@ namespace fCraft
                         }
                     }
                     if (enabled) {
-                        string formattedMessage = String.Format("{0}{1}: {2}{3}", args.Player.ClassyName, ResetCode,
+                        string formattedMessage = String.Format("{0}{1}: {2}{3}", args.Player.ClassyName, Reset,
                             args.Message, ignoreIRC);
                         SendChannelMessage(formattedMessage);
                     } else if (args.Message.StartsWith("#")) {
-                        string formattedMessage = String.Format("{0}{1}: {2}{3}", args.Player.ClassyName, ResetCode,
+                        string formattedMessage = String.Format("{0}{1}: {2}{3}", args.Player.ClassyName, Reset,
                             args.Message.Substring(1), ignoreIRC);
                         SendChannelMessage(formattedMessage);
                     }
@@ -1235,15 +1235,13 @@ namespace fCraft
 
                 case ChatMessageType.Me:
                     if (enabled) {
-                        SendChannelMessage("\u212C&S[&MMe&S][\u211C" + args.Player.Name + "\u212C&S] \u211C" +
-                                           args.Message);
+                        SendChannelMessage(Bold + "&M*" + args.Player.Name + " " + Reset + args.Message);
                     }
                     break;
 
                 case ChatMessageType.Say:
                     if (enabled) {
-                        SendChannelMessage("\u212C&S[&YSay&S] \u211C" +
-                                           args.Message);
+                        SendChannelMessage(Bold + "&S[&YSay&S] " + Reset + args.Message);
                     }
                     break;
             }
@@ -1255,7 +1253,7 @@ namespace fCraft
             if (e == null) throw new ArgumentNullException("e");
             if (ConfigKey.IRCBotAnnounceServerJoins.Enabled() && !e.Player.Info.IsHidden)
             {
-                string message = string.Format("{0}&2+(&f{1}&2) Connected{2}.", BoldCode, e.Player.ClassyName, e.Player.Info.TimesVisited == 1 ? " for their first time" : "");
+                string message = string.Format("{0}&2+(&f{1}&2) Connected{2}.", Bold, e.Player.ClassyName, e.Player.Info.TimesVisited == 1 ? " for their first time" : "");
                 SendChannelMessage(message);
             }
         }
@@ -1316,7 +1314,7 @@ namespace fCraft
         {
             if (player == null) throw new ArgumentNullException("player");
             string message = string.Format("{0}{1} &c({2})",
-                                            BoldCode,
+                                            Bold,
                                             Server.MakePlayerDisconnectedMessage(player),
                                             (player.usedquit ? player.quitmessage : leaveReason.ToString()));
             SendChannelMessage(message);
@@ -1331,7 +1329,7 @@ namespace fCraft
             if (target == null) throw new ArgumentNullException("target");
             if (!ConfigKey.IRCBotAnnounceServerEvents.Enabled()) return;
             string message = String.Format("{0}&WPlayer {1}&W was {2} by {3}&W",
-                                            BoldCode,
+                                            Bold,
                                             target.ClassyName,
                                             action,
                                             player.ClassyName);
