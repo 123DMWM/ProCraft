@@ -32,8 +32,8 @@ namespace fCraft.ConfigGUI {
         private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             this.tabs = new System.Windows.Forms.TabControl();
             this.tabGeneral = new System.Windows.Forms.TabPage();
             this.gHeartbeatUrl = new System.Windows.Forms.GroupBox();
@@ -86,6 +86,8 @@ namespace fCraft.ConfigGUI {
             this.bColorHelp = new System.Windows.Forms.Button();
             this.bColorSay = new System.Windows.Forms.Button();
             this.gAppearence = new System.Windows.Forms.GroupBox();
+            this.tNewPlayerPrefix = new System.Windows.Forms.TextBox();
+            this.lNewPlayerPrefix = new System.Windows.Forms.Label();
             this.xShowConnectionMessages = new System.Windows.Forms.CheckBox();
             this.xShowJoinedWorldMessages = new System.Windows.Forms.CheckBox();
             this.xRankColorsInWorldNames = new System.Windows.Forms.CheckBox();
@@ -151,7 +153,7 @@ namespace fCraft.ConfigGUI {
             this.lRankName = new System.Windows.Forms.Label();
             this.bDeleteRank = new System.Windows.Forms.Button();
             this.vPermissions = new System.Windows.Forms.ListView();
-            this.chPermissions = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.chPermissions = new System.Windows.Forms.ColumnHeader();
             this.bAddRank = new System.Windows.Forms.Button();
             this.lPermissions = new System.Windows.Forms.Label();
             this.vRanks = new System.Windows.Forms.ListBox();
@@ -214,7 +216,7 @@ namespace fCraft.ConfigGUI {
             this.lLogFileOptionsDescription = new System.Windows.Forms.Label();
             this.xLogLimit = new System.Windows.Forms.CheckBox();
             this.vLogFileOptions = new System.Windows.Forms.ListView();
-            this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader2 = new System.Windows.Forms.ColumnHeader();
             this.lLogLimitUnits = new System.Windows.Forms.Label();
             this.nLogLimit = new System.Windows.Forms.NumericUpDown();
             this.cLogMode = new System.Windows.Forms.ComboBox();
@@ -222,13 +224,8 @@ namespace fCraft.ConfigGUI {
             this.gConsole = new System.Windows.Forms.GroupBox();
             this.lLogConsoleOptionsDescription = new System.Windows.Forms.Label();
             this.vConsoleOptions = new System.Windows.Forms.ListView();
-            this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader3 = new System.Windows.Forms.ColumnHeader();
             this.tabIRC = new System.Windows.Forms.TabPage();
-            this.gIRCColors = new System.Windows.Forms.GroupBox();
-            this.xIRCStripMinecraftColors = new System.Windows.Forms.CheckBox();
-            this.bColorIRC = new System.Windows.Forms.Button();
-            this.xIRCUseColor = new System.Windows.Forms.CheckBox();
-            this.lColorIRC = new System.Windows.Forms.Label();
             this.xIRCListShowNonEnglish = new System.Windows.Forms.CheckBox();
             this.gIRCOptions = new System.Windows.Forms.GroupBox();
             this.xIRCBotAnnounceServerEvents = new System.Windows.Forms.CheckBox();
@@ -290,8 +287,15 @@ namespace fCraft.ConfigGUI {
             this.bResetAll = new System.Windows.Forms.Button();
             this.bApply = new System.Windows.Forms.Button();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.tNewPlayerPrefix = new System.Windows.Forms.TextBox();
-            this.lNewPlayerPrefix = new System.Windows.Forms.Label();
+            this.gIRCFormatting = new System.Windows.Forms.GroupBox();
+            this.bColorIRC = new System.Windows.Forms.Button();
+            this.lColorIRC = new System.Windows.Forms.Label();
+            this.lblMCtoIRC = new System.Windows.Forms.Label();
+            this.lblIRCtoMC = new System.Windows.Forms.Label();
+            this.xIRCShowEmotesFromServer = new System.Windows.Forms.CheckBox();
+            this.xIRCShowEmotesFromIRC = new System.Windows.Forms.CheckBox();
+            this.xIRCShowColorsFromIRC = new System.Windows.Forms.CheckBox();
+            this.xIRCShowColorsFromServer = new System.Windows.Forms.CheckBox();
             this.tabs.SuspendLayout();
             this.tabGeneral.SuspendLayout();
             this.gHeartbeatUrl.SuspendLayout();
@@ -341,7 +345,6 @@ namespace fCraft.ConfigGUI {
             ((System.ComponentModel.ISupportInitialize)(this.nLogLimit)).BeginInit();
             this.gConsole.SuspendLayout();
             this.tabIRC.SuspendLayout();
-            this.gIRCColors.SuspendLayout();
             this.gIRCOptions.SuspendLayout();
             this.gIRCNetwork.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nIRCDelay)).BeginInit();
@@ -353,6 +356,7 @@ namespace fCraft.ConfigGUI {
             this.gAdvancedMisc.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nMaxUndoStates)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nMaxUndo)).BeginInit();
+            this.gIRCFormatting.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabs
@@ -421,7 +425,7 @@ namespace fCraft.ConfigGUI {
             this.lHeartbeatUrlWarning.Size = new System.Drawing.Size(427, 30);
             this.lHeartbeatUrlWarning.TabIndex = 2;
             this.lHeartbeatUrlWarning.Text = "Use caution. Note that different providers may use different player databases.\r\nI" +
-    "t\'s recommended to wipe your PlayerDB completely after switching providers.";
+            "t\'s recommended to wipe your PlayerDB completely after switching providers.";
             // 
             // cHeartbeatUrl
             // 
@@ -1004,6 +1008,23 @@ namespace fCraft.ConfigGUI {
             this.gAppearence.TabStop = false;
             this.gAppearence.Text = "Appearence Tweaks";
             // 
+            // tNewPlayerPrefix
+            // 
+            this.tNewPlayerPrefix.Location = new System.Drawing.Point(25, 68);
+            this.tNewPlayerPrefix.MaxLength = 1;
+            this.tNewPlayerPrefix.Name = "tNewPlayerPrefix";
+            this.tNewPlayerPrefix.Size = new System.Drawing.Size(35, 21);
+            this.tNewPlayerPrefix.TabIndex = 7;
+            // 
+            // lNewPlayerPrefix
+            // 
+            this.lNewPlayerPrefix.AutoSize = true;
+            this.lNewPlayerPrefix.Location = new System.Drawing.Point(66, 71);
+            this.lNewPlayerPrefix.Name = "lNewPlayerPrefix";
+            this.lNewPlayerPrefix.Size = new System.Drawing.Size(220, 15);
+            this.lNewPlayerPrefix.TabIndex = 6;
+            this.lNewPlayerPrefix.Text = "Prefix for less than 24 hour new players";
+            // 
             // xShowConnectionMessages
             // 
             this.xShowConnectionMessages.AutoSize = true;
@@ -1244,8 +1265,8 @@ namespace fCraft.ConfigGUI {
             this.dgvWorlds.MultiSelect = false;
             this.dgvWorlds.Name = "dgvWorlds";
             this.dgvWorlds.RowHeadersVisible = false;
-            dataGridViewCellStyle4.Padding = new System.Windows.Forms.Padding(0, 1, 0, 1);
-            this.dgvWorlds.RowsDefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle2.Padding = new System.Windows.Forms.Padding(0, 1, 0, 1);
+            this.dgvWorlds.RowsDefaultCellStyle = dataGridViewCellStyle2;
             this.dgvWorlds.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dgvWorlds.Size = new System.Drawing.Size(636, 325);
             this.dgvWorlds.TabIndex = 0;
@@ -1303,8 +1324,8 @@ namespace fCraft.ConfigGUI {
             // dgvcBlockDB
             // 
             this.dgvcBlockDB.DataPropertyName = "BlockDBEnabled";
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.dgvcBlockDB.DefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.dgvcBlockDB.DefaultCellStyle = dataGridViewCellStyle1;
             this.dgvcBlockDB.HeaderText = "BlockDB";
             this.dgvcBlockDB.Name = "dgvcBlockDB";
             this.dgvcBlockDB.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
@@ -1910,7 +1931,7 @@ namespace fCraft.ConfigGUI {
             this.xPaidPlayersOnly.Size = new System.Drawing.Size(489, 19);
             this.xPaidPlayersOnly.TabIndex = 0;
             this.xPaidPlayersOnly.Text = "Only allow players with paid Minecraft accounts to join the server (not recommend" +
-    "ed).";
+            "ed).";
             this.xPaidPlayersOnly.UseVisualStyleBackColor = true;
             // 
             // lPatrolledRankAndBelow
@@ -2173,7 +2194,7 @@ namespace fCraft.ConfigGUI {
             this.xAllowUnverifiedLAN.Size = new System.Drawing.Size(490, 19);
             this.xAllowUnverifiedLAN.TabIndex = 2;
             this.xAllowUnverifiedLAN.Text = "Allow connections from LAN without name verification (192.168.0.0/16 and 10.0.0.0" +
-    "/8)";
+            "/8)";
             this.xAllowUnverifiedLAN.UseVisualStyleBackColor = true;
             // 
             // xMaxConnectionsPerIP
@@ -2590,7 +2611,7 @@ namespace fCraft.ConfigGUI {
             // 
             // tabIRC
             // 
-            this.tabIRC.Controls.Add(this.gIRCColors);
+            this.tabIRC.Controls.Add(this.gIRCFormatting);
             this.tabIRC.Controls.Add(this.xIRCListShowNonEnglish);
             this.tabIRC.Controls.Add(this.gIRCOptions);
             this.tabIRC.Controls.Add(this.gIRCNetwork);
@@ -2604,58 +2625,6 @@ namespace fCraft.ConfigGUI {
             this.tabIRC.TabIndex = 8;
             this.tabIRC.Text = "IRC";
             this.tabIRC.UseVisualStyleBackColor = true;
-            // 
-            // gIRCColors
-            // 
-            this.gIRCColors.Controls.Add(this.xIRCStripMinecraftColors);
-            this.gIRCColors.Controls.Add(this.bColorIRC);
-            this.gIRCColors.Controls.Add(this.xIRCUseColor);
-            this.gIRCColors.Controls.Add(this.lColorIRC);
-            this.gIRCColors.Location = new System.Drawing.Point(8, 206);
-            this.gIRCColors.Name = "gIRCColors";
-            this.gIRCColors.Size = new System.Drawing.Size(635, 77);
-            this.gIRCColors.TabIndex = 6;
-            this.gIRCColors.TabStop = false;
-            this.gIRCColors.Text = "Colors";
-            // 
-            // xIRCStripMinecraftColors
-            // 
-            this.xIRCStripMinecraftColors.AutoSize = true;
-            this.xIRCStripMinecraftColors.Location = new System.Drawing.Point(38, 49);
-            this.xIRCStripMinecraftColors.Name = "xIRCStripMinecraftColors";
-            this.xIRCStripMinecraftColors.Size = new System.Drawing.Size(395, 19);
-            this.xIRCStripMinecraftColors.TabIndex = 3;
-            this.xIRCStripMinecraftColors.Text = "Strip Minecraft color codes (&&-codes) from incoming IRC messages.";
-            this.xIRCStripMinecraftColors.UseVisualStyleBackColor = true;
-            // 
-            // bColorIRC
-            // 
-            this.bColorIRC.BackColor = System.Drawing.Color.White;
-            this.bColorIRC.Location = new System.Drawing.Point(159, 20);
-            this.bColorIRC.Name = "bColorIRC";
-            this.bColorIRC.Size = new System.Drawing.Size(100, 23);
-            this.bColorIRC.TabIndex = 1;
-            this.bColorIRC.UseVisualStyleBackColor = false;
-            this.bColorIRC.Click += new System.EventHandler(this.bColorIRC_Click);
-            // 
-            // xIRCUseColor
-            // 
-            this.xIRCUseColor.AutoSize = true;
-            this.xIRCUseColor.Location = new System.Drawing.Point(325, 20);
-            this.xIRCUseColor.Name = "xIRCUseColor";
-            this.xIRCUseColor.Size = new System.Drawing.Size(304, 19);
-            this.xIRCUseColor.TabIndex = 2;
-            this.xIRCUseColor.Text = "Use colors in bot\'s IRC messages and notifications.";
-            this.xIRCUseColor.UseVisualStyleBackColor = true;
-            // 
-            // lColorIRC
-            // 
-            this.lColorIRC.AutoSize = true;
-            this.lColorIRC.Location = new System.Drawing.Point(42, 24);
-            this.lColorIRC.Name = "lColorIRC";
-            this.lColorIRC.Size = new System.Drawing.Size(111, 15);
-            this.lColorIRC.TabIndex = 0;
-            this.lColorIRC.Text = "IRC message color";
             // 
             // xIRCListShowNonEnglish
             // 
@@ -2677,7 +2646,7 @@ namespace fCraft.ConfigGUI {
             this.gIRCOptions.Controls.Add(this.xIRCBotForwardFromIRC);
             this.gIRCOptions.Controls.Add(this.xIRCBotAnnounceServerJoins);
             this.gIRCOptions.Controls.Add(this.xIRCBotForwardFromServer);
-            this.gIRCOptions.Location = new System.Drawing.Point(8, 289);
+            this.gIRCOptions.Location = new System.Drawing.Point(7, 316);
             this.gIRCOptions.Name = "gIRCOptions";
             this.gIRCOptions.Size = new System.Drawing.Size(636, 136);
             this.gIRCOptions.TabIndex = 5;
@@ -2702,7 +2671,7 @@ namespace fCraft.ConfigGUI {
             this.lIRCNoForwardingMessage.Size = new System.Drawing.Size(567, 15);
             this.lIRCNoForwardingMessage.TabIndex = 8;
             this.lIRCNoForwardingMessage.Text = "NOTE: If forwarding all messages is not enabled, only messages starting with a ha" +
-    "sh (#) will be relayed.";
+            "sh (#) will be relayed.";
             // 
             // xIRCBotAnnounceIRCJoins
             // 
@@ -3040,8 +3009,8 @@ namespace fCraft.ConfigGUI {
             this.lAdvancedWarning.Size = new System.Drawing.Size(558, 30);
             this.lAdvancedWarning.TabIndex = 0;
             this.lAdvancedWarning.Text = "Warning: Altering these settings may decrease your server\'s stability and perform" +
-    "ance.\r\nIf you\'re not sure what these settings do, you probably shouldn\'t change " +
-    "them...";
+            "ance.\r\nIf you\'re not sure what these settings do, you probably shouldn\'t change " +
+            "them...";
             // 
             // xLowLatencyMode
             // 
@@ -3051,7 +3020,7 @@ namespace fCraft.ConfigGUI {
             this.xLowLatencyMode.Size = new System.Drawing.Size(544, 19);
             this.xLowLatencyMode.TabIndex = 3;
             this.xLowLatencyMode.Text = "Low-latency mode (disables Nagle\'s algorithm, reducing latency but increasing ban" +
-    "dwidth use).";
+            "dwidth use).";
             this.xLowLatencyMode.UseVisualStyleBackColor = true;
             // 
             // lProcessPriority
@@ -3227,7 +3196,7 @@ namespace fCraft.ConfigGUI {
             this.lIPWarning.Size = new System.Drawing.Size(408, 13);
             this.lIPWarning.TabIndex = 20;
             this.lIPWarning.Text = "Note: You do not need to specify an IP address unless you have multiple NICs or I" +
-    "Ps.";
+            "Ps.";
             // 
             // tIP
             // 
@@ -3318,7 +3287,7 @@ namespace fCraft.ConfigGUI {
             this.xRelayAllBlockUpdates.Size = new System.Drawing.Size(560, 19);
             this.xRelayAllBlockUpdates.TabIndex = 1;
             this.xRelayAllBlockUpdates.Text = "When a player changes a block, send him the redundant update packet anyway (origi" +
-    "nal behavior).";
+            "nal behavior).";
             this.xRelayAllBlockUpdates.UseVisualStyleBackColor = true;
             // 
             // xNoPartialPositionUpdates
@@ -3396,22 +3365,101 @@ namespace fCraft.ConfigGUI {
             this.toolTip.IsBalloon = true;
             this.toolTip.ReshowDelay = 100;
             // 
-            // tNewPlayerPrefix
+            // gIRCFormatting
             // 
-            this.tNewPlayerPrefix.Location = new System.Drawing.Point(25, 68);
-            this.tNewPlayerPrefix.MaxLength = 1;
-            this.tNewPlayerPrefix.Name = "tNewPlayerPrefix";
-            this.tNewPlayerPrefix.Size = new System.Drawing.Size(35, 21);
-            this.tNewPlayerPrefix.TabIndex = 7;
+            this.gIRCFormatting.Controls.Add(this.bColorIRC);
+            this.gIRCFormatting.Controls.Add(this.lColorIRC);
+            this.gIRCFormatting.Controls.Add(this.lblMCtoIRC);
+            this.gIRCFormatting.Controls.Add(this.lblIRCtoMC);
+            this.gIRCFormatting.Controls.Add(this.xIRCShowEmotesFromServer);
+            this.gIRCFormatting.Controls.Add(this.xIRCShowEmotesFromIRC);
+            this.gIRCFormatting.Controls.Add(this.xIRCShowColorsFromIRC);
+            this.gIRCFormatting.Controls.Add(this.xIRCShowColorsFromServer);
+            this.gIRCFormatting.Enabled = false;
+            this.gIRCFormatting.Location = new System.Drawing.Point(8, 206);
+            this.gIRCFormatting.Name = "gIRCFormatting";
+            this.gIRCFormatting.Size = new System.Drawing.Size(635, 104);
+            this.gIRCFormatting.TabIndex = 7;
+            this.gIRCFormatting.TabStop = false;
+            this.gIRCFormatting.Text = "Formatting";
             // 
-            // lNewPlayerPrefix
+            // bColorIRC
             // 
-            this.lNewPlayerPrefix.AutoSize = true;
-            this.lNewPlayerPrefix.Location = new System.Drawing.Point(66, 71);
-            this.lNewPlayerPrefix.Name = "lNewPlayerPrefix";
-            this.lNewPlayerPrefix.Size = new System.Drawing.Size(220, 15);
-            this.lNewPlayerPrefix.TabIndex = 6;
-            this.lNewPlayerPrefix.Text = "Prefix for less than 24 hour new players";
+            this.bColorIRC.BackColor = System.Drawing.Color.White;
+            this.bColorIRC.Location = new System.Drawing.Point(325, 73);
+            this.bColorIRC.Name = "bColorIRC";
+            this.bColorIRC.Size = new System.Drawing.Size(100, 23);
+            this.bColorIRC.TabIndex = 17;
+            this.bColorIRC.UseVisualStyleBackColor = false;
+            // 
+            // lColorIRC
+            // 
+            this.lColorIRC.AutoSize = true;
+            this.lColorIRC.Location = new System.Drawing.Point(208, 77);
+            this.lColorIRC.Name = "lColorIRC";
+            this.lColorIRC.Size = new System.Drawing.Size(111, 15);
+            this.lColorIRC.TabIndex = 16;
+            this.lColorIRC.Text = "IRC message color";
+            // 
+            // lblMCtoIRC
+            // 
+            this.lblMCtoIRC.AutoSize = true;
+            this.lblMCtoIRC.Location = new System.Drawing.Point(52, 24);
+            this.lblMCtoIRC.Name = "lblMCtoIRC";
+            this.lblMCtoIRC.Size = new System.Drawing.Size(267, 15);
+            this.lblMCtoIRC.TabIndex = 8;
+            this.lblMCtoIRC.Text = "For messages sent from Minecraft to IRC, show:";
+            this.lblMCtoIRC.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            // 
+            // lblIRCtoMC
+            // 
+            this.lblIRCtoMC.AutoSize = true;
+            this.lblIRCtoMC.Location = new System.Drawing.Point(52, 49);
+            this.lblIRCtoMC.Name = "lblIRCtoMC";
+            this.lblIRCtoMC.Size = new System.Drawing.Size(267, 15);
+            this.lblIRCtoMC.TabIndex = 7;
+            this.lblIRCtoMC.Text = "For messages sent from IRC to Minecraft, show:";
+            this.lblIRCtoMC.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            // 
+            // xIRCShowEmotesFromServer
+            // 
+            this.xIRCShowEmotesFromServer.AutoSize = true;
+            this.xIRCShowEmotesFromServer.Location = new System.Drawing.Point(403, 23);
+            this.xIRCShowEmotesFromServer.Name = "xIRCShowEmotesFromServer";
+            this.xIRCShowEmotesFromServer.Size = new System.Drawing.Size(68, 19);
+            this.xIRCShowEmotesFromServer.TabIndex = 5;
+            this.xIRCShowEmotesFromServer.Text = "Emotes";
+            this.xIRCShowEmotesFromServer.UseVisualStyleBackColor = true;
+            // 
+            // xIRCShowEmotesFromIRC
+            // 
+            this.xIRCShowEmotesFromIRC.AutoSize = true;
+            this.xIRCShowEmotesFromIRC.Location = new System.Drawing.Point(403, 48);
+            this.xIRCShowEmotesFromIRC.Name = "xIRCShowEmotesFromIRC";
+            this.xIRCShowEmotesFromIRC.Size = new System.Drawing.Size(68, 19);
+            this.xIRCShowEmotesFromIRC.TabIndex = 4;
+            this.xIRCShowEmotesFromIRC.Text = "Emotes";
+            this.xIRCShowEmotesFromIRC.UseVisualStyleBackColor = true;
+            // 
+            // xIRCShowColorsFromIRC
+            // 
+            this.xIRCShowColorsFromIRC.AutoSize = true;
+            this.xIRCShowColorsFromIRC.Location = new System.Drawing.Point(325, 48);
+            this.xIRCShowColorsFromIRC.Name = "xIRCShowColorsFromIRC";
+            this.xIRCShowColorsFromIRC.Size = new System.Drawing.Size(61, 19);
+            this.xIRCShowColorsFromIRC.TabIndex = 3;
+            this.xIRCShowColorsFromIRC.Text = "Colors";
+            this.xIRCShowColorsFromIRC.UseVisualStyleBackColor = true;
+            // 
+            // xIRCShowColorsFromServer
+            // 
+            this.xIRCShowColorsFromServer.AutoSize = true;
+            this.xIRCShowColorsFromServer.Location = new System.Drawing.Point(325, 23);
+            this.xIRCShowColorsFromServer.Name = "xIRCShowColorsFromServer";
+            this.xIRCShowColorsFromServer.Size = new System.Drawing.Size(61, 19);
+            this.xIRCShowColorsFromServer.TabIndex = 2;
+            this.xIRCShowColorsFromServer.Text = "Colors";
+            this.xIRCShowColorsFromServer.UseVisualStyleBackColor = true;
             // 
             // MainForm
             // 
@@ -3496,8 +3544,6 @@ namespace fCraft.ConfigGUI {
             this.gConsole.PerformLayout();
             this.tabIRC.ResumeLayout(false);
             this.tabIRC.PerformLayout();
-            this.gIRCColors.ResumeLayout(false);
-            this.gIRCColors.PerformLayout();
             this.gIRCOptions.ResumeLayout(false);
             this.gIRCOptions.PerformLayout();
             this.gIRCNetwork.ResumeLayout(false);
@@ -3513,9 +3559,17 @@ namespace fCraft.ConfigGUI {
             this.gAdvancedMisc.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nMaxUndoStates)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nMaxUndo)).EndInit();
+            this.gIRCFormatting.ResumeLayout(false);
+            this.gIRCFormatting.PerformLayout();
             this.ResumeLayout(false);
-
         }
+        private System.Windows.Forms.CheckBox xIRCShowColorsFromServer;
+        private System.Windows.Forms.CheckBox xIRCShowColorsFromIRC;
+        private System.Windows.Forms.CheckBox xIRCShowEmotesFromIRC;
+        private System.Windows.Forms.CheckBox xIRCShowEmotesFromServer;
+        private System.Windows.Forms.Label lblIRCtoMC;
+        private System.Windows.Forms.Label lblMCtoIRC;
+        private System.Windows.Forms.GroupBox gIRCFormatting;
 
         #endregion
 
@@ -3717,7 +3771,6 @@ namespace fCraft.ConfigGUI {
         private Label lLogFileOptionsDescription;
         private Label lLogConsoleOptionsDescription;
         private CheckBox xIRCBotAnnounceServerEvents;
-        private CheckBox xIRCUseColor;
         private CheckBox xPaidPlayersOnly;
         private Button bMapPath;
         private CheckBox xMapPath;
@@ -3758,8 +3811,6 @@ namespace fCraft.ConfigGUI {
         private NumericUpDown nMaxUndoStates;
         private Label lMaxUndoStates;
         private GroupBox gPerformance;
-        private GroupBox gIRCColors;
-        private CheckBox xIRCStripMinecraftColors;
         private CheckBox xAntispamMessageCount;
         private CheckBox xAntispamMuteDuration;
         private CheckBox xUpperCharLimit;

@@ -344,6 +344,7 @@ namespace fCraft.ConfigGUI {
             xIRCBotEnabled.Checked = ConfigKey.IRCBotEnabled.Enabled();
             gIRCNetwork.Enabled = xIRCBotEnabled.Checked;
             gIRCOptions.Enabled = xIRCBotEnabled.Checked;
+            gIRCFormatting.Enabled = xIRCBotEnabled.Checked;
 
             tIRCBotNetwork.Text = ConfigKey.IRCBotNetwork.GetString();
             nIRCBotPort.Value = ConfigKey.IRCBotPort.GetInt();
@@ -361,13 +362,14 @@ namespace fCraft.ConfigGUI {
             xIRCBotAnnounceServerJoins.Checked = ConfigKey.IRCBotAnnounceServerJoins.Enabled();
             xIRCBotForwardFromIRC.Checked = ConfigKey.IRCBotForwardFromIRC.Enabled();
             xIRCBotForwardFromServer.Checked = ConfigKey.IRCBotForwardFromServer.Enabled();
-            xIRCStripMinecraftColors.Checked = ConfigKey.IRCStripMinecraftColors.Enabled();
+            xIRCShowEmotesFromIRC.Checked = ConfigKey.IRCShowEmotesFromIRC.Enabled();
+            xIRCShowEmotesFromServer.Checked = ConfigKey.IRCShowEmotesFromServer.Enabled();
+            xIRCShowColorsFromIRC.Checked = ConfigKey.IRCShowColorsFromIRC.Enabled();
+            xIRCShowColorsFromServer.Checked = ConfigKey.IRCShowColorsFromServer.Enabled();
 
             colorIRC = ParseToIndex( ConfigKey.IRCMessageColor.GetString() );
             ApplyColor( bColorIRC, colorIRC );
             Color.IRC = Parse( colorIRC );
-
-            xIRCUseColor.Checked = ConfigKey.IRCUseColor.Enabled();
             xIRCBotAnnounceServerEvents.Checked = ConfigKey.IRCBotAnnounceServerEvents.Enabled();
         }
 
@@ -594,8 +596,10 @@ namespace fCraft.ConfigGUI {
             ConfigKey.IRCBotForwardFromServer.TrySetValue( xIRCBotForwardFromServer.Checked );
 
             ConfigKey.IRCMessageColor.TrySetValue( GetName( colorIRC ) );
-            ConfigKey.IRCUseColor.TrySetValue( xIRCUseColor.Checked );
-            ConfigKey.IRCStripMinecraftColors.TrySetValue( xIRCStripMinecraftColors.Checked );
+            ConfigKey.IRCShowEmotesFromIRC.TrySetValue( xIRCShowEmotesFromIRC.Checked );
+            ConfigKey.IRCShowEmotesFromServer.TrySetValue( xIRCShowEmotesFromServer.Checked );
+            ConfigKey.IRCShowColorsFromIRC.TrySetValue( xIRCShowColorsFromIRC.Checked );
+            ConfigKey.IRCShowColorsFromServer.TrySetValue( xIRCShowColorsFromServer.Checked );
 
             // advanced
 

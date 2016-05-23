@@ -400,6 +400,7 @@ Your rank is {RANK}&S. Type &H/Help&S for help." );
         private void xIRC_CheckedChanged( object sender, EventArgs e ) {
             gIRCNetwork.Enabled = xIRCBotEnabled.Checked;
             gIRCOptions.Enabled = xIRCBotEnabled.Checked;
+            gIRCFormatting.Enabled = xIRCBotEnabled.Checked;
             lIRCList.Enabled = xIRCBotEnabled.Checked;
             cIRCList.Enabled = xIRCBotEnabled.Checked;
             xIRCListShowNonEnglish.Enabled = xIRCBotEnabled.Checked;
@@ -1480,7 +1481,7 @@ Your rank is {RANK}&S. Type &H/Help&S for help." );
             if (xIRCBotEnabled.Checked)
             {
                 lines.Add(String.Format("&S{0}(IRC) 123DMWM{1}: This is a normal IRC chat message.",
-                                          xIRCUseColor.Checked ? Color.IRC : "",
+                                          xIRCShowColorsFromIRC.Checked ? Color.IRC : "",
                                           Color.White));
             }
             if( xShowConnectionMessages.Checked ) {

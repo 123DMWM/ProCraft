@@ -711,9 +711,10 @@ or type in address/port manually below.";
             toolTip.SetToolTip( xIRCBotAnnounceServerEvents, ConfigKey.IRCBotAnnounceServerEvents.GetDescription() );
 
             // TODO: IRCThreads
-
-            toolTip.SetToolTip( xIRCUseColor, ConfigKey.IRCUseColor.GetDescription() );
-            toolTip.SetToolTip( xIRCStripMinecraftColors, ConfigKey.IRCStripMinecraftColors.GetDescription() );
+            toolTip.SetToolTip( xIRCShowEmotesFromIRC, ConfigKey.IRCShowEmotesFromIRC.GetDescription() );
+            toolTip.SetToolTip( xIRCShowEmotesFromServer, ConfigKey.IRCShowEmotesFromServer.GetDescription() );
+            toolTip.SetToolTip( xIRCShowColorsFromIRC, ConfigKey.IRCShowColorsFromIRC.GetDescription() );
+            toolTip.SetToolTip( xIRCShowColorsFromServer, ConfigKey.IRCShowColorsFromServer.GetDescription() );
         }
 
 
