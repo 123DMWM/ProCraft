@@ -20,9 +20,11 @@ namespace fCraft {
         public string ClassyName {
             get {
                 StringBuilder sb = new StringBuilder();
-                string newPlayer = (TimeSinceFirstLogin <= TimeSpan.FromDays(1) ? "&2" + Chat.newPlayerPrefix + "&f" : "");
-                if (!string.IsNullOrEmpty(newPlayer)) {
-                    sb.Append(newPlayer);
+                if (PlayerObject != null) { //Don't apply to Console
+                    string newPlayer = (TimeSinceFirstLogin <= TimeSpan.FromDays(1) ? "&2" + Chat.newPlayerPrefix + "&f" : "");
+                    if (!string.IsNullOrEmpty(newPlayer)) {
+                        sb.Append(newPlayer);
+                    }
                 }
                 if ( ConfigKey.RankColorsInChat.Enabled() ) {
                     sb.Append( Rank.Color );
