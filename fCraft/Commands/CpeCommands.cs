@@ -325,7 +325,7 @@ namespace fCraft {
             Permissions = new[] { Permission.Chat },
             Usage = "/AFKModel [Player] [Model]",
             IsConsoleSafe = true,
-            Help = "Change your own model for when you are AFK!&n" +
+            Help = "Changes the model of a player when they are AFK.&n" +
     "Valid models: &s [Any Block Name or ID#], Chibi, Chicken, Creeper, Giant, Humanoid, Pig, Sheep, Skeleton, Spider, Zombie!",
             Handler = AFKModelHandler
         };
@@ -338,7 +338,7 @@ namespace fCraft {
         
         static void SetModel(Player player, CommandReader cmd, string prefix,
                              Func<PlayerInfo, string> getter, Action<PlayerInfo, string> setter) {
-            PlayerInfo target = InfoCommands.FindPlayerInfo(player, cmd);
+            PlayerInfo target = InfoCommands.FindPlayerInfo(player, cmd, false);
             if (target == null) return;
 
             if (!player.IsStaff && target != player.Info) {
@@ -439,7 +439,7 @@ namespace fCraft {
                 return;
             }
 
-            PlayerInfo p = InfoCommands.FindPlayerInfo(player, cmd);
+            PlayerInfo p = InfoCommands.FindPlayerInfo(player, cmd, false);
             if (p == null) return;
 
             if (!cmd.HasNext) {
@@ -489,7 +489,7 @@ namespace fCraft {
         };
 
         static void ClickDistanceHandler(Player player, CommandReader cmd) {
-            PlayerInfo otherPlayer = InfoCommands.FindPlayerInfo(player, cmd);
+            PlayerInfo otherPlayer = InfoCommands.FindPlayerInfo(player, cmd, false);
             if (otherPlayer == null) return;
 
             if (!player.IsStaff && otherPlayer != player.Info) {
@@ -2089,7 +2089,7 @@ namespace fCraft {
 
         static void HackControlHandler(Player player, CommandReader cmd) {
 
-            PlayerInfo target = InfoCommands.FindPlayerInfo(player, cmd);
+            PlayerInfo target = InfoCommands.FindPlayerInfo(player, cmd, false);
             if (target == null || player.Info.Rank != RankManager.HighestRank) {
                 player.Message("&sCurrent Hacks for {0}", player.ClassyName);
                 player.Message("    &sFlying: &a{0} &sNoclip: &a{1} &sSpeedhack: &a{2}",
