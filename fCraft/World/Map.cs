@@ -111,11 +111,7 @@ namespace fCraft {
         public Position getSpawnIfRandom() {
             if (spawn == new Position(-1, -1, -1, 0, 0)) {
                 Random rand = new Random(Guid.NewGuid().GetHashCode());
-                Logger.Log(LogType.Debug, "Width: {0} Length: {1} Height: {2}", Width, Length, Height);
-                int newX = rand.Next(Width),
-                    newY = rand.Next(Length),
-                    newZ = Height;
-                Logger.Log(LogType.Debug, "newX: {0} newY: {1} newZ: {2}", newX, newY, newZ);
+                int newX = rand.Next(Width), newY = rand.Next(Length), newZ = Height;
             retry2:
                 if (GetBlock(newX, newY, newZ - 3) == Block.Air) {
                     newZ = (short)(newZ - 1);
@@ -403,60 +399,6 @@ namespace fCraft {
         /// <summary> Number of blocks that are waiting to be processed. </summary>
         public int UpdateQueueLength {
             get { return updates.Length; }
-        }
-
-        readonly Queue<PhysicsUpdate> tickQueue = new Queue<PhysicsUpdate>();
-        readonly object physicsLock = new object();
-        static readonly byte[] TickDelays = new byte[256];
-
-        public void PhysicsQueueTick(int x, int y, int z, Block oldBlock)
-        {
-            if (!InBounds(x, y, z))
-                return;
-            PhysicsUpdate update = new PhysicsUpdate(x, y, z, oldBlock, TickDelays[(int)oldBlock]);
-            lock (physicsLock)
-            {
-                tickQueue.Enqueue(update);
-            }
-        }
-
-        //void PhysicsOnNeighborUpdate(int x, int y, int z, Block updatedNeighbor)
-        //{
-        //    if (!InBounds(x, y, z))
-        //        return;
-        //    Block thisBlock = GetBlock(x, y, z);
-        //
-        //    GrassPhysics.OnNeighborUpdated(x, y, z, thisBlock, updatedNeighbor);
-        //}
-
-        //public void PhysicsUpdateNeighbors(int x, int y, int z, Block block)
-        //{
-        //    PhysicsOnNeighborUpdate(x - 1, y, z, block);
-        //    PhysicsOnNeighborUpdate(x + 1, y, z, block);
-        //    PhysicsOnNeighborUpdate(x, y - 1, z, block);
-        //    PhysicsOnNeighborUpdate(x, y + 1, z, block);
-        //}
-
-        public void SetBlockNoUpdate(int x, int y, int z, Block newBlock)
-        {
-            Blocks[Index(x, y, z)] = (byte)newBlock;
-            map.HasChangedSinceSave = true;
-        }
-
-        public bool SetBlock([CanBeNull] Player except, int x, int y, int z, Block newBlock)
-        {
-            lock (physicsLock)
-            {
-                if (SetBlockNoNeighborChange(x, y, z, newBlock))
-                {
-                    //PhysicsUpdateNeighbors(x, y, z, newBlock);
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
         }
 
         /// <summary> Queues a new block update to be processed.

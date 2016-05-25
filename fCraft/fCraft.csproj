@@ -224,7 +224,6 @@
     <Compile Include="World\MapGenerator.cs">
     </Compile>
     <Compile Include="World\MapGeneratorArgs.cs" />
-    <Compile Include="World\PhysicsUpdate.cs" />
     <Compile Include="World\World.cs" />
     <Compile Include="World\Zone.cs" />
   </ItemGroup>
