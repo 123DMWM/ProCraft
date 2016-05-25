@@ -216,6 +216,7 @@ namespace fCraft
         /// Strips any unrecognized sequences. Does not replace percent-codes.
         /// Note that LineWrapper itself does this substitution internally. </summary>
         /// <param name="sb"> StringBuilder, contents of which will be processed. </param>
+        /// <param name="useFallbacks"> whether or not to use color fallback codes. </param>
         /// <returns> Processed string. </returns>
         /// <exception cref="ArgumentNullException"> sb is null. </exception>
         public static void SubstituteSpecialColors([NotNull] StringBuilder sb, bool useFallbacks) {
@@ -253,6 +254,7 @@ namespace fCraft
         /// Strips any unrecognized sequences. Does not replace percent-codes.
         /// Note that LineWrapper itself does this substitution internally. </summary>
         /// <param name="input"> String to process. </param>
+        /// <param name="useFallbacks"> whether or not to use color fallback codes. </param>
         /// <returns> Processed string. </returns>
         /// <exception cref="ArgumentNullException"> input is null. </exception>
         [NotNull, Pure]

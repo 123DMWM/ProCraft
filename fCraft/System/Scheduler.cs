@@ -287,15 +287,6 @@ namespace fCraft {
         }
 
 
-        public static event EventHandler<SchedulerTaskEventArgs> TaskAdded;
-
-        public static event EventHandler<SchedulerTaskEventArgs> TaskExecuting;
-
-        public static event EventHandler<SchedulerTaskEventArgs> TaskExecuted;
-
-        public static event EventHandler<SchedulerTaskEventArgs> TaskRemoved;
-
-
         static void FireEvent( EventHandler<SchedulerTaskEventArgs> eventToFire, SchedulerTask task ) {
             var h = eventToFire;
             if( h != null ) h( null, new SchedulerTaskEventArgs( task ) );

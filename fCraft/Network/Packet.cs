@@ -171,6 +171,7 @@ namespace fCraft {
         /// <summary> Creates a new Message (0x0D) packet. </summary>
         /// <param name="type"> Message type. </param>
         /// <param name="message"> Message. </param>
+        /// <param name="useFallbacks"> whether or not to use color fallback codes. </param>
         public static Packet Message(byte type, string message, bool useFallbacks) {
             Packet packet = new Packet(OpCode.Message);
             packet.Bytes[1] = type;
