@@ -953,62 +953,43 @@ namespace fCraft {
         #endregion
         #region Nick
         static readonly CommandDescriptor CdNick = new CommandDescriptor {
-            Name = "Nick",
+            Name = "SetNick",
+            Aliases = new[] { "SetNickname", "Nickname", "Nick" },
             Category = CommandCategory.New | CommandCategory.Maintenance,
             Permissions = new[] { Permission.EditPlayerDB },
             IsConsoleSafe = true,
-            Help = "Quick changes your displayed name.",
-            Usage = "/Nick <NewPlayerName>",
+            Help = "Set displayed name of specified player",
+            Usage = "/SetNick <player> <NewPlayerName>",
             Handler = NickHandler
         };
 
         static void NickHandler(Player player, CommandReader cmd)
         {
-            string targetName = player.Name;
-            string valName = cmd.NextAll();
 
-            PlayerInfo info = player.Info;
+            PlayerInfo info = InfoCommands.FindPlayerInfo(player, cmd, true);
             if (info == null) return;
-
-            //Quickchanges nickname.
-            string oldDisplayedName = info.DisplayedName;
-            if (valName.Length == 0) valName = null;
-            if (valName == info.DisplayedName)
-            {
-                if (valName == null)
-                {
-                    player.Message("Nick: Your DisplayedName is not set.",
-                                    info.Name);
-                }
-                else
-                {
-                    player.Message("Nick: Your DisplayedName is already set to \"{1}&S\"",
-                                    info.Name,
-                                    valName);
-                }
+            if (!cmd.HasNext) {
+                CdNick.PrintUsage(player);
                 return;
             }
-            info.DisplayedName = valName;
-
-            if (oldDisplayedName == null)
-            {
-                player.Message("Nick: Your DisplayedName was set to \"{1}&S\"",
-                                info.Name,
-                                valName);
+            string newNick = cmd.NextAll();
+            string oldNick = info.DisplayedName ?? "";
+            if (oldNick.Equals(newNick)) {
+                player.Message("&f{0}&s's nickname is already set to &f{1}",info.Name, newNick);
+                return;
             }
-            else if (valName == null)
-            {
-                player.Message("Nick: Your DisplayedName was reset (was \"{1}&S\")",
-                                info.Name,
-                                oldDisplayedName);
+            if (info.IsOnline) {
+                info.PlayerObject.Message("&f{0}&shanged your nickname{1} &sto &f{2}",
+                    (info.PlayerObject == player ? "&sC" : player.Name + " &sc"),
+                    string.IsNullOrEmpty(oldNick) ? string.Format(" from &f{0}", oldNick) : "",
+                    newNick);
             }
-            else
-            {
-                player.Message("Nick: Your DisplayedName was changed from \"{1}&S\" to \"{2}&S\"",
-                                info.Name,
-                                oldDisplayedName,
-                                valName);
+            if (info.PlayerObject != player) {
+                player.Message("&sChanged nickname of &f{0}{1} &sto &f{2}", info.Name,
+                    string.IsNullOrEmpty(oldNick) ? string.Format(" &sfrom &f{0}", oldNick) : "",
+                    newNick);
             }
+            info.DisplayedName = newNick;
         }
         #endregion
         #region Reload
