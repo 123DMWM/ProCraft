@@ -986,7 +986,7 @@ namespace fCraft {
 				player.LastWorld = player.World;
 				player.LastPosition = player.Position;
 			}
-            player.TeleportTo( player.World.LoadMap().Spawn );
+            player.TeleportTo( player.World.LoadMap().getSpawnIfRandom());
         }
 
         #endregion
@@ -1023,7 +1023,7 @@ namespace fCraft {
             if (note == "")
             {
                 Server.Message("&s{0}&s took the easy way out", player.ClassyName);
-                player.TeleportTo(player.World.LoadMap().Spawn);
+                player.TeleportTo(player.World.LoadMap().getSpawnIfRandom());
                 player.LastServerMessageDate = DateTime.UtcNow;
                 return;
             }
@@ -1031,7 +1031,7 @@ namespace fCraft {
             {
                 Server.Message("&s{0}&s took the easy way out and left a note", player.ClassyName);
                 Server.Message("&s[&fNote&s] {0}", note);
-				player.TeleportTo(player.World.LoadMap().Spawn);
+				player.TeleportTo(player.World.LoadMap().getSpawnIfRandom());
                 player.LastServerMessageDate = DateTime.UtcNow;
                 return;
             }
@@ -3658,10 +3658,10 @@ namespace fCraft {
                                             player.PortalTPPos = new Position((short)(x * 32), (short)(y * 32), (short)(z * 32), (byte)rot, (byte)lot);
                                         }
                                     } else {
-                                        player.PortalTPPos = tpWorld.map == null ? new Position(0, 0, 0) : tpWorld.map.Spawn;
+                                        player.PortalTPPos = tpWorld.map == null ? new Position(0, 0, 0) : tpWorld.map.getSpawnIfRandom();
                                     }
                                 } else {
-                                    player.PortalTPPos = tpWorld.map == null ? new Position(0, 0, 0) : tpWorld.map.Spawn;
+                                    player.PortalTPPos = tpWorld.map == null ? new Position(0, 0, 0) : tpWorld.map.getSpawnIfRandom();
                                 }
                                 operation.Brush = brush;
                                 player.PortalWorld = addWorld;

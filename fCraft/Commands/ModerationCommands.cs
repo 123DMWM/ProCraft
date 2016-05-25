@@ -1198,11 +1198,12 @@ namespace fCraft {
             if( playerWorld == null ) PlayerOpException.ThrowNoWorld( player );
 
 
-            string playerName = cmd.Next();
-            if( playerName == null ) {
+            string playerName = cmd.Next() ?? "null";
+            if( playerName.Equals("null") || playerName.ToLower().Equals("random")) {
                 Map map = player.WorldMap;
-                map.Spawn = player.Position;
-                player.TeleportTo( map.Spawn );
+                Position newSpawn = playerName.ToLower().Equals("random") ? new Position(-1, -1, -1, 0, 0) : player.Position;
+                map.Spawn = newSpawn;
+                player.TeleportTo( map.getSpawnIfRandom());
                 player.Send( Packet.MakeAddEntity( Packet.SelfId, player.ListName, player.Position ) );
                 player.Message( "New spawn point saved." );
                 Logger.Log( LogType.UserActivity,
@@ -1978,7 +1979,7 @@ namespace fCraft {
 					target.LastWorld = target.World;
 					target.LastPosition = target.Position;
 				}
-                target.TeleportTo( target.WorldMap.Spawn );
+                target.TeleportTo( target.WorldMap.getSpawnIfRandom());
                 return;
             }
 

@@ -96,15 +96,41 @@ namespace fCraft {
                 return spawn;
             }
             set {
-                if( value.X > Width * 32 || value.Y > Length * 32 || value.X < 0 || value.Y < 0 || value.Z < 0 ) {
-                    Logger.Log( LogType.Warning, "Map.Spawn: Coordinates are outside the map!" );
-                    return;
+                if (new Position(value.X, value.Y, value.Z, value.R, value.L) != new Position(-1, -1, -1, 0, 0)) {
+                    if (value.X > Width * 32 || value.Y > Length * 32 || value.X < 0 || value.Y < 0 || value.Z < 0) {
+                        Logger.Log(LogType.Warning, "Map.Spawn: Coordinates are outside the map!");
+                        return;
+                    }
                 }
                 spawn = value;
                 HasChangedSinceSave = true;
             }
         }
         Position spawn;
+
+        public Position getSpawnIfRandom() {
+            if (spawn == new Position(-1, -1, -1, 0, 0)) {
+                Random rand = new Random(Guid.NewGuid().GetHashCode());
+                Logger.Log(LogType.Debug, "Width: {0} Length: {1} Height: {2}", Width, Length, Height);
+                int newX = rand.Next(Width),
+                    newY = rand.Next(Length),
+                    newZ = Height;
+                Logger.Log(LogType.Debug, "newX: {0} newY: {1} newZ: {2}", newX, newY, newZ);
+            retry2:
+                if (GetBlock(newX, newY, newZ - 3) == Block.Air) {
+                    newZ = (short)(newZ - 1);
+                    goto retry2;
+                }
+            retry:
+                if (GetBlock(newX, newY, newZ - 2) != Block.Air ||
+                    GetBlock(newX, newY, newZ - 1) != Block.Air) {
+                    newZ = (newZ + 1);
+                    goto retry;
+                }
+                return new Position((short)(newX * 32), (short)(newY * 32), (short)(newZ * 32), 0, 0);
+            }
+            return spawn;
+        }
 
         /// <summary> Resets spawn to the default location (top center of the map). </summary>
         public void ResetSpawn() {

@@ -459,7 +459,7 @@ namespace fCraft {
                     if (!zone.Controller.Check(Info) || zone.Controller.MinRank >= Info.Rank) {
                         if (zone.Bounds.Contains(newPos.X / 32, newPos.Y / 32, (newPos.Z - 32) / 32)) {
                             sendZoneMessage(zone, "&WRespawned!");
-                            TeleportTo(WorldMap.Spawn);
+                            TeleportTo(WorldMap.getSpawnIfRandom());
                             break;
                         }
                     }
@@ -888,7 +888,7 @@ namespace fCraft {
             // Figure out what the starting world should be
             World startingWorld = WorldManager.FindMainWorld(this);
             startingWorld = RaisePlayerConnectedEvent(this, startingWorld);
-            Position = startingWorld.LoadMap().Spawn;
+            Position = startingWorld.LoadMap().getSpawnIfRandom();
 
             // Send server information
             string serverName = ConfigKey.ServerName.GetString();
@@ -1205,7 +1205,7 @@ namespace fCraft {
 
             World = newWorld;
             // Set spawn point
-            Position = doUseWorldSpawn ? map.Spawn : postJoinPosition;
+            Position = doUseWorldSpawn ? map.getSpawnIfRandom() : postJoinPosition;
 
             // Start sending over the level copy
             if (oldWorld != null) {
