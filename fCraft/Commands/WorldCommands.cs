@@ -3842,7 +3842,8 @@ namespace fCraft {
                         player.PortalName = Portal.GenerateName(player.World);
                     }
 
-                    Portal portal = new Portal(player.PortalWorld, marks, new PortalRange(Xmin, Xmax, Ymin, Ymax, Zmin, Zmax), player.PortalName, player.Name, player.World.Name, player.PortalTPPos);
+                    Portal portal = new Portal(player.PortalWorld, new PortalRange(Xmin, Xmax, Ymin, Ymax, Zmin, Zmax),
+                                               player.PortalName, player.Name, player.World.Name, player.PortalTPPos);
                     PortalHandler.CreatePortal(portal, player.World);
                     op.AnnounceCompletion = false;
                     op.Context = BlockChangeContext.Portal;

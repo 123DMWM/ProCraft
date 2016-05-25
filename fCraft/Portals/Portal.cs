@@ -23,7 +23,6 @@ namespace fCraft.Portals {
         public string Creator { get; set; }
         public DateTime Created { get; set; }
         public string World { get; set; }
-        public Vector3I[] AffectedBlocks { get; set; }
         public PortalRange Range { get; set; }
         public string Place { get; set; }
         public short TeleportPosX { get; set; }
@@ -32,9 +31,9 @@ namespace fCraft.Portals {
         public byte TeleportPosR { get; set; }
         public byte TeleportPosL { get; set; }
 
-        public Portal(string world, Vector3I[] affectedBlocks, PortalRange range,  string name, string creator, string place, Position teleportPos) {
+        public Portal(string world, PortalRange range,  string name, 
+                      string creator, string place, Position teleportPos) {
             World = world;
-            AffectedBlocks = affectedBlocks;
             Range = range;
             Name = name;
             Creator = creator;
@@ -129,22 +128,16 @@ namespace fCraft.Portals {
             removeOperation.Brush = brush;
             removeOperation.Context = BlockChangeContext.Portal;
 
-            if (this.AffectedBlocks == null) {
-                this.AffectedBlocks = new Vector3I[2];
-                this.AffectedBlocks[0] = new Vector3I(Range.Xmin, Range.Ymin, Range.Zmin);
-                this.AffectedBlocks[1] = new Vector3I(Range.Xmax, Range.Ymax, Range.Zmax);
-            }
-
-            if (!removeOperation.Prepare(this.AffectedBlocks)) {
+            Vector3I[] affectedBlocks = {
+                new Vector3I(Range.Xmin, Range.Ymin, Range.Zmin),
+                new Vector3I(Range.Xmax, Range.Ymax, Range.Zmax),
+            };
+            if (!removeOperation.Prepare(affectedBlocks))
                 throw new PortalException("Unable to remove portal.");
-            }
 
             removeOperation.Begin();
-
-            lock (pWorld.Portals.SyncRoot) {
+            lock (pWorld.Portals.SyncRoot)
                 pWorld.Portals.Remove(this);
-            }
-
             PortalDB.Save();
         }
     }
