@@ -786,128 +786,55 @@ namespace fCraft {
                 player.Message("Invalid distance: {0}", tryInt);
                 return;
             }
-            dis = dis*32;
-            byte rot = player.Position.R;
-            byte ud = player.Position.L;
-            if (225 < ud || ud < 32) {
-                if (225 <= rot || rot <= 32) {
-                    Vector3I Pos = new Vector3I(player.Position.X/32, (player.Position.Y - dis)/32,
+            dis = dis * 32;
+            byte yaw = player.Position.R, pitch = player.Position.L;
+            Vector3I Pos;
+            
+            if (225 < pitch || pitch < 32) {
+                if (225 <= yaw || yaw <= 32) {
+                   Pos = new Vector3I(player.Position.X/32, (player.Position.Y - dis)/32,
                         (player.Position.Z - 32)/32);
-                    Pos.X = Math.Min(player.WorldMap.Width - 1, Math.Max(0, Pos.X));
-                    Pos.Y = Math.Min(player.WorldMap.Length - 1, Math.Max(0, Pos.Y));
-                    Pos.Z = Math.Min(player.WorldMap.Height - 1, Math.Max(0, Pos.Z));
-
-                    if (player.CanPlace(player.World.Map, Pos, block, BlockChangeContext.Drawn) !=
-                        CanPlaceResult.Allowed) {
-                        player.Message("&WYou are not allowed to build here");
-                        return;
-                    }
-
-                    Player.RaisePlayerPlacedBlockEvent(player, player.WorldMap, Pos, player.WorldMap.GetBlock(Pos),
-                        block, BlockChangeContext.Drawn);
-                    BlockUpdate blockUpdate = new BlockUpdate(null, Pos, block);
-                    player.World.Map.QueueUpdate(blockUpdate);
-                    player.Message("Block placed at {0} ({1} blocks away from you)", Pos, dis/32);
-                } else if (33 <= rot && rot <= 96) {
-                    Vector3I Pos = new Vector3I((player.Position.X + dis)/32, player.Position.Y/32,
+                   
+                } else if (33 <= yaw && yaw <= 96) {
+                   Pos = new Vector3I((player.Position.X + dis)/32, player.Position.Y/32,
                         (player.Position.Z - 32) / 32);
-                    Pos.X = Math.Min(player.WorldMap.Width - 1, Math.Max(0, Pos.X));
-                    Pos.Y = Math.Min(player.WorldMap.Length - 1, Math.Max(0, Pos.Y));
-                    Pos.Z = Math.Min(player.WorldMap.Height - 1, Math.Max(0, Pos.Z));
-
-                    if (player.CanPlace(player.World.Map, Pos, block, BlockChangeContext.Drawn) !=
-                        CanPlaceResult.Allowed) {
-                        player.Message("&WYou are not allowed to build here");
-                        return;
-                    }
-
-                    Player.RaisePlayerPlacedBlockEvent(player, player.WorldMap, Pos, player.WorldMap.GetBlock(Pos),
-                        block, BlockChangeContext.Drawn);
-                    BlockUpdate blockUpdate = new BlockUpdate(null, Pos, block);
-                    player.World.Map.QueueUpdate(blockUpdate);
-                    player.Message("Block placed at {0} ({1} blocks away from you)", Pos, dis/32);
-                } else if (97 <= rot && rot <= 160) {
-                    Vector3I Pos = new Vector3I(player.Position.X/32, (player.Position.Y + dis)/32,
+                } else if (97 <= yaw && yaw <= 160) {
+                   Pos = new Vector3I(player.Position.X/32, (player.Position.Y + dis)/32,
                         (player.Position.Z - 32) / 32);
-                    Pos.X = Math.Min(player.WorldMap.Width - 1, Math.Max(0, Pos.X));
-                    Pos.Y = Math.Min(player.WorldMap.Length - 1, Math.Max(0, Pos.Y));
-                    Pos.Z = Math.Min(player.WorldMap.Height - 1, Math.Max(0, Pos.Z));
-
-                    if (player.CanPlace(player.World.Map, Pos, block, BlockChangeContext.Drawn) !=
-                        CanPlaceResult.Allowed) {
-                        player.Message("&WYou are not allowed to build here");
-                        return;
-                    }
-
-                    Player.RaisePlayerPlacedBlockEvent(player, player.WorldMap, Pos, player.WorldMap.GetBlock(Pos),
-                        block, BlockChangeContext.Drawn);
-                    BlockUpdate blockUpdate = new BlockUpdate(null, Pos, block);
-                    player.World.Map.QueueUpdate(blockUpdate);
-                    player.Message("Block placed at {0} ({1} blocks away from you)", Pos, dis/32);
-                } else if (161 <= rot && rot <= 224) {
-                    Vector3I Pos = new Vector3I((player.Position.X - dis)/32, player.Position.Y/32,
+                } else if (161 <= yaw && yaw <= 224) {
+                   Pos = new Vector3I((player.Position.X - dis)/32, player.Position.Y/32,
                         (player.Position.Z - 32) / 32);
-                    Pos.X = Math.Min(player.WorldMap.Width - 1, Math.Max(0, Pos.X));
-                    Pos.Y = Math.Min(player.WorldMap.Length - 1, Math.Max(0, Pos.Y));
-                    Pos.Z = Math.Min(player.WorldMap.Height - 1, Math.Max(0, Pos.Z));
-
-                    if (player.CanPlace(player.World.Map, Pos, block, BlockChangeContext.Drawn) !=
-                        CanPlaceResult.Allowed) {
-                        player.Message("&WYou are not allowed to build here");
-                        return;
-                    }
-
-                    Player.RaisePlayerPlacedBlockEvent(player, player.WorldMap, Pos, player.WorldMap.GetBlock(Pos),
-                        block, BlockChangeContext.Drawn);
-                    BlockUpdate blockUpdate = new BlockUpdate(null, Pos, block);
-                    player.World.Map.QueueUpdate(blockUpdate);
-                    player.Message("Block placed at {0} ({1} blocks away from you)", Pos, dis/32);
                 } else {
                     player.Message("Error occurred, please try again.");
                     return;
                 }
             } else {
-                if (192 <= ud && ud <= 224) {
-                    Vector3I Pos = new Vector3I(player.Position.X/32, player.Position.Y/32,
+                if (192 <= pitch && pitch <= 224) {
+                    Pos = new Vector3I(player.Position.X/32, player.Position.Y/32,
                         (player.Position.Z - 32 + dis) / 32);
-                    Pos.X = Math.Min(player.WorldMap.Width - 1, Math.Max(0, Pos.X));
-                    Pos.Y = Math.Min(player.WorldMap.Length - 1, Math.Max(0, Pos.Y));
-                    Pos.Z = Math.Min(player.WorldMap.Height - 1, Math.Max(0, Pos.Z));
-
-                    if (player.CanPlace(player.World.Map, Pos, block, BlockChangeContext.Drawn) !=
-                        CanPlaceResult.Allowed) {
-                        player.Message("&WYou are not allowed to build here");
-                        return;
-                    }
-
-                    Player.RaisePlayerPlacedBlockEvent(player, player.WorldMap, Pos, player.WorldMap.GetBlock(Pos),
-                        block, BlockChangeContext.Drawn);
-                    BlockUpdate blockUpdate = new BlockUpdate(null, Pos, block);
-                    player.World.Map.QueueUpdate(blockUpdate);
-                    player.Message("Block placed at {0} ({1} blocks away from you)", Pos, dis / 32);
-                } else if (33 <= ud && ud <= 65) {
-                    Vector3I Pos = new Vector3I(player.Position.X/32, player.Position.Y/32,
+                } else if (33 <= pitch && pitch <= 65) {
+                    Pos = new Vector3I(player.Position.X/32, player.Position.Y/32,
                         (player.Position.Z - 32 - dis) / 32);
-                    Pos.X = Math.Min(player.WorldMap.Width - 1, Math.Max(0, Pos.X));
-                    Pos.Y = Math.Min(player.WorldMap.Length - 1, Math.Max(0, Pos.Y));
-                    Pos.Z = Math.Min(player.WorldMap.Height - 1, Math.Max(0, Pos.Z));
-
-                    if (player.CanPlace(player.World.Map, Pos, block, BlockChangeContext.Drawn) !=
-                        CanPlaceResult.Allowed) {
-                        player.Message("&WYou are not allowed to build here");
-                        return;
-                    }
-
-                    Player.RaisePlayerPlacedBlockEvent(player, player.WorldMap, Pos, player.WorldMap.GetBlock(Pos),
-                        block, BlockChangeContext.Drawn);
-                    BlockUpdate blockUpdate = new BlockUpdate(null, Pos, block);
-                    player.World.Map.QueueUpdate(blockUpdate);
-                    player.Message("Block placed at {0} ({1} blocks away from you)", Pos, dis/32);
                 } else {
                     player.Message("Error occurred, please try again.");
                     return;
                 }
             }
+            
+            Pos.X = Math.Min(player.WorldMap.Width - 1, Math.Max(0, Pos.X));
+            Pos.Y = Math.Min(player.WorldMap.Length - 1, Math.Max(0, Pos.Y));
+            Pos.Z = Math.Min(player.WorldMap.Height - 1, Math.Max(0, Pos.Z));
+
+            if (player.CanPlace(player.World.Map, Pos, block, BlockChangeContext.Drawn) != CanPlaceResult.Allowed) {
+                player.Message("&WYou are not allowed to build here");
+                return;
+            }
+
+            Player.RaisePlayerPlacedBlockEvent(player, player.WorldMap, Pos, player.WorldMap.GetBlock(Pos),
+                                               block, BlockChangeContext.Drawn);
+            BlockUpdate blockUpdate = new BlockUpdate(null, Pos, block);
+            player.World.Map.QueueUpdate(blockUpdate);
+            player.Message("Block placed at {0} ({1} blocks away from you)", Pos, dis/32);
         }
 
         #endregion
