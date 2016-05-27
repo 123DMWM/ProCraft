@@ -32,24 +32,10 @@ using System.Reflection;
 
 namespace fCraft {
 
-    internal class PluginManager {
-        private static PluginManager instance;
+    internal static class PluginManager {
         public static List<Plugin> Plugins = new List<Plugin>();
 
-        private PluginManager() {
-            // Empty bitch
-        }
-
-        public static PluginManager GetInstance() {
-            if ( instance == null ) {
-                instance = new PluginManager();
-                instance.Initialize();
-            }
-
-            return instance;
-        }
-
-        private void Initialize() {
+        public static void Init() {
             try {
                 if ( !Directory.Exists( "plugins" ) ) {
                     Directory.CreateDirectory( "plugins" );
@@ -60,18 +46,17 @@ namespace fCraft {
             }
 
             // Load plugins
-            String[] plugins = Directory.GetFiles( "plugins", "*.dll" );
-
+            string[] plugins = Directory.GetFiles( "plugins", "*.dll" );
             if ( plugins.Length == 0 ) {
                 Logger.Log( LogType.ConsoleOutput, "PluginManager: No plugins found" );
                 return;
             } else {
                 Logger.Log( LogType.ConsoleOutput, "PluginManager: Loading " + plugins.Length + " plugins" );
 
-                foreach ( String plugin in plugins ) {
+                foreach ( string plugin in plugins ) {
                     try {
                         Type pluginType = null;
-                        String args = plugin.Substring( plugin.LastIndexOf( "\\" ) + 1, plugin.IndexOf( ".dll" ) - plugin.LastIndexOf( "\\" ) - 1 );
+                        string args = Path.GetFileNameWithoutExtension( plugin );
                         Assembly assembly = Assembly.LoadFile( Path.GetFullPath( plugin ) );
 
                         if ( assembly != null ) {
@@ -86,11 +71,10 @@ namespace fCraft {
                     }
                 }
             }
-
             LoadPlugins();
         }
 
-        private void LoadPlugins() {
+        static void LoadPlugins() {
             if ( Plugins.Count > 0 ) {
 				foreach (Plugin plugin in Plugins) {
 					try {

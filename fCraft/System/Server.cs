@@ -278,7 +278,7 @@ namespace fCraft {
 
             // prepare the list of commands
             CommandManager.Init();
-			PluginManager.GetInstance();
+            PluginManager.Init();
 
             // prepare the brushes
             BrushManager.Init();
