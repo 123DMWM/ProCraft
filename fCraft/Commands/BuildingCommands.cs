@@ -1845,34 +1845,20 @@ namespace fCraft {
 				}
 			}
 
-			if (flipX) {
-				if (flipY) {
-					if (flipH) {
-						player.Message("Flipped copy along all axes.");
-					} else {
-						player.Message("Flipped copy along X (east/west) and Y (north/south) axes.");
-					}
-				} else {
-					if (flipH) {
-						player.Message("Flipped copy along X (east/west) and Z (vertical) axes.");
-					} else {
-						player.Message("Flipped copy along X (east/west) axis.");
-					}
-				}
-			} else {
-				if (flipY) {
-					if (flipH) {
-						player.Message("Flipped copy along Y (north/south) and Z (vertical) axes.");
-					} else {
-						player.Message("Flipped copy along Y (north/south) axis.");
-					}
-				} else {
-					player.Message("Flipped copy along Z (vertical) axis.");
-				}
-			}
+            List<string> axes = new List<string>(3);
+            if (flipX) axes.Add("X (east/west)");
+            if (flipY) axes.Add("Y (north/south)");
+            if (flipH) axes.Add("Z (vertical)");
+            
+            if (axes.Count == 3)
+                player.Message("Flipped copy along all axes.");
+            else if (axes.Count == 2)
+                player.Message("Flipped copy along {0} and {1} axes.", axes[0], axes[1]);
+            else
+                player.Message("Flipped copy along {0} axis.", axes[0]);
 
-			player.SetCopyState(info);
-		}
+            player.SetCopyState(info);
+        }
 
 
 
