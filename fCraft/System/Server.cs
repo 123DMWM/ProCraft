@@ -1566,13 +1566,13 @@ namespace fCraft {
             
             string nick = Color.StripColors(Chat.ReplacePercentColorCodes(p.Info.DisplayedName, false));
             bool nickSame = nick.Equals(p.Info.Name, StringComparison.OrdinalIgnoreCase);
-            return nickSame ? p.ListName : p.ListName + " &e(&7" + nick + "&e)";
+            return nickSame ? p.ListName : p.ListName + " &S(&7" + nick + "&S)";
         }
         
         static string GetGroup(Player p, IEnumerable<Player> canBeSeen) {
             if (p.IsPlayingCTF) return "&sTeam " + p.Team.ClassyName;
-            if (p.Info.IsAFK) return "&e(&f" + canBeSeen.Where(pl => pl.Info.IsAFK).Count() + "&e) Away From Keyboard";
-            return "&e(&f" + canBeSeen.Where(pl => !pl.Info.IsAFK && pl.World == p.World).Count() + "&e) " + p.World.ClassyName;
+            if (p.Info.IsAFK) return "&S(&f" + canBeSeen.Where(pl => pl.Info.IsAFK).Count() + "&S) Away From Keyboard";
+            return "&S(&f" + canBeSeen.Where(pl => !pl.Info.IsAFK && pl.World == p.World).Count() + "&S) " + p.World.ClassyName;
         }
 
         internal static void UpdatePlayerList()
