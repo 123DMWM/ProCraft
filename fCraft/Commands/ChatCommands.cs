@@ -1324,11 +1324,11 @@ namespace fCraft
                 return;
             }
             if (!(cmd.Count <= 2) && cmd.IsConfirmed) {
-                Server.Players.Message("&f{0} &chas warned &f{1} &cto &4{2}", player.ClassyName, other.ClassyName, warning);
+                Server.Players.Message("{0} &chas warned {1}&c: &4{2}", player.ClassyName, other.ClassyName, warning);
                 return;
             }
             if (other != null) {
-                player.Confirm(cmd, "Your warning will display as: \"&f{0} &chas warned &f{1} &cto &4{2}\"", player.ClassyName, other.ClassyName, warning);
+                player.Confirm(cmd, "Your warning will display as: \"{0} &chas warned {1}&c: &4{2}\"", player.ClassyName, other.ClassyName, warning);
             }
         }
 
