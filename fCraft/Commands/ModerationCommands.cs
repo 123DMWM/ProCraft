@@ -1115,7 +1115,7 @@ namespace fCraft {
 			}
 
 			// for aware players: notify
-			Server.Players.CanSee(player).Message("&SPlayer {0}&S is now hidden. {1}", player.ClassyName, quitMessage);
+			Server.Players.CanSee(player).Message("Player {0}&S is now hidden. {1}", player.ClassyName, quitMessage);
 			Player.RaisePlayerHideChangedEvent(player, true, silent);
 			foreach (Player p1 in Server.Players) {
 				if (p1.Supports(CpeExt.ExtPlayerList) || p1.Supports(CpeExt.ExtPlayerList2)) {
@@ -1151,7 +1151,7 @@ namespace fCraft {
 			// for aware players: notify
 			Server.Players
 				  .CanSee(player)
-				  .Message("&SPlayer {0}&S is no longer hidden.",
+				  .Message("Player {0}&S is no longer hidden.",
 							player.ClassyName);
 
 			player.Info.IsHidden = false;
@@ -1448,7 +1448,7 @@ namespace fCraft {
 						player.LastPosition = player.Position;
 					}
                     player.TeleportTo((zPos));
-                    player.Message("&sTeleporting you to zone " + zone.ClassyName);
+                    player.Message("Teleporting you to zone " + zone.ClassyName);
                     return;
                 }
             }
@@ -1533,7 +1533,7 @@ namespace fCraft {
                 }
                 Player[] matches = Server.FindPlayers(player, name, SearchOptions.Default);
                 if (matches.Length == 0) {
-                    player.Message("&sNo player found by the name \"&f{0}&s\"", name);
+                    player.Message("No player found by the name \"{0}\"", name);
                     return;
                 }
                 if (matches.Length == 1) {
@@ -1542,7 +1542,7 @@ namespace fCraft {
                     if (targetWorld == null) PlayerOpException.ThrowNoWorld(target);
                     if (target.Info.TPDeny && target.Info.Rank >= player.Info.Rank) {
                         player.Message("&CThis player does not want people teleporting to them");
-                        player.Message("Cannot teleport to {0}&S.", target.ClassyName, targetWorld.ClassyName,
+                        player.Message("Cannot teleport to {0}", target.ClassyName, targetWorld.ClassyName,
                             targetWorld.AccessSecurity.MinRank.ClassyName);
                         return;
                     }
@@ -1912,7 +1912,7 @@ namespace fCraft {
                             //Allow banned players to be moved about...
                             if (target.Info.Rank.Name == "Banned")
                             {
-                                player.Message("&sYou CAN move banned players about... It is considered bad form though...");
+                                player.Message("You CAN move banned players about... It is considered bad form though...");
                             }
                             Logger.Log( LogType.UserActivity,
                                         "Bring: Asked {0} to confirm overriding world permissions to bring player {1} to world {2}",
@@ -1992,7 +1992,7 @@ namespace fCraft {
                         //Allow banned players to be moved about...
                         if (target.Info.Rank.Name == "Banned")
                         {
-                            player.Message("&sYou CAN move banned players about... It is considered bad form though...");
+                            player.Message("You CAN move banned players about... It is considered bad form though...");
                         }
                         Logger.Log( LogType.UserActivity,
                                     "WBring: Asked {0} to confirm overriding world permissions to bring player {1} to world {2}",
@@ -2011,7 +2011,7 @@ namespace fCraft {
                 //Allow banned players to be moved about...
                 if (target.Info.Rank.Name == "Banned")
                 {
-                    player.Message("&sYou CAN move banned players about... It is considered bad form though...");
+                    player.Message("You CAN move banned players about... It is considered bad form though...");
                 }
                 BringPlayerToWorld( player, target, world, false, false );
             }
@@ -2171,7 +2171,7 @@ namespace fCraft {
                         //Allow banned players to be moved about...
                         if (target.Info.Rank.Name == "Banned")
                         {
-                            player.Message("&sYou CAN move banned players about... It is considered bad form though...");
+                            player.Message("You CAN move banned players about... It is considered bad form though...");
                         }
                         target.StopSpectating();
                         if( usePlayerPosition ) {

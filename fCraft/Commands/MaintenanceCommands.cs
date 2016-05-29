@@ -975,18 +975,18 @@ namespace fCraft {
             string newNick = cmd.NextAll();
             string oldNick = info.DisplayedName ?? "";
             if (oldNick.Equals(newNick)) {
-                player.Message("&f{0}&s's nickname is already set to &f{1}",info.Name, newNick);
+                player.Message("{0}'s nickname is already set to {1}",info.Name, newNick);
                 return;
             }
             if (info.IsOnline) {
-                info.PlayerObject.Message("&f{0}&shanged your nickname{1} &sto &f{2}",
-                    (info.PlayerObject == player ? "&sC" : player.Name + " &sc"),
-                    string.IsNullOrEmpty(oldNick) ? string.Format(" from &f{0}", oldNick) : "",
+                info.PlayerObject.Message("{0}hanged your nickname{1} to {2}",
+                    (info.PlayerObject == player ? "C" : player.Name + " c"),
+                    string.IsNullOrEmpty(oldNick) ? string.Format(" from {0}", oldNick) : "",
                     newNick);
             }
             if (info.PlayerObject != player) {
-                player.Message("&sChanged nickname of &f{0}{1} &sto &f{2}", info.Name,
-                    string.IsNullOrEmpty(oldNick) ? string.Format(" &sfrom &f{0}", oldNick) : "",
+                player.Message("Changed nickname of {0}{1} to {2}", info.Name,
+                    string.IsNullOrEmpty(oldNick) ? string.Format(" from {0}", oldNick) : "",
                     newNick);
             }
             info.DisplayedName = newNick;

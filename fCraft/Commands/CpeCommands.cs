@@ -383,7 +383,7 @@ namespace fCraft {
                                            getter(target), model, prefix);
             }
             if (target.PlayerObject != player) {
-               player.Message("&sChanged {3}model of &f{0} &sfrom &f{1} &sto &f{2}", 
+               player.Message("Changed {3}model of &f{0} &sfrom &f{1} &sto &f{2}", 
                               target.Name, getter(target), model, prefix);
             }
             target.oldMob = target.Mob;
@@ -467,7 +467,7 @@ namespace fCraft {
                 p.PlayerObject.Message("&f{0}&shanged your skin from &f{1} &sto &f{2}", (p.PlayerObject == player ? "&sC" : player.Name + " &sc"), p.oldskinName, skinString);
             }
             if (p.PlayerObject != player) {
-                player.Message("&sChanged skin of &f{0} &sfrom &f{1} &sto &f{2}", p.Name, p.oldskinName, skinString);
+                player.Message("Changed skin of &f{0} &sfrom &f{1} &sto &f{2}", p.Name, p.oldskinName, skinString);
             }
             p.oldskinName = p.skinName;
             p.skinName = skinString;
@@ -1404,8 +1404,8 @@ namespace fCraft {
             p.currentBD.BlockID = (byte)blockId;
             p.currentBD.Version2 = true;
             p.Message("   &bSet block id to: " + blockId);
-            p.Message("&sFrom now on, use &h{0} [value]&s to enter arguments.", name);
-            p.Message("&sYou can abort the currently partially " +
+            p.Message("From now on, use &h{0} [value]&s to enter arguments.", name);
+            p.Message("You can abort the currently partially " +
                            "created custom block at any time by typing \"&h{0} abort&s\"", name);
 
             p.currentBDStep = 0;
@@ -1424,7 +1424,7 @@ namespace fCraft {
 
                 if (index >= offset) {
                     count++;
-                    p.Message("&s{2} custom block &h{0} &sname is &h{1}", def.BlockID, def.Name, scope);
+                    p.Message("{2} custom block &h{0} &sname is &h{1}", def.BlockID, def.Name, scope);
 
                     if (count >= 8) {
                         p.Message("To see the next set of {1} custom blocks, " +
@@ -2091,7 +2091,7 @@ namespace fCraft {
 
             PlayerInfo target = InfoCommands.FindPlayerInfo(player, cmd, false);
             if (target == null || player.Info.Rank != RankManager.HighestRank) {
-                player.Message("&sCurrent Hacks for {0}", player.ClassyName);
+                player.Message("Current Hacks for {0}", player.ClassyName);
                 player.Message("    &sFlying: &a{0} &sNoclip: &a{1} &sSpeedhack: &a{2}",
                                 player.Info.AllowFlying.ToString(),
                                 player.Info.AllowNoClip.ToString(),
@@ -2108,7 +2108,7 @@ namespace fCraft {
             string hackStr = "hack";
 
             if (hack == "null") {
-                player.Message("&sCurrent Hacks for {0}", target.ClassyName);
+                player.Message("Current Hacks for {0}", target.ClassyName);
                 player.Message("    &sFlying: &a{0} &sNoclip: &a{1} &sSpeedhack: &a{2}",
                                 target.AllowFlying.ToString(),
                                 target.AllowNoClip.ToString(),
@@ -2226,7 +2226,7 @@ namespace fCraft {
             }
             player.Message("Players using:");
             foreach (var kvp in clients) {
-                player.Message("  &s{0}:&f {1}",
+                player.Message("  {0}:&f {1}",
                                kvp.Key, kvp.Value.JoinToClassyString());
             }
         }
@@ -2269,7 +2269,7 @@ namespace fCraft {
                     return;
                 }
             }
-            player.Message("&sSet max reach distance for world &f{0}&s to &f{1} &s(&f{2}&s blocks)", world.ClassyName, distance, distance / 32);
+            player.Message("Set max reach distance for world &f{0}&s to &f{1} &s(&f{2}&s blocks)", world.ClassyName, distance, distance / 32);
             world.maxReach = distance;
 
         }

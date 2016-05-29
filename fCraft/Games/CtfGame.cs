@@ -80,7 +80,7 @@ namespace fCraft.Games {
 				RedTeam.Score = 0;
 				BlueTeam.Score = 0;
 				
-				world.Players.Message("&sStarting the next round.");
+				world.Players.Message("Starting the next round.");
 				foreach (Player player in world.Players)
 					player.TeleportTo(player.Team.Spawn);
 			}
@@ -91,7 +91,7 @@ namespace fCraft.Games {
 			} else if (BlueTeam.TotalScore > RedTeam.TotalScore) {
 				op = "&S<--";
 			}
-			world.Players.Message("&SScores so far: {0}{1} &a{2}{0}:&f{3} {4} {5}{6} &a{7}{5}:&f{8}",
+			world.Players.Message("Scores so far: {0}{1} &a{2}{0}:&f{3} {4} {5}{6} &a{7}{5}:&f{8}",
 			                      RedTeam.Color, RedTeam.Name, RedTeam.RoundsWon, RedTeam.Score, op,
 			                      BlueTeam.Color, BlueTeam.Name, BlueTeam.RoundsWon, BlueTeam.Score);
 		}
@@ -169,7 +169,7 @@ namespace fCraft.Games {
 				RemovePlayer(e.Player, e.OldWorld);
 				
 				if (BlueTeam.Count + RedTeam.Count == 0) {
-					e.Player.Message("&sYou were the last player in the game, and thus, the game has ended.");
+					e.Player.Message("You were the last player in the game, and thus, the game has ended.");
 					Stop();
 				}
 			}
@@ -188,7 +188,7 @@ namespace fCraft.Games {
 				return;
 			
 			CtfTeam loser = Opposition(winner);
-			world.Players.Message("&SThe {0}{1}&S team won that round: {0}{2} &S- {3}{4}", 
+			world.Players.Message("The {0}{1}&S team won that round: {0}{2} &S- {3}{4}", 
 			                      winner.Color, winner.Name, winner.Score, loser.Color, loser.Score);
 		}
 
@@ -206,7 +206,7 @@ namespace fCraft.Games {
 		
 		static void AddPlayerToTeam(CtfTeam team, Player p) {
 			team.Players.Add(p);
-			p.Message("&SAdding you to the " + team.ClassyName + " team");
+			p.Message("Adding you to the " + team.ClassyName + " team");
 			p.TeleportTo(team.Spawn);
 			p.Team = team;
 			
@@ -255,7 +255,7 @@ namespace fCraft.Games {
 		
 		static void RemovePlayerFromTeam(Player p, CtfTeam opposingTeam) {
 			p.Team.Players.Remove(p);
-			p.Message("&SRemoving you from the game");
+			p.Message("Removing you from the game");
 			if (p.IsHoldingFlag) {
 				world.Players.Message("&cFlag holder " + p.ClassyName + " &cleft CTF, " +
 				                      "thus dropping the flag for the " + p.Team.ClassyName + " team!");
@@ -274,14 +274,14 @@ namespace fCraft.Games {
 		public static void Start(Player player, World world) {
 			Server.Players.Message("{0}&S Started a game of CTF on world {1}",
 			                       player.ClassyName, world.ClassyName);
-			world.Players.Message("&SThe game will start in ten seconds.");
+			world.Players.Message("The game will start in ten seconds.");
 			GameRunning = true;
 			
-			Scheduler.NewTask(t => world.Players.Message("&SGame Starting: 3"))
+			Scheduler.NewTask(t => world.Players.Message("Game Starting: 3"))
 				.RunOnce(TimeSpan.FromSeconds(7));
-			Scheduler.NewTask(t => world.Players.Message("&SGame Starting: 2"))
+			Scheduler.NewTask(t => world.Players.Message("Game Starting: 2"))
 				.RunOnce(TimeSpan.FromSeconds(8));
-			Scheduler.NewTask(t => world.Players.Message("&SGame Starting: 1"))
+			Scheduler.NewTask(t => world.Players.Message("Game Starting: 1"))
 				.RunOnce(TimeSpan.FromSeconds(9));
 			Scheduler.NewTask(StartGame, player)
 				.RunOnce(TimeSpan.FromSeconds(10));
@@ -294,7 +294,7 @@ namespace fCraft.Games {
 		
 		static void StartGame(SchedulerTask task) {
 			if (!GameRunning && world != null) {
-				world.Players.Message("&SCTF game was aborted.");
+				world.Players.Message("CTF game was aborted.");
 				return;
 			}
 			

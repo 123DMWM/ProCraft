@@ -361,13 +361,13 @@ namespace fCraft.Drawing {
                 if (BlocksUpdated > 0) {
                     if (BlocksDenied > 0) {
                         Player.Message(
-                            "{0}: Finished in {1}, updated &f{2}&s blocks. &WSkipped &f{3}&w blocks due to permission issues.",
+                            "{0}: Finished in {1}, updated {2} blocks. &WSkipped {3} blocks due to permission issues.",
                             Description,
                             DateTime.UtcNow.Subtract(StartTime).ToMiniString(),
                             BlocksUpdated,
                             BlocksDenied);
                     } else {
-                        Player.Message("{0}: Finished in {1}, updated &f{2}&s blocks.",
+                        Player.Message("{0}: Finished in {1}, updated {2} blocks.",
                                        Description,
                                        DateTime.UtcNow.Subtract(StartTime).ToMiniString(),
                                        BlocksUpdated);
@@ -375,7 +375,7 @@ namespace fCraft.Drawing {
                 } else {
                     if (BlocksDenied > 0) {
                         Player.Message(
-                            "{0}: Finished in {1}, no changes made. &WSkipped &f{2}&w blocks due to permission issues.",
+                            "{0}: Finished in {1}, no changes made. &WSkipped {2} blocks due to permission issues.",
                             Description,
                             DateTime.UtcNow.Subtract(StartTime).ToMiniString(),
                             BlocksDenied);
@@ -406,14 +406,14 @@ namespace fCraft.Drawing {
             if (AnnounceCompletion) {
                 if (BlocksDenied > 0) {
                     Player.Message(
-                        "{0}: Cancelled after {1}. Processed &f{2}&s, updated &f{3}&s. &wSkipped &f{4}&w due to permission issues.",
+                        "{0}: Cancelled after {1}. Processed {2}, updated {3}. &wSkipped {4} due to permission issues.",
                         Description,
                         DateTime.UtcNow.Subtract(StartTime).ToMiniString(),
                         BlocksProcessed,
                         BlocksUpdated,
                         BlocksDenied);
                 } else {
-                    Player.Message("{0}: Cancelled after {1}. Processed &f{2}&s blocks, updated &f{3}&s blocks.",
+                    Player.Message("{0}: Cancelled after {1}. Processed {2} blocks, updated {3} blocks.",
                                    Description,
                                    DateTime.UtcNow.Subtract(StartTime).ToMiniString(),
                                    BlocksProcessed,

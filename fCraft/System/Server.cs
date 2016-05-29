@@ -975,7 +975,7 @@ namespace fCraft {
 
                 if (player.IdBotTime.ToSeconds()%300 == 0 && player.IdBotTime.ToSeconds() >= 300) {
                     if (player.Info.IsAFK == false) {
-                        Players.CanSee(player).Message("&S{0} is now AFK (Auto)", player.Name);
+                        Players.CanSee(player).Message("{0} is now AFK (Auto)", player.Name);
                         player.Info.IsAFK = true;
                         player.Info.oldafkMob = player.Info.afkMob;
                         player.Info.afkMob = player.AFKModel;
@@ -1076,7 +1076,7 @@ namespace fCraft {
                 {
                     if (player.Info.IsAFK == false)
                     {
-                        Server.Players.CanSee(player).Message("&S{0} is now AFK (Auto)", player.Name);
+                        Server.Players.CanSee(player).Message("{0} is now AFK (Auto)", player.Name);
                         player.Info.IsAFK = true;
                         player.Info.Mob = player.AFKModel;
                         int TimeLeft = (player.Info.Rank.IdleKickTimer - (int)player.IdBotTime.ToMinutes());

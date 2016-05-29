@@ -331,7 +331,7 @@ namespace fCraft {
             }
 
             if (!rawMessage.ToLower().StartsWith("/afk") && Info.IsAFK) {
-                Server.Players.CanSee(this).Message("&S{0} is no longer AFK", this.Name);
+                Server.Players.CanSee(this).Message("{0} is no longer AFK", this.Name);
                 Message("&SYou are no longer AFK");
                 Info.IsAFK = false;
                 Info.oldafkMob = Info.afkMob;
@@ -588,7 +588,7 @@ namespace fCraft {
                                                             .Where( p => p.spectatedPlayer == this )
                                                             .ToArray();
                         if( spectators.Length > 0 ) {
-                            spectators.Message( "[Spectate]: &Fto rank {0}&F: {1}", rank.ClassyName, messageText );
+                            spectators.Message( "[Spectate]: to rank {0}&F: {1}", rank.ClassyName, messageText );
                         }
 
                         Chat.SendRank( this, rank, messageText );
@@ -1785,7 +1785,7 @@ namespace fCraft {
                     Message("Last block marked at {0}. Type &H/Mark&S or click any block to continue.", coord);
                 }
             } else if (announce) {
-                Message("Block #&f{0}&s marked at {1}. Place mark #&f{2}&s.",
+                Message("Block #{0} marked at {1}. Place mark #{2}.",
                         SelectionMarkCount,
                         coord,
                         SelectionMarkCount + 1);

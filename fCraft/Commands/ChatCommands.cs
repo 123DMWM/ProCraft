@@ -235,10 +235,10 @@ namespace fCraft
             if (player.DetectChatSpam()) return;
             var staff = Server.Players.Where(p => p.IsStaff);
             if (staff != null && staff.Any()) {
-                player.Message("&SYour review request has been sent to the Moderators. They will be with you shortly");
-                Server.Players.Where(p => p.IsStaff).Message("&SPlayer " + player.ClassyName + " &Srequests a building review.");
+                player.Message("Your review request has been sent to the Moderators. They will be with you shortly");
+                Server.Players.Where(p => p.IsStaff).Message("Player " + player.ClassyName + " &Srequests a building review.");
             } else {
-                player.Message("&SThere are no staff on! Sorry!");
+                player.Message("There are no staff on! Sorry!");
             }
         }
 
@@ -253,8 +253,8 @@ namespace fCraft
             // Check if the player actually moved and not just rotated
             if ((oldPos.X != newPos.X) || (oldPos.Y != newPos.Y) || (oldPos.Z != newPos.Z)) {
                 if (e.Player.Info.IsAFK) {
-                    Server.Players.CanSee(e.Player).Message("&S{0} is no longer AFK", e.Player.Name);
-                    e.Player.Message("&SYou are no longer AFK");
+                    Server.Players.CanSee(e.Player).Message("{0} is no longer AFK", e.Player.Name);
+                    e.Player.Message("You are no longer AFK");
                     e.Player.Info.IsAFK = false;
                     e.Player.Info.oldafkMob = e.Player.Info.afkMob;
                     e.Player.Info.afkMob = e.Player.Info.Mob;
@@ -281,9 +281,9 @@ namespace fCraft
                 return;
             }
             Server.Players.CanSee(player)
-                .Message("&S{0} is {1} AFK{2}", player.Name, player.Info.IsAFK ? "no longer" : "now",
+                .Message("{0} is {1} AFK{2}", player.Name, player.Info.IsAFK ? "no longer" : "now",
                 msg.Length > 0 ? " (" + (msg.Length > 32 ? msg.Remove(32) : msg) + ")" : "");
-            player.Message("&SYou are {0} AFK {1}", player.Info.IsAFK ? "no longer" : "now",
+            player.Message("You are {0} AFK {1}", player.Info.IsAFK ? "no longer" : "now",
                 msg.Length > 0 ? " (" + (msg.Length > 32 ? msg.Remove(32) : msg) + ")" : "");
             player.Info.IsAFK = !player.Info.IsAFK;
             player.Info.oldafkMob = player.Info.afkMob;
@@ -443,9 +443,9 @@ namespace fCraft
             IsConsoleSafe = true,
             Help = "Gives random number between 1 and 100.&n" +
                    "&H/Roll MaxNumber&n" +
-                   "&S  Gives number between 1 and max.&n" +
+                   "  Gives number between 1 and max.&n" +
                    "&H/Roll MinNumber MaxNumber&n" +
-                   "&S  Gives number between min and max.",
+                   "  Gives number between min and max.",
             Handler = RollHandler
         };
 
@@ -713,7 +713,7 @@ namespace fCraft
                     } else {
                         player.Message("There are {0} reports:", Chat.Reports.Count);
                         foreach (Report r in Chat.Reports.OrderBy(r => r.Datesent)) {
-                            player.Message("&s[&1Report&s] #&f" + r.Id + " &sFrom:&f " + r.Sender);
+                            player.Message("[&1Report&s] #&f" + r.Id + " &sFrom:&f " + r.Sender);
                         }
                     }
                     break;
@@ -1234,7 +1234,7 @@ namespace fCraft
                     } else if (noun.EndsWith("s")) {
                         ana = "some";
                     }
-                    player.Message("&sIdea #{0}&f: Build " + ana + " " + adjective + " " + noun, i);
+                    player.Message("Idea #{0}&f: Build " + ana + " " + adjective + " " + noun, i);
                     i++;
                     ana = "a";
                 }
@@ -1247,7 +1247,7 @@ namespace fCraft
                 } else if (noun.EndsWith("s")) {
                     ana = "some";
                 }
-                player.Message("&sIdea&f: Build " + ana + " " + adjective + " " + noun);
+                player.Message("Idea&f: Build " + ana + " " + adjective + " " + noun);
             }
             player.LastServerMessageDate = DateTime.UtcNow;
         }

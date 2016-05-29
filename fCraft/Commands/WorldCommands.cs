@@ -518,15 +518,15 @@ namespace fCraft {
                     }
 
                     if( entry.OldBlock == (byte)Block.Air ) {
-						args.Player.Message(" {0} ago {1} placed &f{2} &s{3}",
+						args.Player.Message(" {0} ago {1} placed {2} {3}",
                                              date, playerName, Map.GetBlockName(args.World, entry.NewBlock), 
                                              contextString);
                     } else if( entry.NewBlock == (byte)Block.Air ) {
-						args.Player.Message(" {0} ago {1} deleted &f{2} &s{3}",
+						args.Player.Message(" {0} ago {1} deleted {2} {3}",
                                              date, playerName, Map.GetBlockName(args.World, entry.OldBlock), 
                                              contextString);
                     } else {
-                        args.Player.Message(" {0} ago {1} replaced &f{2} &swith &f{3} &s{4}",
+                        args.Player.Message(" {0} ago {1} replaced {2} with {3} {4}",
                                              date, playerName, Map.GetBlockName(args.World, entry.OldBlock), 
                                              Map.GetBlockName(args.World, entry.NewBlock), contextString);
                     }
@@ -1013,7 +1013,7 @@ namespace fCraft {
             }
             if (note.Length > 64)
             {
-                player.Message("&sProbably bad timing, but your suicide note can't be {0} characters long. Max is 64.", note.Length);
+                player.Message("Probably bad timing, but your suicide note can't be {0} characters long. Max is 64.", note.Length);
                 return;
 			}
 			if (player.World != null) {
@@ -1022,15 +1022,15 @@ namespace fCraft {
 			}
             if (note == "")
             {
-                Server.Message("&s{0}&s took the easy way out", player.ClassyName);
+                Server.Message("{0}&s took the easy way out", player.ClassyName);
                 player.TeleportTo(player.World.LoadMap().getSpawnIfRandom());
                 player.LastServerMessageDate = DateTime.UtcNow;
                 return;
             }
             else
             {
-                Server.Message("&s{0}&s took the easy way out and left a note", player.ClassyName);
-                Server.Message("&s[&fNote&s] {0}", note);
+                Server.Message("{0}&s took the easy way out and left a note", player.ClassyName);
+                Server.Message("[&fNote&s] {0}", note);
 				player.TeleportTo(player.World.LoadMap().getSpawnIfRandom());
                 player.LastServerMessageDate = DateTime.UtcNow;
                 return;
@@ -1100,7 +1100,7 @@ namespace fCraft {
             string option = cmd.Next();
             if (option == null)
             {
-                player.Message("&sGame settings for world (&a{0}&s)", world.Name);
+                player.Message("Game settings for world (&a{0}&s)", world.Name);
                 player.Message("  &sHiders spawn: {0}", new Position(world.HiderPosX, world.HiderPosY, world.HiderPosZ).ToBlockCoords().ToString());
                 player.Message("  &sSeeker spawn: {0}", new Position(world.SeekerPosX, world.SeekerPosY, world.SeekerPosZ).ToBlockCoords().ToString());
                 player.Message("  &sGame Blocks: {0}", world.GameBlocks.JoinToString(", "));
@@ -2961,7 +2961,7 @@ namespace fCraft {
                             {
                                 world.Greeting = File.ReadAllText("./WorldGreeting/" + player.World.Name + ".txt");
                                 if (world.Greeting.Length == 0) player.Message("No greeting message is set for world {0}", world.ClassyName);
-                                else player.Message("&SGreeting message for world {0}&s is: {1}", world.ClassyName, world.Greeting);
+                                else player.Message("Greeting message for world {0}&s is: {1}", world.ClassyName, world.Greeting);
                                 world.Greeting = null;
                             }
                             else player.Message("No greeting message is set for world {0}", world.ClassyName);
@@ -2989,9 +2989,9 @@ namespace fCraft {
                 case "motd":
                     if (string.IsNullOrEmpty(value)) {
                         if (string.IsNullOrEmpty(world.MOTD)) {
-                            player.Message("World \"&f{0}&s\" does not have a custom MOTD", world.Name);
+                            player.Message("World \"{0}\" does not have a custom MOTD", world.Name);
                         } else {
-                            player.Message("MOTD for \"&F{0}&S\" is: ", world.Name);
+                            player.Message("MOTD for \"{0}\" is: ", world.Name);
                             player.Message("  " + world.MOTD);
                         }
                     } else {
@@ -2999,11 +2999,11 @@ namespace fCraft {
                             value = value.Substring(0, 64);
                         }
                         if (value.ToLower().Equals("remove") || value.ToLower().Equals("delete") || value.ToLower().Equals("reset")) {
-                            player.Message("MOTD for \"&F{0}&S\" has been removed", world.Name);
+                            player.Message("MOTD for \"{0}\" has been removed", world.Name);
                             world.MOTD = null;
                             WorldManager.SaveWorldList();
                         } else {
-                            player.Message("MOTD for \"&F{0}&S\" has been set to:", world.Name);
+                            player.Message("MOTD for \"{0}\" has been set to:", world.Name);
                             player.Message("  " + value);
                             world.MOTD = value;
                             WorldManager.SaveWorldList();

@@ -554,7 +554,7 @@ namespace fCraft {
             BytesReceived += 9;
             if( World == null || World.Map == null ) return;
             if (Info.IsAFK) {
-                Server.Players.CanSee(this).Message("&S{0} is no longer AFK", Name);
+                Server.Players.CanSee(this).Message("{0} is no longer AFK", Name);
                 Message("&SYou are no longer AFK");
                 Info.IsAFK = false;
                 Info.oldafkMob = Info.afkMob;

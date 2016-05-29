@@ -12,7 +12,7 @@ namespace fCraft.Games {
 				return;
 			
 			if (e.NewBlock == Opposition(e.Player.Team).FlagBlock) {
-				e.Player.Message("&sYou cannot place {0}&s blocks, you are on the {1}&s Team.",
+				e.Player.Message("You cannot place {0}&s blocks, you are on the {1}&s Team.",
 				                 Opposition(e.Player.Team).ClassyName, e.Player.Team.ClassyName);
 				e.Result = CanPlaceResult.CTFDenied;
 			} else if (e.NewBlock == Block.Lava || e.NewBlock == Block.Water) {
