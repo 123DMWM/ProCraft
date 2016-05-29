@@ -376,13 +376,13 @@ namespace fCraft {
 				throw new ArgumentNullException("rawMessage");
 
 			var recepientList = Server.Players.Where(p => !p.IsStaff);
-			string formattedMessage = Color.Say + rawMessage;
-			var e = new ChatSendingEventArgs(player, rawMessage, formattedMessage, ChatMessageType.Say, recepientList);
+			string formattedMessage = "&Y[/say] " + rawMessage;
+            var e = new ChatSendingEventArgs(player, rawMessage, formattedMessage, ChatMessageType.Say, recepientList);
 			if (!SendInternal(e))
 				return false;
 
 			var recepientListStaff = Server.Players.Can(Permission.ReadStaffChat);
-			string formattedMessageStaff = "&s[&YSay&s][&f" + player.Name + "&s] &Y" + rawMessage;
+			string formattedMessageStaff = "&Y["+ player.Name + "/say] " + rawMessage;
 			var es = new ChatSendingEventArgs(player, rawMessage, formattedMessageStaff, ChatMessageType.SayStaff, recepientListStaff);
 			if (!SendInternal(es))
 				return false;
@@ -404,13 +404,13 @@ namespace fCraft {
 				throw new ArgumentNullException("rawMessage");
 
 			var recepientList = Server.Players.Where(p => p.Info.Rank != RankManager.HighestRank).Can(Permission.ReadStaffChat);
-			string formattedMessage = Color.Say + rawMessage;
-			var e = new ChatSendingEventArgs(player, rawMessage, formattedMessage, ChatMessageType.Staff, recepientList);
+			string formattedMessage = "&Y[/staffsay] " + rawMessage;
+            var e = new ChatSendingEventArgs(player, rawMessage, formattedMessage, ChatMessageType.Staff, recepientList);
 			if (!SendInternal(e))
 				return false;
 
 			var recepientListOwner = Server.Players.Where(p => p.Info.Rank == RankManager.HighestRank);
-			string formattedMessageOwner = "&s[&yStaffSay&s][&f" + player.Name + "&s] &Y" + rawMessage;
+			string formattedMessageOwner = "&Y[" + player.Name + "/staffsay] " + rawMessage;
 			var eo = new ChatSendingEventArgs(player, rawMessage, formattedMessageOwner, ChatMessageType.StaffSayOwner, recepientListOwner);
 			if (!SendInternal(eo))
 				return false;

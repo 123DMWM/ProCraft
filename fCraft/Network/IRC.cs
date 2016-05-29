@@ -1241,7 +1241,7 @@ namespace fCraft
 
                 case ChatMessageType.Say:
                     if (enabled) {
-                        SendChannelMessage(Bold + "&S[&YSay&S] " + Reset + args.Message);
+                        SendChannelMessage(Bold + "&S[Say&S] " + Reset + args.Message);
                     }
                     break;
             }
