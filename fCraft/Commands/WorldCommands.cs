@@ -1358,7 +1358,7 @@ namespace fCraft {
                 player.Message( "There are no {0}.", listName );
 
             } else if( worlds.Length <= WorldNamesPerPage || player.IsSuper ) {
-                player.MessagePrefixed( "&S  ", "&SThere are {0} {1}: {2}",
+                player.Message("  There are {0} {1}: {2}",
                                         worlds.Length, listName, worlds.JoinToClassyString() );
 
             } else {
@@ -1366,7 +1366,7 @@ namespace fCraft {
                     offset = Math.Max( 0, worlds.Length - WorldNamesPerPage );
                 }
                 World[] worldsPart = worlds.Skip( offset ).Take( WorldNamesPerPage ).ToArray();
-                player.MessagePrefixed( "&S   ", "&S{0}: {1}",
+                player.Message("  {0}: {1}",
                                         listName.UppercaseFirst(), worldsPart.JoinToClassyString() );
 
                 if( offset + worldsPart.Length < worlds.Length ) {

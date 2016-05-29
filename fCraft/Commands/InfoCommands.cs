@@ -267,27 +267,23 @@ namespace fCraft {
                     altNames.Sort( new PlayerInfoComparer( player ) );
                     if( altNames.Count > MaxAltsToPrint ) {
                         if( bannedAltCount > 0 ) {
-                            player.MessagePrefixed( "&S  ",
-                                                    "&S  Over {0} accounts ({1} banned) on IP: {2}  &Setc",
+                            player.Message("  Over {0} accounts ({1} banned) on IP: {2}  &Setc",
                                                     MaxAltsToPrint,
                                                     bannedAltCount,
                                                     altNames.Take( 15 ).ToArray().JoinToClassyString() );
                         } else {
-                            player.MessagePrefixed( "&S  ",
-                                                    "&S  Over {0} accounts on IP: {1} &Setc",
+                            player.Message("  Over {0} accounts on IP: {1} &Setc",
                                                     MaxAltsToPrint,
                                                     altNames.Take( 15 ).ToArray().JoinToClassyString() );
                         }
                     } else {
                         if( bannedAltCount > 0 ) {
-                            player.MessagePrefixed( "&S  ",
-                                                    "&S  {0} accounts ({1} banned) on IP: {2}",
+                            player.Message("  {0} accounts ({1} banned) on IP: {2}",
                                                     altNames.Count,
                                                     bannedAltCount,
                                                     altNames.ToArray().JoinToClassyString() );
                         } else {
-                            player.MessagePrefixed( "&S  ",
-                                                    "&S  {0} accounts on IP: {1}",
+                            player.Message("  {0} accounts on IP: {1}",
                                                     altNames.Count,
                                                     altNames.ToArray().JoinToClassyString() );
                         }
@@ -533,27 +529,23 @@ namespace fCraft {
                     altNames.Sort( new PlayerInfoComparer( player ) );
                     if( altNames.Count > MaxAltsToPrint ) {
                         if( bannedAltCount > 0 ) {
-                            player.MessagePrefixed( "&S  ",
-                                                    "&S  Over {0} accounts ({1} banned) on IP: {2} &Setc",
+                            player.Message("  Over {0} accounts ({1} banned) on IP: {2} &Setc",
                                                     MaxAltsToPrint,
                                                     bannedAltCount,
                                                     altNames.Take( 15 ).ToArray().JoinToClassyString() );
                         } else {
-                            player.MessagePrefixed( "&S  ",
-                                                    "&S  Over {0} accounts on IP: {1} &Setc",
+                            player.Message("  Over {0} accounts on IP: {1} &Setc",
                                                     MaxAltsToPrint,
                                                     altNames.Take( 15 ).ToArray().JoinToClassyString() );
                         }
                     } else {
                         if( bannedAltCount > 0 ) {
-                            player.MessagePrefixed( "&S  ",
-                                                    "&S  {0} accounts ({1} banned) on IP: {2}",
+                            player.Message("  {0} accounts ({1} banned) on IP: {2}",
                                                     altNames.Count,
                                                     bannedAltCount,
                                                     altNames.ToArray().JoinToClassyString() );
                         } else {
-                            player.MessagePrefixed( "&S  ",
-                                                    "&S  {0} accounts on IP: {1}",
+                            player.Message("  {0} accounts on IP: {1}",
                                                     altNames.Count,
                                                     altNames.ToArray().JoinToClassyString() );
                         }
@@ -1194,7 +1186,7 @@ namespace fCraft {
 
                 } else if( visiblePlayers.Length <= PlayersPerPage || player.IsSuper ) {
                 	string names = realNames ? visiblePlayers.JoinToRealString() : visiblePlayers.JoinToClassyString();
-                    player.MessagePrefixed( "&S  ", "&SThere are {0} players {1}: {2}",
+                    player.Message("  There are {0} players {1}: {2}",
                                             visiblePlayers.Length, qualifier, names );
 
                 } else {
@@ -1203,7 +1195,7 @@ namespace fCraft {
                     }
                     Player[] playersPart = visiblePlayers.Skip( offset ).Take( PlayersPerPage ).ToArray();
                     string names = realNames ? playersPart.JoinToRealString() : playersPart.JoinToClassyString();
-                    player.MessagePrefixed( "&S   ", "&SPlayers {0}: {1}", qualifier, names);
+                    player.Message("  Players {0}: {1}", qualifier, names);
 
                     if( offset + playersPart.Length < visiblePlayers.Length ) {
                         player.Message( "Showing {0}-{1} (out of {2}). Next: &H/Players {3}{1}",
@@ -1286,8 +1278,6 @@ namespace fCraft {
         #endregion
         #region Help
 
-        const string HelpPrefix = "&S    ";
-
         static readonly CommandDescriptor CdHelp = new CommandDescriptor {
             Name = "Help",
             Aliases = new[] { "herp", "man" },
@@ -1316,7 +1306,7 @@ namespace fCraft {
                 if( sectionName != null ) {
                     string sectionHelp;
                     if( descriptor.HelpSections != null && descriptor.HelpSections.TryGetValue( sectionName.ToLower(), out sectionHelp ) ) {
-                        player.MessagePrefixed( HelpPrefix, sectionHelp );
+                        player.Message("  " + sectionHelp);
                     } else {
                         player.Message( "No help found for \"{0}\"", sectionName );
                     }
@@ -1336,7 +1326,7 @@ namespace fCraft {
                         sb.Append( descriptor.Help );
                     }
 
-                    player.MessagePrefixed( HelpPrefix, sb.ToString() );
+                    player.Message("  " + sb.ToString() );
 
                     if( descriptor.Permissions != null && descriptor.Permissions.Length > 0 ) {
                         player.MessageNoAccess( descriptor );
@@ -1619,7 +1609,7 @@ namespace fCraft {
                 offset = Math.Max(0, infos.Count() - PlayersPerPage);
             }
             var playersPart = infos.Skip(offset).Take(10).ToArray();
-            player.MessagePrefixed("&S   ", "&SPlayers in rank ({1}&s): {0}", playersPart.JoinToString((r => String.Format("&n{0}&S (Had rank for: {1})", r.ClassyName, r.TimeSinceRankChange.ToMiniString()))), rank.ClassyName);
+            player.Message("  Players in rank ({1}&s): {0}", playersPart.JoinToString((r => String.Format("&n{0}&S (Had rank for: {1})", r.ClassyName, r.TimeSinceRankChange.ToMiniString()))), rank.ClassyName);
             player.Message("Showing players {0}-{1} (out of {2}).", offset + 1, offset + playersPart.Length, infos.Count());
         }
 
@@ -1659,7 +1649,7 @@ namespace fCraft {
                 offset = Math.Max(0, infos.Count() - PlayersPerPage);
             }
             var playersPart = infos.Skip(offset).Take(10).ToArray();
-            player.MessagePrefixed("&S   ", "&SPlayers who previously had rank ({1}&s): {0}", playersPart.JoinToString((r => String.Format("&n{0}&S (Had current rank ({2}&s) for: {1})", r.ClassyName, r.TimeSinceRankChange.ToMiniString(), r.Rank.ClassyName))), rank.ClassyName);
+            player.Message("  Players who previously had rank ({1}&s): {0}", playersPart.JoinToString((r => String.Format("&n{0}&S (Had current rank ({2}&s) for: {1})", r.ClassyName, r.TimeSinceRankChange.ToMiniString(), r.Rank.ClassyName))), rank.ClassyName);
             player.Message("Showing players {0}-{1} (out of {2}).", offset + 1, offset + playersPart.Length, infos.Count());
         }
 
