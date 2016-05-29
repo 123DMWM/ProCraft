@@ -10,7 +10,6 @@ namespace fCraft.ConfigGUI {
             new KeywordInfo("{RANK}", "Player's rank", "Player's rank, including prefix and colors (if applicable)." ),
             new KeywordInfo("{PLAYER_NAME}", "Player's name", "Name of the player, including prefix and colors (if applicable)." ),
             new KeywordInfo("{TIME}", "Time", "Current time (server clock)."),
-            new KeywordInfo("{PTIME}", "Player Time", "Current time (player clock)."),
             new KeywordInfo("{WORLD}", "Main world name","Name of the main/starting world, including prefix and colors (if applicable)." ),
             new KeywordInfo("{PLAYERS}", "Number of players online", "Note that hidden players will not be included in this number." ),
             new KeywordInfo("{WORLDS}", "Number of worlds", "Number of worlds accessible by the player. Does not count hidden worlds." ),
