@@ -1445,7 +1445,7 @@ Your rank is {RANK}&S. Type &H/Help&S for help." );
         void UpdateChatPreview() {
             List<string> lines = new List<string>();
             if( xShowConnectionMessages.Checked ) {
-                lines.Add( String.Format( "&2+(&f{0}{1}Facepalmed&2) Connected. &aUsing: ClassicalSharp Client",
+                lines.Add( String.Format( "&2({0}{1}Facepalmed&2) Connected. &aUsing: ClassicalSharp Client",
                                           xRankColorsInChat.Checked ? RankManager.HighestRank.Color : "",
                                           xRankPrefixesInChat.Checked ? RankManager.HighestRank.Prefix : "" ));
             }
@@ -1485,7 +1485,7 @@ Your rank is {RANK}&S. Type &H/Help&S for help." );
                                           Color.White));
             }
             if( xShowConnectionMessages.Checked ) {
-                lines.Add( String.Format( "&4-(&f{0}{1}Facepalmed&4) Disconnected",
+                lines.Add( String.Format( "&4({0}{1}Facepalmed&4) Disconnected",
                                           xRankColorsInChat.Checked ? RankManager.HighestRank.Color : "",
                                           xRankPrefixesInChat.Checked ? RankManager.HighestRank.Prefix : "" ) );
             }

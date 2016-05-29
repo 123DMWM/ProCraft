@@ -1482,9 +1482,9 @@ namespace fCraft {
             if( player == null ) throw new ArgumentNullException( "player" );
             UpdateTabList(true);
             if( firstTime ) {
-                return string.Format("&2+(&f{0}&2) Connected for their first time. &a{1}", player.ClassyName, string.IsNullOrEmpty(player.ClientName) ? "" : "Using: " + player.ClientName);
+                return string.Format("&2({0}&2) Connected for the first time. &a{1}", player.ClassyName, string.IsNullOrEmpty(player.ClientName) ? "" : "Using: " + player.ClientName);
             } else {
-                return string.Format("&2+(&f{0}&2) Connected. &a{1}", player.ClassyName, string.IsNullOrEmpty(player.ClientName) ? "" : "Using: " + player.ClientName);
+                return string.Format("&2({0}&2) Connected. &a{1}", player.ClassyName, string.IsNullOrEmpty(player.ClientName) ? "" : "Using: " + player.ClientName);
             }
 
 
@@ -1495,7 +1495,7 @@ namespace fCraft {
 			if (player == null)
 				throw new ArgumentNullException("player");
 			UpdateTabList(true);
-            return string.Format("&4-(&f{0}&4) Disconnected.", player.ClassyName);
+            return string.Format("&4({0}&4) Disconnected.", player.ClassyName);
 
         }
 

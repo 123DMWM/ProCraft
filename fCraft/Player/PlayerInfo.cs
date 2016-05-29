@@ -136,9 +136,9 @@ namespace fCraft {
         /// </summary>
         public void DisplayGeoIp() {
             if (PlayerObject != null) {
-                string comesFrom = string.Format("&f{0}&2 comes from {1}", PlayerObject.ListName,
+                string comesFrom = string.Format("&2{0}&2 comes from {1}", PlayerObject.Name,
 					CountryName);
-				string comesFromIRC = string.Format("\u212C&f{0}\u211C&2 comes from \u212C{1}", PlayerObject.ListName,
+				string comesFromIRC = string.Format("\u212C&2{0}\u211C&2 comes from \u212C{1}", PlayerObject.Name,
 					CountryName);
                 Server.Players.CanSee(PlayerObject).Message(comesFrom);
                 PlayerObject.Message(comesFrom);
