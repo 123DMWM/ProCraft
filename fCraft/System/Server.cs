@@ -1401,6 +1401,19 @@ namespace fCraft {
         }
         internal static readonly RequestCachePolicy CachePolicy = new RequestCachePolicy(RequestCacheLevel.BypassCache);
 
+        public static string GetNumberString(long num) {
+            if (num >= 1000 && num < 1000000) {
+                return num.ToString().Remove(num.ToString().Length - 3) + "K";
+            } else if (num >= 1000000 && num < 1000000000) {
+                return num.ToString().Remove(num.ToString().Length - 6) + "M";
+            } else if (num >= 1000000000 && num < 1000000000000) {
+                return num.ToString().Remove(num.ToString().Length - 9) + "B";
+            } else if (num >= 1000000000000 && num < 1000000000000000) {
+                return num.ToString().Remove(num.ToString().Length - 9) + "T";
+            }
+            return num.ToString();
+        }
+
         #endregion
 
 

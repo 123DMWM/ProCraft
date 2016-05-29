@@ -731,8 +731,8 @@ namespace fCraft
                             SendChannelMessage("Player " + Bold + "{0}" + Reset + 
                         	                   " has Built: " + Bold + "{1}" + Reset +
                         	                   " blocks Deleted: " + Bold + "{2}" + Reset + " blocks{3}",
-                                               info.ClassyName, info.BlocksBuilt, info.BlocksDeleted,
-                                               (info.Can(Permission.Draw) ? " Drawn: " + Bold + info.BlocksDrawn + Reset + " blocks." : ""));
+                                               info.ClassyName, Server.GetNumberString(info.BlocksBuilt), Server.GetNumberString(info.BlocksDeleted),
+                                               (info.Can(Permission.Draw) ? " Drawn: " + Bold + Server.GetNumberString(info.BlocksDrawn) + Reset + " blocks." : ""));
                         } else {
                             SendChannelMessage("No player found with name \"" + Bold + findPlayer + Reset + "\"");
                         }
