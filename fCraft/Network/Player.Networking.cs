@@ -65,7 +65,7 @@ namespace fCraft {
             if (ipBanInfo != null) {
                 Logger.Log(LogType.SuspiciousActivity, "Player on banned ip(" + ipAddress.ToString() +") tried to join");
                 string bannedMessage = string.Format("IP-banned {0} ago by {1}: {2}",
-                     DateTime.UtcNow.Subtract(ipBanInfo.BanDate).ToMiniNoColorString(),
+                     DateTime.UtcNow.Subtract(ipBanInfo.BanDate).ToMiniString(),
                      ipBanInfo.BannedBy, ipBanInfo.BanReason);
                 tcpClient.Client.Send(Packet.MakeKick(bannedMessage).Bytes);
                 return null;
@@ -816,7 +816,7 @@ namespace fCraft {
                 Logger.Log(LogType.SuspiciousActivity,
                             "{0} tried to log in from a banned IP.", Name);
                 string bannedMessage = String.Format("IP-banned {0} ago by {1}: {2}",
-                                                      DateTime.UtcNow.Subtract(ipBanInfo.BanDate).ToMiniNoColorString(),
+                                                      DateTime.UtcNow.Subtract(ipBanInfo.BanDate).ToMiniString(),
                                                       ipBanInfo.BannedBy,
                                                       ipBanInfo.BanReason);
                 KickNow(bannedMessage, LeaveReason.LoginFailed);

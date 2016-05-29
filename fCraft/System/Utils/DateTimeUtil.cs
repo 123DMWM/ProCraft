@@ -176,34 +176,18 @@ namespace fCraft {
             return sb;
         }
 
-
-        [NotNull]
-        public static string ToMiniNoColorString( this TimeSpan span ) {
-            if( span.TotalSeconds < 60 ) {
-                return String.Format( "{0}s", span.Seconds );
-            } else if( span.TotalMinutes < 60 ) {
-				return String.Format("{0}m{1}s", span.Minutes, span.Seconds);
-            } else if( span.TotalHours < 48 ) {
-				return String.Format("{0}h{1}m", (int)Math.Floor(span.TotalHours), span.Minutes);
-            } else if( span.TotalDays < 15 ) {
-				return String.Format("{0}d{1}h", span.Days, span.Hours);
-            } else {
-				return String.Format("{0:0}w{1:0}d", Math.Floor(span.TotalDays / 7), Math.Floor(span.TotalDays) % 7);
-            }
-        }
-
 		[NotNull]
 		public static string ToMiniString(this TimeSpan span) {
 			if (span.TotalSeconds < 60) {
-				return String.Format("&f{0}&ss", span.Seconds);
+				return String.Format("{0}s", span.Seconds);
 			} else if (span.TotalMinutes < 60) {
-				return String.Format("&f{0}&sm&f{1}&ss", span.Minutes, span.Seconds);
+				return String.Format("{0}m{1}s", span.Minutes, span.Seconds);
 			} else if (span.TotalHours < 48) {
-				return String.Format("&f{0}&sh&f{1}&sm", (int)Math.Floor(span.TotalHours), span.Minutes);
+				return String.Format("{0}h{1}m", (int)Math.Floor(span.TotalHours), span.Minutes);
 			} else if (span.TotalDays < 15) {
-				return String.Format("&f{0}&sd&f{1}&sh", span.Days, span.Hours);
+				return String.Format("{0}d{1}h", span.Days, span.Hours);
 			} else {
-				return String.Format("&f{0:0}&sw&f{1:0}&sd", Math.Floor(span.TotalDays / 7), Math.Floor(span.TotalDays) % 7);
+				return String.Format("{0:0}w{1:0}d", Math.Floor(span.TotalDays / 7), Math.Floor(span.TotalDays) % 7);
 			}
 		}
 

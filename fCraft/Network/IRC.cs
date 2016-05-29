@@ -700,7 +700,7 @@ namespace fCraft
                             if (target != null) {
                                 SendChannelMessage("Player " + Bold + "{0}" + Reset + " has been " + 
                             	                   Bold + "&aOnline" + Reset + " for " + Bold + "{1}",
-                                                   target.Info.Rank.Color + target.Name, target.Info.TimeSinceLastLogin.ToMiniNoColorString());
+                                                   target.Info.Rank.Color + target.Name, target.Info.TimeSinceLastLogin.ToMiniString());
                                 if (target.World != null) {
                                     SendChannelMessage("They are currently on world " + Bold + "{0}",
                                                        target.World.ClassyName);
@@ -710,7 +710,7 @@ namespace fCraft
                                                    info.ClassyName);
                                 SendChannelMessage(
                                     "They were last seen " + Bold + "{0}" + Reset + " ago on world " + Bold + "{1}",
-                                    info.TimeSinceLastSeen.ToMiniNoColorString(),
+                                    info.TimeSinceLastSeen.ToMiniString(),
                                     info.LastWorld);
                             }
                         } else {
