@@ -447,7 +447,8 @@ namespace fCraft {
                 }
 
             } else {
-                info = PlayerDB.FindPlayerInfoOrPrintMatches( player, name, SearchOptions.IncludeHidden );
+                SearchOptions flags = SearchOptions.IncludeHidden | SearchOptions.IncludeSelf;
+                info = PlayerDB.FindPlayerInfoOrPrintMatches( player, name, flags );
                 if( info == null ) return;
 
                 address = info.LastIP;
