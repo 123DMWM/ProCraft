@@ -491,7 +491,7 @@ namespace fCraft {
             }
             Player[] sourceArray = source.ToArray();
             foreach (Player player in sourceArray) {
-                foreach (Packet packet in LineWrapper.Wrap(message, player.Supports(CpeExt.EmoteFix), 
+                foreach (Packet packet in LineWrapper.Wrap(Color.Sys + message, player.Supports(CpeExt.EmoteFix), 
             	                                           player.Supports(CpeExt.FullCP437), player.UseFallbackColors)) {
                     player.Send(packet);
                     i++;
