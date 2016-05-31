@@ -175,7 +175,7 @@ namespace fCraft {
         public static Packet Message(byte type, string message, bool useFallbacks) {
             Packet packet = new Packet(OpCode.Message);
             packet.Bytes[1] = type;
-            message = Color.SubstituteSpecialColors(message, useFallbacks);
+            message = Color.Sys + Color.SubstituteSpecialColors(message, useFallbacks);
             Encoding.ASCII.GetBytes(message.PadRight(64), 0, 64, packet.Bytes, 2);
             return packet;
         }

@@ -127,9 +127,9 @@ namespace fCraft.Games {
 				
 				if (player.Team != null) {
 					player.Send(Packet.Message((byte)MessageType.Status3,
-					                           "&sTeam: " + player.Team.ClassyName, player.UseFallbackColors));
+					                           "Team: " + player.Team.ClassyName, player.UseFallbackColors));
 				} else {
-					player.Send(Packet.Message((byte)MessageType.Status3, "&sTeam: &0None", true));
+					player.Send(Packet.Message((byte)MessageType.Status3, "Team: &0None", true));
 				}
 			}
 			

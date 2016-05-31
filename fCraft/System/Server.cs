@@ -961,7 +961,7 @@ namespace fCraft {
                 	
                     if (player.LastDrawOp != null && !player.IsPlayingCTF)
                         if (player.LastDrawOp.PercentDone < 100) {
-                            player.Send(Packet.Message((byte)MessageType.Status3, "&s" + player.LastDrawOp.Description + 
+                            player.Send(Packet.Message((byte)MessageType.Status3, player.LastDrawOp.Description + 
                     	                           " percent done: &f" + player.LastDrawOp.PercentDone + "&s%", true));
                         } else if (player.LastDrawOp.PercentDone == 100 || player.LastDrawOp.IsDone) {
                             player.Send(Packet.Message((byte)MessageType.Status3, "", true));
@@ -1542,8 +1542,8 @@ namespace fCraft {
                 string nick = GetNick(p), group = GetGroup(p, canSee);
                 
                 if (p.Supports(CpeExt.MessageType)) {
-                    string status2 = p.World == null ? p.ListName :
-                        p.ListName + " &son world " + p.World.ClassyName;
+                    string status2 = p.World == null ? p.Name :
+                        p.Name + " on world " + p.World.ClassyName;
                     if (status2 != p.lastStatus2) {
                         p.lastStatus2 = status2;
                         p.Send(Packet.Message((byte)MessageType.Status2, status2, p.UseFallbackColors));
@@ -1575,17 +1575,17 @@ namespace fCraft {
         
         static string GetNick(Player p) {
             if (p.IsPlayingCTF) return "&f" + p.Name;
-            if (p.Info.DisplayedName == null) return p.ListName;
+            if (p.Info.DisplayedName == null) return p.Name;
             
             string nick = Color.StripColors(Chat.ReplacePercentColorCodes(p.Info.DisplayedName, false));
             bool nickSame = nick.Equals(p.Info.Name, StringComparison.OrdinalIgnoreCase);
-            return nickSame ? p.ListName : p.ListName + " &S(&7" + nick + "&S)";
+            return nickSame ? Color.White + p.Name : Color.White + p.Name + " &S(&7" + nick + "&S)";
         }
         
         static string GetGroup(Player p, IEnumerable<Player> canBeSeen) {
             if (p.IsPlayingCTF) return "&sTeam " + p.Team.ClassyName;
-            if (p.Info.IsAFK) return "&S(&f" + canBeSeen.Where(pl => pl.Info.IsAFK).Count() + "&S) Away From Keyboard";
-            return "&S(&f" + canBeSeen.Where(pl => !pl.Info.IsAFK && pl.World == p.World).Count() + "&S) " + p.World.ClassyName;
+            if (p.Info.IsAFK) return "&SAway From Keyboard (&f" + canBeSeen.Where(pl => pl.Info.IsAFK).Count() + "&S)";
+            return "&S" + p.World.Name + " (&f" + canBeSeen.Where(pl => !pl.Info.IsAFK && pl.World == p.World).Count() + "&S)";
         }
 
         internal static void UpdatePlayerList()

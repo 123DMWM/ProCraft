@@ -1198,13 +1198,17 @@ namespace fCraft {
             if( playerWorld == null ) PlayerOpException.ThrowNoWorld( player );
 
 
-            string playerName = cmd.Next() ?? "null";
-            if( playerName.Equals("null") || playerName.ToLower().Equals("random")) {
+            string playerName = cmd.Next();
+            if( string.IsNullOrEmpty(playerName) || playerName.ToLower().Equals("random")) {
                 Map map = player.WorldMap;
                 Position newSpawn = playerName.ToLower().Equals("random") ? new Position(-1, -1, -1, 0, 0) : player.Position;
                 map.Spawn = newSpawn;
                 player.TeleportTo( map.getSpawnIfRandom());
-                player.Send( Packet.MakeAddEntity( Packet.SelfId, player.ListName, player.Position ) );
+                if (player.Supports(CpeExt.ExtPlayerList2)) {
+                    player.Send(Packet.MakeExtAddEntity2(Packet.SelfId, player.Info.Rank.Color + player.Name, (player.Info.skinName == "" ? player.Name : player.Info.skinName), player.Position, player));
+                } else {
+                    player.Send(Packet.MakeAddEntity(Packet.SelfId, player.Name, player.Position));
+                }
                 player.Message( "New spawn point saved." );
                 Logger.Log( LogType.UserActivity,
                             "{0} changed the spawned point.",
@@ -1216,7 +1220,11 @@ namespace fCraft {
                     Player target = infos[0];
                     player.LastUsedPlayerName = target.Name;
                     if( player.Can( Permission.Bring, target.Info.Rank ) ) {
-                        target.Send( Packet.MakeAddEntity( Packet.SelfId, target.ListName, player.Position ) );
+                        if (target.Supports(CpeExt.ExtPlayerList2)) {
+                            target.Send(Packet.MakeExtAddEntity2(Packet.SelfId, target.Info.Rank.Color + target.Name, (target.Info.skinName == "" ? target.Name : target.Info.skinName), player.Position, target));
+                        } else {
+                            target.Send(Packet.MakeAddEntity(Packet.SelfId, target.Name, player.Position));
+                        }
                     } else {
                         player.Message( "You may only set spawn of players ranked {0}&S or lower.",
                                         player.Info.Rank.GetLimit( Permission.Bring ).ClassyName );

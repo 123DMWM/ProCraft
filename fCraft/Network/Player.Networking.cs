@@ -382,7 +382,7 @@ namespace fCraft {
                     if (Info.heldBlock != failsafe) {
                         Info.heldBlock = failsafe;
                         if (Supports(CpeExt.MessageType) && !IsPlayingCTF) {
-                            Send(Packet.Message((byte)MessageType.BottomRight1, "&sBlock:&f" + Map.GetBlockName(World, Info.heldBlock) 
+                            Send(Packet.Message((byte)MessageType.BottomRight1, "Block:&f" + Map.GetBlockName(World, Info.heldBlock) 
                                                 + " &sID:&f" + (byte)Info.heldBlock, true));
                         }
                     }
@@ -1349,7 +1349,7 @@ namespace fCraft {
             }
 
             if (Supports(CpeExt.MessageType) && !IsPlayingCTF) {
-                Send(Packet.Message((byte)MessageType.BottomRight1, "&sBlock:&f" + Map.GetBlockName(World, Info.heldBlock)
+                Send(Packet.Message((byte)MessageType.BottomRight1, "Block:&f" + Map.GetBlockName(World, Info.heldBlock)
                                     + " &sID:&f" + (byte)Info.heldBlock, true));
             }
             if (Supports(CpeExt.MessageType)) {

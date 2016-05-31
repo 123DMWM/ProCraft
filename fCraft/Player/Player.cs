@@ -230,14 +230,6 @@ namespace fCraft {
             get { return Info.Name; }
         }
 
-        /// <summary> Name formatted for display in the player list. </summary>
-        [NotNull]
-        public string ListName {
-            get {
-				return (IsStaff ? (Info.Rank == RankManager.HighestRank ? "&7+" : "&f-") : " ") + Info.Rank.Color + Name;
-            }
-        }
-
         /// <summary> Name formatted for display in chat. </summary>
         public string ClassyName {
             get { return Info.ClassyName; }
