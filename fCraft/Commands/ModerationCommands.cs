@@ -1198,8 +1198,8 @@ namespace fCraft {
             if( playerWorld == null ) PlayerOpException.ThrowNoWorld( player );
 
 
-            string playerName = cmd.Next();
-            if( string.IsNullOrEmpty(playerName) || playerName.ToLower().Equals("random")) {
+            string playerName = cmd.Next() ?? "null";
+            if(playerName.ToLower().Equals("null") || playerName.ToLower().Equals("random")) {
                 Map map = player.WorldMap;
                 Position newSpawn = playerName.ToLower().Equals("random") ? new Position(-1, -1, -1, 0, 0) : player.Position;
                 map.Spawn = newSpawn;
