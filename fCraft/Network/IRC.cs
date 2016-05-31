@@ -1223,12 +1223,12 @@ namespace fCraft
                         }
                     }
                     if (enabled) {
-                        string formattedMessage = String.Format("{0}{1}: {2}{3}", args.Player.ClassyName, Reset,
-                            args.Message, ignoreIRC);
+                        string formattedMessage = String.Format("&S[&7{4}&s]{1}{0}{1}: {2}{3}", args.Player.ClassyName, Reset,
+                            args.Message, ignoreIRC, args.Player.World.Name ?? "WHERE AM I");
                         SendChannelMessage(formattedMessage);
                     } else if (args.Message.StartsWith("#")) {
-                        string formattedMessage = String.Format("{0}{1}: {2}{3}", args.Player.ClassyName, Reset,
-                            args.Message.Substring(1), ignoreIRC);
+                        string formattedMessage = String.Format("&S[&7{4}&s]{1}{0}{1}: {2}{3}", args.Player.ClassyName, Reset,
+                            args.Message.Substring(1), ignoreIRC, args.Player.World.Name ?? "WHERE AM I");
                         SendChannelMessage(formattedMessage);
                     }
                     break;
