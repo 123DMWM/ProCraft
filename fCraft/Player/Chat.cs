@@ -61,6 +61,20 @@ namespace fCraft {
         public static bool SendGlobal([NotNull] Player player, [NotNull] string rawMessage) {
             if (player == null) throw new ArgumentNullException("player");
             if (rawMessage == null) throw new ArgumentNullException("rawMessage");
+
+            if (!player.IsStaff) {
+                if (player.LastMessage == new string(rawMessage.ToLower().Where(c => !char.IsWhiteSpace(c)).ToArray())) {
+                    if (player.MessageSpam >= 2) {
+                        player.Message("Please refrain from repeating yourself!");
+                        return false;
+                    }
+                    player.MessageSpam++;
+                } else {
+                    player.LastMessage = new string(rawMessage.ToLower().Where(c => !char.IsWhiteSpace(c)).ToArray());
+                    player.MessageSpam = 0;
+                }
+            }
+
             foreach (Filter Swear in Filters) {
                 if (rawMessage.ToLower().Contains(Swear.Word.ToLower())) {
                     rawMessage = rawMessage.ReplaceString(Swear.Word, Swear.Replacement, StringComparison.InvariantCultureIgnoreCase);
