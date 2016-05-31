@@ -798,28 +798,30 @@ namespace fCraft {
         };
 
         static void EnvHandler(Player player, CommandReader cmd) {
-            string worldName = cmd.Next();
+            string arg1 = cmd.Next(), arg2 = cmd.Next(), arg3 = cmd.Next();
             World world;
-            if (worldName == null) {
+            
+            // Print own world info when just /env
+            if (arg1 == null) {
                 world = player.World;
-                if (world == null) {
-                    player.Message("When used from console, /Env requires a world name.");
-                    return;
-                }
-            } else {
-                world = WorldManager.FindWorldOrPrintMatches(player, worldName);
-                if (world == null) return;
+                if (world == null) { player.Message("When used from console, /Env requires a world name."); return; }
+                ShowEnvSettings(player, world);
+                return;
             }
-
-            string variable = cmd.Next(), value = cmd.Next();
-            if (variable == null) {
+            // Print that world's info when /env worldname
+            if (arg2 == null) {
+                world = WorldManager.FindWorldOrPrintMatches(player, arg1);
+                if (world == null) return;
                 ShowEnvSettings(player, world);
                 return;
             }
 
-            if (variable.Equals("normal", StringComparison.OrdinalIgnoreCase)) {
+            // Reset env when /env worldname normal
+            if (arg2.Equals("normal", StringComparison.OrdinalIgnoreCase)) {
+                world = WorldManager.FindWorldOrPrintMatches(player, arg1);
+                if (world == null) return;
                 if (cmd.IsConfirmed) {
-            		ResetEnv(player, world);
+                    ResetEnv(player, world);
                 } else {
                     Logger.Log(LogType.UserActivity,
                                 "Env: Asked {0} to confirm resetting enviroment settings for world {1}",
@@ -828,11 +830,15 @@ namespace fCraft {
                 }
                 return;
             }
-
-            if (value == null) {
-                CdEnv.PrintUsage(player);
-                return;
+            
+            // Handle either /env var value (using current world), or /env world var value
+            if (arg3 == null && player.World == null) {
+                player.Message("When used from console, /Env requires a world name."); return;
             }
+            world = arg3 == null ? player.World : WorldManager.FindWorldOrPrintMatches(player, arg1);
+            if (world == null) return;
+            string variable = arg3 == null ? arg1 : arg2;
+            string value = arg3 == null ? arg2 : arg3;
             if (value.StartsWith("#"))
                 value = value.Remove(0, 1);
 
@@ -916,7 +922,7 @@ namespace fCraft {
                     }
                     world.Texture = value;
                     foreach (Player p in world.Players) {
-                    	if (p.Supports(CpeExt.EnvMapAspect))
+                        if (p.Supports(CpeExt.EnvMapAspect))
                             p.Send(Packet.MakeEnvSetMapUrl(world.GetTexture()));
                         else if (p.Supports(CpeExt.EnvMapAppearance) || p.Supports(CpeExt.EnvMapAppearance2))
                             p.SendEnvSettings();
