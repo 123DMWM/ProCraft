@@ -1140,19 +1140,18 @@ namespace fCraft {
 
         static void EnvPresetHandler(Player player, CommandReader cmd) {
             string option = cmd.Next();
-            string args = cmd.NextAll();
+            string name = cmd.NextAll();
             World world = player.World;
             EnvPresets preset;
             if (string.IsNullOrEmpty(option)) {
                 CdEnvPreset.PrintUsage(player);
                 return;
             }
-            if (!option.ToLower().Equals("list") && !option.ToLower().Equals("reload") && string.IsNullOrEmpty(args)) {
+            if (!option.ToLower().Equals("list") && !option.ToLower().Equals("reload") && string.IsNullOrEmpty(name)) {
                 CdEnvPreset.PrintUsage(player);
                 return;
             }
 
-            string name = args.Split()[0];
             switch (option.ToLower()) {
                 case "save":
                     if (!EnvPresets.exists(name)) {
@@ -1202,7 +1201,7 @@ namespace fCraft {
                     }
                     break;
                 case "info":
-                    if ((preset = EnvPresets.Find(args)) != null) {
+                    if ((preset = EnvPresets.Find(name)) != null) {
                         player.Message("Environment settings for Preset {0}&S:", preset.Name);
                         player.Message("  Cloud: {0}   Fog: {1}   Sky: {2}",
                                         preset.CloudColor == null ? "normal" : '#' + preset.CloudColor,

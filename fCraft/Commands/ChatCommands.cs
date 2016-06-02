@@ -25,8 +25,7 @@ namespace fCraft
             CommandManager.RegisterCommand(CdDeafen);
             CommandManager.RegisterCommand(CdClear);
             CommandManager.RegisterCommand(CdTimer);
-            CommandManager.RegisterCommand(CdSwear);
-            CommandManager.RegisterCommand(CdSwears);
+            CommandManager.RegisterCommand(CdFilters);
             CommandManager.RegisterCommand(CdIRC);
             CommandManager.RegisterCommand(CdQuit);
             CommandManager.RegisterCommand(CdReport);
@@ -879,42 +878,15 @@ namespace fCraft
         #endregion
         #region Filters
 
-        static readonly CommandDescriptor CdSwears = new CommandDescriptor
-        {
-            Name = "filters",
-            Aliases = new[] { "filterlist", "fl" },
-            IsConsoleSafe = true,
-            Category = CommandCategory.New | CommandCategory.Chat,
-            Usage = "/filters",
-            Help = "Lists all words that are replaced with their replacment word.",
-            Handler = SwearsHandler
-        };
-
-        static void SwearsHandler(Player player, CommandReader cmd)
-        {
-            if (Chat.Filters.Count == 0)
-            {
-                player.Message("There are no filters.");
-            }
-            else
-            {
-                player.Message("There are {0} filters:", Chat.Filters.Count);
-                foreach (Filter filter in Chat.Filters.OrderBy(f => f.Id))
-                {
-                    player.Message("  #{0} \"{1}\" --> \"{2}&S\"",
-                                    filter.Id, filter.Word, filter.Replacement);
-                }
-            }
-        }
-        static readonly CommandDescriptor CdSwear = new CommandDescriptor
-        {
+        static readonly CommandDescriptor CdFilters = new CommandDescriptor {
             Name = "filter",
+            Aliases = new[] { "filterlist", "fl", "filters" },
             IsConsoleSafe = true,
-            Permissions = new[] { Permission.ShutdownServer },
             Category = CommandCategory.Chat,
             Usage = "/Filter {option} {args}",
-            Help = "Adds or removes a word and it's replacement to the filter" + 
-                "Options: Add, Edit, Remove",
+            Help = "Adds or removes a word and it's replacement to the chat filters&n" +
+                "Options: Add, Edit, Remove&n" + 
+                "Writing nothing will display all filters.",
             HelpSections = new Dictionary<string, string> {
                 { "add",  "&H/Filter add <Word> <Replacement>&n&S" +
                             "Adds a Word and it's replacement to the filter list. " },
@@ -929,9 +901,21 @@ namespace fCraft
         };
 
         private static void SwearHandler(Player player, CommandReader cmd) {
+            if (!player.IsStaff || cmd.CountRemaining == 0) {
+                if (ChatFilter.Filters.Count == 0) {
+                    player.Message("There are no filters.");
+                } else {
+                    player.Message("There are {0} filters:", ChatFilter.Filters.Count);
+                    foreach (ChatFilter filter in ChatFilter.Filters.OrderBy(f => f.Id)) {
+                        player.Message("  #{0} \"{1}\" --> \"{2}&S\"",
+                                        filter.Id, filter.Word, filter.Replacement);
+                    }
+                }
+                return;
+            }
             string param = cmd.Next();
-            if (String.IsNullOrEmpty(param)) {
-                CdSwear.PrintUsage(player); return;
+            if (string.IsNullOrEmpty(param)) {
+                CdFilters.PrintUsage(player); return;
             }
             
             switch (param.ToLower()) {
@@ -939,84 +923,85 @@ namespace fCraft
                 case "d":
                 case "remove":
                 case "delete":
-                    int fId;
-                    Filter fRemove = null;
-                    if (!cmd.NextInt(out fId)) {
-                        CdSwear.PrintUsage(player); return;
+                    string dID = cmd.Next();
+                    if (string.IsNullOrEmpty(dID)) {
+                        CdFilters.PrintUsage(player);
+                        break;
                     }
-                    
-                    foreach (Filter f in Chat.Filters) {
-                        if (f.Id == fId) {
+                    ChatFilter dFilter = ChatFilter.Find(dID);
+                    if (dFilter != null) {
+                        if (cmd.IsConfirmed) {
+                            ChatFilter.RemoveFilter(dID);
                             Server.Message("&Y[Filters] {0}&Y removed the filter \"{1}\" -> \"{2}\"",
-                                           player.ClassyName, f.Word, f.Replacement);
-                            fRemove = f;
+                                           player.ClassyName, dFilter.Word, dFilter.Replacement);
+                            break;
+                        } else {
+                            player.Confirm(cmd, "This will delete the filter permanently");
+                            break;
                         }
+                    } else {
+                        player.Message("Given filter (#{0}) does not exist.", dID);
+                        break;
                     }
-                    if (fRemove != null) {
-                        fRemove.removeFilter(); return;
-                    }
-                    player.Message("Given filter (#{0}) does not exist.", fId);
-                    break;
                 case "a":
                 case "add":
                 case "create":
-                    Filter fCreate = new Filter();
-                    if (player.Info.IsMuted) {
-                        player.MessageMuted(); return;
-                    }
+                    ChatFilter aFilter = new ChatFilter();
                     string word = cmd.Next();
                     string replacement = cmd.NextAll();
-                    if (String.IsNullOrEmpty(word) || String.IsNullOrEmpty(replacement)) {
-                        CdSwear.PrintUsage(player); return;
+                    if (string.IsNullOrEmpty(word) || string.IsNullOrEmpty(replacement)) {
+                        CdFilters.PrintUsage(player); return;
                     }
-                    bool exists = false;
-                    foreach (Filter f in Chat.Filters) {
-                        if (f.Word.ToLower().Equals(word.ToLower())) {
-                            exists = true;
-                        }
-                    }
-                    if (!exists) {
+                    if (!ChatFilter.exists(word)) {
                         Server.Message("&Y[Filters] \"{0}\" is now replaced by \"{1}\"", word, replacement);
-                        fCreate.addFilter(getNewFilterId(), word, replacement);
+                        ChatFilter.CreateFilter(getNewFilterId(), word, replacement);
                     } else {
                         player.Message("A filter with that word already exists!");
                     }
                     break;
                 case "edit":
                 case "change":
-                    int eId;
-                    if (!cmd.NextInt(out eId)) {
-                        CdSwear.PrintUsage(player); return;
+                case "update":
+                    int eID;
+                    if (!cmd.NextInt(out eID)) {
+                        CdFilters.PrintUsage(player); return;
                     }
                     string option = cmd.Next() ?? "n/a";
                     
-                    Filter[] matches = Chat.Filters.Where(f => f.Id == eId).ToArray();
+                    ChatFilter[] matches = ChatFilter.Filters.Where(f => f.Id == eID).ToArray();
                     if (matches.Length == 0) {
-                        player.Message("No filters have the ID \"" + eId + "\"."); return;
+                        player.Message("No filters have the ID \"" + eID + "\"."); return;
                     }
-                    Filter filter = matches[0];
-                    string oldWord = filter.Word, oldReplacement = filter.Replacement;
+                    ChatFilter eFilter = matches[0];
+                    string oldWord = eFilter.Word, oldReplacement = eFilter.Replacement;
                     string value = cmd.NextAll();
                     if (string.IsNullOrEmpty(value)) {
-                        CdSwear.PrintUsage(player); return;
+                        CdFilters.PrintUsage(player); return;
                     }
                     
                     switch (option.ToLower()) {
                         case "word":
-                        case "w":                      
-                            filter.Word = value; break;
+                        case "w":
+                            eFilter.Word = value; break;
                         case "replacement":
                         case "r":
-                            filter.Replacement = value; break;
+                            eFilter.Replacement = value; break;
                         default:
-                            CdSwear.PrintUsage(player); return;
+                            CdFilters.PrintUsage(player); return;
                     }
                     Server.Message("&Y[Filters] {0}&Y edited a filter from &n(\"{1}\" -> \"{2}\") &nto (\"{3}\" -> \"{2}\")",
-                                   player.ClassyName, oldWord, oldReplacement, filter.Word, filter.Replacement);
-                    Chat.SaveFilter(filter);
+                                   player.ClassyName, oldWord, oldReplacement, eFilter.Word, eFilter.Replacement);
+                    ChatFilter.RemoveFilter(eID.ToString());
+                    ChatFilter.Filters.Add(eFilter);
+                    break;
+                case "reload":
+                    if (player.Info.Rank == RankManager.HighestRank) {
+                        ChatFilter.ReloadAll();
+                        player.Message("Reloaded filters from file");
+                    }
                     break;
                 default:
-                    CdSwear.PrintUsage(player);
+                    CdFilters.PrintUsage(player);
                     break;
             }
         }
@@ -1024,7 +1009,7 @@ namespace fCraft
         public static int getNewFilterId() {
             int i = 1;
             go:
-            foreach (Filter filter in Chat.Filters) {
+            foreach (ChatFilter filter in ChatFilter.Filters) {
                 if (filter.Id == i) {
                     i++;
                     goto go;

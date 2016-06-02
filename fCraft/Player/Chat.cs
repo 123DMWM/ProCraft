@@ -15,27 +15,9 @@ namespace fCraft {
     {
         static readonly Regex RegexIPMatcher = new Regex(@"\d{1,3}(\.\d{1,3}){3}(:?(\d{0,5})?)");
         public static char newPlayerPrefix = '+';
-        #region Filters/Reports
-        public static List<Filter> Filters = new List<Filter>();
+        #region Reports
         public static List<Report> Reports = new List<Report>();
 
-        /// <summary>
-        /// Saves the Filter data to be used when restarting the server
-        /// </summary>
-        /// <param name="filter">Filter being saved</param>
-        public static void SaveFilter(Filter filter) {
-            try {
-                String[] filterData = {
-                    filter.Word, filter.Replacement
-                };
-                if (!Directory.Exists("./Filters")) {
-                    Directory.CreateDirectory("./Filters");
-                }
-                File.WriteAllLines("./Filters/" + filter.Id + ".txt", filterData);
-            } catch (Exception ex) {
-                Player.Console.Message("Filter Saver Has Crashed: {0}", ex);
-            }
-        }
         /// <summary>
         /// Saves the report to be read by the owner with /reports
         /// </summary>
@@ -75,7 +57,7 @@ namespace fCraft {
                 }
             }
 
-            foreach (Filter Swear in Filters) {
+            foreach (ChatFilter Swear in ChatFilter.Filters) {
                 if (rawMessage.ToLower().Contains(Swear.Word.ToLower())) {
                     rawMessage = rawMessage.ReplaceString(Swear.Word, Swear.Replacement, StringComparison.InvariantCultureIgnoreCase);
                 }

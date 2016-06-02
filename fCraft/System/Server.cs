@@ -545,34 +545,7 @@ namespace fCraft {
 
             #region LoadFilters
 
-            try {
-                if (Directory.Exists("./Filters")) {
-                    string[] FilterFileList = Directory.GetFiles("./Filters");
-                    int created = 0;
-                    foreach (string filename in FilterFileList) {
-                        Filter filterCreate = new Filter();
-                        if (Path.GetExtension("./Filters/" + filename) == ".txt") {
-                            string[] filterData = File.ReadAllLines(filename);
-                            string idString = filename.Replace("./Filters\\", "").Replace(".txt", "");
-                            string wordString = filterData[0];
-                            string replacementString = filterData[1];
-                            int id;
-                            if (int.TryParse(idString, out id)) {
-                                filterCreate.addFilter(id, wordString, replacementString);
-                                created++;
-                            }
-
-                        }
-
-                    }
-                    if (created > 0)
-                        Player.Console.Message("All Filters Loaded. ({0})", created);
-                    else
-                        Player.Console.Message("No filters were loaded.");
-                }
-            } catch (Exception ex) {
-                Player.Console.Message("Filter Loader Has Crashed: {0}", ex);
-            }
+            ChatFilter.LoadAll();
 
             #endregion
 
