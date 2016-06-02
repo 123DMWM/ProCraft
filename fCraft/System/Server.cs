@@ -551,52 +551,7 @@ namespace fCraft {
 
             #region LoadEntities
 
-            try {
-                if (Directory.Exists("./Entities")) {
-                    string[] EntityFileList = Directory.GetFiles("./Entities");
-                    foreach (string filename in EntityFileList) {
-                        Bot botCreate = new Bot();
-                        if (Path.GetExtension("./Entities/" + filename) == ".txt") {
-                            string[] entityData = File.ReadAllLines(filename);
-                            sbyte idString;
-                            Position posString;
-                            string nameString = entityData[0];
-                            string skinString = entityData[1];
-                            string modelString = entityData[2];
-                            modelString = CpeCommands.ParseModel(null, modelString);
-                            if (modelString == null) modelString = "humanoid";
-
-                            if (!sbyte.TryParse(entityData[3], out idString)) { }
-                            World worldString = WorldManager.FindWorldExact(entityData[4]) ??
-                                                WorldManager.FindMainWorld(RankManager.LowestRank);
-                            if (!short.TryParse(entityData[5], out posString.X)) {
-                                posString.X = worldString.map.Spawn.X;
-                            }
-                            if (!short.TryParse(entityData[6], out posString.Y)) {
-                                posString.Y = worldString.map.Spawn.Y;
-                            }
-                            if (!short.TryParse(entityData[7], out posString.Z)) {
-                                posString.Z = worldString.map.Spawn.Z;
-                            }
-                            if (!byte.TryParse(entityData[8], out posString.L)) {
-                                posString.L = worldString.map.Spawn.L;
-                            }
-                            if (!byte.TryParse(entityData[9], out posString.R)) {
-                                posString.R = worldString.map.Spawn.R;
-                            }
-
-                            botCreate.setBot(nameString, skinString ?? nameString, modelString, worldString, posString, idString);
-                        }
-
-                    }
-                    if (EntityFileList.Length > 0)
-                        Player.Console.Message("All Entities Loaded. ({0})", EntityFileList.Length);
-                    else
-                        Player.Console.Message("No Entities Were Loaded.");
-                }
-            } catch (Exception ex) {
-                Player.Console.Message("Entity Loader Has Crashed: {0}", ex);
-            }
+            Entity.LoadAll();
 
             #endregion
 
@@ -991,33 +946,6 @@ namespace fCraft {
 			} else
 				return "&fN/A";
 		}
-
-        #region SaveEntity
-
-        /// <summary>
-        /// Saves the entity data to be used when restarting the server
-        /// </summary>
-        /// <param name="bot">entity being saved</param>
-        public static void SaveEntity(Bot bot) {
-            try {
-                String[] entityData = {
-                    bot.Name, bot.SkinName ?? bot.Name, bot.Model ?? "humanoid", bot.ID.ToString(CultureInfo.InvariantCulture),
-                    bot.World.Name, bot.Position.X.ToString(CultureInfo.InvariantCulture),
-                    bot.Position.Y.ToString(CultureInfo.InvariantCulture),
-                    bot.Position.Z.ToString(CultureInfo.InvariantCulture),
-                    bot.Position.L.ToString(CultureInfo.InvariantCulture),
-                    bot.Position.R.ToString(CultureInfo.InvariantCulture)
-                };
-                if (!Directory.Exists("./Entities")) {
-                    Directory.CreateDirectory("./Entities");
-                }
-                File.WriteAllLines("./Entities/" + bot.Name.ToLower() + ".txt", entityData);
-            } catch (Exception ex) {
-                Player.Console.Message("Entity Saver Has Crashed: {0}", ex);
-            }
-        }
-
-        #endregion
 
         /*// checks for idle players
         static SchedulerTask setWeatherTask;

@@ -106,7 +106,6 @@ namespace fCraft {
         }
         public static void OldLoad() {
             string[] FilterFileList = Directory.GetFiles("./Filters");
-            int created = 0;
             foreach (string filename in FilterFileList) {
                 if (Path.GetExtension("./Filters/" + filename) == ".txt") {
                     string[] filterData = File.ReadAllLines(filename);
@@ -120,7 +119,6 @@ namespace fCraft {
                         filter.Word = word;
                         filter.Replacement = replacement;
                         Filters.Add(filter);
-                        created++;
                     }
                 }
             }

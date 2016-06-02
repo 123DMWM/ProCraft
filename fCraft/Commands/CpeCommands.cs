@@ -63,66 +63,69 @@ namespace fCraft {
             HelpSections = new Dictionary<string, string>{
                 { "create", "&H/Ent create <entity name> <model> <skin>&n&S" +
                                 "Creates a new entity with the given name. Valid models are chibi, chicken, creeper, giant, human, pig, sheep, skeleton, spider, zombie, or any block ID/Name." },
-                { "remove", "&H/Ent remove <entity name>&n&S" +
+                { "remove", "&H/Ent remove <entity name> <world>&n&S" +
                                 "Removes the given entity." },
                 { "removeall", "&H/Ent removeAll&n&S" +
-                                "Removes all entities from the server."},
+                                "Removes all entities from the world."},
                 { "model", "&H/Ent model <entity name> <model>&n&S" +
                                 "Changes the model of an entity to the given model. Valid models are chibi, chicken, creeper, giant, human, pig, sheep, skeleton, spider, zombie, or any block ID/Name."},
-                { "list", "&H/Ent list&n&S" +
+                { "list", "&H/Ent list <world>&n&S" +
                                 "Prints out a list of all the entites on the server."},
                  { "bring", "&H/Ent bring <entity name>&n&S" +
                                 "Brings the given entity to you."},
                  { "skin", "&H/Ent skin <entity name> <skin url or name>&n&S" +
                                 "Changes the skin of a bot."}
             },
-            Handler = BotHandler,
+            Handler = EntityHandler,
         };
 
-        private static void BotHandler(Player player, CommandReader cmd) {
+        private static void EntityHandler(Player player, CommandReader cmd) {
             string option = cmd.Next();
             if (string.IsNullOrEmpty(option)) {
                 CdEntity.PrintUsage(player);
                 return;
             }
+            if (option.ToLower() == "reload" && player.Info.Rank == RankManager.HighestRank) {
+                Entity.ReloadAll();
+                player.Message("Reloaded Entities from file");
+                return;
+            }
 
             if (option.ToLower() == "list") {
-                player.Message("_Entities on {0}_", ConfigKey.ServerName.GetString());
-                foreach (Bot botCheck in World.Bots) {
-                    player.Message(botCheck.Name + " on " + botCheck.World.Name);
+                string search = cmd.Next() ?? player.World.Name;
+                World world = WorldManager.FindWorldOrPrintMatches(player, search);
+                if (world != null) {
+                    player.Message("Entities on &f{0}&s: ", world.Name);
+                    player.Message("  &F" + Entity.Entities.Where(w => Entity.getWorld(w) == world).JoinToString("&S, &F", n => n.Name));
                 }
                 return;
             }
             if (option.ToLower() == "removeall") {
+                string search = cmd.Next() ?? player.World.Name;
+                World world = WorldManager.FindWorldOrPrintMatches(player, search);
                 if (cmd.IsConfirmed) {
-                    foreach (Bot b in World.Bots) {
-                        b.World.Players.Send(Packet.MakeRemoveEntity(b.ID));
-                        if (File.Exists("./Entities/" + b.Name.ToLower() + ".txt")) {
-                            File.Delete("./Entities/" + b.Name.ToLower() + ".txt");
-                        }
-                    }
-                    World.Bots.Clear();
-                    player.Message("All entities removed.");
+                    Entity.RemoveAll(world);
+                    player.Message("All entities on &f{0}&s removed.", player.World.Name);
                 } else {
-                    player.Confirm(cmd, "This will remove all the entites everywhere, are you sure?");
+                    player.Confirm(cmd, "This will remove all the entites on {0}, are you sure?", player.World.Name);
                 }
                 return;
             }
 
             //finally away from the special cases
-            string botName = cmd.Next();
-            if (string.IsNullOrEmpty(botName)) {
+            string entityName = cmd.Next();
+            if (string.IsNullOrEmpty(entityName)) {
                 CdEntity.PrintUsage(player);
                 return;
             }
 
-            Bot bot = new Bot();
+            Entity entity = new Entity();
             if (option != "create" && option != "add") {
-                bot = World.FindBot(botName.ToLower());
-                if (bot == null) {
+                entity = Entity.Find(player.World, entityName.ToLower());
+                if (entity == null) {
                     player.Message(
                         "Could not find {0}! Please make sure you spelled the entities name correctly. To view all the entities, type /ent list.",
-                        botName);
+                        entityName);
                     return;
                 }
             }
@@ -142,14 +145,12 @@ namespace fCraft {
                     }
 
                     //if a botname has already been chosen, ask player for a new name
-                    var matchingNames = from b in World.Bots where b.Name.ToLower() == botName.ToLower() select b;
-
-                    if (matchingNames.Count() > 0) {
+                    if (Entity.exists(player.World, entityName)) {
                         player.Message("An entity with that name already exists! To view all entities, type /ent list.");
                         return;
                     }
 
-                    string skinString1 = (cmd.Next() ?? botName);
+                    string skinString1 = (cmd.Next() ?? entityName);
                     if (skinString1 != null) {
                         if (skinString1.StartsWith("--")) {
                             skinString1 = string.Format("http://minecraft.net/skin/{0}.png", skinString1.Replace("--", ""));
@@ -161,14 +162,12 @@ namespace fCraft {
                             skinString1 = string.Format("http://i.imgur.com/{0}.png", skinString1.Replace("++", ""));
                         }
                     }
-                    Bot botCreate = new Bot();
-                    botCreate.setBot(botName, skinString1, requestedModel, player.World, player.Position, getNewID());
-                    botCreate.createBot();
-                    player.Message("Successfully created entity {0}&s with id:{1} and skin {2}.", botCreate.Name, botCreate.ID, skinString1 ?? bot.Name);
+                    entity = Entity.CreateEntity(entityName, skinString1, requestedModel, player.World, player.Position, getNewID(player.World));
+                    player.Message("Successfully created entity {0}&s with id:{1} and skin {2}.", entity.Name, entity.ID, entity.Skin, entity.Name);
                     break;
                 case "remove":
-                    player.Message("{0} was removed from the server.", bot.Name);
-                    bot.removeBot();
+                    player.Message("{0} was removed from {1}", entity.Name, player.World.Name);
+                    Entity.RemoveEntity(entity);
                     break;
                 case "model":
                     if (cmd.HasNext) {
@@ -185,26 +184,24 @@ namespace fCraft {
                             break;
                         }
                         player.Message("Changed entity model to {0}.", model);
-                        bot.changeBotModel(model);
+                        Entity.ChangeEntityModel(entity, model);
                     } else {
                         player.Message(
                             "Usage is /Ent model <bot> <model>. Valid models are chibi, chicken, creeper, giant, human, pig, sheep, skeleton, spider, zombie, or any block ID/Name.");
                     }
                     break;
                 case "bring":
-                    bot.teleportBot(player.Position);
+                    Entity.TeleportEntity(entity, player.Position);
                     break;
                 case "tp":
                 case "teleport":
-                    World targetWorld = bot.World;
-                    Bot target = bot;
+                    World targetWorld = Entity.getWorld(entity);
                     if (targetWorld == player.World) {
                         if (player.World != null) {
                             player.LastWorld = player.World;
                             player.LastPosition = player.Position;
                         }
-                        player.TeleportTo(target.Position);
-
+                        player.TeleportTo(Entity.getPos(entity));
                     } else {
                         if (targetWorld.Name.StartsWith("PW_") &&
                             !targetWorld.AccessSecurity.ExceptionList.Included.Contains(player.Info)) {
@@ -217,28 +214,28 @@ namespace fCraft {
                             case SecurityCheckResult.WhiteListed:
                                 if (player.Info.Rank.Name == "Banned") {
                                     player.Message("&CYou can not change worlds while banned.");
-                                    player.Message("Cannot teleport to {0}&S.", target.Name,
+                                    player.Message("Cannot teleport to {0}&S.", entity.Name,
                                         targetWorld.ClassyName, targetWorld.AccessSecurity.MinRank.ClassyName);
                                     break;
                                 }
                                 if (targetWorld.IsFull) {
                                     player.Message("Cannot teleport to {0}&S because world {1}&S is full.",
-                                        target.Name, targetWorld.ClassyName);
-                                    player.Message("Cannot teleport to {0}&S.", target.Name,
+                                        entity.Name, targetWorld.ClassyName);
+                                    player.Message("Cannot teleport to {0}&S.", entity.Name,
                                         targetWorld.ClassyName, targetWorld.AccessSecurity.MinRank.ClassyName);
                                     break;
                                 }
                                 player.StopSpectating();
-                                player.JoinWorld(targetWorld, WorldChangeReason.Tp, target.Position);
+                                player.JoinWorld(targetWorld, WorldChangeReason.Tp, Entity.getPos(entity));
                                 break;
                             case SecurityCheckResult.BlackListed:
                                 player.Message("Cannot teleport to {0}&S because you are blacklisted on world {1}",
-                                    target.Name, targetWorld.ClassyName);
+                                    entity.Name, targetWorld.ClassyName);
                                 break;
                             case SecurityCheckResult.RankTooLow:
                                 if (player.Info.Rank.Name == "Banned") {
                                     player.Message("&CYou can not change worlds while banned.");
-                                    player.Message("Cannot teleport to {0}&S.", target.Name,
+                                    player.Message("Cannot teleport to {0}&S.", entity.Name,
                                         targetWorld.ClassyName, targetWorld.AccessSecurity.MinRank.ClassyName);
                                     break;
                                 }
@@ -246,17 +243,17 @@ namespace fCraft {
                                 if (targetWorld.IsFull) {
                                     if (targetWorld.IsFull) {
                                         player.Message("Cannot teleport to {0}&S because world {1}&S is full.",
-                                            target.Name, targetWorld.ClassyName);
-                                        player.Message("Cannot teleport to {0}&S.", target.Name,
+                                            entity.Name, targetWorld.ClassyName);
+                                        player.Message("Cannot teleport to {0}&S.", entity.Name,
                                             targetWorld.ClassyName, targetWorld.AccessSecurity.MinRank.ClassyName);
                                         break;
                                     }
                                     player.StopSpectating();
-                                    player.JoinWorld(targetWorld, WorldChangeReason.Tp, target.Position);
+                                    player.JoinWorld(targetWorld, WorldChangeReason.Tp, Entity.getPos(entity));
                                     break;
                                 }
                                 player.Message("Cannot teleport to {0}&S because world {1}&S requires {2}+&S to join.",
-                                    target.Name, targetWorld.ClassyName,
+                                    entity.Name, targetWorld.ClassyName,
                                     targetWorld.AccessSecurity.MinRank.ClassyName);
                                 break;
                         }
@@ -278,20 +275,20 @@ namespace fCraft {
                             skinString3 = string.Format("http://i.imgur.com/{0}.png", skinString3.Replace("++", ""));
                         }
                     }
-                    player.Message("Changed entity skin to {0}.", skinString3 ?? bot.Name);
-                    bot.changeBotSkin(skinString3);
+                    player.Message("Changed entity skin to {0}.", skinString3 ?? entity.Name);
+                    Entity.ChangeEntitySkin(entity, skinString3);
                     break;
-                default:
+            default:
                     CdEntity.PrintUsage(player);
                     break;
             }
         }
 
-        public static sbyte getNewID() {
+        public static sbyte getNewID(World world) {
             sbyte i = 1;
         go:
-            foreach (Bot bot in World.Bots) {
-                if (bot.ID == i) {
+            foreach (Entity entity in Entity.Entities.Where(e => Entity.getWorld(e) == world)) {
+                if (entity.ID == i) {
                     i++;
                     goto go;
                 }
@@ -391,6 +388,7 @@ namespace fCraft {
         }
         
         internal static string ParseModel(Player player, string model) {
+            model = model ?? "humanoid";
             float scale = 0.0f;
             string scalestr = "";
             int sepIndex = model.IndexOf('|');

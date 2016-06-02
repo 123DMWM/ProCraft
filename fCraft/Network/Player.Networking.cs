@@ -1355,18 +1355,16 @@ namespace fCraft {
             if (Supports(CpeExt.MessageType)) {
                 Send(Packet.Message((byte)MessageType.Status1, ConfigKey.ServerName.GetString(), UseFallbackColors));
             }
-            
-            foreach (Bot bot in World.Bots) {
-                Send(Packet.MakeRemoveEntity(bot.ID));
-                if (bot.World == World) {
-                    if (Supports(CpeExt.ExtPlayerList2)) {
-                        Send(Packet.MakeExtAddEntity2(bot.ID, bot.Name, (bot.SkinName ?? bot.Name), bot.Position, this));
-                    } else {
-                        Send(Packet.MakeAddEntity(bot.ID, bot.Name, bot.Position));
-                    }
-                    if (bot.Model != "humanoid" && Supports(CpeExt.ChangeModel))
-                        Send(Packet.MakeChangeModel((byte)bot.ID, bot.Model));
+
+            foreach (Entity entity in Entity.Entities.Where(e => Entity.getWorld(e) == World)) {
+                Send(Packet.MakeRemoveEntity(entity.ID));
+                if (Supports(CpeExt.ExtPlayerList2)) {
+                    Send(Packet.MakeExtAddEntity2(entity.ID, entity.Name, entity.Skin, Entity.getPos(entity), this));
+                } else {
+                    Send(Packet.MakeAddEntity(entity.ID, entity.Name, Entity.getPos(entity)));
                 }
+                if (entity.Model.ToLower() != "humanoid" && Supports(CpeExt.ChangeModel))
+                    Send(Packet.MakeChangeModel((byte)entity.ID, entity.Model));
             }
             if (Supports(CpeExt.SelectionCuboid)) {
                 foreach (Zone z in WorldMap.Zones) {
@@ -1638,7 +1636,6 @@ namespace fCraft {
             // check every player on the current world
             Player[] worldPlayerList = World.Players;
             Position pos = Position;
-            CheckBotChanges();
             
             for( int i = 0; i < worldPlayerList.Length; i++ ) {
                 Player otherPlayer = worldPlayerList[i];
@@ -1773,21 +1770,6 @@ namespace fCraft {
             	byte block = (byte)SpectatedPlayer.Info.heldBlock;
                 CheckBlock(ref block);
                 SendNow(Packet.MakeHoldThis((Block)block, false));
-            }
-        }
-        
-        void CheckBotChanges() {
-            foreach (Bot bot in World.Bots.Where(b => b.World == World)) {
-                if (!bot.oldModel.ToLower().Equals(bot.Model.ToLower()) && Supports(CpeExt.ChangeModel)) {
-                    SendNow(Packet.MakeChangeModel((byte)bot.ID, bot.Model));
-                    bot.oldModel = bot.Model;
-                }
-                if (bot.oldSkinName != bot.SkinName && Supports(CpeExt.ExtPlayerList2)) {
-                    SendNow(Packet.MakeRemoveEntity(bot.ID));
-                    SendNow(Packet.MakeExtAddEntity2(bot.ID, bot.Name, (bot.SkinName == "" ? bot.Name : bot.SkinName), bot.Position, this));
-                    SendNow(Packet.MakeChangeModel((byte)bot.ID, bot.Model));
-                    bot.oldSkinName = bot.SkinName;
-                }                
             }
         }
         

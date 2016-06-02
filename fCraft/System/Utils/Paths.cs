@@ -46,7 +46,8 @@ namespace fCraft {
                 AutoRankFileName,
                 PortalDBFileName,
                 GlobalDefsFile,
-                FiltersFileName
+                FiltersFileName,
+                EntitiesFileName
             };
 
             DataFilesToBackup = new[] {
@@ -56,7 +57,8 @@ namespace fCraft {
                 WorldListFileName,
                 ConfigFileName,
                 GlobalDefsFile,
-                FiltersFileName
+                FiltersFileName,
+                EntitiesFileName
             };
         }
 
@@ -133,6 +135,7 @@ namespace fCraft {
         public const string EnvPresetsFileName = "EnvPresets.txt";
 
         public const string FiltersFileName = "Filters.txt";
+        public const string EntitiesFileName = "Entities.txt";
 
 
         /// <summary> Directory where block database files (.fbdb) are stored. </summary>
