@@ -1183,12 +1183,17 @@ namespace fCraft
         static void HookUpHandlers()
         {
             Chat.Sent += ChatSentHandler;
+            Player.JoinedWorld += PlayerJoinedWorldHandler;
             Player.Ready += PlayerReadyHandler;
             Player.HideChanged += OnPlayerHideChanged;
             Player.Disconnected += PlayerDisconnectedHandler;
             Player.Kicked += PlayerKickedHandler;
             PlayerInfo.BanChanged += PlayerInfoBanChangedHandler;
             PlayerInfo.RankChanged += PlayerInfoRankChangedHandler;
+        }
+
+        static void PlayerJoinedWorldHandler(object sender, PlayerJoinedWorldEventArgs e) {
+            e.Player.PublicAuxStateObjects["IRC_World"] = e.NewWorld.Name;
         }
 
 
@@ -1216,20 +1221,28 @@ namespace fCraft
             bool enabled = ConfigKey.IRCBotForwardFromServer.Enabled();
             switch (args.MessageType) {
                 case ChatMessageType.Global:
-                    string ignoreIRC = "";
-                    if (args.Player.Info.ReadIRC == false) {
-                        if (args.Player != Player.Console) {
-                            ignoreIRC = "&7[Ignoring IRC]";
-                        }
-                    }
-                    if (enabled) {
-                        string formattedMessage = String.Format("&S[{1}{5}{4}&s]{1}{0}{1}: {2}{3}", args.Player.ClassyName, Reset,
-                            args.Message, ignoreIRC, args.Player.World.Name ?? "WHERE AM I", Bold);
-                        SendChannelMessage(formattedMessage);
-                    } else if (args.Message.StartsWith("#")) {
-                        string formattedMessage = String.Format("&S[{1}{5}{4}&s]{1}{0}{1}: {2}{3}", args.Player.ClassyName, Reset,
-                            args.Message.Substring(1), ignoreIRC, args.Player.World.Name ?? "WHERE AM I", Bold);
-                        SendChannelMessage(formattedMessage);
+                    string ignored = "";
+                    if (!args.Player.Info.ReadIRC && args.Player != Player.Console)
+                        ignored = " &7[Ignoring IRC]";
+                    
+                    object world = "";
+                    if (args.Player.PublicAuxStateObjects.TryGetValue("IRC_World", out world))
+                        args.Player.PublicAuxStateObjects.Remove("IRC_World");
+                    else
+                        world = "";
+                    
+                    string text = null;
+                    if (enabled)
+                        text = args.Message;
+                    else if (args.Message.StartsWith("#"))
+                        text = args.Message.Substring(1);
+                        
+                    if (text != null) {
+                        bool prefix = world != null && ((string)world).Length > 0;
+                        string template = prefix ? "&S[{1}{5}{4}&s] {1}{0}{1}: {2}{3}" : "&S{1}{0}{1}: {2}{3}";
+                        string formatted = String.Format(template, args.Player.ClassyName,
+                                                         Reset, text, ignored, world, Bold);
+                        SendChannelMessage(formatted);                        
                     }
                     break;
 
