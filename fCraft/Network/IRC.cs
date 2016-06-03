@@ -748,7 +748,7 @@ namespace fCraft
                         string findPlayer = rawMessage.Remove(0, messageStart);
                         PlayerInfo info = PlayerDB.FindPlayerInfoExact(findPlayer);
                         if (info != null && info.IsOnline) {
-                            TimeSpan idle = info.PlayerObject.IdBotTime;
+                            TimeSpan idle = info.PlayerObject.IdleTime;
                             SendChannelMessage("Player " + Bold + "{0}" + Reset + " has spent a total of: " + Bold + "{1:F1}" + Reset +
                                                " hours (" + Bold + "{2:F1}" + Reset + " hours this session{3}",
                                                info.ClassyName,

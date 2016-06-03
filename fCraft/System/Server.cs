@@ -899,9 +899,9 @@ namespace fCraft {
                 player.lastSolidPos = player.Position;
 
                 if (player.Info.Rank.IdleKickTimer <= 0) continue;
-                TimeSpan TimeLeft = new TimeSpan(0, player.Info.Rank.IdleKickTimer, 0) - player.IdBotTime;
+                TimeSpan TimeLeft = new TimeSpan(0, player.Info.Rank.IdleKickTimer, 0) - player.IdleTime;
 
-                if (player.IdBotTime.ToSeconds()%300 == 0 && player.IdBotTime.ToSeconds() >= 300) {
+                if (player.IdleTime.ToSeconds()%300 == 0 && player.IdleTime.ToSeconds() >= 300) {
                     if (player.Info.IsAFK == false) {
                         Players.CanSee(player).Message("{0} is now AFK (Auto)", player.Name);
                         player.Info.IsAFK = true;
@@ -912,16 +912,16 @@ namespace fCraft {
                     player.Message("You have " + TimeLeft.ToMiniString() + " left before being kicked for idleing");
                 }
 
-                if (player.IdBotTime.TotalMinutes >= player.Info.Rank.IdleKickTimer) {
+                if (player.IdleTime.TotalMinutes >= player.Info.Rank.IdleKickTimer) {
                     Message("{0}&S was kicked for being idle for {1} min", player.ClassyName,
                         player.Info.Rank.IdleKickTimer);
                     string kickReason = "Idle for " + player.Info.Rank.IdleKickTimer + " minutes";
                     player.Kick(Player.Console, kickReason, LeaveReason.IdleKick, false, true, false);
-                    player.Info.TotalTime = player.Info.TotalTime - player.IdBotTime;
+                    player.Info.TotalTime = player.Info.TotalTime - player.IdleTime;
                     player.Info.IsAFK = false;
                     player.Info.oldafkMob = player.Info.afkMob;
                     player.Info.afkMob = player.Info.Mob;
-                    player.ResetIdBotTimer(); // to prevent kick from firing more than once
+                    player.ResetIdleTimer(); // to prevent kick from firing more than once
                 }
 			}
 			UpdateTabList(false);
@@ -973,34 +973,34 @@ namespace fCraft {
                 Player player = tempPlayerList[i];
                 if (player.Info.Rank.IdleKickTimer <= 0) continue;
 
-                if (player.IdBotTime.ToSeconds() % 300 == 0 && player.IdBotTime.ToSeconds() >= 300)
+                if (player.IdleTime.ToSeconds() % 300 == 0 && player.IdleTime.ToSeconds() >= 300)
                 {
                     if (player.Info.IsAFK == false)
                     {
                         Server.Players.CanSee(player).Message("{0} is now AFK (Auto)", player.Name);
                         player.Info.IsAFK = true;
                         player.Info.Mob = player.AFKModel;
-                        int TimeLeft = (player.Info.Rank.IdleKickTimer - (int)player.IdBotTime.ToMinutes());
+                        int TimeLeft = (player.Info.Rank.IdleKickTimer - (int)player.IdleTime.ToMinutes());
                         player.Message("You have " + TimeLeft + "m left before you get kicked for being AFK");
                     }
                     else
                     {
                         player.Info.IsAFK = true;
-                        int TimeLeft = (player.Info.Rank.IdleKickTimer - (int)player.IdBotTime.ToMinutes());
+                        int TimeLeft = (player.Info.Rank.IdleKickTimer - (int)player.IdleTime.ToMinutes());
                         player.Message("You have " + TimeLeft + "m left before you get kicked for being AFK");
                     }
                 }
 
-                if (player.IdBotTime.Minutes >= player.Info.Rank.IdleKickTimer)
+                if (player.IdleTime.Minutes >= player.Info.Rank.IdleKickTimer)
                 {
                     Message("{0}&S was kicked for being idle for {1} min",
                              player.ClassyName,
                              player.Info.Rank.IdleKickTimer);
                     string kickReason = "Idle for " + player.Info.Rank.IdleKickTimer + " minutes";
                     player.Kick(Player.Console, kickReason, LeaveReason.IdleKick, false, true, false);
-                    player.Info.TotalTime = player.Info.TotalTime - player.IdBotTime;
+                    player.Info.TotalTime = player.Info.TotalTime - player.IdleTime;
                     player.Info.IsAFK = false;
-                    player.ResetIdBotTimer(); // to prevent kick from firing more than once
+                    player.ResetIdleTimer(); // to prevent kick from firing more than once
                 }
             }
         }
@@ -1015,7 +1015,7 @@ namespace fCraft {
         //    {
         //        Player player = tempPlayerList[i];
         //        int fail;
-        //        if (player.IdBotTime.ToSeconds() % 5 == 0 && player.IdBotTime.ToSeconds() == 5 && int.TryParse(player.Info.Mob, out fail)) //&& player.isPlayingAsHider && player.isPlayingGame)
+        //        if (player.IdleTime.ToSeconds() % 5 == 0 && player.IdleTime.ToSeconds() == 5 && int.TryParse(player.Info.Mob, out fail)) //&& player.isPlayingAsHider && player.isPlayingGame)
         //        {
         //            short x = (short)(player.Position.X / 32 * 32 + 16);
         //            short y = (short)(player.Position.Y / 32 * 32 + 16);
@@ -1409,7 +1409,7 @@ namespace fCraft {
                 if( !player.HasRegistered ) {
                     return;
                 }
-                player.ResetIdBotTimer();
+                player.ResetIdleTimer();
                 player.Info.ProcessLogout( player );
 
                 Logger.Log( LogType.UserActivity,

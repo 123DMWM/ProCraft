@@ -259,7 +259,7 @@ namespace fCraft
                     e.Player.Info.afkMob = e.Player.Info.Mob;
                     Server.UpdateTabList(true);
                 }
-                e.Player.ResetIdBotTimer();
+                e.Player.ResetIdleTimer();
             }
         }
 
@@ -288,7 +288,7 @@ namespace fCraft
             player.Info.oldafkMob = player.Info.afkMob;
             player.Info.afkMob = player.Info.IsAFK ? player.AFKModel : player.Info.Mob;
             Server.UpdateTabList(true);
-            player.ResetIdBotTimer();
+            player.ResetIdleTimer();
         }
 
         #endregion

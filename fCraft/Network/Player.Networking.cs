@@ -336,7 +336,7 @@ namespace fCraft {
 
         bool ProcessMessagePacket() {
             BytesReceived += 66;
-            ResetIdBotTimer();
+            ResetIdleTimer();
             byte longerMessage = reader.ReadByte();
             string message = reader.ReadString();
 
@@ -417,9 +417,9 @@ namespace fCraft {
             bool posChanged = (delta.X != 0) || (delta.Y != 0) || (delta.Z != 0);
             bool rotChanged = (delta.R != 0) || (delta.L != 0);
             
-            //if(rotChanged && !this.isSolid) ResetIdBotTimer();
-            //if(posChanged && this.isSolid) ResetIdBotTimer();
-            if (rotChanged) ResetIdBotTimer();
+            //if(rotChanged && !this.isSolid) ResetIdleTimer();
+            //if(posChanged && this.isSolid) ResetIdleTimer();
+            if (rotChanged) ResetIdleTimer();
 
             bool deniedzone = false;
 
@@ -561,7 +561,7 @@ namespace fCraft {
                 Info.afkMob = Info.Mob;
                 Server.UpdateTabList(true);
             }
-            ResetIdBotTimer();
+            ResetIdleTimer();
             short x = reader.ReadInt16();
             short z = reader.ReadInt16();
             short y = reader.ReadInt16();

@@ -2163,15 +2163,15 @@ namespace fCraft {
 
 
         /// <summary> Time since the player was last active (moved, talked, or clicked). </summary>
-        public TimeSpan IdBotTime {
+        public TimeSpan IdleTime {
             get {
                 return DateTime.UtcNow.Subtract( LastActiveTime );
             }
         }
 
 
-        /// <summary> Resets the IdBotTimer to 0. </summary>
-        public void ResetIdBotTimer()
+        /// <summary> Resets the IdleTimer to 0. </summary>
+        public void ResetIdleTimer()
         {
             //if (this.isSolid) // && this.isPlayingGame)
             //{

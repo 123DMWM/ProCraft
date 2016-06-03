@@ -173,8 +173,8 @@ namespace fCraft {
                     if( player.Can( Permission.ViewPlayerIPs ) ) {
                         firstLine.AppendFormat( " from {0}", info.LastIP );
                     }
-                    if( target.IdBotTime > InfoIdleThreshold ) {
-                        firstLine.AppendFormat( " (idle {0})", target.IdBotTime.ToMiniString() );
+                    if( target.IdleTime > InfoIdleThreshold ) {
+                        firstLine.AppendFormat( " (idle {0})", target.IdleTime.ToMiniString() );
                     }
 
                 } else {
