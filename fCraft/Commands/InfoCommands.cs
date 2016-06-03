@@ -631,34 +631,31 @@ namespace fCraft {
             if( rank.IdleKickTimer > 0 ) {
                 player.Message( "Idle kick after {0}", TimeSpan.FromMinutes( rank.IdleKickTimer ).ToMiniString() );
             }
-            if (Directory.Exists(Paths.RankReqDirectory) && player.IsStaff) {
-                string rankReqFileName = null;
-                string[] sectionFiles = Directory.GetFiles(Paths.RankReqPath,rank.Name.ToLower() + ".txt", SearchOption.TopDirectoryOnly);
-                for (int i = 0; i < sectionFiles.Length; i++) {
-                    string sectionFullName = Path.GetFileNameWithoutExtension(sectionFiles[i]).ToLower();
-                    if (rank.Name.ToLower().Equals(sectionFullName)) {
-                        rankReqFileName = sectionFiles[i];
-                        break;
+            if (!Directory.Exists(Paths.RankReqDirectory) || !player.IsStaff) return;
+            
+            string rankReqFile = null;
+            string[] files = Directory.GetFiles(Paths.RankReqPath, rank.Name.ToLower() + ".txt", SearchOption.TopDirectoryOnly);
+            for (int i = 0; i < files.Length; i++) {
+                string name = Path.GetFileNameWithoutExtension(files[i]).ToLower();
+                if (rank.Name.ToLower().Equals(name)) {
+                    rankReqFile = files[i]; break;
+                }
+            }
+            if (rankReqFile == null) return;
+            
+            try {
+                string[] lines = File.ReadAllLines(rankReqFile);
+                player.Message("&RRank requirements:");
+                foreach (string line in lines) {
+                    if (line.Trim().Length > 0) {
+                        player.Message("&R{0}", Chat.ReplaceTextKeywords(player, line));
                     }
                 }
-                if (rankReqFileName != null) {
-                    string sectionFullName = Path.GetFileNameWithoutExtension(rankReqFileName);
-                    FileInfo rankReqFile = new FileInfo(rankReqFileName);
-                    try {
-                        string[] ruleLines = File.ReadAllLines(rankReqFile.FullName);
-                        player.Message("&RRank requirements:");
-                        foreach (string ruleLine in ruleLines) {
-                            if (ruleLine.Trim().Length > 0) {
-                                player.Message("&R{0}", Chat.ReplaceTextKeywords(player, ruleLine));
-                            }
-                        }
-                    } catch (Exception ex) {
-                        Logger.Log(LogType.Error,
-                                    "InfoCommands.PrintRankReq: An error occurred while trying to read {0}: {1}",
-                                    rankReqFile.FullName, ex);
-                        player.Message("&WError reading the rank requirement file.");
-                    }
-                }
+            } catch (Exception ex) {
+                Logger.Log(LogType.Error,
+                           "InfoCommands.PrintRankReq: An error occurred while trying to read {0}: {1}",
+                           rankReqFile, ex);
+                player.Message("&WError reading the rank requirement file.");
             }
         }
 
