@@ -931,12 +931,20 @@ namespace fCraft {
         public byte[] MakeCompressedMap(byte maxLegal, out int compressedLen) {
             byte[] array = Blocks;
             BlockDefinition[] defs = World.BlockDefs;
+            bool hasCPEBlocks = maxLegal == (byte)MaxCustomBlockType;
+            
             byte* fallback = stackalloc byte[256];
             for (int i = 0; i < 256; i++) {
                 fallback[i] = (byte)FallbackBlocks[i];
                 if (defs[i] == null) continue;
                 fallback[i] = defs[i].FallBack;
+                
+                // Handle CPE defined fallback blocks for custom blocks
+                if (fallback[i] > (byte)maxLegal)
+                    fallback[i] = (byte)FallbackBlocks[fallback[i]];
             }
+            for (int i = 0; i <= (byte)maxLegal; i++)
+                fallback[i] = (byte)i;
                         
             using (MemoryStream ms = new MemoryStream()) {
                 using (GZipStream compressor = new GZipStream(ms, CompressionMode.Compress, true)) {
@@ -946,11 +954,8 @@ namespace fCraft {
                     byte[] buffer = new byte[bufferSize];
                     for (int i = 0; i < array.Length; i += bufferSize) {
                         int len = Math.Min(bufferSize, array.Length - i);
-                        for (int j = 0; j < len; j++) {
-                            byte block = array[i + j];
-                            if (block > maxLegal) block = fallback[block];
-                            buffer[j] = block;
-                        }
+                        for (int j = 0; j < len; j++)
+                            buffer[j] = fallback[array[i + j]];
                         compressor.Write(buffer, 0, len);
                     }
                 }
