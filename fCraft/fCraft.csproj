@@ -148,6 +148,7 @@
     <Compile Include="MapConversion\MapFCMv3.cs" />
     <Compile Include="MapConversion\MapMCF.cs" />
     <Compile Include="Network\CpeConstants.cs" />
+    <Compile Include="Network\IRCHandlers.cs" />
     <Compile Include="Player\ChatFilter.cs" />
     <Compile Include="Player\Report.cs" />
     <Compile Include="Player\Replace.cs" />
