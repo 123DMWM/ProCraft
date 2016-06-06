@@ -121,7 +121,7 @@ namespace fCraft
                     Server.Port.ToStringInvariant(),
                     Server.CountPlayers( false ).ToStringInvariant(),
                     ConfigKey.MaxPlayers.GetString(),
-                    Color.StripColors(ConfigKey.ServerName.GetString()),
+                    ConfigKey.ServerName.GetString(),
                     ConfigKey.IsPublic.GetString(),
                     ConfigKey.HeartbeatUrl.GetString()
                 };
@@ -311,7 +311,7 @@ namespace fCraft
             if (Heartbeat.sendUptime) {
                 ServerName = namePadded.Remove(namePadded.Length - uptime.Length, uptime.Length) + uptime;
             } else {
-                ServerName = Color.StripColors(ConfigKey.ServerName.GetString());
+                ServerName = ConfigKey.ServerName.GetString();
             }
             CustomData = new Dictionary<string, string>();
             HeartbeatUri = heartbeatUri;
