@@ -121,7 +121,7 @@ namespace fCraft
                     Server.Port.ToStringInvariant(),
                     Server.CountPlayers( false ).ToStringInvariant(),
                     ConfigKey.MaxPlayers.GetString(),
-                    ConfigKey.ServerName.GetString(),
+                    Color.StripColors(ConfigKey.ServerName.GetString()),
                     ConfigKey.IsPublic.GetString(),
                     ConfigKey.HeartbeatUrl.GetString()
                 };
@@ -298,8 +298,7 @@ namespace fCraft
 
     /// <summary> Contains data that's sent to heartbeat servers. </summary>
     public sealed class HeartbeatData {
-		String uptime = "[Uptime: " + (DateTime.UtcNow.Subtract(Server.StartTime)).ToMiniString() + "]";
-		String namePadded = Color.StripColors(ConfigKey.ServerName.GetString()).PadRight(64, ' ');
+		
         internal HeartbeatData([NotNull] Uri heartbeatUri) {
             if (heartbeatUri == null) throw new ArgumentNullException("heartbeatUri");
             IsPublic = ConfigKey.IsPublic.Enabled();
@@ -308,10 +307,12 @@ namespace fCraft
             Port = Server.Port;
             ProtocolVersion = Config.ProtocolVersion;
             Salt = Heartbeat.Salt;
+            ServerName = Color.StripColors(ConfigKey.ServerName.GetString());
+            
             if (Heartbeat.sendUptime) {
+                string uptime = "[Uptime: " + (DateTime.UtcNow.Subtract(Server.StartTime)).ToMiniString() + "]";
+                string namePadded = ServerName.PadRight(64, ' ');
                 ServerName = namePadded.Remove(namePadded.Length - uptime.Length, uptime.Length) + uptime;
-            } else {
-                ServerName = ConfigKey.ServerName.GetString();
             }
             CustomData = new Dictionary<string, string>();
             HeartbeatUri = heartbeatUri;
