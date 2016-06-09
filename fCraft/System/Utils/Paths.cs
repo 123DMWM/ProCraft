@@ -370,7 +370,8 @@ namespace fCraft {
         /// <returns> True if file exists, otherwise false. </returns>
         public static bool FileExists( [NotNull] string fileName, bool caseSensitive ) {
             if( fileName == null ) throw new ArgumentNullException( "fileName" );
-            if( caseSensitive == MonoCompat.IsCaseSensitive ) {
+            bool osSensitive = MonoCompat.IsCaseSensitive;
+            if( caseSensitive == osSensitive || !osSensitive ) {
                 return File.Exists( fileName );
             } else {
                 return new FileInfo( fileName ).Exists( caseSensitive );
@@ -385,7 +386,8 @@ namespace fCraft {
         /// <exception cref="ArgumentNullException"> If fileInfo is null. </exception>
         public static bool Exists( [NotNull] this FileInfo fileInfo, bool caseSensitive ) {
             if( fileInfo == null ) throw new ArgumentNullException( "fileInfo" );
-            if( caseSensitive == MonoCompat.IsCaseSensitive ) {
+            bool osSensitive = MonoCompat.IsCaseSensitive;
+            if( caseSensitive == osSensitive || !osSensitive ) {
                 return fileInfo.Exists;
             } else {
                 string parentDir = GetDirectoryNameOrRoot( fileInfo.FullName );
