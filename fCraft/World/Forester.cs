@@ -9,12 +9,8 @@ using JetBrains.Annotations;
 
 namespace fCraft.Events {
     public sealed class ForesterBlockPlacingEventArgs : EventArgs {
-        internal ForesterBlockPlacingEventArgs( Vector3I coordinate, Block block ) {
-            Coordinate = coordinate;
-            Block = block;
-        }
-        public Vector3I Coordinate { get; private set; }
-        public Block Block { get; private set; }
+        public Vector3I Coords { get; internal set; }
+        public Block Block { get; internal set; }
     }
 }
 
@@ -944,15 +940,22 @@ namespace fCraft {
         public Block FoliageBlock = Block.Leaves;
 
         public event EventHandler<ForesterBlockPlacingEventArgs> BlockPlacing;
+        ForesterBlockPlacingEventArgs args = new ForesterBlockPlacingEventArgs();
 
         internal void PlaceBlock( int x, int y, int z, Block block ) {
             var h = BlockPlacing;
-            if( h != null ) h( this, new ForesterBlockPlacingEventArgs( new Vector3I( x, y, z ), block ) );
+            if( h == null ) return;
+            
+            args.Coords = new Vector3I( x, y, z ); args.Block = block;
+            h( this, args );
         }
 
-        internal void PlaceBlock( Vector3I coord, Block block ) {
+        internal void PlaceBlock( Vector3I p, Block block ) {
             var h = BlockPlacing;
-            if( h != null ) h( this, new ForesterBlockPlacingEventArgs( new Vector3I(coord.X,coord.Z,coord.Y), block ) ); // todo: rewrite the whole thing to use XYZ coords
+            if( h == null ) return;
+            
+            args.Coords = new Vector3I( p.X, p.Z, p.Y ); args.Block = block;
+            h( this, args ); // todo: rewrite the whole thing to use XYZ coords
         }
 
         internal void Validate() {

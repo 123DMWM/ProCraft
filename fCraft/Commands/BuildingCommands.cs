@@ -732,7 +732,7 @@ namespace fCraft {
             UndoState undoState = player.DrawBegin(null);
             args.BlockPlacing +=
                 (sender, e) =>
-               DrawOneBlock(player, player.World.Map, e.Block, new Vector3I(e.Coordinate.X, e.Coordinate.Y, e.Coordinate.Z),
+               DrawOneBlock(player, player.World.Map, e.Block, new Vector3I(e.Coords.X, e.Coords.Y, e.Coords.Z),
                               BlockChangeContext.Drawn,
                               ref blocksPlaced, ref blocksDenied, undoState);
             Forester.SexyPlant(args, marks[0]);

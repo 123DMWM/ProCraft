@@ -449,7 +449,7 @@ namespace fCraft {
                         Operation = Forester.ForesterOperation.Add,
                         PlantOn = bGroundSurface
                     };
-                    foresterArgs.BlockPlacing += ( sender, e ) => outMap.SetBlock( e.Coordinate, e.Block );
+                    foresterArgs.BlockPlacing += ( sender, e ) => outMap.SetBlock( e.Coords, e.Block );
                     Forester.Generate( foresterArgs );
                     map = outMap;
                 }
