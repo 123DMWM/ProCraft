@@ -38,7 +38,7 @@ namespace fCraft{
 
 
         public BlockDBEntry( int timestamp, int playerID, short x, short y, short z,
-                             Block oldBlock, Block newBlock, BlockChangeContext flags ) {
+                            Block oldBlock, Block newBlock, BlockChangeContext flags ) {
             Timestamp = timestamp;
             PlayerID = playerID;
             X = x;
@@ -50,7 +50,7 @@ namespace fCraft{
         }
 
         public BlockDBEntry( int timestamp, int playerID, Vector3I coords,
-                             Block oldBlock, Block newBlock, BlockChangeContext flags ) {
+                            Block oldBlock, Block newBlock, BlockChangeContext flags ) {
             Timestamp = timestamp;
             PlayerID = playerID;
             X = (short)coords.X;
@@ -61,15 +61,24 @@ namespace fCraft{
             Context = flags;
         }
 
-        public void Serialize( BinaryWriter writer ) {
-            writer.Write( Timestamp );
-            writer.Write( PlayerID );
-            writer.Write( X );
-            writer.Write( Y );
-            writer.Write( Z );
-            writer.Write( (byte)OldBlock );
-            writer.Write( (byte)NewBlock );
-            writer.Write( (int)Context );
+        public void Serialize( Stream stream, byte[] buffer ) {
+            WriteInt( Timestamp, buffer, 0 );
+            WriteInt( PlayerID, buffer, 4 );
+            buffer[8] = (byte)X; buffer[9] = (byte)(X >> 8);
+            buffer[10] = (byte)Y; buffer[11] = (byte)(Y >> 8);
+            buffer[12] = (byte)Z; buffer[13] = (byte)(Z >> 8);
+            
+            buffer[14] = (byte)OldBlock;
+            buffer[15] = (byte)NewBlock;
+            WriteInt( (int)Context, buffer, 16 );
+            stream.Write( buffer, 0, buffer.Length );
+        }
+        
+        static void WriteInt( int value, byte[] buffer, int offset ) {
+            buffer[offset + 0] = (byte)value;
+            buffer[offset + 1] = (byte)(value >> 8);
+            buffer[offset + 2] = (byte)(value >> 16);
+            buffer[offset + 3] = (byte)(value >> 24);
         }
     }
 }

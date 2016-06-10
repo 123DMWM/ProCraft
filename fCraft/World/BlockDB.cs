@@ -540,9 +540,9 @@ namespace fCraft {
 #endif
                     int count = 0;
                     using( FileStream stream = OpenAppend() ) {
-                        BinaryWriter writer = new BinaryWriter( stream );
+                        byte[] buffer = new byte[20];
                         for( int i = LastFlushedIndex; i < CacheSize; i++ ) {
-                            cacheStore[i].Serialize( writer );
+                            cacheStore[i].Serialize( stream, buffer );
                             count++;
                         }
                     }
