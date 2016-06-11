@@ -59,31 +59,25 @@ namespace fCraft {
                 Handler = BumHandler
         };
 
-        static void BumHandler(Player player, CommandReader cmd)
-        {
-            string newModeName = cmd.Next();
-            if (newModeName == null)
-            {
+        static void BumHandler(Player player, CommandReader cmd) {
+            string mode = cmd.Next();
+            if (mode == null) {
                 player.Message("Bytes Sent: {0}  Per Second: {1:0.0}", player.BytesSent, player.BytesSentRate);
                 player.Message("Bytes Received: {0}  Per Second: {1:0.0}", player.BytesReceived, player.BytesReceivedRate);
                 player.Message("Bandwidth mode: {0}",player.BandwidthUseMode);
-                                
-                                
-                                
-                return;
-            }
-            else if (player.Can(Permission.EditPlayerDB))
-            {
-                var newMode = (BandwidthUseMode)Enum.Parse(typeof(BandwidthUseMode), newModeName, true);
-                player.Message("Bandwidth mode: {0} --> {1}", player.BandwidthUseMode, newMode.ToString());
+            } else if (player.Can(Permission.EditPlayerDB)) {
+                BandwidthUseMode newMode;
+                if (!EnumUtil.TryParse(mode, out newMode, true)) {
+                    player.Message("Unrecognized mode \"{0}\". Available modes: {1}",
+                                   mode, Enum.GetNames(typeof(BandwidthUseMode)).JoinToString());
+                    return;
+                }
+                
+                player.Message("Bandwidth mode: {0} --> {1}", player.BandwidthUseMode, newMode);
                 player.BandwidthUseMode = newMode;
                 player.Info.BandwidthUseMode = newMode;
-                return;
-            }
-            else
-            {
+            } else {
                 player.Message("You need {0}&s to change your BandwidthUseMode", RankManager.GetMinRankWithAnyPermission(Permission.EditPlayerDB).ClassyName);
-                return;
             }
             
         }
@@ -100,12 +94,12 @@ namespace fCraft {
 
         static void BDBDBHandler(Player player, CommandReader cmd)
         {
-                    if( player.World == null ) PlayerOpException.ThrowNoWorld( player );
-                    BlockDB db = player.World.BlockDB;
-                    lock( db.SyncRoot ) {
-                        player.Message( "BlockDB: CAP={0} SZ={1} FI={2}",
-                                        db.CacheCapacity, db.CacheSize, db.LastFlushedIndex );
-                    }
+            if( player.World == null ) PlayerOpException.ThrowNoWorld( player );
+            BlockDB db = player.World.BlockDB;
+            lock( db.SyncRoot ) {
+                player.Message( "BlockDB: CAP={0} SZ={1} FI={2}",
+                               db.CacheCapacity, db.CacheSize, db.LastFlushedIndex );
+            }
         }
 
         static CommandDescriptor cdTaskDebug = new CommandDescriptor

@@ -258,7 +258,7 @@ namespace fCraft {
                 p.PlayerObject.ParseMessage(sudocmd, false);
                 player.Message("Forced {0} to type in \"{1}\"", p.Name, sudocmd);
             } catch {
-                    player.Message("Cannot use that command with /sudo");
+                player.Message("Cannot use that command with /sudo");
             }
 
         }
