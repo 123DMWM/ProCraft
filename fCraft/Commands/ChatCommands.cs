@@ -1037,7 +1037,7 @@ namespace fCraft
             string Msg = "/Quit" + (cmd.HasNext ? " " + cmd.NextAll() : "");
             player.usedquit = true;
             player.quitmessage = (Msg.Length > 70 ? Msg.Remove(70) : Msg);
-            player.SendNow(Packet.MakeKick(Msg));
+            player.Send(Packet.MakeKick(Msg));
             Logger.Log(LogType.UserActivity,
                         "{0} disconnected. Reason: {1}", player.Name, player.quitmessage);
         }
