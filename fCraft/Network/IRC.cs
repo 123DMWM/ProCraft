@@ -1022,7 +1022,7 @@ namespace fCraft
                         
                     if (text != null) {
                         bool prefix = world != null && ((string)world).Length > 0;
-                        string template = prefix ? "&S[{1}{5}{4}&s] {1}{0}{1}: {2}{3}" : "&S{1}{0}{1}: {2}{3}";
+                        string template = prefix ? "&S[{1}on {5}{4}&s] {1}{0}{1}: {2}{3}" : "&S{1}{0}{1}: {2}{3}";
                         string formatted = String.Format(template, args.Player.ClassyName,
                                                          Reset, text, ignored, world, Bold);
                         SendChannelMessage(formatted);                        
