@@ -1191,6 +1191,7 @@ namespace fCraft {
             lock (entitiesLock)
                 ResetVisibleEntities();
             ClearQueue(blockQueue);
+            RemoveOldEntities(oldWorld);
             Map map;
 
             // try to join the new world
@@ -1236,6 +1237,7 @@ namespace fCraft {
             BytesSent += 7;
 
             SendJoinCpeExtensions();
+            SendNewEntities(newWorld);
 
             // Teleport player to the target location
             // This allows preserving spawn rotation/look, and allows
@@ -1356,21 +1358,31 @@ namespace fCraft {
                 Send(Packet.Message((byte)MessageType.Status1, ConfigKey.ServerName.GetString(), UseFallbackColors));
             }
 
-            foreach (Entity entity in Entity.Entities.Where(e => Entity.getWorld(e) == World)) {
-                Send(Packet.MakeRemoveEntity(entity.ID));
-                if (Supports(CpeExt.ExtPlayerList2)) {
-                    Send(Packet.MakeExtAddEntity2(entity.ID, entity.Name, entity.Skin, Entity.getPos(entity), this));
-                } else {
-                    Send(Packet.MakeAddEntity(entity.ID, entity.Name, Entity.getPos(entity)));
-                }
-                if (entity.Model.ToLower() != "humanoid" && Supports(CpeExt.ChangeModel))
-                    Send(Packet.MakeChangeModel((byte)entity.ID, entity.Model));
-            }
+
             if (Supports(CpeExt.SelectionCuboid)) {
                 foreach (Zone z in WorldMap.Zones) {
                     if (z.ShowZone)
                         Send(Packet.MakeMakeSelection(z.ZoneID, z.Name, z.Bounds, z.Color, z.Alpha));
                 }
+            }
+        }
+        
+        internal void RemoveOldEntities(World world) {
+            if (world == null) return;
+            foreach (Entity entity in Entity.Entities.Where(e => Entity.getWorld(e) == world)) {
+                SendNow(Packet.MakeRemoveEntity(entity.ID));
+            } 
+        }
+        
+        internal void SendNewEntities(World world) {
+            foreach (Entity entity in Entity.Entities.Where(e => Entity.getWorld(e) == world)) {
+                if (Supports(CpeExt.ExtPlayerList2)) {
+                    SendNow(Packet.MakeExtAddEntity2(entity.ID, entity.Name, entity.Skin, Entity.getPos(entity), this));
+                } else {
+                    SendNow(Packet.MakeAddEntity(entity.ID, entity.Name, Entity.getPos(entity)));
+                }
+                if (entity.Model.ToLower() != "humanoid" && Supports(CpeExt.ChangeModel))
+                    SendNow(Packet.MakeChangeModel((byte)entity.ID, entity.Model));
             }
         }
         
