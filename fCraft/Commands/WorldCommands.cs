@@ -2729,38 +2729,26 @@ namespace fCraft {
             Permissions = new[] { Permission.ManageWorlds },
             Usage = "/WCS",
             Help = "Saves a map copy to be used with /WClear",
+            IsConsoleSafe = false,
             Handler = WorldClearSaveHandler
         };
 
-        static void WorldClearSaveHandler(Player player, CommandReader cmd)
-        {
-            string WorldCSave = player.World.Name;
-            if (player.World.Name == null)
-            {
-                CdWorldSave.PrintUsage(player);
-                return;
-            }
+        static void WorldClearSaveHandler(Player player, CommandReader cmd) {
+            if (player.World == null) { CdWorldSave.PrintUsage(player); return; }
 
             World world = player.World;
-            string fileName;
-            fileName = WorldCSave;
-            {
-                world = WorldManager.FindWorldOrPrintMatches(player, WorldCSave);
-                if (world == null) return;
-                fileName = WorldCSave;
-            }
+            string fileName = world.Name;
 
             // normalize the path
             fileName = fileName.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
-            fileName = "World(" + WorldCSave + ")clear.fcm";
-            if (!Paths.IsValidPath(fileName))
-            {
+            fileName = "World(" + fileName + ")clear.fcm";
+            if (!Paths.IsValidPath(fileName)) {
                 player.Message("Invalid file name.");
                 return;
             }
+            
             string fullFileName = Path.Combine(Paths.WClearPath, fileName);
-            if (!Paths.Contains(Paths.WClearPath, fullFileName))
-            {
+            if (!Paths.Contains(Paths.WClearPath, fullFileName)) {
                 player.MessageUnsafePath();
                 return;
             }
