@@ -152,24 +152,12 @@ namespace fCraft {
 
             Zone[] zoneListCache = Cache;
             for( int i = 0; i < zoneListCache.Length; i++ ) {
-                if( zoneListCache[i].Bounds.Contains( coords ) ) {
-                    if( zoneListCache[i].Controller.Check( player.Info ) ) {
-                        if (zoneListCache[i].Bounds.Volume == 1)
-                        {
-                            if (player.World.Name == "CTF" && zoneListCache[i].Name == "Blue" || zoneListCache[i].Name == "Red") {
-                                result = PermissionOverride.Allow;
-                            }
-                            else {
-                                //THIS IS A SIGN! DENY THE BLOCK CHANGE!
-                                //player.Message(player.World.Name);
-                                //player.Message(zoneListCache[i].Name);
-                                return PermissionOverride.Deny;
-                            }
-                        }
-                        result = PermissionOverride.Allow;
-                    } else {
-                        return PermissionOverride.Deny;
-                    }
+                if( !zoneListCache[i].Bounds.Contains( coords ) ) continue;
+                
+                if( zoneListCache[i].Controller.Check( player.Info ) ) {
+                	result = PermissionOverride.Allow;
+                } else {
+                	return PermissionOverride.Deny;
                 }
             }
             return result;
@@ -219,32 +207,11 @@ namespace fCraft {
         public Zone FindDenied( Vector3I coords, [NotNull] Player player ) {
             if( player == null ) throw new ArgumentNullException( "player" );
             Zone[] zoneListCache = Cache;
-            List<Zone> deniedlist = new List<Zone>();
             for( int i = 0; i < zoneListCache.Length; i++ ) {
-                if( zoneListCache[i].Bounds.Contains( coords ) && !zoneListCache[i].Controller.Check( player.Info )) {
-                    deniedlist.Add(zoneListCache[i]);
+                if( zoneListCache[i].Bounds.Contains( coords ) &&
+                    !zoneListCache[i].Controller.Check( player.Info ) ) {
+                    return zoneListCache[i];
                 }
-            }
-            if (deniedlist.ToArray().Length == 0) {
-                //Check for Signs...
-                for( int i = 0; i < zoneListCache.Length; i++ ) {
-                    if( zoneListCache[i].Bounds.Contains( coords )) {
-                        if(zoneListCache[i].Bounds.Volume == 1) deniedlist.Add(zoneListCache[i]);
-                    }
-                }
-                if (deniedlist.ToArray().Length == 0) return null;
-            }
-
-            if (deniedlist.ToArray().Length > 0)
-            {
-                foreach (Zone zone in deniedlist)
-                {
-                    if (zone.Bounds.Volume == 1)
-                    {
-                        return zone;
-                    }
-                }
-                return deniedlist.ToArray()[0];
             }
             return null;
         }
