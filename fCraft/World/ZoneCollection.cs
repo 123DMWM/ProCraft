@@ -151,18 +151,20 @@ namespace fCraft {
             if( Cache.Length == 0 ) return result;
 
             Zone[] zoneListCache = Cache;
+            bool anyDeny = false;
             for( int i = 0; i < zoneListCache.Length; i++ ) {
                 Zone zone = zoneListCache[i];
                 if( !zone.Bounds.Contains( coords ) ) continue;
+                // want to be able to interact with special zones, even if can't affect zoned region
                 if( SpecialZone.IsSpecial( zone.Name ) ) return PermissionOverride.Allow;
                    
                 if( zone.Controller.Check( player.Info ) ) {
                     result = PermissionOverride.Allow;
                 } else {
-                    return PermissionOverride.Deny;
+                    anyDeny = true;
                 }
             }
-            return result;
+            return anyDeny ? PermissionOverride.Deny : result;
         }
 
 
