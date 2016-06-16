@@ -152,12 +152,14 @@ namespace fCraft {
 
             Zone[] zoneListCache = Cache;
             for( int i = 0; i < zoneListCache.Length; i++ ) {
-                if( !zoneListCache[i].Bounds.Contains( coords ) ) continue;
-                
-                if( zoneListCache[i].Controller.Check( player.Info ) ) {
-                	result = PermissionOverride.Allow;
+                Zone zone = zoneListCache[i];
+                if( !zone.Bounds.Contains( coords ) ) continue;
+                if( SpecialZone.IsSpecial( zone.Name ) ) return PermissionOverride.Allow;
+                   
+                if( zone.Controller.Check( player.Info ) ) {
+                    result = PermissionOverride.Allow;
                 } else {
-                	return PermissionOverride.Deny;
+                    return PermissionOverride.Deny;
                 }
             }
             return result;
@@ -181,13 +183,16 @@ namespace fCraft {
 
             Zone[] zoneListCache = Cache;
             for( int i = 0; i < zoneListCache.Length; i++ ) {
-                if( zoneListCache[i].Bounds.Contains( coords ) ) {
-                    found = true;
-                    if( zoneListCache[i].Controller.Check( player.Info ) ) {
-                        allowedList.Add( zoneListCache[i] );
-                    } else {
-                        deniedList.Add( zoneListCache[i] );
-                    }
+                Zone zone = zoneListCache[i];
+                if( !zone.Bounds.Contains( coords ) ) continue;
+                
+                found = true;
+                if( SpecialZone.IsSpecial( zone.Name ) ) {
+                    allowedList.Add( zone );
+                } else if( zone.Controller.Check( player.Info ) ) {
+                    allowedList.Add( zone );
+                } else {
+                    deniedList.Add( zone );
                 }
             }
             allowedZones = allowedList.ToArray();

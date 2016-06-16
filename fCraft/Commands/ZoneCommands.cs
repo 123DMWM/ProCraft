@@ -220,13 +220,11 @@ namespace fCraft {
         {
             World playerWorld = player.World;
             if (playerWorld == null) PlayerOpException.ThrowNoWorld(player);
-
-            string givenZoneName = "Sign_" + cmd.Next();
-            if (givenZoneName == null || !cmd.HasNext)
-            {
-                CdSignAdd.PrintUsage(player);
-                return;
+            
+            if (!cmd.HasNext) {
+                CdSignAdd.PrintUsage(player); return;
             }
+            string givenZoneName = SpecialZone.Sign + cmd.Next();
 
             if (!player.Info.Rank.AllowSecurityCircumvention)
             {
@@ -813,13 +811,11 @@ namespace fCraft {
         static void SignRemoveHandler(Player player, CommandReader cmd)
         {
             if (player.World == null) PlayerOpException.ThrowNoWorld(player);
-
-            string zoneName = "Sign_" + cmd.Next();
-            if (zoneName == "Sign_")
-            {
-                CdSignRemove.PrintUsage(player);
-                return;
+            
+            if (!cmd.HasNext) {
+                CdSignRemove.PrintUsage(player); return;
             }
+            string zoneName = SpecialZone.Sign + cmd.Next();
 
             ZoneCollection zones = player.WorldMap.Zones;
             Zone zone = zones.Find(zoneName);
@@ -993,12 +989,12 @@ namespace fCraft {
                             player.Message("You must specify a name for this door! Usage is /Door Create [name]");
                             break;
                         }
-                        if (player.WorldMap.Zones.FindExact("Door_" + add.ToLower()) != null) {
+                        if (player.WorldMap.Zones.FindExact(SpecialZone.Door + add) != null) {
                             player.Message("Door with same name already exists!");
                             break;
                         }
                         Zone door = new Zone();
-                        door.Name = "Door_" + add.ToLower();
+                        door.Name = SpecialZone.Door + add.ToLower();
                         player.SelectionStart(2, DoorAdd, door, cdDoor.Permissions);
                         player.Message("Door: Place a block or type /mark to use your location.");
                         break;
@@ -1013,7 +1009,7 @@ namespace fCraft {
                         if (delete.ToLower().StartsWith("door_")) {
                             delete = delete.Substring(5);
                         }
-                        if ((rzone = player.WorldMap.Zones.FindExact("Door_" + delete.ToLower())) != null) {
+                        if ((rzone = player.WorldMap.Zones.FindExact(SpecialZone.Door + delete)) != null) {
                             if (rzone.CreatedBy.ToLower().Equals(player.Name.ToLower()) || player.IsStaff) {
                                 player.WorldMap.Zones.Remove(rzone);
                                 player.Message("Door removed.");
@@ -1026,7 +1022,7 @@ namespace fCraft {
                         break;
                     case "list":
                         player.Message("__Doors on {0}__", player.World.Name);
-                        foreach (Zone list in player.World.Map.Zones.Where(z => z.Name.StartsWith("Door_")).ToArray()) {
+                        foreach (Zone list in player.World.Map.Zones.Where(z => z.Name.StartsWith(SpecialZone.Door)).ToArray()) {
                             player.Message(list.Name);
                         }
                         break;
@@ -1045,7 +1041,7 @@ namespace fCraft {
         static void DoorTestCallback(Player player, Vector3I[] marks, object tag) {
             bool doorPresent = false;
             foreach (Zone zone in player.World.map.Zones) {
-                if (zone.Name.StartsWith("Door_") && zone.Bounds.Contains(marks[0])) {
+                if (zone.Name.StartsWith(SpecialZone.Door) && zone.Bounds.Contains(marks[0])) {
                     player.Message("{0} created by {1} on {2}", zone.Name, zone.CreatedBy, zone.CreatedDate);
                     doorPresent = false;
                 }

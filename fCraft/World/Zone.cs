@@ -139,11 +139,11 @@ namespace fCraft {
 				}
 			}
 
-            if (header[0].Contains("Door_")) {
+            if (header[0].Contains(SpecialZone.Door)) {
                 buildRank = RankManager.DefaultRank;
             }
             // if all else fails, fall back to lowest class... ignore door instances
-            if (buildRank == null && !header[0].Contains("Door_")) {
+            if (buildRank == null && !header[0].Contains(SpecialZone.Door)) {
                 if (world != null) {
                     Controller.MinRank = world.BuildSecurity.MinRank;
                 } else {

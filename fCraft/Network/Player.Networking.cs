@@ -1524,7 +1524,7 @@ namespace fCraft {
         // Gets the block from given location in player's world, and sends it (sync) to the player.
         // Used to undo player's attempted block placement/deletion.
         // To avoid threading issues, only use this from this player's IoThread.
-        void RevertBlockNow( Vector3I coords ) {
+        internal void RevertBlockNow( Vector3I coords ) {
             SendNow( Packet.MakeSetBlock( coords, WorldMap.GetBlock( coords ) ));
         }
 

@@ -1088,9 +1088,9 @@ namespace fCraft {
         /// <summary> Max distance that player may be from a block to reach it (hack detection). </summary>
         public static int MaxBlockPlacementRange { get; set; }
 
-        string[] SignList = null;
-        bool IsCommandBlockRunnin = false;
-        int signspot = 0;
+        internal string[] SignLines = null;
+        internal bool IsCommandBlockRunning = false;
+        internal int SignPos = 0;
 
 
         public void PlaceBlockWithEvents( Vector3I coords, ClickAction action, Block type ) {
@@ -1179,20 +1179,10 @@ namespace fCraft {
             // if all is well, try placing it
             switch( canPlaceResult ) {
                 case CanPlaceResult.Allowed:
-                    //after 10s, revert effects of /DoorCheck
                     Zone[] allowed, denied;
                     if (WorldMap.Zones.CheckDetailed(coord, this, out allowed, out denied)) {
                         foreach (Zone zone in allowed) {
-                            if (zone.Name.StartsWith("Door_")) {
-                                RevertBlockNow(coord);
-                                lock (ZoneCommands.openDoorsLock) {
-                                    if (!ZoneCommands.openDoors.Contains(zone)) {
-                                        ZoneCommands.openDoor(zone, this);
-                                        ZoneCommands.openDoors.Add(zone);
-                                    }
-                                }
-                                break;
-                            }
+                            if (SpecialZone.CheckZone(this, zone, coord)) return false;
                         }
                     }
 
@@ -1266,75 +1256,13 @@ namespace fCraft {
                 case CanPlaceResult.ZoneDenied:
                     Zone deniedZone = WorldMap.Zones.FindDenied( coord, this );
                     if (deniedZone != null) {
-                        if (deniedZone.Name.ToLower().StartsWith("sign_") && deniedZone.Bounds.Volume == 1) {
-                            if (deniedZone.Sign == null) {
-                                FileInfo SignInfo = new FileInfo("./signs/" + World.Name + "/" + deniedZone.Name + ".txt");
-                                String[] SignList2 = null;
-                                if (SignList2 != null && (DateTime.UtcNow - LastZoneNotification).Seconds > SignList2.Length) {
-                                    goto revert;
-                                }
-                                if (SignInfo.Exists) {
-                                    SignList2 = File.ReadAllLines("./signs/" + World.Name + "/" + deniedZone.Name + ".txt");
-                                    string SignMessage = "";
-                                    foreach (string line in SignList2) {
-                                        SignMessage += line + "&n";
-                                    }
-                                    Message(SignMessage);
-                                    LastZoneNotification = DateTime.Now;
-                                    Logger.Log(LogType.Debug, "[Signs] {0} clicked on sign [{1}] On map [{2}]", Name, deniedZone.Name, World.Name);
-                                    LastSignClicked = deniedZone.Name;
-                                }
-                                    //else Message("&WSignFile for this signpost not found!&n.Looking For: &s./signs/" + World.Name + "/" + deniedZone.Name + "&w.");
-                                else {
-                                    Message("&WThis zone, {0}&W,  is marked as a signpost, but no text is added to the sign!", deniedZone.ClassyName);
-                                    Logger.Log(LogType.Debug, "[Signs] {0} clicked on an empty sign [{1}] On map: [{2}]", Name, deniedZone.Name, World.Name);
-                                    LastSignClicked = deniedZone.Name;
-                                }
-                            } else {
-                                Message("&WThis zone, {0}&W,  is marked as a signpost, but no text is added to the sign!", deniedZone.ClassyName);
-                                Logger.Log(LogType.Debug, "[Signs] {0} clicked on an empty sign [{1}] On map: [{2}]", Name, deniedZone.Name, World.Name);
-                                LastSignClicked = deniedZone.Name;
-                            }
-
-                            LastZoneNotification = DateTime.UtcNow;
-                        } else if ((deniedZone.Name.ToLower().StartsWith("command_") || deniedZone.Name.ToLower().StartsWith("c_command_")) && deniedZone.Bounds.Height == 1 && deniedZone.Bounds.Length == 1 && deniedZone.Bounds.Width == 1) {
-                            if (deniedZone.Sign == null) {
-                                FileInfo SignInfo = new FileInfo("./signs/" + World.Name + "/" + deniedZone.Name + ".txt");
-                                if (IsCommandBlockRunnin || (SignList != null && (DateTime.UtcNow - LastZoneNotification).Seconds > SignList.Length)) {
-                                    goto revert;
-                                }
-                                if (SignInfo.Exists) {
-                                    SignList = File.ReadAllLines("./signs/" + World.Name + "/" + deniedZone.Name + ".txt");
-                                    if (SignList.Length >= 1) {
-                                        if (!deniedZone.Name.ToLower().StartsWith("c_command_")) {
-                                            Scheduler.NewTask(CommandBlock).RunRepeating(new TimeSpan(0, 0, 0), new TimeSpan(0, 0, 1), SignList.Length);
-                                        } else {
-                                            Scheduler.NewTask(CommandBlock).RunRepeating(new TimeSpan(0, 0, 0), new TimeSpan(0, 0, 0, 0, 1), SignList.Length);
-                                        }
-                                    }
-                                    Logger.Log(LogType.Debug, "[Signs] {0} clicked on command block [{1}] On map [{2}]", Name, deniedZone.Name, World.Name);
-                                    LastSignClicked = deniedZone.Name;
-                                }
-                                    //else Message("&WSignFile for this signpost not found!&n.Looking For: &s./signs/" + World.Name + "/" + deniedZone.Name + "&w.");
-                                else {
-                                    Message("&WThis zone, {0}&W,  is marked as a command block, but no text is added to the sign!", deniedZone.ClassyName);
-                                    Logger.Log(LogType.Debug, "[Signs] {0} clicked on an empty command block [{1}] On map: [{2}]", Name, deniedZone.Name, World.Name);
-                                    LastSignClicked = deniedZone.Name;
-                                }
-                            } else {
-                                Message("&WThis zone, {0}&W,  is marked as a command block, but no text is added to the sign!", deniedZone.ClassyName);
-                                Logger.Log(LogType.Debug, "[Signs] {0} clicked on an empty command block [{1}] On map: [{2}]", Name, deniedZone.Name, World.Name);
-                                LastSignClicked = deniedZone.Name;
-                            }
-                            LastZoneNotification = DateTime.UtcNow;
-                        } else if (deniedZone.Name.ToLower() == "spawn") {
+                        if (deniedZone.Name.ToLower() == "spawn")
                             Message("&WThis is the Spawn zone. To build, please exit the spawn.", deniedZone.Name);
-                        } else
+                        else
                             Message("&WYou are not allowed to build in zone \"{0}\".", deniedZone.Name);
                     } else {
                         Message("&WYou are not allowed to build here.");
                     }
-            revert:
                     RevertBlockNow( coord );
                     break;
 
@@ -1345,40 +1273,9 @@ namespace fCraft {
                 case CanPlaceResult.PluginDenied:
                     RevertBlockNow( coord );
                     break;
-
-                //case CanPlaceResult.PluginDeniedNoUpdate:
-                //    break;
             }
             return false;
         }
-        // removes announcements
-        void CommandBlock(SchedulerTask task) {
-            IsCommandBlockRunnin = true;
-            if (SignList[signspot] != null) {
-                if (task.Interval == new TimeSpan(0, 0, 0, 0, 1)) {
-                    try {
-                        Player.Console.ParseMessage(SignList[signspot], true);
-                    } catch (Exception ex) {
-                        Logger.Log(LogType.Error, ex.ToString());
-                    }
-                } else {
-                    try {
-                        ParseMessage(SignList[signspot], false);
-                    } catch (Exception ex) {
-                        Message("Command produces error: \"" + SignList[signspot] + "\"");
-                        Logger.Log(LogType.Error, ex.ToString());
-                    }
-                }
-            }
-            LastZoneNotification = DateTime.UtcNow;
-            signspot++;
-            if (signspot >= SignList.Length) {
-                SignList = null;
-                signspot = 0;
-                IsCommandBlockRunnin = false;
-            }
-        }
-        
 
         // returns true if the player is spamming and should be kicked.
         bool CheckBlockSpam() {
