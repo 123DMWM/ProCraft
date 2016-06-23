@@ -4,7 +4,7 @@ using System.IO;
 using JetBrains.Annotations;
 
 namespace fCraft {
-    public static class SpecialZone {
+    public static partial class SpecialZone {
 
         public const string Door = "Door_";
         public const string Sign = "Sign_";
@@ -16,7 +16,7 @@ namespace fCraft {
                 name.StartsWith(Command) || name.StartsWith(ConsoleCommand);
         }
         
-        internal static bool CheckZone(Player p, Zone zone, Vector3I coord) {
+        internal static bool CheckAffectZone(Player p, Zone zone, Vector3I coord) {
             if (zone.Name.StartsWith(Door)) {
                 p.RevertBlockNow(coord);
                 HandleDoor(p, zone); return true;

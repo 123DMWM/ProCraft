@@ -422,69 +422,9 @@ namespace fCraft {
             if (rotChanged) ResetIdleTimer();
 
             bool deniedzone = false;
-
-            #region special zones
             foreach (Zone zone in World.Map.Zones.Cache) {
-                #region DenyLower
-                if (zone.Name.ToLower().StartsWith("deny_")) {
-                    if (!zone.Controller.Check(Info) || zone.Controller.MinRank >= Info.Rank) {
-                        if (!zone.Bounds.Contains(lastValidPosition.X / 32, lastValidPosition.Y / 32, (lastValidPosition.Z - 32) / 32)) {
-                            lastValidPosition = Position;
-                        }
-                        if (zone.Bounds.Contains(newPos.X / 32, newPos.Y / 32, (newPos.Z - 32) / 32)) {
-                            deniedzone = true;
-                            if (zone.Controller.MinRank.NextRankUp != null) {
-                                sendZoneMessage(zone, "&WYou must be atleast rank " + zone.Controller.MinRank.NextRankUp.Name + "&w to enter this area.");
-                            } else {
-                                sendZoneMessage(zone, "&WNo rank may enter this area.");
-                            }
-                            SendNow(Packet.MakeSelfTeleport(lastValidPosition));
-                            break;
-                        }
-                    }
-                }
-                #endregion
-                #region Message
-                if (zone.Name.ToLower().StartsWith("text_")) {
-                    if (!zone.Controller.Check(Info) || zone.Controller.MinRank >= Info.Rank) {
-                        if (zone.Bounds.Contains(newPos.X / 32, newPos.Y / 32, (newPos.Z - 32) / 32)) {
-                            sendZoneMessage(zone, "&WThis zone is marked as a text area, but no text is added to the message!");
-                            break;
-                        }
-                    }
-                }
-                #endregion
-                #region RespawnLower
-                if (zone.Name.ToLower().StartsWith("respawn_")) {
-                    if (!zone.Controller.Check(Info) || zone.Controller.MinRank >= Info.Rank) {
-                        if (zone.Bounds.Contains(newPos.X / 32, newPos.Y / 32, (newPos.Z - 32) / 32)) {
-                            sendZoneMessage(zone, "&WRespawned!");
-                            TeleportTo(WorldMap.getSpawnIfRandom());
-                            break;
-                        }
-                    }
-                }
-                #endregion
-                #region CheckPoint
-                if (zone.Name.ToLower().StartsWith("checkpoint_") && Info.CheckPoint != new Position(((zone.Bounds.XMin + zone.Bounds.XMax) / 2) * 32 + 16, ((zone.Bounds.YMin + zone.Bounds.YMax) / 2) * 32 + 16, ((zone.Bounds.ZMin + zone.Bounds.ZMax) / 2) * 32 + 64)) {
-                    if (zone.Bounds.Contains(newPos.X / 32, newPos.Y / 32, (newPos.Z - 32) / 32)) {
-                        sendZoneMessage(zone, "&aCheckPoint &sreached! This is now your respawn point.");
-                        Info.CheckPoint = new Position(((zone.Bounds.XMin + zone.Bounds.XMax) / 2) * 32 + 16, ((zone.Bounds.YMin + zone.Bounds.YMax) / 2) * 32 + 16, ((zone.Bounds.ZMin + zone.Bounds.ZMax) / 2) * 32 + 64);
-                        break;
-                    }
-                }
-                #endregion
-                #region Death
-                if (zone.Name.ToLower().StartsWith("death_")) {
-                    if (zone.Bounds.Contains(newPos.X / 32, newPos.Y / 32, (newPos.Z - 32) / 32)) {
-                        sendZoneMessage(zone, "&WYou Died!");
-                        TeleportTo(Info.CheckPoint != new Position(-1, -1, -1) ? Info.CheckPoint : WorldMap.Spawn);
-                        break;
-                    }
-                }
-                #endregion
+            	if (SpecialZone.CheckMoveZone(this, zone, ref deniedzone, newPos)) break;
             }
-            #endregion
 
             if ( Info.IsFrozen || deniedzone) {
                 // special handling for frozen players
@@ -1984,9 +1924,7 @@ namespace fCraft {
             public bool SkippedLastMove;
         }
 
-
-        Position lastValidPosition; // used in speedhack detection
-
+        internal Position lastValidPosition; // used in speedhack detection
 
         bool DetectMovementPacketSpam() {
             if( antiSpeedPacketLog.Count >= AntiSpeedMaxPacketCount ) {

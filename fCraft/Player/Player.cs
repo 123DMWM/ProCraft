@@ -1182,7 +1182,7 @@ namespace fCraft {
                     Zone[] allowed, denied;
                     if (WorldMap.Zones.CheckDetailed(coord, this, out allowed, out denied)) {
                         foreach (Zone zone in allowed) {
-                            if (SpecialZone.CheckZone(this, zone, coord)) return false;
+                            if (SpecialZone.CheckAffectZone(this, zone, coord)) return false;
                         }
                     }
 

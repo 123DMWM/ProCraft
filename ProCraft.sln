@@ -1,9 +1,18 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
+# Visual Studio 2012
+# SharpDevelop 4.4
 VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{300DF2F8-0CD5-4DDD-BAC9-4367E23B5264}"
+	ProjectSection(SolutionItems) = postProject
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapRenderer", "MapRenderer\MapRenderer.csproj", "{52922C22-50A7-4E5D-8020-C5B0571B0F74}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapConverter", "MapConverter\MapConverter.csproj", "{A5DA5B53-2047-40DE-9504-29B6EF4BE5B6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HeartbeatSaver", "HeartbeatSaver\HeartbeatSaver.csproj", "{F289060F-A463-48B7-BDCC-1D51D89B23C9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fCraft", "fCraft\fCraft.csproj", "{7FBE7809-6F77-415C-ABEB-A3F627E817B0}"
 EndProject
@@ -14,12 +23,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerCLI", "ServerCLI\ServerCLI.csproj", "{315FB33C-6C57-4A89-ABFB-C083F2015880}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fCraftGUI", "fCraftGUI\fCraftGUI.csproj", "{AFAEE6CC-8B4F-40CD-9623-7FFDC8E52222}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapRenderer", "MapRenderer\MapRenderer.csproj", "{52922C22-50A7-4E5D-8020-C5B0571B0F74}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapConverter", "MapConverter\MapConverter.csproj", "{A5DA5B53-2047-40DE-9504-29B6EF4BE5B6}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HeartbeatSaver", "HeartbeatSaver\HeartbeatSaver.csproj", "{F289060F-A463-48B7-BDCC-1D51D89B23C9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
