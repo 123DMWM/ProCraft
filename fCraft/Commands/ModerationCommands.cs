@@ -1436,9 +1436,9 @@ namespace fCraft {
                         player.MessageNoZone(zoneName);
                         return;
                     }
-                    int zoneX = (zone.Bounds.XMin + zone.Bounds.XMax)/2;
-                    int zoneY = (zone.Bounds.YMin + zone.Bounds.YMax)/2;
-                    int zoneZ = (zone.Bounds.ZMin + zone.Bounds.ZMax)/2;
+                    int zoneX = zone.Bounds.XCentre;
+                    int zoneY = zone.Bounds.YCentre;
+                    int zoneZ = zone.Bounds.ZCentre;
                     retry2:
                     if (player.World.map.GetBlock(zoneX, zoneY, zoneZ - 1) == Block.Air) {
                         zoneZ = zoneZ - 1;

@@ -12,6 +12,10 @@ namespace fCraft {
         public static readonly BoundingBox Empty = new BoundingBox(0, 0, 0, 0, 0, 0);
 
         public int XMin, YMin, ZMin, XMax, YMax, ZMax;
+        
+        public int XCentre { get { return (XMin + XMax) / 2; } }
+        public int YCentre { get { return (YMin + YMax) / 2; } }
+        public int ZCentre { get { return (ZMin + ZMax) / 2; } }
 
 
         /// <summary> Constructs a bounding box using two vectors as opposite corners. </summary>

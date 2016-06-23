@@ -936,112 +936,86 @@ namespace fCraft {
             Handler = CenterHandler
         };
 
-        private static void CenterHandler(Player player, CommandReader cmd)
-        {
+        private static void CenterHandler(Player player, CommandReader cmd) {
             player.SelectionStart(2, CenterCallback, null, CdCenter.Permissions);
             player.Message("Center: Place a block or type /Mark to use your location.");
         }
 
-        private static void CenterCallback(Player player, Vector3I[] marks, object tag)
-        {
-            if (player.LastUsedBlockType != Block.None)
-            {
-                int sx = Math.Min(marks[0].X, marks[1].X), ex = Math.Max(marks[0].X, marks[1].X),
-                sy = Math.Min(marks[0].Y, marks[1].Y), ey = Math.Max(marks[0].Y, marks[1].Y),
-                sz = Math.Min(marks[0].Z, marks[1].Z), ez = Math.Max(marks[0].Z, marks[1].Z);
-
-                BoundingBox bounds = new BoundingBox(sx, sy, sz, ex, ey, ez);
-                int blocksDrawn = 0,
-                blocksSkipped = 0;
-                UndoState undoState = player.DrawBegin(null);
-
-                World playerWorld = player.World;
-                if (playerWorld == null)
-                    PlayerOpException.ThrowNoWorld(player);
-                Map map = player.WorldMap;
-                if (((bounds.XMin + bounds.XMax) % 2) == 1)
-                {
-                    Vector3I cPos = new Vector3I(((bounds.XMin + bounds.XMax) / 2) + 1,
-                    (bounds.YMin + bounds.YMax) / 2,
-                    (bounds.ZMin + bounds.ZMax) / 2);
-
-                    DrawOneBlock(player, player.World.Map, player.LastUsedBlockType, cPos,
-                              BlockChangeContext.Drawn,
-                              ref blocksDrawn, ref blocksSkipped, undoState);
-                }
-                if (((bounds.XMin + bounds.XMax) % 2) == 1 && ((bounds.YMin + bounds.YMax) % 2) == 1)
-                {
-                    Vector3I cPos = new Vector3I(((bounds.XMin + bounds.XMax) / 2) + 1,
-                    ((bounds.YMin + bounds.YMax) / 2) + 1,
-                    (bounds.ZMin + bounds.ZMax) / 2);
-
-                    DrawOneBlock(player, player.World.Map, player.LastUsedBlockType, cPos,
-                              BlockChangeContext.Drawn,
-                              ref blocksDrawn, ref blocksSkipped, undoState);
-                }
-                if (((bounds.XMin + bounds.XMax) % 2) == 1 && ((bounds.ZMin + bounds.ZMax) % 2) == 1)
-                {
-                    Vector3I cPos = new Vector3I(((bounds.XMin + bounds.XMax) / 2) + 1,
-                    (bounds.YMin + bounds.YMax) / 2,
-                    ((bounds.ZMin + bounds.ZMax) / 2) + 1);
-
-                    DrawOneBlock(player, player.World.Map, player.LastUsedBlockType, cPos,
-                              BlockChangeContext.Drawn,
-                              ref blocksDrawn, ref blocksSkipped, undoState);
-                }
-                if (((bounds.XMin + bounds.XMax) % 2) == 1 && ((bounds.YMin + bounds.YMax) % 2) == 1 && ((bounds.ZMin + bounds.ZMax) % 2) == 1)
-                {
-                    Vector3I cPos = new Vector3I(((bounds.XMin + bounds.XMax) / 2) + 1,
-                    ((bounds.YMin + bounds.YMax) / 2) + 1,
-                    ((bounds.ZMin + bounds.ZMax) / 2) + 1);
-
-                    DrawOneBlock(player, player.World.Map, player.LastUsedBlockType, cPos,
-                              BlockChangeContext.Drawn,
-                              ref blocksDrawn, ref blocksSkipped, undoState);
-                }
-                if (((bounds.YMin + bounds.YMax) % 2) == 1)
-                {
-                    Vector3I cPos = new Vector3I((bounds.XMin + bounds.XMax) / 2,
-                    ((bounds.YMin + bounds.YMax) / 2) + 1,
-                    (bounds.ZMin + bounds.ZMax) / 2);
-
-                    DrawOneBlock(player, player.World.Map, player.LastUsedBlockType, cPos,
-                              BlockChangeContext.Drawn,
-                              ref blocksDrawn, ref blocksSkipped, undoState);
-                }
-                if (((bounds.YMin + bounds.YMax) % 2) == 1 && ((bounds.ZMin + bounds.ZMax) % 2) == 1)
-                {
-                    Vector3I cPos = new Vector3I((bounds.XMin + bounds.XMax) / 2,
-                    ((bounds.YMin + bounds.YMax) / 2) + 1,
-                    ((bounds.ZMin + bounds.ZMax) / 2) + 1);
-
-                    DrawOneBlock(player, player.World.Map, player.LastUsedBlockType, cPos,
-                              BlockChangeContext.Drawn,
-                              ref blocksDrawn, ref blocksSkipped, undoState);
-                }
-                if (((bounds.ZMin + bounds.ZMax) % 2) == 1)
-                {
-                    Vector3I cPos = new Vector3I((bounds.XMin + bounds.XMax) / 2,
-                    (bounds.YMin + bounds.YMax) / 2,
-                    ((bounds.ZMin + bounds.ZMax) / 2) + 1);
-
-                    DrawOneBlock(player, player.World.Map, player.LastUsedBlockType, cPos,
-                              BlockChangeContext.Drawn,
-                              ref blocksDrawn, ref blocksSkipped, undoState);
-                }
-                Vector3I cPoso = new Vector3I((bounds.XMin + bounds.XMax) / 2,
-                    (bounds.YMin + bounds.YMax) / 2,
-                    (bounds.ZMin + bounds.ZMax) / 2);
-
-                DrawOneBlock(player, player.World.Map, player.LastUsedBlockType, cPoso,
-                          BlockChangeContext.Drawn,
-                          ref blocksDrawn, ref blocksSkipped, undoState);
-                DrawingFinished(player, "Placed", blocksDrawn, blocksSkipped);
+        private static void CenterCallback(Player player, Vector3I[] marks, object tag) {
+            if (player.LastUsedBlockType == Block.None) {
+            	 player.Message("&WCannot deduce desired block. Click a block or type out the block name.");
+            	 return;
             }
-            else
+            int sx = Math.Min(marks[0].X, marks[1].X), ex = Math.Max(marks[0].X, marks[1].X),
+            sy = Math.Min(marks[0].Y, marks[1].Y), ey = Math.Max(marks[0].Y, marks[1].Y),
+            sz = Math.Min(marks[0].Z, marks[1].Z), ez = Math.Max(marks[0].Z, marks[1].Z);
+
+            BoundingBox bounds = new BoundingBox(sx, sy, sz, ex, ey, ez);
+            int blocksDrawn = 0,
+            blocksSkipped = 0;
+            UndoState undoState = player.DrawBegin(null);
+
+            World playerWorld = player.World;
+            if (playerWorld == null)
+                PlayerOpException.ThrowNoWorld(player);
+            
+            Map map = player.WorldMap;
+            if (((bounds.XMin + bounds.XMax) % 2) == 1)
             {
-                player.Message("&WCannot deduce desired block. Click a block or type out the block name.");
+                Vector3I cPos = new Vector3I(bounds.XCentre + 1, bounds.YCentre, bounds.ZCentre);
+                DrawOneBlock(player, player.World.Map, player.LastUsedBlockType, cPos,
+                             BlockChangeContext.Drawn,
+                             ref blocksDrawn, ref blocksSkipped, undoState);
             }
+            if (((bounds.XMin + bounds.XMax) % 2) == 1 && ((bounds.YMin + bounds.YMax) % 2) == 1)
+            {
+                Vector3I cPos = new Vector3I(bounds.XCentre + 1, bounds.YCentre + 1, bounds.ZCentre);
+                DrawOneBlock(player, player.World.Map, player.LastUsedBlockType, cPos,
+                             BlockChangeContext.Drawn,
+                             ref blocksDrawn, ref blocksSkipped, undoState);
+            }
+            if (((bounds.XMin + bounds.XMax) % 2) == 1 && ((bounds.ZMin + bounds.ZMax) % 2) == 1)
+            {
+                Vector3I cPos = new Vector3I(bounds.XCentre + 1, bounds.YCentre, bounds.ZCentre + 1);
+                DrawOneBlock(player, player.World.Map, player.LastUsedBlockType, cPos,
+                             BlockChangeContext.Drawn,
+                             ref blocksDrawn, ref blocksSkipped, undoState);
+            }
+            if (((bounds.XMin + bounds.XMax) % 2) == 1 && ((bounds.YMin + bounds.YMax) % 2) == 1 && ((bounds.ZMin + bounds.ZMax) % 2) == 1)
+            {
+                Vector3I cPos = new Vector3I(bounds.XCentre + 1, bounds.YCentre + 1, bounds.ZCentre + 1);
+                DrawOneBlock(player, player.World.Map, player.LastUsedBlockType, cPos,
+                             BlockChangeContext.Drawn,
+                             ref blocksDrawn, ref blocksSkipped, undoState);
+            }
+            if (((bounds.YMin + bounds.YMax) % 2) == 1)
+            {
+                Vector3I cPos = new Vector3I(bounds.XCentre, bounds.YCentre + 1, bounds.ZCentre);
+                DrawOneBlock(player, player.World.Map, player.LastUsedBlockType, cPos,
+                             BlockChangeContext.Drawn,
+                             ref blocksDrawn, ref blocksSkipped, undoState);
+            }
+            if (((bounds.YMin + bounds.YMax) % 2) == 1 && ((bounds.ZMin + bounds.ZMax) % 2) == 1)
+            {
+                Vector3I cPos = new Vector3I(bounds.XCentre, bounds.YCentre + 1, bounds.ZCentre + 1);
+                DrawOneBlock(player, player.World.Map, player.LastUsedBlockType, cPos,
+                             BlockChangeContext.Drawn,
+                             ref blocksDrawn, ref blocksSkipped, undoState);
+            }
+            if (((bounds.ZMin + bounds.ZMax) % 2) == 1)
+            {
+                Vector3I cPos = new Vector3I(bounds.XCentre, bounds.YCentre, bounds.ZCentre + 1);
+
+                DrawOneBlock(player, player.World.Map, player.LastUsedBlockType, cPos,
+                             BlockChangeContext.Drawn,
+                             ref blocksDrawn, ref blocksSkipped, undoState);
+            }
+            
+            Vector3I cPoso = new Vector3I(bounds.XCentre, bounds.YCentre, bounds.ZCentre);
+            DrawOneBlock(player, player.World.Map, player.LastUsedBlockType, cPoso,
+                         BlockChangeContext.Drawn,
+                         ref blocksDrawn, ref blocksSkipped, undoState);
+            DrawingFinished(player, "Placed", blocksDrawn, blocksSkipped);
         }
         #endregion
         #region Fill
