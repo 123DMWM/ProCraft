@@ -156,7 +156,7 @@ namespace fCraft {
                 Zone zone = zoneListCache[i];
                 if( !zone.Bounds.Contains( coords ) ) continue;
                 // want to be able to interact with special zones, even if can't affect zoned region
-                if( SpecialZone.IsSpecial( zone.Name ) ) return PermissionOverride.Allow;
+                if( SpecialZone.IsSpecialAffect( zone.Name ) ) return PermissionOverride.Allow;
                    
                 if( zone.Controller.Check( player.Info ) ) {
                     result = PermissionOverride.Allow;
@@ -189,7 +189,7 @@ namespace fCraft {
                 if( !zone.Bounds.Contains( coords ) ) continue;
                 
                 found = true;
-                if( SpecialZone.IsSpecial( zone.Name ) ) {
+                if( SpecialZone.IsSpecialAffect( zone.Name ) ) {
                     allowedList.Add( zone );
                 } else if( zone.Controller.Check( player.Info ) ) {
                     allowedList.Add( zone );

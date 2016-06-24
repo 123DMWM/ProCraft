@@ -5,16 +5,6 @@ using JetBrains.Annotations;
 
 namespace fCraft {
     public static partial class SpecialZone {
-
-        public const string Door = "Door_";
-        public const string Sign = "Sign_";
-        public const string Command = "command_";
-        public const string ConsoleCommand = "c_command_";
-        
-        public static bool IsSpecial(string name) {
-            return name.StartsWith(Door) || name.StartsWith(Sign) ||
-                name.StartsWith(Command) || name.StartsWith(ConsoleCommand);
-        }
         
         internal static bool CheckAffectZone(Player p, Zone zone, Vector3I coord) {
             if (zone.Name.StartsWith(Door)) {

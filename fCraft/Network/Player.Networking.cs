@@ -474,22 +474,6 @@ namespace fCraft {
             RaisePlayerMovedEvent( this, oldPos );
         }
 
-        public void sendZoneMessage(Zone zone, string backup) {
-            FileInfo SignInfo = new FileInfo("./signs/" + World.Name + "/" + zone.Name + ".txt");
-            string SignMessage = null;
-            if (SignInfo.Exists) {
-                string[] SignList = File.ReadAllLines("./signs/" + World.Name + "/" + zone.Name + ".txt");
-                foreach (string line in SignList) {
-                    SignMessage += line + "&n";
-                }
-            }
-            if ((DateTime.UtcNow - LastZoneNotification).Seconds > 2) {
-                Message(SignMessage ?? backup);
-                LastZoneNotification = DateTime.UtcNow;
-            }
-        }
-
-
         void ProcessSetBlockPacket() {
             BytesReceived += 9;
             if( World == null || World.Map == null ) return;

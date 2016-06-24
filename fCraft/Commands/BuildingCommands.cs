@@ -1005,7 +1005,6 @@ namespace fCraft {
             if (((bounds.ZMin + bounds.ZMax) % 2) == 1)
             {
                 Vector3I cPos = new Vector3I(bounds.XCentre, bounds.YCentre, bounds.ZCentre + 1);
-
                 DrawOneBlock(player, player.World.Map, player.LastUsedBlockType, cPos,
                              BlockChangeContext.Drawn,
                              ref blocksDrawn, ref blocksSkipped, undoState);

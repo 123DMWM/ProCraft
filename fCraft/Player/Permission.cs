@@ -149,8 +149,8 @@ namespace fCraft {
         /// renaming, and removing zones. </summary>
         ManageZones,
 
-        /// <summary> Ability to manipulate zones: adding, editing,
-        /// renaming, and removing zones. </summary>
+        /// <summary> Ability to manipulate speical zones (signs/text/checkpoints etc)
+        /// : adding, editing, renaming, and removing special zones. </summary>
         ManageSpecialZones,
 
         /// <summary> Ability to manipulate the world list:
