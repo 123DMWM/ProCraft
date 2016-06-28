@@ -1936,7 +1936,7 @@ namespace fCraft {
             if (player.Can(Permission.ViewOthersInfo)) {
                 player.Message("  Did they read the rules: &f{0}", info.HasRTR.ToString());
                 player.Message("  Can they see IRC chat: &f{0}", info.ReadIRC.ToString());
-                if (info.LastWorld != "" && info.LastWorldPos != "") {
+                if (!string.IsNullOrEmpty(info.LastWorld) && !string.IsNullOrEmpty(info.LastWorldPos)) {
                     player.Message("  Last block action...");
                     player.Message("    On world: &f{0}", info.LastWorld);
                     player.Message("    Player Position...");
@@ -1944,7 +1944,7 @@ namespace fCraft {
                     player.Message("    (Use &h/TPP X Y Z R L&s)");
                 }
             }
-            if (target != null)
+            if (target != null && target.PingList.Any())
                 player.Message("  Ping: {0}ms Avg: {1}ms", target.PingList[9], target.PingList.Average());
         }
 
