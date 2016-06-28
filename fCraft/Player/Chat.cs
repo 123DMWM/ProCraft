@@ -8,15 +8,19 @@ using fCraft.Events;
 using JetBrains.Annotations;
 using System.IO;
 using Microsoft.SqlServer.Server;
+using System.Net;
 
 namespace fCraft {
     /// <summary> Helper class for handling player-generated chat. </summary>
     public static class Chat
     {
         static readonly Regex RegexIPMatcher = new Regex(@"\d{1,3}(\.\d{1,3}){3}(:?(\d{0,5})?)");
+        // Regex pattern courtesy of Matthew O'Riordan, updated by Matvei Stefarov
+        static readonly Regex RegexURLMatcher = new Regex("\\(?(?:(?:[a-z]{2,9}:(?:\\/\\/)?)(?:[\\-;:&=\\+\\$,\\w]+@)?[a-z0-9\\-]+(?:\\.[a-z0-9\\-]+)+|www\\.[a-z0-9\\-]+(?:\\.[a-z0-9\\-]+)+)(?::\\d{1,5})?(?:\\/[\\+~%\\/\\.\\w\\-\\(\\)]*)?(?:\\?[\\-\\+=&;%@\\.\\w]*)?(?:#\\S*)?", RegexOptions.IgnoreCase);
         public static char newPlayerPrefix = '+';
         #region Reports
         public static List<Report> Reports = new List<Report>();
+        public static List<string> fullUrls = new List<string>();
 
         /// <summary>
         /// Saves the report to be read by the owner with /reports
@@ -102,13 +106,43 @@ namespace fCraft {
 
 
             if (!SendInternal(e)) return false;
-            rawMessage = Color.StripColors(rawMessage);
 
+            Scheduler.NewTask(t => getUrls(rawMessage)).RunOnce();
+
+            rawMessage = Color.StripColors(rawMessage);
             checkBotResponses(player, rawMessage);
 
             Logger.Log(LogType.GlobalChat,
                         "(global){0}: {1}", player.Info.Rank.Color + player.Name + Color.White, rawMessage);
             return true;
+        }
+
+        static void getUrls(string rawMessage) {
+            fullUrls.Clear();
+            try {
+                MatchCollection urlMatches = RegexURLMatcher.Matches(rawMessage);
+                foreach (Match match in urlMatches) {
+
+                    var request = (HttpWebRequest)WebRequest.Create("http://123dmwm.tk/unshorten.php?url=" + match.ToString());
+                    string fullUrl = null;
+                    using (var response = (HttpWebResponse)request.GetResponse()) {
+                        var encoding = Encoding.GetEncoding(response.CharacterSet);
+
+                        using (var responseStream = response.GetResponseStream())
+                        using (var reader = new StreamReader(responseStream, encoding))
+                        fullUrl = reader.ReadToEnd();
+                    }
+                    if (!fullUrl.ToLower().Contains(match.ToString().ToLower()) && !match.ToString().ToLower().Contains(fullUrl.ToLower())) {
+                        fullUrls.Add(fullUrl);
+                    }
+                }
+                if (fullUrls.Any()) {
+                    Server.BotMessage("Full Urls: " + fullUrls.JoinToString(" - "));
+                }
+            } catch (Exception ex) {
+                Logger.Log(LogType.Error, "Unshorterner website may be down or you are not connected to the internet!");
+                Logger.Log(LogType.Debug, ex.ToString());
+            }
         }
 
         static readonly char[] RainbowChars = { 'c', '4', '6', 'e', 'a', '2', 'b', '3', '9', '1', 'd', '5' };
