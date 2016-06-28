@@ -1115,8 +1115,8 @@ namespace fCraft {
             Aliases = new[] { "EnvPresets", "EnvP" },
             Category = CommandCategory.CPE | CommandCategory.World,
             Permissions = new[] { Permission.ManageWorlds },
-            Help = "Environment preset commands" +
-                   "Options are: Delete, Edit, Info, List, Load, Save" +
+            Help = "Environment preset commands&n" +
+                   "Options are: Delete, Edit, Info, List, Load, Save&n" +
                    "See &H/Help EnvPreset <option>&S for details about each variable. ",
             HelpSections = new Dictionary<string, string>{
                 { "save",   "&H/EnvPreset Save <PresetName> &n&S" +
