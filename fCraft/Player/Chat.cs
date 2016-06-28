@@ -122,22 +122,23 @@ namespace fCraft {
             try {
                 MatchCollection urlMatches = RegexURLMatcher.Matches(rawMessage);
                 foreach (Match match in urlMatches) {
+                    if (fullUrls.Count() < 3) {
+                        var request = (HttpWebRequest)WebRequest.Create("http://123dmwm.tk/unshorten.php?url=" + match.ToString());
+                        string fullUrl = null;
+                        using (var response = (HttpWebResponse)request.GetResponse()) {
+                            var encoding = Encoding.GetEncoding(response.CharacterSet);
 
-                    var request = (HttpWebRequest)WebRequest.Create("http://123dmwm.tk/unshorten.php?url=" + match.ToString());
-                    string fullUrl = null;
-                    using (var response = (HttpWebResponse)request.GetResponse()) {
-                        var encoding = Encoding.GetEncoding(response.CharacterSet);
-
-                        using (var responseStream = response.GetResponseStream())
-                        using (var reader = new StreamReader(responseStream, encoding))
-                        fullUrl = reader.ReadToEnd();
-                    }
-                    if (!fullUrl.ToLower().Contains(match.ToString().ToLower()) && !match.ToString().ToLower().Contains(fullUrl.ToLower())) {
-                        fullUrls.Add(fullUrl);
+                            using (var responseStream = response.GetResponseStream())
+                            using (var reader = new StreamReader(responseStream, encoding))
+                                fullUrl = reader.ReadToEnd();
+                        }
+                        if (!fullUrl.ToLower().Contains(match.ToString().ToLower()) && !match.ToString().ToLower().Contains(fullUrl.ToLower())) {
+                            fullUrls.Add(fullUrl);
+                        }
                     }
                 }
                 if (fullUrls.Any()) {
-                    Server.BotMessage("Full Urls: " + fullUrls.JoinToString(" - "));
+                    Server.BotMessage("Full Url{0}: {1}", fullUrls.Count() > 1 ? "s" : "" ,fullUrls.JoinToString(" - "));
                 }
             } catch (Exception ex) {
                 Logger.Log(LogType.Error, "Unshorterner website may be down or you are not connected to the internet!");
