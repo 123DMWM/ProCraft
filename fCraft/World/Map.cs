@@ -796,36 +796,24 @@ namespace fCraft {
             BlockNames["ladder"] = Block.Rope;
 
             BlockNames["sandstone"] = Block.Sandstone;
-
             BlockNames["snow"] = Block.Snow;
-
             BlockNames["fire"] = Block.Fire;
-
             BlockNames["lightpink"] = Block.LightPink;
-
+            BlockNames["forestgreen"] = Block.DarkGreen;
             BlockNames["darkgreen"] = Block.DarkGreen;
-
             BlockNames["brown"] = Block.Brown;
-
             BlockNames["darkblue"] = Block.DarkBlue;
-
+            BlockNames["deepblue"] = Block.DarkBlue;
             BlockNames["turquoise"] = Block.Turquoise;
             BlockNames["turq"] = Block.Turquoise;
-
             BlockNames["ice"] = Block.Ice;
-
             BlockNames["tile"] = Block.Tile;
-
             BlockNames["magma"] = Block.Magma;
-
             BlockNames["pillar"] = Block.Pillar;
-
             BlockNames["crate"] = Block.Crate;
-
             BlockNames["stonebrick"] = Block.StoneBrick;
-
+            
             BlockNames["hot_lava"] = Block.StillLava;
-
             BlockNames["cold_water"] = Block.StillWater;
         }
 
