@@ -64,7 +64,7 @@ namespace fCraft.Portals {
             try {
                 // Player can use portals again
                 e.Player.CanUsePortal = true;
-                e.Player.LastUsedPortal = DateTime.Now;
+                e.Player.LastUsedPortal = DateTime.UtcNow;
             } catch (Exception ex) {
                 Logger.Log(LogType.Error, "PortalHandler.Player_JoinedWorld: " + ex);
             }
@@ -100,10 +100,10 @@ namespace fCraft.Portals {
                             if ((e.OldPosition.X != e.NewPosition.X) || (e.OldPosition.Y != e.NewPosition.Y) || (e.OldPosition.Z != (e.NewPosition.Z))) {
                                 if (e.Player.Can(Permission.Chat)) {
                                     if (PortalHandler.GetInstance().GetPortal(e.Player) != null && !e.Player.StandingInPortal) {
-                                        if (e.Player.LastUsedPortal != null && (DateTime.Now - e.Player.LastUsedPortal).TotalSeconds < 5) {
+                                        if ((DateTime.UtcNow - e.Player.LastUsedPortal).TotalSeconds < 5) {
                                             // To prevent portal loops
-                                            if (e.Player.LastWarnedPortal == null || (DateTime.Now - e.Player.LastWarnedPortal).TotalSeconds > 2) {
-                                                e.Player.LastWarnedPortal = DateTime.Now;
+                                            if ((DateTime.UtcNow - e.Player.LastWarnedPortal).TotalSeconds > 2) {
+                                                e.Player.LastWarnedPortal = DateTime.UtcNow;
                                                 e.Player.Message("You can not use portals within 5 seconds of joining a world.");
                                             }
 
@@ -136,15 +136,15 @@ namespace fCraft.Portals {
                                                     break;
 
                                                 case SecurityCheckResult.BlackListed:
-                                                    if (e.Player.LastWarnedPortal == null || (DateTime.Now - e.Player.LastWarnedPortal).TotalSeconds < 2) {
-                                                        e.Player.LastWarnedPortal = DateTime.Now;
+                                                    if ((DateTime.UtcNow - e.Player.LastWarnedPortal).TotalSeconds < 2) {
+                                                        e.Player.LastWarnedPortal = DateTime.UtcNow;
                                                         e.Player.Message("Cannot join world {0}&S: you are blacklisted.",
                                                             world.ClassyName);
                                                     }
                                                     break;
                                                 case SecurityCheckResult.RankTooLow:
-                                                    if (e.Player.LastWarnedPortal == null || (DateTime.Now - e.Player.LastWarnedPortal).TotalSeconds > 2) {
-                                                        e.Player.LastWarnedPortal = DateTime.Now;
+                                                    if ((DateTime.UtcNow - e.Player.LastWarnedPortal).TotalSeconds > 2) {
+                                                        e.Player.LastWarnedPortal = DateTime.UtcNow;
                                                         e.Player.Message("Cannot join world {0}&S: must be {1}+",
                                                                      world.ClassyName, world.AccessSecurity.MinRank.ClassyName);
                                                     }
