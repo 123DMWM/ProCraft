@@ -178,17 +178,22 @@ namespace fCraft {
 
 		[NotNull]
 		public static string ToMiniString(this TimeSpan span) {
+			bool negate = span.TotalSeconds < 0;
+			string value = "";
+			if (negate) span = -span;
+			
 			if (span.TotalSeconds < 60) {
-				return String.Format("{0}s", span.Seconds);
+				value = String.Format("{0}s", span.Seconds);
 			} else if (span.TotalMinutes < 60) {
-				return String.Format("{0}m{1}s", span.Minutes, span.Seconds);
+				value = String.Format("{0}m{1}s", span.Minutes, span.Seconds);
 			} else if (span.TotalHours < 48) {
-				return String.Format("{0}h{1}m", (int)Math.Floor(span.TotalHours), span.Minutes);
+				value = String.Format("{0}h{1}m", (int)Math.Floor(span.TotalHours), span.Minutes);
 			} else if (span.TotalDays < 15) {
-				return String.Format("{0}d{1}h", span.Days, span.Hours);
+				value = String.Format("{0}d{1}h", span.Days, span.Hours);
 			} else {
-				return String.Format("{0:0}w{1:0}d", Math.Floor(span.TotalDays / 7), Math.Floor(span.TotalDays) % 7);
+				value = String.Format("{0:0}w{1:0}d", Math.Floor(span.TotalDays / 7), Math.Floor(span.TotalDays) % 7);
 			}
+			return negate ? "-" + value : value;
 		}
 
 

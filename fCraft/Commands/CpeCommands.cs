@@ -406,7 +406,7 @@ namespace fCraft {
                 Block block;
                 if (byte.TryParse(model, out blockId)) {
                 } else if (Map.GetBlockByName(model, false, out block)) {
-                    model = block.GetHashCode().ToString();
+                    model = ((byte)block).ToString();
                 } else {
                     return null;
                 }
