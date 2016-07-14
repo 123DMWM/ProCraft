@@ -23,7 +23,8 @@ namespace fCraft {
             CommandManager.RegisterCommand( CdPruneDB );
             CommandManager.RegisterCommand( CdImport );
             CommandManager.RegisterCommand( CdInfoSwap );
-            CommandManager.RegisterCommand( CdSave );
+            CommandManager.RegisterCommand(CdSave);
+            CommandManager.RegisterCommand(CdCheckUpdate); 
 
         }
         #region DumpStats
@@ -1589,6 +1590,40 @@ namespace fCraft {
                 player.Message( "InfoSwap: Stats of {0}&S and {1}&S have been swapped.",
                                 p1.ClassyName, p2.ClassyName );
             }
+        }
+        #endregion
+        #region Check Update
+        static readonly CommandDescriptor CdCheckUpdate = new CommandDescriptor {
+            Name = "Updates",
+            Category = CommandCategory.New | CommandCategory.Maintenance,
+            IsConsoleSafe = true,
+            Help = "Checks latest ProCraft release date and time",
+            Usage = "/Updates",
+            Handler = UpdatesHandler
+        };
+
+        static void UpdatesHandler(Player player, CommandReader cmd) {
+            DateTime latest = DateTime.UtcNow, current = DateTime.UtcNow;
+            current = File.GetLastWriteTime(Process.GetCurrentProcess().MainModule.FileName);
+            TimeSpan zipTime = TimeSpan.Zero, currentTime = (DateTime.Now - current);
+            try {
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://123DMWM.tk/ProCraft/ProCraft.zip?");
+                request.Method = "HEAD";
+
+                using (var resp = (HttpWebResponse)request.GetResponse()) {
+                    latest = resp.LastModified;
+                }
+                zipTime = (DateTime.Now - latest);
+                player.Message("ProCraft.zip last update (&7" + zipTime.ToMiniString() + " &Sago):");
+                player.Message("    &7" + latest.ToLongDateString() + " &Sat &7" + latest.ToLongTimeString());
+            } catch (Exception ex) {
+                Logger.Log(LogType.Debug, ex.ToString());
+                player.Message("Cannot access http://123dmwm.tk/ at the moment.");
+            }
+            player.Message("Server file last update (&7" + currentTime.ToMiniString() + " &Sago):");
+            player.Message("    &7" + current.ToLongDateString() + " &Sat &7" + current.ToLongTimeString());
+
+            player.Message("Download updated Zip here: &9http://123DMWM.tk/ProCraft/ProCraft.zip");
         }
         #endregion
     }
