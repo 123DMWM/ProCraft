@@ -1216,6 +1216,9 @@ namespace fCraft {
                 Position newSpawn = playerName.ToLower().Equals("random") ? new Position(-1, -1, -1, 0, 0) : player.Position;
                 map.Spawn = newSpawn;
                 player.TeleportTo( map.getSpawnIfRandom());
+                if (newSpawn == new Position(-1, -1, -1, 0, 0)) {
+                    player.Message("Randomized Spawn!");
+                }
                 if (player.Supports(CpeExt.ExtPlayerList2)) {
                     player.Send(Packet.MakeExtAddEntity2(Packet.SelfId, player.Info.Rank.Color + player.Name, (player.Info.skinName == "" ? player.Name : player.Info.skinName), player.Position, player));
                 } else {
@@ -2000,6 +2003,9 @@ namespace fCraft {
 					target.LastPosition = target.Position;
 				}
                 target.TeleportTo( target.WorldMap.getSpawnIfRandom());
+                if (target.WorldMap.Spawn == new Position(-1, -1, -1, 0, 0)) {
+                    player.Message("Randomized Spawn!");
+                }
                 return;
             }
 

@@ -125,11 +125,17 @@ namespace fCraft.Portals {
                                                     }
                                                     e.Player.StopSpectating();
                                                     if (portal.TeleportPosX != 0 && portal.TeleportPosY != 0 && portal.TeleportPosZ != 0) {
-                                                        e.Player.JoinWorld(WorldManager.FindWorldExact(portal.World), WorldChangeReason.Portal, portal.tpPosition());
+                                                        e.Player.JoinWorld(WorldManager.FindWorldExact(portal.World), WorldChangeReason.Portal, 
+                                                            portal.tpPosition() == new Position(-1, -1, -1, 0, 0) 
+                                                            ? WorldManager.FindWorldExact(portal.World).map.getSpawnIfRandom() 
+                                                            : portal.tpPosition());
                                                     } else {
                                                         e.Player.JoinWorld(WorldManager.FindWorldExact(portal.World), WorldChangeReason.Portal);
                                                     }
                                                     e.Player.Message("You used portal: " + portal.Name);
+                                                    if (e.Player.WorldMap.Spawn == new Position(-1, -1, -1, 0, 0)) {
+                                                        e.Player.Message("Randomized Spawn!");
+                                                    }
 
                                                     // Make sure this method isn't called twice
                                                     e.Player.CanUsePortal = false;

@@ -42,7 +42,6 @@ namespace fCraft {
             CommandManager.RegisterCommand( CdWorldUnload );
             CommandManager.RegisterCommand( CdCTF );
             CommandManager.RegisterCommand( CdWorldClear );
-            CommandManager.RegisterCommand( CdSuicide );
             CommandManager.RegisterCommand( CdReJoin );
             CommandManager.RegisterCommand( CdMyWorld );
             CommandManager.RegisterCommand( CdMaxPW );
@@ -975,6 +974,7 @@ namespace fCraft {
 
         static readonly CommandDescriptor CdSpawn = new CommandDescriptor {
             Name = "Spawn",
+            Aliases = new[] { "respawn", "suicide" },
             Category = CommandCategory.World,
             Help = "Teleports you to the current map's spawn.",
             Handler = SpawnHandler
@@ -987,53 +987,8 @@ namespace fCraft {
 				player.LastPosition = player.Position;
 			}
             player.TeleportTo( player.World.LoadMap().getSpawnIfRandom());
-        }
-
-        #endregion
-        #region Suicide
-        
-        static readonly CommandDescriptor CdSuicide = new CommandDescriptor
-        {
-            Name = "Suicide",
-            Category = CommandCategory.New | CommandCategory.World | CommandCategory.Chat,
-            Aliases = new[] { "Kill", "DoABackFlip", "ThanksObama", "ErraBodyDoTheFlop" },
-            Help = "Tells the world of your sad ending. Now with the ability to add a note!",
-            Usage = "/Suicide <Note>",
-            Handler = SuicideHandler
-        };
-
-        static void SuicideHandler(Player player, CommandReader cmd)
-        {
-            if (player.Info.IsMuted) { player.MessageMuted(); return; }        	
-            string note = cmd.NextAll();
-            if (player.World == null) PlayerOpException.ThrowNoWorld(player);
-            if (player.TimeSinceLastServerMessage.TotalSeconds < 10) {
-                player.getLeftOverTime(10, cmd);
-                return;
-            }
-            if (note.Length > 64)
-            {
-                player.Message("Probably bad timing, but your suicide note can't be {0} characters long. Max is 64.", note.Length);
-                return;
-			}
-			if (player.World != null) {
-				player.LastWorld = player.World;
-				player.LastPosition = player.Position;
-			}
-            if (note == "")
-            {
-                Server.Message("{0}&s took the easy way out", player.ClassyName);
-                player.TeleportTo(player.World.LoadMap().getSpawnIfRandom());
-                player.LastServerMessageDate = DateTime.UtcNow;
-                return;
-            }
-            else
-            {
-                Server.Message("{0}&s took the easy way out and left a note", player.ClassyName);
-                Server.Message("[&fNote&s] {0}", note);
-				player.TeleportTo(player.World.LoadMap().getSpawnIfRandom());
-                player.LastServerMessageDate = DateTime.UtcNow;
-                return;
+            if (player.WorldMap.Spawn == new Position(-1, -1, -1, 0, 0)) {
+                player.Message("Randomized Spawn!");
             }
         }
 
@@ -3649,10 +3604,10 @@ namespace fCraft {
                                             player.PortalTPPos = new Position((short)(x * 32), (short)(y * 32), (short)(z * 32), (byte)rot, (byte)lot);
                                         }
                                     } else {
-                                        player.PortalTPPos = tpWorld.map == null ? new Position(0, 0, 0) : tpWorld.map.getSpawnIfRandom();
+                                        player.PortalTPPos = tpWorld.map == null ? new Position(0, 0, 0) : tpWorld.map.Spawn;
                                     }
                                 } else {
-                                    player.PortalTPPos = tpWorld.map == null ? new Position(0, 0, 0) : tpWorld.map.getSpawnIfRandom();
+                                    player.PortalTPPos = tpWorld.map == null ? new Position(0, 0, 0) : tpWorld.map.Spawn;
                                 }
                                 operation.Brush = brush;
                                 player.PortalWorld = addWorld;

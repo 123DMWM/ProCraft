@@ -55,6 +55,9 @@ namespace fCraft {
                 if (zone.Bounds.Contains(newPos.X / 32, newPos.Y / 32, (newPos.Z - 32) / 32)) {
                     SendZoneMessage(p, zone, "&WRespawned!");
                     p.TeleportTo(p.WorldMap.getSpawnIfRandom());
+                    if (p.WorldMap.Spawn == new Position(-1, -1, -1, 0, 0)) {
+                        p.Message("Randomized Spawn!");
+                    }
                     return true;
                 }
             }
