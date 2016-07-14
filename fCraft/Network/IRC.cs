@@ -369,11 +369,11 @@ namespace fCraft
                         if (!ResponsibleForInputParsing) return;
                         if (ConfigKey.IRCBotAnnounceIRCJoins.Enabled())
                         {
-                            Server.Message("&i(IRC) {0} joined the IRC channel",
+                            Server.Message("&i(IRC) {0} joined the IRC channel ({1})",
                                             msg.Nick,
                                             msg.Channel);
                             Logger.Log(LogType.IrcChat,
-                                        "{0} joined the IRC channel",
+                                        "{0} joined the IRC channel ({1})",
                                         msg.Nick,
                                         msg.Channel);
                         }
@@ -427,7 +427,7 @@ namespace fCraft
                         // Announce parts/quits of IRC people (except the bots)
                         if (ConfigKey.IRCBotAnnounceIRCJoins.Enabled() && !IsBotNick(msg.Nick))
                         {
-                            Server.Message("&i(IRC) {0} left the IRC channel",
+                            Server.Message("&i(IRC) {0} left the IRC channel ({1})",
                                             msg.Nick,
                                             msg.Channel);
                             string quitMsg = (msg.Message == null)
@@ -976,7 +976,9 @@ namespace fCraft
         }
 
         static void PlayerJoinedWorldHandler(object sender, PlayerJoinedWorldEventArgs e) {
-            e.Player.PublicAuxStateObjects["IRC_World"] = e.NewWorld.Name;
+            if (e.OldWorld != e.NewWorld) {
+                e.Player.PublicAuxStateObjects["IRC_World"] = e.NewWorld.Name;
+            }
         }
 
 
