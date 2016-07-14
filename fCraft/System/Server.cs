@@ -816,6 +816,13 @@ namespace fCraft {
 
         public static void BotMessage( string message, [CanBeNull] params object[] formatArgs) {
             if (formatArgs.Length > 0) {
+                int count = 0;
+                foreach (object obj in formatArgs) {
+                    if (obj is int) {
+                        formatArgs[count] = string.Format("{0:#,##0}", obj);
+                    }
+                    count++;
+                }
                 message = String.Format(message, formatArgs);
             }
             Server.Players.Message("&6Bot&f: " + message);
@@ -1301,19 +1308,6 @@ namespace fCraft {
             return new IPEndPoint( InternalIP, 0 );
         }
         internal static readonly RequestCachePolicy CachePolicy = new RequestCachePolicy(RequestCacheLevel.BypassCache);
-
-        public static string GetNumberString(long num) {
-            if (num >= 1000 && num < 1000000) {
-                return num.ToString().Remove(num.ToString().Length - 3) + "K";
-            } else if (num >= 1000000 && num < 1000000000) {
-                return num.ToString().Remove(num.ToString().Length - 6) + "M";
-            } else if (num >= 1000000000 && num < 1000000000000) {
-                return num.ToString().Remove(num.ToString().Length - 9) + "B";
-            } else if (num >= 1000000000000 && num < 1000000000000000) {
-                return num.ToString().Remove(num.ToString().Length - 9) + "T";
-            }
-            return num.ToString();
-        }
 
         #endregion
 

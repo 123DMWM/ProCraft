@@ -658,6 +658,13 @@ namespace fCraft {
             if( message == null ) throw new ArgumentNullException( "message" );
             if( args == null ) throw new ArgumentNullException( "args" );
             if( args.Length > 0 ) {
+                int count = 0;
+                foreach(object obj in args) {
+                    if (obj is int) {
+                        args[count] = string.Format("{0:#,##0}", obj);
+                    }
+                    count++;
+                }
                 message = String.Format( message, args );
             }
             if( IsSuper ) {
@@ -682,8 +689,14 @@ namespace fCraft {
         {
             if (message == null) throw new ArgumentNullException("message");
             if (args == null) throw new ArgumentNullException("args");
-            if (args.Length > 0)
-            {
+            if (args.Length > 0) {
+                int count = 0;
+                foreach (object obj in args) {
+                    if (obj is int) {
+                        args[count] = string.Format("{0:#,##0}", obj);
+                    }
+                    count++;
+                }
                 message = String.Format(message, args);
             }
             if (IsSuper)
@@ -713,6 +726,13 @@ namespace fCraft {
             if( message == null ) throw new ArgumentNullException( "message" );
             if( args == null ) throw new ArgumentNullException( "args" );
             if( args.Length > 0 ) {
+                int count = 0;
+                foreach (object obj in args) {
+                    if (obj is int) {
+                        args[count] = string.Format("{0:#,##0}", obj);
+                    }
+                    count++;
+                }
                 message = String.Format( message, args );
             }
             if( this == Console ) {

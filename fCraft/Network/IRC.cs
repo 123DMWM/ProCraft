@@ -804,6 +804,13 @@ namespace fCraft
             if (args == null) throw new ArgumentNullException("args");
             if (args.Length > 0)
             {
+                int count = 0;
+                foreach (object obj in args) {
+                    if (obj is int) {
+                        args[count] = string.Format("{0:#,##0}", obj);
+                    }
+                    count++;
+                }
                 line = String.Format(line, args);
             }
             if (channelNames == null) return; // in case IRC bot is disabled.

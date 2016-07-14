@@ -288,7 +288,9 @@ namespace fCraft {
                                     "&sType: &f!Bot Time Total&n&S" +
                                     "Displays your Total Time spent on the server." },
                 { "promos",         "&sType: &f!Bot Promos&n&S" +
-                                    "Displays the amount of players you have promoted."},
+                                    "Displays the amount of times you have promoted."},
+                { "demotes",        "&sType: &f!Bot Demotes&n&S" +
+                                    "Displays the amount of times you have demoted."},
                 { "bans",           "&sType: &f!Bot Bans&n&S" +
                                     "Displays the amount of players you have banned."},
                 { "kicks",          "&sType: &f!Bot Kicks&n&S" +
@@ -385,7 +387,8 @@ namespace fCraft {
 					if (adjective.StartsWith("a") || adjective.StartsWith("e") || adjective.StartsWith("i") ||
 						adjective.StartsWith("o") || adjective.StartsWith("u")) {
 						ana = "an";
-					} else if (noun.EndsWith("s")) {
+					}
+                    if (noun.EndsWith("s")) {
 						ana = "some";
 					}
 					Server.BotMessage("Build " + ana + " " + adjective + " " + noun);
@@ -414,35 +417,44 @@ namespace fCraft {
 					break;
 				case "promos":
 					if (player.Info.Rank.Can(Permission.Promote) || player.Info.PromoCount != 0) {
-						Server.BotMessage(player.ClassyName + "&f has promoted " + player.Info.PromoCount + " players.");
+						Server.BotMessage(player.ClassyName + "&f has promoted {0} times.", player.Info.PromoCount);
 					} else {
 						Server.BotMessage(player.ClassyName + "&f cannot promote players yet");
 					}
 					break;
-				case "bans":
+                case "demotes":
+                    if (player.Info.Rank.Can(Permission.Demote) || player.Info.DemoCount != 0) {
+                        Server.BotMessage(player.ClassyName + "&f has demoted {0} times.", player.Info.PromoCount);
+                    } else {
+                        Server.BotMessage(player.ClassyName + "&f cannot demote players yet");
+                    }
+                    break;
+                case "bans":
 					if (player.Info.Rank.Can(Permission.Ban) || player.Info.TimesBannedOthers != 0) {
-						Server.BotMessage(player.ClassyName + "&f has banned " + player.Info.TimesBannedOthers + " players.");
+						Server.BotMessage(player.ClassyName + "&f has banned {0} players.", player.Info.TimesBannedOthers);
 					} else {
 						Server.BotMessage(player.ClassyName + "&f cannot ban yet");
 					}
 					break;
 				case "kicks":
 					if (player.Info.Rank.Can(Permission.Kick) || player.Info.TimesKickedOthers != 0) {
-						Server.BotMessage(player.ClassyName + "&f has kicked " +
-											   player.Info.TimesKickedOthers + " players.");
+						Server.BotMessage(player.ClassyName + "&f has kicked {0} players.", player.Info.TimesKickedOthers);
 					} else {
 						Server.BotMessage(player.ClassyName + "&f cannot kick yet");
-					}
-					break;
+                    }
+                    if (player.Info.TimesKicked != 0) {
+                        Server.BotMessage(player.ClassyName + "&f has been kicked {0} times.", player.Info.TimesKicked);
+                    } else {
+                        Server.BotMessage(player.ClassyName + "&f has been a good player and wasn't kicked yet.");
+                    }
+                    break;
 				case "blocks":
 					if (helper == "total") {
-						Server.BotMessage(player.ClassyName + "&f has built " + player.Info.BlocksBuilt +
-											   " blocks, deleted " + player.Info.BlocksDeleted + " and drew " +
-											   player.Info.BlocksDrawn + ".");
+						Server.BotMessage(player.ClassyName + "&f has built {0} blocks, deleted {1} and drew {2}.",
+                            player.Info.BlocksBuilt, player.Info.BlocksDeleted, player.Info.BlocksDrawnString);
 					} else {
-						Server.BotMessage(player.ClassyName + "&f has built " +
-											   player.Info.BlocksBuiltThisGame + " blocks and deleted " +
-											   player.Info.BlocksDeletedThisGame + " blocks this session.");
+						Server.BotMessage(player.ClassyName + "&f has built {0} blocks and deleted {1} blocks this session.", 
+                            player.Info.BlocksBuiltThisGame, player.Info.BlocksDeletedThisGame);
 					}
 					break;
 				case "funfact":

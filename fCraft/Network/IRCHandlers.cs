@@ -89,8 +89,8 @@ namespace fCraft {
                         IRC.SendChannelMessage("Player " + Bold + "{0}" + Reset +
                                                " has Built: " + Bold + "{1}" + Reset +
                                                " blocks Deleted: " + Bold + "{2}" + Reset + " blocks{3}",
-                                               info.ClassyName, Server.GetNumberString(info.BlocksBuilt), Server.GetNumberString(info.BlocksDeleted),
-                                               (info.Can(Permission.Draw) ? " Drawn: " + Bold + Server.GetNumberString(info.BlocksDrawn) + Reset + " blocks." : ""));
+                                               info.ClassyName, info.BlocksBuilt, info.BlocksDeleted,
+                                               (info.Can(Permission.Draw) ? " Drawn: " + Bold + info.BlocksDrawnString + Reset + " blocks." : ""));
                     } else {
                         IRC.SendChannelMessage("No player found with name \"" + Bold + findPlayer + Reset + "\"");
                     }

@@ -291,18 +291,18 @@ namespace fCraft {
             if (info.BlocksDrawn > 0)
             {
                 player.Message("  Built {0} Deleted {1} Drew {2}",
-                                Server.GetNumberString(info.BlocksBuilt),
-                                Server.GetNumberString(info.BlocksDeleted),
-                                Server.GetNumberString(info.BlocksDrawn));
+                                info.BlocksBuilt,
+                                info.BlocksDeleted,
+                                info.BlocksDrawnString);
             }
             else
             {
                 player.Message("  Built {0} Deleted {1}",
-                                Server.GetNumberString(info.BlocksBuilt),
-                                Server.GetNumberString(info.BlocksDeleted));
+                                info.BlocksBuilt,
+                                info.BlocksDeleted);
             }
             float blocks = ((info.BlocksBuilt) - info.BlocksDeleted);
-            player.Message("  Wrote {0} messages.", Server.GetNumberString(info.MessagesWritten));
+            player.Message("  Wrote {0} messages.", info.MessagesWritten);
             // More stats
             if (info.TimesBannedOthers > 0 || info.TimesKickedOthers > 0)
             {
@@ -1521,7 +1521,7 @@ namespace fCraft {
                     formatter = p => string.Format("{0:N0}", p.DemoCount);
                     orderer = p => p.DemoCount; break;
                 case "drawn":
-                    formatter = p => string.Format("{0:N0}&sK", p.BlocksDrawn / 1000.0);
+                    formatter = p => string.Format("{0}", p.BlocksDrawnString);
                     orderer = p => p.BlocksDrawn; break;
                 case "time":
                 case "hours":

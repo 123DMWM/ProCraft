@@ -268,6 +268,25 @@ namespace fCraft {
         /// <summary> Total number of blocks modified using draw and copy/paste commands. </summary>
         public long BlocksDrawn;
 
+        public string BlocksDrawnString
+        {
+            get
+            {
+                if (BlocksDrawn < 1000) {
+                    return BlocksDrawn.ToString();
+                } else if (BlocksDrawn < 1000000) {
+                    return BlocksDrawn.ToString().Remove(BlocksDrawn.ToString().Length - 3) + "K";
+                } else if (BlocksDrawn < 1000000000) {
+                    return BlocksDrawn.ToString().Remove(BlocksDrawn.ToString().Length - 6) + "M";
+                } else if (BlocksDrawn < 1000000000000) {
+                    return BlocksDrawn.ToString().Remove(BlocksDrawn.ToString().Length - 9) + "B";
+                } else if (BlocksDrawn < 1000000000000000) {
+                    return BlocksDrawn.ToString().Remove(BlocksDrawn.ToString().Length - 12) + "T";
+                }
+                return BlocksDrawn.ToString();
+            }
+        }
+
         /// <summary> Number of sessions/logins. </summary>
         public int TimesVisited;
 
