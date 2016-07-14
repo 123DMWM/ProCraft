@@ -555,6 +555,7 @@ namespace fCraft {
                     return false;
 
                 case 15:
+                case 21:
                 case 254:
                     // ignore SMP pings
                     return false;
