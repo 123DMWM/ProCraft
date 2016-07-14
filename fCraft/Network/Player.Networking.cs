@@ -557,6 +557,14 @@ namespace fCraft {
                 case 15:
                 case 21:
                 case 254:
+                    /*Start attempt at making server info show in premium clients
+                    writer.Write(0x00);
+                    string noPremium = @"{ 'version': { 'name': '0.30c', 'protocol': 7 }, 'players': { 'max': 100, 'online': 5, 'sample': [ { 'name': 'thinkofdeath', 'id': '4566e69f-c907-48ee-8d71-d7ba5aa00d20' } ] }, 'description': { 'text': 'Hello world' } }";
+                    byte[] stringData = Encoding.BigEndianUnicode.GetBytes(noPremium);
+                    writer.Write((short)noPremium.Length);
+                    writer.Write(stringData);
+                    BytesSent += (1 + stringData.Length);
+                    writer.Flush();*/
                     // ignore SMP pings
                     return false;
 
