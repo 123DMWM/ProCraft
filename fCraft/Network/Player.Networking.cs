@@ -536,7 +536,6 @@ namespace fCraft {
         bool LoginSequence()
         {
             byte opCode = reader.ReadByte();
-            Logger.Log(LogType.Debug, "OpCode: {0}", opCode);
 
 #if DEBUG_NETWORKING
             Logger.Log( LogType.Trace, "from {0} [{1}] {2}", IP, outPacketNumber++, (OpCode)opCode );
@@ -1029,10 +1028,8 @@ namespace fCraft {
             // send SMP KICK packet
             writer.Write((byte)255);
             byte[] stringData = Encoding.BigEndianUnicode.GetBytes(premiumPingMotd);
-            Logger.Log(LogType.Debug, "premiumPingMotd: {0}", premiumPingMotd);
             writer.Write((short)premiumPingMotd.Length);
             writer.Write(stringData);
-            Logger.Log(LogType.Debug, "done");
             BytesSent += (1 + stringData.Length);
             writer.Flush();
         }
