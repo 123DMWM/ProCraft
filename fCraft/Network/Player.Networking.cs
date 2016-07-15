@@ -26,9 +26,6 @@ namespace fCraft {
         public DateTime LastZoneNotification = DateTime.UtcNow;
         public Stopwatch pingTimer = new Stopwatch();
 
-        const string NoSmpMessage = "Only ClassicalSharp clients work!";
-
-
         static Player() {
             MaxBlockPlacementRange = 32767;
             SocketTimeout = 10000;
@@ -539,6 +536,7 @@ namespace fCraft {
         bool LoginSequence()
         {
             byte opCode = reader.ReadByte();
+            Logger.Log(LogType.Debug, "OpCode: {0}", opCode);
 
 #if DEBUG_NETWORKING
             Logger.Log( LogType.Trace, "from {0} [{1}] {2}", IP, outPacketNumber++, (OpCode)opCode );
@@ -549,22 +547,16 @@ namespace fCraft {
                 case (byte)OpCode.Handshake:
                     break;
 
-                case 2:
                 case 250:
-                    GentlyKickSMPClients();
+                case 254:
+                    SMPPing();
                     return false;
 
+                case 2:
                 case 15:
+                case 16:
                 case 21:
-                case 254:
-                    /*Start attempt at making server info show in premium clients
-                    writer.Write(0x00);
-                    string noPremium = @"{ 'version': { 'name': '0.30c', 'protocol': 7 }, 'players': { 'max': 100, 'online': 5, 'sample': [ { 'name': 'thinkofdeath', 'id': '4566e69f-c907-48ee-8d71-d7ba5aa00d20' } ] }, 'description': { 'text': 'Hello world' } }";
-                    byte[] stringData = Encoding.BigEndianUnicode.GetBytes(noPremium);
-                    writer.Write((short)noPremium.Length);
-                    writer.Write(stringData);
-                    BytesSent += (1 + stringData.Length);
-                    writer.Flush();*/
+                    GentlyKickSMPClients();
                     // ignore SMP pings
                     return false;
 
@@ -1020,30 +1012,29 @@ namespace fCraft {
 
         void GentlyKickSMPClients() {
             // This may be someone connecting with an SMP client
-            int strLen = reader.ReadInt16();
+            string premiumKickMessage = "§EPlease join us at §9http://classicube.net/";
+            // send SMP KICK packet
+            writer.Write((byte)255);
+            byte[] stringData = Encoding.BigEndianUnicode.GetBytes(premiumKickMessage);
+            writer.Write((short)premiumKickMessage.Length);
+            writer.Write(stringData);
+            BytesSent += (1 + stringData.Length);
+            writer.Flush();
+            Logger.Log(LogType.Warning, "Player.LoginSequence: A player tried connecting with Minecraft Beta client from {0}.", IP);
+        }
 
-            if( strLen >= 2 && strLen <= 16 ) {
-                string smpPlayerName = Encoding.BigEndianUnicode.GetString( reader.ReadBytes( strLen * 2 ) );
-
-                Logger.Log( LogType.Warning,
-                            "Player.LoginSequence: Player \"{0}\" tried connecting with Minecraft Beta client from {1}. " +
-                            "ProCraft does not support Minecraft Beta.",
-                            smpPlayerName, IP );
-
-                // send SMP KICK packet
-                writer.Write( (byte)255 );
-                byte[] stringData = Encoding.BigEndianUnicode.GetBytes( NoSmpMessage );
-                writer.Write( (short)NoSmpMessage.Length );
-                writer.Write( stringData );
-                BytesSent += ( 1 + stringData.Length );
-                writer.Flush();
-
-            } else {
-                // Not SMP client (invalid player name length)
-                Logger.Log( LogType.Error,
-                            "Player.LoginSequence: Unexpected opcode in the first packet from {0}: 2.", IP );
-                KickNow( "Unexpected handshake message - possible protocol mismatch!", LeaveReason.ProtocolViolation );
-            }
+        void SMPPing() {
+            string servername = Chat.ReplacePercentColorCodes(ConfigKey.ServerName.GetString(), false).Replace('&', '§');
+            string premiumPingMotd = "§1" + '\0' + "78" + '\0' + "0.30c" + '\0' + "§E" + servername + '\0' + Server.CountPlayers(false) + '\0' + ConfigKey.MaxPlayers.GetInt();
+            // send SMP KICK packet
+            writer.Write((byte)255);
+            byte[] stringData = Encoding.BigEndianUnicode.GetBytes(premiumPingMotd);
+            Logger.Log(LogType.Debug, "premiumPingMotd: {0}", premiumPingMotd);
+            writer.Write((short)premiumPingMotd.Length);
+            writer.Write(stringData);
+            Logger.Log(LogType.Debug, "done");
+            BytesSent += (1 + stringData.Length);
+            writer.Flush();
         }
 
 
