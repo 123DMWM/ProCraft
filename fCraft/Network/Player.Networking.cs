@@ -540,36 +540,7 @@ namespace fCraft {
 #if DEBUG_NETWORKING
             Logger.Log( LogType.Trace, "from {0} [{1}] {2}", IP, outPacketNumber++, (OpCode)opCode );
 #endif
-
-            switch (opCode)
-            {
-                case (byte)OpCode.Handshake:
-                    break;
-
-                case 250:
-                case 254:
-                    SMPPing();
-                    return false;
-
-                case 2:
-                case 15:
-                case 16:
-                case 21:
-                    GentlyKickSMPClients();
-                    // ignore SMP pings
-                    return false;
-
-                case (byte)'G':
-                    return false;
-
-                default:
-                    Logger.Log(LogType.Error,
-                                "Player.LoginSequence: Unexpected op code in the first packet from {0}: {1}.",
-                                IP,
-                                opCode);
-                    KickNow("Incompatible client, or a network error.", LeaveReason.ProtocolViolation);
-                    return false;
-            }
+            if (!HandleOpcode(opCode)) return false;
 
             // Check protocol version
             int clientProtocolVersion = reader.ReadByte();

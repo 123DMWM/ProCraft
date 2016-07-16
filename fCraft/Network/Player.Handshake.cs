@@ -7,6 +7,36 @@ namespace fCraft {
     /// <summary> Represents a connection to a Minecraft client. Handles initial handshake between a client and a server. </summary>
     public sealed partial class Player {
 
+        bool HandleOpcode(byte opcode) {
+            switch (opcode) {
+                case (byte)OpCode.Handshake:
+                    return true;
+
+                case 0xFA:
+                case 0xFE: // SMP ping packet id
+                    OldSMPPing();
+                    return false;
+
+                case 2:
+                case 15:
+                case 16:
+                case 21:
+                    GentlyKickSMPClients();
+                    // ignore SMP pings
+                    return false;
+
+                case (byte)'G': // WoM GET requests
+                    return false;
+
+                default:
+                    Logger.Log(LogType.Error,
+                                "Player.LoginSequence: Unexpected op code in the first packet from {0}: {1}.",
+                                IP, opcode);
+                    KickNow("Incompatible client, or a network error.", LeaveReason.ProtocolViolation);
+                    return false;
+            }
+        }
+        
         void GentlyKickSMPClients() {
             // This may be someone connecting with an SMP client
             string premiumKickMessage = "§EPlease join us at §9http://classicube.net/";
@@ -20,15 +50,24 @@ namespace fCraft {
             Logger.Log(LogType.Warning, "Player.LoginSequence: A player tried connecting with Minecraft Beta client from {0}.", IP);
         }
 
-        void SMPPing() {
-            string servername = Chat.ReplacePercentColorCodes(ConfigKey.ServerName.GetString(), false).Replace('&', '§');
-            string premiumPingMotd = "§1" + '\0' + "78" + '\0' + "0.30c" + '\0' + "§E" + servername + '\0' + Server.CountPlayers(false) + '\0' + ConfigKey.MaxPlayers.GetInt();
+        void OldSMPPing() {
+            string data;
+            if (client.Available > 0 && reader.ReadByte() == 1) {
+                // 1.4 - 1.5
+                string name = Chat.ReplacePercentColorCodes(ConfigKey.ServerName.GetString(), false).Replace('&', '§');
+                data = "§1" + '\0' + "78" + '\0' + "0.30c" + '\0' + "§E" + name + '\0' + Server.CountPlayers(false) + '\0' + ConfigKey.MaxPlayers.GetInt();
+            } else {
+                // beta 1.8 - 1.3
+                string name = Chat.ReplacePercentColorCodes(ConfigKey.ServerName.GetString(), false);
+                data = name + "§" + Server.CountPlayers(false) + "§" + ConfigKey.MaxPlayers.GetInt();
+            }
+
             // send SMP KICK packet
             writer.Write((byte)255);
-            byte[] stringData = Encoding.BigEndianUnicode.GetBytes(premiumPingMotd);
-            writer.Write((short)premiumPingMotd.Length);
-            writer.Write(stringData);
-            BytesSent += (1 + stringData.Length);
+            byte[] rawData = Encoding.BigEndianUnicode.GetBytes(data);
+            writer.Write((short)data.Length);
+            writer.Write(rawData);
+            BytesSent += (1 + 2 + rawData.Length);
             writer.Flush();
         }
 
