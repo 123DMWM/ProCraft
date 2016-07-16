@@ -43,9 +43,9 @@ namespace fCraft {
             // Ensure that we have enough bytes for packet data
             if (client.Available < length || reader.ReadByte() != 0) return false;
             
-            if (client.Available < 3) return false;
-            reader.ReadByte(); // protocol version
+            int protocolVer = ReadVarInt(); // protocol version
             int hostLen = ReadVarInt();
+            if (protocolVer == -1 || hostLen == -1) return false;
             
             if (client.Available < hostLen) return false;
             reader.ReadBytes(hostLen); // hostname
@@ -99,14 +99,14 @@ namespace fCraft {
         int ReadVarInt() {
             int shift = 0, result = 0;
             while (shift < 32) {
-                if (client.Available == 0) return int.MaxValue; // out of data
+                if (client.Available == 0) return -1; // out of data
                 
                 byte part = reader.ReadByte();
                 result |= (part & 0x7F) << shift;
                 if ((part & 0x80) == 0) return result;
                 shift += 7;
             }
-            return int.MaxValue; // varint too big
+            return -1; // varint too big
         }
         
         static int VarIntBytes(int value) {
