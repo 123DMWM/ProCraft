@@ -1178,7 +1178,7 @@ namespace fCraft {
                         {
                             GreetingMessage += line + "&n";
                         }
-                        Message(GreetingMessage);
+                        Message(Chat.ReplaceTextKeywords(this, GreetingMessage));
                     }
                 }
             }
