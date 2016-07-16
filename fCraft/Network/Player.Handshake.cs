@@ -52,22 +52,18 @@ namespace fCraft {
 
         void OldSMPPing() {
             string data;
-            if (client.Available > 0 && reader.ReadByte() == 1) {
-                // 1.4 - 1.5
+                // 1.4 - 1.6
                 string name = Chat.ReplacePercentColorCodes(ConfigKey.ServerName.GetString(), false).Replace('&', '§');
                 data = "§1" + '\0' + "78" + '\0' + "0.30c" + '\0' + "§E" + name + '\0' + Server.CountPlayers(false) + '\0' + ConfigKey.MaxPlayers.GetInt();
-            } else {
-                // beta 1.8 - 1.3
-                string name = Chat.ReplacePercentColorCodes(ConfigKey.ServerName.GetString(), false);
-                data = name + "§" + Server.CountPlayers(false) + "§" + ConfigKey.MaxPlayers.GetInt();
-            }
 
             // send SMP KICK packet
-            writer.Write((byte)255);
-            byte[] rawData = Encoding.BigEndianUnicode.GetBytes(data);
-            writer.Write((short)data.Length);
-            writer.Write(rawData);
-            BytesSent += (1 + 2 + rawData.Length);
+            byte[] packet = new byte[3 + data.Length * 2];
+            packet[0] = 255; // kick opcode
+            Packet.ToNetOrder((short)data.Length, packet, 1);
+            Encoding.BigEndianUnicode.GetBytes(data, 0, data.Length, packet, 3);
+            
+            writer.Write(packet);
+            BytesSent += packet.Length;
             writer.Flush();
         }
 
