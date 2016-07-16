@@ -1009,32 +1009,6 @@ namespace fCraft {
         }
 
 
-        void GentlyKickSMPClients() {
-            // This may be someone connecting with an SMP client
-            string premiumKickMessage = "§EPlease join us at §9http://classicube.net/";
-            // send SMP KICK packet
-            writer.Write((byte)255);
-            byte[] stringData = Encoding.BigEndianUnicode.GetBytes(premiumKickMessage);
-            writer.Write((short)premiumKickMessage.Length);
-            writer.Write(stringData);
-            BytesSent += (1 + stringData.Length);
-            writer.Flush();
-            Logger.Log(LogType.Warning, "Player.LoginSequence: A player tried connecting with Minecraft Beta client from {0}.", IP);
-        }
-
-        void SMPPing() {
-            string servername = Chat.ReplacePercentColorCodes(ConfigKey.ServerName.GetString(), false).Replace('&', '§');
-            string premiumPingMotd = "§1" + '\0' + "78" + '\0' + "0.30c" + '\0' + "§E" + servername + '\0' + Server.CountPlayers(false) + '\0' + ConfigKey.MaxPlayers.GetInt();
-            // send SMP KICK packet
-            writer.Write((byte)255);
-            byte[] stringData = Encoding.BigEndianUnicode.GetBytes(premiumPingMotd);
-            writer.Write((short)premiumPingMotd.Length);
-            writer.Write(stringData);
-            BytesSent += (1 + stringData.Length);
-            writer.Flush();
-        }
-
-
         #region Joining Worlds
 
         readonly object joinWorldLock = new object();
