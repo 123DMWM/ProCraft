@@ -62,6 +62,7 @@ namespace fCraft {
                     + max + @", ""online"": " + players + @"}, ""description"": {""text"": """ + name + @"""}}";
             } else if (nextState == 2) { // game state
                 data = @"{""text"": ""§EPlease join us at §9http://classicube.net/""}";
+                Logger.Log(LogType.Warning, "Player.LoginSequence: A player tried connecting with Minecraft premium client from {0}.", IP);
             }
             if (data == null) return false;
             
@@ -79,7 +80,6 @@ namespace fCraft {
             writer.Write(packet);
             BytesSent += packet.Length;
             writer.Flush();
-            Logger.Log(LogType.Warning, "Player.LoginSequence: A player tried connecting with Minecraft premium client from {0}.", IP);
             return true;
         }
 
