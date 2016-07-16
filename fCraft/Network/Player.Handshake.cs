@@ -56,24 +56,45 @@ namespace fCraft {
             
             string data = null;
             if (nextState == 1) { // status state
-                data = @"{""version"": { ""name"": ""0.30c"", ""protocol"": 0 }, ""players"": {""max"": 100, ""online"": 5}, ""description"": {""text"": ""Hello world""}}";
+                int players = Server.CountPlayers(false), max = ConfigKey.MaxPlayers.GetInt();
+                string name = Chat.ReplacePercentColorCodes(ConfigKey.ServerName.GetString(), false).Replace('&', '§');
+                data = @"{""version"": { ""name"": ""0.30c"", ""protocol"": 0 }, ""players"": {""max"": "
+                    + max + @", ""online"": " + players + @"}, ""description"": {""text"": """ + name + @"""}}";
             } else if (nextState == 2) { // game state
                 data = @"{""text"": ""§EPlease join us at §9http://classicube.net/""}";
-            }            
+            }
             if (data == null) return false;
             
-            int utf8Count = Encoding.UTF8.GetByteCount(data);
-            byte[] packet = new byte[3 + utf8Count];
-            packet[0] = (byte)(utf8Count + 2);
-            packet[1] = 0; // opcode
-            packet[2] = (byte)utf8Count;
-            Encoding.UTF8.GetBytes(data, 0, data.Length, packet, 3);
+            int strLength = Encoding.UTF8.GetByteCount(data);
+            int strLength_S = VarIntBytes(strLength);
+            int dataLength = 1 + strLength_S + strLength;
+            int dataLength_S = VarIntBytes(dataLength);
+            
+            byte[] packet = new byte[dataLength_S + dataLength];
+            WriteVarInt(dataLength, packet, 0);
+            packet[dataLength_S] = 0; // opcode
+            WriteVarInt(strLength, packet, dataLength_S + 1);
+            Encoding.UTF8.GetBytes(data, 0, data.Length, packet, strLength_S + dataLength_S + 1);
             
             writer.Write(packet);
             BytesSent += packet.Length;
             writer.Flush();
+            Logger.Log(LogType.Warning, "Player.LoginSequence: A player tried connecting with Minecraft premium client from {0}.", IP);
             return true;
         }
+
+        void SendOldSMPKick(string data) {
+            // send SMP KICK packet
+            byte[] packet = new byte[3 + data.Length * 2];
+            packet[0] = 255; // kick opcode
+            Packet.ToNetOrder((short)data.Length, packet, 1);
+            Encoding.BigEndianUnicode.GetBytes(data, 0, data.Length, packet, 3);
+            
+            writer.Write(packet);
+            BytesSent += packet.Length;
+            writer.Flush();
+        }
+        
         
         int ReadVarInt() {
             int shift = 0, result = 0;
@@ -87,17 +108,21 @@ namespace fCraft {
             }
             return int.MaxValue; // varint too big
         }
+        
+        static int VarIntBytes(int value) {
+            int count = 1;
+            while ((value >>= 7) > 0) count++;
+            return count;
+        }
+                
+        static void WriteVarInt(int value, byte[] buffer, int offset) {
+            do {
+                byte part = (byte)(value & 0x7F);
+                value >>= 7;
+                if (value > 0) part |= 0x80;
 
-        void SendOldSMPKick(string data) {
-            // send SMP KICK packet
-            byte[] packet = new byte[3 + data.Length * 2];
-            packet[0] = 255; // kick opcode
-            Packet.ToNetOrder((short)data.Length, packet, 1);
-            Encoding.BigEndianUnicode.GetBytes(data, 0, data.Length, packet, 3);
-            
-            writer.Write(packet);
-            BytesSent += packet.Length;
-            writer.Flush();
+                buffer[offset] = part; offset++;
+            } while (value > 0);
         }
 
         #endregion
