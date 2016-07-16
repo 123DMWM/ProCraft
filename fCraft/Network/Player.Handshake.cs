@@ -12,16 +12,17 @@ namespace fCraft {
                 case (byte)OpCode.Handshake:
                     return true;
 
-                case 0xFA:
                 case 0xFE: // SMP ping packet id
-                    OldSMPPing();
+                    // 1.4 - 1.6
+                    string name = Chat.ReplacePercentColorCodes(ConfigKey.ServerName.GetString(), false).Replace('&', '§');
+                    string data = "§1\078\00.30c\0§E" + name + '\0' + Server.CountPlayers(false) + '\0' + ConfigKey.MaxPlayers.GetInt();
+                    SendOldSMPKick(data);
                     return false;
 
-                case 2:
-                case 15:
-                case 16:
-                case 21:
-                    GentlyKickSMPClients();
+                case 0x02:
+                case 0xFA:
+                    SendOldSMPKick("§EPlease join us at §9http://classicube.net/");
+                    Logger.Log(LogType.Warning, "Player.LoginSequence: A player tried connecting with Minecraft Beta client from {0}.", IP);
                     // ignore SMP pings
                     return false;
 
@@ -29,33 +30,65 @@ namespace fCraft {
                     return false;
 
                 default:
-                    Logger.Log(LogType.Error,
-                                "Player.LoginSequence: Unexpected op code in the first packet from {0}: {1}.",
-                                IP, opcode);
+                    if (CheckModernSMP(opcode)) return false;
+                    Logger.Log(LogType.Error, "Player.LoginSequence: Unexpected op code in the first packet from {0}: {1}.", IP, opcode);
                     KickNow("Incompatible client, or a network error.", LeaveReason.ProtocolViolation);
                     return false;
             }
         }
         
-        void GentlyKickSMPClients() {
-            // This may be someone connecting with an SMP client
-            string premiumKickMessage = "§EPlease join us at §9http://classicube.net/";
-            // send SMP KICK packet
-            writer.Write((byte)255);
-            byte[] stringData = Encoding.BigEndianUnicode.GetBytes(premiumKickMessage);
-            writer.Write((short)premiumKickMessage.Length);
-            writer.Write(stringData);
-            BytesSent += (1 + stringData.Length);
+        #region SMP
+        
+        bool CheckModernSMP(byte length) {
+            // Ensure that we have enough bytes for packet data
+            if (client.Available < length || reader.ReadByte() != 0) return false;
+            
+            if (client.Available < 3) return false;
+            reader.ReadByte(); // protocol version
+            int hostLen = ReadVarInt();
+            
+            if (client.Available < hostLen) return false;
+            reader.ReadBytes(hostLen); // hostname
+            
+            if (client.Available < 3) return false;
+            reader.ReadInt16(); // port
+            byte nextState = reader.ReadByte();
+            
+            string data = null;
+            if (nextState == 1) { // status state
+                data = @"{""version"": { ""name"": ""0.30c"", ""protocol"": 0 }, ""players"": {""max"": 100, ""online"": 5}, ""description"": {""text"": ""Hello world""}}";
+            } else if (nextState == 2) { // game state
+                data = @"{""text"": ""§EPlease join us at §9http://classicube.net/""}";
+            }            
+            if (data == null) return false;
+            
+            int utf8Count = Encoding.UTF8.GetByteCount(data);
+            byte[] packet = new byte[3 + utf8Count];
+            packet[0] = (byte)(utf8Count + 2);
+            packet[1] = 0; // opcode
+            packet[2] = (byte)utf8Count;
+            Encoding.UTF8.GetBytes(data, 0, data.Length, packet, 3);
+            
+            writer.Write(packet);
+            BytesSent += packet.Length;
             writer.Flush();
-            Logger.Log(LogType.Warning, "Player.LoginSequence: A player tried connecting with Minecraft Beta client from {0}.", IP);
+            return true;
+        }
+        
+        int ReadVarInt() {
+            int shift = 0, result = 0;
+            while (shift < 32) {
+                if (client.Available == 0) return int.MaxValue; // out of data
+                
+                byte part = reader.ReadByte();
+                result |= (part & 0x7F) << shift;
+                if ((part & 0x80) == 0) return result;
+                shift += 7;
+            }
+            return int.MaxValue; // varint too big
         }
 
-        void OldSMPPing() {
-            string data;
-                // 1.4 - 1.6
-                string name = Chat.ReplacePercentColorCodes(ConfigKey.ServerName.GetString(), false).Replace('&', '§');
-                data = "§1" + '\0' + "78" + '\0' + "0.30c" + '\0' + "§E" + name + '\0' + Server.CountPlayers(false) + '\0' + ConfigKey.MaxPlayers.GetInt();
-
+        void SendOldSMPKick(string data) {
             // send SMP KICK packet
             byte[] packet = new byte[3 + data.Length * 2];
             packet[0] = 255; // kick opcode
@@ -67,7 +100,11 @@ namespace fCraft {
             writer.Flush();
         }
 
+        #endregion
 
+
+        #region CPE
+        
         bool NegotiateProtocolExtension() {
             // write our ExtInfo and ExtEntry packets
             writer.Write(Packet.MakeExtInfo("ProCraft", 24).Bytes);
@@ -272,5 +309,6 @@ namespace fCraft {
             //UsesCustomBlocks = (clientLevel >= CustomBlocksLevel);
             return true;
         }
+        #endregion
     }
 }
