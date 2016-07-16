@@ -1,5 +1,6 @@
 ﻿// Part of fCraft | Copyright 2009-2015 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt //Copyright (c) 2011-2013 Jon Baker, Glenn Marien and Lao Tszy <Jonty800@gmail.com> //Copyright (c) <2012-2014> <LeChosenOne, DingusBungus> | ProCraft Copyright 2014-2016 Joseph Beauvais <123DMWM@gmail.com>
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -58,8 +59,7 @@ namespace fCraft {
             if (nextState == 1) { // status state
                 int players = Server.CountPlayers(false), max = ConfigKey.MaxPlayers.GetInt();
                 string name = Chat.ReplacePercentColorCodes(ConfigKey.ServerName.GetString(), false).Replace('&', '§');
-                data = @"{""version"": { ""name"": ""0.30c"", ""protocol"": 0 }, ""players"": {""max"": "
-                    + max + @", ""online"": " + players + @"}, ""description"": {""text"": """ + name + @"""}}";
+                data = @"{""version"": { ""name"": ""0.30c"", ""protocol"": 210 }, ""players"": " + ServiceStack.Text.JsonSerializer.SerializeToString(new Players()) + @", ""description"": {""text"": """ + name + @"""}}";
             } else if (nextState == 2) { // game state
                 data = @"{""text"": ""§EPlease join us at §9http://classicube.net/""}";
                 Logger.Log(LogType.Warning, "Player.LoginSequence: A player tried connecting with Minecraft premium client from {0}.", IP);
@@ -81,6 +81,44 @@ namespace fCraft {
             BytesSent += packet.Length;
             writer.Flush();
             return true;
+        }
+
+        public class Sample {
+            public string name { get; set; }
+            public string id { get; set; }
+
+            public Sample(string Name, string Id) {
+                name = Name;
+                id = Id;
+            }
+        }
+
+        public class Players {
+            public int max
+            {
+                get
+                {
+                    return ConfigKey.MaxPlayers.GetInt();
+                }
+            }
+            public int online
+            {
+                get
+                {
+                    return Server.CountPlayers(false);
+                }
+            }
+            public List<Sample> sample
+            {
+                get
+                {
+                    List<Sample> players = new List<Sample>();
+                    foreach (Player p in Server.Players.Where(p => !p.Info.IsHidden)) {
+                        players.Add(new Sample(p.Name, "00000000-0000-3000-0000-000000000000"));
+                    }
+                    return players;
+                }
+            }
         }
 
         void SendOldSMPKick(string data) {
