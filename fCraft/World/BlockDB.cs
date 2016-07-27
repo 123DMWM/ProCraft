@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading;
 using System.Xml.Linq;
 using fCraft.Events;
+using fCraft.MapConversion;
 using JetBrains.Annotations;
 
 namespace fCraft {
@@ -618,16 +619,15 @@ namespace fCraft {
             if( selector == null ) throw new ArgumentNullException( "selector" );
 
             IBlockDBQueryProcessor processor;
-
             switch( searchType ) {
                 case BlockDBSearchType.ReturnAll:
                     processor = new ReturnAllProcessor( max, selector );
                     break;
                 case BlockDBSearchType.ReturnNewest:
-                    processor = new ReturnNewestProcessor( World.LoadMap(), max, selector );
+                    processor = new ReturnNewestProcessor( GetMapDimensions(), max, selector );
                     break;
                 case BlockDBSearchType.ReturnOldest:
-                    processor = new ReturnOldestProcessor( World.LoadMap(), max, selector );
+                    processor = new ReturnOldestProcessor( GetMapDimensions(), max, selector );
                     break;
                 default:
                     throw new ArgumentOutOfRangeException( "searchType" );
@@ -765,28 +765,26 @@ namespace fCraft {
 
 
         sealed class ReturnOldestProcessor : IBlockDBQueryProcessor {
-            readonly Map map;
+            readonly Vector3I dims;
             int count;
             readonly int max;
             readonly Func<BlockDBEntry, bool> selector;
             readonly Dictionary<int, BlockDBEntry> result = new Dictionary<int, BlockDBEntry>();
 
 
-            public ReturnOldestProcessor( Map map, int max, Func<BlockDBEntry, bool> selector ) {
+            public ReturnOldestProcessor( Vector3I dims, int max, Func<BlockDBEntry, bool> selector ) {
+                this.dims = dims;
                 this.max = max;
                 this.selector = selector;
-                this.map = map;
             }
 
 
             public bool ProcessEntry( BlockDBEntry entry ) {
                 if( selector( entry ) ) {
-                    int index = map.Index( entry.X, entry.Y, entry.Z );
+                    int index = (entry.Z * dims.Y + entry.Y) * dims.X + entry.X;
                     result[index] = entry;
                     count++;
-                    if( count >= max ) {
-                        return false;
-                    }
+                    if( count >= max ) return false;
                 }
                 return true;
             }
@@ -798,30 +796,28 @@ namespace fCraft {
 
 
         sealed class ReturnNewestProcessor : IBlockDBQueryProcessor {
-            readonly Map map;
+            readonly Vector3I dims;
             int count;
             readonly int max;
             readonly Func<BlockDBEntry, bool> selector;
             readonly Dictionary<int, BlockDBEntry> result = new Dictionary<int, BlockDBEntry>();
 
 
-            public ReturnNewestProcessor( Map map, int max, Func<BlockDBEntry, bool> selector ) {
+            public ReturnNewestProcessor( Vector3I dims, int max, Func<BlockDBEntry, bool> selector ) {
+                this.dims = dims;
                 this.max = max;
                 this.selector = selector;
-                this.map = map;
             }
 
 
             public bool ProcessEntry( BlockDBEntry entry ) {
                 if( selector( entry ) ) {
-                    int index = map.Index( entry.X, entry.Y, entry.Z );
+                    int index = (entry.Z * dims.Y + entry.Y) * dims.X + entry.X;
                     if( !result.ContainsKey( index ) ) {
                         result.Add( index, entry );
                     }
                     count++;
-                    if( count >= max ) {
-                        return false;
-                    }
+                    if( count >= max ) return false;
                 }
                 return true;
             }
@@ -832,7 +828,7 @@ namespace fCraft {
 
 
         sealed class ExcludingReturnOldestProcessor : IBlockDBQueryProcessor {
-            readonly Map map;
+            readonly Vector3I dims;
             int count;
             readonly int max;
             readonly Func<BlockDBEntry, bool> inclusionSelector;
@@ -841,19 +837,19 @@ namespace fCraft {
             readonly Dictionary<int, BlockDBEntry> result = new Dictionary<int, BlockDBEntry>();
 
 
-            public ExcludingReturnOldestProcessor( Map map, int max,
+            public ExcludingReturnOldestProcessor( Vector3I dims, int max,
                                                    Func<BlockDBEntry, bool> inclusionSelector,
                                                    Func<BlockDBEntry, bool> exclusionSelector ) {
+                this.dims = dims;
                 this.max = max;
                 this.inclusionSelector = inclusionSelector;
                 this.exclusionSelector = exclusionSelector;
-                this.map = map;
             }
 
 
             public bool ProcessEntry( BlockDBEntry entry ) {
                 if( inclusionSelector( entry ) ) {
-                    int index = map.Index( entry.X, entry.Y, entry.Z );
+                    int index = (entry.Z * dims.Y + entry.Y) * dims.X + entry.X;
                     if( !excluded.Contains( index ) ) {
                         if( exclusionSelector( entry ) ) {
                             excluded.Add( index );
@@ -861,9 +857,7 @@ namespace fCraft {
                             result[index] = entry;
                         }
                         count++;
-                        if( count >= max ) {
-                            return false;
-                        }
+                        if( count >= max ) return false;
                     }
                 }
                 return true;
@@ -926,15 +920,15 @@ namespace fCraft {
         public BlockDBEntry[] Lookup( int max, [NotNull] PlayerInfo info, bool exclude ) {
             if( info == null ) throw new ArgumentNullException( "info" );
             int pid = info.ID;
-            Map map = World.LoadMap();
+            Vector3I dims = GetMapDimensions();
 
             IBlockDBQueryProcessor processor;
             if( exclude ) {
-                processor = new ExcludingReturnOldestProcessor( map, max,
+                processor = new ExcludingReturnOldestProcessor( dims, max,
                                                                 entry => true,
                                                                 entry => entry.PlayerID == pid );
             } else {
-                processor = new ReturnOldestProcessor( map, max,
+                processor = new ReturnOldestProcessor( dims, max,
                                                        entry => entry.PlayerID == pid );
             }
             Traverse( processor );
@@ -947,15 +941,15 @@ namespace fCraft {
             if( span < TimeSpan.Zero ) throw new ArgumentOutOfRangeException( "span" );
             int pid = info.ID;
             long ticks = DateTime.UtcNow.Subtract( span ).ToUnixTime();
-            Map map = World.LoadMap();
+            Vector3I dims = GetMapDimensions();
 
             IBlockDBQueryProcessor processor;
             if( exclude ) {
-                processor = new ExcludingReturnOldestProcessor( map, max,
+                processor = new ExcludingReturnOldestProcessor( dims, max,
                                                                 entry => entry.Timestamp >= ticks,
                                                                 entry => entry.PlayerID == pid );
             } else {
-                processor = new ReturnOldestProcessor( map, max,
+                processor = new ReturnOldestProcessor( dims, max,
                                                        entry => entry.Timestamp >= ticks && entry.PlayerID == pid );
             }
             Traverse( processor );
@@ -967,15 +961,15 @@ namespace fCraft {
             if( infos == null ) throw new ArgumentNullException( "infos" );
             if( infos.Length == 0 ) throw new ArgumentException( "At least one PlayerInfo must be given", "infos" );
             if( infos.Length == 1 ) return Lookup( max, infos[0], exclude );
-            Map map = World.LoadMap();
+            Vector3I dims = GetMapDimensions();
 
             IBlockDBQueryProcessor processor;
             if( exclude ) {
-                processor = new ExcludingReturnOldestProcessor( map, max,
+                processor = new ExcludingReturnOldestProcessor( dims, max,
                                                                 entry => true,
                                                                 entry => infos.Any( t => entry.PlayerID == t.ID ) );
             } else {
-                processor = new ReturnOldestProcessor( map, max,
+                processor = new ReturnOldestProcessor( dims, max,
                                                        entry => infos.Any( t => entry.PlayerID == t.ID ) );
             }
             Traverse( processor );
@@ -989,17 +983,17 @@ namespace fCraft {
             if( span < TimeSpan.Zero ) throw new ArgumentOutOfRangeException( "span" );
             if( infos.Length == 1 ) return Lookup( max, infos[0], exclude, span );
             long ticks = DateTime.UtcNow.Subtract( span ).ToUnixTime();
-            Map map = World.LoadMap();
+            Vector3I dims = GetMapDimensions();
 
             IBlockDBQueryProcessor processor;
             if( exclude ) {
                 // ReSharper disable ImplicitlyCapturedClosure
-                processor = new ExcludingReturnOldestProcessor( map, max,
+                processor = new ExcludingReturnOldestProcessor( dims, max,
                                                                 entry => entry.Timestamp >= ticks,
                                                                 entry => infos.Any( t => entry.PlayerID == t.ID ) );
                 // ReSharper restore ImplicitlyCapturedClosure
             } else {
-                processor = new ReturnOldestProcessor( map, max,
+                processor = new ReturnOldestProcessor( dims, max,
                                                        entry => entry.Timestamp >= ticks &&
                                                                 infos.Any( t => entry.PlayerID == t.ID ) );
             }
@@ -1012,17 +1006,17 @@ namespace fCraft {
             if( area == null ) throw new ArgumentNullException( "area" );
             if( info == null ) throw new ArgumentNullException( "info" );
             int pid = info.ID;
-            Map map = World.LoadMap();
+            Vector3I dims = GetMapDimensions();
 
             IBlockDBQueryProcessor processor;
             if( exclude ) {
                 // ReSharper disable ImplicitlyCapturedClosure
-                processor = new ExcludingReturnOldestProcessor( map, max,
+                processor = new ExcludingReturnOldestProcessor( dims, max,
                                                                 entry => area.Contains( entry.X, entry.Y, entry.Z ),
                                                                 entry => entry.PlayerID == pid );
                 // ReSharper restore ImplicitlyCapturedClosure
             } else {
-                processor = new ReturnOldestProcessor( map, max,
+                processor = new ReturnOldestProcessor( dims, max,
                                                        entry => area.Contains( entry.X, entry.Y, entry.Z ) &&
                                                                 entry.PlayerID == pid );
             }
@@ -1037,18 +1031,18 @@ namespace fCraft {
             if( span < TimeSpan.Zero ) throw new ArgumentOutOfRangeException( "span" );
             int pid = info.ID;
             long ticks = DateTime.UtcNow.Subtract( span ).ToUnixTime();
-            Map map = World.LoadMap();
+            Vector3I dims = GetMapDimensions();
 
             IBlockDBQueryProcessor processor;
             if( exclude ) {
                 // ReSharper disable ImplicitlyCapturedClosure
-                processor = new ExcludingReturnOldestProcessor( map, max,
+                processor = new ExcludingReturnOldestProcessor( dims, max,
                                                                 entry => entry.Timestamp >= ticks &&
                                                                          area.Contains( entry.X, entry.Y, entry.Z ),
                                                                 entry => entry.PlayerID == pid );
                 // ReSharper restore ImplicitlyCapturedClosure
             } else {
-                processor = new ReturnOldestProcessor( map, max,
+                processor = new ReturnOldestProcessor( dims, max,
                                                        entry => entry.Timestamp >= ticks &&
                                                                 entry.PlayerID == pid &&
                                                                 area.Contains( entry.X, entry.Y, entry.Z ) );
@@ -1063,17 +1057,17 @@ namespace fCraft {
             if( infos == null ) throw new ArgumentNullException( "infos" );
             if( infos.Length == 0 ) throw new ArgumentException( "At least one PlayerInfo must be given", "infos" );
             if( infos.Length == 1 ) return Lookup( max, area, infos[0], exclude );
-            Map map = World.LoadMap();
+            Vector3I dims = GetMapDimensions();
 
             IBlockDBQueryProcessor processor;
             if( exclude ) {
                 // ReSharper disable ImplicitlyCapturedClosure
-                processor = new ExcludingReturnOldestProcessor( map, max,
+                processor = new ExcludingReturnOldestProcessor( dims, max,
                                                                 entry => area.Contains( entry.X, entry.Y, entry.Z ),
                                                                 entry => infos.Any( t => entry.PlayerID == t.ID ) );
                 // ReSharper restore ImplicitlyCapturedClosure
             } else {
-                processor = new ReturnOldestProcessor( map, max,
+                processor = new ReturnOldestProcessor( dims, max,
                                                        entry => area.Contains( entry.X, entry.Y, entry.Z ) &&
                                                                 infos.Any( t => entry.PlayerID == t.ID ) );
             }
@@ -1089,24 +1083,46 @@ namespace fCraft {
             if( span < TimeSpan.Zero ) throw new ArgumentOutOfRangeException( "span" );
             if( infos.Length == 1 ) return Lookup( max, area, infos[0], exclude, span );
             long ticks = DateTime.UtcNow.Subtract( span ).ToUnixTime();
-            Map map = World.LoadMap();
+            Vector3I dims = GetMapDimensions();
 
             IBlockDBQueryProcessor processor;
             if( exclude ) {
                 // ReSharper disable ImplicitlyCapturedClosure
-                processor = new ExcludingReturnOldestProcessor( map, max,
+                processor = new ExcludingReturnOldestProcessor( dims, max,
                                                                 entry => entry.Timestamp >= ticks &&
                                                                          area.Contains( entry.X, entry.Y, entry.Z ),
                                                                 entry => infos.Any( t => entry.PlayerID == t.ID ) );
                 // ReSharper restore ImplicitlyCapturedClosure
             } else {
-                processor = new ReturnOldestProcessor( map, max,
+                processor = new ReturnOldestProcessor( dims, max,
                                                        entry => entry.Timestamp >= ticks &&
                                                                 area.Contains( entry.X, entry.Y, entry.Z ) &&
                                                                 infos.Any( t => entry.PlayerID == t.ID ) );
             }
             Traverse( processor );
             return processor.GetResults();
+        }
+        
+        Vector3I GetMapDimensions() {
+            Map map = World.Map;
+            if (map != null) return new Vector3I(map.Width, map.Length, map.Height);
+            
+            lock (World.SyncRoot) {
+                if (!File.Exists(World.MapFileName)) {
+                    Logger.Log( LogType.Warning, "BlockDB.GetMapDimensions: Map file missing for " +
+                               "world {0}, assuming default map size.",World.Name );
+                    return new Vector3I(128, 128, 64);
+                }
+                
+                try {
+                    map = MapUtility.LoadHeader( World.MapFileName );
+                    return new Vector3I(map.Width, map.Length, map.Height);
+                } catch( Exception ex ) {
+                    Logger.Log( LogType.Error, "BlockDB.GetMapDimensions: " +
+                               "Failed to load map header ({0}): {1}", World.MapFileName, ex );
+                    return new Vector3I(128, 128, 64);
+                }
+            }
         }
 
         #endregion
