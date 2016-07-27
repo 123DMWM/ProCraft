@@ -172,7 +172,8 @@ namespace fCraft
 
                         // register
                         Send(IRCCommands.Nick(ActualBotNick));
-                        Send(IRCCommands.User(ActualBotNick, 8, ConfigKey.ServerName.GetString()));
+                        string serverName = Color.StripColors(Chat.ReplacePercentColorCodes(ConfigKey.ServerName.GetString(), false));
+                        Send(IRCCommands.User(ActualBotNick, 8, "ProCraft Server: " + serverName));
                         lastNickAttempt = DateTime.UtcNow;
                         nickTry = 0;
 
