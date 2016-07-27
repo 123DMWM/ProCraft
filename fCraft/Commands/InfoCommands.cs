@@ -1078,27 +1078,30 @@ namespace fCraft {
                             box.MaxVertex );
 
             Map map = player.WorldMap;
-            Dictionary<byte, int> blockCounts = new Dictionary<byte, int>();
-            for( int i = 0; i < 256; i++ )
-            	blockCounts[(byte)i] = 0;            
-            
+            int[] counts = new int[256];          
             for( int z = box.ZMin; z <= box.ZMax; z++ )
                 for( int y = box.YMin; y <= box.YMax; y++ )
                     for( int x = box.XMin; x <= box.XMax; x++ )
             {
-            	Block block = map.GetBlock( x, y, z );
-            	blockCounts[(byte)block]++;
+                Block block = map.GetBlock( x, y, z );
+                counts[(byte)block]++;
             }
-            var topBlocks = blockCounts.Where( p => p.Value > 0 )
-                                       .OrderByDescending( p => p.Value )
+            
+            Dictionary<byte, int> blockCounts = new Dictionary<byte, int>();
+            for( int i = 0; i < counts.Length; i++) {
+                if( counts[i] == 0 ) continue;
+                blockCounts[(byte)i] = counts[i];
+            }
+            
+            var topBlocks = blockCounts.OrderByDescending( p => p.Value )
                                        .Take( TopBlocksToList )
                                        .ToArray();
+            
+            World world = player.World;
             var blockString = topBlocks.JoinToString( p => String.Format( "{0}: {1} ({2}%)",
-                                                                          (Block)p.Key,
-                                                                          p.Value,
+                                                                          Map.GetBlockName(world, (Block)p.Key), p.Value,
                                                                           (p.Value * 100L) / box.Volume ) );
-            player.Message( "  Top {0} block types: {1}",
-                            topBlocks.Length, blockString );
+            player.Message( "  Top {0} block types: {1}", topBlocks.Length, blockString );
         }
 
         #endregion
