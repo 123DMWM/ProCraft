@@ -46,6 +46,7 @@ namespace fCraft {
             CommandManager.RegisterCommand( CdMyWorld );
             CommandManager.RegisterCommand( CdMaxPW );
             CommandManager.RegisterCommand( CdPortal );
+            CommandManager.RegisterCommand( CdBlockInfoList );
         }
         #region BlockDB
 
@@ -533,6 +534,63 @@ namespace fCraft {
             } else {
                 args.Player.Message( "BlockInfo: No results for {0}",
                                      args.Coordinate );
+            }
+        }
+
+        #endregion
+        #region BlockInfoList
+
+        static readonly CommandDescriptor CdBlockInfoList = new CommandDescriptor {
+            Name = "BInfoList",
+            Category = CommandCategory.World,
+            Aliases = new[] { "blist", "bl" },
+            Permissions = new[] { Permission.ViewOthersInfo },
+            RepeatableSelection = true,
+            Usage = "/BInfoList [Player]",
+            Help = "Checks edit history for a given player.",
+            Handler = BlockInfoListHandler
+        };
+
+        static void BlockInfoListHandler(Player player, CommandReader cmd) {
+            PlayerInfo info = InfoCommands.FindPlayerInfo(player, cmd, true);
+            if (info == null) return;
+            var args = new BlockInfoListLookupArgs {
+                Player = info,
+                Sender = player
+            };
+            Scheduler.NewBackgroundTask(BlockInfoListSchedulerCallback, args).RunOnce();
+        }
+
+        sealed class BlockInfoListLookupArgs {
+            public PlayerInfo Player;
+            public Player Sender;
+        }
+
+        const int MaxWorldsToList = 10;
+        static void BlockInfoListSchedulerCallback(SchedulerTask task) {
+            BlockInfoListLookupArgs args = (BlockInfoListLookupArgs)task.UserState;
+            List<BlockDBEntry> results = new List<BlockDBEntry>();
+            string playerName = args.Player.Rank.Color + args.Player.Name;
+            bool verbose = true;
+            foreach(World world in WorldManager.Worlds.Where(w => w.BlockDB.IsEnabled)) {
+                BlockDBEntry[] LookupList = world.BlockDB.Lookup(int.MaxValue,args.Player, false, args.Player.TimeSinceFirstLogin);
+                foreach (BlockDBEntry entry in LookupList) {
+                    results.Add(entry);
+                }
+                if (results.Count > 0) {
+                    if (verbose) {
+                        args.Sender.Message("{0}&S has commited block changes on... ", playerName);
+                        verbose = false;
+                    }
+                    int Built = results.Where(r => r.Context == BlockChangeContext.Manual && r.OldBlock == Block.Air).Count();
+                    int Deleted = results.Where(r => r.Context == BlockChangeContext.Manual && r.OldBlock != Block.Air && r.NewBlock == Block.Air).Count();
+                    int Drew = results.Where(r => r.Context == BlockChangeContext.Drawn).Count();
+                    args.Sender.Message("  {0}&S: Built &F{1}&S, Deleted &F{2}&S, Drew &F{3}", world.ClassyName, Built, Deleted, Drew);
+                }
+                results.Clear();
+            }
+            if (verbose) {
+                args.Sender.Message("{0}&S has not commited any block changes on the currently loaded worlds", playerName);
             }
         }
 
