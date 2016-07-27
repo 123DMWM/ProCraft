@@ -206,7 +206,33 @@ namespace fCraft {
             GlobalDefs = Load(path, out count);
             Logger.Log(LogType.SystemActivity, "BlockDefinitions.LoadGlobal: Loaded " + count + " blocks");
         }
-        
+
+        public static void ReLoadGlobalDefinitions() {
+            //Dont know what I am doing here....
+
+            /*GlobalDefs = new BlockDefinition[256];
+            Player[] players = Server.Players;
+            foreach (Player pl in players) {
+                SendRemoveOldCustomBlocks(pl, pl.World);
+            }
+            LoadGlobalDefinitions();
+            int nothing;
+            foreach (World world in WorldManager.Worlds) {
+                world.BlockDefs = new BlockDefinition[256];
+                string blockDefPath = Path.Combine(Paths.BlockDefsDirectory, world.Name + ".txt");
+                if (File.Exists(blockDefPath)) {
+                    BlockDefinition[] defs = Load(blockDefPath, out nothing);
+                    for (int i = 0; i < defs.Length; i++) {
+                        if (defs[i] == null) defs[i] = GlobalDefs[i];
+                    }
+                    world.BlockDefs = defs;
+                } else world.BlockDefs = GlobalDefs;
+            }
+            foreach (Player p in players) {
+                SendCustomBlocks(p);
+            }*/            
+        }
+
         public static BlockDefinition[] Load(string path, out int count) {
             BlockDefinition[] defs;
             count = 0;

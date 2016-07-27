@@ -1292,6 +1292,8 @@ namespace fCraft {
                 { "edit",     "&h" + name + " edit [id] [option] {args}&n" +
                         "&sEdits already defined blocks so you don't have to re-add them to change something. " +
                         "Options: Name, Solidity, Speed, AllId, TopId, SideID, BottomID, Light, Sound, FullBright, Shape, Draw, FogDensity, (FogHex or FogR, FogG, FogB), FallBack"},
+                { "reload",     "&h" + name + " reload&n" +
+                        "&sReloads all " + scope + " custom blocks from file. " },
                 { "info",     "&h" + name + " info [id]&n" +
                         "&sDisplays information about the given " + scope + " custom block." },
                 { "list",    "&h" + name + " list [offset]&n" +
@@ -1335,6 +1337,11 @@ namespace fCraft {
                 case "copy":
                 case "duplicate":
                     CustomBlockDuplicateHandler(p, cmd, global, defs); break;
+                case "reload":
+                    if (p.Info.Rank == RankManager.HighestRank && p.Can(Permission.ShutdownServer)) {
+                        BlockDefinition.ReLoadGlobalDefinitions(); 
+                    }
+                    break;
                 case "i":
                 case "info":
                     string input = cmd.Next() ?? "n/a";
