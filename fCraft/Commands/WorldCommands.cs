@@ -569,27 +569,23 @@ namespace fCraft {
         const int MaxWorldsToList = 10;
         static void BlockInfoListSchedulerCallback(SchedulerTask task) {
             BlockInfoListLookupArgs args = (BlockInfoListLookupArgs)task.UserState;
-            List<BlockDBEntry> results = new List<BlockDBEntry>();
             string playerName = args.Player.Rank.Color + args.Player.Name;
-            bool verbose = true;
+            bool noChanges = true;
+            
             foreach(World world in WorldManager.Worlds.Where(w => w.BlockDB.IsEnabled)) {
-                BlockDBEntry[] LookupList = world.BlockDB.Lookup(int.MaxValue,args.Player, false, args.Player.TimeSinceFirstLogin);
-                foreach (BlockDBEntry entry in LookupList) {
-                    results.Add(entry);
+                BlockDBEntry[] results = world.BlockDB.Lookup(int.MaxValue, args.Player, false, args.Player.TimeSinceFirstLogin);
+                if (results.Length == 0) continue;
+                
+                if (noChanges) {
+                    args.Sender.Message("{0}&S has commited block changes on... ", playerName);
+                    noChanges = false;
                 }
-                if (results.Count > 0) {
-                    if (verbose) {
-                        args.Sender.Message("{0}&S has commited block changes on... ", playerName);
-                        verbose = false;
-                    }
-                    int Built = results.Where(r => r.Context == BlockChangeContext.Manual && r.OldBlock == Block.Air).Count();
-                    int Deleted = results.Where(r => r.Context == BlockChangeContext.Manual && r.OldBlock != Block.Air && r.NewBlock == Block.Air).Count();
-                    int Drew = results.Where(r => r.Context == BlockChangeContext.Drawn).Count();
-                    args.Sender.Message("  {0}&S: Built &F{1}&S, Deleted &F{2}&S, Drew &F{3}", world.ClassyName, Built, Deleted, Drew);
-                }
-                results.Clear();
+                int Built = results.Where(r => r.Context == BlockChangeContext.Manual && r.OldBlock == Block.Air).Count();
+                int Deleted = results.Where(r => r.Context == BlockChangeContext.Manual && r.OldBlock != Block.Air && r.NewBlock == Block.Air).Count();
+                int Drew = results.Where(r => r.Context == BlockChangeContext.Drawn).Count();
+                args.Sender.Message("  {0}&S: Built &F{1}&S, Deleted &F{2}&S, Drew &F{3}", world.ClassyName, Built, Deleted, Drew);
             }
-            if (verbose) {
+            if (noChanges) {
                 args.Sender.Message("{0}&S has not commited any block changes on the currently loaded worlds", playerName);
             }
         }
