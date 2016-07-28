@@ -120,7 +120,7 @@ namespace fCraft {
         
         #region Packets
         
-        internal static void SendRemoveOldCustomBlocks(Player p, World oldWorld) {
+        internal static void SendNowRemoveOldBlocks(Player p, World oldWorld) {
             BlockDefinition[] defs = oldWorld.BlockDefs;
             for (int i = (int)Map.MaxCustomBlockType + 1; i < defs.Length; i++) {
                 BlockDefinition def = defs[i];
@@ -129,7 +129,7 @@ namespace fCraft {
             }
         }
         
-        internal static void SendCustomBlocks(Player p) {
+        internal static void SendNowBlocks(Player p) {
             BlockDefinition[] defs = p.World.BlockDefs;
             for (int i = (int)Map.MaxCustomBlockType + 1; i < defs.Length; i++) {
                 BlockDefinition def = defs[i];

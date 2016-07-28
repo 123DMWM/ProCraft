@@ -1081,8 +1081,8 @@ namespace fCraft {
             // needs to be sent before the client receives the map data
             if (Supports(CpeExt.BlockDefinitions)) {
             	if (oldWorld != null)
-            	    BlockDefinition.SendRemoveOldCustomBlocks(this, oldWorld);
-                BlockDefinition.SendCustomBlocks(this);
+            	    BlockDefinition.SendNowRemoveOldBlocks(this, oldWorld);
+                BlockDefinition.SendNowBlocks(this);
             }
 
             writer.Write(OpCode.MapBegin);
@@ -1123,34 +1123,14 @@ namespace fCraft {
         }
         
         void WriteWorldData(Map map) {
-             // Fetch compressed map copy
-            int mapBytesSent = 0, compressedLen = 0;
+             // Transfer compressed map copy
             Block maxLegal = supportsCustomBlocks ? Map.MaxCustomBlockType : Map.MaxLegalBlockType;
-            byte[] compressed = (supportsCustomBlocks && supportsBlockDefs) ? 
-                map.GetCompressedCopy(out compressedLen) : map.MakeCompressedMap((byte)maxLegal, out compressedLen);
-            Logger.Log(LogType.Debug, "Player.JoinWorldNow: Sending compressed map ({0} bytes) to {1}.", compressedLen, Name);
-
-            // Transfer the map copy
-            while (mapBytesSent < compressedLen) {
-                int chunkSize = compressedLen - mapBytesSent;
-                if (chunkSize > 1024) chunkSize = 1024;              
-                byte progress = (byte)(100 * mapBytesSent / compressedLen);
-
-                // write in chunks of 1024 bytes or less
-                writer.Write(OpCode.MapChunk);
-                writer.Write((short)chunkSize);
-                if (chunkSize == 1024) {
-                    writer.Write(compressed, mapBytesSent, 1024);
-                } else {
-                    byte[] buffer = new byte[1024];
-                    Array.Copy(compressed, mapBytesSent, buffer, 0, chunkSize);
-                    writer.Write(buffer, 0, 1024);
-                }
-
-                writer.Write(progress);
-                BytesSent += 1028;
-                mapBytesSent += chunkSize;
-            }
+            Logger.Log(LogType.Debug, "Player.JoinWorldNow: Sending compressed map to {0}.", Name);
+            
+            if (supportsCustomBlocks && supportsBlockDefs)
+                map.CompressMap(this);
+            else
+            	map.CompressAndConvertMap((byte)maxLegal, this);
         }
         
         void SendJoinMessage(World oldWorld, World newWorld) {

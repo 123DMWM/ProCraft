@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net;
 using fCraft.Drawing;
 using fCraft.MapConversion;
+using fCraft.Network;
 using JetBrains.Annotations;
 using System.Diagnostics;
 
@@ -284,7 +285,6 @@ namespace fCraft {
             {
                 Blocks[Index(x, y, z)] = (byte)type;
                 HasChangedSinceSave = true;
-                compressedCopyCache = null;
             }
         }
 
@@ -322,7 +322,6 @@ namespace fCraft {
             if( coords.X < Width && coords.Y < Length && coords.Z < Height && coords.X >= 0 && coords.Y >= 0 && coords.Z >= 0 && (byte)type < 50 ) {
                 Blocks[Index( coords )] = (byte)type;
                 HasChangedSinceSave = true;
-                compressedCopyCache = null;
             }
         }
 
@@ -333,7 +332,6 @@ namespace fCraft {
         public void SetBlock( int index, Block type ) {
             Blocks[index] = (byte)type;
             HasChangedSinceSave = true;
-            compressedCopyCache = null;
         }
 
 
@@ -436,13 +434,11 @@ namespace fCraft {
             BlockUpdate update = new BlockUpdate();
             while( packetsSent < maxPacketsPerUpdate ) {
                 if( !updates.TryDequeue( out update ) ) {
-                    if( World.IsFlushing ) {
-                        canFlush = true;
-                    }
+                    if( World.IsFlushing ) canFlush = true;
                     break;
                 }
+            	
                 HasChangedSinceSave = true;
-                compressedCopyCache = null;
                 if( !InBounds( update.X, update.Y, update.Z ) ) continue;
                 int blockIndex = Index( update.X, update.Y, update.Z );
                 Blocks[blockIndex] = (byte)update.BlockType;
@@ -450,10 +446,8 @@ namespace fCraft {
                 if( !World.IsFlushing ) {
                     Player[] players = World.Players;
                     for( int i = 0; i < players.Length; i++ ) {
-                        // cannot reuse packet as each player may require different modifications to block field
                         Player p = players[i];
-                        if (p == update.Origin) 
-                            continue;
+                        if (p == update.Origin) continue;
                         p.SendBlock( new Vector3I( update.X, update.Y, update.Z ), update.BlockType );
                     }
                 }
@@ -892,36 +886,51 @@ namespace fCraft {
             }
         }
 
-
-        /// <summary> Gets a compressed (GZip) copy of the map (raw block data with signed, 32bit, big-endian block count prepended).
-        /// If the map has not been modified since last GetCompressedCopy call, returns a cached copy. </summary>
-        public byte[] GetCompressedCopy(out int compressedLen) {
+        const int bufferSize = 64 * 1024;
+        internal void CompressMap(Player dst) {
             byte[] array = Blocks;
-            byte[] currentCopy = compressedCopyCache;
-            if (currentCopy == null) {
-                using (MemoryStream ms = new MemoryStream()) {
-                    using (GZipStream compressor = new GZipStream(ms, CompressionMode.Compress, true)) {
-                        // convert block count to big-endian
-                        int convertedBlockCount = IPAddress.HostToNetworkOrder(array.Length);
-                        // write block count to gzip stream
-                        compressor.Write(BitConverter.GetBytes(convertedBlockCount), 0, 4);
-                        compressor.Write(array, 0, array.Length);
-                    }
-                    currentCopy = ms.ToArray();
+            using (LevelChunkStream ms = new LevelChunkStream(dst))
+                using (GZipStream compressor = new GZipStream(ms, CompressionMode.Compress, true))
+            {
+                int count = IPAddress.HostToNetworkOrder(array.Length); // convert to big endian
+                compressor.Write(BitConverter.GetBytes(count), 0, 4);
+                ms.length = array.Length;
+                
+                for (int i = 0; i < array.Length; i += bufferSize) {
+                    int len = Math.Min(bufferSize, array.Length - i);
+                    ms.position = i;
+                    compressor.Write(array, i, len);
                 }
-                compressedCopyCache = currentCopy;
             }
-            compressedLen = currentCopy.Length;
-            return currentCopy;
         }
         
-        const int bufferSize = 64 * 1024;
-        public byte[] MakeCompressedMap(byte maxLegal, out int compressedLen) {
+        internal void CompressAndConvertMap(byte maxLegal, Player dst) {
             byte[] array = Blocks;
-            BlockDefinition[] defs = World.BlockDefs;
-            bool hasCPEBlocks = maxLegal == (byte)MaxCustomBlockType;
-            
             byte* fallback = stackalloc byte[256];
+            MakeFallbacks(fallback, maxLegal, World);
+            using (LevelChunkStream ms = new LevelChunkStream(dst))
+                using (GZipStream compressor = new GZipStream(ms, CompressionMode.Compress, true))
+            {
+                int count = IPAddress.HostToNetworkOrder(array.Length); // convert to big endian
+                compressor.Write(BitConverter.GetBytes(count), 0, 4);
+                ms.length = array.Length;
+                
+                byte[] buffer = new byte[bufferSize];
+                for (int i = 0; i < array.Length; i += bufferSize) {
+                    int len = Math.Min(bufferSize, array.Length - i);
+                    for (int j = 0; j < len; j++)
+                        buffer[j] = fallback[array[i + j]];
+                    
+                    ms.position = i;
+                    compressor.Write(buffer, 0, len);
+                }
+            }
+        }
+        
+        unsafe static void MakeFallbacks(byte* fallback, byte maxLegal, World world) {
+            BlockDefinition[] defs = world.BlockDefs;
+            bool hasCPEBlocks = maxLegal == (byte)MaxCustomBlockType;
+
             for (int i = 0; i < 256; i++) {
                 fallback[i] = (byte)FallbackBlocks[i];
                 if (defs[i] == null) continue;
@@ -933,26 +942,7 @@ namespace fCraft {
             }
             for (int i = 0; i <= (byte)maxLegal; i++)
                 fallback[i] = (byte)i;
-                        
-            using (MemoryStream ms = new MemoryStream()) {
-                using (GZipStream compressor = new GZipStream(ms, CompressionMode.Compress, true)) {
-                    int count = IPAddress.HostToNetworkOrder(array.Length);
-                    compressor.Write(BitConverter.GetBytes(count), 0, 4);
-                    
-                    byte[] buffer = new byte[bufferSize];
-                    for (int i = 0; i < array.Length; i += bufferSize) {
-                        int len = Math.Min(bufferSize, array.Length - i);
-                        for (int j = 0; j < len; j++)
-                            buffer[j] = fallback[array[i + j]];
-                        compressor.Write(buffer, 0, len);
-                    }
-                }
-                compressedLen = (int)ms.Length;
-                return ms.GetBuffer();
-            }
         }
-
-        volatile byte[] compressedCopyCache;
 
 
         /// <summary> Searches the map, from top to bottom, for the first appearance of a given block. </summary>
