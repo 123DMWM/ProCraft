@@ -5,8 +5,8 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 
-namespace fCraft.Network {
-    public sealed class LevelChunkStream : Stream {
+namespace fCraft {
+    internal sealed class LevelChunkStream : Stream {
         public override bool CanRead { get { return false; } }
         public override bool CanSeek { get { return false; } }
         public override bool CanWrite { get { return true; } }

@@ -7,7 +7,6 @@ using System.Linq;
 using System.Net;
 using fCraft.Drawing;
 using fCraft.MapConversion;
-using fCraft.Network;
 using JetBrains.Annotations;
 using System.Diagnostics;
 

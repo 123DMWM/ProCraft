@@ -149,6 +149,7 @@
     <Compile Include="MapConversion\MapMCF.cs" />
     <Compile Include="Network\CpeConstants.cs" />
     <Compile Include="Network\IRCHandlers.cs" />
+    <Compile Include="Network\LevelChunkStream.cs" />
     <Compile Include="Network\Player.Handshake.cs" />
     <Compile Include="Player\ChatFilter.cs" />
     <Compile Include="Player\Report.cs" />
