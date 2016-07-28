@@ -59,6 +59,15 @@ namespace fCraft {
             return false;
         }
 
+        public static bool existsAny(World world) {
+            foreach (Entity e in Entities) {
+                if (e.World.ToLower() == world.Name.ToLower()) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         public static Entity CreateEntity(string name, string skin, string modelName, World world, Position pos, sbyte entityID) {
             Entity entity = new Entity();
             entity.Name = name;
@@ -106,6 +115,12 @@ namespace fCraft {
             getWorld(entity).Players.Send(Packet.MakeTeleport(entity.ID, p));
             setPos(entity, p);
             SaveAll(false);
+        }
+
+        public static void UpdateEntityWorld(Entity entity, string newWorld) {
+            entity.World = newWorld;
+            SaveAll(false);
+            ShowEntity(entity);
         }
 
         public static void ChangeEntityModel(Entity entity, string botModel) {

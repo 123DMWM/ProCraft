@@ -263,7 +263,8 @@ namespace fCraft {
                     BlockDB.Clear();
                     BlockDB.World = newWorld;
                 }
-                foreach( Player player in Players ) {
+                if (Entity.existsAny(this)) Entity.RemoveAll(this);
+                foreach ( Player player in Players ) {
                     player.JoinWorld( newWorld, WorldChangeReason.Rejoin );
                 }
                 return newWorld;

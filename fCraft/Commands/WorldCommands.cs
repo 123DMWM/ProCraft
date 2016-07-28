@@ -758,9 +758,13 @@ namespace fCraft {
                 }
                 if (!cmd.IsConfirmed) {
                     Logger.Log(LogType.UserActivity,
-                        "Gen: Asked {0} to confirm replacing the map of world {1} (\"this map\"). Request Denied because of Security Precautions In Place.",
+                        "Gen: Asked {0} to confirm replacing the map of world {1} (\"this map\").",
                         player.Name, playerWorld.Name);
-                    player.Confirm(cmd, "Replace THIS MAP with a generated one ({0})?", templateFullName);
+                    if (!Entity.existsAny(player.World)) {
+                        player.Confirm(cmd, "Replace THIS MAP with a generated one ({0})?", templateFullName);
+                    } else {
+                        player.Confirm(cmd, "Replace THIS MAP with a generated one ({0})?&NThis will also remove all the Entities/Bots on the world.", templateFullName);
+                    }
                     return;
                 }
 
@@ -2110,7 +2114,12 @@ namespace fCraft {
                     Logger.Log(LogType.UserActivity,
                         "WLoad: Asked {0} to confirm replacing the map of world {1} (\"this map\")", player.Name,
                         player.World.Name);
-                    player.Confirm(cmd, "Replace THIS MAP with \"{0}\"?", fileName);
+
+                    if (!Entity.existsAny(player.World)) {
+                        player.Confirm(cmd, "Replace THIS MAP with \"{0}\"?", fileName);
+                    } else {
+                        player.Confirm(cmd, "Replace THIS MAP with \"{0}\"?&NThis will also remove all the Entities/Bots on the world.", fileName);
+                    }
                     return;
                 }
                 Map map;
@@ -2126,7 +2135,7 @@ namespace fCraft {
                 try {
                     world.MapChangedBy = player.Name;
                     world.ChangeMap(map);
-                } catch (WorldOpException ex) {
+                    } catch (WorldOpException ex) {
                     Logger.Log(LogType.Error, "Could not complete WorldLoad operation: {0}", ex.Message);
                     player.Message("&WWLoad: {0}", ex.Message);
                     return;
@@ -2183,7 +2192,11 @@ namespace fCraft {
                         if (!cmd.IsConfirmed) {
                             Logger.Log(LogType.UserActivity,
                                 "WLoad: Asked {0} to confirm replacing the map of world {1}", player.Name, world.Name);
-                            player.Confirm(cmd, "Replace map for {0}&S with \"{1}\"?", world.ClassyName, fileName);
+                            if (!Entity.existsAny(world)) {
+                                player.Confirm(cmd, "Replace map for {0}&S with \"{1}\"?", world.ClassyName, fileName);
+                            } else {
+                                player.Confirm(cmd, "Replace map for {0}&S with \"{1}\"?&NThis will also remove all Entities/Bots on that world", world.ClassyName, fileName);
+                            }
                             return;
                         }
 
@@ -2301,7 +2314,11 @@ namespace fCraft {
                     Logger.Log(LogType.UserActivity,
                                 "WLoad: Asked {0} to confirm clearing the map of world {1} (\"this map\")",
                                 player.Name, player.World.Name);
-                    player.Confirm(cmd, "Clear \"{0}\"?", player.World);
+                    if (!Entity.existsAny(player.World)) {
+                        player.Confirm(cmd, "Clear \"{0}\"?", player.World);
+                    } else {
+                        player.Confirm(cmd, "Clear \"{0}\"?&NThis will also remove all the Entities/Bots on the world.", player.World);
+                    }
                     return;
                 }
                 Map map;
@@ -2357,8 +2374,13 @@ namespace fCraft {
                             Logger.Log(LogType.UserActivity,
                                         "WClear: Asked {0} to confirm replacing the map of world {1}",
                                         player.Name, world.Name);
-                            player.Confirm(cmd, "Clear {0}&S map?",
-                                            world.ClassyName, player.World);
+                            if (!Entity.existsAny(player.World)) {
+                                player.Confirm(cmd, "Clear {0}&S map?",
+                                                world.ClassyName, player.World);
+                            } else {
+                                player.Confirm(cmd, "Clear {0}&S map?&NThis will also remove all the Entities/Bots on the world.",
+                                                world.ClassyName, player.World);
+                            }
                             return;
                         }
 
@@ -2625,6 +2647,9 @@ namespace fCraft {
             player.LastUsedWorldName = newName;
             Logger.Log(LogType.UserActivity, "{0} renamed the world \"{1}\" to \"{2}\".", player.Name, oldName, newName);
             Server.Message("{0}&S renamed the world \"{1}\" to \"{2}\"", player.ClassyName, oldName, newName);
+            foreach(Entity bot in Entity.Entities.Where(e => oldName.ToLower().Equals(e.World.ToLower()))) {
+                Entity.UpdateEntityWorld(bot, newName);
+            }
         }
 
         #endregion
@@ -3413,8 +3438,13 @@ namespace fCraft {
                 player.Message("You have no personal worlds by that number: {0}", num); return;
             }
             if (!cmd.IsConfirmed) {
-                player.Confirm(cmd, "This will reset your personal world:   " + mapName +
-                               "&n&cThis cannot be undone!");
+                if (!Entity.existsAny(player.World)) {
+                    player.Confirm(cmd, "This will reset your personal world:   " + mapName +
+                                   "&n&cThis cannot be undone!");
+                } else {
+                    player.Confirm(cmd, "This will reset your personal world:   " + mapName +
+                                   "&n&cThis cannot be undone!&NThis will also remove all the Entities/Bots on the world.");
+                }
                 return;
             }
             
