@@ -600,6 +600,33 @@ namespace fCraft {
                 player.Message("  - &4R:&F{0} &2G:&F{1} &1B:&F{2}", color.R, color.G, color.B);
                 player.Message("  Alpha: &F{0}", zone.Alpha);
             }
+            Scheduler.NewTask(t => highlightZones(player, new Zone[] { zone })).RunOnce();
+        }
+
+        public static void highlightZones(Player player, Zone[] zones) {
+            char[] colors = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+                              'A', 'B', 'C', 'D', 'E', 'F', 'E', 'D', 'C', 'B',
+                              'A', '9', '8', '7', '6', '5', '4', '3', '2', '1' };
+            for(int i = 0; i < 123; i++) {
+                if (player != null) {
+                    if (player.Supports(CpeExt.SelectionCuboid)) {
+                        char c = colors[i % colors.Length];
+                        foreach (Zone zone in zones) {
+                            player.Send(Packet.MakeMakeSelection(zone.ZoneID, "ZInfo", zone.Bounds, "" + c + c + c, 127));
+                        }
+                        System.Threading.Thread.Sleep(21);
+                    }
+                } else return;
+            }
+            if (player != null) {
+                foreach (Zone zone in zones) {
+                    if (zone.ShowZone) {
+                        player.Send(Packet.MakeMakeSelection(zone.ZoneID, zone.Name, zone.Bounds, zone.Color, zone.Alpha));
+                    } else {
+                        player.Send(Packet.MakeRemoveSelection(zone.ZoneID));
+                    }
+                }
+            }
         }
 
         #endregion
@@ -618,6 +645,7 @@ namespace fCraft {
         static void ZoneListHandler( Player player, CommandReader cmd ) {
             World world = player.World;
             string worldName = cmd.Next();
+            string showZones = cmd.Next() ?? "yes";
             if( worldName != null ) {
                 world = WorldManager.FindWorldOrPrintMatches( player, worldName );
                 if( world == null ) return;
@@ -650,6 +678,9 @@ namespace fCraft {
                                     zone.Bounds.Width,
                                     zone.Bounds.Length,
                                     zone.Bounds.Height );
+                }
+                if (showZones.ToLower().Equals("yes")) {
+                    Scheduler.NewTask(t => highlightZones(player, zones)).RunOnce();
                 }
                 player.Message( "   Type &H/ZInfo ZoneName&S for details." );
             } else {
