@@ -340,6 +340,7 @@ namespace fCraft
                         
                         if (ConfigKey.IRCBotForwardFromIRC.Enabled()) {
                             if (msg.Type == IRCMessageType.ChannelAction) {
+                                Scheduler.NewTask(t => Chat.getUrls(processedMessage)).RunOnce();
                                 foreach (Player player in Server.Players) {
                                     if (player.Info.ReadIRC) {
                                         player.Message("&i(IRC) * {0} {1}", msg.Nick, processedMessage);
@@ -349,14 +350,17 @@ namespace fCraft
                                            IRCColorsAndNonStandardCharsExceptEmotes.Replace(rawMessage, ""));
                             } else if (IRCHandlers.HandleCommand(ActualBotNick, msg.Nick, rawMessage)) {
                             } else if (IRCHandlers.HandlePM(ActualBotNick, msg.Nick, rawMessage)) {
-                            } else
+                            } else {
+                                Scheduler.NewTask(t => Chat.getUrls(processedMessage)).RunOnce();
                                 foreach (Player player in Server.Players.Where(player => player.Info.ReadIRC)) {
-                                player.Message("&i(IRC) {0}{1}: {2}", msg.Nick, Color.White,
-                                               processedMessage);
+                                    player.Message("&i(IRC) {0}{1}: {2}", msg.Nick, Color.White,
+                                                   processedMessage);
+                                }
                             }
                             Logger.Log(LogType.IrcChat, "{0}: {1}: {2}", msg.Channel, msg.Nick,
                                        IRCColorsAndNonStandardCharsExceptEmotes.Replace(rawMessage, ""));
                         } else if (msg.Message.StartsWith("#")) {
+                            Scheduler.NewTask(t => Chat.getUrls(processedMessage)).RunOnce();
                             foreach (Player player in Server.Players.Where(player => player.Info.ReadIRC)) {
                                 player.Message("&i(IRC) {0}{1}: {2}", msg.Nick, Color.White,
                                                processedMessage.Substring(1));

@@ -117,12 +117,12 @@ namespace fCraft {
             return true;
         }
 
-        static void getUrls(string rawMessage) {
+        public static void getUrls(string rawMessage) {
             fullUrls.Clear();
             try {
                 MatchCollection urlMatches = RegexURLMatcher.Matches(rawMessage);
                 foreach (Match match in urlMatches) {
-                    if (fullUrls.Count() < 3) {
+                    if (fullUrls.Count() < 5) {
                         var request = (HttpWebRequest)WebRequest.Create("http://123dmwm.tk/unshorten.php?url=" + match.ToString());
                         string fullUrl = null;
                         using (var response = (HttpWebResponse)request.GetResponse()) {
