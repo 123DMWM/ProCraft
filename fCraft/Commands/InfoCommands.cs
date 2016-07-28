@@ -1069,22 +1069,20 @@ namespace fCraft {
         static void MeasureCallback( Player player, Vector3I[] marks, object tag ) {
             BoundingBox box = new BoundingBox( marks[0], marks[1] );
             player.Message( "Measure: {0} x {1} wide, {2} tall, {3} blocks.",
-                            box.Width,
-                            box.Length,
-                            box.Height,
-                            box.Volume );
+                            box.Width, box.Length, box.Height, box.Volume );
             player.Message( "  Located between {0} and {1}",
-                            box.MinVertex,
-                            box.MaxVertex );
+                            box.MinVertex, box.MaxVertex );
 
             Map map = player.WorldMap;
-            int[] counts = new int[256];          
+            int[] counts = new int[256];
             for( int z = box.ZMin; z <= box.ZMax; z++ )
-                for( int y = box.YMin; y <= box.YMax; y++ )
-                    for( int x = box.XMin; x <= box.XMax; x++ )
+                for( int y = box.YMin; y <= box.YMax; y++ ) 
             {
-                Block block = map.GetBlock( x, y, z );
-                counts[(byte)block]++;
+                int index = map.Index( box.XMin, y, z );
+                for( int x = box.XMin; x <= box.XMax; x++ ) {
+                    counts[map.Blocks[index]]++;
+                    index++;
+                }
             }
             
             Dictionary<byte, int> blockCounts = new Dictionary<byte, int>();
