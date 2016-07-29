@@ -600,29 +600,42 @@ namespace fCraft {
                 player.Message("  - &4R:&F{0} &2G:&F{1} &1B:&F{2}", color.R, color.G, color.B);
                 player.Message("  Alpha: &F{0}", zone.Alpha);
             }
-            Scheduler.NewTask(t => highlightZones(player, new Zone[] { zone })).RunOnce();
+            
+            if (player.IsSuper || !player.Supports(CpeExt.SelectionCuboid)) return;
+            HighlightZoneArgs args = new HighlightZoneArgs() { Player = player, Zones = new[] { zone }};
+            Scheduler.NewTask(HighlightZones, args)
+                .RunRepeating(TimeSpan.Zero, highlightZonesInterval, highlightZonesRepeats);
         }
 
-        static void highlightZones(Player player, Zone[] zones) {
-            char[] colors = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-                              'A', 'B', 'C', 'D', 'E', 'F', 'E', 'D', 'C', 'B',
-                              'A', '9', '8', '7', '6', '5', '4', '3', '2', '1' };
-        	if (player == null || !player.Supports(CpeExt.SelectionCuboid)) return;
-        	
-            for (int i = 0; i < 123; i++) {
-        		string c = new string(colors[i % colors.Length], 6);
-                foreach (Zone zone in zones) {
-                    player.Send(Packet.MakeMakeSelection(zone.ZoneID, "ZInfo", zone.Bounds, c, 127));
+        struct HighlightZoneArgs {
+            public Player Player;
+            public Zone[] Zones;
+        }
+        
+        static TimeSpan highlightZonesInterval = TimeSpan.FromMilliseconds(21);
+        const int highlightZonesRepeats = 123;
+        static void HighlightZones(SchedulerTask task) {
+            HighlightZoneArgs args = (HighlightZoneArgs)task.UserState;
+            // Last iteration, restore zones state
+            if (task.MaxRepeats == 1) {
+                foreach (Zone zone in args.Zones) {
+                    if (zone.ShowZone) {
+                        args.Player.Send(Packet.MakeMakeSelection(zone.ZoneID, zone.Name, zone.Bounds, zone.Color, zone.Alpha));
+                    } else {
+                        args.Player.Send(Packet.MakeRemoveSelection(zone.ZoneID));
+                    }
                 }
-                System.Threading.Thread.Sleep(21);
-            }
+                return;
+            }         
             
-            foreach (Zone zone in zones) {
-                if (zone.ShowZone) {
-                    player.Send(Packet.MakeMakeSelection(zone.ZoneID, zone.Name, zone.Bounds, zone.Color, zone.Alpha));
-                } else {
-                    player.Send(Packet.MakeRemoveSelection(zone.ZoneID));
-                }
+            // cycle from 0-->9 then A-->F then E-->A then 9-->1
+            int j = (highlightZonesRepeats - task.MaxRepeats) % 30;
+            if (j >= 16) j = 30 - j;
+            char col = j < 10 ? (char)('0' + j) : (char)('A' + (j - 10));
+            
+            string c = new string(col, 6);
+            foreach (Zone zone in args.Zones) {
+                args.Player.Send(Packet.MakeMakeSelection(zone.ZoneID, "ZInfo", zone.Bounds, c, 127));
             }
         }
 
@@ -667,22 +680,24 @@ namespace fCraft {
             }
 
             Zone[] zones = map.Zones.Cache;
-            if( zones.Length > 0 ) {
-                foreach( Zone zone in zones ) {
-                    player.Message( "   {0} ({1}&S) - {2} x {3} x {4}",
-                                    zone.Name,
-                                    zone.Controller.MinRank.ClassyName,
-                                    zone.Bounds.Width,
-                                    zone.Bounds.Length,
-                                    zone.Bounds.Height );
-                }
-                if (showZones.ToLower().Equals("yes")) {
-                    Scheduler.NewTask(t => highlightZones(player, zones)).RunOnce();
-                }
-                player.Message( "   Type &H/ZInfo ZoneName&S for details." );
-            } else {
-                player.Message( "   No zones defined." );
+            if( zones.Length == 0 ) {
+                player.Message( "   No zones defined." ); 
+                return;
             }
+            
+            foreach( Zone zone in zones ) {
+                player.Message( "   {0} ({1}&S) - {2} x {3} x {4}",
+                               zone.Name, zone.Controller.MinRank.ClassyName,
+                               zone.Bounds.Width, zone.Bounds.Length, zone.Bounds.Height );
+            }
+            player.Message( "   Type &H/ZInfo ZoneName&S for details." );
+            
+            if (player.IsSuper || !player.Supports(CpeExt.SelectionCuboid)) return;
+            if (showZones.ToLower() !="yes") return;
+            
+            HighlightZoneArgs args = new HighlightZoneArgs() { Player = player, Zones = zones };
+            Scheduler.NewTask(HighlightZones, args)
+                .RunRepeating(TimeSpan.Zero, highlightZonesInterval, highlightZonesRepeats);
         }
 
         #endregion
