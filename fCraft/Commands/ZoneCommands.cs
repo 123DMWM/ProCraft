@@ -603,28 +603,25 @@ namespace fCraft {
             Scheduler.NewTask(t => highlightZones(player, new Zone[] { zone })).RunOnce();
         }
 
-        public static void highlightZones(Player player, Zone[] zones) {
+        static void highlightZones(Player player, Zone[] zones) {
             char[] colors = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
                               'A', 'B', 'C', 'D', 'E', 'F', 'E', 'D', 'C', 'B',
                               'A', '9', '8', '7', '6', '5', '4', '3', '2', '1' };
-            for(int i = 0; i < 123; i++) {
-                if (player != null) {
-                    if (player.Supports(CpeExt.SelectionCuboid)) {
-                        char c = colors[i % colors.Length];
-                        foreach (Zone zone in zones) {
-                            player.Send(Packet.MakeMakeSelection(zone.ZoneID, "ZInfo", zone.Bounds, "" + c + c + c, 127));
-                        }
-                        System.Threading.Thread.Sleep(21);
-                    }
-                } else return;
-            }
-            if (player != null) {
+        	if (player == null || !player.Supports(CpeExt.SelectionCuboid)) return;
+        	
+            for (int i = 0; i < 123; i++) {
+        		string c = new string(colors[i % colors.Length], 6);
                 foreach (Zone zone in zones) {
-                    if (zone.ShowZone) {
-                        player.Send(Packet.MakeMakeSelection(zone.ZoneID, zone.Name, zone.Bounds, zone.Color, zone.Alpha));
-                    } else {
-                        player.Send(Packet.MakeRemoveSelection(zone.ZoneID));
-                    }
+                    player.Send(Packet.MakeMakeSelection(zone.ZoneID, "ZInfo", zone.Bounds, c, 127));
+                }
+                System.Threading.Thread.Sleep(21);
+            }
+            
+            foreach (Zone zone in zones) {
+                if (zone.ShowZone) {
+                    player.Send(Packet.MakeMakeSelection(zone.ZoneID, zone.Name, zone.Bounds, zone.Color, zone.Alpha));
+                } else {
+                    player.Send(Packet.MakeRemoveSelection(zone.ZoneID));
                 }
             }
         }
