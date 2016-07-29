@@ -612,8 +612,8 @@ namespace fCraft {
             public Zone[] Zones;
         }
         
-        static TimeSpan highlightZonesInterval = TimeSpan.FromMilliseconds(21);
-        const int highlightZonesRepeats = 123;
+        static TimeSpan highlightZonesInterval = TimeSpan.FromMilliseconds(20);
+        const int highlightZonesRepeats = 250;
         static void HighlightZones(SchedulerTask task) {
             HighlightZoneArgs args = (HighlightZoneArgs)task.UserState;
             // Last iteration, restore zones state
