@@ -344,12 +344,12 @@ namespace fCraft {
             bool sentMessage = true;
             switch (option) {
 				case "go":
-					Scheduler.NewTask(t => Server.BotMessage("5")).RunManual(TimeSpan.FromSeconds(0));
-					Scheduler.NewTask(t => Server.BotMessage("4")).RunManual(TimeSpan.FromSeconds(1));
-					Scheduler.NewTask(t => Server.BotMessage("3")).RunManual(TimeSpan.FromSeconds(2));
-					Scheduler.NewTask(t => Server.BotMessage("2")).RunManual(TimeSpan.FromSeconds(3));
-					Scheduler.NewTask(t => Server.BotMessage("1")).RunManual(TimeSpan.FromSeconds(4));
-					Scheduler.NewTask(t => Server.BotMessage("Go!")).RunManual(TimeSpan.FromSeconds(5));
+					Scheduler.NewTask(t => Server.BotMessage("5")).RunOnce(TimeSpan.FromSeconds(0));
+					Scheduler.NewTask(t => Server.BotMessage("4")).RunOnce(TimeSpan.FromSeconds(1));
+					Scheduler.NewTask(t => Server.BotMessage("3")).RunOnce(TimeSpan.FromSeconds(2));
+					Scheduler.NewTask(t => Server.BotMessage("2")).RunOnce(TimeSpan.FromSeconds(3));
+					Scheduler.NewTask(t => Server.BotMessage("1")).RunOnce(TimeSpan.FromSeconds(4));
+					Scheduler.NewTask(t => Server.BotMessage("Go!")).RunOnce(TimeSpan.FromSeconds(5));
 					break;
 				case "server":
 					Server.BotMessage("The name of this server is " + ConfigKey.ServerName.GetString() + ".");

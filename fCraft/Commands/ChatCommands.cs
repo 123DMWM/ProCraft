@@ -520,11 +520,11 @@ namespace fCraft
                 player.Message("This server has IRC disabled or does not have IRC settings setup correctly");
                 return;
             } else {
-                player.Message("&IInternet Relayed Chat information");
+                player.Message("&IInternet Relay Chat information");
                 player.Message(" IRC Network: &f{0}", ConfigKey.IRCBotNetwork.GetString());
                 player.Message(" Network Channel/s: (please wait 1 second for updates)");
                 IRC.SendRawMessage(IRCCommands.Names(ConfigKey.IRCBotChannels.GetString()),"","");
-                Scheduler.NewTask(t => sendChannelUsers(player)).RunManual(TimeSpan.FromSeconds(1));
+                Scheduler.NewTask(t => sendChannelUsers(player)).RunOnce(TimeSpan.FromSeconds(1));
             }
         }
 
