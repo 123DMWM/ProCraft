@@ -422,8 +422,10 @@ namespace fCraft {
             if (rotChanged) ResetIdleTimer();
 
             bool deniedzone = false;
-            foreach (Zone zone in World.Map.Zones.Cache) {
-            	if (SpecialZone.CheckMoveZone(this, zone, ref deniedzone, newPos)) break;
+            if (World.IsLoaded) { //prevents server error when using genheightmap with large maps
+                foreach (Zone zone in World.Map.Zones.Cache) {
+                    if (SpecialZone.CheckMoveZone(this, zone, ref deniedzone, newPos)) break;
+                }
             }
 
             if ( Info.IsFrozen || deniedzone) {

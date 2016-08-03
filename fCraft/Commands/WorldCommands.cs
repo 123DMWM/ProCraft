@@ -10,6 +10,8 @@ using System.Text;
 using fCraft.Games;
 using fCraft.Portals;
 using System.Diagnostics;
+using System.Net;
+using System.Drawing;
 
 namespace fCraft {
     /// <summary> Contains commands related to world management. </summary>
@@ -25,6 +27,7 @@ namespace fCraft {
                               "Available terrain types: Empty, Ocean, " + Enum.GetNames( typeof( MapGenTemplate ) ).JoinToString() + "&N" +
                               "Note: You do not need to specify a theme with \"Empty\" and \"Ocean\" templates.";
             CommandManager.RegisterCommand( CdGenerate );
+            CommandManager.RegisterCommand( CdGenerateHeightMap );
             CommandManager.RegisterCommand( CdJoin );
             CommandManager.RegisterCommand( CdWorldLock );
             CommandManager.RegisterCommand( CdWorldUnlock );
@@ -861,6 +864,290 @@ namespace fCraft {
                 playerWorld.MapChangedBy = player.Name;
                 playerWorld.ChangeMap(map);
             }
+        }
+
+        #endregion
+        #region GenHeightMap
+        
+        static readonly CommandDescriptor CdGenerateHeightMap = new CommandDescriptor {
+            Name = "GenHeightMap",
+            Aliases = new[] { "genhm" },
+            Category = CommandCategory.World,
+            IsConsoleSafe = true,
+            Permissions = new[] { Permission.ManageWorlds },
+            Usage = "/GenHeightMap [URL to heightmap image file] [FileName]",
+            Help = "Generates a new map based on a heightmap image.&N" +
+                              "If no file name is given, loads generated world into current world.&n" +
+                              "If no file theme is given, generates default Grass theme.&n" +
+                              "Available themes: Grass, " + Enum.GetNames(typeof(MapGenTheme)).JoinToString(),
+            Handler = GenHMHandler
+        };
+
+        private static void GenHMHandler(Player player, CommandReader cmd) {
+            World playerWorld = player.World;
+            bool noTrees = true;
+            string themeName = cmd.Next();
+            string url = null;
+            string[] themes = { "arctic", "desert", "forest", "grass", "hell", "swamp" };
+
+            if (themes.Contains(themeName.ToLower())) {
+                if (themeName.ToLower() == "forest" || themeName.ToLower() == "swamp") {
+                    noTrees = false;
+                }
+                url = cmd.Next();
+            } else {
+                cmd.Rewind();
+                url = cmd.Next();
+            }
+
+            if (!parseUrl(ref url, player)) return;
+
+            Bitmap heightmap = null;
+
+            // check file/world name
+            string fileName = cmd.Next();
+            string fullFileName = null;
+            if (string.IsNullOrEmpty(fileName)) {
+                // replacing current world
+                if (playerWorld == null) {
+                    player.Message("When used from console, /GenHeightMap requires FileName.");
+                    CdGenerateHeightMap.PrintUsage(player);
+                    return;
+                }
+                if (!cmd.IsConfirmed) {
+                    Logger.Log(LogType.UserActivity,
+                        "GenHM: Asked {0} to confirm replacing the map of world {1} (\"this map\").",
+                        player.Name, playerWorld.Name);
+                    if (!Entity.existsAny(player.World)) {
+                        player.Confirm(cmd, "Replace THIS MAP with a generated one (HeightMap: &9{0}&S)?", url);
+                    } else {
+                        player.Confirm(cmd, "Replace THIS MAP with a generated one (HeightMap: &9{0}&S)?&NThis will also remove all the Entities/Bots on the world.", url);
+                    }
+                    return;
+                }
+
+            } else if (fileName.ToLower().StartsWith("pw_") && player.Info.Rank != RankManager.HighestRank) {
+                player.Message("You cannot make fake personal worlds");
+                return;
+            } else {
+                if (cmd.HasNext) {
+                    CdGenerateHeightMap.PrintUsage(player);
+                    return;
+                }
+                // saving to file
+                fileName = fileName.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+                if (!fileName.EndsWith(".fcm", StringComparison.OrdinalIgnoreCase)) {
+                    fileName += ".fcm";
+                }
+                if (!Paths.IsValidPath(fileName)) {
+                    player.Message("Invalid file name.");
+                    return;
+                }
+                fullFileName = Path.Combine(Paths.MapPath, fileName);
+                if (!Paths.Contains(Paths.MapPath, fullFileName)) {
+                    player.MessageUnsafePath();
+                    return;
+                }
+                string dirName = fullFileName.Substring(0, fullFileName.LastIndexOf(Path.DirectorySeparatorChar));
+                if (!Directory.Exists(dirName)) {
+                    Directory.CreateDirectory(dirName);
+                }
+                if (!cmd.IsConfirmed && File.Exists(fullFileName)) {
+                    Logger.Log(LogType.UserActivity, "Gen: Asked {0} to confirm overwriting map file \"{1}\"",
+                        player.Name, fileName);
+                    player.Confirm(cmd, "The mapfile \"{0}\" already exists. Overwrite?", fileName);
+                    return;
+                }
+            }
+
+            // generate the map
+            int mapWidth = 0, mapLength = 0;
+            player.SendNow(Packet.Message(0, "Downloading file from: &9" + url, false));
+            heightmap = DownloadImage(url, player);
+            if (heightmap == null) return;
+            mapWidth = heightmap.Width;
+            mapLength = heightmap.Height;
+            if (!Map.IsValidDimension(mapWidth) || !Map.IsValidDimension(mapLength)) {
+                player.Message("Invalid image size along {0} &S(Must be inbetween 16 and 1024)", Map.IsValidDimension(mapWidth) ? "height: &F" + mapLength : "width: &F" + mapWidth);
+                return;
+            }
+            player.SendNow(Packet.Message(0, "Generating HeightMap...", false));
+            Map map = MapGenerator.GenerateEmpty(mapWidth, mapLength, 256);
+            Generate(ref map, heightmap, themeName.ToLower());
+            if (!noTrees) {
+                Block stone = Block.Stone, dirt = Block.Dirt, grass = Block.Grass;
+                ApplyTheme(themeName.ToLower(), ref stone, ref dirt, ref grass);
+                GenerateTrees(map, grass);
+            }
+            Server.RequestGC();
+
+            // save map to file, or load it into a world
+            if (fileName != null) {
+                if (map.Save(fullFileName)) {
+                    player.Message("Generation done. Saved to {0}", fileName);
+                } else {
+                    player.Message("&WAn error occurred while saving generated map to {0}", fileName);
+                }
+            } else {
+                player.Message("Generation done. Changing map...");
+                playerWorld.MapChangedBy = player.Name;
+                playerWorld.ChangeMap(map);
+            }
+        }
+
+        public static void Generate(ref Map map, Bitmap image, string theme) {
+            // Modified McGalaxy Code
+            Block stone = Block.Stone, dirt = Block.Dirt, grass = Block.Grass;
+            ApplyTheme(theme, ref stone, ref dirt, ref grass);
+            int index = 0, oneY = map.Width * map.Length;
+            using (image) {
+                for (int z = 0; z < image.Height; z++)
+                    for (int x = 0; x < image.Width; x++) {
+                        byte R = image.GetPixel(x, z).R, G = image.GetPixel(x, z).G, B = image.GetPixel(x, z).B;
+                        int height = ((R + G + B) / 3);
+                        for (int y = 0; y < height - 5; y++)
+                            if(y >= 0) map.Blocks[index + oneY * y] = (byte)stone;
+                        for (int y = height - 5; y < height - 1; y++)
+                            if (y >= 0) map.Blocks[index + oneY * y] = (byte)dirt;
+                        if (height > 0)
+                            map.Blocks[index + oneY * (height - 1)] = (byte)grass;
+                        index++;
+                    }
+            }
+        }
+
+        public static void GenerateTrees([NotNull] Map map, Block grass) {
+            if (map == null) throw new ArgumentNullException("map");
+            int minHeight = 5;
+            int maxHeight = 7;
+            int minTrunkPadding = 7;
+            int maxTrunkPadding = 11;
+            const int topLayers = 2;
+            const double odds = 0.618;
+
+            Random rn = new Random();
+
+            short[,] shadows = map.ComputeHeightmap();
+
+            for (int x = 0; x < map.Width; x += rn.Next(minTrunkPadding, maxTrunkPadding + 1)) {
+                for (int y = 0; y < map.Length; y += rn.Next(minTrunkPadding, maxTrunkPadding + 1)) {
+                    int nx = x + rn.Next(-(minTrunkPadding / 2), (maxTrunkPadding / 2) + 1);
+                    int ny = y + rn.Next(-(minTrunkPadding / 2), (maxTrunkPadding / 2) + 1);
+                    if (nx < 0 || nx >= map.Width || ny < 0 || ny >= map.Length) continue;
+                    int nz = shadows[nx, ny];
+
+                    if ((map.GetBlock(nx, ny, nz) == grass)) {
+                        int nh;
+                        if ((nh = rn.Next(minHeight, maxHeight + 1)) + nz + nh / 2 > map.Height)
+                            continue;
+
+                        for (int z = 1; z <= nh; z++)
+                            map.SetBlock(nx, ny, nz + z, Block.Log);
+
+                        for (int i = -1; i < nh / 2; i++) {
+                            int radius = (i >= (nh / 2) - topLayers) ? 1 : 2;
+                            for (int xoff = -radius; xoff < radius + 1; xoff++) {
+                                for (int yoff = -radius; yoff < radius + 1; yoff++) {
+                                    if (rn.NextDouble() > odds && Math.Abs(xoff) == Math.Abs(yoff) && Math.Abs(xoff) == radius)
+                                        continue;
+                                    if (map.GetBlock(nx + xoff, ny + yoff, nz + nh + i) == Block.Air)
+                                        map.SetBlock(nx + xoff, ny + yoff, nz + nh + i, Block.Leaves);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        public static void ApplyTheme(string theme, ref Block stone, ref Block dirt, ref Block grass) {
+            switch (theme) {
+                case "arctic":
+                    grass = Block.Snow;
+                    dirt = Block.Ice;
+                    break;
+                case "desert":
+                    grass = Block.Sand;
+                    dirt = Block.Sand;
+                    stone = Block.Sandstone;
+                    break;
+                case "hell":
+                    grass = Block.Obsidian;
+                    dirt = Block.Magma;
+                    stone = Block.StillLava;
+                    break;
+                case "swamp":
+                    grass = Block.Dirt;
+                    stone = Block.MossyCobble;
+                    break;
+                default:
+                    break;
+
+            }
+        }
+
+        public static Bitmap DownloadImage(string url, Player player) {
+            if (url == null) {
+                throw new InvalidOperationException(
+                    "ImageUrl must be set before calling DownloadImage()");
+            }
+
+            int ContentLength;
+            HttpWebRequest reqLen = (HttpWebRequest)WebRequest.Create(url);
+            reqLen.Timeout = (int)TimeSpan.FromSeconds(6).TotalMilliseconds;
+            reqLen.Method = "HEAD";
+            using (WebResponse resp = reqLen.GetResponse()) {
+                int.TryParse(resp.Headers.Get("Content-Length"), out ContentLength);
+            }
+            if (ContentLength > 5000000) {
+                player.Message("&WImage size is too large {0}MB > 5MB", ContentLength / 1000000);
+                return null;
+            }
+
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+            request.Timeout = (int)TimeSpan.FromSeconds(6).TotalMilliseconds;
+            request.ServicePoint.BindIPEndPointDelegate = Server.BindIPEndPointCallback;
+            request.UserAgent = Updater.UserAgent;
+
+            using (HttpWebResponse response = (HttpWebResponse)request.GetResponse()) {
+                if ((response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.Moved ||
+                     response.StatusCode == HttpStatusCode.Redirect) &&
+                    response.ContentType.StartsWith("image", StringComparison.OrdinalIgnoreCase)) {
+                    // if the remote file was found, download it
+                    using (Stream inputStream = response.GetResponseStream()) {
+                        // TODO: check file size limit?
+                        return new Bitmap(inputStream);
+                    }
+                } else {
+                    player.Message("&WFailed to download the image from the given url.");
+                    throw new Exception("Error downloading image: " + response.StatusCode);
+                }
+            }
+
+        }
+
+        public static bool parseUrl(ref string urlString, Player player) {
+            if (string.IsNullOrWhiteSpace(urlString)) {
+                player.Message("You must provide a url to a heightmap image.");
+                return false;
+            }
+
+            if (urlString.StartsWith("http://imgur.com/")) urlString = "http://i.imgur.com/" + urlString.Substring("http://imgur.com/".Length) + ".png";
+            if (urlString.StartsWith("++")) urlString = "http://i.imgur.com/" + urlString.Substring(2) + ".png";
+            if (!urlString.ToLower().StartsWith("http://") && !urlString.ToLower().StartsWith("https://")) urlString = "http://" + urlString;
+
+            if (!urlString.ToLower().StartsWith("http://i.imgur.com/") && !urlString.ToLower().StartsWith("http://123dmwm.tk/")) {
+                player.Message("For safety reasons we only accept images uploaded to &9http://imgur.com/ &sSorry for this inconvenience.");
+                player.Message("    You cannot use: &9" + urlString);
+                return false;
+            }
+
+            if (!urlString.ToLower().EndsWith(".png") && !urlString.ToLower().EndsWith(".jpg") && !urlString.ToLower().EndsWith(".bmp")) {
+                player.Message("URL must be a link to an image (.png/.jpg/.bmp");
+                return false;
+            }
+
+            return true;
         }
 
         #endregion       
