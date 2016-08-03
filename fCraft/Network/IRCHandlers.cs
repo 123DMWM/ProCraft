@@ -123,7 +123,7 @@ namespace fCraft {
                         IRC.SendChannelMessage("No player found with name \"" + Bold + findPlayer + Reset + "\"");
                     }
                 } else {
-                    IRC.SendChannelMessage("Please specify a player name.");
+                    IRC.SendChannelMessage("Server has been up for: " + Bold + DateTime.UtcNow.Subtract(Server.StartTime).ToMiniString());
                 }
                 lastIrcCommand = DateTime.UtcNow;
                 return true;
@@ -159,7 +159,7 @@ namespace fCraft {
                 lastIrcCommand = DateTime.UtcNow;
                 return true;
             }
-            return cmd[0] == '!';
+            return false; //IRC Fantasy commands
         }
         
         static char[] trimChars = {' '};
