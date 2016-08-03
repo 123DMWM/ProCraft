@@ -9,6 +9,7 @@ using fCraft.Drawing;
 using System.Text;
 using fCraft.Games;
 using fCraft.Portals;
+using System.Diagnostics;
 
 namespace fCraft {
     /// <summary> Contains commands related to world management. </summary>
@@ -543,7 +544,8 @@ namespace fCraft {
         static readonly CommandDescriptor CdBlockInfoList = new CommandDescriptor {
             Name = "BInfoList",
             Category = CommandCategory.World,
-            Aliases = new[] { "blist", "bl" },
+            IsConsoleSafe = true,
+            Aliases = new[] { "bilist", "blist", "bl", "bil" },
             Permissions = new[] { Permission.ViewOthersInfo },
             RepeatableSelection = true,
             Usage = "/BInfoList [Player]",
@@ -566,27 +568,38 @@ namespace fCraft {
             public Player Sender;
         }
 
-        const int MaxWorldsToList = 10;
+
         static void BlockInfoListSchedulerCallback(SchedulerTask task) {
             BlockInfoListLookupArgs args = (BlockInfoListLookupArgs)task.UserState;
             string playerName = args.Player.Rank.Color + args.Player.Name;
             bool noChanges = true;
-            
-            foreach(World world in WorldManager.Worlds.Where(w => w.BlockDB.IsEnabled)) {
+            int worldsListed = 0, worldsNotListed = 0;
+            Stopwatch sw = Stopwatch.StartNew();
+
+            foreach (World world in WorldManager.Worlds.Where(w => w.BlockDB.IsEnabled)) {
+                if (worldsListed >= 10) {
+                    worldsNotListed++;
+                    continue;
+                }
                 BlockDBEntry[] results = world.BlockDB.Lookup(int.MaxValue, args.Player, false, args.Player.TimeSinceFirstLogin);
-                if (results.Length == 0) continue;
-                
+                if (results.Length == 0) continue;                
                 if (noChanges) {
-                    args.Sender.Message("{0}&S has commited block changes on... ", playerName);
+                    args.Sender.Message("{0}&S has commited block changes on...", playerName);
                     noChanges = false;
                 }
                 int Built = results.Where(r => r.Context == BlockChangeContext.Manual && r.OldBlock == Block.Air).Count();
                 int Deleted = results.Where(r => r.Context == BlockChangeContext.Manual && r.OldBlock != Block.Air && r.NewBlock == Block.Air).Count();
                 int Drew = results.Where(r => r.Context == BlockChangeContext.Drawn).Count();
                 args.Sender.Message("  {0}&S: Built &F{1}&S, Deleted &F{2}&S, Drew &F{3}", world.ClassyName, Built, Deleted, Drew);
+                worldsListed++;
             }
+
+            sw.Stop();
+
             if (noChanges) {
                 args.Sender.Message("{0}&S has not commited any block changes on the currently loaded worlds", playerName);
+            } else {
+                args.Sender.Message("Showing &F{0}&S of &F{1}&S (Done in &F{2}&Sms)", worldsListed, worldsListed + worldsNotListed, sw.ElapsedMilliseconds);
             }
         }
 
