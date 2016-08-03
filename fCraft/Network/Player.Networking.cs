@@ -369,26 +369,29 @@ namespace fCraft {
 
         DateTime lastSpamTime = DateTime.MinValue;
         DateTime lastMoveTime = DateTime.MinValue;
+        
+        void UpdateHeldBlock() {
+            byte id = reader.ReadByte();
+            if (!Supports(CpeExt.HeldBlock)) {
+                Info.heldBlock = Block.None; return;
+            }
+            Block held;
+            if (!Map.GetBlockByName(World, id.ToString(), false, out held)) {
+                Info.heldBlock = Block.Stone; return;
+            }
+            
+            if (Info.heldBlock == held) return;
+            Info.heldBlock = held;
+            LastUsedBlockType = held;
+            if (Supports(CpeExt.MessageType) && !IsPlayingCTF) {
+                Send(Packet.Message((byte)MessageType.BottomRight1, "Block:&f" + Map.GetBlockName(World, Info.heldBlock)
+                                    + " &sID:&f" + (byte)Info.heldBlock, true));
+            }
+        }
 
         void ProcessMovementPacket() {
             BytesReceived += 10;
-            byte id = reader.ReadByte();
-            Block failsafe;
-            if (Supports(CpeExt.HeldBlock)) {
-                if (Map.GetBlockByName(World, id.ToString(), false, out failsafe)) {
-                    if (Info.heldBlock != failsafe) {
-                        Info.heldBlock = failsafe;
-                        if (Supports(CpeExt.MessageType) && !IsPlayingCTF) {
-                            Send(Packet.Message((byte)MessageType.BottomRight1, "Block:&f" + Map.GetBlockName(World, Info.heldBlock) 
-                                                + " &sID:&f" + (byte)Info.heldBlock, true));
-                        }
-                    }
-                } else {
-                    Info.heldBlock = Block.Stone;
-                }
-            } else {
-                Info.heldBlock = Block.None;
-            }
+            UpdateHeldBlock();
             Position newPos = new Position {
                 X = reader.ReadInt16(),
                 Z = reader.ReadInt16(),
