@@ -590,10 +590,7 @@ namespace fCraft {
                 if (lib.blockCount > 0)
                 {
                     player.Message("/Draw2D: Drawing {0} with a size of '{1}' using {2} blocks of {3}",
-                        Shape,
-                        radius,
-                        lib.blockCount,
-                        block.ToString());
+                	               Shape, radius, lib.blockCount, Map.GetBlockName(player.World, block));
                 }
                 else
                 {
@@ -642,10 +639,8 @@ namespace fCraft {
                 render.CreateGraphicsAndDraw(sentence);
                 if (render.blockCount > 0) {
                     player.Message("/Write (Size {0}, {1}: Writing '{2}' using {3} blocks of {4}",
-                        player.font.Size,
-                        player.font.FontFamily.Name,
-                        sentence, render.blockCount,
-                        block.ToString());
+                        player.font.Size, player.font.FontFamily.Name, sentence, render.blockCount,
+                        Map.GetBlockName(player.World, block));
                 } else {
                     player.Message("&WNo direction was set");
                 }
@@ -914,11 +909,11 @@ namespace fCraft {
                 player.SendNow(Packet.MakeSetBlock(coords, block));
                 player.PlaceBlockWithEvents(coords, ClickAction.Build, block);
             }
+            
             if (!isConsole) 
-                player.Message("{0} placed at {1}", block.ToString(), coords.ToString());
-            if (unLoad) {
+                player.Message("{0} placed at {1}", Map.GetBlockName(player.World, block), coords);
+            if (unLoad)
                 world.UnloadMap(true);
-            }
         }
 
         #endregion
@@ -2843,21 +2838,21 @@ namespace fCraft {
             Block newBlock;
             if (sblock == null) {
                 if (player.LastUsedBlockType != Block.None) {
-                    player.Message("No block specified, Using last used block ({0})", player.LastUsedBlockType.ToString());
+                    string blockName = Map.GetBlockName(player.World, player.LastUsedBlockType);
+                    player.Message("No block specified, Using last used block ({0})", blockName);
                     newBlock = player.LastUsedBlockType;
                 } else {
                     player.Message("&WCannot deduce desired block. Click a block or type out the block name.");
                     return;
                 }
-            } else {
-                if (!Map.GetBlockByName(player.World, sblock, false, out newBlock)) {
-                    if (player.LastUsedBlockType != Block.None) {
-                        player.Message("No block specified, Using last used block ({0})", player.LastUsedBlockType.ToString());
-                        newBlock = player.LastUsedBlockType;
-                    } else {
-                        player.Message("&WCannot deduce desired block. Click a block or type out the block name.");
-                        return;
-                    }
+            } else if (!Map.GetBlockByName(player.World, sblock, false, out newBlock)) {
+                if (player.LastUsedBlockType != Block.None) {
+                    string blockName = Map.GetBlockName(player.World, player.LastUsedBlockType);
+                    player.Message("No block specified, Using last used block ({0})", blockName);
+                    newBlock = player.LastUsedBlockType;
+                } else {
+                    player.Message("&WCannot deduce desired block. Click a block or type out the block name.");
+                    return;
                 }
             }
             Random dir = new Random();
