@@ -1363,57 +1363,33 @@ namespace fCraft {
             Handler = TPDenyHandler
         };
 
-        static void TPDenyHandler(Player player, CommandReader cmd)
-        {
-            if (cmd.HasNext)
-            {
-                string state = cmd.Next();
-                if (state.ToLower() == "on" || state.ToLower() == "yes")
-                {
+        static void TPDenyHandler(Player player, CommandReader cmd) {
+            if (cmd.HasNext) {
+            	string state = cmd.Next().ToLower();
+                if (state == "on" || state == "yes") {
                     player.Info.TPDeny = true;
                     player.Message("TPDeny: &2On");
                     player.Message("Lower ranks can no longer teleport to you.");
-                    return;
-                }
-                if (state.ToLower() == "off" || state.ToLower() == "no")
-                {
+                } else if (state == "off" || state == "no") {
                     player.Info.TPDeny = false;
                     player.Message("TPDeny: &4Off");
                     player.Message("Lower ranks can now teleport to you.");
-                    return;
+                } else if (state == "state" || state == "what" || state == "current") {
+                    player.Message("TPDeny: {0}", player.Info.TPDeny ? "&2On" : "&4Off");
+                } else {
+                    CdTPDeny.PrintUsage(player);                    
                 }
-                if (state.ToLower() == "state" || state.ToLower() == "what" || state.ToLower() == "current")
-                {
-                    if (player.Info.TPDeny == false)
-                    {
-                        player.Message("TPDeny: &4Off");
-                    }
-                    if (player.Info.TPDeny == true)
-                    {
-                        player.Message("TPDeny: &2On");
-                    }
-                    return;
-                }
-                else
-                {
-                    CdTPDeny.PrintUsage(player);
-                    return;
-                }
+                return;
             }
-            if (player.Info.TPDeny == true)
-            {
-                player.Info.TPDeny = false;
+        	
+            if (player.Info.TPDeny) {
                 player.Message("TPDeny: &4Off");
                 player.Message("Lower ranks can now teleport to you.");
-                return;
-            }
-            else
-            {
-                player.Info.TPDeny = true;
+            } else {                
                 player.Message("TPDeny: &2On");
                 player.Message("Lower ranks can no longer teleport to you.");
-                return;
             }
+        	player.Info.TPDeny = !player.Info.TPDeny;
         }
         #endregion
         #region TP
