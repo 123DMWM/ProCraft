@@ -66,10 +66,10 @@ namespace fCraft {
 
         static bool HandleCheckpoint(Player p, Zone zone, ref bool deniedZone, Position newPos) {
             Position centre = new Position(zone.Bounds.XCentre * 32 + 16, zone.Bounds.YCentre * 32 + 16, zone.Bounds.ZCentre * 32 + 64);
-            if (p.Info.CheckPoint == centre) return false;
+            if (p.CheckPoint == centre) return false;
             if (zone.Bounds.Contains(newPos.X / 32, newPos.Y / 32, (newPos.Z - 32) / 32)) {
                 SendZoneMessage(p, zone, "&aCheckPoint &Sreached! This is now your respawn point.");
-                p.Info.CheckPoint = centre;
+                p.CheckPoint = centre;
                 return true;
             }
             return false;
@@ -78,7 +78,7 @@ namespace fCraft {
         static bool HandleDeath(Player p, Zone zone, ref bool deniedZone, Position newPos) {
             if (zone.Bounds.Contains(newPos.X / 32, newPos.Y / 32, (newPos.Z - 32) / 32)) {
                 SendZoneMessage(p, zone, "&WYou Died!");
-                p.TeleportTo(p.Info.CheckPoint != new Position(-1, -1, -1) ? p.Info.CheckPoint : p.WorldMap.Spawn);
+                p.TeleportTo(p.CheckPoint != new Position(-1, -1, -1) ? p.CheckPoint : p.WorldMap.Spawn);
                 return true;
             }
             return false;

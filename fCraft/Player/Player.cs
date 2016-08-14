@@ -133,9 +133,17 @@ namespace fCraft {
 
 		/// <summary> Whether the player's chat is bwrainbow. </summary>
         public bool ChatBWRainbows;
+
+        /// <summary> Whether the player is currently afk. </summary>
+        public bool IsAFK;
         
         /// <summary> The block the player currently has in their hand.</summary>
         public Block HeldBlock = Block.Stone;
+        
+        public string oldMob = "Humanoid";
+        public string oldafkMob = "Humanoid";
+        public string afkMob = "Humanoid";
+        public string oldskinName = "";
 
         //Portals
         public bool StandingInPortal = false;
@@ -207,6 +215,10 @@ namespace fCraft {
 
 		/// <summary> Player's last position before a teleport. </summary>
 		public Position LastPosition;
+		
+		/// <summary> Player's checkpoint respawn position in the current world. </summary>
+        public Position CheckPoint = new Position(-1, -1, -1);
+        
 		/// <summary> Last world player was on before teleport. </summary>
 		public World LastWorld;
 
@@ -325,12 +337,12 @@ namespace fCraft {
                 return;
             }
 
-            if (!rawMessage.ToLower().StartsWith("/afk") && Info.IsAFK) {
+            if (!rawMessage.ToLower().StartsWith("/afk") && IsAFK) {
                 Server.Players.CanSee(this).Message("{0} is no longer AFK", this.Name);
                 Message("&SYou are no longer AFK");
-                Info.IsAFK = false;
-                Info.oldafkMob = Info.afkMob;
-                Info.afkMob = Info.Mob;
+                IsAFK = false;
+                oldafkMob = afkMob;
+                afkMob = Info.Mob;
                 Server.UpdateTabList(true);
             }
 

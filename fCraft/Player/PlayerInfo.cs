@@ -354,6 +354,49 @@ namespace fCraft {
         }        
 
         #endregion
+        
+        
+        #region Hacks
+        
+        /// <summary> Controls from how far away the player is allowed to modify blocks. </summary>
+        public short ReachDistance = 160;
+        
+        byte hackFlags = 0xFF; // pack into bitflags to reduce memory usage
+
+        /// <summary> Control whether player can fly using HackControl packet. </summary>
+        public bool AllowFlying {
+            get { return (hackFlags & 0x01) != 0; }
+            set { hackFlags &= 0xFE; hackFlags |= (byte)(value ? 0x01 : 0); }
+        }
+
+        /// <summary> Control whether player can use noclip using HackControl packet. </summary>
+        public bool AllowNoClip {
+            get { return (hackFlags & 0x02) != 0; }
+            set { hackFlags &= 0xFD; hackFlags |= (byte)(value ? 0x02 : 0); }
+        }
+
+        /// <summary> Control whether player can speedhack using HackControl packet. </summary>
+        public bool AllowSpeedhack {
+            get { return (hackFlags & 0x04) != 0; }
+            set { hackFlags &= 0xFB; hackFlags |= (byte)(value ? 0x04 : 0); }
+        }
+
+        /// <summary> Control whether player can use "r" to respawn using HackControl packet. </summary>
+        public bool AllowRespawn {
+            get { return (hackFlags & 0x08) != 0; }
+            set { hackFlags &= 0xF7; hackFlags |= (byte)(value ? 0x08 : 0); }
+        }
+
+        /// <summary> Control whether player can use third person view using HackControl packet. </summary>
+        public bool AllowThirdPerson {
+            get { return (hackFlags & 0x10) != 0; }
+            set { hackFlags &= 0xEF; hackFlags |= (byte)(value ? 0x10 : 0); }
+        }
+
+        /// <summary> Control player jump height using HackControl packet. </summary>
+        public short JumpHeight = 40;
+        
+        #endregion
 
 
         /// <summary> Whether the player is currently online.
@@ -369,39 +412,8 @@ namespace fCraft {
         /// Use Player.CanSee() method to check visibility to specific observers. </summary>
         public bool IsHidden;
 
-        /// <summary> Whether the player is currently afk. </summary>
-        public bool IsAFK;
-
-        //public short NameID;
-        //
-        //public byte EntityID;
-
-        public string oldMob = "Humanoid";
         public string Mob = "Humanoid";
-        public string oldafkMob = "Humanoid";
-        public string afkMob = "Humanoid";
-        public string oldskinName = "";
         public string skinName = "";
-        
-        public short ReachDistance = 160;
-
-        /// <summary> Control whether player can fly using HackControl packet. </summary>
-        public bool AllowFlying = true;
-
-        /// <summary> Control whether player can use noclip using HackControl packet. </summary>
-        public bool AllowNoClip = true;
-
-        /// <summary> Control whether player can speedhack using HackControl packet. </summary>
-        public bool AllowSpeedhack = true;
-
-        /// <summary> Control whether player can use "r" to respawn using HackControl packet. </summary>
-        public bool AllowRespawn = true;
-
-        /// <summary> Control whether player can use third person view using HackControl packet. </summary>
-        public bool AllowThirdPerson = true;
-
-        /// <summary> Control player jump height using HackControl packet. </summary>
-        public short JumpHeight = 40;
 
         /// <summary> Whether player has read the rules or not.</summary>
         public bool HasRTR;
@@ -411,9 +423,6 @@ namespace fCraft {
 
         /// <summary> The position player was last building on.</summary>
         public string LastWorldPos;
-
-        /// <summary> Player's position in the current world. </summary>
-        public Position CheckPoint = new Position(-1, -1, -1);
 
         /// <summary> Whether player wants to spawn on their rank world.</summary>
         public bool JoinOnRankWorld;
@@ -703,43 +712,19 @@ namespace fCraft {
             {
                 info.Email = PlayerDB.Unescape(fields[62]);
             }
+            
+            bool temp;
             if (count > 63)
-            {
-                if (!Boolean.TryParse(fields[63], out info.AllowFlying))
-                {
-                    info.AllowFlying = true;
-                }
-            }
+                info.AllowFlying = Boolean.TryParse(fields[63], out temp) ? temp : true;
             if (count > 64)
-            {
-                if (!Boolean.TryParse(fields[64], out info.AllowNoClip))
-                {
-                    info.AllowNoClip = true;
-                }
-            }
+                info.AllowNoClip = Boolean.TryParse(fields[64], out temp) ? temp : true;
             if (count > 65)
-            {
-                if (!Boolean.TryParse(fields[65], out info.AllowSpeedhack))
-                {
-                    info.AllowSpeedhack = true;
-                }
-            }
+                info.AllowSpeedhack = Boolean.TryParse(fields[65], out temp) ? temp : true;
             if (count > 66)
-            {
-                if (!Boolean.TryParse(fields[66], out info.AllowRespawn))
-                {
-                    info.AllowRespawn = true;
-                }
-            }
+                info.AllowRespawn = Boolean.TryParse(fields[66], out temp) ? temp : true;
             if (count > 67)
-            {
-                if (!Boolean.TryParse(fields[67], out info.AllowThirdPerson))
-                {
-                    info.AllowThirdPerson = true;
-                }
-            }
-            if (count > 68)
-            {
+                info.AllowThirdPerson = Boolean.TryParse(fields[67], out temp) ? temp : true;
+            if (count > 68) {
                 short.TryParse(fields[68], out info.JumpHeight);
             }
 
@@ -802,14 +787,11 @@ namespace fCraft {
 
             switch( fields[5] ) {
                 case "b":
-                    info.BanStatus = BanStatus.Banned;
-                    break;
+                    info.BanStatus = BanStatus.Banned; break;
                 case "x":
-                    info.BanStatus = BanStatus.IPBanExempt;
-                    break;
+                    info.BanStatus = BanStatus.IPBanExempt; break;
                 default:
-                    info.BanStatus = BanStatus.NotBanned;
-                    break;
+                    info.BanStatus = BanStatus.NotBanned; break;
             }
 
             // ban information
@@ -927,14 +909,11 @@ namespace fCraft {
 
             switch( fields[5] ) {
                 case "b":
-                    info.BanStatus = BanStatus.Banned;
-                    break;
+                    info.BanStatus = BanStatus.Banned; break;
                 case "x":
-                    info.BanStatus = BanStatus.IPBanExempt;
-                    break;
+                    info.BanStatus = BanStatus.IPBanExempt; break;
                 default:
-                    info.BanStatus = BanStatus.NotBanned;
-                    break;
+                    info.BanStatus = BanStatus.NotBanned; break;
             }
 
             // ban information

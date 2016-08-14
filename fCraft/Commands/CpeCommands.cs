@@ -370,20 +370,20 @@ namespace fCraft {
                 return;
             }
             if (getter(target).ToLower() == model.ToLower()) {
-               player.Message("&f{0}&s's {0}model is already set to &f{1}", target.Name, model, prefix); 
-               return;
+                player.Message("&f{0}&s's {0}model is already set to &f{1}", target.Name, model, prefix); 
+                return;
             }
             
             if (target.IsOnline) {
-               target.PlayerObject.Message("&f{0}&shanged your {3}model from &f{1} &sto &f{2}", 
+                target.PlayerObject.Message("&f{0}&shanged your {3}model from &f{1} &sto &f{2}", 
                                            (target.PlayerObject == player ? "&sC" : player.Name + " &sC"), 
                                            getter(target), model, prefix);
+                target.PlayerObject.oldMob = target.Mob;
             }
             if (target.PlayerObject != player) {
-               player.Message("Changed {3}model of &f{0} &sfrom &f{1} &sto &f{2}", 
+                player.Message("Changed {3}model of &f{0} &sfrom &f{1} &sto &f{2}", 
                               target.Name, getter(target), model, prefix);
             }
-            target.oldMob = target.Mob;
             setter(target, model);
         }
         
@@ -462,12 +462,12 @@ namespace fCraft {
                 return;
             }
             if (p.IsOnline) {
-                p.PlayerObject.Message("&f{0}&shanged your skin from &f{1} &sto &f{2}", (p.PlayerObject == player ? "&sC" : player.Name + " &sc"), p.oldskinName, skinString);
+                p.PlayerObject.Message("&f{0}&shanged your skin from &f{1} &sto &f{2}", (p.PlayerObject == player ? "&sC" : player.Name + " &sc"), p.PlayerObject.oldskinName, skinString);
+                p.PlayerObject.oldskinName = p.skinName;
             }
             if (p.PlayerObject != player) {
-                player.Message("Changed skin of &f{0} &sfrom &f{1} &sto &f{2}", p.Name, p.oldskinName, skinString);
+                player.Message("Changed skin of &f{0} &sto &f{1}", p.Name, skinString);
             }
-            p.oldskinName = p.skinName;
             p.skinName = skinString;
         }
 

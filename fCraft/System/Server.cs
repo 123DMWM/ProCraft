@@ -909,11 +909,11 @@ namespace fCraft {
                 TimeSpan TimeLeft = new TimeSpan(0, player.Info.Rank.IdleKickTimer, 0) - player.IdleTime;
 
                 if (player.IdleTime.ToSeconds()%300 == 0 && player.IdleTime.ToSeconds() >= 300) {
-                    if (!player.Info.IsAFK) {
+                    if (!player.IsAFK) {
                         Players.CanSee(player).Message("{0} is now AFK (Auto)", player.Name);
-                        player.Info.IsAFK = true;
-                        player.Info.oldafkMob = player.Info.afkMob;
-                        player.Info.afkMob = player.AFKModel;
+                        player.IsAFK = true;
+                        player.oldafkMob = player.afkMob;
+                        player.afkMob = player.AFKModel;
 
                     }
                     player.Message("You have " + TimeLeft.ToMiniString() + " left before being kicked for idleing");
@@ -925,14 +925,15 @@ namespace fCraft {
                     string kickReason = "Idle for " + player.Info.Rank.IdleKickTimer + " minutes";
                     player.Kick(Player.Console, kickReason, LeaveReason.IdleKick, false, true, false);
                     player.Info.TotalTime = player.Info.TotalTime - player.IdleTime;
-                    player.Info.IsAFK = false;
-                    player.Info.oldafkMob = player.Info.afkMob;
-                    player.Info.afkMob = player.Info.Mob;
+                    player.IsAFK = false;
+                    player.oldafkMob = player.afkMob;
+                    player.afkMob = player.Info.Mob;
                     player.ResetIdleTimer(); // to prevent kick from firing more than once
                 }
 			}
 			UpdateTabList(false);
         }
+        
 		public static string compassString(int rot) {
 			if (rot > 240 || rot < 15) {
 				return "&1S";
@@ -1425,7 +1426,7 @@ namespace fCraft {
                     }
                 }
                 PlayerIndex.Remove( player );
-                player.Info.IsAFK = false;
+                player.IsAFK = false;
                 UpdatePlayerList();
                 UpdateTabList(true);
             }
@@ -1479,8 +1480,8 @@ namespace fCraft {
         
         static string GetGroup(Player p, IEnumerable<Player> canBeSeen) {
             if (p.IsPlayingCTF) return "&sTeam " + p.Team.ClassyName;
-            if (p.Info.IsAFK) return "&SAway From Keyboard (&f" + canBeSeen.Where(pl => pl.Info.IsAFK).Count() + "&S)";
-            return "&S" + p.World.Name + " (&f" + canBeSeen.Where(pl => !pl.Info.IsAFK && pl.World == p.World).Count() + "&S)";
+            if (p.IsAFK) return "&SAway From Keyboard (&f" + canBeSeen.Where(pl => pl.IsAFK).Count() + "&S)";
+            return "&S" + p.World.Name + " (&f" + canBeSeen.Where(pl => !pl.IsAFK && pl.World == p.World).Count() + "&S)";
         }
 
         internal static void UpdatePlayerList()
