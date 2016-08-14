@@ -36,7 +36,7 @@ namespace fCraft.Drawing {
 
 
         public override bool Prepare( Vector3I[] marks ) {
-            if( Player.World == null && Player.IsSuper == false ) PlayerOpException.ThrowNoWorld( Player );
+            if( Player.World == null && !Player.IsSuper ) PlayerOpException.ThrowNoWorld( Player );
             if( !base.Prepare( marks ) ) return false;
 
             BlocksTotalEstimate = Bounds.Volume;

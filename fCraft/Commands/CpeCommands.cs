@@ -528,7 +528,7 @@ namespace fCraft {
 
             if (distance != otherPlayer.ReachDistance) {
                 if (otherPlayer != player.Info) {
-                    if (otherPlayer.IsOnline == true) {
+                    if (otherPlayer.IsOnline) {
                         if (otherPlayer.PlayerObject.Supports(CpeExt.ClickDistance)) {
                             otherPlayer.PlayerObject.Message("{0} set your reach distance from {1} to {2} blocks [Units: {3}]", player.Name, otherPlayer.ReachDistance / 32, distance / 32, distance);
                             player.Message("Set reach distance for {0} from {1} to {2} blocks [Units: {3}]", otherPlayer.Name, otherPlayer.ReachDistance / 32, distance / 32, distance);

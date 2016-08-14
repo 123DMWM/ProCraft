@@ -540,7 +540,7 @@ namespace fCraft {
             if (player == null) throw new ArgumentNullException("player");
             if (rawMessage == null) throw new ArgumentNullException("rawMessage");
 
-            var recipientList = Server.Players.Can(Permission.ReadStaffChat).Where(p => p.Info.ReadIRC == true);
+            var recipientList = Server.Players.Can(Permission.ReadStaffChat).Where(p => p.Info.ReadIRC);
 
             string formattedMessage = String.Format("&P(IRC+staff)&5(IRC){0}&P: {1}",
                                                      player,
@@ -555,10 +555,7 @@ namespace fCraft {
             if (!SendInternal(e)) return false;
 			IRC.SendChannelMessage("\u211C\u212C(IRC+Staff)(IRC)\u211C" + player + ": " + rawMessage);
 
-            Logger.Log(LogType.GlobalChat,
-                        "(IRC+staff)(IRC){0}: {1}",
-                        player,
-                        rawMessage);
+            Logger.Log(LogType.GlobalChat, "(IRC+staff)(IRC){0}: {1}", player, rawMessage);
             return true;
         }
 

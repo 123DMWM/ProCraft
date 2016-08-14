@@ -909,7 +909,7 @@ namespace fCraft {
                 TimeSpan TimeLeft = new TimeSpan(0, player.Info.Rank.IdleKickTimer, 0) - player.IdleTime;
 
                 if (player.IdleTime.ToSeconds()%300 == 0 && player.IdleTime.ToSeconds() >= 300) {
-                    if (player.Info.IsAFK == false) {
+                    if (!player.Info.IsAFK) {
                         Players.CanSee(player).Message("{0} is now AFK (Auto)", player.Name);
                         player.Info.IsAFK = true;
                         player.Info.oldafkMob = player.Info.afkMob;
@@ -1083,7 +1083,7 @@ namespace fCraft {
             string line = lines[new Random().Next( 0, lines.Length )].Trim();
             if( line.Length == 0 ) return;
             var visiblePlayers = Server.Players
-                                            .Where(p => p.Info.IsHidden == false)
+                                            .Where(p => !p.Info.IsHidden)
                                             .OrderBy(p => p.Name)
                                             .ToArray();
             if (visiblePlayers.Count() > 0)

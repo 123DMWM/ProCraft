@@ -342,7 +342,7 @@ namespace fCraft {
 
                     case "clear":
                         // wipes BlockDB data
-                        if (player.Can(Permission.ShutdownServer) == false)
+                        if (!player.Can(Permission.ShutdownServer))
                         {
                             player.Message("You must be {0}&s to clear the block DataBase", RankManager.GetMinRankWithAllPermissions(Permission.ShutdownServer).ClassyName);
                             return;
@@ -1202,7 +1202,7 @@ namespace fCraft {
                             player.JoinWorldNow(world, true, WorldChangeReason.ManualJoin);
                             return;
                         }
-                        if (player.World.Name.ToLower() == "tutorial" && player.Info.HasRTR == false) {
+                        if (player.World.Name.ToLower() == "tutorial" && !player.Info.HasRTR) {
                             player.Confirm(cmd,
                                 "&sYou are choosing to skip the rules, if you continue you will spawn here the next time you log in.");
                             return;

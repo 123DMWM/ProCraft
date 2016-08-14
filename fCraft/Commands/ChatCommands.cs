@@ -309,7 +309,7 @@ namespace fCraft
             string name = cmd.Next();
             if (!string.IsNullOrEmpty(name)) {
                 if (name.ToLower() == "irc") {
-                    if (player.Info.ReadIRC == true) {
+                    if (player.Info.ReadIRC) {
                         player.Info.ReadIRC = false;
                         player.Message("You are now ignoring &iIRC");
                         string message = String.Format("\u212C&SPlayer {0}&S is now Ignoring IRC", player.ClassyName);
@@ -359,7 +359,7 @@ namespace fCraft
             string name = cmd.Next();
             if (!string.IsNullOrEmpty(name)) {
                 if (name.ToLower() == "irc") {
-                    if (player.Info.ReadIRC == false) {
+                    if (!player.Info.ReadIRC) {
                         player.Info.ReadIRC = true;
                         player.Message("You are no longer ignoring &iIRC");
                         string message = String.Format("\u212C&SPlayer {0}&S is no longer Ignoring IRC", player.ClassyName);
