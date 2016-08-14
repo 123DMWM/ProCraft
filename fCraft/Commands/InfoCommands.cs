@@ -1929,11 +1929,14 @@ namespace fCraft {
             if (target != null && target.ClientName != null) {
                 player.Message("  Client Name: &F{0}", target.ClientName);
             }
-			player.Message(target == null ? "  Block they last held: {0}" : "  Block they are currently holding: {0}",
-				info.heldBlock);
-			if (target != null && target.LastMotdMessage != null) {
-				player.Message("  Latest motd message: &f{0}", target.LastMotdMessage);
-			}
+            if (target != null) {
+                player.Message("  Block they are currently holding: {0}", 
+            	               Map.GetBlockName(target.World, target.HeldBlock));
+            }
+            if (target != null && target.LastMotdMessage != null) {
+                player.Message("  Latest motd message: &f{0}", target.LastMotdMessage);
+            }
+            
             if (player.Can(Permission.ViewOthersInfo)) {
                 player.Message("  Did they read the rules: &f{0}", info.HasRTR.ToString());
                 player.Message("  Can they see IRC chat: &f{0}", info.ReadIRC.ToString());

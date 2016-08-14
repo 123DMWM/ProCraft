@@ -373,19 +373,19 @@ namespace fCraft {
         void UpdateHeldBlock() {
             byte id = reader.ReadByte();
             if (!Supports(CpeExt.HeldBlock)) {
-                Info.heldBlock = Block.None; return;
+                HeldBlock = Block.None; return;
             }
             Block held;
             if (!Map.GetBlockByName(World, id.ToString(), false, out held)) {
-                Info.heldBlock = Block.Stone; return;
+                HeldBlock = Block.Stone; return;
             }
             
-            if (Info.heldBlock == held) return;
-            Info.heldBlock = held;
+            if (HeldBlock == held) return;
+            HeldBlock = held;
             LastUsedBlockType = held;
             if (Supports(CpeExt.MessageType) && !IsPlayingCTF) {
-                Send(Packet.Message((byte)MessageType.BottomRight1, "Block:&f" + Map.GetBlockName(World, Info.heldBlock)
-                                    + " &sID:&f" + (byte)Info.heldBlock, true));
+                Send(Packet.Message((byte)MessageType.BottomRight1, "Block:&f" + Map.GetBlockName(World, HeldBlock)
+                                    + " &sID:&f" + (byte)HeldBlock, true));
             }
         }
 
@@ -1205,8 +1205,8 @@ namespace fCraft {
             }
 
             if (Supports(CpeExt.MessageType) && !IsPlayingCTF) {
-                Send(Packet.Message((byte)MessageType.BottomRight1, "Block:&f" + Map.GetBlockName(World, Info.heldBlock)
-                                    + " &sID:&f" + (byte)Info.heldBlock, true));
+                Send(Packet.Message((byte)MessageType.BottomRight1, "Block:&f" + Map.GetBlockName(World, HeldBlock)
+                                    + " &sID:&f" + (byte)HeldBlock, true));
             }
             if (Supports(CpeExt.MessageType)) {
                 Send(Packet.Message((byte)MessageType.Status1, ConfigKey.ServerName.GetString(), UseFallbackColors));
@@ -1631,9 +1631,9 @@ namespace fCraft {
             } else if( spectatePos != Position ) {
                 SendNow( Packet.MakeSelfTeleport( spectatePos ) );
             }
-            if (SpectatedPlayer.Info.heldBlock != Info.heldBlock && SpectatedPlayer.Supports(CpeExt.HeldBlock))
+            if (SpectatedPlayer.HeldBlock != HeldBlock && SpectatedPlayer.Supports(CpeExt.HeldBlock))
             {
-            	byte block = (byte)SpectatedPlayer.Info.heldBlock;
+            	byte block = (byte)SpectatedPlayer.HeldBlock;
                 CheckBlock(ref block);
                 SendNow(Packet.MakeHoldThis((Block)block, false));
             }

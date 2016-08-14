@@ -119,14 +119,11 @@ namespace fCraft {
         /// <summary> Whether placing dirt near grass will spread the grass onto the dirt </summary>
         public bool GrassGrowth;
 
-        /// <summary> How Many Blocks player has deleted this session. </summary>
-        public double BlocksDeletedThisSession { get; set; }
+        /// <summary> How many blocks the player has deleted this session. </summary>
+        public int BlocksDeletedThisSession;
 
-        /// <summary> How Many Blocks player has placed this session. </summary>
-        public double BlocksPlacedThisSession { get; set; }
-            
-        /// <summary> How Many Blocks player has placed this session. </summary>
-        public double BlocksPlacedDeletedMixed { get; set; }
+        /// <summary> How many blocks the player has placed this session. </summary>
+        public int BlocksPlacedThisSession;
 
         /// <summary> The Time that has passed since the last block change.</summary>
         public DateTime TimeLastBlockChange { get; set; }        
@@ -136,6 +133,9 @@ namespace fCraft {
 
 		/// <summary> Whether the player's chat is bwrainbow. </summary>
         public bool ChatBWRainbows;
+        
+        /// <summary> The block the player currently has in their hand.</summary>
+        public Block HeldBlock = Block.Stone;
 
         //Portals
         public bool StandingInPortal = false;
@@ -165,7 +165,7 @@ namespace fCraft {
         public void getLeftOverTime(Double maxTime, CommandReader cmd) {
             double timeLeft = maxTime - Math.Round(TimeSinceLastServerMessage.TotalSeconds);
             if (timeLeft == 1) {
-                Message("&WYou can use /" + cmd.Name + "again in 1 second."); return;
+                Message("&WYou can use /" + cmd.Name + " again in 1 second."); return;
             }
             Message("&WYou can use /" + cmd.Name + " again in " + timeLeft + " seconds");
         }

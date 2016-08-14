@@ -454,7 +454,7 @@ namespace fCraft {
                             player.Info.BlocksBuilt, player.Info.BlocksDeleted, player.Info.BlocksDrawnString);
 					} else {
 						Server.BotMessage(player.ClassyName + "&f has built {0} blocks and deleted {1} blocks this session.", 
-                            player.Info.BlocksBuiltThisGame, player.Info.BlocksDeletedThisGame);
+                            player.BlocksPlacedThisSession, player.BlocksDeletedThisSession);
 					}
 					break;
 				case "funfact":

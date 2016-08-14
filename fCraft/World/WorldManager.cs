@@ -57,7 +57,7 @@ namespace fCraft {
         public static World FindMainWorld( Player player ) {
             World rankMain = player.Info.Rank.MainWorld;
             if ((player.Info.TimesVisited == 1 || !player.Info.HasRTR) && FindWorldExact("Tutorial") != null) return FindWorldOrPrintMatches(player, "Tutorial");
-            if( rankMain != null && player.CanJoin( rankMain ) && player.Info.JoinOnRankWorldue ) {
+            if( rankMain != null && player.CanJoin( rankMain ) && player.Info.JoinOnRankWorld ) {
                 return rankMain;
             } else {
                 return MainWorld;

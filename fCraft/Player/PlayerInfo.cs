@@ -62,22 +62,11 @@ namespace fCraft {
         public DateTime FirstLoginDate;
 
 
-        /// <summary> Whether the player is ignoring IRC Messages.
-        /// Boolean On or Off.</summary>
-        [NotNull]
-        public Boolean ReadIRC = true;
-
-        /// <summary> Whether the player is ignoring IRC Messages.
-        /// Boolean On or Off.</summary>
-        [NotNull]
-        public Boolean WriteIRC;
+        /// <summary> Whether the player can read(i.e. is not ignoring) IRC Messages. </summary>
+        public bool ReadIRC = true;
 
         /// <summary> Whether the player is ignoring teleport requests.</summary>
-        [NotNull]
-        public Boolean TPDeny;
-
-        /// <summary> The block the player currently has in their hand.</summary>
-        public Block heldBlock = Block.Stone;
+        public bool TPDeny;
 
         /// <summary> Most recent time the player logged in, UTC.
         /// May be DateTime.MinValue if player has never been online. </summary>
@@ -258,12 +247,6 @@ namespace fCraft {
 
         /// <summary> Total number of blocks manually deleted by the player. </summary>
         public int BlocksDeleted;
-
-        /// <summary> How Many Blocks player has deleted this session. </summary>
-        public int BlocksDeletedThisGame = 0;
-
-        /// <summary> How Many Blocks player has placed this session. </summary>
-        public int BlocksBuiltThisGame = 0;
 
         /// <summary> Total number of blocks modified using draw and copy/paste commands. </summary>
         public long BlocksDrawn;
@@ -1387,37 +1370,28 @@ namespace fCraft {
 
         public void ProcessBlockPlaced( byte type ) {
             LastModified = DateTime.UtcNow;
-            if (PlayerObject != null)
-            {
-                if (PlayerObject.World.Name == "Grief" || PlayerObject.World.Name == "Spleef")
-                {
-                    return;
+            if (PlayerObject != null) {
+                if (PlayerObject.World.Name == "Grief" || PlayerObject.World.Name == "Spleef") return;
+                
+                if (type == 0) { // air
+                    Interlocked.Increment(ref PlayerObject.BlocksDeletedThisSession);
+                } else {
+                    Interlocked.Increment(ref PlayerObject.BlocksPlacedThisSession);
                 }
             }
+            
             if( type == 0 ) { // air
                 Interlocked.Increment( ref BlocksDeleted );
             } else {
                 Interlocked.Increment( ref BlocksBuilt );
-            }
-            if (type == 0)
-            { // air
-                Interlocked.Increment(ref BlocksDeletedThisGame);
-            }
-            else
-            {
-                Interlocked.Increment(ref BlocksBuiltThisGame);
             }
         }
 
 
         public void ProcessDrawCommand( int blocksDrawn ) {
             LastModified = DateTime.UtcNow;
-            if (PlayerObject != null)
-            {
-                if (PlayerObject.World.Name == "Grief" || PlayerObject.World.Name == "Spleef")
-                {
-                    return;
-                }
+            if (PlayerObject != null) {
+                if (PlayerObject.World.Name == "Grief" || PlayerObject.World.Name == "Spleef") return;
             }
             Interlocked.Add( ref BlocksDrawn, blocksDrawn );
         }
