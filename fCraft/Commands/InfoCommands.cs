@@ -928,119 +928,71 @@ namespace fCraft {
             Handler = RulesHandler
         };
 
-        static void RulesHandler( Player player, CommandReader cmd ) {
-            string sectionName = cmd.Next();
+        static void RulesHandler(Player player, CommandReader cmd) {
             if (!player.Info.HasRTR) {
-                Server.Players.Can( Permission.ReadStaffChat ).Message( player.ClassyName + " &sread the rules!" );
+                Server.Players.Can(Permission.ReadStaffChat).Message(player.ClassyName + " &sread the rules!");
                 player.Info.HasRTR = true;
                 player.Info.ReadIRC = true;
             }
+            
+            string section = cmd.Next();
+            string[] sections = null;
+            if (Directory.Exists(Paths.RulesDirectory)) {
+                sections = Directory.GetFiles(Paths.RulesPath, "*.txt",
+                                              SearchOption.TopDirectoryOnly);
+            }
 
             // if no section name is given
-            if( sectionName == null ) {
-                FileInfo ruleFile = new FileInfo( Paths.RulesFileName );
-
-                if( ruleFile.Exists ) {
-                    PrintRuleFile( player, ruleFile );
+            if (section == null) {
+                if (File.Exists(Paths.RulesFileName)) {
+                    PrintRuleFile(player, Paths.RulesFileName);
                 } else {
-                    player.Message( DefaultRules );
+                    player.Message(DefaultRules);
                 }
 
-                // print a list of available sections
-                string[] sections = GetRuleSectionList();
-                if( sections != null ) {
-                    player.Message( "Rule sections: {0}. Type &H/Rules SectionName&S to read.", sections.JoinToString() );
+                if (sections != null) {
+                    player.Message("Rule sections: {0}. Type &H/Rules SectionName&S to read.", 
+                                   sections.JoinToString(f => Path.GetFileNameWithoutExtension(f)));
                 }
                 return;
             }
 
             // if a section name is given, but no section files exist
-            if( !Directory.Exists( Paths.RulesDirectory ) ) {
-                player.Message( "There are no rule sections defined." );
-                return;
+            if (sections == null || sections.Length == 0) {
+                player.Message("There are no rule sections defined."); return;
             }
-
-            string ruleFileName = null;
-            string[] sectionFiles = Directory.GetFiles( Paths.RulesPath,
-                                                        "*.txt",
-                                                        SearchOption.TopDirectoryOnly );
-
-            for( int i = 0; i < sectionFiles.Length; i++ ) {
-                string sectionFullName = Path.GetFileNameWithoutExtension( sectionFiles[i] );
-                if( sectionFullName == null ) continue;
-                if( sectionFullName.StartsWith( sectionName, StringComparison.OrdinalIgnoreCase ) ) {
-                    if( sectionFullName.Equals( sectionName, StringComparison.OrdinalIgnoreCase ) ) {
-                        // if there is an exact match, break out of the loop early
-                        ruleFileName = sectionFiles[i];
-                        break;
-
-                    } else if( ruleFileName == null ) {
-                        // if there is a partial match, keep going to check for multiple matches
-                        ruleFileName = sectionFiles[i];
-
-                    } else {
-                        var matches = sectionFiles.Select( f => Path.GetFileNameWithoutExtension( f ) )
-                                                  .Where( sn => sn != null && sn.StartsWith( sectionName, StringComparison.OrdinalIgnoreCase ) );
-                        // if there are multiple matches, print a list
-                        player.Message( "Multiple rule sections matched \"{0}\": {1}",
-                                        sectionName, matches.JoinToString() );
-                        return;
-                    }
+            string[] matches = NameMatcher.Find(sections, section, 
+                                                f => Path.GetFileNameWithoutExtension(f));
+            
+            if (matches.Length > 1) {
+                player.Message("Multiple rule sections matched \"{0}\": {1}",
+                               section, matches.JoinToString());
+            } else if (matches.Length == 1) {
+                section = Path.GetFileNameWithoutExtension(matches[0]);
+                if (section.IndexOf("Admin") >= 0 && !player.IsStaff) {
+                    player.Message("You need to be staff to read the Admin Rules.");
+                    return;
                 }
-            }
-
-            if( ruleFileName != null ) {
-                string sectionFullName = Path.GetFileNameWithoutExtension( ruleFileName );
-                if (sectionFullName.IndexOf("Admin") > -1) {
-                    if (!player.IsStaff) {
-                        player.Message("You need to be an Admin to read the Admin Rules.");
-                    } else {
-                        PrintRuleFile(player, new FileInfo(ruleFileName));
-                    }
-                } else {
-                    PrintRuleFile(player, new FileInfo(ruleFileName));
-                }
-
+                PrintRuleFile(player, matches[0]);
             } else {
-                var sectionList = GetRuleSectionList();
-                if( sectionList == null ) {
-                    player.Message( "There are no rule sections defined." );
-                } else {
-                    player.Message( "No rule section defined for \"{0}\". Available sections: {1}",
-                                    sectionName, sectionList.JoinToString() );
-                }
+                player.Message("No rule section defined for \"{0}\". Available sections: {1}",
+                               section, sections.JoinToString(f => Path.GetFileNameWithoutExtension(f)));
             }
         }
 
-
-        [CanBeNull]
-        static string[] GetRuleSectionList() {
-            if( Directory.Exists( Paths.RulesDirectory ) ) {
-                string[] sections = Directory.GetFiles( Paths.RulesPath, "*.txt", SearchOption.TopDirectoryOnly )
-                                             .Select( name => Path.GetFileNameWithoutExtension( name ) )
-                                             .Where( name => !String.IsNullOrEmpty( name ) )
-                                             .ToArray();
-                if( sections.Length != 0 ) {
-                    return sections;
-                }
-            }
-            return null;
-        }
-
-
-        static void PrintRuleFile( Player player, FileSystemInfo ruleFile ) {
+        static void PrintRuleFile(Player player, string path) {
             try {
-                string[] ruleLines = File.ReadAllLines( ruleFile.FullName );
-                foreach( string ruleLine in ruleLines ) {
-                    if( ruleLine.Trim().Length > 0 ) {
-                        player.Message( "&R{0}", Chat.ReplaceTextKeywords( player, ruleLine ) );
-                    }
+                string[] lines = File.ReadAllLines(path);
+                for (int i = 0; i < lines.Length; i++) {
+                    string line = lines[i].Trim();
+                    if (line.Length == 0) continue;
+                    player.Message( "&R{0}", Chat.ReplaceTextKeywords(player, line));
                 }
-            } catch( Exception ex ) {
-                Logger.Log( LogType.Error,
-                            "InfoCommands.PrintRuleFile: An error occurred while trying to read {0}: {1}",
-                            ruleFile.FullName, ex );
-                player.Message( "&WError reading the rule file." );
+            } catch (Exception ex) {
+                Logger.Log(LogType.Error,
+                           "InfoCommands.PrintRuleFile: An error occurred while trying to read {0}: {1}",
+                           path, ex);
+                player.Message("&WError reading the rule file.");
             }
         }
 
@@ -1234,7 +1186,8 @@ namespace fCraft {
                     player.MessageNoAccess( Permission.ViewOthersInfo );
                     return;
                 }
-                target = Server.FindPlayerOrPrintMatches(player, name, SearchOptions.IncludeSelf);
+                target = Server.FindPlayerOrPrintMatches(player, name, 
+            	                                         SearchOptions.IncludeSelf);
                 if( target == null ) return;
             } else if( target.World == null ) {
                 player.Message( "When called from console, &H/Where&S requires a player name." );
@@ -1527,7 +1480,7 @@ namespace fCraft {
                 case "time":
                 case "hours":
                     formatter = p => string.Format("{0:N2}&sH", p.TotalTime.TotalHours);
-                    orderer = p => p.TotalTime.Ticks; break;
+                    orderer = p => p.TotalTime.ToHours(); break;
                 case "kicks":
                 case "kicked":
                     formatter = p => string.Format("{0:N0}", p.TimesKickedOthers);
@@ -1929,14 +1882,11 @@ namespace fCraft {
             if (target != null && target.ClientName != null) {
                 player.Message("  Client Name: &F{0}", target.ClientName);
             }
-            if (target != null) {
-                player.Message("  Block they are currently holding: {0}", 
-            	               Map.GetBlockName(target.World, target.HeldBlock));
-            }
-            if (target != null && target.LastMotdMessage != null) {
-                player.Message("  Latest motd message: &f{0}", target.LastMotdMessage);
-            }
-            
+			player.Message(target == null ? "  Block they last held: {0}" : "  Block they are currently holding: {0}",
+				info.heldBlock);
+			if (target != null && target.LastMotdMessage != null) {
+				player.Message("  Latest motd message: &f{0}", target.LastMotdMessage);
+			}
             if (player.Can(Permission.ViewOthersInfo)) {
                 player.Message("  Did they read the rules: &f{0}", info.HasRTR.ToString());
                 player.Message("  Can they see IRC chat: &f{0}", info.ReadIRC.ToString());
