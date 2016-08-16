@@ -1501,36 +1501,18 @@ namespace fCraft {
         /// <returns> An array of matches. List length of 0 means "no matches";
         /// 1 is an exact match; over 1 for multiple matches. </returns>
         /// <exception cref="ArgumentNullException"></exception>
-        public static Player[] FindPlayers([NotNull] string namePart, SearchOptions options)
-        {
+        public static Player[] FindPlayers([NotNull] string namePart, SearchOptions options) {
             if (namePart == null) throw new ArgumentNullException("namePart");
             bool suppressEvent = (options & SearchOptions.SuppressEvent) != 0;
-            Player[] tempList = Players;
-            List<Player> results = new List<Player>();
-            for (int i = 0; i < tempList.Length; i++)
-            {
-                if (tempList[i] == null) continue;
-                if (tempList[i].Name.Equals(namePart, StringComparison.OrdinalIgnoreCase))
-                {
-                    results.Clear();
-                    results.Add(tempList[i]);
-                    break;
-                }
-                else if (tempList[i].Name.StartsWith(namePart, StringComparison.OrdinalIgnoreCase))
-                {
-                    results.Add(tempList[i]);
-                }
+            List<Player> matches = NameMatcher.Find(Players, namePart, p => p.Name);
+            
+            var h = SearchingForPlayer;
+            if (!suppressEvent && h != null) {
+                var e = new SearchingForPlayerEventArgs(null, namePart, matches, options);
+                h(null, e);
+                matches = e.Matches;
             }
-            if (!suppressEvent)
-            {
-                var h = SearchingForPlayer;
-                if (h != null)
-                {
-                    var e = new SearchingForPlayerEventArgs(null, namePart, results, options);
-                    h(null, e);
-                }
-            }
-            return results.ToArray();
+            return matches.ToArray();
         }
 
         /// <summary> Finds a player by name, using autocompletion. Does not include hidden players. 
@@ -1669,53 +1651,7 @@ namespace fCraft {
         {
             if (player == null) throw new ArgumentNullException("player");
             if (namePart == null) throw new ArgumentNullException("namePart");
-
-            // Repeat last-used player name
-            if (namePart == "-")
-            {
-                if (player.LastUsedPlayerName != null)
-                {
-                    namePart = player.LastUsedPlayerName;
-                }
-                else
-                {
-                    player.Message("Cannot repeat player name: you haven't used any names yet.");
-                    return null;
-                }
-            }
-
-            // in case someone tries to use the "!" prefix in an online-only search
-            if (namePart.Length > 0 && namePart[0] == '!')
-            {
-                namePart = namePart.Substring(1);
-            }
-
-            // Make sure player name is valid
-            if (!Player.ContainsValidCharacters(namePart))
-            {
-                player.MessageInvalidPlayerName(namePart);
-                return null;
-            }
-
-            Player[] matches = FindPlayers(namePart, options);
-
-            if (matches.Length == 0)
-            {
-                player.MessageNoPlayer(namePart);
-                return null;
-
-            }
-            else if (matches.Length > 1)
-            {
-                player.MessageManyMatches("player", matches);
-                return null;
-
-            }
-            else
-            {
-                player.LastUsedPlayerName = matches[0].Name;
-                return matches[0];
-            }
+            return NameMatcher.FindPlayerMatches(player, namePart, options);
         }
 
 

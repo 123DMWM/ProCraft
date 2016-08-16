@@ -703,21 +703,7 @@ namespace fCraft {
         /// Target worlds are not guaranteed to have a loaded map. </summary>
         public static World[] FindWorldsNoEvent( [NotNull] string name ) {
             if( name == null ) throw new ArgumentNullException( "name" );
-            World[] worldListCache = Worlds;
-
-            List<World> results = new List<World>();
-            for( int i = 0; i < worldListCache.Length; i++ ) {
-                if( worldListCache[i] != null ) {
-                    if( worldListCache[i].Name.Equals( name, StringComparison.OrdinalIgnoreCase ) ) {
-                        results.Clear();
-                        results.Add( worldListCache[i] );
-                        break;
-                    } else if( worldListCache[i].Name.StartsWith( name, StringComparison.OrdinalIgnoreCase ) ) {
-                        results.Add( worldListCache[i] );
-                    }
-                }
-            }
-            return results.ToArray();
+            return NameMatcher.Find(Worlds, name, w => w.Name).ToArray();
         }
 
 
@@ -729,14 +715,15 @@ namespace fCraft {
         /// <returns> An array of 0 or more worlds that matched the name. </returns>
         public static World[] FindWorlds( [CanBeNull] Player player, [NotNull] string name ) {
             if( name == null ) throw new ArgumentNullException( "name" );
-            World[] matches = FindWorldsNoEvent( name );
+            List<World> matches = NameMatcher.Find(Worlds, name, w => w.Name);
             var h = SearchingForWorld;
-            if( h != null ) {
-                SearchingForWorldEventArgs e = new SearchingForWorldEventArgs( player, name, matches.ToList() );
+            
+            if(h != null) {
+                SearchingForWorldEventArgs e = new SearchingForWorldEventArgs( player, name, matches );
                 h( null, e );
-                matches = e.Matches.ToArray();
+                matches = e.Matches;
             }
-            return matches;
+            return matches.ToArray();
         }
 
 
@@ -748,28 +735,7 @@ namespace fCraft {
         public static World FindWorldOrPrintMatches( [NotNull] Player player, [NotNull] string worldName ) {
             if( player == null ) throw new ArgumentNullException( "player" );
             if( worldName == null ) throw new ArgumentNullException( "worldName" );
-            if( worldName == "-" ) {
-                if( player.LastUsedWorldName != null ) {
-                    worldName = player.LastUsedWorldName;
-                } else {
-                    player.Message( "Cannot repeat world name: you haven't used any names yet." );
-                    return null;
-                }
-            }
-            player.LastUsedWorldName = worldName;
-
-            World[] matches = FindWorlds( player, worldName );
-
-            if( matches.Length == 0 ) {
-                player.MessageNoWorld( worldName );
-                return null;
-            }
-
-            if( matches.Length > 1 ) {
-                player.MessageManyMatches( "world", matches );
-                return null;
-            }
-            return matches[0];
+            return NameMatcher.FindWorldMatches( player, worldName );
         }
 
         #endregion
