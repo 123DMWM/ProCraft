@@ -251,12 +251,12 @@ namespace fCraft
 
             // Check if the player actually moved and not just rotated
             if ((oldPos.X != newPos.X) || (oldPos.Y != newPos.Y) || (oldPos.Z != newPos.Z)) {
-                if (e.Player.Info.IsAFK) {
+                if (e.Player.IsAFK) {
                     Server.Players.CanSee(e.Player).Message("{0} is no longer AFK", e.Player.Name);
                     e.Player.Message("You are no longer AFK");
-                    e.Player.Info.IsAFK = false;
-                    e.Player.Info.oldafkMob = e.Player.Info.afkMob;
-                    e.Player.Info.afkMob = e.Player.Info.Mob;
+                    e.Player.IsAFK = false;
+                    e.Player.oldafkMob = e.Player.afkMob;
+                    e.Player.afkMob = e.Player.Info.Mob;
                     Server.UpdateTabList(true);
                 }
                 e.Player.ResetIdleTimer();
@@ -280,13 +280,13 @@ namespace fCraft
                 return;
             }
             Server.Players.CanSee(player)
-                .Message("{0} is {1} AFK{2}", player.Name, player.Info.IsAFK ? "no longer" : "now",
+                .Message("{0} is {1} AFK{2}", player.Name, player.IsAFK ? "no longer" : "now",
                 msg.Length > 0 ? " (" + (msg.Length > 32 ? msg.Remove(32) : msg) + ")" : "");
-            player.Message("You are {0} AFK {1}", player.Info.IsAFK ? "no longer" : "now",
+            player.Message("You are {0} AFK {1}", player.IsAFK ? "no longer" : "now",
                 msg.Length > 0 ? " (" + (msg.Length > 32 ? msg.Remove(32) : msg) + ")" : "");
-            player.Info.IsAFK = !player.Info.IsAFK;
-            player.Info.oldafkMob = player.Info.afkMob;
-            player.Info.afkMob = player.Info.IsAFK ? player.AFKModel : player.Info.Mob;
+            player.IsAFK = !player.IsAFK;
+            player.oldafkMob = player.afkMob;
+            player.afkMob = player.IsAFK ? player.AFKModel : player.Info.Mob;
             Server.UpdateTabList(true);
             player.ResetIdleTimer();
         }
@@ -309,7 +309,7 @@ namespace fCraft
             string name = cmd.Next();
             if (!string.IsNullOrEmpty(name)) {
                 if (name.ToLower() == "irc") {
-                    if (player.Info.ReadIRC == true) {
+                    if (player.Info.ReadIRC) {
                         player.Info.ReadIRC = false;
                         player.Message("You are now ignoring &iIRC");
                         string message = String.Format("\u212C&SPlayer {0}&S is now Ignoring IRC", player.ClassyName);
@@ -359,7 +359,7 @@ namespace fCraft
             string name = cmd.Next();
             if (!string.IsNullOrEmpty(name)) {
                 if (name.ToLower() == "irc") {
-                    if (player.Info.ReadIRC == false) {
+                    if (!player.Info.ReadIRC) {
                         player.Info.ReadIRC = true;
                         player.Message("You are no longer ignoring &iIRC");
                         string message = String.Format("\u212C&SPlayer {0}&S is no longer Ignoring IRC", player.ClassyName);

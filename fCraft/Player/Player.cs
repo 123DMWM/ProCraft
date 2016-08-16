@@ -119,14 +119,11 @@ namespace fCraft {
         /// <summary> Whether placing dirt near grass will spread the grass onto the dirt </summary>
         public bool GrassGrowth;
 
-        /// <summary> How Many Blocks player has deleted this session. </summary>
-        public double BlocksDeletedThisSession { get; set; }
+        /// <summary> How many blocks the player has deleted this session. </summary>
+        public int BlocksDeletedThisSession;
 
-        /// <summary> How Many Blocks player has placed this session. </summary>
-        public double BlocksPlacedThisSession { get; set; }
-            
-        /// <summary> How Many Blocks player has placed this session. </summary>
-        public double BlocksPlacedDeletedMixed { get; set; }
+        /// <summary> How many blocks the player has placed this session. </summary>
+        public int BlocksPlacedThisSession;
 
         /// <summary> The Time that has passed since the last block change.</summary>
         public DateTime TimeLastBlockChange { get; set; }        
@@ -136,6 +133,17 @@ namespace fCraft {
 
 		/// <summary> Whether the player's chat is bwrainbow. </summary>
         public bool ChatBWRainbows;
+
+        /// <summary> Whether the player is currently afk. </summary>
+        public bool IsAFK;
+        
+        /// <summary> The block the player currently has in their hand.</summary>
+        public Block HeldBlock = Block.Stone;
+        
+        public string oldMob = "Humanoid";
+        public string oldafkMob = "Humanoid";
+        public string afkMob = "Humanoid";
+        public string oldskinName = "";
 
         //Portals
         public bool StandingInPortal = false;
@@ -165,7 +173,7 @@ namespace fCraft {
         public void getLeftOverTime(Double maxTime, CommandReader cmd) {
             double timeLeft = maxTime - Math.Round(TimeSinceLastServerMessage.TotalSeconds);
             if (timeLeft == 1) {
-                Message("&WYou can use /" + cmd.Name + "again in 1 second."); return;
+                Message("&WYou can use /" + cmd.Name + " again in 1 second."); return;
             }
             Message("&WYou can use /" + cmd.Name + " again in " + timeLeft + " seconds");
         }
@@ -207,6 +215,10 @@ namespace fCraft {
 
 		/// <summary> Player's last position before a teleport. </summary>
 		public Position LastPosition;
+		
+		/// <summary> Player's checkpoint respawn position in the current world. </summary>
+        public Position CheckPoint = new Position(-1, -1, -1);
+        
 		/// <summary> Last world player was on before teleport. </summary>
 		public World LastWorld;
 
@@ -325,12 +337,12 @@ namespace fCraft {
                 return;
             }
 
-            if (!rawMessage.ToLower().StartsWith("/afk") && Info.IsAFK) {
+            if (!rawMessage.ToLower().StartsWith("/afk") && IsAFK) {
                 Server.Players.CanSee(this).Message("{0} is no longer AFK", this.Name);
                 Message("&SYou are no longer AFK");
-                Info.IsAFK = false;
-                Info.oldafkMob = Info.afkMob;
-                Info.afkMob = Info.Mob;
+                IsAFK = false;
+                oldafkMob = afkMob;
+                afkMob = Info.Mob;
                 Server.UpdateTabList(true);
             }
 
