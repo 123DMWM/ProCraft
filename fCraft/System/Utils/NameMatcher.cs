@@ -48,7 +48,7 @@ namespace fCraft {
                 return null;
             }
 
-            Player[] matches = Server.FindPlayers(namePart, options);
+            Player[] matches = Server.FindPlayers(player, namePart, options);
             if (matches.Length == 0) {
                 player.MessageNoPlayer(namePart);
                 return null;
@@ -66,6 +66,7 @@ namespace fCraft {
             for (int i = 0; i < items.Length; i++) {
                 if (items[i] == null) continue;
                 string itemName = getName(items[i]);
+                if (itemName == null) continue;
                 
                 if (itemName.Equals(name, StringComparison.OrdinalIgnoreCase)) {
                     results.Clear();

@@ -961,13 +961,13 @@ namespace fCraft {
             if (sections == null || sections.Length == 0) {
                 player.Message("There are no rule sections defined."); return;
             }
-            string[] matches = NameMatcher.Find(sections, section, 
+            List<string> matches = NameMatcher.Find(sections, section, 
                                                 f => Path.GetFileNameWithoutExtension(f));
             
-            if (matches.Length > 1) {
+            if (matches.Count > 1) {
                 player.Message("Multiple rule sections matched \"{0}\": {1}",
                                section, matches.JoinToString());
-            } else if (matches.Length == 1) {
+            } else if (matches.Count == 1) {
                 section = Path.GetFileNameWithoutExtension(matches[0]);
                 if (section.IndexOf("Admin") >= 0 && !player.IsStaff) {
                     player.Message("You need to be staff to read the Admin Rules.");
@@ -1325,7 +1325,8 @@ namespace fCraft {
                 player.Message("&h  /cmds World");
                 return;
 			}
-			Array items = CommandManager.GetCommands(player.Info.Rank, false);
+            
+            CommandDescriptor[] items = CommandManager.GetCommands(player.Info.Rank, false);
 			string output = "";
             if (param.StartsWith("*") && param.EndsWith("*")) {
                 foreach (CommandDescriptor item in items) {
@@ -1879,14 +1880,14 @@ namespace fCraft {
             player.Message("  Times used &6Bot&s: {0}", info.TimesUsedBot);
             player.Message("  Promoted: {0} Demoted: {1}", info.PromoCount, info.DemoCount);
             player.Message("  Reach Distance: {0} Model: {1}", info.ReachDistance, info.Mob);
-            if (target != null && target.ClientName != null) {
+            
+            if (target != null && target.ClientName != null)
                 player.Message("  Client Name: &F{0}", target.ClientName);
-            }
-			player.Message(target == null ? "  Block they last held: {0}" : "  Block they are currently holding: {0}",
-				info.heldBlock);
-			if (target != null && target.LastMotdMessage != null) {
-				player.Message("  Latest motd message: &f{0}", target.LastMotdMessage);
-			}
+            if (target != null)
+			    player.Message("  Block they are currently holding: {0}", target.HeldBlock);
+			if (target != null && target.LastMotdMessage != null)
+			    player.Message("  Latest motd message: &f{0}", target.LastMotdMessage);
+			    
             if (player.Can(Permission.ViewOthersInfo)) {
                 player.Message("  Did they read the rules: &f{0}", info.HasRTR.ToString());
                 player.Message("  Can they see IRC chat: &f{0}", info.ReadIRC.ToString());
