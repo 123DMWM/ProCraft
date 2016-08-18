@@ -1505,7 +1505,13 @@ namespace fCraft {
         public static Player[] FindPlayers([NotNull] string namePart, SearchOptions options) {
             if (namePart == null) throw new ArgumentNullException("namePart");
             bool suppressEvent = (options & SearchOptions.SuppressEvent) != 0;
-            List<Player> matches = NameMatcher.Find(Players, namePart, p => p.Name);
+            bool includeHidden = (options & SearchOptions.IncludeHidden) != 0;
+            List<Player> matches = null;
+            
+            if (includeHidden)
+                matches = NameMatcher.Find(Players, namePart, p => p.Name);
+            else
+                matches = NameMatcher.Find(Players, namePart, p => p.Info.IsHidden ? null : p.Name);
             
             var h = SearchingForPlayer;
             if (!suppressEvent && h != null) {

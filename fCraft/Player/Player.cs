@@ -511,15 +511,15 @@ namespace fCraft {
                         if (otherPlayerName.ToLower() == "irc")
                         {
 							IRC.SendChannelMessage("\u211C\u212C(PM)\u211C" + Name + ": " + messageText);
-                            Message("&P(PM)" + this.ClassyName + " &P-> IRC&P: " + messageText);
+                            Message("&P(PM)" + ClassyName + " &P-> IRC&P: " + messageText);
                             return;
                         }
                         // first, find ALL players (visible and hidden)
-                        Player[] allPlayers = Server.FindPlayers(otherPlayerName, SearchOptions.IncludeHidden);
+                        Player[] allPlayers = Server.FindPlayers(this, otherPlayerName, SearchOptions.IncludeHidden);
 
                         // if there is more than 1 target player, exclude hidden players
                         if( allPlayers.Length > 1 ) {
-                            allPlayers = Server.FindPlayers(otherPlayerName, SearchOptions.Default );
+                            allPlayers = Server.FindPlayers(this, otherPlayerName, SearchOptions.Default );
                         }
 
                         if( allPlayers.Length == 1 ) {

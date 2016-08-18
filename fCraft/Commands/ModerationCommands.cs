@@ -1250,7 +1250,7 @@ namespace fCraft {
                     player.MessageManyMatches( "player", infos );
 
                 } else {
-                    infos = Server.FindPlayers(playerName, SearchOptions.IncludeSelf);
+                    infos = Server.FindPlayers(player, playerName, SearchOptions.IncludeSelf);
                     if( infos.Length > 0 ) {
                         player.Message( "You may only set spawn of players on the same world as you." );
                     } else {
