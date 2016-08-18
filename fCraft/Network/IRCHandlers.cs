@@ -25,7 +25,7 @@ namespace fCraft {
             string cmd = rawMessage.ToLower();
             bool elapsed = DateTime.UtcNow.Subtract(lastIrcCommand).TotalSeconds > 5;
             
-            if (cmd == "!players" || cmd == nick + " players") {
+            if (cmd == "!players" || cmd == ".who" || cmd == ".players" || cmd == nick + " players") {
                 if (!elapsed) return true;
                 var visiblePlayers = Server.Players.Where(p => !p.Info.IsHidden)
                     .OrderBy(p => p, PlayerListSorter.Instance).ToArray();
