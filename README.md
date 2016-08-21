@@ -1,6 +1,6 @@
 #ProCraft
 ---
-This is a custom server based on [fCraft](https://github.com/fragmer/fCraft) but with tons of extra features and complete [CPE](http://wiki.vg/CPE) supportsupport.
+This is a custom server based on [fCraft](https://github.com/fragmer/fCraft) but with tons of extra features and complete [CPE](http://wiki.vg/CPE) support.
 
 Suggestions and questions are welcome!
 
