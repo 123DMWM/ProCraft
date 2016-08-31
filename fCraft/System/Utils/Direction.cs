@@ -1,46 +1,22 @@
 ﻿using System;
 
-namespace fCraft
-{
-
-    public enum Direction
-    {
-        Null,
-        one,
-        two,
-        three,
-        four
+namespace fCraft {
+    public enum Direction {
+        None, PlusX, MinusX, PlusZ, MinusZ
     }
 
-    public class DirectionFinder
-    {
-
-        public static Direction GetDirection(Vector3I[] marks)
-        {
-            if (Math.Abs(marks[1].X - marks[0].X) > Math.Abs(marks[1].Y - marks[0].Y))
-            {
-                if (marks[0].X < marks[1].X)
-                {
-                    return Direction.one;
-                }
-                else
-                {
-                    return Direction.two;
-                }
+    public static class DirectionFinder  {
+        public static Direction GetDirection(Vector3I[] marks) {
+            int lenX = Math.Abs(marks[1].X - marks[0].X);
+            int lenY = Math.Abs(marks[1].Y - marks[0].Y);
+            
+            if (lenX > lenY) {
+                return marks[0].X < marks[1].X ? Direction.PlusX : Direction.MinusX;
+            } else if (lenX < lenY) {
+                return marks[0].Y < marks[1].Y ? Direction.PlusZ : Direction.MinusZ;
+            } else {
+                return Direction.None;
             }
-            else if (Math.Abs(marks[1].X - marks[0].X) < Math.Abs(marks[1].Y - marks[0].Y))
-            {
-                if (marks[0].Y < marks[1].Y)
-                {
-                    return Direction.three;
-                }
-                else
-                {
-                    return Direction.four;
-                }
-            }
-            else
-                return Direction.Null;
         }
     }
 }

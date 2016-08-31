@@ -426,10 +426,10 @@ namespace fCraft {
             }
             
             int dirX = 0, dirY = 0;
-            if (direction == Direction.one) dirX = 1;
-            if (direction == Direction.two) dirX = -1;
-            if (direction == Direction.three) dirY = 1;
-            if (direction == Direction.four) dirY = -1;            
+            if (direction == Direction.PlusX) dirX = 1;
+            if (direction == Direction.MinusX) dirX = -1;
+            if (direction == Direction.PlusZ) dirY = 1;
+            if (direction == Direction.MinusZ) dirY = -1;            
             if (dirX == 0 && dirY == 0) return; //if blockcount = 0, message is shown and returned
 
             for ( int z = 0; z < img.Height; z++ ) {
