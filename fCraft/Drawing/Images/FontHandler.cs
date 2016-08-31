@@ -1,9 +1,5 @@
 ﻿using System;
-using System.IO;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 
 /*        ----
         Copyright (c) 2011-2013 Jon Baker, Glenn Marien and Lao Tszy <Jonty800@gmail.com>
@@ -35,14 +31,12 @@ namespace fCraft {
     public class FontHandler : BitmapDrawOp {
 
         //instance
-        public FontHandler ( Block textColor, Vector3I[] Marks, Player p, Direction dir ) {
+        public FontHandler(Block block, Vector3I[] marks, Player p, Direction dir) {
             direction = dir;
             blockCount = 0;
             player = p;
-            PixelData.X = Marks[0].X;
-            PixelData.Y = Marks[0].Y;
-            PixelData.Z = Marks[0].Z;
-            PixelData.BlockColor = textColor;
+            origin = marks[0];
+            blockColor = block;
             undoState = player.DrawBegin( null );
         }
 

@@ -1,9 +1,6 @@
 ﻿using System;
-using System.IO;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 
 /*        ----
         Copyright (c) 2011-2013 Jon Baker, Glenn Marien and Lao Tszy <Jonty800@gmail.com>
@@ -31,34 +28,21 @@ using System.Text;
         (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
         SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         ----*/
-
-
 namespace fCraft {
     public class ShapesLib : BitmapDrawOp {
-        #region Instancing
-
-        public int blockCount; //blockcount for player message. ++ when drawing
-        int blocks = 0, //drawn blocks
-        blocksDenied = 0; //denied blocks (zones, ect)
-        fCraft.Drawing.UndoState undoState; //undostate
         Vector3I[] marks;
         int Radius = 0;
 
-        //instance
-        public ShapesLib ( Block BlockColor, Vector3I[] Marks, Player p, int radius, Direction dir ) {
-            marks = Marks;
+        public ShapesLib(Block block, Vector3I[] marks, Player p, int radius, Direction dir) {
+            this.marks = marks;
             direction = dir;
             blockCount = 0;
             player = p;
-            PixelData.X = Marks[0].X;
-            PixelData.Y = Marks[0].Y;
-            PixelData.Z = Marks[0].Z;
-            PixelData.BlockColor = BlockColor;
+            origin = marks[0];
+            blockColor = block;
             undoState = player.DrawBegin( null );
             Radius = radius;
         }
-
-        #endregion
 
         #region GoldenSpiral
         public void DrawSpiral () {
