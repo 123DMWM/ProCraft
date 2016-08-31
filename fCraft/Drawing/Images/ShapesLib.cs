@@ -11,12 +11,12 @@ using System.Text;
 
         Redistribution and use in source and binary forms, with or without
         modification, are permitted provided that the following conditions are met:
-         * Redistributions of source code must retain the above copyright
+ * Redistributions of source code must retain the above copyright
               notice, this list of conditions and the following disclaimer.
-            * Redistributions in binary form must reproduce the above copyright
+ * Redistributions in binary form must reproduce the above copyright
              notice, this list of conditions and the following disclaimer in the
              documentation and/or other materials provided with the distribution.
-            * Neither the name of 800Craft or the names of its
+ * Neither the name of 800Craft or the names of its
              contributors may be used to endorse or promote products derived from this
              software without specific prior written permission.
 
@@ -34,15 +34,13 @@ using System.Text;
 
 
 namespace fCraft {
-    public class ShapesLib {
+    public class ShapesLib : BitmapDrawOp {
         #region Instancing
 
-        public Player player; //player using command
         public int blockCount; //blockcount for player message. ++ when drawing
         int blocks = 0, //drawn blocks
-            blocksDenied = 0; //denied blocks (zones, ect)
+        blocksDenied = 0; //denied blocks (zones, ect)
         fCraft.Drawing.UndoState undoState; //undostate
-        Direction direction; //direction of the blocks (x++-- ect)
         Vector3I[] marks;
         int Radius = 0;
 
@@ -166,7 +164,7 @@ namespace fCraft {
                     break;
                 case RectOrientations.RemoveBottom:
                     rect = new RectangleF( ( float )x, ( float )( y + hgt - 2 * wid ),
-                        ( float )( 2 * wid ), ( float )( 2 * wid ) );
+                                          ( float )( 2 * wid ), ( float )( 2 * wid ) );
                     break;
             }
 
@@ -342,21 +340,21 @@ namespace fCraft {
             bool lines_intersect, segments_intersect;
             PointF intersection, close_p1, close_p2;
             FindIntersection( pt00, pt01, pt10, pt11,
-                out lines_intersect, out segments_intersect,
-                out intersection, out close_p1, out close_p2 );
+                             out lines_intersect, out segments_intersect,
+                             out intersection, out close_p1, out close_p2 );
 
             // Calculate the distance between the
             // point of intersection and the center.
             return Math.Sqrt(
                 intersection.X * intersection.X +
-                  intersection.Y * intersection.Y );
+                intersection.Y * intersection.Y );
         }
 
         // Find the point of intersection between
         // the lines p1 --> p2 and p3 --> p4.
         private void FindIntersection ( PointF p1, PointF p2, PointF p3, PointF p4,
-            out bool lines_intersect, out bool segments_intersect,
-            out PointF intersection, out PointF close_p1, out PointF close_p2 ) {
+                                       out bool lines_intersect, out bool segments_intersect,
+                                       out PointF intersection, out PointF close_p1, out PointF close_p2 ) {
             // Get the segments' parameters.
             float dx12 = p2.X - p1.X;
             float dy12 = p2.Y - p1.Y;
@@ -407,127 +405,11 @@ namespace fCraft {
 
         #endregion
 
-        #region Draw
-        public void Draw ( Bitmap img ) {
-            //guess how big the draw will be
-            int Count = 0;
-            for ( int x = 0; x < img.Width; x++ ) {
-                for ( int z = 0; z < img.Height; z++ ) {
-                    if ( img.GetPixel( x, z ).ToArgb() != System.Drawing.Color.White.ToArgb() ) {
-                        Count++;
-                    }
-                }
-            }
-            //check if player can make the drawing
-            if ( !player.CanDraw( Count ) ) {
-                player.Message( String.Format( "You are only allowed to run commands that affect up to {0} blocks. This one would affect {1} blocks.",
-                                               player.Info.Rank.DrawLimit, Count ) );
-                return;
-            }
-            
-            int dirX = 0, dirY = 0;
-            if (direction == Direction.PlusX) dirX = 1;
-            if (direction == Direction.MinusX) dirX = -1;
-            if (direction == Direction.PlusZ) dirY = 1;
-            if (direction == Direction.MinusZ) dirY = -1;            
-            if (dirX == 0 && dirY == 0) return; //if blockcount = 0, message is shown and returned
-
-            for ( int z = 0; z < img.Height; z++ ) {
-                for ( int i = 0; i < img.Width; i++ ) {  
-            		if ( img.GetPixel( i, z ).ToArgb() != System.Drawing.Color.White.ToArgb() ) {
-            			BuildingCommands.DrawOneBlock( player, player.World.Map, PixelData.BlockColor,
-            			      new Vector3I( PixelData.X + dirX * i, PixelData.Y + dirY * i, PixelData.Z + z ), BlockChangeContext.Drawn,
-            			      ref blocks, ref blocksDenied, undoState );
-            			blockCount++;
-            		}
-            	}
-            }
-        }
-        #endregion
-
-        #region Helpers
-
-        private Point DegreesToXY ( float degrees, float radius, Point origin ) {
-            Point xy = new Point();
+        Point DegreesToXY(float degrees, float radius, Point origin) {
             double radians = degrees * Math.PI / 180.0;
-
-            xy.X = ( int )( Math.Cos( radians ) * radius + origin.X );
-            xy.Y = ( int )( Math.Sin( -radians ) * radius + origin.Y );
-
-            return xy;
+            return new Point(
+                (int)(Math.Cos( radians ) * radius + origin.X),
+                (int)(Math.Sin( -radians ) * radius + origin.Y));
         }
-
-        public static Bitmap Crop ( Bitmap bmp ) {
-            int w = bmp.Width;
-            int h = bmp.Height;
-            Func<int, bool> allWhiteRow = row => {
-                for ( int i = 0; i < w; ++i )
-                    if ( bmp.GetPixel( i, row ).R != 255 )
-                        return false;
-                return true;
-            };
-            Func<int, bool> allWhiteColumn = col => {
-                for ( int i = 0; i < h; ++i )
-                    if ( bmp.GetPixel( col, i ).R != 255 )
-                        return false;
-                return true;
-            };
-            int topmost = 0;
-            for ( int row = 0; row < h; ++row ) {
-                if ( allWhiteRow( row ) )
-                    topmost = row;
-                else break;
-            }
-            int bottommost = 0;
-            for ( int row = h - 1; row >= 0; --row ) {
-                if ( allWhiteRow( row ) )
-                    bottommost = row;
-                else break;
-            }
-            int leftmost = 0, rightmost = 0;
-            for ( int col = 0; col < w; ++col ) {
-                if ( allWhiteColumn( col ) )
-                    leftmost = col;
-                else
-                    break;
-            }
-            for ( int col = w - 1; col >= 0; --col ) {
-                if ( allWhiteColumn( col ) )
-                    rightmost = col;
-                else
-                    break;
-            }
-            if ( rightmost == 0 ) rightmost = w; // As reached left
-            if ( bottommost == 0 ) bottommost = h; // As reached top.
-            int croppedWidth = rightmost - leftmost;
-            int croppedHeight = bottommost - topmost;
-            if ( croppedWidth == 0 ) {// No border on left or right
-                leftmost = 0;
-                croppedWidth = w;
-            }
-            if ( croppedHeight == 0 ) {// No border on top or bottom
-                topmost = 0;
-                croppedHeight = h;
-            } try {
-                var target = new Bitmap( croppedWidth, croppedHeight );
-                using ( Graphics g = Graphics.FromImage( target ) ) {
-                    g.DrawImage( bmp,
-                      new RectangleF( 0, 0, croppedWidth, croppedHeight ),
-                      new RectangleF( leftmost, topmost, croppedWidth, croppedHeight ),
-                      GraphicsUnit.Pixel );
-                }
-                return target;
-            } catch {
-                return bmp; //return original image, I guess
-            }
-        }
-        //stores information needed for each pixel
-        public struct PixelData {
-            public static int X;
-            public static int Y;
-            public static int Z;
-            public static Block BlockColor;
-        }
-        #endregion
     }
 }

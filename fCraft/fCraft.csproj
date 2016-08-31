@@ -115,8 +115,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\CpeCommands.cs" />
-    <Compile Include="Commands\System.Drawing\FontHandler.cs" />
-    <Compile Include="Commands\System.Drawing\ShapesLib.cs" />
+    <Compile Include="Drawing\Images\BitmapDrawOp.cs" />
+    <Compile Include="Drawing\Images\FontHandler.cs" />
+    <Compile Include="Drawing\Images\ShapesLib.cs" />
     <Compile Include="Drawing\Brushes\BWRainbowBrush.cs" />
     <Compile Include="Drawing\Brushes\CheckeredBrush.cs" />
     <Compile Include="Drawing\Brushes\CloudyBrush.cs" />
