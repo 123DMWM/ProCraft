@@ -48,9 +48,6 @@ namespace fCraft {
                 g.FillRectangle(Brushes.White, 0, 0, img.Width, img.Height); //make background, else crop will not work
                 g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SingleBitPerPixelGridFit; //fix to bleeding
                 g.DrawString(text, player.font, Brushes.Black, 0, 0);
-                
-                img = Crop(img); //crop the image to fix all problems with location
-                img.RotateFlip(RotateFlipType.Rotate180FlipX); //flip this badboy
                 Draw(img);
                 img.Dispose();
             }

@@ -86,47 +86,41 @@ namespace fCraft {
             double x = ( client_wid - wid ) / 2;
             double y = ( client_hgt - hgt ) / 2;
 
-            // Make the Bitmap.
-            Bitmap bm = new Bitmap( client_wid, client_hgt );
+            // Draw the rectangles.
+            using (Bitmap bmp = new Bitmap(client_wid, client_hgt))
+                using (Graphics gr = Graphics.FromImage(bmp))
             {
-
+                gr.FillRectangle( Brushes.White, 0, 0, bmp.Width, bmp.Height );
                 // Draw the rectangles.
-                using ( Graphics gr = Graphics.FromImage( bm ) ) {
-                    gr.FillRectangle( Brushes.White, 0, 0, bm.Width, bm.Height );
-                    // Draw the rectangles.
-                    gr.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-                    List<PointF> points = new List<PointF>();
-                    DrawPhiRectanglesOnGraphics( gr, points, x, y, wid, hgt, orientation );
+                gr.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+                List<PointF> points = new List<PointF>();
+                DrawPhiRectanglesOnGraphics( gr, points, x, y, wid, hgt, orientation );
 
-                    // Draw the true spiral.
-                    PointF start = points[0];
-                    PointF origin = points[points.Count - 1];
-                    float dx = start.X - origin.X;
-                    float dy = start.Y - origin.Y;
-                    double radius = Math.Sqrt( dx * dx + dy * dy );
+                // Draw the true spiral.
+                PointF start = points[0];
+                PointF origin = points[points.Count - 1];
+                float dx = start.X - origin.X;
+                float dy = start.Y - origin.Y;
+                double radius = Math.Sqrt( dx * dx + dy * dy );
 
-                    double theta = Math.Atan2( dy, dx );
-                    const int num_slices = 1000;
-                    double dtheta = Math.PI / 2 / num_slices;
-                    double factor = 1 - ( 1 / phi ) / num_slices * 0.78; //@
-                    List<PointF> new_points = new List<PointF>();
+                double theta = Math.Atan2( dy, dx );
+                const int num_slices = 1000;
+                double dtheta = Math.PI / 2 / num_slices;
+                double factor = 1 - ( 1 / phi ) / num_slices * 0.78; //@
+                List<PointF> new_points = new List<PointF>();
 
-                    // Repeat until dist is too small to see.
-                    while ( radius > 0.1 ) {
-                        PointF new_point = new PointF(
-                            ( float )( origin.X + radius * Math.Cos( theta ) ),
-                            ( float )( origin.Y + radius * Math.Sin( theta ) ) );
-                        new_points.Add( new_point );
-                        theta += dtheta;
-                        radius *= factor;
-                    }
-                    gr.DrawLines( Pens.Blue, new_points.ToArray() );
+                // Repeat until dist is too small to see.
+                while ( radius > 0.1 ) {
+                    PointF new_point = new PointF(
+                        ( float )( origin.X + radius * Math.Cos( theta ) ),
+                        ( float )( origin.Y + radius * Math.Sin( theta ) ) );
+                    new_points.Add( new_point );
+                    theta += dtheta;
+                    radius *= factor;
                 }
-                bm = Crop( bm );
-                bm.RotateFlip( RotateFlipType.Rotate180FlipX );
-                Draw( bm );
-                bm.Dispose();
-            }
+                gr.DrawLines( Pens.Blue, new_points.ToArray() );
+                Draw( bmp );
+            }      
         }
 
         private void DrawPhiRectanglesOnGraphics ( Graphics gr, List<PointF> points, double x, double y, double wid, double hgt, RectOrientations orientation ) {
@@ -196,20 +190,15 @@ namespace fCraft {
             Point[] verticies = CalculateVertices( sides, Radius / 2, startingAngle, center );
 
             //Render the polygon
-            Bitmap polygon = new Bitmap( Radius + 1, Radius + 1 );
-            using ( Graphics g = Graphics.FromImage( polygon ) ) {
-                g.FillRectangle( Brushes.White, 0, 0, polygon.Width, polygon.Height );
-                g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-                g.DrawPolygon( Pens.Black, verticies );
-                if ( FillPoly ) {
-                    SolidBrush brush = new SolidBrush( System.Drawing.Color.Black );
-                    g.FillPolygon( brush, verticies );
-                }
+            using (Bitmap bmp = new Bitmap(Radius + 1, Radius + 1))
+            	using (Graphics g = Graphics.FromImage(bmp))
+            {
+            	g.FillRectangle( Brushes.White, 0, 0, bmp.Width, bmp.Height );
+            	g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+            	g.DrawPolygon( Pens.Black, verticies );
+            	if (FillPoly) g.FillPolygon(Brushes.Black, verticies);
+            	Draw(bmp);
             }
-            polygon = Crop( polygon );
-            polygon.RotateFlip( RotateFlipType.Rotate180FlipX );
-            Draw( polygon );
-            polygon.Dispose();
         }
 
         private Point[] CalculateVertices ( int sides, int radius, int startingAngle, Point center ) {
@@ -232,23 +221,18 @@ namespace fCraft {
         #region Multi-point star
 
         // Draw the indicated star in the rectangle.
-        public void DrawStar ( int num_points, int Radius, bool Fill ) {
-            Bitmap bmp = new Bitmap( Radius, Radius );
-            using ( Graphics g = Graphics.FromImage( bmp ) ) {
+        public void DrawStar(int num_points, int Radius, bool Fill) {
+            using (Bitmap bmp = new Bitmap(Radius, Radius))
+                using (Graphics g = Graphics.FromImage(bmp))
+            {
                 g.FillRectangle( Brushes.White, 0, 0, bmp.Width, bmp.Height );
                 // Get the star's points.
                 PointF[] star_points = MakeStarPoints( -Math.PI / 2, num_points, Radius / 2 );
 
                 // Draw the star.
-                SolidBrush brush = new SolidBrush( System.Drawing.Color.Black );
-                if ( Fill ) {
-                    g.FillPolygon( brush, star_points );
-                }
+                if (Fill) g.FillPolygon( Brushes.Black, star_points );
                 g.DrawPolygon( Pens.Black, star_points );
-                bmp = Crop( bmp );
-                bmp.RotateFlip( RotateFlipType.Rotate180FlipX );
                 Draw( bmp );
-                bmp.Dispose();
             }
         }
 

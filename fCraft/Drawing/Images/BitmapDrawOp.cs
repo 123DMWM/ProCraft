@@ -44,16 +44,12 @@ namespace fCraft {
         
         public void Draw(Bitmap img) {
             //guess how big the draw will be
-            int count = 0, white = System.Drawing.Color.White.ToArgb();
-            for (int y = 0; y < img.Height; y++)
-                for (int x = 0; x < img.Width; x++)
-            {
-                if (img.GetPixel(x, y).ToArgb() == white) continue;
-                count++;
-            }
+            int white = System.Drawing.Color.White.ToArgb();
+            int left, right, top, bottom;
+            int count = Crop(img, out left, out right, out top, out bottom);
             
             //check if player can make the drawing
-            if (!player.CanDraw(count )) {
+            if (!player.CanDraw(count)) {
                 player.Message(String.Format("You are only allowed to run commands that affect up to {0} blocks. " +
                                              "This one would affect {1} blocks.",
                                              player.Info.Rank.DrawLimit, count));
@@ -67,12 +63,13 @@ namespace fCraft {
             if (direction == Direction.MinusZ) dirY = -1;
             if (dirX == 0 && dirY == 0) return; //if blockcount = 0, message is shown and returned
             
-            for (int z = 0; z < img.Height; z++)
-                for (int i = 0; i < img.Width; i++)
+            for (int yy = top; yy <= bottom; yy++)
+                for (int xx = left; xx <= right; xx++)
             {
-                if (img.GetPixel(i, z).ToArgb() == white) continue;
+                if (img.GetPixel(xx, yy).ToArgb() == white) continue;
+                int dx = xx - left, dy = bottom - yy;
                 
-                Vector3I coords = new Vector3I(origin.X + dirX * i, origin.Y + dirY * i, origin.Z + z);
+                Vector3I coords = new Vector3I(origin.X + dirX * dx, origin.Y + dirY * dx, origin.Z + dy);
                 BuildingCommands.DrawOneBlock(
                     player, player.World.Map, blockColor,
                     coords, BlockChangeContext.Drawn,
@@ -81,73 +78,23 @@ namespace fCraft {
             }
         }
 
-        public static Bitmap Crop(Bitmap bmp) {
-            int w = bmp.Width;
-            int h = bmp.Height;
-            Func<int, bool> allWhiteRow = row => {
-                for (int i = 0; i < w; i++) {
-                    if (bmp.GetPixel(i, row).R != 255)
-                        return false;
-                }
-                return true;
-            };
-            Func<int, bool> allWhiteColumn = col => {
-                for (int i = 0; i < h; i++) {
-                    if (bmp.GetPixel(col, i).R != 255)
-                        return false;
-                }
-                return true;
-            };
+        static int Crop(Bitmap bmp, 
+                        out int left, out int right, out int top, out int bottom) {
+            int count = 0, white = System.Drawing.Color.White.ToArgb();
+            left = bmp.Width; right = 0;
+            top = bmp.Height; bottom = 0;
             
-            int topmost = 0, bottommost = 0;
-            for (int row = 0; row < h; row++) {
-                if (allWhiteRow(row)) {
-                    topmost = row;
-                } else { break; }
+            for (int y = 0; y < bmp.Height; y++)
+                for (int x = 0; x < bmp.Width; x++)
+            {
+                if (bmp.GetPixel(x, y).ToArgb() == white) continue;
+                count++;
+                left = Math.Min(x, left);
+                right = Math.Max(x, right);
+                top = Math.Min(y, top);
+                bottom = Math.Max(y, bottom);
             }
-            for (int row = h - 1; row >= 0; row--) {
-                if (allWhiteRow(row)) {
-                    bottommost = row;
-                } else { break; }
-            }
-            
-            int leftmost = 0, rightmost = 0;
-            for (int col = 0; col < w; col++) {
-                if (allWhiteColumn(col)) {
-                    leftmost = col;
-                } else { break; }
-            }
-            for (int col = w - 1; col >= 0; col--) {
-                if (allWhiteColumn(col)) {
-                    rightmost = col;
-                } else { break; }
-            }
-            
-            if ( rightmost == 0 ) rightmost = w; // As reached left
-            if ( bottommost == 0 ) bottommost = h; // As reached top.
-            int croppedWidth = rightmost - leftmost;
-            int croppedHeight = bottommost - topmost;
-            if ( croppedWidth == 0 ) {// No border on left or right
-                leftmost = 0;
-                croppedWidth = w;
-            }
-            if ( croppedHeight == 0 ) {// No border on top or bottom
-                topmost = 0;
-                croppedHeight = h;
-            }
-            
-            try {
-                Bitmap cropped = new Bitmap( croppedWidth, croppedHeight );
-                using (Graphics g = Graphics.FromImage( cropped )) {
-                    g.DrawImage(bmp,
-                                new RectangleF( 0, 0, croppedWidth, croppedHeight ),
-                                new RectangleF( leftmost, topmost, croppedWidth, croppedHeight ),
-                                GraphicsUnit.Pixel);
-                }
-                return cropped;
-            } catch {
-                return bmp; //return original image, I guess
-            }
+            return count;
         }
     }
 }
