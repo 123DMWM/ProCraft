@@ -547,25 +547,22 @@ namespace fCraft
             Handler = DeafenHandler
         };
 
-        static void DeafenHandler(Player player, CommandReader cmd)
-        {
-            if (cmd.HasNext)
-            {
+        static void DeafenHandler(Player player, CommandReader cmd) {
+            if (cmd.HasNext) {
                 CdDeafen.PrintUsage(player);
                 return;
             }
-            if (!player.IsDeaf)
-            {
-                for (int i = 0; i < LinesToClear; i++)
-                {
+            
+            if (!player.IsDeaf) {
+                for (int i = 0; i < LinesToClear; i++) {
                     player.Message("");
                 }
-                player.Message("Deafened mode: &2ON");
-                player.Message("You will not see ANY messages until you type &H/Deafen&S again.");
+                  
+                bool fallback = !player.Supports(CpeExt.TextColors);
+                player.SendNow(Packet.Message(0, "Deafened mode: &2ON", fallback));
+                player.SendNow(Packet.Message(0, "You will not see ANY messages until you type &H/Deafen&S again.", fallback));
                 player.IsDeaf = true;
-            }
-            else
-            {
+            } else {
                 player.IsDeaf = false;
                 player.Message("Deafened mode: &4OFF");
             }
