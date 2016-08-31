@@ -2131,23 +2131,19 @@ namespace fCraft {
             Category = CommandCategory.New | CommandCategory.Info,
             IsConsoleSafe = true,
             Usage = "/Seen [PlayerName or IP [Offset]]",
-            Help = "Prints the extra information about a given player",
+            Help = "Prints when the given player was last seen",
             Handler = SeenHandler
         };
 
         static void SeenHandler(Player player, CommandReader cmd) {
-			PlayerInfo info = FindPlayerInfo(player, cmd, true);
+            PlayerInfo info = FindPlayerInfo(player, cmd, true);
             if (info == null) return;
             Player target = info.PlayerObject;
 
-            if (target != null)
-            {
-                player.Message("Player {0}&s has been &aOnline&s for {1}", target.Info.Rank.Color + target.Name, target.Info.TimeSinceLastLogin.ToMiniString());
-				player.Message("They are currently on world {0}", target.World.ClassyName);
-            }
-            else
-            {
-
+            if (target != null) {
+                player.Message("Player {0}&s has been &aOnline&s for {1}", info.ClassyName, info.TimeSinceLastLogin.ToMiniString());
+                player.Message("They are currently on world {0}", target.World.ClassyName);
+            } else {
                 player.Message("Player {0}&s is &cOffline", info.ClassyName);
                 player.Message("Was last seen {0} ago on world &f{1}", info.TimeSinceLastSeen.ToMiniString(), info.LastWorld);
             }
