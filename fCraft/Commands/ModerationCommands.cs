@@ -1488,7 +1488,9 @@ namespace fCraft {
                 int x, y, z, rot, lot;
                 rot = player.Position.R;
                 lot = player.Position.L;
-                if (cmd.NextInt(out x) && cmd.NextInt(out y) && cmd.NextInt(out z)) {
+                if (cmd.NextCoord(player.Position.ToBlockCoords().X, out x) 
+                    && cmd.NextCoord(player.Position.ToBlockCoords().Y, out y) 
+                    && cmd.NextCoord(player.Position.ToBlockCoords().Z, out z)) {
                     if (cmd.HasNext) {
                         if (cmd.HasNext) {
                             if (cmd.NextInt(out rot) && cmd.NextInt(out lot)) {

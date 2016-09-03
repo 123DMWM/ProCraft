@@ -129,6 +129,31 @@ namespace fCraft
             }
         }
 
+        /// <summary> Returns the next command argument, parsed as an integer. </summary>
+        /// <param name="original"> Original coord if using ~player coords,
+        /// <param name="number"> Set to the argument's value if parsing succeeded,
+        /// or zero if parsing failed or if there are no more arguments. </param>
+        /// <returns> Returns true if parsing succeeded,
+        /// and false if parsing failed or if there are no more arguments. </returns>
+        [DebuggerStepThrough]
+        public bool NextCoord(int original, out int number) {
+            string nextVal = Next();
+            if (nextVal == null) {
+                number = 0;
+                return false;
+            } else {
+                if (nextVal.StartsWith("~")){
+                    int add = 0; int.TryParse(nextVal.Remove(0, 1), out add);
+                    number = original + add;
+                    return true;
+                } else if (nextVal.StartsWith("~-")) {
+                    int sub = 0; int.TryParse(nextVal.Remove(0, 2), out sub);
+                    number = original - sub;
+                    return true;
+                } else return int.TryParse(nextVal, out number);
+            }
+        }
+
 
         /// <summary> Checks whether there there is an int argument available.
         /// Does not modify the offset. </summary>
