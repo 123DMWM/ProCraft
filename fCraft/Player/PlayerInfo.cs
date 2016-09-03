@@ -103,13 +103,14 @@ namespace fCraft {
         /// <summary> Begins to asynchronously check player's account type. </summary>
         public void GeoipLogin() {
             String ip = LastIP.ToString();
-            if (IPAddress.Parse(ip).IsLocal() && Server.ExternalIP != null)
+            if (IPAddress.Parse(ip).IsLocal() && Server.ExternalIP != null) {
                 ip = Server.ExternalIP.ToString();
+            }
 
 			if (ip != GeoIP || Accuracy == 0) {
                 Scheduler.NewBackgroundTask(GeoipLoginCallback).RunOnce(this, TimeSpan.Zero);
             } else {
-                DisplayGeoIp();
+                DisplayGeoIp(false);
             }
         }
 
@@ -117,23 +118,26 @@ namespace fCraft {
         public void GeoipLoginCallback( SchedulerTask task ) {
             PlayerInfo info = (PlayerInfo)task.UserState;
 			InfoCommands.GetGeoip(info);
-			DisplayGeoIp();
+			DisplayGeoIp(true);
         }
 
         /// <summary>
         /// Displayes the GeoIP information to the server.
         /// </summary>
-        public void DisplayGeoIp() {
-            if (PlayerObject != null) {
-                string comesFrom = string.Format("&2{0}&2 comes from {1}", PlayerObject.Name,
-					CountryName);
-				string comesFromIRC = string.Format("\u212C&2{0}\u211C&2 comes from \u212C{1}", PlayerObject.Name,
-					CountryName);
-                Server.Players.CanSee(PlayerObject).Message(comesFrom);
-                PlayerObject.Message(comesFrom);
-                if (!IsHidden) {
-                    IRC.SendChannelMessage(comesFromIRC);
+        public void DisplayGeoIp(bool newData) {
+            if (PlayerObject != null && !string.IsNullOrEmpty(CountryName)) {
+                string name = (TimeSinceFirstLogin <= TimeSpan.FromDays(1) ? Chat.newPlayerPrefix.ToString() : "") + PlayerObject.Name;
+                string comesFrom = 
+                    string.Format("&2{0}&2 comes from {1}", name, CountryName);
+				string comesFromIRC = 
+                    string.Format("\u212C&2{0}\u211C&2 comes from \u212C{1}", name, CountryName);
+                if (newData) {
+                    Server.Players.CanSee(PlayerObject).Message(comesFrom);
+                    if (!IsHidden) {
+                        IRC.SendChannelMessage(comesFromIRC);
+                    }
                 }
+                PlayerObject.Message(comesFrom);
                 Logger.Log(LogType.UserActivity, comesFrom);
             }
         }

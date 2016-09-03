@@ -1063,7 +1063,13 @@ namespace fCraft
             if (e == null) throw new ArgumentNullException("e");
             if (ConfigKey.IRCBotAnnounceServerJoins.Enabled() && !e.Player.Info.IsHidden)
             {
-                string message = string.Format("&2{0}&2(&f{1}&2) Connected{2}.", Bold, e.Player.ClassyName, e.Player.Info.TimesVisited == 1 ? " for the first time" : "");
+                string ip = e.Player.Info.LastIP.ToString();
+                if (IPAddress.Parse(ip).IsLocal() && Server.ExternalIP != null)
+                    ip = Server.ExternalIP.ToString();
+
+                string name = (e.Player.Info.TimeSinceFirstLogin.ToMilliSeconds() <= 86400000 ? Chat.newPlayerPrefix.ToString() : "") + e.Player.Name;
+                string message = string.Format("&2{0}&2(&A{1}&2) Connected{2}.", Bold, name, 
+                    e.Player.Info.TimesVisited == 1 ? " for the first time" : (ip != e.Player.Info.GeoIP || e.Player.Info.Accuracy == 0) ? "" : " from " + e.Player.Info.CountryName);
                 SendChannelMessage(message);
             }
         }
