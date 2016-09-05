@@ -337,10 +337,13 @@ namespace fCraft
                         }
                         string processedMessage = ProcessMessageFromIRC(rawMessage);
                         if (processedMessage.Length == 0) return;
-                        
+                        bool elapsed = DateTime.UtcNow.Subtract(IRCHandlers.lastIrcCommand).TotalSeconds > 5;
                         if (ConfigKey.IRCBotForwardFromIRC.Enabled()) {
                             if (msg.Type == IRCMessageType.ChannelAction) {
-                                Scheduler.NewTask(t => Chat.getUrls(processedMessage)).RunOnce();
+                                if (elapsed) {
+                                    Scheduler.NewTask(t => Chat.getUrls(processedMessage)).RunOnce();
+                                    IRCHandlers.lastIrcCommand = DateTime.UtcNow;
+                                }
                                 foreach (Player player in Server.Players) {
                                     if (player.Info.ReadIRC) {
                                         player.Message("&i(IRC) * {0} {1}", msg.Nick, processedMessage);
@@ -351,7 +354,10 @@ namespace fCraft
                             } else if (IRCHandlers.HandleCommand(ActualBotNick, msg.Nick, rawMessage)) {
                             } else if (IRCHandlers.HandlePM(ActualBotNick, msg.Nick, rawMessage)) {
                             } else {
-                                Scheduler.NewTask(t => Chat.getUrls(processedMessage)).RunOnce();
+                                if (elapsed) {
+                                    Scheduler.NewTask(t => Chat.getUrls(processedMessage)).RunOnce();
+                                    IRCHandlers.lastIrcCommand = DateTime.UtcNow;
+                                }
                                 foreach (Player player in Server.Players.Where(player => player.Info.ReadIRC)) {
                                     player.Message("&i(IRC) {0}{1}: {2}", msg.Nick, Color.White,
                                                    processedMessage);
@@ -360,7 +366,10 @@ namespace fCraft
                             Logger.Log(LogType.IrcChat, "{0}: {1}: {2}", msg.Channel, msg.Nick,
                                        IRCColorsAndNonStandardCharsExceptEmotes.Replace(rawMessage, ""));
                         } else if (msg.Message.StartsWith("#")) {
-                            Scheduler.NewTask(t => Chat.getUrls(processedMessage)).RunOnce();
+                            if (elapsed) {
+                                Scheduler.NewTask(t => Chat.getUrls(processedMessage)).RunOnce();
+                                IRCHandlers.lastIrcCommand = DateTime.UtcNow;
+                            }
                             foreach (Player player in Server.Players.Where(player => player.Info.ReadIRC)) {
                                 player.Message("&i(IRC) {0}{1}: {2}", msg.Nick, Color.White,
                                                processedMessage.Substring(1));
