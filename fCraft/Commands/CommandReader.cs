@@ -130,7 +130,7 @@ namespace fCraft
         }
 
         /// <summary> Returns the next command argument, parsed as an integer. </summary>
-        /// <param name="original"> Original coord if using ~player coords,
+        /// <param name="original"> Original coord if using ~player coords, </param>
         /// <param name="number"> Set to the argument's value if parsing succeeded,
         /// or zero if parsing failed or if there are no more arguments. </param>
         /// <returns> Returns true if parsing succeeded,
@@ -141,16 +141,15 @@ namespace fCraft
             if (nextVal == null) {
                 number = 0;
                 return false;
+            }
+            
+            if (nextVal.StartsWith("~")){
+                int delta = 0; 
+                bool success = int.TryParse(nextVal.Remove(0, 1), out delta);
+                number = original + delta;
+                return success;
             } else {
-                if (nextVal.StartsWith("~")){
-                    int add = 0; int.TryParse(nextVal.Remove(0, 1), out add);
-                    number = original + add;
-                    return true;
-                } else if (nextVal.StartsWith("~-")) {
-                    int sub = 0; int.TryParse(nextVal.Remove(0, 2), out sub);
-                    number = original - sub;
-                    return true;
-                } else return int.TryParse(nextVal, out number);
+                return int.TryParse(nextVal, out number);
             }
         }
 
