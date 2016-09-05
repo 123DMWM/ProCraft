@@ -3278,33 +3278,32 @@ namespace fCraft {
 
                 case "description":
                 case "greeting":
-                    if( String.IsNullOrEmpty( value ) ) {
-                        if (world.Greeting == null)
-                        {
-                            if (!Directory.Exists("./WorldGreeting/")) Directory.CreateDirectory("./WorldGreeting/");
-                            if (File.Exists("./WorldGreeting/" + player.World.Name + ".txt"))
-                            {
-                                world.Greeting = File.ReadAllText("./WorldGreeting/" + player.World.Name + ".txt");
-                                if (world.Greeting.Length == 0) player.Message("No greeting message is set for world {0}", world.ClassyName);
-                                else player.Message("Greeting message for world {0}&s is: {1}", world.ClassyName, world.Greeting);
+                    if (!Directory.Exists("./WorldGreeting/")) 
+                        Directory.CreateDirectory("./WorldGreeting/");
+                    
+                    if (String.IsNullOrEmpty(value )) {
+                        if (world.Greeting == null) {
+                            if (File.Exists("./WorldGreeting/" + world.Name + ".txt")) {
+                                world.Greeting = File.ReadAllText("./WorldGreeting/" + world.Name + ".txt");
+                                if (world.Greeting.Length == 0) 
+                                    player.Message("No greeting message is set for world {0}", world.ClassyName);
+                                else 
+                                    player.Message("Greeting message for world {0}&s is: {1}", world.ClassyName, world.Greeting);
                                 world.Greeting = null;
+                            } else {
+                                player.Message("No greeting message is set for world {0}", world.ClassyName);
                             }
-                            else player.Message("No greeting message is set for world {0}", world.ClassyName);
                         }
                     } else {
-                        if (value.ToLower() == "remove")
-                        {
+                        if (value.ToLower() == "remove") {
                             player.Message("Greeting message removed for world {0}", world.ClassyName);
-                            if (!Directory.Exists("./WorldGreeting/")) Directory.CreateDirectory("./WorldGreeting/");
-                            if (File.Exists("./WorldGreeting/" + player.World.Name + ".txt")) File.Delete("./WorldGreeting/" + player.World.Name + ".txt");
+                            if (File.Exists("./WorldGreeting/" + world.Name + ".txt")) 
+                                File.Delete("./WorldGreeting/" + world.Name + ".txt");
                             world.Greeting = null;
-                        }
-                        else
-                        {
+                        } else {
                             world.Greeting = value.Replace("%n", "/n");
                             player.Message("Greeting message for world {0}&S set to: {1}", world.ClassyName, world.Greeting);
-                            if (!Directory.Exists("./WorldGreeting/")) Directory.CreateDirectory("./WorldGreeting/");
-                            File.WriteAllText("./WorldGreeting/" + player.World.Name + ".txt", world.Greeting);
+                            File.WriteAllText("./WorldGreeting/" + world.Name + ".txt", world.Greeting);
                             world.Greeting = null;
                         }
                     }
