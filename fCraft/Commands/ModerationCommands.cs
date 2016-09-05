@@ -1522,7 +1522,6 @@ namespace fCraft {
                 } else {
                     CdTeleport.PrintUsage(player);
                 }
-
             } else {
                 if (name == "-") {
                     if (player.LastUsedPlayerName != null) {
@@ -1532,13 +1531,18 @@ namespace fCraft {
                         return;
                     }
                 }
-                Player[] matches = Server.FindPlayers(player, name, SearchOptions.Default);
+                Player[] matches = Server.FindPlayers(player, name, SearchOptions.ReturnSelfIfOnlyMatch);
                 if (matches.Length == 0) {
                     player.Message("No player found by the name \"{0}\"", name);
                     return;
                 }
                 if (matches.Length == 1) {
                     Player target = matches[0];
+                    if (target == player) {
+                        player.Message("You cannot &H/Teleport&S to yourself.");
+                        return;
+                    }
+                
                     World targetWorld = target.World;
                     if (targetWorld == null) PlayerOpException.ThrowNoWorld(target);
                     if (target.Info.TPDeny && target.Info.Rank >= player.Info.Rank) {

@@ -1548,21 +1548,16 @@ namespace fCraft {
             bool returnSelf = (options & SearchOptions.ReturnSelfIfOnlyMatch) != 0;
 
             // Repeat last-used player name
-            if (name == "-")
-            {
-                if (player.LastUsedPlayerName != null)
-                {
+            if (name == "-") {
+                if (player.LastUsedPlayerName != null) {
                     name = player.LastUsedPlayerName;
-                }
-                else
-                {
+                } else {
                     return new Player[0];
                 }
             }
 
             // in case someone tries to use the "!" prefix in an online-only search
-            if (name.Length > 0 && name[0] == '!')
-            {
+            if (name.Length > 0 && name[0] == '!') {
                 name = name.Substring(1);
             }
 
