@@ -96,7 +96,13 @@ namespace fCraft {
         /// <summary> BlockDB instance used to store/lookup block changes for this world. </summary>
         public BlockDB BlockDB { get; private set; }
 
-
+        /// <summary> Whether players can place any blocks in the world. </summary>
+        public bool Buildable { get; set; }
+        
+        /// <summary> Whether players can delete any blocks in the world. </summary>
+        public bool Deletable { get; set; }
+        
+        
         internal World( [NotNull] string name ) {
             if( name == null ) throw new ArgumentNullException( "name" );
             if(!IsValidName( name ) ) {
@@ -107,6 +113,9 @@ namespace fCraft {
             BuildSecurity = new SecurityController();
             Name = name;
             UpdatePlayerList();
+            
+            Buildable = true;
+            Deletable = true;
             BlockDefs = new BlockDefinition[256];
             for (int i = 0; i < BlockDefs.Length; i++)
                 BlockDefs[i] = BlockDefinition.GlobalDefs[i];
@@ -129,9 +138,7 @@ namespace fCraft {
         public Map map;
 
         /// <summary> Whether the map is currently loaded. </summary>
-        public bool IsLoaded {
-            get { return Map != null; }
-        }
+        public bool IsLoaded { get { return Map != null; } }
 
 
         /// <summary> Loads the map file, if needed.
@@ -198,9 +205,7 @@ namespace fCraft {
 
         /// <summary> Returns the map file name, including MapPath. </summary>
         public string MapFileName {
-            get {
-                return Path.Combine( Paths.MapPath, Name + ".fcm" );
-            }
+            get { return Path.Combine( Paths.MapPath, Name + ".fcm" ); }
         }
 
 
@@ -253,6 +258,8 @@ namespace fCraft {
                     CloudsSpeed = CloudsSpeed,
                     WeatherSpeed = WeatherSpeed,
                     WeatherFade = WeatherFade,
+                    Buildable = Buildable,
+                    Deletable = Deletable,
                 };
                 newMap.World = newWorld;
                 newWorld.Map = newMap;

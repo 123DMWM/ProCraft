@@ -270,16 +270,16 @@ namespace fCraft {
             // load environment settings
             XElement envEl = el.Element(EnvironmentXmlTagName);
             if (envEl != null) {
-            	if ((tempAttr = envEl.Attribute("cloud")) != null)
-            		ParseColor(tempAttr, "cloud", worldName, ref world.CloudColor);
+                if ((tempAttr = envEl.Attribute("cloud")) != null)
+                    ParseColor(tempAttr, "cloud", worldName, ref world.CloudColor);
                 if ((tempAttr = envEl.Attribute("fog")) != null)
                     ParseColor(tempAttr, "fog", worldName, ref world.FogColor);
                 if ((tempAttr = envEl.Attribute("sky")) != null)
                     ParseColor(tempAttr, "sky", worldName, ref world.SkyColor);
                 if ((tempAttr = envEl.Attribute("shadow")) != null)
-                	ParseColor(tempAttr, "shadow", worldName, ref world.ShadowColor);
+                    ParseColor(tempAttr, "shadow", worldName, ref world.ShadowColor);
                 if ((tempAttr = envEl.Attribute("light")) != null)
-                	ParseColor(tempAttr, "light", worldName, ref world.LightColor);
+                    ParseColor(tempAttr, "light", worldName, ref world.LightColor);
                 
                 if ((tempAttr = envEl.Attribute("water")) != null) {
                     try {
@@ -302,18 +302,18 @@ namespace fCraft {
                     }
                 }
                 if ((tempAttr = envEl.Attribute("level")) != null)
-                	ParseShort(tempAttr, "level", worldName, -1, "normal height / 2", ref world.EdgeLevel);
-            	if ((tempAttr = envEl.Attribute("cloudsheight")) != null)
-            		ParseShort(tempAttr, "cloudsheight", worldName, short.MinValue, "normal height + 2", ref world.CloudsHeight);
-            	if ((tempAttr = envEl.Attribute("maxfog")) != null)
-            		ParseShort(tempAttr, "maxfog", worldName, 0, "no limit", ref world.MaxFogDistance);
-            	if ((tempAttr = envEl.Attribute("weatherspeed")) != null)
-            		ParseShort(tempAttr, "weatherspeed", worldName, 256, "normal speed", ref world.WeatherSpeed);
-            	if ((tempAttr = envEl.Attribute("cloudsspeed")) != null)
-            		ParseShort(tempAttr, "cloudsspeed", worldName, 256, "normal speed", ref world.CloudsSpeed);
-            	if ((tempAttr = envEl.Attribute("weatherfade")) != null)
-            		ParseShort(tempAttr, "weatherfade", worldName, 128, "normal rate", ref world.WeatherFade);
-            	
+                    ParseShort(tempAttr, "level", worldName, -1, "normal height / 2", ref world.EdgeLevel);
+                if ((tempAttr = envEl.Attribute("cloudsheight")) != null)
+                    ParseShort(tempAttr, "cloudsheight", worldName, short.MinValue, "normal height + 2", ref world.CloudsHeight);
+                if ((tempAttr = envEl.Attribute("maxfog")) != null)
+                    ParseShort(tempAttr, "maxfog", worldName, 0, "no limit", ref world.MaxFogDistance);
+                if ((tempAttr = envEl.Attribute("weatherspeed")) != null)
+                    ParseShort(tempAttr, "weatherspeed", worldName, 256, "normal speed", ref world.WeatherSpeed);
+                if ((tempAttr = envEl.Attribute("cloudsspeed")) != null)
+                    ParseShort(tempAttr, "cloudsspeed", worldName, 256, "normal speed", ref world.CloudsSpeed);
+                if ((tempAttr = envEl.Attribute("weatherfade")) != null)
+                    ParseShort(tempAttr, "weatherfade", worldName, 128, "normal rate", ref world.WeatherFade);
+                
                 if ((tempAttr = envEl.Attribute("terrain")) != null) {
                     try {
                         world.Texture = tempAttr.Value;
@@ -325,7 +325,7 @@ namespace fCraft {
                     }
                 }
                 if ((tempAttr = envEl.Attribute("maxreach")) != null)
-                	ParseShort(tempAttr, "maxreach", worldName, 160, "normal 160", ref world.maxReach);
+                    ParseShort(tempAttr, "maxreach", worldName, 160, "normal 160", ref world.maxReach);
                 if ((tempAttr = envEl.Attribute("weather")) != null) {
                     if (!byte.TryParse(tempAttr.Value, out world.Weather)) {
                         world.Weather = 0;
@@ -503,12 +503,12 @@ namespace fCraft {
         }
         
         static void ParseShort(XAttribute tempAttr, string name, string worldName, short defValue, string defValueName, ref short target) {
-        	if (!short.TryParse(tempAttr.Value, out target)) {
-        		target = defValue;
-        		Logger.Log(LogType.Warning,
-        		           "WorldManager: Could not parse \"{0}\" attribute of Environment settings for world \"{1}\", assuming default ({2}).",
-        		           name, worldName, defValueName);
-        	}
+            if (!short.TryParse(tempAttr.Value, out target)) {
+                target = defValue;
+                Logger.Log(LogType.Warning,
+                           "WorldManager: Could not parse \"{0}\" attribute of Environment settings for world \"{1}\", assuming default ({2}).",
+                           name, worldName, defValueName);
+            }
         }
 
         // Makes sure that the map file exists, is properly named, and is loadable.
@@ -601,59 +601,9 @@ namespace fCraft {
                         temp.Add( new XElement( RankMainXmlTagName, mainedRank.FullName ) );
                     }
 
-                    // save loaded/map-changed information
-                    if( !String.IsNullOrEmpty( world.LoadedBy ) ) {
-                        temp.Add( new XElement( "LoadedBy", world.LoadedBy ) );
-                    }
-                    if( world.LoadedOn != DateTime.MinValue ) {
-                        temp.Add( new XElement( "LoadedOn", world.LoadedOn.ToUnixTime() ) );
-                    }
-                    if( !String.IsNullOrEmpty( world.MapChangedBy ) ) {
-                        temp.Add( new XElement( "MapChangedBy", world.MapChangedBy ) );
-                    }
-                    if( world.MapChangedOn != DateTime.MinValue ) {
-                        temp.Add( new XElement( "MapChangedOn", world.MapChangedOn.ToUnixTime() ) );
-                    }
-
-                    // save environmental settings
-                    XElement elEnv = new XElement( EnvironmentXmlTagName );
-                    if( world.CloudColor != null ) elEnv.Add( new XAttribute( "cloud", world.CloudColor ) );
-                    if (world.FogColor != null) elEnv.Add(new XAttribute("fog", world.FogColor));
-                    if (world.SkyColor != null) elEnv.Add(new XAttribute("sky", world.SkyColor));
-                    if (world.ShadowColor != null) elEnv.Add(new XAttribute("shadow", world.ShadowColor));
-                    if (world.LightColor != null) elEnv.Add(new XAttribute("light", world.LightColor));
-                    elEnv.Add(new XAttribute("level", world.EdgeLevel));
-                    elEnv.Add(new XAttribute("water", world.HorizonBlock.GetHashCode()));
-                    elEnv.Add(new XAttribute("bedrock", world.EdgeBlock.GetHashCode()));
-                    if (world.Texture != null) elEnv.Add(new XAttribute("terrain", world.Texture));
-                    elEnv.Add(new XAttribute("maxreach", world.maxReach));
-                    elEnv.Add(new XAttribute("weather", world.Weather));
-                    if (world.CloudsHeight != short.MinValue) elEnv.Add(new XAttribute("cloudsheight", world.CloudsHeight));
-                    elEnv.Add(new XAttribute("maxfog", world.MaxFogDistance));
-                    elEnv.Add(new XAttribute("weatherspeed", world.WeatherSpeed));
-                    elEnv.Add(new XAttribute("cloudsspeed", world.CloudsSpeed));
-                    elEnv.Add(new XAttribute("weatherfade", world.WeatherFade));
-                    if( elEnv.HasAttributes ) {
-                        temp.Add( elEnv );
-                    }
-
-                    // save lock information
-                    if( world.IsLocked ) {
-                        temp.Add( new XAttribute( "locked", true ) );
-                        if( !String.IsNullOrEmpty( world.LockedBy ) ) {
-                            temp.Add( new XElement( "LockedBy", world.LockedBy ) );
-                        }
-                        if( world.LockedOn != DateTime.MinValue ) {
-                            temp.Add( new XElement( "LockedOn", world.LockedOn.ToUnixTime() ) );
-                        }
-                    } else {
-                        if( !String.IsNullOrEmpty( world.UnlockedBy ) ) {
-                            temp.Add( new XElement( "UnlockedBy", world.UnlockedBy ) );
-                        }
-                        if( world.UnlockedOn != DateTime.MinValue ) {
-                            temp.Add( new XElement( "UnlockedOn", world.UnlockedOn.ToUnixTime() ) );
-                        }
-                    }
+                    SaveMapChangedInformation(world, temp);
+                    SaveEnvSettings(world, temp);
+                    SaveLockInformation(world, temp);
 
                     if (!String.IsNullOrEmpty(world.MOTD)) {
                         temp.Add(new XElement("MOTD", world.MOTD));
@@ -682,7 +632,70 @@ namespace fCraft {
                 Paths.MoveOrReplaceFile( worldListTempFileName, Paths.WorldListFileName );
             }
         }
+        
+        static void SaveMapChangedInformation(World world, XElement temp) {
+            if (!String.IsNullOrEmpty(world.LoadedBy)) {
+                temp.Add(new XElement("LoadedBy", world.LoadedBy));
+            }
+            if (world.LoadedOn != DateTime.MinValue) {
+                temp.Add(new XElement("LoadedOn", world.LoadedOn.ToUnixTime()));
+            }
+            if (!String.IsNullOrEmpty(world.MapChangedBy)) {
+                temp.Add( new XElement("MapChangedBy", world.MapChangedBy));
+            }
+            if (world.MapChangedOn != DateTime.MinValue) {
+                temp.Add(new XElement("MapChangedOn", world.MapChangedOn.ToUnixTime()));
+            }
+        }
 
+        static void SaveEnvSettings(World world, XElement temp) {
+            XElement elEnv = new XElement(EnvironmentXmlTagName);
+            if (world.CloudColor != null) 
+                elEnv.Add(new XAttribute("cloud", world.CloudColor));
+            if (world.FogColor != null) 
+                elEnv.Add(new XAttribute("fog", world.FogColor));
+            if (world.SkyColor != null) 
+                elEnv.Add(new XAttribute("sky", world.SkyColor));
+            if (world.ShadowColor != null) 
+                elEnv.Add(new XAttribute("shadow", world.ShadowColor));
+            if (world.LightColor != null) 
+                elEnv.Add(new XAttribute("light", world.LightColor));
+            
+            elEnv.Add(new XAttribute("level", world.EdgeLevel));
+            elEnv.Add(new XAttribute("water", world.HorizonBlock.GetHashCode()));
+            elEnv.Add(new XAttribute("bedrock", world.EdgeBlock.GetHashCode()));
+            if (world.Texture != null) 
+                elEnv.Add(new XAttribute("terrain", world.Texture));            
+            elEnv.Add(new XAttribute("maxreach", world.maxReach));
+            elEnv.Add(new XAttribute("weather", world.Weather));
+            
+            if (world.CloudsHeight != short.MinValue) 
+                elEnv.Add(new XAttribute("cloudsheight", world.CloudsHeight));
+            elEnv.Add(new XAttribute("maxfog", world.MaxFogDistance));
+            elEnv.Add(new XAttribute("weatherspeed", world.WeatherSpeed));
+            elEnv.Add(new XAttribute("cloudsspeed", world.CloudsSpeed));
+            elEnv.Add(new XAttribute("weatherfade", world.WeatherFade));
+            temp.Add(elEnv);
+        }
+        
+        static void SaveLockInformation(World world, XElement temp) {
+            if (world.IsLocked) {
+                temp.Add(new XAttribute("locked", true));
+                if (!String.IsNullOrEmpty(world.LockedBy)) {
+                    temp.Add(new XElement("LockedBy", world.LockedBy));
+                }
+                if (world.LockedOn != DateTime.MinValue) {
+                    temp.Add(new XElement("LockedOn", world.LockedOn.ToUnixTime()));
+                }
+            } else {
+                if (!String.IsNullOrEmpty(world.UnlockedBy)) {
+                    temp.Add(new XElement("UnlockedBy", world.UnlockedBy));
+                }
+                if (world.UnlockedOn != DateTime.MinValue) {
+                    temp.Add(new XElement("UnlockedOn", world.UnlockedOn.ToUnixTime()));
+                }
+            }
+        }
         #endregion
 
 
