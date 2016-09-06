@@ -1675,6 +1675,7 @@ namespace fCraft {
                                         worlds.Length, listName, worlds.JoinToClassyString() );
 
             } else {
+                if( offset < 0 ) offset = 0;
                 if( offset >= worlds.Length ) {
                     offset = Math.Max( 0, worlds.Length - WorldNamesPerPage );
                 }

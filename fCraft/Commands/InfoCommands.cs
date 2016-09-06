@@ -1135,6 +1135,7 @@ namespace fCraft {
                                             visiblePlayers.Length, qualifier, names );
 
                 } else {
+                    if( offset < 0 ) offset = 0;
                     if( offset >= visiblePlayers.Length ) {
                         offset = Math.Max( 0, visiblePlayers.Length - PlayersPerPage );
                     }
@@ -2358,6 +2359,8 @@ namespace fCraft {
                     if (offset >= infos.Length) {
                         offset = Math.Max(0, infos.Length - PlayersPerPage);
                     }
+                    if (offset < 0) offset = 0;
+                    
                     PlayerInfo[] infosPart = infos.Skip(offset).Take(PlayersPerPage).ToArray();
                     player.MessageManyMatches("player", infosPart);
                     if (offset + infosPart.Length < infos.Length) {
