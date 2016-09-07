@@ -1787,11 +1787,21 @@ namespace fCraft {
 
             if (!changesWereMade) return;
             WorldManager.SaveWorldList();
-            
-            var playersWhoCantStay = world.Players.Where(p => !p.CanJoin(world));
-            foreach(Player p in playersWhoCantStay ) {
-            	p.Message( "&WYou are no longer allowed to join world {0}", world.ClassyName );
-            	p.JoinWorld( WorldManager.FindMainWorld( p ), WorldChangeReason.PermissionChanged );
+
+            if (build) {
+                if (BlockDB.IsEnabledGlobally && world.BlockDB.AutoToggleIfNeeded()) {
+                    if (world.BlockDB.IsEnabled) {
+                        player.Message("BlockDB is now auto-enabled on world {0}", world.ClassyName);
+                    } else {
+                        player.Message("BlockDB is now auto-disabled on world {0}", world.ClassyName);
+                    }
+                }
+            } else {
+                var playersWhoCantStay = world.Players.Where(p => !p.CanJoin(world));
+                foreach(Player p in playersWhoCantStay ) {
+                    p.Message( "&WYou are no longer allowed to join world {0}", world.ClassyName );
+                    p.JoinWorld( WorldManager.FindMainWorld( p ), WorldChangeReason.PermissionChanged );
+                }
             }
         }
 
@@ -1807,7 +1817,7 @@ namespace fCraft {
                 Logger.Log(LogType.UserActivity,
                            "{0} {1} &scleared {4} whitelist of world {2}: {3}",
                            player.Info.Rank.Name, player.Name, world.Name, 
-                           whitelist.JoinToString(pi => pi.Name), type.ToLower() );
+                           whitelist.JoinToString(pi => pi.Name), type.ToLower());
                 return true;
             } else {
                 player.Message("{1} whitelist of world {0}&S is empty.", world.ClassyName, type);
@@ -1821,7 +1831,7 @@ namespace fCraft {
             string type = build ? "Build" : "Access";
             
             if (blacklist.Length > 0) {
-                world.BuildSecurity.ResetExcludedList();
+                controller.ResetExcludedList();
                 player.Message("{2} blacklist of world {0}&S cleared: {1}",
                                world.ClassyName, blacklist.JoinToClassyString(), type);
                 Logger.Log(LogType.UserActivity,
