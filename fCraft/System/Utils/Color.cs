@@ -444,14 +444,14 @@ namespace fCraft
             return c;
         }
         
-        static int Hex(char value) {
-            if (value >= '0' && value <= '9')
-                return (int)(value - '0');
-            if (value >= 'a' && value <= 'f')
-                return (int)(value - 'a') + 10;
-            if (value >= 'A' && value <= 'F')
-                return (int)(value - 'A') + 10;
-            throw new ArgumentException("Non hex char: " + value);
+        public static int Hex(char hexChar) {
+            if (hexChar >= '0' && hexChar <= '9')
+                return (int)(hexChar - '0');
+            if (hexChar >= 'a' && hexChar <= 'f')
+                return (int)(hexChar - 'a') + 10;
+            if (hexChar >= 'A' && hexChar <= 'F')
+                return (int)(hexChar - 'A') + 10;
+            throw new ArgumentException("Non hex char: " + hexChar);
         }
     }
     
