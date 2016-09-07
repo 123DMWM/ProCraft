@@ -230,23 +230,11 @@ namespace fCraft.Portals {
         public static bool IsInRangeOfSpawnpoint(Player player, World world, Vector3I block) {
             if (player.Info.Rank == RankManager.HighestRank)
                 return false;
-            try {
-                int Xdistance = (world.Map.Spawn.X / 32) - block.X;
-                int Ydistance = (world.Map.Spawn.Y / 32) - block.Y;
-                int Zdistance = (world.Map.Spawn.Z / 32) - block.Z;
-
-                if (Xdistance <= 10 && Xdistance >= -10) {
-                    if (Ydistance <= 10 && Ydistance >= -10) {
-                        if (Zdistance <= 10 && Zdistance >= -10) {
-                            return true;
-                        }
-                    }
-                }
-            } catch (Exception ex) {
-                Logger.Log(LogType.Error, "PortalHandler.IsInRangeOfSpawnpoint: " + ex);
-            }
-
-            return false;
+            
+            int dx = (world.Map.Spawn.X / 32) - block.X;
+            int dy = (world.Map.Spawn.Y / 32) - block.Y;
+            int dz = (world.Map.Spawn.Z / 32) - block.Z;
+            return Math.Abs(dx) <= 10 && Math.Abs(dy) <= 10 && Math.Abs(dz) <= 10;
         }
     }
 }
