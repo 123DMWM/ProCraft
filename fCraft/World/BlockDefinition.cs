@@ -84,10 +84,7 @@ namespace fCraft {
                 if (!global && pl.World != world) continue;
                 if (!pl.Supports(CpeExt.BlockDefinitions)) continue;
                 if (global && pl.World.BlockDefs[id] != GlobalDefs[id]) continue;
-                
-                pl.Send(GetPacket(pl, def));
-                if (pl.Supports(CpeExt.BlockPermissions))
-                    pl.Send(Packet.MakeSetBlockPermission((Block)id, true, true));
+                SendAdd(pl, def);
             }
             Save(global, world);
         }
@@ -111,9 +108,7 @@ namespace fCraft {
             foreach (Player pl in players) {
                 if (!global && pl.World != world) continue;
                 if (global && pl.World.BlockDefs[id] != null) continue;
-                
-                if (pl.Supports(CpeExt.BlockDefinitions))
-                    pl.Send(Packet.MakeRemoveBlockDefinition(id));
+                SendRemove(pl, def);
             }
             Save(global, world);
         }
@@ -133,36 +128,35 @@ namespace fCraft {
             BlockDefinition[] defs = p.World.BlockDefs;
             for (int i = (int)Map.MaxCustomBlockType + 1; i < defs.Length; i++) {
                 BlockDefinition def = defs[i];
-                if (def == null) continue;
-                
+                if (def == null) continue;              
                 p.SendNow(GetPacket(p, def));
-                if (p.Supports(CpeExt.BlockPermissions))
-                    p.SendNow(Packet.MakeSetBlockPermission((Block)i, true, true));
             }
         }
         
-        public static void SendGlobalAdd(Player p, BlockDefinition def) {
-            if (p.Supports(CpeExt.BlockDefinitionsExt2) && def.Shape != 0)
-                p.Send(Packet.MakeDefineBlockExt(def, true));
-            else if (p.Supports(CpeExt.BlockDefinitionsExt) && def.Shape != 0)
-                p.Send(Packet.MakeDefineBlockExt(def, false));
-            else
-                p.Send(Packet.MakeDefineBlock(def));
-            p.Send(Packet.MakeSetBlockPermission((Block)def.BlockID, true, true));
+        public static void SendAdd(Player p, BlockDefinition def) {
+            p.Send(GetPacket(p, def));
+            if (!p.Supports(CpeExt.BlockPermissions)) return;
+            
+            p.Send(Packet.MakeSetBlockPermission(
+                (Block)def.BlockID, p.World.Buildable, p.World.Deletable));
         }
         
-        public static void SendGlobalRemove(Player p, BlockDefinition def) {
+        public static void SendRemove(Player p, BlockDefinition def) {
             p.Send(Packet.MakeRemoveBlockDefinition(def.BlockID));
-            p.Send(Packet.MakeSetBlockPermission((Block)def.BlockID, false, false));
+            if (!p.Supports(CpeExt.BlockPermissions)) return;
+            
+            p.Send(Packet.MakeSetBlockPermission(
+                (Block)def.BlockID, false, false));
         }
         
         static Packet GetPacket(Player p, BlockDefinition def) {
-            if (p.Supports(CpeExt.BlockDefinitionsExt2) && def.Shape != 0)
+            if (p.Supports(CpeExt.BlockDefinitionsExt2) && def.Shape != 0) {
                 return Packet.MakeDefineBlockExt(def, true);
-            else if (p.Supports(CpeExt.BlockDefinitionsExt) && def.Shape != 0)
+            } else if (p.Supports(CpeExt.BlockDefinitionsExt) && def.Shape != 0) {
                 return Packet.MakeDefineBlockExt(def, false);
-            else
+            } else {
                 return Packet.MakeDefineBlock(def);
+            }
         }
         #endregion
         
@@ -230,7 +224,7 @@ namespace fCraft {
             }
             foreach (Player p in players) {
                 SendCustomBlocks(p);
-            }*/            
+            }*/
         }
 
         public static BlockDefinition[] Load(string path, out int count) {

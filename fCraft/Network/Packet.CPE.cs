@@ -109,8 +109,7 @@ namespace fCraft {
 
 
         [Pure]
-        public static Packet MakeEnvSetColor(Byte variable, string color)
-        {
+        public static Packet MakeEnvSetColor(Byte variable, string color) {
             Packet packet = new Packet( OpCode.EnvSetColor );
             packet.Bytes[1] = (byte)variable;
             if (color != null) {

@@ -3202,18 +3202,18 @@ namespace fCraft {
             switch (varName.ToLower()) {
                 case "hide":
                 case "hidden":
-                    SetWorldBool(player, world, value, world.IsHidden,
-                                 v => world.IsHidden = v, "hidden");
+                    SetWorldBool(player, world, value, world.IsHidden, "hidden",
+            		             v => world.IsHidden = v);
                     break;
                 case "build":
                 case "buildable":
-                    SetWorldBool(player, world, value, world.Buildable,
-                                 v => world.Buildable = v, "buildable");
+                    SetWorldBool(player, world, value, world.Buildable, "buildable",
+                                 v => { world.Buildable = v; UpdateBlockPerms(world); } );
                     break;
                 case "delete":
                 case "deletable":
-                    SetWorldBool(player, world, value, world.Deletable,
-                                 v => world.Deletable = v, "deletable");
+                    SetWorldBool(player, world, value, world.Deletable, "deletable",
+                                 v => { world.Deletable = v; UpdateBlockPerms(world); } );
                     break;
                     
                 case "backup":
@@ -3229,9 +3229,17 @@ namespace fCraft {
                     CdWorldSet.PrintUsage(player); break;
             }
         }
+        
+        static void UpdateBlockPerms(World world) {
+            Player[] players = world.Players;
+            foreach (Player pl in players) {
+                if (!pl.Supports(CpeExt.BlockPermissions)) continue;
+                pl.SendBlockPermissions();
+            }
+        }
 
         static void SetWorldBool(Player player, World world, string value,
-                                 bool curValue, Action<bool> setter, string type) {
+                                 bool curValue, string type, Action<bool> setter) {
             if (String.IsNullOrEmpty(value)) {
                 player.Message("World {0}&S is currently {1}{2}.",
                                world.ClassyName, curValue ? "" : "NOT ", type);

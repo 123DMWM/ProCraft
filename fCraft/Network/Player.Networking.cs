@@ -1099,6 +1099,8 @@ namespace fCraft {
             	    BlockDefinition.SendNowRemoveOldBlocks(this, oldWorld);
                 BlockDefinition.SendNowBlocks(this);
             }
+            if (Supports(CpeExt.BlockPermissions))
+                SendBlockPermissions();
 
             writer.Write(OpCode.MapBegin);
             BytesSent++;
@@ -1182,51 +1184,45 @@ namespace fCraft {
         void SendJoinCpeExtensions() {
             SendEnvSettings();
             if (Supports(CpeExt.ExtPlayerList2)) {
-                Send(Packet.MakeExtAddEntity2(Packet.SelfId, Info.Rank.Color + Name, (Info.skinName == "" ? Name : Info.skinName), Position, this));
+                SendNow(Packet.MakeExtAddEntity2(Packet.SelfId, Info.Rank.Color + Name, 
+            	                                 (Info.skinName == "" ? Name : Info.skinName), Position, this));
             } else {
-                Send(Packet.MakeAddEntity(Packet.SelfId, Info.Rank.Color + Name, Position));
+                SendNow(Packet.MakeAddEntity(Packet.SelfId, Info.Rank.Color + Name, Position));
             }
 
             if (Supports(CpeExt.ChangeModel)) {
-                Send(Packet.MakeChangeModel(255, !IsAFK ? Info.Mob : AFKModel));
+                SendNow(Packet.MakeChangeModel(255, !IsAFK ? Info.Mob : AFKModel));
             }
 
             if (Supports(CpeExt.HackControl)) {
                 bool canFly, canNoClip, canSpeed, canRespawn;
                 bool useMotd = GetHacksFromMotd(out canFly, out canNoClip, out canSpeed, out canRespawn);
+                
                 if (useMotd) {
-                    Send(Packet.HackControl(canFly, canNoClip, canSpeed, canRespawn, canNoClip, 40));
+                    SendNow(Packet.HackControl(canFly, canNoClip, canSpeed, canRespawn, canNoClip, 40));
                 } else {
-                    Send(Packet.HackControl(Info.AllowFlying, Info.AllowNoClip, Info.AllowSpeedhack, Info.AllowRespawn, Info.AllowThirdPerson, Info.JumpHeight));
+                    SendNow(Packet.HackControl(Info.AllowFlying, Info.AllowNoClip, Info.AllowSpeedhack, 
+                	                           Info.AllowRespawn, Info.AllowThirdPerson, Info.JumpHeight));
                 }
             }
 
             if (Supports(CpeExt.ClickDistance)) {
-                Send(Packet.MakeSetClickDistance((World.maxReach < Info.ReachDistance && !IsStaff) ? World.maxReach : Info.ReachDistance));
-            }
-
-            if (Supports(CpeExt.BlockPermissions)) {
-                Send(Packet.MakeSetBlockPermission(Block.Admincrete, Can(Permission.PlaceAdmincrete), Can(Permission.PlaceAdmincrete)));
-                Send(Packet.MakeSetBlockPermission(Block.Water, Can(Permission.PlaceWater), true));
-                Send(Packet.MakeSetBlockPermission(Block.StillWater, Can(Permission.PlaceWater), true));
-                Send(Packet.MakeSetBlockPermission(Block.Lava, Can(Permission.PlaceLava), true));
-                Send(Packet.MakeSetBlockPermission(Block.StillLava, Can(Permission.PlaceLava), true));
-                Send(Packet.MakeSetBlockPermission(Block.Grass, Can(Permission.PlaceGrass), true));
+                short reach = (World.maxReach < Info.ReachDistance && !IsStaff) ? World.maxReach : Info.ReachDistance;
+                SendNow(Packet.MakeSetClickDistance(reach));
             }
 
             if (Supports(CpeExt.MessageType) && !IsPlayingCTF) {
-                Send(Packet.Message((byte)MessageType.BottomRight1, "Block:&f" + Map.GetBlockName(World, HeldBlock)
+                SendNow(Packet.Message((byte)MessageType.BottomRight1, "Block:&f" + Map.GetBlockName(World, HeldBlock)
                                     + " &sID:&f" + (byte)HeldBlock, true));
             }
             if (Supports(CpeExt.MessageType)) {
-                Send(Packet.Message((byte)MessageType.Status1, ConfigKey.ServerName.GetString(), UseFallbackColors));
+                SendNow(Packet.Message((byte)MessageType.Status1, ConfigKey.ServerName.GetString(), UseFallbackColors));
             }
-
 
             if (Supports(CpeExt.SelectionCuboid)) {
                 foreach (Zone z in WorldMap.Zones) {
                     if (z.ShowZone)
-                        Send(Packet.MakeMakeSelection(z.ZoneID, z.Name, z.Bounds, z.Color, z.Alpha));
+                        SendNow(Packet.MakeMakeSelection(z.ZoneID, z.Name, z.Bounds, z.Color, z.Alpha));
                 }
             }
         }
@@ -1247,6 +1243,34 @@ namespace fCraft {
                 }
         		if (!entity.Model.CaselessEquals("humanoid") && Supports(CpeExt.ChangeModel))
                     SendNow(Packet.MakeChangeModel((byte)entity.ID, entity.Model));
+            }
+        }
+        
+        internal void SendBlockPermissions() {
+            Block max = supportsCustomBlocks ? Map.MaxCustomBlockType : Map.MaxLegalBlockType;
+            bool build = World.Buildable, delete = World.Deletable;
+            for (Block block = Block.Stone; block <= max; block++) {
+                Send(Packet.MakeSetBlockPermission(block, build, delete));
+            }
+            
+            Send(Packet.MakeSetBlockPermission(Block.Admincrete, 
+                build && Can(Permission.PlaceAdmincrete), delete && Can(Permission.PlaceAdmincrete)));
+            Send(Packet.MakeSetBlockPermission(
+                Block.Water, build && Can(Permission.PlaceWater), delete));
+            Send(Packet.MakeSetBlockPermission(
+                Block.StillWater, build && Can(Permission.PlaceWater), delete));
+            Send(Packet.MakeSetBlockPermission(
+                Block.Lava, build && Can(Permission.PlaceLava), delete));
+            Send(Packet.MakeSetBlockPermission(
+                Block.StillLava, build && Can(Permission.PlaceLava), delete));
+            Send(Packet.MakeSetBlockPermission(
+                Block.Grass, build && Can(Permission.PlaceGrass), delete));
+            
+            if (!supportsBlockDefs) return;
+            BlockDefinition[] defs = World.BlockDefs;
+            for (int i = (int)Map.MaxCustomBlockType + 1; i < defs.Length; i++) {
+                if (defs[i] == null) continue;
+                Send(Packet.MakeSetBlockPermission((Block)i, build, delete));
             }
         }
         
