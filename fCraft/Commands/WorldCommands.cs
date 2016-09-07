@@ -3194,7 +3194,7 @@ namespace fCraft {
                 case "hide":
                 case "hidden":
                     if( String.IsNullOrEmpty( value ) ) {
-                        player.Message( "World {0}&S is current {1}hidden.",
+                        player.Message( "World {0}&S is currently {1}hidden.",
                                         world.ClassyName,
                                         world.IsHidden ? "" : "NOT " );
                     } else if( value.Equals( "on", StringComparison.OrdinalIgnoreCase ) ||
