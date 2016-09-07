@@ -85,13 +85,13 @@ namespace fCraft {
                 CdEntity.PrintUsage(player);
                 return;
             }
-            if (option.ToLower() == "reload" && player.Info.Rank == RankManager.HighestRank) {
+            if (option.CaselessEquals("reload") && player.Info.Rank == RankManager.HighestRank) {
                 Entity.ReloadAll();
                 player.Message("Reloaded Entities from file");
                 return;
             }
 
-            if (option.ToLower() == "list") {
+            if (option.CaselessEquals("list")) {
                 string search = cmd.Next() ?? player.World.Name;
                 World world = WorldManager.FindWorldOrPrintMatches(player, search);
                 if (world != null) {
@@ -100,7 +100,7 @@ namespace fCraft {
                 }
                 return;
             }
-            if (option.ToLower() == "removeall") {
+            if (option.CaselessEquals("removeall")) {
                 string search = cmd.Next() ?? player.World.Name;
                 World world = WorldManager.FindWorldOrPrintMatches(player, search);
                 if (cmd.IsConfirmed) {
@@ -369,7 +369,7 @@ namespace fCraft {
                 player.Message("Model not valid, see &h/Help {0}Model&s.", prefix.TrimEnd());
                 return;
             }
-            if (getter(target).ToLower() == model.ToLower()) {
+            if (getter(target).CaselessEquals(model)) {
                 player.Message("&f{0}&s's {0}model is already set to &f{1}", target.Name, model, prefix); 
                 return;
             }
@@ -905,7 +905,7 @@ namespace fCraft {
                 case "tex":
                 case "terrain":
                 case "texture":
-                    if (value.ToLower() == "default") {
+                    if (value.CaselessEquals("default")) {
                         player.Message("Reset texture for {0}&S to {1}", world.ClassyName, Server.DefaultTerrain);
                         value = "Default";
                     } else if (!value.EndsWith(".png") && !value.EndsWith(".zip")) {

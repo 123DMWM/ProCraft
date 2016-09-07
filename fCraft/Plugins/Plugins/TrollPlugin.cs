@@ -58,7 +58,7 @@ namespace TrollPlugin {
                 return;
             }
             string Message = cmd.NextAll();
-            if ( Message.Length < 1 && options.ToLower() != "leave" ) {
+            if ( Message.Length < 1 && !options.CaselessEquals("leave")) {
                 player.Message( "&WError: Please enter a message for {0}.", target.ClassyName );
                 return;
             }

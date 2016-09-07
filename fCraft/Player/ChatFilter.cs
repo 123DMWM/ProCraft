@@ -19,20 +19,17 @@ namespace fCraft {
         public static List<ChatFilter> Filters = new List<ChatFilter>();
 
         public static ChatFilter Find(string sid) {
-            int id; int.TryParse(sid, out id);
+            int id; 
+            int.TryParse(sid, out id);
             foreach (ChatFilter filter in Filters) {
-                if (filter.Id == id) {
-                    return filter;
-                }
+                if (filter.Id == id) return filter;
             }
             return null;
         }
 
         public static bool exists(string word) {
             foreach (ChatFilter filter in Filters) {
-                if (filter.Word.CaselessEquals(word.ToLower())) {
-                    return true;
-                }
+                if (filter.Word.CaselessEquals(word) return true;
             }
             return false;
         }

@@ -397,13 +397,13 @@ namespace fCraft {
                 CdSetFont.PrintUsage(player); return;
             }
             
-            if (arg.ToLower() == "reset") {
+            if (arg.CaselessEquals("reset")) {
                 player.font = new Font("Times New Roman", 20, FontStyle.Regular);
                 player.Message("SetFont: Font reverted back to default ({0} size {1})",
                     player.font.FontFamily.Name, player.font.Size);
-            } else if (arg.ToLower() == "font") {
+            } else if (arg.CaselessEquals("font")) {
                 HandleFont(player, cmd);
-            } else if (arg.ToLower() == "size") {
+            } else if (arg.CaselessEquals("size")) {
                 int size = -1;
                 if (cmd.NextInt(out size)) {
                     if (size < 5) {
@@ -416,17 +416,17 @@ namespace fCraft {
                 } else {
                     player.Message("&WInvalid size, use /SetFont Size FontSize. Example: /SetFont Size 14");
                 }
-            } else if (arg.ToLower() == "style") {
+            } else if (arg.CaselessEquals("style")) {
                 string style = cmd.Next();
                 if (style == null) {
                     CdSetFont.PrintUsage(player);
-                } else if (style.ToLower() == "italic") {
+                } else if (style.CaselessEquals("italic")) {
                     player.font = new System.Drawing.Font(player.font, FontStyle.Italic);
                     player.Message("SetFont: Style set to Italic ({0})", player.font.FontFamily.Name);
-                } else if (style.ToLower() == "bold") {
+                } else if (style.CaselessEquals("bold")) {
                     player.font = new System.Drawing.Font(player.font, FontStyle.Bold);
                     player.Message("SetFont: Style set to Bold ({0})", player.font.FontFamily.Name);
-                } else if (style.ToLower() == "regular") {
+                } else if (style.CaselessEquals("regular")) {
                     player.font = new System.Drawing.Font(player.font, FontStyle.Regular);
                     player.Message("SetFont: Style set to Regular ({0})", player.font.FontFamily.Name);
                 }

@@ -35,18 +35,14 @@ namespace fCraft {
 
         public static EnvPresets Find(string name) {
             foreach (EnvPresets env in Presets) {
-                if (env.Name.CaselessEquals(name.ToLower())) {
-                    return env;
-                }
+                if (env.Name.CaselessEquals(name)) return env;
             }
             return null;
         }
 
         public static bool exists(string name) {
             foreach (EnvPresets env in Presets) {
-                if (env.Name.CaselessEquals(name.ToLower())) {
-                    return true;
-                }
+                if (env.Name.CaselessEquals(name)) return true;
             }
             return false;
         }

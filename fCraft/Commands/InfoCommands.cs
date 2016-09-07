@@ -773,17 +773,16 @@ namespace fCraft {
 
             List<PlayerInfo> Results = new List<PlayerInfo>();
             PlayerInfo[] CachedList = PlayerDB.PlayerInfoList;
-            foreach (PlayerInfo playerinfo in CachedList)
-            {
-                if (playerinfo.DisplayedName == null)
-                {
-                    if (Color.StripColors(playerinfo.Name.ToLower()) == Color.StripColors(TargetDisplayedName.ToLower())) Results.Add(playerinfo);
-                }
-                else
-                {
-                    if (Color.StripColors(playerinfo.DisplayedName.ToLower()) == Color.StripColors(TargetDisplayedName.ToLower())) Results.Add(playerinfo);
+            foreach (PlayerInfo playerinfo in CachedList) {
+                if (playerinfo.DisplayedName == null) {
+                    if (Color.StripColors(playerinfo.Name).CaselessEquals(Color.StripColors(TargetDisplayedName))) 
+                        Results.Add(playerinfo);
+                } else {
+                    if (Color.StripColors(playerinfo.DisplayedName).CaselessEquals(Color.StripColors(TargetDisplayedName)) 
+                        Results.Add(playerinfo);
                 }
             }
+            
             if (Results.Count <= 0)
             {
                 player.Message("No players have the displayed name \"" + TargetDisplayedName + "\"");
@@ -1749,7 +1748,7 @@ namespace fCraft {
                     break;
                 default:
                     foreach (CustomColor col in Color.ExtColors.Where(c => !c.Undefined)) {
-                        if (color.ToLower() == col.Name.ToLower() || color == col.Code.ToString()) {
+                        if (color.CaselessEquals(col.Name) || color == col.Code.ToString()) {
                             player.Message("Color: &{0}{1}", col.Code, col.Name);
                             player.Message("    Color Code: &f%{0}", col.Code);
                             player.Message("    Fallback Color Code: &f%{0}", col.Fallback);

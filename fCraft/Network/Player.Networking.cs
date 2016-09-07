@@ -1235,7 +1235,7 @@ namespace fCraft {
                 } else {
                     SendNow(Packet.MakeAddEntity(entity.ID, entity.Name, Entity.getPos(entity)));
                 }
-                if (entity.Model.ToLower() != "humanoid" && Supports(CpeExt.ChangeModel))
+        		if (!entity.Model.CaselessEquals("humanoid") && Supports(CpeExt.ChangeModel))
                     SendNow(Packet.MakeChangeModel((byte)entity.ID, entity.Model));
             }
         }

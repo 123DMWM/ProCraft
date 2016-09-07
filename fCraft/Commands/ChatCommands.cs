@@ -308,7 +308,7 @@ namespace fCraft
         static void IgnoreHandler(Player player, CommandReader cmd) {
             string name = cmd.Next();
             if (!string.IsNullOrEmpty(name)) {
-                if (name.ToLower() == "irc") {
+            	if (name.CaselessEquals("irc")) {
                     if (player.Info.ReadIRC) {
                         player.Info.ReadIRC = false;
                         player.Message("You are now ignoring &iIRC");
@@ -358,7 +358,7 @@ namespace fCraft
         static void UnignoreHandler(Player player, CommandReader cmd) {
             string name = cmd.Next();
             if (!string.IsNullOrEmpty(name)) {
-                if (name.ToLower() == "irc") {
+            	if (name.CaselessEquals("irc")) {
                     if (!player.Info.ReadIRC) {
                         player.Info.ReadIRC = true;
                         player.Message("You are no longer ignoring &iIRC");
@@ -1054,7 +1054,7 @@ namespace fCraft
 
 		static void RBChatHandler(Player player, CommandReader cmd) {
 			string s = cmd.Next();
-			if (s != null && s.ToLower() == "bw") {
+			if (s != null && s.CaselessEquals("bw")) {
 				if (player.ChatBWRainbows) {
 					player.ChatRainbows = false;
 					player.ChatBWRainbows = false;
@@ -1349,7 +1349,7 @@ namespace fCraft
                                     valName);
                 return;
             }
-            if (valName != null && Color.StripColors(Chat.ReplacePercentColorCodes(valName, false)).ToLower() != info.Name.ToLower())
+            if (valName != null && !Color.StripColors(Chat.ReplacePercentColorCodes(valName, false)).CaselessEquals(info.Name))
             {
                 player.Message("CapColor: You may not change your name to something else");
                 return;

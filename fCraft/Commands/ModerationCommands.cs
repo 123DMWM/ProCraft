@@ -1412,7 +1412,7 @@ namespace fCraft {
                 CdTeleport.PrintUsage(player);
                 return;
             }
-            if (player.World.Name.ToLower() == "maze") {
+            if (player.World.Name.CaselessEquals("maze")) {
                 player.Message("Hey no cheating!");
                 return;
             }

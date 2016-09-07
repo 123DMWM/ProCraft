@@ -1032,7 +1032,7 @@ namespace fCraft {
                             delete = delete.Substring(5);
                         }
                         if ((rzone = player.WorldMap.Zones.FindExact(SpecialZone.Door + delete)) != null) {
-                            if (rzone.CreatedBy.CaselessEquals(player.Name.ToLower()) || player.IsStaff) {
+                            if (rzone.CreatedBy.CaselessEquals(player.Name) || player.IsStaff) {
                                 player.WorldMap.Zones.Remove(rzone);
                                 player.Message("Door removed.");
                             } else {

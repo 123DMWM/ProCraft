@@ -43,7 +43,7 @@ namespace fCraft {
 
         public static Entity Find(World world, string name) {
             foreach (Entity entity in Entities.Where(w => w.World == world.Name)) {
-                if (entity.Name.CaselessEquals(name.ToLower())) {
+                if (entity.Name.CaselessEquals(name)) {
                     return entity;
                 }
             }
@@ -52,18 +52,14 @@ namespace fCraft {
 
         public static bool exists(World world, string name) {
             foreach(Entity e in Entities.Where(w => w.World == world.Name)) {
-                if (e.Name.ToLower() == name.ToLower()) {
-                    return true;
-                }
+        		if (e.Name.CaselessEquals(name)) return true;
             }
             return false;
         }
 
         public static bool existsAny(World world) {
             foreach (Entity e in Entities) {
-                if (e.World.ToLower() == world.Name.ToLower()) {
-                    return true;
-                }
+        		if (e.World.CaselessEquals(world.Name)) return true;
             }
             return false;
         }

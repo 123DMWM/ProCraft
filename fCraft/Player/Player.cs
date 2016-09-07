@@ -507,7 +507,7 @@ namespace fCraft {
                             }
                         }
 
-                        if (otherPlayerName.ToLower() == "irc")
+                        if (otherPlayerName.CaselessEquals("irc"))
                         {
 							IRC.SendChannelMessage("\u211C\u212C(PM)\u211C" + Name + ": " + messageText);
                             Message("&P(PM)" + ClassyName + " &P-> IRC&P: " + messageText);
@@ -1287,7 +1287,7 @@ namespace fCraft {
                 case CanPlaceResult.ZoneDenied:
                     Zone deniedZone = WorldMap.Zones.FindDenied( coord, this );
                     if (deniedZone != null) {
-                        if (deniedZone.Name.ToLower() == "spawn")
+                    	if (deniedZone.Name.CaselessEquals("spawn"))
                             Message("&WThis is the Spawn zone. To build, please exit the spawn.", deniedZone.Name);
                         else
                             Message("&WYou are not allowed to build in zone \"{0}\".", deniedZone.Name);

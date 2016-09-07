@@ -892,7 +892,7 @@ namespace fCraft {
             string[] themes = { "arctic", "desert", "forest", "grass", "hell", "swamp" };
 
             if (themes.Contains(themeName.ToLower())) {
-                if (themeName.ToLower() == "forest" || themeName.ToLower() == "swamp") {
+            	if (themeName.CaselessEquals("forest") || themeName.CaselessEquals("swamp")) {
                     noTrees = false;
                 }
                 url = cmd.Next();
@@ -1203,7 +1203,7 @@ namespace fCraft {
                             player.JoinWorldNow(world, true, WorldChangeReason.ManualJoin);
                             return;
                         }
-                        if (player.World.Name.ToLower() == "tutorial" && !player.Info.HasRTR) {
+                		if (player.World.Name.CaselessEquals("tutorial") && !player.Info.HasRTR) {
                             player.Confirm(cmd,
                                 "&sYou are choosing to skip the rules, if you continue you will spawn here the next time you log in.");
                             return;
@@ -1632,11 +1632,11 @@ namespace fCraft {
             } else if (param.EndsWith("*")) {
                 listName = "worlds starting with \"" + param.ToLower().Replace("*", "") + "\"";
                 extraParam = param.ToLower();
-                worlds = WorldManager.Worlds.Where(w => w.Name.CaselessStarts(param.ToLower().Replace("*", ""))).ToArray();
+                worlds = WorldManager.Worlds.Where(w => w.Name.CaselessStarts(param.Replace("*", ""))).ToArray();
             } else if (param.StartsWith("*")) {
                 listName = "worlds ending with \"" + param.ToLower().Replace("*", "") + "\"";
                 extraParam = param.ToLower();
-                worlds = WorldManager.Worlds.Where(w => w.Name.CaselessEnds(param.ToLower().Replace("*", ""))).ToArray();
+                worlds = WorldManager.Worlds.Where(w => w.Name.CaselessEnds(param.Replace("*", ""))).ToArray();
             } else {
                 switch (param) {
                     case "a":
@@ -2949,7 +2949,7 @@ namespace fCraft {
             player.LastUsedWorldName = newName;
             Logger.Log(LogType.UserActivity, "{0} renamed the world \"{1}\" to \"{2}\".", player.Name, oldName, newName);
             Server.Message("{0}&S renamed the world \"{1}\" to \"{2}\"", player.ClassyName, oldName, newName);
-            foreach(Entity bot in Entity.Entities.Where(e => oldName.CaselessEquals(e.World.ToLower()))) {
+            foreach(Entity bot in Entity.Entities.Where(e => oldName.CaselessEquals(e.World))) {
                 Entity.UpdateEntityWorld(bot, newName);
             }
         }
@@ -3352,7 +3352,7 @@ namespace fCraft {
                         player.Message("No greeting message is set for world {0}", world.ClassyName);
                     }
                 }
-            } else if (value.ToLower() == "remove") {
+            } else if (value.CaselessEquals("remove")) {
                 player.Message("Greeting message removed for world {0}", world.ClassyName);
                 if (File.Exists("./WorldGreeting/" + world.Name + ".txt"))
                     File.Delete("./WorldGreeting/" + world.Name + ".txt");
@@ -3511,7 +3511,7 @@ namespace fCraft {
             switch (options) {
                 case "start":
                     if (!CTF.GameRunning) {
-                        if (player.World.Name.ToLower() != "ctf") {
+        				if (!player.World.Name.CaselessEquals("ctf")) {
                             player.Message("You can only start a game on the CTF map.");
                         } else {
                             player.Message("Started CTF game on world {0}", player.World.ClassyName);
@@ -4020,7 +4020,7 @@ namespace fCraft {
                                     Portal portalFound = null;
                                     lock (remWorld.Portals.SyncRoot) {
                                         foreach (Portal portal in remWorld.Portals) {
-                                            if (portal.Name.CaselessEquals(remPortalName.ToLower())) {
+                                            if (portal.Name.CaselessEquals(remPortalName)) {
                                                 portalFound = portal;
                                                 found = true;
                                                 break;
@@ -4060,7 +4060,7 @@ namespace fCraft {
 
                                 lock (iWorld.Portals.SyncRoot) {
                                     foreach (Portal portal in iWorld.Portals) {
-                                        if (portal.Name.CaselessEquals(iPortalName.ToLower())) {
+                                        if (portal.Name.CaselessEquals(iPortalName)) {
                                             World portalWorld = WorldManager.FindWorldExact(portal.World);
                                             player.Message("Portal {0}&S was created by {1}&S at {2} and teleports to world {3} at {4}&S.",
                                                 portal.Name, PlayerDB.FindPlayerInfoExact(portal.Creator).ClassyName, portal.Created, portalWorld.ClassyName, portal.position().ToString());
