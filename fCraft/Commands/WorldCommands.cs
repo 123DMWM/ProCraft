@@ -3179,175 +3179,116 @@ namespace fCraft {
         };
 
         static void WorldSetHandler( Player player, CommandReader cmd ) {
-            string worldName = cmd.Next();
-            string varName = cmd.Next();
+            string worldName = cmd.Next(), varName = cmd.Next();
             string value = cmd.NextAll();
-            if( worldName == null || varName == null ) {
-                CdWorldSet.PrintUsage( player );
+            if (worldName == null || varName == null) {
+                CdWorldSet.PrintUsage(player);
                 return;
             }
 
-            World world = WorldManager.FindWorldOrPrintMatches( player, worldName );
-            if( world == null ) return;
+            World world = WorldManager.FindWorldOrPrintMatches(player, worldName);
+            if (world == null) return;
 
-            switch( varName.ToLower() ) {
+            switch (varName.ToLower()) {
                 case "hide":
                 case "hidden":
-                    if( String.IsNullOrEmpty( value ) ) {
-                        player.Message( "World {0}&S is currently {1}hidden.",
-                                        world.ClassyName,
-                                        world.IsHidden ? "" : "NOT " );
-                    } else if( value.Equals( "on", StringComparison.OrdinalIgnoreCase ) ||
-                               value.Equals( "true", StringComparison.OrdinalIgnoreCase ) ||
-                               value == "1" ) {
-                        if( world.IsHidden ) {
-                            player.Message( "World {0}&S is already hidden.", world.ClassyName );
-                        } else {
-                            player.Message( "World {0}&S is now hidden.", world.ClassyName );
-                            world.IsHidden = true;
-                            WorldManager.SaveWorldList();
-                        }
-                    } else if( value.Equals( "off", StringComparison.OrdinalIgnoreCase ) ||
-                               value.Equals( "false", StringComparison.OrdinalIgnoreCase ) ||
-                               value == "0" ) {
-                        if( world.IsHidden ) {
-                            player.Message( "World {0}&S is no longer hidden.", world.ClassyName );
-                            world.IsHidden = false;
-                            WorldManager.SaveWorldList();
-                        } else {
-                            player.Message( "World {0}&S is not hidden.", world.ClassyName );
-                        }
-                    } else {
-                        CdWorldSet.PrintUsage( player );
-                    }
-                    break;
-
+                    SetWorldBool(player, world, value, world.IsHidden,
+                                 v => world.IsHidden = v, "hidden"); break;
                 case "backup":
                 case "backups":
-                    TimeSpan backupInterval;
-                    string oldDescription = world.BackupSettingDescription;
-                    if( String.IsNullOrEmpty( value ) ) {
-                        player.Message( GetBackupSettingsString( world ) );
-                        return;
-
-                    } else if( value.Equals( "off", StringComparison.OrdinalIgnoreCase ) ||
-                               value.StartsWith( "disable", StringComparison.OrdinalIgnoreCase ) ) {
-                        // Disable backups on the world
-                        if( world.BackupEnabledState == YesNoAuto.No ) {
-                            MessageSameBackupSettings( player, world );
-                            return;
-                        } else {
-                            world.BackupEnabledState = YesNoAuto.No;
-                        }
-
-                    } else if( value.Equals( "default", StringComparison.OrdinalIgnoreCase ) ||
-                               value.Equals( "auto", StringComparison.OrdinalIgnoreCase ) ) {
-                        // Set world to use default settings
-                        if( world.BackupEnabledState == YesNoAuto.Auto ) {
-                            MessageSameBackupSettings( player, world );
-                            return;
-                        } else {
-                            world.BackupEnabledState = YesNoAuto.Auto;
-                        }
-
-                    } else if( value.TryParseMiniTimespan( out backupInterval ) ) {
-                        if( backupInterval == TimeSpan.Zero ) {
-                            // Set world's backup interval to 0, which is equivalent to disabled
-                            if( world.BackupEnabledState == YesNoAuto.No ) {
-                                MessageSameBackupSettings( player, world );
-                                return;
-                            } else {
-                                world.BackupEnabledState = YesNoAuto.No;
-                            }
-                        } else if( world.BackupEnabledState != YesNoAuto.Yes ||
-                                   world.BackupInterval != backupInterval ) {
-                            // Alter world's backup interval
-                            world.BackupInterval = backupInterval;
-                        } else {
-                            MessageSameBackupSettings( player, world );
-                            return;
-                        }
-
-                    } else {
-                        CdWorldSet.PrintUsage( player );
-                        return;
-                    }
-                    player.Message( "Backup setting for world {0}&S changed from \"{1}\" to \"{2}\"",
-                                    world.ClassyName, oldDescription, world.BackupSettingDescription );
-                    WorldManager.SaveWorldList();
-                    break;
-
+                    SetBackupSettings(player, world, value); break;
                 case "description":
                 case "greeting":
-                    if (!Directory.Exists("./WorldGreeting/")) 
-                        Directory.CreateDirectory("./WorldGreeting/");
-                    
-                    if (String.IsNullOrEmpty(value )) {
-                        if (world.Greeting == null) {
-                            if (File.Exists("./WorldGreeting/" + world.Name + ".txt")) {
-                                world.Greeting = File.ReadAllText("./WorldGreeting/" + world.Name + ".txt");
-                                if (world.Greeting.Length == 0) 
-                                    player.Message("No greeting message is set for world {0}", world.ClassyName);
-                                else 
-                                    player.Message("Greeting message for world {0}&s is: {1}", world.ClassyName, world.Greeting);
-                                world.Greeting = null;
-                            } else {
-                                player.Message("No greeting message is set for world {0}", world.ClassyName);
-                            }
-                        }
-                    } else {
-                        if (value.ToLower() == "remove") {
-                            player.Message("Greeting message removed for world {0}", world.ClassyName);
-                            if (File.Exists("./WorldGreeting/" + world.Name + ".txt")) 
-                                File.Delete("./WorldGreeting/" + world.Name + ".txt");
-                            world.Greeting = null;
-                        } else {
-                            world.Greeting = value.Replace("%n", "/n");
-                            player.Message("Greeting message for world {0}&S set to: {1}", world.ClassyName, world.Greeting);
-                            File.WriteAllText("./WorldGreeting/" + world.Name + ".txt", world.Greeting);
-                            world.Greeting = null;
-                        }
-                    }
-                    break;
-
+                    SetGreeting(player, world, value); break;
                 case "messageoftheday":
                 case "motd":
-                    if (string.IsNullOrEmpty(value)) {
-                        if (string.IsNullOrEmpty(world.MOTD)) {
-                            player.Message("World \"{0}\" does not have a custom MOTD", world.Name);
-                        } else {
-                            player.Message("MOTD for \"{0}\" is: ", world.Name);
-                            player.Message("  " + world.MOTD);
-                        }
-                    } else {
-                        if(value.Length > 64) {
-                            value = value.Substring(0, 64);
-                        }
-                        if (value.ToLower().Equals("remove") || value.ToLower().Equals("delete") || value.ToLower().Equals("reset")) {
-                            player.Message("MOTD for \"{0}\" has been removed", world.Name);
-                            world.MOTD = null;
-                            WorldManager.SaveWorldList();
-                        } else {
-                            player.Message("MOTD for \"{0}\" has been set to:", world.Name);
-                            player.Message("  " + value);
-                            world.MOTD = value;
-                            WorldManager.SaveWorldList();
-                        }
-                    }
-                    break;
-
+                    SetMOTD(player, world, value); break;
                 default:
-                    CdWorldSet.PrintUsage( player );
-                    break;
+                    CdWorldSet.PrintUsage(player); break;
             }
         }
 
-
+        static void SetWorldBool(Player player, World world, string value,
+                                 bool curValue, Action<bool> setter, string type) {
+            if (String.IsNullOrEmpty(value)) {
+                player.Message("World {0}&S is currently {1}{2}.",
+                               world.ClassyName, curValue ? "" : "NOT ", type);
+            } else if (value.Equals( "on", StringComparison.OrdinalIgnoreCase) ||
+                      value.Equals( "true", StringComparison.OrdinalIgnoreCase) ||
+                      value == "1" ) {
+                if (curValue) {
+                    player.Message("World {0}&S is already {1}.", world.ClassyName, type);
+                } else {
+                    player.Message("World {0}&S is now {1}.", world.ClassyName, type);
+                    setter(true);
+                    WorldManager.SaveWorldList();
+                }
+            } else if (value.Equals("off", StringComparison.OrdinalIgnoreCase) ||
+                      value.Equals("false", StringComparison.OrdinalIgnoreCase) ||
+                      value == "0") {
+                if (curValue) {
+                    player.Message("World {0}&S is no longer {1}.", world.ClassyName, type);
+                    setter(false);
+                    WorldManager.SaveWorldList();
+                } else {
+                    player.Message( "World {0}&S is not {1}.", world.ClassyName, type);
+                }
+            } else {
+                CdWorldSet.PrintUsage( player );
+            }
+        }
+        
+        static void SetBackupSettings( Player player, World world, string value ) {
+            TimeSpan backupInterval;
+            string oldDescription = world.BackupSettingDescription;
+            if( String.IsNullOrEmpty( value ) ) {
+                player.Message( GetBackupSettingsString( world ) );
+                return;
+            } else if( value.Equals( "off", StringComparison.OrdinalIgnoreCase ) ||
+                      value.StartsWith( "disable", StringComparison.OrdinalIgnoreCase ) ) {
+                // Disable backups on the world
+                if( world.BackupEnabledState == YesNoAuto.No ) {
+                    MessageSameBackupSettings( player, world );
+                    return;
+                }
+                world.BackupEnabledState = YesNoAuto.No;
+            } else if( value.Equals( "default", StringComparison.OrdinalIgnoreCase ) ||
+                      value.Equals( "auto", StringComparison.OrdinalIgnoreCase ) ) {
+                // Set world to use default settings
+                if( world.BackupEnabledState == YesNoAuto.Auto ) {
+                    MessageSameBackupSettings( player, world );
+                    return;
+                }
+                world.BackupEnabledState = YesNoAuto.Auto;
+            } else if( value.TryParseMiniTimespan( out backupInterval ) ) {
+                if( backupInterval == TimeSpan.Zero ) {
+                    // Set world's backup interval to 0, which is equivalent to disabled
+                    if( world.BackupEnabledState == YesNoAuto.No ) {
+                        MessageSameBackupSettings( player, world );
+                        return;
+                    }
+                    world.BackupEnabledState = YesNoAuto.No;
+                } else if( world.BackupEnabledState != YesNoAuto.Yes ||
+                          world.BackupInterval != backupInterval ) {
+                    // Alter world's backup interval
+                    world.BackupInterval = backupInterval;
+                } else {
+                    MessageSameBackupSettings( player, world );
+                    return;
+                }
+            } else {
+                CdWorldSet.PrintUsage( player );
+                return;
+            }
+            player.Message( "Backup setting for world {0}&S changed from \"{1}\" to \"{2}\"",
+                           world.ClassyName, oldDescription, world.BackupSettingDescription );
+            WorldManager.SaveWorldList();
+        }
+        
         static void MessageSameBackupSettings( Player player, World world ) {
             player.Message( "Backup settings for {0}&S are already \"{1}\"",
                             world.ClassyName, world.BackupSettingDescription );
         }
-
 
         static string GetBackupSettingsString( World world ) {
             switch( world.BackupEnabledState ) {
@@ -3370,6 +3311,62 @@ namespace fCraft {
                 default:
                     // never happens
                     throw new Exception( "Unexpected BackupEnabledState value: " + world.BackupEnabledState );
+            }
+        }
+        
+        static void SetMOTD(Player player, World world, string value) {
+            if (string.IsNullOrEmpty(value)) {
+                if (string.IsNullOrEmpty(world.MOTD)) {
+                    player.Message("World \"{0}\" does not have a custom MOTD", world.Name);
+                } else {
+                    player.Message("MOTD for \"{0}\" is: ", world.Name);
+                    player.Message("  " + world.MOTD);
+                }
+                return;
+            }
+            
+            if (value.Length > 64) {
+                value = value.Substring(0, 64);
+            }
+            if (value.ToLower().Equals("remove") || value.ToLower().Equals("delete") || value.ToLower().Equals("reset")) {
+                player.Message("MOTD for \"{0}\" has been removed", world.Name);
+                world.MOTD = null;
+                WorldManager.SaveWorldList();
+            } else {
+                player.Message("MOTD for \"{0}\" has been set to:", world.Name);
+                player.Message("  " + value);
+                world.MOTD = value;
+                WorldManager.SaveWorldList();
+            }
+        }
+        
+        static void SetGreeting(Player player, World world, string value) {
+            if (!Directory.Exists("./WorldGreeting/"))
+                Directory.CreateDirectory("./WorldGreeting/");
+            
+            if (String.IsNullOrEmpty(value)) {
+                if (world.Greeting == null) {
+                    if (File.Exists("./WorldGreeting/" + world.Name + ".txt")) {
+                        world.Greeting = File.ReadAllText("./WorldGreeting/" + world.Name + ".txt");
+                        if (world.Greeting.Length == 0)
+                            player.Message("No greeting message is set for world {0}", world.ClassyName);
+                        else
+                            player.Message("Greeting message for world {0}&s is: {1}", world.ClassyName, world.Greeting);
+                        world.Greeting = null;
+                    } else {
+                        player.Message("No greeting message is set for world {0}", world.ClassyName);
+                    }
+                }
+            } else if (value.ToLower() == "remove") {
+                player.Message("Greeting message removed for world {0}", world.ClassyName);
+                if (File.Exists("./WorldGreeting/" + world.Name + ".txt"))
+                    File.Delete("./WorldGreeting/" + world.Name + ".txt");
+                world.Greeting = null;
+            } else {
+                world.Greeting = value.Replace("%n", "/n");
+                player.Message("Greeting message for world {0}&S set to: {1}", world.ClassyName, world.Greeting);
+                File.WriteAllText("./WorldGreeting/" + world.Name + ".txt", world.Greeting);
+                world.Greeting = null;
             }
         }
 
