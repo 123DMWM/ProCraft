@@ -320,8 +320,7 @@ namespace fCraft {
 
             // handle canceling selections and partial messages
 
-            if( rawMessage.StartsWith( "/nvm", StringComparison.OrdinalIgnoreCase ) ||
-                rawMessage.StartsWith( "/cancel", StringComparison.OrdinalIgnoreCase ) ) {
+            if( rawMessage.CaselessStarts( "/nvm" ) || rawMessage.CaselessStarts( "/cancel" ) ) {
                 if( partialMessage != null ) {
                     Message( "Partial message cancelled." );
                     partialMessage = null;
@@ -337,7 +336,7 @@ namespace fCraft {
                 return;
             }
 
-            if (!rawMessage.ToLower().StartsWith("/afk") && IsAFK) {
+            if (!rawMessage.CaselessStarts("/afk") && IsAFK) {
                 Server.Players.CanSee(this).Message("{0} is no longer AFK", this.Name);
                 Message("&SYou are no longer AFK");
                 IsAFK = false;
@@ -398,7 +397,7 @@ namespace fCraft {
 
                 case RawMessageType.Command:
                     {
-                        if (rawMessage.ToLower().Equals("/ok")) {
+                        if (rawMessage.CaselessEquals("/ok")) {
                             if (Info.IsFrozen) {
                                 Message("&WYou cannot use any commands while frozen.");
                                 return;
@@ -441,7 +440,7 @@ namespace fCraft {
                             Message("&WYou cannot use this command while frozen.");
                             Logger.Log(LogType.UserCommand, "{0}[Frozen]: {1}", Name, rawMessage);
                         } else {
-                            if (!commandDescriptor.DisableLogging && !(fromConsole && rawMessage.ToLower().StartsWith("/place"))) {
+                            if (!commandDescriptor.DisableLogging && !(fromConsole && rawMessage.CaselessStarts("/place"))) {
                                 Logger.Log(LogType.UserCommand, "{0}: {1}", Name, rawMessage);
                             }
                             if (commandDescriptor.RepeatableSelection) {

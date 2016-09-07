@@ -1108,7 +1108,7 @@ namespace fCraft {
 			}
 
 			string silentString = cmd.NextAll();
-			bool silent = (silentString.ToLower().Equals("silent") || silentString.ToLower().Equals("s"));
+			bool silent = (silentString.CaselessEquals("silent") || silentString.CaselessEquals("s"));
 
 			player.Info.IsHidden = true;
 			player.Message(silent ? "&8You are now hidden (silent)." : "&8You are now hidden.");
@@ -1211,9 +1211,9 @@ namespace fCraft {
 
 
             string playerName = cmd.Next() ?? "null";
-            if(playerName.ToLower().Equals("null") || playerName.ToLower().Equals("random")) {
+            if(playerName.CaselessEquals("null") || playerName.CaselessEquals("random")) {
                 Map map = player.WorldMap;
-                Position newSpawn = playerName.ToLower().Equals("random") ? new Position(-1, -1, -1, 0, 0) : player.Position;
+                Position newSpawn = playerName.CaselessEquals("random") ? new Position(-1, -1, -1, 0, 0) : player.Position;
                 map.Spawn = newSpawn;
                 player.TeleportTo( map.getSpawnIfRandom());
                 if (newSpawn == new Position(-1, -1, -1, 0, 0)) {

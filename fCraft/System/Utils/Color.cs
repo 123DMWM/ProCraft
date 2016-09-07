@@ -370,7 +370,7 @@ namespace fCraft
             for (int i = 0; i < ExtColors.Length; i++) {
                 CustomColor col = ExtColors[i];
                 if (col.Undefined) continue;
-                if (col.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+                if (col.Name.CaselessEquals(name))
                     return "&" + col.Code;
             }
             return null;

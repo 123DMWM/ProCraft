@@ -30,7 +30,7 @@ namespace fCraft {
 
         public static bool exists(string word) {
             foreach (ChatFilter filter in Filters) {
-                if (filter.Word.ToLower().Equals(word.ToLower())) {
+                if (filter.Word.CaselessEquals(word.ToLower())) {
                     return true;
                 }
             }

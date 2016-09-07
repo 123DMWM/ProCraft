@@ -89,14 +89,14 @@ namespace fCraft.Drawing {
                 urlString = "http://i.imgur.com/" + urlString.Substring(2) + ".png";
             }
             // prepend the protocol, if needed (assume http)
-            if (!urlString.ToLower().StartsWith("http://") && !urlString.ToLower().StartsWith("https://")) {
+            if (!urlString.CaselessStarts("http://") && !urlString.CaselessStarts("https://")) {
                 urlString = "http://" + urlString;
             }
-            if (!urlString.ToLower().StartsWith("http://i.imgur.com")) {
+            if (!urlString.CaselessStarts("http://i.imgur.com")) {
                 Player.Message("For safety reasons we only accept images uploaded to &9http://imgur.com/ &sSorry for this inconvenience.");
                 return false;
             }
-            if (!urlString.ToLower().EndsWith(".png") && !urlString.ToLower().EndsWith(".jpg") && !urlString.ToLower().EndsWith(".gif")) {
+            if (!urlString.CaselessEnds(".png") && !urlString.CaselessEnds(".jpg") && !urlString.CaselessEnds(".gif")) {
                 Player.Message("URL must be a link to an image");
                 return false;
             }
@@ -169,7 +169,7 @@ namespace fCraft.Drawing {
                     // yield the StatusCode "OK", even though the image was not found.
                     if ((response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.Moved ||
                          response.StatusCode == HttpStatusCode.Redirect) &&
-                        response.ContentType.StartsWith("image", StringComparison.OrdinalIgnoreCase)) {
+                        response.ContentType.CaselessStarts("image")) {
                         // if the remote file was found, download it
                         using (Stream inputStream = response.GetResponseStream()) {
                             // TODO: check file size limit?

@@ -631,7 +631,7 @@ namespace fCraft {
             string[] files = Directory.GetFiles(Paths.RankReqPath, rank.Name.ToLower() + ".txt", SearchOption.TopDirectoryOnly);
             for (int i = 0; i < files.Length; i++) {
                 string name = Path.GetFileNameWithoutExtension(files[i]).ToLower();
-                if (rank.Name.ToLower().Equals(name)) {
+                if (rank.Name.CaselessEquals(name)) {
                     rankReqFile = files[i]; break;
                 }
             }
@@ -1344,7 +1344,7 @@ namespace fCraft {
                 return;
             } else if (param.EndsWith("*")) {
                 foreach (CommandDescriptor item in items) {
-                    if (item.Name.ToLower().StartsWith(param.ToLower().Trim('*'))) {
+                    if (item.Name.CaselessStarts(param.ToLower().Trim('*'))) {
                         output += item.MinRank.Color + item.Name + "&s, ";
                     }
                 }
@@ -1357,7 +1357,7 @@ namespace fCraft {
                 return;
 			} else if (param.StartsWith("*")) {
                 foreach (CommandDescriptor item in items) {
-                    if (item.Name.ToLower().EndsWith(param.ToLower().Trim('*'))) {
+                    if (item.Name.CaselessEnds(param.ToLower().Trim('*'))) {
                         output += item.MinRank.Color + item.Name + "&s, ";
                     }
                 }
@@ -1377,10 +1377,10 @@ namespace fCraft {
                 }
                 prefix = string.Format("Commands available to {0}&S", rank.ClassyName);
                 cd = CommandManager.GetCommands(rank, false);
-            } else if (param.Equals("all", StringComparison.OrdinalIgnoreCase)) {
+            } else if (param.CaselessEquals("all")) {
                 prefix = "All commands";
                 cd = CommandManager.GetCommands();
-            } else if (param.Equals("hidden", StringComparison.OrdinalIgnoreCase)) {
+            } else if (param.CaselessEquals("hidden")) {
                 prefix = "Hidden commands";
                 cd = CommandManager.GetCommands(true);
             } else if (EnumUtil.TryComplete(param, out category, true)) {
@@ -2107,7 +2107,7 @@ namespace fCraft {
             string username;
             result.TryGetValue("username", out username);
 
-            if (error.ToLower().Equals("user not found")) {
+            if (error.CaselessEquals("user not found")) {
                 player.Message("User not found!");
                 return;
             }
@@ -2253,7 +2253,7 @@ namespace fCraft {
                 return player.Info;
             }
 
-            if (name.ToLower().Equals(player.Name.ToLower())) {
+            if (name.CaselessEquals(player.Name.ToLower())) {
                 // own name given
                 player.LastUsedPlayerName = player.Name;
                 return player.Info;

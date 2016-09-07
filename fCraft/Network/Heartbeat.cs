@@ -192,7 +192,7 @@ namespace fCraft
 
                 // try parse response as server Url, if needed
                 string replyString = responseText.Trim();
-                if (replyString.StartsWith("bad heartbeat", StringComparison.OrdinalIgnoreCase))
+                if (replyString.CaselessStarts("bad heartbeat"))
                 {
                     Logger.Log(LogType.Error, "Heartbeat: {0}", replyString);
                 }

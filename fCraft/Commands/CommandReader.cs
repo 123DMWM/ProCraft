@@ -363,12 +363,12 @@ namespace fCraft
                 param = false;
                 return false;
             }
-            else if (token.Equals("on", StringComparison.OrdinalIgnoreCase) || token == "1")
+            else if (token.CaselessEquals("on") || token == "1")
             {
                 // "on" or "1" given
                 param = true;
             }
-            else if (token.Equals("off", StringComparison.OrdinalIgnoreCase) || token == "0")
+            else if (token.CaselessEquals("off") || token == "0")
             {
                 // "off" or "0" given
                 param = false;

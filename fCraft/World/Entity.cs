@@ -43,7 +43,7 @@ namespace fCraft {
 
         public static Entity Find(World world, string name) {
             foreach (Entity entity in Entities.Where(w => w.World == world.Name)) {
-                if (entity.Name.ToLower().Equals(name.ToLower())) {
+                if (entity.Name.CaselessEquals(name.ToLower())) {
                     return entity;
                 }
             }

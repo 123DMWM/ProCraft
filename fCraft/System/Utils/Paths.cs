@@ -438,7 +438,7 @@ namespace fCraft {
             string fileName = Path.GetFileName( fullFileName );
             DirectoryInfo directory = new DirectoryInfo( GetDirectoryNameOrRoot( fullFileName ) );
             return directory.GetFiles( "*", SearchOption.TopDirectoryOnly )
-                            .Where( file => file.Name.Equals( fileName, StringComparison.OrdinalIgnoreCase ) )
+                            .Where( file => file.Name.CaselessEquals( fileName ) )
                             .ToArray();
         }
 

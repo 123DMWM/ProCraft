@@ -100,10 +100,10 @@ namespace fCraft {
 
             Rank result = null;
             foreach( string rankName in RanksByName.Keys ) {
-                if( rankName.Equals( name, StringComparison.OrdinalIgnoreCase ) ) {
+                if( rankName.CaselessEquals( name ) ) {
                     return RanksByName[rankName];
                 }
-                if( rankName.StartsWith( name, StringComparison.OrdinalIgnoreCase ) ) {
+                if( rankName.CaselessStarts( name ) ) {
                     if( result == null ) {
                         result = RanksByName[rankName];
                     } else {
@@ -194,7 +194,7 @@ namespace fCraft {
         public static bool CanRenameRank( [NotNull] Rank rank, [NotNull] string newName ) {
             if( rank == null ) throw new ArgumentNullException( "rank" );
             if( newName == null ) throw new ArgumentNullException( "newName" );
-            if( rank.Name.Equals( newName, StringComparison.OrdinalIgnoreCase ) ) {
+            if( rank.Name.CaselessEquals( newName ) ) {
                 return true;
             } else {
                 return !RanksByName.ContainsKey( newName.ToLower() );

@@ -891,7 +891,7 @@ namespace fCraft {
 
             if( LegacyConfigValues.ContainsKey( key ) ) {
                 foreach( var pair in LegacyConfigValues.Values ) {
-                    if( pair.Key.Equals( value, StringComparison.OrdinalIgnoreCase ) ) {
+                    if( pair.Key.CaselessEquals( value ) ) {
                         value = pair.Value;
                         break;
                     }

@@ -35,7 +35,7 @@ namespace fCraft {
 
         public static EnvPresets Find(string name) {
             foreach (EnvPresets env in Presets) {
-                if (env.Name.ToLower().Equals(name.ToLower())) {
+                if (env.Name.CaselessEquals(name.ToLower())) {
                     return env;
                 }
             }
@@ -44,7 +44,7 @@ namespace fCraft {
 
         public static bool exists(string name) {
             foreach (EnvPresets env in Presets) {
-                if (env.Name.ToLower().Equals(name.ToLower())) {
+                if (env.Name.CaselessEquals(name.ToLower())) {
                     return true;
                 }
             }

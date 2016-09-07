@@ -82,7 +82,7 @@ namespace fCraft {
         public bool Contains( [NotNull] string zoneName ) {
             if( zoneName == null ) throw new ArgumentNullException( "zoneName" );
             Zone[] cache = Cache;
-            return cache.Any( t => t.Name.Equals( zoneName, StringComparison.OrdinalIgnoreCase ) );
+            return cache.Any( t => t.Name.CaselessEquals( zoneName ) );
         }
 
 
@@ -264,7 +264,7 @@ namespace fCraft {
             Zone match = null;
             Zone[] cache = Cache;
             foreach( Zone zone in cache ) {
-                if( zone.Name.StartsWith( name, StringComparison.OrdinalIgnoreCase ) ) {
+                if( zone.Name.CaselessStarts( name ) ) {
                     if( match == null ) {
                         // first (and hopefully only) match found
                         match = zone;

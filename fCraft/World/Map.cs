@@ -862,7 +862,6 @@ namespace fCraft {
             }
         }
         
-        const StringComparison comp = StringComparison.OrdinalIgnoreCase;
         public static bool GetBlockByName([CanBeNull] World world, [NotNull] string blockName, 
                                           bool allowNoneBlock, out Block block) {
             if (blockName == null) throw new ArgumentNullException("blockName");
@@ -877,7 +876,7 @@ namespace fCraft {
                     if (def != null) { block = (Block)id; return true; }
                 } else {
                     foreach (BlockDefinition def in defs) {
-                        if (def == null || !def.BlockName.Equals(blockName, comp)) continue;
+                        if (def == null || !def.BlockName.CaselessEquals(blockName)) continue;
                         block = (Block)def.BlockID; return true;
                     }
                 }

@@ -455,18 +455,17 @@ namespace fCraft {
             }
             
             string match = null;
-            const StringComparison comp = StringComparison.OrdinalIgnoreCase;
             for (int i = 0; i < available.Length; i++) {
                 string font = available[i];
                 if (font == null) continue;
-                if (!font.StartsWith(name, comp)) continue;
+                if (!font.CaselessStarts(name)) continue;
                 
-                if (font.Equals(name, comp)) {
+                if (font.CaselessEquals(name)) {
                     match = font; break;
                 } else if (match == null) {
                     match = font;
                 } else {
-                    var matches = available.Where(f => f.StartsWith(name, comp));
+                    var matches = available.Where(f => f.CaselessStarts(name));
                     player.Message("Multiple font files matched \"{0}\": {1}",
                                    name, matches.JoinToString());
                     return;

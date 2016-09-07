@@ -181,12 +181,35 @@ namespace fCraft {
             return list.Substring(2);
         }
         
+
+    }
+    
+    /// <summary> Provides utility methods for working with strings. </summary>
+    public static class StringUtil {
+    	
+    	/// <summary> Returns whether the string is null, or if all the 
+    	/// characters in the string are whitespace. </summary>
         public static bool NullOrWhiteSpace(this string value) {
             if (value == null) return true;
             foreach (char c in value) {
                 if (!Char.IsWhiteSpace(c)) return false;
             }
             return true;
+        }
+        
+        /// <summary> Returns whether 'a' caselessly equals 'b'. </summary>
+        public static bool CaselessEquals(this string a, string b) {
+            return a.Equals(b, StringComparison.OrdinalIgnoreCase);
+        }
+        
+        /// <summary> Returns whether 'a' caselessly starts with 'b'. </summary>
+        public static bool CaselessStarts(this string a, string b) {
+            return a.StartsWith(b, StringComparison.OrdinalIgnoreCase);
+        }
+        
+        /// <summary> Returns whether 'a' caselessly ends with 'b'. </summary>
+        public static bool CaselessEnds(this string a, string b) {
+            return a.EndsWith(b, StringComparison.OrdinalIgnoreCase);
         }
     }
 

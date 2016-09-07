@@ -449,11 +449,11 @@ namespace fCraft {
             List<Player> results = new List<Player>();
             for( int i = 0; i < tempList.Length; i++ ) {
                 if( tempList[i] != null && player.CanSee( tempList[i] ) ) {
-                    if( tempList[i].Name.Equals( playerName, StringComparison.OrdinalIgnoreCase ) ) {
+                    if( tempList[i].Name.CaselessEquals( playerName ) ) {
                         results.Clear();
                         results.Add( tempList[i] );
                         break;
-                    } else if( tempList[i].Name.StartsWith( playerName, StringComparison.OrdinalIgnoreCase ) ) {
+                    } else if( tempList[i].Name.CaselessStarts( playerName ) ) {
                         results.Add( tempList[i] );
                     }
                 }
@@ -468,7 +468,7 @@ namespace fCraft {
             if( playerName == null ) throw new ArgumentNullException( "playerName" );
             Player[] tempList = Players;
             for( int i = 0; i < tempList.Length; i++ ) {
-                if( tempList[i] != null && tempList[i].Name.Equals( playerName, StringComparison.OrdinalIgnoreCase ) ) {
+                if( tempList[i] != null && tempList[i].Name.CaselessEquals( playerName ) ) {
                     return tempList[i];
                 }
             }
@@ -983,7 +983,7 @@ namespace fCraft {
         public string Texture = "default";
 
         public string GetTexture() {
-            return Texture.ToLower().Equals("default") ? Server.DefaultTerrain : Texture;
+            return Texture.CaselessEquals("default") ? Server.DefaultTerrain : Texture;
         }
 
         /// <summary> The current weather in this world. </summary>

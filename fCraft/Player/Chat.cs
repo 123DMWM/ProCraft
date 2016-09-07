@@ -169,7 +169,7 @@ namespace fCraft {
         
         static void checkBotResponses(Player player, string rawMessage) {
             if (player.Can(Permission.UseBot)) {
-                if (rawMessage.StartsWith("Bot ", StringComparison.OrdinalIgnoreCase) && rawMessage.Length < 17) {
+        		if (rawMessage.CaselessStarts("Bot ") && rawMessage.Length < 17) {
                     player.ParseMessage("/bot <CalledFromChat> " + rawMessage.Remove(0, 4), false);
                 }
                 double BotTime = player.TimeSinceLastServerMessage.TotalSeconds;
@@ -620,7 +620,7 @@ namespace fCraft {
         {
             if (string.IsNullOrEmpty(message)) return RawMessageType.Invalid;
             if (message == "/") return RawMessageType.RepeatCommand;
-            if (message.Equals("/ok", StringComparison.OrdinalIgnoreCase)) return RawMessageType.Command;
+            if (message.CaselessEquals("/ok")) return RawMessageType.Command;
             if (message.EndsWith(" /")) return RawMessageType.PartialMessage;
             if (message.EndsWith(" //")) message = message.Substring(0, message.Length - 1);
 			if (message.EndsWith(@" \")) return RawMessageType.PartialMessageNoSpace;

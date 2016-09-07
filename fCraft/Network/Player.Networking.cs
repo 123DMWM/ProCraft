@@ -1646,7 +1646,7 @@ namespace fCraft {
                 //otherPlayer.Send(Packet.MakeTeleport(id, Position));
                 if (otherPlayer.Supports(CpeExt.ChangeModel)) {
                     string thisModel = IsAFK ? AFKModel : Info.Mob;
-                    if (otherPlayer.Info.Rank.CanSee(Info.Rank) && (thisModel.ToLower().Equals("air") || thisModel.ToLower().Equals("0"))) {
+                    if (otherPlayer.Info.Rank.CanSee(Info.Rank) && (thisModel.CaselessEquals("air") || thisModel.CaselessEquals("0"))) {
                         thisModel = "Humanoid";
                     }
                     otherPlayer.Send(Packet.MakeChangeModel((byte)id, thisModel));
@@ -1654,7 +1654,7 @@ namespace fCraft {
             }
             if ((oldMob != Info.Mob || oldafkMob != afkMob) && otherPlayer.Supports(CpeExt.ChangeModel)) {
                 string thisModel = IsAFK ? AFKModel : Info.Mob;
-                if (otherPlayer.Info.Rank.CanSee(Info.Rank) && (thisModel.ToLower().Equals("air") || thisModel.ToLower().Equals("0"))) {
+                if (otherPlayer.Info.Rank.CanSee(Info.Rank) && (thisModel.CaselessEquals("air") || thisModel.CaselessEquals("0"))) {
                     thisModel = "Humanoid";
                 }
                 otherPlayer.Send(Packet.MakeChangeModel((byte)id, thisModel));
@@ -1684,7 +1684,7 @@ namespace fCraft {
                 }
                 if (Supports(CpeExt.ChangeModel)) {
                     string addedModel = player.IsAFK ? player.AFKModel : player.Info.Mob;
-                    if (Info.Rank.CanSee(player.Info.Rank) && (addedModel.ToLower().Equals("air") || addedModel.ToLower().Equals("0"))) {
+                    if (Info.Rank.CanSee(player.Info.Rank) && (addedModel.CaselessEquals("air") || addedModel.CaselessEquals("0"))) {
                         addedModel = "Humanoid";
                     }
                     Send(Packet.MakeChangeModel((byte)newEntity.Id, addedModel));
@@ -1736,7 +1736,7 @@ namespace fCraft {
 
             if (Supports(CpeExt.ChangeModel)) {
                 string readdedModel = player.IsAFK ? player.AFKModel : player.Info.Mob;
-                if (Info.Rank.CanSee(player.Info.Rank) && (readdedModel.ToLower().Equals("air") || readdedModel.ToLower().Equals("0"))) {
+                if (Info.Rank.CanSee(player.Info.Rank) && (readdedModel.CaselessEquals("air") || readdedModel.CaselessEquals("0"))) {
                     readdedModel = "Humanoid";
                 }
                 SendNow(Packet.MakeChangeModel((byte)entity.Id, readdedModel));

@@ -1093,7 +1093,7 @@ namespace fCraft {
                 {
                     if (pl.Supports(CpeExt.MessageType))
                     {
-                        if (line.StartsWith("&d", StringComparison.OrdinalIgnoreCase))
+                        if (line.CaselessStarts("&d"))
                         {
                             line = line.Remove(0, 2);
                         }
@@ -1155,7 +1155,7 @@ namespace fCraft {
             foreach( byte b in hasher.ComputeHash( Encoding.ASCII.GetBytes( salt + name ) ) ) {
                 sb.AppendFormat( "{0:x2}", b );
             }
-            return sb.ToString().Equals( hash, StringComparison.OrdinalIgnoreCase );
+            return sb.ToString().CaselessEquals( hash );
         }
 
 
@@ -1337,8 +1337,7 @@ namespace fCraft {
 
             lock( PlayerListLock ) {
                 // Kick other sessions with same player name
-                Player ghost = PlayerIndex.FirstOrDefault( p => p.Name.Equals( player.Name,
-                                                                               StringComparison.OrdinalIgnoreCase ) );
+                Player ghost = PlayerIndex.FirstOrDefault( p => p.Name.CaselessEquals( player.Name ) );
                 if( ghost != null ) {
                     // Wait for other session to exit/unregister
                     Logger.Log( LogType.SuspiciousActivity,
@@ -1478,7 +1477,7 @@ namespace fCraft {
             if (p.Info.DisplayedName == null) return p.Name;
             
             string nick = Color.StripColors(Chat.ReplacePercentColorCodes(p.Info.DisplayedName, false));
-            bool nickSame = nick.Equals(p.Info.Name, StringComparison.OrdinalIgnoreCase);
+            bool nickSame = nick.CaselessEquals(p.Info.Name);
             return nickSame ? Color.White + p.Name : Color.White + p.Name + " &S(&7" + nick + "&S)";
         }
         
@@ -1571,7 +1570,7 @@ namespace fCraft {
                 {
                     continue;
                 }
-                if (otherPlayer.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+                if (otherPlayer.Name.CaselessEquals(name))
                 {
                     if (!includeSelf && otherPlayer == player)
                     {
@@ -1584,7 +1583,7 @@ namespace fCraft {
                         break;
                     }
                 }
-                else if (otherPlayer.Name.StartsWith(name, StringComparison.OrdinalIgnoreCase))
+                else if (otherPlayer.Name.CaselessStarts(name))
                 {
                     if (!includeSelf && otherPlayer == player)
                     {
@@ -1630,7 +1629,7 @@ namespace fCraft {
         /// <returns> Player object if player was found online; otherwise null. </returns>
         public static Player FindPlayerExact([NotNull] Player player, [NotNull] string name, SearchOptions options)
         {
-            Player target = Players.FirstOrDefault(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+            Player target = Players.FirstOrDefault(p => p.Name.CaselessEquals(name));
             bool includeHidden = (options & SearchOptions.IncludeHidden) != 0;
             bool includeSelf = (options & SearchOptions.IncludeSelf) != 0;
             if (target != null && !includeHidden && !player.CanSee(target) || // hide players whom player cant see

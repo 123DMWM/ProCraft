@@ -401,7 +401,7 @@ namespace fCraft {
                 if (scale > 3f) scale = 3f;
             }
             
-            if (!validEntities.Contains(model.ToLower()) && !model.ToLower().StartsWith("dev:")) {
+            if (!validEntities.Contains(model.ToLower()) && !model.CaselessStarts("dev:")) {
                 byte blockId;
                 Block block;
                 if (byte.TryParse(model, out blockId)) {
@@ -412,7 +412,7 @@ namespace fCraft {
                 }
             }
             
-            if (model.ToLower().StartsWith("dev:")) {
+            if (model.CaselessStarts("dev:")) {
                 if (player != null)
                     player.Message("&cBe careful with development models, as they could crash others.");
                 model = model.Remove(0, 4);
@@ -815,7 +815,7 @@ namespace fCraft {
             }
 
             // Reset env when /env worldname normal
-            if (arg2.Equals("normal", StringComparison.OrdinalIgnoreCase)) {
+            if (arg2.CaselessEquals("normal")) {
                 world = WorldManager.FindWorldOrPrintMatches(player, arg1);
                 if (world == null) return;
                 if (cmd.IsConfirmed) {
@@ -911,8 +911,7 @@ namespace fCraft {
                     } else if (!value.EndsWith(".png") && !value.EndsWith(".zip")) {
                         player.Message("Env Texture: Invalid image type. Please use a \".png\" or \".zip\"", world.ClassyName);
                         return;
-                    } else if (!(value.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
-                                 value.StartsWith("https://", StringComparison.OrdinalIgnoreCase))) {
+                    } else if (!(value.CaselessStarts("http://") || value.CaselessStarts("https://"))) {
                         player.Message("Env Texture: Invalid URL. Please use a \"http://\" or \"https://\" type url.", world.ClassyName);
                         return;
                     } else {
@@ -929,16 +928,16 @@ namespace fCraft {
 
                 case "weather":
                     byte weather = 0;
-                    if (value.Equals("normal", StringComparison.OrdinalIgnoreCase)) {
+                    if (value.CaselessEquals("normal")) {
                         player.Message("Reset weather for {0}&S to normal(0) ", world.ClassyName);
                         world.Weather = 0;
                     } else {
                         if (!byte.TryParse(value, out weather)) {
-                            if (value.Equals("sun", StringComparison.OrdinalIgnoreCase)) {
+                            if (value.CaselessEquals("sun")) {
                                 weather = 0;
-                            } else if (value.Equals("rain", StringComparison.OrdinalIgnoreCase)) {
+                            } else if (value.CaselessEquals("rain")) {
                                 weather = 1;
-                            } else if (value.Equals("snow", StringComparison.OrdinalIgnoreCase)) {
+                            } else if (value.CaselessEquals("snow")) {
                                 weather = 2;
                             }
                         }
@@ -1092,9 +1091,8 @@ namespace fCraft {
         }
         
         static bool IsReset(string value) {
-        	return value.Equals("-1") || value.Equals("normal", StringComparison.OrdinalIgnoreCase) 
-        		|| value.Equals("reset", StringComparison.OrdinalIgnoreCase)
-        		|| value.Equals("default", StringComparison.OrdinalIgnoreCase);
+        	return value.Equals("-1") || value.CaselessEquals("normal") 
+        		|| value.CaselessEquals("reset") || value.CaselessEquals("default");
         }
         
         static void UpdateAppearance(World world, EnvProp prop, int target) {
@@ -1145,7 +1143,7 @@ namespace fCraft {
                 CdEnvPreset.PrintUsage(player);
                 return;
             }
-            if (!option.ToLower().Equals("list") && !option.ToLower().Equals("reload") && string.IsNullOrEmpty(name)) {
+            if (!option.CaselessEquals("list") && !option.CaselessEquals("reload") && string.IsNullOrEmpty(name)) {
                 CdEnvPreset.PrintUsage(player);
                 return;
             }
@@ -1383,7 +1381,7 @@ namespace fCraft {
                 case "texture":
                 case "terrain":
                     p.Message("Terrain IDs: &9http://123dmwm.tk/ID-Overlay.png");
-                    p.Message("Current world terrain: &9{0}", p.World.Texture.ToLower().Equals("default") ? Server.DefaultTerrain : p.World.Texture);
+                    p.Message("Current world terrain: &9{0}", p.World.Texture.CaselessEquals("default") ? Server.DefaultTerrain : p.World.Texture);
                     break;
                 default:
                     if (p.currentBD != null) {
@@ -1598,7 +1596,7 @@ namespace fCraft {
                     }
                     break;
                 case 16:
-                    if (args.ToLower().Equals("-1")) {
+                    if (args.CaselessEquals("-1")) {
                         p.Message("   &bBlock will display as a Sprite");
                         def.Shape = 0;
                         def.MinX = 0; def.MinY = 0; def.MinZ = 0;
@@ -1944,7 +1942,7 @@ namespace fCraft {
                     }
                     break;
                 case "min":
-                    if (args.ToLower().Equals("-1")) {
+                    if (args.CaselessEquals("-1")) {
                         p.Message("Block will display as a sprite!");
                         def.Shape = 0;
                         hasChanged = true;
@@ -2002,7 +2000,7 @@ namespace fCraft {
 
             foreach (Player pl in Server.Players) {
                 if (!p.Supports(CpeExt.BlockDefinitions) && 
-                    (option.ToLower().Equals("block") || option.ToLower().Equals("fallback"))) {
+                    (option.CaselessEquals("block") || option.CaselessEquals("fallback"))) {
                     p.JoinWorld(p.World, WorldChangeReason.Rejoin, p.Position);
                 }
             }
@@ -2265,8 +2263,8 @@ namespace fCraft {
             short distance = 160;
             World world = player.World;
             if (!short.TryParse(disString, out distance)) {
-                if (disString.ToLower().Equals("normal") || disString.ToLower().Equals("reset") ||
-                    disString.ToLower().Equals("default")) {
+                if (disString.CaselessEquals("normal") || disString.CaselessEquals("reset") ||
+                    disString.CaselessEquals("default")) {
                     distance = 160;
                 } else {
                     player.Message("Invalid distance!");
@@ -2345,7 +2343,7 @@ namespace fCraft {
             if (player.World != null && !string.IsNullOrEmpty(player.World.Texture)) {
                 player.Message("This world uses a custom texture pack");
                 player.Message("A preview can be found here: ");
-                player.Message("  " + (player.World.Texture.ToLower().Equals("default") ? Server.DefaultTerrain : player.World.Texture));
+                player.Message("  " + (player.World.Texture.CaselessEquals("default") ? Server.DefaultTerrain : player.World.Texture));
             } else {
                 player.Message("You are not in a world with a custom texturepack.");
             }
@@ -2391,7 +2389,7 @@ namespace fCraft {
                 color = color.ToUpper().Remove(0, 1);
             }
             if (!IsValidHex(color)) {
-                if (color.ToLower().Equals("on") || color.ToLower().Equals("true") || color.ToLower().Equals("yes")) {
+                if (color.CaselessEquals("on") || color.CaselessEquals("true") || color.CaselessEquals("yes")) {
                     zone.ShowZone = true;
                     if (zone.Color != null) {
                         player.Message("Zone ({0}&s) will now show its bounderies", zone.ClassyName);
@@ -2399,7 +2397,7 @@ namespace fCraft {
                             zone.Color, zone.Alpha));
                     }
                     return;
-                } else if (color.ToLower().Equals("off") || color.ToLower().Equals("false") || color.ToLower().Equals("no")) {
+                } else if (color.CaselessEquals("off") || color.CaselessEquals("false") || color.CaselessEquals("no")) {
                     zone.ShowZone = false;
                     player.Message("Zone ({0}&s) will no longer show its bounderies", zone.ClassyName);
                     player.World.Players.Where(p => p.Supports(CpeExt.SelectionCuboid)).Send(Packet.MakeRemoveSelection(zone.ZoneID));
@@ -2424,17 +2422,17 @@ namespace fCraft {
                 zone.Alpha = alpha;
             }
             if (bol != null) {
-                if (!bol.ToLower().Equals("on") && !bol.ToLower().Equals("off") && !bol.ToLower().Equals("true") &&
-                    !bol.ToLower().Equals("false") && !bol.ToLower().Equals("0") && !bol.ToLower().Equals("1") &&
-                    !bol.ToLower().Equals("yes") && !bol.ToLower().Equals("no")) {
+                if (!bol.CaselessEquals("on") && !bol.CaselessEquals("off") && !bol.CaselessEquals("true") &&
+                    !bol.CaselessEquals("false") && !bol.CaselessEquals("0") && !bol.CaselessEquals("1") &&
+                    !bol.CaselessEquals("yes") && !bol.CaselessEquals("no")) {
                     zone.ShowZone = false;
                     player.Message("({0}) is not a valid bool statement", bol);
-                } else if (bol.ToLower().Equals("on") || bol.ToLower().Equals("true") || bol.ToLower().Equals("1") ||
-                           bol.ToLower().Equals("yes")) {
+                } else if (bol.CaselessEquals("on") || bol.CaselessEquals("true") || bol.CaselessEquals("1") ||
+                           bol.CaselessEquals("yes")) {
                     zone.ShowZone = true;
                     player.Message("Zone ({0}&s) color set! Bounderies: ON", zone.ClassyName);
-                } else if (bol.ToLower().Equals("off") || bol.ToLower().Equals("false") || bol.ToLower().Equals("0") ||
-                           bol.ToLower().Equals("no")) {
+                } else if (bol.CaselessEquals("off") || bol.CaselessEquals("false") || bol.CaselessEquals("0") ||
+                           bol.CaselessEquals("no")) {
                     zone.ShowZone = false;
                     player.Message("Zone ({0}&s) color set! Bounderies: OFF", zone.ClassyName);
                 }

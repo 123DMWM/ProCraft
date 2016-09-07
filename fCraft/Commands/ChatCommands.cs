@@ -781,7 +781,7 @@ namespace fCraft
             }
 
             // Abort a timer
-            if (param.Equals("abort", StringComparison.OrdinalIgnoreCase))
+            if (param.CaselessEquals("abort"))
             {
                 int timerId;
                 if (cmd.NextInt(out timerId))

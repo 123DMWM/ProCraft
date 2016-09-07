@@ -36,7 +36,7 @@ namespace fCraft.MapConversion {
 
         public bool ClaimsName( string fileName ) {
             if( fileName == null ) throw new ArgumentNullException( "fileName" );
-            return fileName.EndsWith( ".gz", StringComparison.OrdinalIgnoreCase );
+            return fileName.CaselessEnds( ".gz" );
         }
 
 

@@ -691,7 +691,7 @@ namespace fCraft {
         [CanBeNull]
         public static World FindWorldExact( [NotNull] string name ) {
             if( name == null ) throw new ArgumentNullException( "name" );
-            return Worlds.FirstOrDefault( w => w.Name.Equals( name, StringComparison.OrdinalIgnoreCase ) );
+            return Worlds.FirstOrDefault( w => w.Name.CaselessEquals( name ) );
         }
 
 

@@ -170,7 +170,7 @@ namespace fCraft {
             }
 
             Zone zone = (Zone)tag;
-            if (zone.Name.ToLower().StartsWith("checkpoint"))
+            if (zone.Name.CaselessStarts("checkpoint"))
             {
                 if (marks[0].X != marks[1].X || marks[0].Y != marks[1].Y || marks[1].Z - marks[0].Z != 1)
                 {
@@ -1028,11 +1028,11 @@ namespace fCraft {
                             player.Message("You must specify the name of a door to remove! Usage is /Door Remove [name]");
                             break;
                         }
-                        if (delete.ToLower().StartsWith("door_")) {
+                        if (delete.CaselessStarts("door_")) {
                             delete = delete.Substring(5);
                         }
                         if ((rzone = player.WorldMap.Zones.FindExact(SpecialZone.Door + delete)) != null) {
-                            if (rzone.CreatedBy.ToLower().Equals(player.Name.ToLower()) || player.IsStaff) {
+                            if (rzone.CreatedBy.CaselessEquals(player.Name.ToLower()) || player.IsStaff) {
                                 player.WorldMap.Zones.Remove(rzone);
                                 player.Message("Door removed.");
                             } else {

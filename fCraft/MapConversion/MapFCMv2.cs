@@ -38,7 +38,7 @@ namespace fCraft.MapConversion {
 
         public bool ClaimsName( string fileName ) {
             if( fileName == null ) throw new ArgumentNullException( "fileName" );
-            return fileName.EndsWith( ".fcm", StringComparison.OrdinalIgnoreCase );
+            return fileName.CaselessEnds( ".fcm" );
         }
 
 
@@ -109,7 +109,7 @@ namespace fCraft.MapConversion {
                 for( int i = 0; i < metaSize; i++ ) {
                     string key = ReadLengthPrefixedString( reader );
                     string value = ReadLengthPrefixedString( reader );
-                    if( key.StartsWith( "@zone", StringComparison.OrdinalIgnoreCase ) ) {
+                    if( key.CaselessStarts( "@zone" ) ) {
                         try {
                             map.Zones.Add( new Zone( value, map.World ) );
                         } catch( Exception ex ) {

@@ -400,7 +400,7 @@ namespace fCraft {
                             // found a new player, not in the database
                             name = newName;
                             break;
-                        } else if( givenName.Equals( info.Email, StringComparison.OrdinalIgnoreCase ) ) {
+                        } else if( givenName.CaselessEquals( info.Email ) ) {
                             // player with matching email found
                             return info;
                         } else {

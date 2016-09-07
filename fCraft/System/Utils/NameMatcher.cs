@@ -68,11 +68,11 @@ namespace fCraft {
                 string itemName = getName(items[i]);
                 if (itemName == null) continue;
                 
-                if (itemName.Equals(name, StringComparison.OrdinalIgnoreCase)) {
+                if (itemName.CaselessEquals(name)) {
                     results.Clear();
                     results.Add(items[i]);
                     return results;
-                } else if (itemName.StartsWith(name, StringComparison.OrdinalIgnoreCase)) {
+                } else if (itemName.CaselessStarts(name)) {
                     results.Add(items[i]);
                 }
             }

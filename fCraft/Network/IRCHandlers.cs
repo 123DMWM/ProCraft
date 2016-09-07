@@ -19,7 +19,7 @@ namespace fCraft {
         
         public static bool HandleCommand(string nick, string userNick, string rawMessage) {
             nick = nick.ToLower();
-            if (!(rawMessage[0] == '!' || rawMessage.StartsWith(nick, StringComparison.OrdinalIgnoreCase)))
+            if (!(rawMessage[0] == '!' || rawMessage.CaselessStarts(nick)))
                 return false;
             
             string cmd = rawMessage.ToLower();
@@ -165,7 +165,7 @@ namespace fCraft {
         static char[] trimChars = {' '};
         public static bool HandlePM(string nick, string userNick, string rawMessage) {
             nick = nick.ToLower();
-            if (!(rawMessage[0] == '@' || rawMessage.StartsWith(nick + " @", StringComparison.OrdinalIgnoreCase)))
+            if (!(rawMessage[0] == '@' || rawMessage.CaselessStarts(nick + " @")))
                 return false;
             if (DateTime.UtcNow.Subtract(lastIrcCommand).TotalSeconds <= 5) return true;
             

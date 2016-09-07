@@ -19,7 +19,7 @@ namespace fCraft.MapConversion {
 
         public override bool ClaimsName( string fileName ) {
             if ( fileName == null ) throw new ArgumentNullException( "fileName" );
-            return fileName.EndsWith( "mcf", StringComparison.OrdinalIgnoreCase );
+            return fileName.CaselessEnds( "mcf" );
         }
 
         public override Map Load( string fileName ) {

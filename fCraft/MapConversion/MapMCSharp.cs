@@ -35,7 +35,7 @@ namespace fCraft.MapConversion {
 
         public virtual bool ClaimsName( string fileName ) {
             if( fileName == null ) throw new ArgumentNullException( "fileName" );
-            return fileName.EndsWith( ".lvl", StringComparison.OrdinalIgnoreCase );
+            return fileName.CaselessEnds( ".lvl" );
         }
 
 

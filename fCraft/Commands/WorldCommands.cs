@@ -244,7 +244,7 @@ namespace fCraft {
                                 return;
                             }
 
-                            if( limitString.Equals( "none", StringComparison.OrdinalIgnoreCase ) ) {
+                            if( limitString.CaselessEquals( "none" ) ) {
                                 limitNumber = 0;
 
                             } else if( !Int32.TryParse( limitString, out limitNumber ) ) {
@@ -296,7 +296,7 @@ namespace fCraft {
                             }
 
                             TimeSpan limit;
-                            if( limitString.Equals( "none", StringComparison.OrdinalIgnoreCase ) ) {
+                            if( limitString.CaselessEquals( "none" ) ) {
                                 limit = TimeSpan.Zero;
 
                             } else if( !limitString.TryParseMiniTimespan( out limit ) ) {
@@ -377,7 +377,7 @@ namespace fCraft {
                                                 (db.IsPreloaded ? "ON" : "OFF"),
                                                 world.ClassyName );
 
-                            } else if( param.Equals( "on", StringComparison.OrdinalIgnoreCase ) ) {
+                            } else if( param.CaselessEquals( "on" ) ) {
                                 // turns preload on
                                 if( db.IsPreloaded ) {
                                     player.Message( "BlockDB preloading is already enabled on world {0}", world.ClassyName );
@@ -387,7 +387,7 @@ namespace fCraft {
                                     player.Message( "BlockDB preloading is now enabled on world {0}", world.ClassyName );
                                 }
 
-                            } else if( param.Equals( "off", StringComparison.OrdinalIgnoreCase ) ) {
+                            } else if( param.CaselessEquals( "off" ) ) {
                                 // turns preload off
                                 if( !db.IsPreloaded ) {
                                     player.Message( "BlockDB preloading is already disabled on world {0}", world.ClassyName );
@@ -651,11 +651,11 @@ namespace fCraft {
 
                 // parse theme
                 bool swapThemeAndTemplate = false;
-                if (themeName.Equals("grass", StringComparison.OrdinalIgnoreCase)) {
+                if (themeName.CaselessEquals("grass")) {
                     theme = MapGenTheme.Forest;
                     noTrees = true;
 
-                } else if (templateName.Equals("grass", StringComparison.OrdinalIgnoreCase)) {
+                } else if (templateName.CaselessEquals("grass")) {
                     theme = MapGenTheme.Forest;
                     noTrees = true;
                     swapThemeAndTemplate = true;
@@ -784,7 +784,7 @@ namespace fCraft {
                     return;
                 }
 
-            } else if (fileName.ToLower().StartsWith("pw_")) {
+            } else if (fileName.CaselessStarts("pw_")) {
                 player.Message("You cannot make fake personal worlds");
                 return;
             } else {
@@ -794,7 +794,7 @@ namespace fCraft {
                 }
                 // saving to file
                 fileName = fileName.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
-                if (!fileName.EndsWith(".fcm", StringComparison.OrdinalIgnoreCase)) {
+                if (!fileName.CaselessEnds(".fcm")) {
                     fileName += ".fcm";
                 }
                 if (!Paths.IsValidPath(fileName)) {
@@ -926,7 +926,7 @@ namespace fCraft {
                     return;
                 }
 
-            } else if (fileName.ToLower().StartsWith("pw_") && player.Info.Rank != RankManager.HighestRank) {
+            } else if (fileName.CaselessStarts("pw_") && player.Info.Rank != RankManager.HighestRank) {
                 player.Message("You cannot make fake personal worlds");
                 return;
             } else {
@@ -936,7 +936,7 @@ namespace fCraft {
                 }
                 // saving to file
                 fileName = fileName.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
-                if (!fileName.EndsWith(".fcm", StringComparison.OrdinalIgnoreCase)) {
+                if (!fileName.CaselessEnds(".fcm")) {
                     fileName += ".fcm";
                 }
                 if (!Paths.IsValidPath(fileName)) {
@@ -1112,7 +1112,7 @@ namespace fCraft {
             using (HttpWebResponse response = (HttpWebResponse)request.GetResponse()) {
                 if ((response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.Moved ||
                      response.StatusCode == HttpStatusCode.Redirect) &&
-                    response.ContentType.StartsWith("image", StringComparison.OrdinalIgnoreCase)) {
+                    response.ContentType.CaselessStarts("image")) {
                     // if the remote file was found, download it
                     using (Stream inputStream = response.GetResponseStream()) {
                         // TODO: check file size limit?
@@ -1134,15 +1134,15 @@ namespace fCraft {
 
             if (urlString.StartsWith("http://imgur.com/")) urlString = "http://i.imgur.com/" + urlString.Substring("http://imgur.com/".Length) + ".png";
             if (urlString.StartsWith("++")) urlString = "http://i.imgur.com/" + urlString.Substring(2) + ".png";
-            if (!urlString.ToLower().StartsWith("http://") && !urlString.ToLower().StartsWith("https://")) urlString = "http://" + urlString;
+            if (!urlString.CaselessStarts("http://") && !urlString.CaselessStarts("https://")) urlString = "http://" + urlString;
 
-            if (!urlString.ToLower().StartsWith("http://i.imgur.com/") && !urlString.ToLower().StartsWith("http://123dmwm.tk/")) {
+            if (!urlString.CaselessStarts("http://i.imgur.com/") && !urlString.CaselessStarts("http://123dmwm.tk/")) {
                 player.Message("For safety reasons we only accept images uploaded to &9http://imgur.com/ &sSorry for this inconvenience.");
                 player.Message("    You cannot use: &9" + urlString);
                 return false;
             }
 
-            if (!urlString.ToLower().EndsWith(".png") && !urlString.ToLower().EndsWith(".jpg") && !urlString.ToLower().EndsWith(".bmp")) {
+            if (!urlString.CaselessEnds(".png") && !urlString.CaselessEnds(".jpg") && !urlString.CaselessEnds(".bmp")) {
                 player.Message("URL must be a link to an image (.png/.jpg/.bmp");
                 return false;
             }
@@ -1426,9 +1426,9 @@ namespace fCraft {
                 return;
             }
             string blocks = cmd.Next();
-            if (option.ToLower().Equals("hiderspawn") || option.ToLower().Equals("hspawn") || option.ToLower().Equals("hider") || option.ToLower().Equals("hs"))
+            if (option.CaselessEquals("hiderspawn") || option.CaselessEquals("hspawn") || option.CaselessEquals("hider") || option.CaselessEquals("hs"))
             {
-                if (action.ToLower().Equals("set"))
+                if (action.CaselessEquals("set"))
                 {
                     if (world == player.World)
                     {
@@ -1444,7 +1444,7 @@ namespace fCraft {
                         return;
                     }
                 }
-                else if (action.ToLower().Equals("reset"))
+                else if (action.CaselessEquals("reset"))
                 {
                     world.HiderPosX = world.map.Spawn.X;
                     world.HiderPosY = world.map.Spawn.Y;
@@ -1452,7 +1452,7 @@ namespace fCraft {
                     player.Message("Hider Spawn for world (&a{0}&s) has reset to world spawn.", world.Name);
                     return;
                 }
-                else if (action.ToLower().Equals("display"))
+                else if (action.CaselessEquals("display"))
                 {
                     player.Message("Hider Spawn for world (&a{0}&s) is: {1}", world.Name, new Position(world.HiderPosX, world.HiderPosY, world.HiderPosZ).ToBlockCoords().ToString());
                     return;
@@ -1463,9 +1463,9 @@ namespace fCraft {
                     return;
                 }
             }
-            else if (option.ToLower().Equals("seekerspawn") || option.ToLower().Equals("sspawn") || option.ToLower().Equals("seeker") || option.ToLower().Equals("ss"))
+            else if (option.CaselessEquals("seekerspawn") || option.CaselessEquals("sspawn") || option.CaselessEquals("seeker") || option.CaselessEquals("ss"))
             {
-                if (action.ToLower().Equals("set"))
+                if (action.CaselessEquals("set"))
                 {
                     if (world == player.World)
                     {
@@ -1481,7 +1481,7 @@ namespace fCraft {
                         return;
                     }
                 }
-                else if (action.ToLower().Equals("reset"))
+                else if (action.CaselessEquals("reset"))
                 {
                     world.SeekerPosX = world.map.Spawn.X;
                     world.SeekerPosY = world.map.Spawn.Y;
@@ -1489,7 +1489,7 @@ namespace fCraft {
                     player.Message("Seeker Spawn for world (&a{0}&s) has reset to world spawn.", world.Name);
                     return;
                 }
-                else if (action.ToLower().Equals("display"))
+                else if (action.CaselessEquals("display"))
                 {
                     player.Message("Seeker Spawn for world (&a{0}&s) is: {1}", world.Name, new Position(world.SeekerPosX, world.SeekerPosY, world.SeekerPosZ).ToBlockCoords().ToString());
                     return;
@@ -1500,9 +1500,9 @@ namespace fCraft {
                     return;
                 }
             }
-            else if (option.ToLower().Equals("gameblocks") || option.ToLower().Equals("gblocks") || option.ToLower().Equals("blocks") || option.ToLower().Equals("gb"))
+            else if (option.CaselessEquals("gameblocks") || option.CaselessEquals("gblocks") || option.CaselessEquals("blocks") || option.CaselessEquals("gb"))
             {
-                if (action.ToLower().Equals("add"))
+                if (action.CaselessEquals("add"))
                 {
                     Block gBlock;
                     if (Map.GetBlockByName(blocks, false, out gBlock))
@@ -1524,7 +1524,7 @@ namespace fCraft {
                         player.Message("({0}) is not a valid block.", blocks);
                     }
                 }
-                else if (action.ToLower().Equals("remove"))
+                else if (action.CaselessEquals("remove"))
                 {
                     Block gBlock;
                     if (Map.GetBlockByName(blocks, false, out gBlock))
@@ -1547,7 +1547,7 @@ namespace fCraft {
                         return;
                     }
                 }
-                else if (action.ToLower().Equals("reset"))
+                else if (action.CaselessEquals("reset"))
                 {
                     if (cmd.IsConfirmed)
                     {
@@ -1558,7 +1558,7 @@ namespace fCraft {
                     player.Confirm(cmd, "This will remove all game blocks for world ({0}). Are you sure?", world.Name);
                     return;
                 }
-                else if (action.ToLower().Equals("list") || action.ToLower().Equals("display"))
+                else if (action.CaselessEquals("list") || action.CaselessEquals("display"))
                 {
                     player.Message("All game block id's for world({0})", world.Name);
                     player.Message(world.GameBlocks.JoinToString(", "));
@@ -1631,11 +1631,11 @@ namespace fCraft {
             } else if (param.EndsWith("*")) {
                 listName = "worlds starting with \"" + param.ToLower().Replace("*", "") + "\"";
                 extraParam = param.ToLower();
-                worlds = WorldManager.Worlds.Where(w => w.Name.ToLower().StartsWith(param.ToLower().Replace("*", ""))).ToArray();
+                worlds = WorldManager.Worlds.Where(w => w.Name.CaselessStarts(param.ToLower().Replace("*", ""))).ToArray();
             } else if (param.StartsWith("*")) {
                 listName = "worlds ending with \"" + param.ToLower().Replace("*", "") + "\"";
                 extraParam = param.ToLower();
-                worlds = WorldManager.Worlds.Where(w => w.Name.ToLower().EndsWith(param.ToLower().Replace("*", ""))).ToArray();
+                worlds = WorldManager.Worlds.Where(w => w.Name.CaselessEnds(param.ToLower().Replace("*", ""))).ToArray();
             } else {
                 switch (param) {
                     case "a":
@@ -2889,7 +2889,7 @@ namespace fCraft {
             World oldWorld = WorldManager.FindWorldOrPrintMatches(player, oldName);
             if (oldWorld == null) return;
             oldName = oldWorld.Name;
-            if (oldName.ToLower().StartsWith("pw_")) {
+            if (oldName.CaselessStarts("pw_")) {
                 player.Message("You cannot change playerworld names");
                 return;
             }
@@ -2900,7 +2900,7 @@ namespace fCraft {
 
             World newWorld = WorldManager.FindWorldExact(newName);
 
-            if (newName.ToLower().StartsWith("pw_")) {
+            if (newName.CaselessStarts("pw_")) {
                 player.Message("You cannot make fake personal worlds.");
                 return;
             }
@@ -2948,7 +2948,7 @@ namespace fCraft {
             player.LastUsedWorldName = newName;
             Logger.Log(LogType.UserActivity, "{0} renamed the world \"{1}\" to \"{2}\".", player.Name, oldName, newName);
             Server.Message("{0}&S renamed the world \"{1}\" to \"{2}\"", player.ClassyName, oldName, newName);
-            foreach(Entity bot in Entity.Entities.Where(e => oldName.ToLower().Equals(e.World.ToLower()))) {
+            foreach(Entity bot in Entity.Entities.Where(e => oldName.CaselessEquals(e.World.ToLower()))) {
                 Entity.UpdateEntityWorld(bot, newName);
             }
         }
@@ -2994,7 +2994,7 @@ namespace fCraft {
             fileName = fileName.Replace( Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar );
             if( fileName.EndsWith( "/" ) && fileName.EndsWith( @"\" ) ) {
                 fileName += world.Name + ".fcm";
-            } else if( !fileName.ToLower().EndsWith( ".fcm", StringComparison.OrdinalIgnoreCase ) ) {
+            } else if( !fileName.CaselessEnds( ".fcm" ) ) {
                 fileName += ".fcm";
             }
             if( !Paths.IsValidPath( fileName ) ) {
@@ -3011,7 +3011,7 @@ namespace fCraft {
             if( File.Exists( fullFileName ) ) {
                 FileInfo targetFile = new FileInfo( fullFileName );
                 FileInfo sourceFile = new FileInfo( world.MapFileName );
-                if( !targetFile.FullName.Equals( sourceFile.FullName, StringComparison.OrdinalIgnoreCase ) ) {
+                if( !targetFile.FullName.CaselessEquals( sourceFile.FullName ) ) {
                     if( !cmd.IsConfirmed ) {
                         Logger.Log( LogType.UserActivity,
                                     "WSave: Asked {0} to confirm overwriting map file \"{1}\"",
@@ -3096,7 +3096,7 @@ namespace fCraft {
             {
                 FileInfo targetFile = new FileInfo(fullFileName);
                 FileInfo sourceFile = new FileInfo(world.MapFileName);
-                if (!targetFile.FullName.Equals(sourceFile.FullName, StringComparison.OrdinalIgnoreCase))
+                if (!targetFile.FullName.CaselessEquals(sourceFile.FullName))
                 {
                     if (!cmd.IsConfirmed)
                     {
@@ -3213,9 +3213,7 @@ namespace fCraft {
             if (String.IsNullOrEmpty(value)) {
                 player.Message("World {0}&S is currently {1}{2}.",
                                world.ClassyName, curValue ? "" : "NOT ", type);
-            } else if (value.Equals( "on", StringComparison.OrdinalIgnoreCase) ||
-                      value.Equals( "true", StringComparison.OrdinalIgnoreCase) ||
-                      value == "1" ) {
+            } else if (value.CaselessEquals("on") || value.CaselessEquals("true") || value == "1") {
                 if (curValue) {
                     player.Message("World {0}&S is already {1}.", world.ClassyName, type);
                 } else {
@@ -3223,9 +3221,7 @@ namespace fCraft {
                     setter(true);
                     WorldManager.SaveWorldList();
                 }
-            } else if (value.Equals("off", StringComparison.OrdinalIgnoreCase) ||
-                      value.Equals("false", StringComparison.OrdinalIgnoreCase) ||
-                      value == "0") {
+            } else if (value.CaselessEquals("off") || value.CaselessEquals("false") || value == "0") {
                 if (curValue) {
                     player.Message("World {0}&S is no longer {1}.", world.ClassyName, type);
                     setter(false);
@@ -3238,79 +3234,77 @@ namespace fCraft {
             }
         }
         
-        static void SetBackupSettings( Player player, World world, string value ) {
+        static void SetBackupSettings(Player player, World world, string value) {
             TimeSpan backupInterval;
             string oldDescription = world.BackupSettingDescription;
-            if( String.IsNullOrEmpty( value ) ) {
-                player.Message( GetBackupSettingsString( world ) );
+            if (String.IsNullOrEmpty(value)) {
+                player.Message(GetBackupSettingsString(world));
                 return;
-            } else if( value.Equals( "off", StringComparison.OrdinalIgnoreCase ) ||
-                      value.StartsWith( "disable", StringComparison.OrdinalIgnoreCase ) ) {
+            } else if (value.CaselessEquals("off") || value.CaselessStarts("disable")) {
                 // Disable backups on the world
-                if( world.BackupEnabledState == YesNoAuto.No ) {
-                    MessageSameBackupSettings( player, world );
+                if(world.BackupEnabledState == YesNoAuto.No) {
+                    MessageSameBackupSettings(player, world);
                     return;
                 }
                 world.BackupEnabledState = YesNoAuto.No;
-            } else if( value.Equals( "default", StringComparison.OrdinalIgnoreCase ) ||
-                      value.Equals( "auto", StringComparison.OrdinalIgnoreCase ) ) {
+            } else if (value.CaselessEquals("default") || value.CaselessEquals("auto")) {
                 // Set world to use default settings
-                if( world.BackupEnabledState == YesNoAuto.Auto ) {
-                    MessageSameBackupSettings( player, world );
+                if (world.BackupEnabledState == YesNoAuto.Auto) {
+                    MessageSameBackupSettings(player, world);
                     return;
                 }
                 world.BackupEnabledState = YesNoAuto.Auto;
-            } else if( value.TryParseMiniTimespan( out backupInterval ) ) {
-                if( backupInterval == TimeSpan.Zero ) {
+            } else if (value.TryParseMiniTimespan(out backupInterval)) {
+                if (backupInterval == TimeSpan.Zero ) {
                     // Set world's backup interval to 0, which is equivalent to disabled
-                    if( world.BackupEnabledState == YesNoAuto.No ) {
-                        MessageSameBackupSettings( player, world );
+                    if (world.BackupEnabledState == YesNoAuto.No) {
+                        MessageSameBackupSettings(player, world);
                         return;
                     }
                     world.BackupEnabledState = YesNoAuto.No;
-                } else if( world.BackupEnabledState != YesNoAuto.Yes ||
-                          world.BackupInterval != backupInterval ) {
+                } else if(world.BackupEnabledState != YesNoAuto.Yes ||
+                          world.BackupInterval != backupInterval) {
                     // Alter world's backup interval
                     world.BackupInterval = backupInterval;
                 } else {
-                    MessageSameBackupSettings( player, world );
+                    MessageSameBackupSettings(player, world);
                     return;
                 }
             } else {
-                CdWorldSet.PrintUsage( player );
+                CdWorldSet.PrintUsage(player);
                 return;
             }
-            player.Message( "Backup setting for world {0}&S changed from \"{1}\" to \"{2}\"",
-                           world.ClassyName, oldDescription, world.BackupSettingDescription );
+            player.Message("Backup setting for world {0}&S changed from \"{1}\" to \"{2}\"",
+                           world.ClassyName, oldDescription, world.BackupSettingDescription);
             WorldManager.SaveWorldList();
         }
         
-        static void MessageSameBackupSettings( Player player, World world ) {
-            player.Message( "Backup settings for {0}&S are already \"{1}\"",
-                            world.ClassyName, world.BackupSettingDescription );
+        static void MessageSameBackupSettings(Player player, World world) {
+            player.Message("Backup settings for {0}&S are already \"{1}\"",
+                            world.ClassyName, world.BackupSettingDescription);
         }
 
-        static string GetBackupSettingsString( World world ) {
-            switch( world.BackupEnabledState ) {
+        static string GetBackupSettingsString(World world) {
+            switch (world.BackupEnabledState) {
                 case YesNoAuto.Yes:
-                    return String.Format( "World {0}&S is backed up every {1}",
+                    return String.Format("World {0}&S is backed up every {1}",
                                           world.ClassyName,
-                                          world.BackupInterval.ToMiniString() );
+                                          world.BackupInterval.ToMiniString());
                 case YesNoAuto.No:
-                    return String.Format( "Backups are manually disabled on {0}&S",
-                                          world.ClassyName );
+                    return String.Format("Backups are manually disabled on {0}&S",
+                                          world.ClassyName);
                 case YesNoAuto.Auto:
-                    if( World.DefaultBackupsEnabled ) {
-                        return String.Format( "World {0}&S is backed up every {1} (default)",
+                    if (World.DefaultBackupsEnabled) {
+                        return String.Format("World {0}&S is backed up every {1} (default)",
                                               world.ClassyName,
-                                              World.DefaultBackupInterval.ToMiniString() );
+                                              World.DefaultBackupInterval.ToMiniString());
                     } else {
-                        return String.Format( "Backups are disabled on {0}&S (default)",
-                                              world.ClassyName );
+                        return String.Format("Backups are disabled on {0}&S (default)",
+                                              world.ClassyName);
                     }
                 default:
                     // never happens
-                    throw new Exception( "Unexpected BackupEnabledState value: " + world.BackupEnabledState );
+                    throw new Exception("Unexpected BackupEnabledState value: " + world.BackupEnabledState);
             }
         }
         
@@ -3328,7 +3322,7 @@ namespace fCraft {
             if (value.Length > 64) {
                 value = value.Substring(0, 64);
             }
-            if (value.ToLower().Equals("remove") || value.ToLower().Equals("delete") || value.ToLower().Equals("reset")) {
+            if (value.CaselessEquals("remove") || value.CaselessEquals("delete") || value.CaselessEquals("reset")) {
                 player.Message("MOTD for \"{0}\" has been removed", world.Name);
                 world.MOTD = null;
                 WorldManager.SaveWorldList();
@@ -4025,7 +4019,7 @@ namespace fCraft {
                                     Portal portalFound = null;
                                     lock (remWorld.Portals.SyncRoot) {
                                         foreach (Portal portal in remWorld.Portals) {
-                                            if (portal.Name.ToLower().Equals(remPortalName.ToLower())) {
+                                            if (portal.Name.CaselessEquals(remPortalName.ToLower())) {
                                                 portalFound = portal;
                                                 found = true;
                                                 break;
@@ -4065,7 +4059,7 @@ namespace fCraft {
 
                                 lock (iWorld.Portals.SyncRoot) {
                                     foreach (Portal portal in iWorld.Portals) {
-                                        if (portal.Name.ToLower().Equals(iPortalName.ToLower())) {
+                                        if (portal.Name.CaselessEquals(iPortalName.ToLower())) {
                                             World portalWorld = WorldManager.FindWorldExact(portal.World);
                                             player.Message("Portal {0}&S was created by {1}&S at {2} and teleports to world {3} at {4}&S.",
                                                 portal.Name, PlayerDB.FindPlayerInfoExact(portal.Creator).ClassyName, portal.Created, portalWorld.ClassyName, portal.position().ToString());

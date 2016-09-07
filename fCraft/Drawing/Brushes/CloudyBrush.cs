@@ -72,7 +72,7 @@ namespace fCraft.Drawing {
                     scale = tempScale;
                     scaleSpecified = true;
                     continue;
-                } else if (rawNextParam.EndsWith("T", StringComparison.OrdinalIgnoreCase)) {
+                } else if (rawNextParam.CaselessEnds("T")) {
                     string numPart = rawNextParam.Substring(0, rawNextParam.Length - 1);
                     int tempTurbulence;
                     if (Int32.TryParse(numPart, out tempTurbulence)) {
@@ -90,7 +90,7 @@ namespace fCraft.Drawing {
                         turbulenceSpecified = true;
                         continue;
                     }
-                } else if (rawNextParam.EndsWith("S", StringComparison.OrdinalIgnoreCase)) {
+                } else if (rawNextParam.CaselessEnds("S")) {
                     string numPart = rawNextParam.Substring(0, rawNextParam.Length - 1);
                     try {
                         seed = UInt16.Parse(numPart, NumberStyles.HexNumber);

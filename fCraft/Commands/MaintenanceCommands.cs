@@ -61,7 +61,7 @@ namespace fCraft {
             }
 
             string extension = Path.GetExtension( fileName );
-            if( extension == null || !extension.Equals( ".txt", StringComparison.OrdinalIgnoreCase ) ) {
+            if( extension == null || !extension.CaselessEquals( ".txt" ) ) {
                 player.Message( "Stats file name must end with .txt" );
                 return;
             }
@@ -513,7 +513,7 @@ namespace fCraft {
                     w.SaveMap();
                 }
             }
-            if (option.ToLower().Equals("backup")) {
+            if (option.CaselessEquals("backup")) {
                 player.Message("Backing up data...");
                 Server.BackupData();
             }
@@ -1079,7 +1079,7 @@ namespace fCraft {
             string reason = "";
 
             if( delayString != null ) {
-                if( delayString.Equals( "abort", StringComparison.OrdinalIgnoreCase ) ) {
+                if( delayString.CaselessEquals( "abort" ) ) {
                     if( Server.CancelShutdown() ) {
                         Logger.Log( LogType.UserActivity,
                                     "Shutdown aborted by {0}.", player.Name );
@@ -1143,7 +1143,7 @@ namespace fCraft {
             string reason = "";
 
             if( delayString != null ) {
-                if( delayString.Equals( "abort", StringComparison.OrdinalIgnoreCase ) ) {
+                if( delayString.CaselessEquals( "abort" ) ) {
                     if( Server.CancelShutdown() ) {
                         Logger.Log( LogType.UserActivity,
                                     "Restart aborted by {0}.", player.Name );
@@ -1349,7 +1349,7 @@ namespace fCraft {
                     break;
 
                 case "commandbook":
-                    if( !fileName.EndsWith( ".csv", StringComparison.OrdinalIgnoreCase ) ) {
+                    if( !fileName.CaselessEnds( ".csv" ) ) {
                         player.Message( "Import: Please provide bans.csv file for CommandBook" );
                         return;
                     }
