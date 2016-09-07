@@ -154,6 +154,7 @@
     <Compile Include="Network\Packet.CPE.cs" />
     <Compile Include="Network\Player.Handshake.cs" />
     <Compile Include="Player\ChatFilter.cs" />
+    <Compile Include="Player\PlayerHacks.cs" />
     <Compile Include="Player\Report.cs" />
     <Compile Include="Player\Replace.cs" />
     <Compile Include="Player\SearchOptions.cs" />

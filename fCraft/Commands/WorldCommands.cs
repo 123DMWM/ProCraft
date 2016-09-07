@@ -3347,21 +3347,25 @@ namespace fCraft {
                     player.Message("  " + world.MOTD);
                 }
                 return;
-            }
-            
-            if (value.Length > 64) {
+            }        	
+            if (value.Length > 64)
                 value = value.Substring(0, 64);
-            }
+            
             if (value.CaselessEquals("remove") || value.CaselessEquals("delete") || value.CaselessEquals("reset")) {
                 player.Message("MOTD for \"{0}\" has been removed", world.Name);
                 world.MOTD = null;
-                WorldManager.SaveWorldList();
             } else {
                 player.Message("MOTD for \"{0}\" has been set to:", world.Name);
                 player.Message("  " + value);
                 world.MOTD = value;
-                WorldManager.SaveWorldList();
             }
+            
+            Player[] players = world.Players;
+            foreach (Player pl in players) {
+                if (!pl.Supports(CpeExt.HackControl)) continue;
+                pl.Send(PlayerHacks.MakePacket(pl, world.MOTD));
+            }
+            WorldManager.SaveWorldList();
         }
         
         static void SetGreeting(Player player, World world, string value) {

@@ -1195,15 +1195,7 @@ namespace fCraft {
             }
 
             if (Supports(CpeExt.HackControl)) {
-                bool canFly, canNoClip, canSpeed, canRespawn;
-                bool useMotd = GetHacksFromMotd(out canFly, out canNoClip, out canSpeed, out canRespawn);
-                
-                if (useMotd) {
-                    SendNow(Packet.HackControl(canFly, canNoClip, canSpeed, canRespawn, canNoClip, 40));
-                } else {
-                    SendNow(Packet.HackControl(Info.AllowFlying, Info.AllowNoClip, Info.AllowSpeedhack, 
-                	                           Info.AllowRespawn, Info.AllowThirdPerson, Info.JumpHeight));
-                }
+                SendNow(PlayerHacks.MakePacket(this, World.MOTD));
             }
 
             if (Supports(CpeExt.ClickDistance)) {
