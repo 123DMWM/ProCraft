@@ -58,18 +58,17 @@ namespace fCraft.ConfigGUI {
             }
             name = temp.Value;
 
-            if( ( temp = el.Attribute( "hidden" ) ) != null && !String.IsNullOrEmpty( temp.Value ) ) {
-                bool hidden;
-                if( Boolean.TryParse( temp.Value, out hidden ) ) {
-                    Hidden = hidden;
-                } else {
-                    throw new FormatException(
-                        "WorldListEntity: Cannot parse XML: Invalid value for \"hidden\" attribute." );
-                }
-            } else {
-                Hidden = false;
+            Hidden = false;
+            if( ( temp = el.Attribute( "hidden" ) ) != null ) {
+                Hidden = ParseBool(temp, name, false, "NOT hidden");
             }
-
+            if( ( temp = el.Attribute( "buildable" ) ) != null ) {
+                buildable = ParseBool(temp, name, true, "is buildable");
+            }
+            if( ( temp = el.Attribute( "deletable" ) ) != null ) {
+                deletable = ParseBool(temp, name, true, "is deletable");
+            }
+            
             if( ( temp = el.Attribute( "backup" ) ) != null ) {
                 TimeSpan realBackupTimer;
                 if( temp.Value.ToTimeSpan( out realBackupTimer ) ) {
@@ -93,6 +92,9 @@ namespace fCraft.ConfigGUI {
                 ( tempEl = el.Element( "buildSecurity" ) ) != null ) {
                 buildSecurity = new SecurityController( tempEl, false );
             }
+            
+            tempEl = el.Element("MOTD");
+            if (tempEl != null) motd = tempEl.Value;
 
             XElement blockEl = el.Element( BlockDB.XmlRootName );
             if( blockEl == null ) {
@@ -110,16 +112,9 @@ namespace fCraft.ConfigGUI {
                     }
                 }
 
-                if( ( temp = blockEl.Attribute( "preload" ) ) != null ) {
-                    bool isPreloaded;
-                    if( Boolean.TryParse( temp.Value, out isPreloaded ) ) {
-                        blockDBIsPreloaded = isPreloaded;
-                    } else {
-                        Logger.Log( LogType.Warning,
-                                    "WorldListEntity: Could not parse BlockDB \"preload\" attribute of world \"{0}\", assuming NOT preloaded.",
-                                    name );
-                    }
-                }
+                if( ( temp = blockEl.Attribute( "preload" ) ) != null )
+                    blockDBIsPreloaded = ParseBool(temp, name, false, "NOT preloaded");
+            	
                 if( ( temp = blockEl.Attribute( "limit" ) ) != null ) {
                     int limit;
                     if( Int32.TryParse( temp.Value, out limit ) ) {
@@ -162,6 +157,16 @@ namespace fCraft.ConfigGUI {
             environmentEl = el.Element( WorldManager.EnvironmentXmlTagName );
 
             rankMains = el.Elements( WorldManager.RankMainXmlTagName ).ToArray();
+        }
+        
+        static bool ParseBool(XAttribute attr, string world, bool defValue, string defValueName) {
+            bool value;
+            if (Boolean.TryParse(attr.Value, out value)) return value;
+            
+            Logger.Log(LogType.Warning,
+                       "WorldListEntity: Could not parse \"{0}\" attribute of world \"{1}\", assuming {2}.",
+                       attr.Name, world, defValueName);
+            return defValue;
         }
 
 
@@ -230,7 +235,8 @@ namespace fCraft.ConfigGUI {
 
 
         public bool Hidden { get; set; }
-
+        bool buildable = true, deletable = true;
+        string motd;
 
         readonly SecurityController accessSecurity = new SecurityController();
         string accessRankString;
@@ -294,6 +300,10 @@ namespace fCraft.ConfigGUI {
             if( Backup != BackupEnumNames[0] ) {
                 element.Add( new XAttribute( "backup", BackupValueFromName( Backup ).ToTickString() ) );
             }
+            if (motd != null) element.Add(new XElement("MOTD", motd));
+            if (!buildable) element.Add(new XAttribute("buildable", false));
+            if (!deletable) element.Add(new XAttribute("deletable", false));
+            
             element.Add( accessSecurity.Serialize( WorldManager.AccessSecurityXmlTagName ) );
             element.Add( buildSecurity.Serialize( WorldManager.BuildSecurityXmlTagName ) );
             XElement blockDB = new XElement( BlockDB.XmlRootName );
