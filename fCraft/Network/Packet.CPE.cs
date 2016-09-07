@@ -142,10 +142,10 @@ namespace fCraft {
             ToNetOrder((short)(bounds.ZMax + 1), packet.Bytes, 74);
             ToNetOrder((short)(bounds.YMax + 1), packet.Bytes, 76);
             
-            var col = System.Drawing.ColorTranslator.FromHtml("#" + color.ToUpper());
-            ToNetOrder((short)col.R, packet.Bytes, 78);
-            ToNetOrder((short)col.G, packet.Bytes, 80);
-            ToNetOrder((short)col.B, packet.Bytes, 82);
+            CustomColor c = Color.ParseHex(color);
+            ToNetOrder((short)c.R, packet.Bytes, 78);
+            ToNetOrder((short)c.G, packet.Bytes, 80);
+            ToNetOrder((short)c.B, packet.Bytes, 82);
             ToNetOrder(opacity, packet.Bytes, 84);
             return packet;
         }

@@ -596,8 +596,8 @@ namespace fCraft {
             if (zone.ShowZone) {
                 player.Message("Zone Colors: ");
                 player.Message("  Hex: #&F{0}", zone.Color.Replace("#", ""));
-                System.Drawing.Color color = System.Drawing.ColorTranslator.FromHtml("#" + zone.Color.Replace("#", ""));
-                player.Message("  - &4R:&F{0} &2G:&F{1} &1B:&F{2}", color.R, color.G, color.B);
+                CustomColor col = Color.ParseHex(zone.Color);
+                player.Message("  - &4R:&F{0} &2G:&F{1} &1B:&F{2}", col.R, col.G, col.B);
                 player.Message("  Alpha: &F{0}", zone.Alpha);
             }
             

@@ -30,23 +30,22 @@ namespace fCraft {
             CommandManager.RegisterCommand(CdZoneShow);
         }
 
-        internal static string[] validEntities =  { "chibi", "chicken", "creeper", "giant", "humanoid", 
+        internal static string[] validEntities = { "chibi", "chicken", "creeper", "giant", "humanoid", 
         "human", "pig", "sheep", "skeleton", "spider", "zombie"
         };
 
-        /// <summary> Ensures that the hex color has the correct length (1-6 characters)
+        /// <summary> Ensures that the hex color has the correct length (3 or 6 characters)
         /// and character set (alphanumeric chars allowed). </summary>
         public static bool IsValidHex(string hex) {
             if (hex == null) throw new ArgumentNullException("hex");
             if (hex.StartsWith("#")) hex = hex.Remove(0, 1);
-            if (hex.Length < 1 || hex.Length > 6) return false;
+            if (hex.Length != 3 && hex.Length != 6) return false;
+            
             for (int i = 0; i < hex.Length; i++) {
                 char ch = hex[i];
-                if (ch < '0' || ch > '9' &&
-                    ch < 'A' || ch > 'F' &&
-                    ch < 'a' || ch > 'f') {
-                    return false;
-                }
+                if (ch < '0' || ch > '9' 
+                    && ch < 'A' || ch > 'F'
+                    && ch < 'a' || ch > 'f') return false;
             }
             return true;
         }
@@ -647,17 +646,12 @@ namespace fCraft {
             }
 
             string hex = cmd.Next();
-            if (hex.Length > 0 && hex[0] == '#')
-                hex = hex.Substring(1);
-            if (hex.Length != 6 || !IsValidHex(hex)) {
-                p.Message("\"#" + hex + "\" is not a valid hex color."); return;
+            if (!IsValidHex(hex)) {
+            	p.Message("\"#{0}\" is not a valid hex color.", hex.Replace("#", "")); return;
             }
 
-            CustomColor col = default(CustomColor);
-            col.Code = code; col.Fallback = fallback; col.A = 255;
-            col.Name = name;
-            System.Drawing.Color rgb = System.Drawing.ColorTranslator.FromHtml("#" + hex);
-            col.R = rgb.R; col.G = rgb.G; col.B = rgb.B;
+            CustomColor col = Color.ParseHex(hex);
+            col.Code = code; col.Fallback = fallback; col.Name = name;
             Color.AddExtColor(col);
             p.Message("Successfully added a custom color. &{0} %{0} {1}", col.Code, col.Name.ToLower().UppercaseFirst());
         }
@@ -1568,7 +1562,7 @@ namespace fCraft {
                     break;
                 case 12:
                     if (IsValidHex(args)) {
-                        System.Drawing.Color col = System.Drawing.ColorTranslator.FromHtml("#" + args.ToUpper().Replace("#", ""));
+                        CustomColor col = Color.ParseHex(args);
                         def.FogR = col.R;
                         p.Message("   &bSet red component of fog to: " + col.R);
                         def.FogG = col.G;
@@ -1893,7 +1887,7 @@ namespace fCraft {
                     break;
                 case "foghex":
                     if (IsValidHex(args)) {
-                        System.Drawing.Color col = System.Drawing.ColorTranslator.FromHtml("#" + args.ToUpper().Replace("#", ""));
+                        CustomColor col = Color.ParseHex(args);
                         p.Message("&bChanged red fog component of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.FogR, col.R);
                         def.FogR = col.R;
                         p.Message("&bChanged green fog component of fog of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.FogG, col.G);
