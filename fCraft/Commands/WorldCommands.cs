@@ -1748,27 +1748,13 @@ namespace fCraft {
 
             bool changesWereMade = false;
             do {
-                // Clear whitelist
-                if( nextToken.Equals( "-*" ) ) {
-                    PlayerInfo[] oldWhitelist = world.AccessSecurity.ExceptionList.Included.ToArray();
-                    world.AccessSecurity.ResetIncludedList();
-                    player.Message( "Access whitelist of {0}&S cleared: {1}",
-                                    world.ClassyName, oldWhitelist.JoinToClassyString() );
-                    Logger.Log( LogType.UserActivity,
-                                "{0} {1} &scleared access whitelist of world {2}: {3}",
-                                player.Info.Rank.Name, player.Name, world.Name, oldWhitelist.JoinToString( pi => pi.Name ) );
+                if (nextToken.Equals("-*")) {
+                    bool cleared = ClearWhitelist(player, world, false);
+                    changesWereMade |= cleared;
                     continue;
-                }
-
-                // Clear blacklist
-                if( nextToken.Equals( "+*" ) ) {
-                    PlayerInfo[] oldBlacklist = world.AccessSecurity.ExceptionList.Excluded.ToArray();
-                    world.AccessSecurity.ResetExcludedList();
-                    player.Message( "Access blacklist of {0}&S cleared: {1}",
-                                    world.ClassyName, oldBlacklist.JoinToClassyString() );
-                    Logger.Log( LogType.UserActivity,
-                                "{0} {1} &scleared access blacklist of world {2}: {3}",
-                                player.Info.Rank.Name, player.Name, world.Name, oldBlacklist.JoinToString( pi => pi.Name ) );
+                } else if (nextToken.Equals("+*")) {
+                    bool cleared = ClearBlacklist(player, world, false);
+                    changesWereMade |= cleared;
                     continue;
                 }
 
@@ -2010,37 +1996,13 @@ namespace fCraft {
 
             bool changesWereMade = false;
             do {
-                // Clear whitelist
-                if( nextToken.Equals( "-*" ) ) {
-                    PlayerInfo[] oldWhitelist = world.BuildSecurity.ExceptionList.Included.ToArray();
-                    if( oldWhitelist.Length > 0 ) {
-                        world.BuildSecurity.ResetIncludedList();
-                        player.Message( "Build whitelist of world {0}&S cleared: {1}",
-                                        world.ClassyName, oldWhitelist.JoinToClassyString() );
-                        Logger.Log( LogType.UserActivity,
-                                    "{0} {1} &scleared build whitelist of world {2}: {3}",
-                                    player.Info.Rank.Name, player.Name, world.Name, oldWhitelist.JoinToString( pi => pi.Name ) );
-                    } else {
-                        player.Message( "Build whitelist of world {0}&S is empty.",
-                                        world.ClassyName );
-                    }
+                if (nextToken.Equals("-*")) {
+                    bool cleared = ClearWhitelist(player, world, true);
+                    changesWereMade |= cleared;
                     continue;
-                }
-
-                // Clear blacklist
-                if( nextToken.Equals( "+*" ) ) {
-                    PlayerInfo[] oldBlacklist = world.BuildSecurity.ExceptionList.Excluded.ToArray();
-                    if( oldBlacklist.Length > 0 ) {
-                        world.BuildSecurity.ResetExcludedList();
-                        player.Message( "Build blacklist of world {0}&S cleared: {1}",
-                                        world.ClassyName, oldBlacklist.JoinToClassyString() );
-                        Logger.Log( LogType.UserActivity,
-                                    "{0} {1} &scleared build blacklist of world {2}: {3}",
-                                    player.Info.Rank.Name, player.Name, world.Name, oldBlacklist.JoinToString( pi => pi.Name ) );
-                    } else {
-                        player.Message( "Build blacklist of world {0}&S is empty.",
-                                        world.ClassyName );
-                    }
+                } else if (nextToken.Equals( "+*")) {
+                    bool cleared = ClearBlacklist(player, world, true);
+                    changesWereMade |= cleared;
                     continue;
                 }
 
@@ -2235,6 +2197,45 @@ namespace fCraft {
             }
         }
 
+        static bool ClearWhitelist(Player player, World world, bool build) {
+        	SecurityController controller = build ? world.BuildSecurity : world.AccessSecurity;
+            PlayerInfo[] whitelist = controller.ExceptionList.Included.ToArray();
+            string type = build ? "Build" : "Access";
+            
+            if (whitelist.Length > 0) {
+                controller.ResetIncludedList();
+                player.Message("{2} whitelist of world {0}&S cleared: {1}",
+                               world.ClassyName, whitelist.JoinToClassyString(), type);
+                Logger.Log(LogType.UserActivity,
+                           "{0} {1} &scleared {4} whitelist of world {2}: {3}",
+                           player.Info.Rank.Name, player.Name, world.Name, 
+                           whitelist.JoinToString(pi => pi.Name), type.ToLower() );
+                return true;
+            } else {
+                player.Message("{1} whitelist of world {0}&S is empty.", world.ClassyName, type);
+                return false;
+            }
+        }
+        
+        static bool ClearBlacklist(Player player, World world, bool build) {
+            SecurityController controller = build ? world.BuildSecurity : world.AccessSecurity;
+            PlayerInfo[] blacklist = controller.ExceptionList.Excluded.ToArray();
+            string type = build ? "Build" : "Access";
+            
+            if (blacklist.Length > 0) {
+                world.BuildSecurity.ResetExcludedList();
+                player.Message("{2} blacklist of world {0}&S cleared: {1}",
+                               world.ClassyName, blacklist.JoinToClassyString(), type);
+                Logger.Log(LogType.UserActivity,
+                           "{0} {1} &scleared {4} blacklist of world {2}: {3}",
+                           player.Info.Rank.Name, player.Name, world.Name, 
+                           blacklist.JoinToString(pi => pi.Name), type.ToLower());
+                return true;
+            } else {
+                player.Message("Build blacklist of world {0}&S is empty.", world.ClassyName, type);
+                return false;
+            }
+        }
         #endregion
         #region WorldFlush
 

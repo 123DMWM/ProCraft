@@ -537,24 +537,23 @@ namespace fCraft {
         public bool Lock( [NotNull] Player player ) {
             if( player == null ) throw new ArgumentNullException( "player" );
             lock( lockLock ) {
-                if( IsLocked ) {
-                    return false;
-                } else {
-                    LockedBy = player.Name;
-                    LockedOn = DateTime.UtcNow;
-                    IsLocked = true;
-                    WorldManager.SaveWorldList();
-                    Map mapCache = Map;
-                    if( mapCache != null ) {
-                        mapCache.ClearUpdateQueue();
-                        mapCache.CancelAllDrawOps();
-                    }
-                    Players.Message( "&WWorld was locked by {0}", player.ClassyName );
-                    Logger.Log( LogType.UserActivity,
-                                "World {0} was locked by {1}",
-                                Name, player.Name );
-                    return true;
+                if( IsLocked ) return false;
+
+                LockedBy = player.Name;
+                LockedOn = DateTime.UtcNow;
+                IsLocked = true;
+                WorldManager.SaveWorldList();
+                Map mapCache = Map;
+                if( mapCache != null ) {
+                    mapCache.ClearUpdateQueue();
+                    mapCache.CancelAllDrawOps();
                 }
+                
+                Players.Message( "&WWorld was locked by {0}", player.ClassyName );
+                Logger.Log( LogType.UserActivity,
+                           "World {0} was locked by {1}",
+                           Name, player.Name );
+                return true;
             }
         }
 
@@ -565,19 +564,18 @@ namespace fCraft {
         public bool Unlock( [NotNull] Player player ) {
             if( player == null ) throw new ArgumentNullException( "player" );
             lock( lockLock ) {
-                if( IsLocked ) {
-                    UnlockedBy = player.Name;
-                    UnlockedOn = DateTime.UtcNow;
-                    IsLocked = false;
-                    WorldManager.SaveWorldList();
-                    Players.Message( "&WMap was unlocked by {0}", player.ClassyName );
-                    Logger.Log( LogType.UserActivity,
-                                "World \"{0}\" was unlocked by {1}",
-                                Name, player.Name );
-                    return true;
-                } else {
-                    return false;
-                }
+                if( !IsLocked ) return false;
+                
+                UnlockedBy = player.Name;
+                UnlockedOn = DateTime.UtcNow;
+                IsLocked = false;
+                WorldManager.SaveWorldList();
+                
+                Players.Message( "&WMap was unlocked by {0}", player.ClassyName );
+                Logger.Log( LogType.UserActivity,
+                           "World \"{0}\" was unlocked by {1}",
+                           Name, player.Name );
+                return true;
             }
         }
 
