@@ -778,7 +778,7 @@ namespace fCraft {
                     if (Color.StripColors(playerinfo.Name).CaselessEquals(Color.StripColors(TargetDisplayedName))) 
                         Results.Add(playerinfo);
                 } else {
-                    if (Color.StripColors(playerinfo.DisplayedName).CaselessEquals(Color.StripColors(TargetDisplayedName)) 
+            		if (Color.StripColors(playerinfo.DisplayedName).CaselessEquals(Color.StripColors(TargetDisplayedName)))
                         Results.Add(playerinfo);
                 }
             }

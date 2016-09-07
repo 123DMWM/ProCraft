@@ -2366,6 +2366,11 @@ namespace fCraft {
             }
 
             player.Message( "  " + GetBackupSettingsString( world ) );
+            
+            if( world.Buildable && world.Deletable ) return;
+            player.Message( "  Buildable: {0}   &SDeletable: {1}",
+                           world.Buildable ? "&aYes" : "&cNo",
+                           world.Deletable ? "&aYes" : "&cNo");
         }
 
         #endregion
@@ -3165,7 +3170,7 @@ namespace fCraft {
             IsConsoleSafe = true,
             Permissions = new[] { Permission.ManageWorlds },
             Usage = "/WSet <World> <Variable> <Value>",
-            Help = "Sets a world variable. Variables are: hide, backups, greeting, motd",
+            Help = "Sets a world variable. Variables are: hide, backups, greeting, motd, buildable, deletable",
             HelpSections = new Dictionary<string, string>{
                 { "hide",       "&H/WSet <WorldName> Hide On/Off&n&S" +
                                 "When a world is hidden, it does not show up on the &H/Worlds&S list. It can still be joined normally." },
@@ -3173,8 +3178,12 @@ namespace fCraft {
                                 "Enables or disables periodic backups. Time is given in the compact format." },
                 { "greeting",   "&H/WSet <WorldName> Greeting <Text>&n&S" +
                                 "Sets a greeting message. Message is shown whenever someone joins the map, and can also be viewed in &H/WInfo" },
-                { "motd",   "&H/WSet <WorldName> Motd <Text>&n&S" +
-                                "Sets a message to be shown when joining/Loading a map." }
+                { "motd",        "&H/WSet <WorldName> Motd <Text>&n&S" +
+                                "Sets a message to be shown when joining/Loading a map." },
+                { "buildable",  "&H/WSet <WorldName> Buildable On/Off&n&S" +
+                                "Whether any blocks can be placed by players in the world." },
+                { "deletable",  "&H/WSet <WorldName> Deletable On/Off&n&S" +
+                                "Whether any blocks can be deleted by players in the world." },
             },
             Handler = WorldSetHandler
         };
@@ -3194,7 +3203,19 @@ namespace fCraft {
                 case "hide":
                 case "hidden":
                     SetWorldBool(player, world, value, world.IsHidden,
-                                 v => world.IsHidden = v, "hidden"); break;
+                                 v => world.IsHidden = v, "hidden");
+                    break;
+                case "build":
+                case "buildable":
+                    SetWorldBool(player, world, value, world.Buildable,
+                                 v => world.Buildable = v, "buildable");
+                    break;
+                case "delete":
+                case "deletable":
+                    SetWorldBool(player, world, value, world.Deletable,
+                                 v => world.Deletable = v, "deletable");
+                    break;
+                    
                 case "backup":
                 case "backups":
                     SetBackupSettings(player, world, value); break;

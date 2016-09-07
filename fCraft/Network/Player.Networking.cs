@@ -499,15 +499,25 @@ namespace fCraft {
             if( type > (byte)Map.MaxCustomBlockType && !Supports(CpeExt.BlockDefinitions)) {
                 type = MapDat.MapBlock( type );
             }
-
             Vector3I coords = new Vector3I( x, y, z );
 
             // If block is in bounds, count the click.
             // Sometimes MC allows clicking out of bounds,
             // like at map transitions or at the top layer of the world.
             // Those clicks should be simply ignored.
-            if( World.Map.InBounds( coords ) )
-                PlaceBlockWithEvents( coords, action, (Block)type );
+            if( !World.Map.InBounds( coords ) ) return;
+            
+            if ((action == ClickAction.Delete || type == 0) && !World.Deletable) {
+                SendNow(Packet.Message(0, "Deleting blocks is disabled in this world.", false));
+                RevertBlockNow(coords); 
+                return;
+            } else if (action == ClickAction.Build && !World.Buildable) {
+                SendNow(Packet.Message(0, "Placing blocks is disabled in this world.", false));
+                RevertBlockNow(coords); 
+                return;
+            }
+            
+            PlaceBlockWithEvents( coords, action, (Block)type );
         }
 
         void ProcessPlayerClickPacket() {

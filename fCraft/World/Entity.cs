@@ -22,8 +22,6 @@ namespace fCraft {
         public sbyte ID { get; set; }
         public string Model { get; set; }
 
-
-
         public static List<Entity> Entities = new List<Entity>();
 
         public static World getWorld(Entity entity) {
@@ -52,14 +50,14 @@ namespace fCraft {
 
         public static bool exists(World world, string name) {
             foreach(Entity e in Entities.Where(w => w.World == world.Name)) {
-        		if (e.Name.CaselessEquals(name)) return true;
+                if (e.Name.CaselessEquals(name)) return true;
             }
             return false;
         }
 
         public static bool existsAny(World world) {
             foreach (Entity e in Entities) {
-        		if (e.World.CaselessEquals(world.Name)) return true;
+                if (e.World.CaselessEquals(world.Name)) return true;
             }
             return false;
         }
