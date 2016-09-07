@@ -579,7 +579,8 @@ namespace fCraft {
             int worldsListed = 0, worldsNotListed = 0;
             Stopwatch sw = Stopwatch.StartNew();
 
-            foreach (World world in WorldManager.Worlds.Where(w => w.BlockDB.IsEnabled)) {
+            foreach (World world in WorldManager.Worlds.Where(w => w.BlockDB.IsEnabled &&
+            DateTime.UtcNow.Subtract(File.GetLastAccessTimeUtc(w.MapFileName)) <= args.Player.TimeSinceFirstLogin)) {
                 if (worldsListed >= 10) {
                     worldsNotListed++;
                     continue;
