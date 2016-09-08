@@ -6,61 +6,50 @@ namespace fCraft {
         
         public static Packet MakePacket(Player p, string motd) {
             bool canFly = true, canNoClip = true, canSpeed = true, canRespawn = true;
-            bool useMotd = GetHacksFromMotd(p, motd, ref canFly, 
-                                            ref canNoClip, ref canSpeed, ref canRespawn);
+            short jumpHeight = -1;
+            bool useMotd = GetHacksFromMotd(p, motd, ref canFly, ref canNoClip,
+                                            ref canSpeed, ref canRespawn, ref jumpHeight);
             
             if (useMotd)
-                return Packet.HackControl(canFly, canNoClip, canSpeed, canRespawn, canNoClip, -1);
+                return Packet.HackControl(canFly, canNoClip, canSpeed, canRespawn, canNoClip, jumpHeight);
             
             return Packet.HackControl(p.Info.AllowFlying, p.Info.AllowNoClip, p.Info.AllowSpeedhack,
                                       p.Info.AllowRespawn, p.Info.AllowThirdPerson, p.Info.JumpHeight);
         }
         
-        static bool GetHacksFromMotd(Player p, string motd, ref bool canFly, 
-		                             ref bool canNoClip, ref bool canSpeed, ref bool canRespawn) {
+        static bool GetHacksFromMotd(Player p, string motd, ref bool fly, ref bool noclip,
+                                     ref bool speed, ref bool respawn, ref short jumpHeight) {
             if (String.IsNullOrEmpty(motd)) return false;
             bool useMotd = false;
             
             foreach (string part in motd.ToLower().Split()) {
-                switch (part) {
-                    case "-fly":
-                    case "+fly":
-                        canFly = part == "+fly";
-                        useMotd = true;
-                        break;
-                    case "-noclip":
-                    case "+noclip":
-                        canNoClip = part == "+noclip";
-                        useMotd = true;
-                        break;
-                    case "-speed":
-                    case "+speed":
-                        canSpeed = part == "+speed";
-                        useMotd = true;
-                        break;
-                    case "-respawn":
-                    case "+respawn":
-                        canRespawn = part == "+respawn";
-                        useMotd = true;
-                        break;
-                    case "-hax":
-                    case "+hax":
-                        canFly = part == "+hax";
-                        canNoClip = part == "+hax";
-                        canSpeed = part == "+hax";
-                        canRespawn = part == "+hax";
-                        useMotd = true;
-                        break;
-                    case "+ophax":
-                        canFly = p.IsStaff;
-                        canNoClip = p.IsStaff;
-                        canSpeed = p.IsStaff;
-                        canRespawn = p.IsStaff;
-                        useMotd = true;
-                        break;
-                    default:
-                        break;
+                if (part == "-fly" || part == "+fly") {
+                    fly = part == "+fly";
+                } else if (part == "-noclip" || part == "+noclip") {
+                    noclip = part == "+noclip";
+                } else if (part == "-speed" || part == "+speed") {
+                    speed = part == "+speed";
+                } else if (part == "-respawn" || part == "+respawn") {
+                    respawn = part == "+respawn";
+                } else if (part == "-hax" || part == "+ophax") {
+                    fly = part == "+hax";
+                    noclip = part == "+hax";
+                    speed = part == "+hax";
+                    respawn = part == "+hax";
+                } else if (part == "-ophax" || part == "+ophax") {
+                    fly = p.IsStaff;
+                    noclip = p.IsStaff;
+                    speed = p.IsStaff;
+                    respawn = p.IsStaff;
+                } else if (part.StartsWith("jumpheight=")) {
+                    string heightPart = part.Substring(part.IndexOf('=') + 1);
+                    float value;
+                    if (float.TryParse(heightPart, out value))
+                        jumpHeight = (short)(value * 32);
+                } else {
+                    continue;
                 }
+                useMotd = true;
             }
             return useMotd;
         }

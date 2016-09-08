@@ -1427,21 +1427,10 @@ namespace fCraft {
                         player.MessageNoZone(zoneName);
                         return;
                     }
-                    int zoneX = zone.Bounds.XCentre;
-                    int zoneY = zone.Bounds.YCentre;
-                    int zoneZ = zone.Bounds.ZCentre;
-                    retry2:
-                    if (player.World.map.GetBlock(zoneX, zoneY, zoneZ - 1) == Block.Air) {
-                        zoneZ = zoneZ - 1;
-                        goto retry2;
-                    }
-                    retry:
-                    if (player.World.map.GetBlock(zoneX, zoneY, zoneZ) != Block.Air ||
-                        player.World.map.GetBlock(zoneX, zoneY, zoneZ + 1) != Block.Air) {
-                        zoneZ = zoneZ + 1;
-                        goto retry;
-                    }
-					Position zPos = new Position((zoneX) * 32 + 16, (zoneY) * 32 + 16, (zoneZ) * 32 + 64);
+
+                    Vector3I P = player.World.map.HighestFreeSpace(zone.Bounds.XCentre,
+                                                                   zone.Bounds.YCentre, zone.Bounds.ZCentre);
+                    Position zPos = new Position(P.X * 32 + 16, P.Y * 32 + 16, P.Z * 32 + (51 + 1));
 					if (player.World != null) {
 						player.LastWorld = player.World;
 						player.LastPosition = player.Position;
@@ -1455,27 +1444,17 @@ namespace fCraft {
                 Random rand = new Random();
                 int x = rand.Next(0, player.WorldMap.Width);
                 int y = rand.Next(0, player.WorldMap.Length);
-                int z = player.Position.Z/32 + 1;
-                retry2:
-                if (player.World.map.GetBlock(x, y, z - 3) == Block.Air) {
-                    z = z - 1;
-                    goto retry2;
-                }
-                retry:
-                if (player.World.map.GetBlock(x, y, z - 2) != Block.Air ||
-                    player.World.map.GetBlock(x, y, z - 1) != Block.Air) {
-                    z = z + 1;
-                    goto retry;
-                }
+                int z = (player.Position.Z - 51) / 32;
+                Vector3I P = player.WorldMap.HighestFreeSpace(x, y, z);
 
 				if (player.World != null) {
 					player.LastWorld = player.World;
 					player.LastPosition = player.Position;
 				}
                 player.TeleportTo(new Position {
-                    X = (short) (x*32 + 16),
-                    Y = (short) (y*32 + 16),
-                    Z = (short) (z*32 + 16),
+                    X = (short)(P.X * 32 + 16),
+                    Y = (short)(P.Y * 32 + 16),
+                    Z = (short)(P.Z * 32 + (51 + 1)),
                     R = player.Position.R,
                     L = player.Position.L
                 });
@@ -1684,26 +1663,16 @@ namespace fCraft {
             Handler = TopHandler
         };
 
-        private static void TopHandler(Player player, CommandReader cmd) {
-            int x = player.Position.X/32;
-            int y = player.Position.Y/32;
-            int z = player.WorldMap.Height;
-            retry2:
-            if (player.World.map.GetBlock(x, y, z - 3) == Block.Air) {
-                z = z - 1;
-                goto retry2;
-            }
-            retry:
-            if (player.World.map.GetBlock(x, y, z - 2) != Block.Air ||
-                player.World.map.GetBlock(x, y, z - 1) != Block.Air) {
-                z = z + 1;
-                goto retry;
-            }
+        static void TopHandler(Player player, CommandReader cmd) {
+            int x = player.Position.X / 32;
+            int y = player.Position.Y / 32;
+            int z = (player.Position.Z - 51) / 32;
+            Vector3I P = player.World.map.HighestFreeSpace(x, y, z);
 
             player.TeleportTo(new Position {
-                X = (short) (x*32 + 16),
-                Y = (short) (y*32 + 16),
-                Z = (short) (z*32 + 16),
+                X = (short) (P.X * 32 + 16),
+                Y = (short) (P.Y * 32 + 16),
+                Z = (short) (P.Z * 32 + (51 + 1)),
                 R = player.Position.R,
                 L = player.Position.L
             });
