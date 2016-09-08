@@ -4,12 +4,12 @@
 
         Redistribution and use in source and binary forms, with or without
         modification, are permitted provided that the following conditions are met:
-         * Redistributions of source code must retain the above copyright
+ * Redistributions of source code must retain the above copyright
               notice, this list of conditions and the following disclaimer.
-            * Redistributions in binary form must reproduce the above copyright
+ * Redistributions in binary form must reproduce the above copyright
              notice, this list of conditions and the following disclaimer in the
              documentation and/or other materials provided with the distribution.
-            * Neither the name of 800Craft or the names of its
+ * Neither the name of 800Craft or the names of its
              contributors may be used to endorse or promote products derived from this
              software without specific prior written permission.
 
@@ -37,8 +37,8 @@ namespace fCraft {
 
         public static void Init() {
             try {
-                if ( !Directory.Exists( "plugins" ) ) {
-                    Directory.CreateDirectory( "plugins" );
+                if (!Directory.Exists("plugins")) {
+                    Directory.CreateDirectory("plugins");
                 }
             } catch ( Exception ex ) {
                 Logger.Log( LogType.Error, "PluginManager.Initialize: " + ex );
@@ -46,45 +46,52 @@ namespace fCraft {
             }
 
             // Load plugins
-            string[] plugins = Directory.GetFiles( "plugins", "*.dll" );
-            if ( plugins.Length == 0 ) {
+            string[] files = Directory.GetFiles( "plugins", "*.dll" );
+            if (files.Length == 0) {
                 Logger.Log( LogType.ConsoleOutput, "PluginManager: No plugins found" );
                 return;
-            } else {
-                Logger.Log( LogType.ConsoleOutput, "PluginManager: Loading " + plugins.Length + " plugins" );
-
-                foreach ( string plugin in plugins ) {
-                    try {
-                        Type pluginType = null;
-                        string args = Path.GetFileNameWithoutExtension( plugin );
-                        Assembly assembly = Assembly.LoadFile( Path.GetFullPath( plugin ) );
-
-                        if ( assembly != null ) {
-                            pluginType = assembly.GetType( args + ".Init" );
-
-                            if ( pluginType != null ) {
-                                Plugins.Add( ( Plugin )Activator.CreateInstance( pluginType ) );
-                            }
-                        }
-                    } catch ( Exception ex ) {
-                        Logger.Log( LogType.Error, "PluginManager: Unable to load plugin at location " + plugin + ": " + ex );
-                    }
+            }
+            
+            Logger.Log(LogType.ConsoleOutput, "PluginManager: Loading " + files.Length + " plugins");
+            foreach (string file in files) {
+                try {
+                    LoadTypes(file);
+                } catch (Exception ex) {
+                    Logger.Log(LogType.Error, "PluginManager: Unable to load plugin at location " + file + ": " + ex);
                 }
             }
-            LoadPlugins();
+            InitPlugins();
+        }
+        
+        static void LoadTypes(string file) {
+            Assembly lib = Assembly.LoadFile(Path.GetFullPath(file));
+            if (lib == null) return;
+            
+            foreach (Type t in lib.GetTypes()) {
+                if (t.IsAbstract || t.IsInterface || !IsPlugin(t)) continue;
+                Plugins.Add((Plugin)Activator.CreateInstance(t));
+            }
+        }
+        
+        static bool IsPlugin(Type plugin) {
+            Type[] interfaces = plugin.GetInterfaces();
+            foreach (Type t in interfaces) {
+                if (t == typeof(Plugin)) return true;
+            }
+            return false;
         }
 
-        static void LoadPlugins() {
-            if ( Plugins.Count > 0 ) {
-				foreach (Plugin plugin in Plugins) {
-					try {
-						plugin.Initialize();
-						Logger.Log(LogType.ConsoleOutput, "PluginManager: Loading plugin " + plugin.Name);
-					} catch (Exception ex) {
-						Logger.Log(LogType.Error, "PluginManager: Failed loading plugin " + plugin.Name);
-						Logger.Log(LogType.Debug, ex.ToString());
-					}
-				}
+        static void InitPlugins() {
+            if (Plugins.Count == 0) return;
+            
+            foreach (Plugin plugin in Plugins) {
+                try {
+                    plugin.Initialize();
+                    Logger.Log(LogType.ConsoleOutput, "PluginManager: Loading plugin " + plugin.Name);
+                } catch (Exception ex) {
+                    Logger.Log(LogType.Error, "PluginManager: Failed loading plugin " + plugin.Name);
+                    Logger.Log(LogType.Debug, ex.ToString());
+                }
             }
         }
     }
