@@ -110,29 +110,33 @@ namespace fCraft {
 
         public Position getSpawnIfRandom() {
             if (spawn == new Position(-1, -1, -1, 0, 0)) {
-                Random rand = new Random(Guid.NewGuid().GetHashCode());
-                int newX = rand.Next(Width), newY = rand.Next(Length), newZ = Height;
-            retry2:
-                if (GetBlock(newX, newY, newZ - 3) == Block.Air) {
-                    newZ = (short)(newZ - 1);
-                    goto retry2;
-                }
-            retry:
-                if (GetBlock(newX, newY, newZ - 2) != Block.Air ||
-                    GetBlock(newX, newY, newZ - 1) != Block.Air) {
-                    newZ = (newZ + 1);
-                    goto retry;
-                }
-                return new Position((short)(newX * 32), (short)(newY * 32), (short)(newZ * 32), 0, 0);
+                Random rnd = new Random();
+                Vector3I P = HighestFreeSpace(rnd.Next(Width), rnd.Next(Length), Height);
+                return new Position((short)(P.X * 32), (short)(P.Y * 32), (short)(P.Z * 32), 0, 0);
             }
             return spawn;
+        }
+        
+        public Vector3I HighestFreeSpace(int x, int y, int z) {
+            while (z > 0 && GetBlock(x, y, z) != Block.Air) {
+                z--;
+            }
+            
+            while (z < Height) {
+                Block bFeet = GetBlock(x, y, z), bHead = GetBlock(x, y, z + 1);
+                bool freeFeet = bFeet == Block.Air || bFeet == Block.None;
+                bool freeHead = bHead == Block.Air || bHead == Block.None;
+                
+                if (freeFeet && freeHead) break;
+                z++;
+            }
+            return new Vector3I(x, y, z);
         }
 
         /// <summary> Resets spawn to the default location (top center of the map). </summary>
         public void ResetSpawn() {
-            Spawn = new Position( Width * 16,
-                                  Length * 16,
-                                  Math.Min( short.MaxValue, Height * 32 ) );
+            Spawn = new Position(Width * 16, Length * 16,
+                                  Math.Min(short.MaxValue, Height * 32));
         }
 
 
