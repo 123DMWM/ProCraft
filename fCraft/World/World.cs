@@ -170,27 +170,9 @@ namespace fCraft {
                                 Name );
                     Map = MapGenerator.GenerateFlatgrass( 128, 128, 64 );
                 }
-
-                byte zid = byte.MinValue;
-                foreach (Zone z in Map.Zones) {
-                    z.ZoneID = zid;
-                    zid++;
-                }
-
                 return Map;
             }
         }
-
-        static public void getNewZoneID(World world, Zone z) {
-        retry:
-            foreach (Zone r in world.map.Zones) {
-                if (z.ZoneID == r.ZoneID && z.ZoneID < 255) {
-                    z.ZoneID++;
-                    goto retry;
-                }
-            }
-        }
-
 
         internal void UnloadMap( bool expectedPendingFlag ) {
             lock( SyncRoot ) {

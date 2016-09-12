@@ -46,6 +46,8 @@ namespace fCraft {
                 if( store.ContainsValue( zone ) ) {
                     throw new ArgumentException( "Duplicate zone.", "zone" );
                 }
+                
+                zone.ZoneID = NextFreeZoneID();
                 store.Add( zoneName, zone );
                 zone.Changed += OnZoneChanged;
                 UpdateCache();
@@ -366,6 +368,21 @@ namespace fCraft {
         void RaiseChangedEvent() {
             var handler = Changed;
             if( handler != null ) handler( null, EventArgs.Empty );
+        }
+        
+        unsafe byte NextFreeZoneID() {
+            byte* used = stackalloc byte[256]; // avoid heap mem allocation
+            for (int i = 0; i < 256; i++) {
+                used[i] = 0;
+            }
+            foreach (var kvp in store) {
+                used[kvp.Value.ZoneID] = 1;
+            }
+            
+            for (int i = 0; i < 256; i++) {
+                if (used[i] == 0) return (byte)i;
+            }
+            return 0;
         }
     }
 }
