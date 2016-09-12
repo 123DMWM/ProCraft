@@ -57,10 +57,10 @@ namespace fCraft
         static int userHostLength = 60,
                    maxNickLength = 30;
 
-        const int MaxMessageSize = 510; // +2 bytes for CR-LF
-
         
 
+        const int MaxMessageSize = 510; // +2 bytes for CR-LF
+        public static bool acceptPMs = true;
         public static Dictionary<string, List<string>> Users = new Dictionary<string, List<string>>();
 
         /// <summary> Class represents an IRC connection/thread.
@@ -560,8 +560,10 @@ namespace fCraft
 
                     case IRCMessageType.QueryMessage:
                         // TODO: PMs
+                        if (acceptPMs && Player.Console.Info.ReadIRC) {
+                            Server.Players.Where(p => p.IsStaff).Message("&i{0} -> {1}&f: {2}", msg.Nick, botNick, msg.Message);
+                        }
                         Logger.Log(LogType.IrcStatus, "QueryMessage: {0}", msg.RawMessage);
-                        Server.Players.Where(p => p.IsStaff).Message("&i{0} -> {1}&f: {2}", msg.Nick, botNick, msg.Message);
                         break;
 
                     case IRCMessageType.Names:

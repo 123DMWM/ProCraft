@@ -321,6 +321,15 @@ namespace fCraft
                     }
                     return;
                 }
+                if (name.CaselessEquals("ircpm") && player.IsStaff) {
+                    if (IRC.acceptPMs) {
+                        IRC.acceptPMs = false;
+                        player.Message("The irc bot is now ignoring PM's");
+                    } else {
+                        player.Message("The irc bot is already ignoring PM's");
+                    }
+                    return;
+                }
                 if (cmd.HasNext) {
                     CdIgnore.PrintUsage(player);
                     return;
@@ -368,6 +377,15 @@ namespace fCraft
                         }
                     } else {
                         player.Message("You are not currently ignoring &iIRC");
+                    }
+                    return;
+                }
+                if (name.CaselessEquals("ircpm") && player.IsStaff) {
+                    if (!IRC.acceptPMs) {
+                        IRC.acceptPMs = true;
+                        player.Message("The irc bot is no longer ignoring PM's");
+                    } else {
+                        player.Message("The irc bot is not currently ignoring PM's");
                     }
                     return;
                 }
