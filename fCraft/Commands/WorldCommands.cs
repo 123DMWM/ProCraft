@@ -1014,15 +1014,15 @@ namespace fCraft {
                     int height = (R + G + B) / 3;
                     
                     for (int y = 0; y < height - 5; y++) {
-                		map.Blocks[index + oneY * y] = (byte)stone;
-                	}
-                	for (int y = height - 5; y < height - 1; y++) {
-                		if (y >= 0) map.Blocks[index + oneY * y] = (byte)dirt;
-                	}
-                	if (height > 0) {
-                		map.Blocks[index + oneY * (height - 1)] = (byte)grass;
-                	}
-                	index++;
+                        map.Blocks[index + oneY * y] = (byte)stone;
+                    }
+                    for (int y = height - 5; y < height - 1; y++) {
+                        if (y >= 0) map.Blocks[index + oneY * y] = (byte)dirt;
+                    }
+                    if (height > 0) {
+                        map.Blocks[index + oneY * (height - 1)] = (byte)grass;
+                    }
+                    index++;
                 }
             }
         }
