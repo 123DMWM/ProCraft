@@ -425,9 +425,10 @@ namespace fCraft
         
         public static CustomColor ParseHex(string hex) {
             if (hex.Length > 0 && hex[0] == '#') hex = hex.Remove(0, 1);
-            if (hex.Length != 3 && hex.Length != 6)
-                throw new ArgumentException("hex must be either 3 or 6 chars long");
-            
+            if (hex.Length > 6)
+                throw new ArgumentException("hex must be at most 6 chars long");
+            if (hex.Length != 3 && hex.Length != 6) hex = hex.PadLeft(6, '0');
+
             CustomColor c = default(CustomColor);
             int R, G, B;
             if (hex.Length == 6) {
