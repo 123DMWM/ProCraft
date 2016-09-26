@@ -481,7 +481,9 @@ namespace fCraft
                 max = 100;
             }
 
-            int num = rand.Next(min, max + 1);
+            // rand.Next(min, max) is exclusive of max, so we need to use (max + 1)
+            int adjMax = max == int.MaxValue ? int.MaxValue : max + 1;
+            int num = rand.Next(min, adjMax);
             Server.Message(player,
                             "{0}{1} rolled {2} ({3}...{4})",
                             player.ClassyName, Color.Silver, num, min, max);            
