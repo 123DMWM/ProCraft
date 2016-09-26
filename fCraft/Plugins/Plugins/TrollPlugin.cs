@@ -22,24 +22,10 @@ namespace TrollPlugin {
         };
 
         //your plugin name
-        public string Name {
-            get {
-                return "TrollPlugin";
-            }
-            set {
-                Name = value;
-            }
-        }
+        public string Name { get { return "TrollPlugin"; } set { } }
 
         //your plugin version
-        public string Version {
-            get {
-                return "1.0";
-            }
-            set {
-                Version = value;
-            }
-        }
+        public string Version { get { return "1.0"; } set { } }
 
         private static void TrollHandler( Player player, CommandReader cmd ) {
             string Name = cmd.Next();

@@ -1001,19 +1001,29 @@ namespace fCraft {
             Block stone = Block.Stone, dirt = Block.Dirt, grass = Block.Grass;
             ApplyTheme(theme, ref stone, ref dirt, ref grass);
             int index = 0, oneY = map.Width * map.Length;
+            int imageWidth = image.Width, imageHeight = image.Height;
+            
             using (image) {
-                for (int z = 0; z < image.Height; z++)
-                    for (int x = 0; x < image.Width; x++) {
-                        byte R = image.GetPixel(x, z).R, G = image.GetPixel(x, z).G, B = image.GetPixel(x, z).B;
-                        int height = ((R + G + B) / 3);
-                        for (int y = 0; y < height - 5; y++)
-                            if(y >= 0) map.Blocks[index + oneY * y] = (byte)stone;
-                        for (int y = height - 5; y < height - 1; y++)
-                            if (y >= 0) map.Blocks[index + oneY * y] = (byte)dirt;
-                        if (height > 0)
-                            map.Blocks[index + oneY * (height - 1)] = (byte)grass;
-                        index++;
+                for (int z = 0; z < imageHeight; z++)
+                    for (int x = 0; x < imageWidth; x++) 
+                {
+                    int ARGB = image.GetPixel(x, z).ToArgb(); // GetPixel is costly
+                    byte R = (byte)(ARGB >> 16);
+                    byte G = (byte)(ARGB >> 8);
+                    byte B = (byte)ARGB;
+                    int height = (R + G + B) / 3;
+                    
+                    for (int y = 0; y < height - 5; y++) {
+                        map.Blocks[index + oneY * y] = (byte)stone;
                     }
+                    for (int y = height - 5; y < height - 1; y++) {
+                        if (y >= 0) map.Blocks[index + oneY * y] = (byte)dirt;
+                    }
+                    if (height > 0) {
+                        map.Blocks[index + oneY * (height - 1)] = (byte)grass;
+                    }
+                    index++;
+                }
             }
         }
 
