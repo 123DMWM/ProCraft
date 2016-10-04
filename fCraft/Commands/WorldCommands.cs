@@ -1007,11 +1007,8 @@ namespace fCraft {
                 for (int z = 0; z < imageHeight; z++)
                     for (int x = 0; x < imageWidth; x++) 
                 {
-                    int ARGB = image.GetPixel(x, z).ToArgb(); // GetPixel is costly
-                    byte R = (byte)(ARGB >> 16);
-                    byte G = (byte)(ARGB >> 8);
-                    byte B = (byte)ARGB;
-                    int height = (R + G + B) / 3;
+                    System.Drawing.Color col = image.GetPixel(x, z);
+                    int height = (int)Math.Floor(((col.R + col.G + col.B) / 3) * (col.A / 255.00));
                     
                     for (int y = 0; y < height - 5; y++) {
                         map.Blocks[index + oneY * y] = (byte)stone;
