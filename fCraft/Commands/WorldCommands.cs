@@ -887,7 +887,7 @@ namespace fCraft {
         private static void GenHMHandler(Player player, CommandReader cmd) {
             World playerWorld = player.World;
             bool noTrees = true;
-            string themeName = cmd.Next();
+            string themeName = cmd.Next() ?? "grass";
             string url = null;
             string[] themes = { "arctic", "desert", "forest", "grass", "hell", "swamp" };
 
