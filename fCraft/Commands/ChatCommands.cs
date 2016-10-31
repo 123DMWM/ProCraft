@@ -1265,7 +1265,7 @@ namespace fCraft
             NotRepeatable = true,
             Usage = "/Action [Player] [Action]",
             Help = "Displays you doing an action to a player. " +
-            	"Example: \"/action Facepalmed high fived\" would show up as \"123DontMessWitMe has high fived Facepalmed",
+                "Example: \"/action Facepalmed high fived\" would show up as \"123DontMessWitMe has high fived Facepalmed",
             Handler = ActionHandler
         };
 
@@ -1274,26 +1274,24 @@ namespace fCraft
                 player.MessageMuted();
                 return;
             }
-            if (player.DetectChatSpam())
-                return;
-            string searchplayer = cmd.Next();
+            if (player.DetectChatSpam()) return;
+            
+            string target = cmd.Next();
             string action = cmd.NextAll().Trim();
-			if ("".Equals(searchplayer) || "".Equals(action)) {
-				CdAction.PrintUsage(player);
-				return;
-			}
-            Player other = Server.FindPlayerOrPrintMatches(player, searchplayer, SearchOptions.Default);
+            if (String.IsNullOrEmpty(target) || String.IsNullOrEmpty(action)) {
+                CdAction.PrintUsage(player);
+                return;
+            }
+            Player other = Server.FindPlayerOrPrintMatches(player, target, SearchOptions.ReturnSelfIfOnlyMatch);
             if (other == player) {
-                player.Message("Cannot action yourself");
+                player.Message("You cannot use &H/action&S on yourself.");
                 return;
             }
-            if (!(cmd.Count <= 2) && cmd.IsConfirmed) {
+            
+            if (cmd.IsConfirmed) {
                 Server.Players.Message("{0} &s{1} {2}", player.ClassyName, action, other.ClassyName);
-                return;
-            }
-            if (other != null) {
-                player.Confirm(cmd, "Your messege will show up as: {0} &s{1} {2}", player.ClassyName, action,
-                    other.ClassyName);
+            } else if (other != null) {
+                player.Confirm(cmd, "Your message will show up as: {0} &s{1} {2}", player.ClassyName, action, other.ClassyName);
             }
         }
 
