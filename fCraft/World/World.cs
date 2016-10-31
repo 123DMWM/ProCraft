@@ -379,7 +379,7 @@ namespace fCraft {
                 }
 
                 Logger.Log( LogType.UserActivity,
-                            "{0} &sjoined world {1}.",
+                            "{0} &Sjoined world {1}.",
                             player.ClassyName, ClassyName );
 
                 if( IsLocked ) {

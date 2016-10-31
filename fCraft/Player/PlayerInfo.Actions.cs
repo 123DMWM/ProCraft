@@ -879,8 +879,8 @@ namespace fCraft {
 
                 // Check if target is already frozen
                 if( IsFrozen ) {
-                    string msg = String.Format( "{0} &sis already frozen (by {1}).", Name, FrozenBy );
-                    string colorMsg = String.Format( "{0} &sis already frozen (by {1}&S).", ClassyName, FrozenByClassy );
+                    string msg = String.Format( "{0} &Sis already frozen (by {1}).", Name, FrozenBy );
+                    string colorMsg = String.Format( "{0} &Sis already frozen (by {1}&S).", ClassyName, FrozenByClassy );
                     throw new PlayerOpException( player, this, PlayerOpExceptionCode.NoActionNeeded, msg, colorMsg );
                 }
 
@@ -907,9 +907,9 @@ namespace fCraft {
                 if( announce ) {
                     if (target != null)
                     {
-                        target.Message( "&WYou were &bfrozen&w by {0}", player.ClassyName );
+                        target.Message( "&WYou were &bfrozen&W by {0}", player.ClassyName );
                     }
-                    Server.Message( target, "{0}&s successfully &bfroze&s: {1}",
+                    Server.Message( target, "{0}&S successfully &bfroze&S: {1}",
                                             player.ClassyName, ClassyName );
                 }
 
@@ -940,8 +940,8 @@ namespace fCraft {
 
                 // Check if target is already frozen
                 if( !IsFrozen ) {
-                    string msg = String.Format( "{0} &sis not currently frozen.", ClassyName );
-                    string colorMsg = String.Format( "{0} &sis not currently frozen.", ClassyName );
+                    string msg = String.Format( "{0} &Sis not currently frozen.", ClassyName );
+                    string colorMsg = String.Format( "{0} &Sis not currently frozen.", ClassyName );
                     throw new PlayerOpException( player, this, PlayerOpExceptionCode.NoActionNeeded, msg, colorMsg );
                 }
 
@@ -1042,7 +1042,7 @@ namespace fCraft {
 
                     // log and announce mute publicly
                     Logger.Log( LogType.UserActivity,
-                                "{0} &swas muted by {1} for {2}",
+                                "{0} &Swas muted by {1} for {2}",
                                 ClassyName, player.Name, duration );
                     if( announce ) {
                         Player target = PlayerObject;
@@ -1058,7 +1058,7 @@ namespace fCraft {
 
                 } else {
                     // no action needed - already muted for same or longer duration
-                    string msg = String.Format( "{0} &swas already muted by {1} ({2} left)",
+                    string msg = String.Format( "{0} &Swas already muted by {1} ({2} left)",
                                                 ClassyName, MutedBy,
                                                 TimeMutedLeft.ToMiniString() );
                     string colorMsg = String.Format( "{0}&S was already muted by {1}&S ({2} left)",
@@ -1096,7 +1096,7 @@ namespace fCraft {
                 }
 
                 if( timeLeft <= TimeSpan.Zero ) {
-                    string msg = String.Format( "{0} &sis not currently muted.", ClassyName );
+                    string msg = String.Format( "{0} &Sis not currently muted.", ClassyName );
                     string msgColor = String.Format("{0}&S is not currently muted.", ClassyName);
                     throw new PlayerOpException( player, this, PlayerOpExceptionCode.NoActionNeeded, msg, msgColor );
                 }
@@ -1117,7 +1117,7 @@ namespace fCraft {
 
                 // log and announce mute publicly
                 Logger.Log( LogType.UserActivity,
-                            "{0} &swas unmuted by {1} ({2} was left on the mute)",
+                            "{0} &Swas unmuted by {1} ({2} was left on the mute)",
                             ClassyName, player.Name, timeLeft );
                 if( announce ) {
                     Player target = PlayerObject;

@@ -93,7 +93,7 @@ namespace fCraft.Drawing {
                 urlString = "http://" + urlString;
             }
             if (!urlString.CaselessStarts("http://i.imgur.com")) {
-                Player.Message("For safety reasons we only accept images uploaded to &9http://imgur.com/ &sSorry for this inconvenience.");
+                Player.Message("For safety reasons we only accept images uploaded to &9http://imgur.com/ &SSorry for this inconvenience.");
                 return false;
             }
             if (!urlString.CaselessEnds(".png") && !urlString.CaselessEnds(".jpg") && !urlString.CaselessEnds(".gif")) {

@@ -16,7 +16,7 @@ namespace TrollPlugin {
             IsConsoleSafe = true,
             NotRepeatable = false,
             Usage = "/troll player option [Message]",
-            Help = "Does a little somthin'-somethin'.&n" +
+            Help = "Does a little somthin'-somethin'.&N" +
             " Available options: st, ac, pm, message or leave",
             Handler = TrollHandler
         };

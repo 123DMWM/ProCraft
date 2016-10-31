@@ -334,7 +334,7 @@ namespace fCraft {
                     file = XDocument.Load( Paths.ConfigFileName );
                     if( file.Root == null || file.Root.Name != ConfigXmlRootName ) {
                         Logger.Log( LogType.Warning,
-                                    "&wConfig.Load: Malformed or incompatible config file {0}. Loading defaults.",
+                                    "&WConfig.Load: Malformed or incompatible config file {0}. Loading defaults.",
                                     Paths.ConfigFileName );
                         file = new XDocument();
                         file.Add( new XElement( ConfigXmlRootName ) );
@@ -345,7 +345,7 @@ namespace fCraft {
                         fromFile = true;
                     }
                 } catch( Exception ex ) {
-                    Logger.LogAndReportCrash( "&wConfig failed to load", "ProCraft", ex, true );
+                    Logger.LogAndReportCrash( "&WConfig failed to load", "ProCraft", ex, true );
                     return false;
                 }
             } else {

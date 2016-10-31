@@ -12,7 +12,7 @@ namespace fCraft.Games {
 				return;
 			
 			if (e.NewBlock == Opposition(e.Player.Team).FlagBlock) {
-				e.Player.Message("You cannot place {0}&s blocks, you are on the {1}&s Team.",
+				e.Player.Message("You cannot place {0}&S blocks, you are on the {1}&S Team.",
 				                 Opposition(e.Player.Team).ClassyName, e.Player.Team.ClassyName);
 				e.Result = CanPlaceResult.CTFDenied;
 			} else if (e.NewBlock == Block.Lava || e.NewBlock == Block.Water) {
@@ -70,14 +70,14 @@ namespace fCraft.Games {
 				e.Result = CanPlaceResult.Allowed;
 				e.Player.Team.HasFlag = true;
 				e.Player.IsHoldingFlag = true;
-				world.Players.Message("{0} &sgot the {1}&s flag.",
+				world.Players.Message("{0} &Sgot the {1}&S flag.",
 				                      e.Player.ClassyName, opposition.ClassyName );
 			}
 		}
 		
 		static void ClickOwnFlag(PlayerPlacingBlockEventArgs e, CtfTeam opposition) {
 			if (!e.Player.IsHoldingFlag) {
-				e.Player.Message("You don't have the {0}&s flag.", opposition.ClassyName);
+				e.Player.Message("You don't have the {0}&S flag.", opposition.ClassyName);
 				e.Result = CanPlaceResult.CTFDenied;
 			} else {
 				world.Map.QueueUpdate(new BlockUpdate(Player.Console, opposition.FlagPos, opposition.FlagBlock));
@@ -86,7 +86,7 @@ namespace fCraft.Games {
 				team.HasFlag = false;
 				e.Player.IsHoldingFlag = false;
 				
-				world.Players.Message("{0} &sscored a point for {1}&s team.",
+				world.Players.Message("{0} &Sscored a point for {1}&S team.",
 				                      e.Player.ClassyName, team.ClassyName);
 				e.Result = CanPlaceResult.CTFDenied;
 				Check();

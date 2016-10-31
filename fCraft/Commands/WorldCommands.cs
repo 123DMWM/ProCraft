@@ -22,7 +22,7 @@ namespace fCraft {
             CommandManager.RegisterCommand( CdBlockDB );
             CommandManager.RegisterCommand( CdBlockInfo );
             CdGenerate.Help = "Generates a new map. If no dimensions are given, uses current world's dimensions. " +
-                              "If no file name is given, loads generated world into current world.&n" +
+                              "If no file name is given, loads generated world into current world.&N" +
                               "Available themes: Grass, " + Enum.GetNames( typeof( MapGenTheme ) ).JoinToString() + "&N" +
                               "Available terrain types: Empty, Ocean, " + Enum.GetNames( typeof( MapGenTemplate ) ).JoinToString() + "&N" +
                               "Note: You do not need to specify a theme with \"Empty\" and \"Ocean\" templates.";
@@ -66,26 +66,26 @@ namespace fCraft {
                    "If no operation is given, world's BlockDB status is shown. " +
                    "If no WorldName is given, prints status of all worlds.",
             HelpSections = new Dictionary<string, string>{
-                { "auto",       "/BlockDB <WorldName> Auto&n&S" +
+                { "auto",       "/BlockDB <WorldName> Auto&N&S" +
                                 "Allows BlockDB to decide whether it should be enabled or disabled based on each world's permissions (default)." },
-                { "on",         "/BlockDB <WorldName> On&n&S" +
+                { "on",         "/BlockDB <WorldName> On&N&S" +
                                 "Enables block tracking. Information will only be available for blocks that changed while BlockDB was enabled." },
-                { "off",        "/BlockDB <WorldName> Off&n&S" +
+                { "off",        "/BlockDB <WorldName> Off&N&S" +
                                 "Disables block tracking. Block changes will NOT be recorded while BlockDB is disabled. " +
                                 "Note that disabling BlockDB does not delete the existing data. Use &Hclear&S for that." },
-                { "clear",      "/BlockDB <WorldName> Clear&n&S" +
+                { "clear",      "/BlockDB <WorldName> Clear&N&S" +
                                 "Clears all recorded data from the BlockDB. Erases all changes from memory and deletes the .fbdb file." },
-                { "limit",      "/BlockDB <WorldName> Limit <#>|None&n&S" +
+                { "limit",      "/BlockDB <WorldName> Limit <#>|None&N&S" +
                                 "Sets the limit on the maximum number of changes to store for a given world. " +
                                 "Oldest changes will be deleted once the limit is reached. " +
                                 "Put \"None\" to disable limiting. " +
                                 "Unless a Limit or a TimeLimit it specified, all changes will be stored indefinitely." },
-                { "timelimit",  "/BlockDB <WorldName> TimeLimit <Time>/None&n&S" +
+                { "timelimit",  "/BlockDB <WorldName> TimeLimit <Time>/None&N&S" +
                                 "Sets the age limit for stored changes. " +
                                 "Oldest changes will be deleted once the limit is reached. " +
                                 "Use \"None\" to disable time limiting. " +
                                 "Unless a Limit or a TimeLimit it specified, all changes will be stored indefinitely." },
-                { "preload",    "/BlockDB <WorldName> Preload On/Off&n&S" +
+                { "preload",    "/BlockDB <WorldName> Preload On/Off&N&S" +
                                 "Enabled or disables preloading. When BlockDB is preloaded, all changes are stored in memory as well as in a file. " +
                                 "This reduces CPU and disk use for busy maps, but may not be suitable for large maps due to increased memory use." },
             },
@@ -174,7 +174,7 @@ namespace fCraft {
 
                         } else {
                             Logger.Log( LogType.UserActivity,
-                                        "BlockDB: {0} {1} &senabled BlockDB on world {2} (was {3})",
+                                        "BlockDB: {0} {1} &Senabled BlockDB on world {2} (was {3})",
                                         player.Info.Rank.Name, player.Name, world.Name, db.EnabledState );
                             db.EnabledState = YesNoAuto.Yes;
                             WorldManager.SaveWorldList();
@@ -203,7 +203,7 @@ namespace fCraft {
                             }
                         } else {
                             Logger.Log( LogType.UserActivity,
-                                        "BlockDB: {0} {1} &sdisabled BlockDB on world {2} (was {3})",
+                                        "BlockDB: {0} {1} &Sdisabled BlockDB on world {2} (was {3})",
                                         player.Info.Rank.Name, player.Name, world.Name, db.EnabledState );
                             db.EnabledState = YesNoAuto.No;
                             WorldManager.SaveWorldList();
@@ -344,7 +344,7 @@ namespace fCraft {
                         // wipes BlockDB data
                         if (!player.Can(Permission.ShutdownServer))
                         {
-                            player.Message("You must be {0}&s to clear the block DataBase", RankManager.GetMinRankWithAllPermissions(Permission.ShutdownServer).ClassyName);
+                            player.Message("You must be {0}&S to clear the block DataBase", RankManager.GetMinRankWithAllPermissions(Permission.ShutdownServer).ClassyName);
                             return;
                         }
                         bool hasData = (db.IsEnabled || File.Exists( db.FileName ));
@@ -499,9 +499,9 @@ namespace fCraft {
                     } else {
                         Player target = info.PlayerObject;
                         if( target != null && args.Player.CanSee( target ) ) {
-                            playerName = info.Rank.Color + info.Name + "&s(&aOn&S)";
+                            playerName = info.Rank.Color + info.Name + "&S(&aOn&S)";
                         } else {
-							playerName = info.Rank.Color + info.Name + "&s(&7Off&s)";
+							playerName = info.Rank.Color + info.Name + "&S(&7Off&S)";
                         }
                     }
                     string contextString;
@@ -878,8 +878,8 @@ namespace fCraft {
             Permissions = new[] { Permission.ManageWorlds },
             Usage = "/GenHeightMap [URL to heightmap image file] [FileName]",
             Help = "Generates a new map based on a heightmap image.&N" +
-                              "If no file name is given, loads generated world into current world.&n" +
-                              "If no file theme is given, generates default Grass theme.&n" +
+                              "If no file name is given, loads generated world into current world.&N" +
+                              "If no file theme is given, generates default Grass theme.&N" +
                               "Available themes: Grass, " + Enum.GetNames(typeof(MapGenTheme)).JoinToString(),
             Handler = GenHMHandler
         };
@@ -1145,7 +1145,7 @@ namespace fCraft {
             if (!urlString.CaselessStarts("http://") && !urlString.CaselessStarts("https://")) urlString = "http://" + urlString;
 
             if (!urlString.CaselessStarts("http://i.imgur.com/") && !urlString.CaselessStarts("http://123dmwm.tk/")) {
-                player.Message("For safety reasons we only accept images uploaded to &9http://imgur.com/ &sSorry for this inconvenience.");
+                player.Message("For safety reasons we only accept images uploaded to &9http://imgur.com/ &SSorry for this inconvenience.");
                 player.Message("    You cannot use: &9" + urlString);
                 return false;
             }
@@ -1189,7 +1189,7 @@ namespace fCraft {
             World[] worlds = WorldManager.FindWorlds(player, worldName);
             foreach (World w in worlds) {
                 if (w.Name.StartsWith("PW_")) {
-                    player.Message("You must use &a/PW Join &sto access personal worlds.");
+                    player.Message("You must use &a/PW Join &Sto access personal worlds.");
                     return;
                 }
             }
@@ -1212,7 +1212,7 @@ namespace fCraft {
                         }
                 		if (player.World.Name.CaselessEquals("tutorial") && !player.Info.HasRTR) {
                             player.Confirm(cmd,
-                                "&sYou are choosing to skip the rules, if you continue you will spawn here the next time you log in.");
+                                "&SYou are choosing to skip the rules, if you continue you will spawn here the next time you log in.");
                             return;
                         }
                         player.StopSpectating();
@@ -1385,15 +1385,15 @@ namespace fCraft {
             Aliases = new[] { "GameSet", "GSet", "GS" },
             Permissions = new[] { Permission.EditPlayerDB },
             Category = CommandCategory.New,
-            Help = "&sAllows direct editing of game settings per world.&n " + 
-                   "&sList of editable options: HiderSpawn, SeekerSpawn, Blocks.&n" + 
-                   "&sFor detailed help see &h/Help GSet <Option>",
+            Help = "&SAllows direct editing of game settings per world.&N " + 
+                   "&SList of editable options: HiderSpawn, SeekerSpawn, Blocks.&N" + 
+                   "&SFor detailed help see &H/Help GSet <Option>",
             HelpSections = new Dictionary<string, string>{
-                { "hiderspawn",  "&H/GSet <WorldName> HiderSpawn <Action>&n" +
+                { "hiderspawn",  "&H/GSet <WorldName> HiderSpawn <Action>&N" +
                                  "&SChanges the spawn for the hiders. Actions: Set, Reset, Display " },
-                { "seekerspawn", "&H/GSet <WorldName> SeekerSpawn <Action>&n" +
+                { "seekerspawn", "&H/GSet <WorldName> SeekerSpawn <Action>&N" +
                                  "&SChanges the spawn for the seeker. Actions: Set, Reset, Display" },
-                { "gameblocks",  "&H/GSet <WorldName> GameBlocks <Action> <Block Name/ID>&n" +
+                { "gameblocks",  "&H/GSet <WorldName> GameBlocks <Action> <Block Name/ID>&N" +
                                  "&SChanges usable blocks in the game. Actions: Add, Remove, Reset, List" }
             },
             Usage = "/GSet <WorldName> <Option> <Action> <block>",
@@ -1421,10 +1421,10 @@ namespace fCraft {
             string option = cmd.Next();
             if (option == null)
             {
-                player.Message("Game settings for world (&a{0}&s)", world.Name);
-                player.Message("  &sHiders spawn: {0}", new Position(world.HiderPosX, world.HiderPosY, world.HiderPosZ).ToBlockCoords().ToString());
-                player.Message("  &sSeeker spawn: {0}", new Position(world.SeekerPosX, world.SeekerPosY, world.SeekerPosZ).ToBlockCoords().ToString());
-                player.Message("  &sGame Blocks: {0}", world.GameBlocks.JoinToString(", "));
+                player.Message("Game settings for world (&a{0}&S)", world.Name);
+                player.Message("  &SHiders spawn: {0}", new Position(world.HiderPosX, world.HiderPosY, world.HiderPosZ).ToBlockCoords().ToString());
+                player.Message("  &SSeeker spawn: {0}", new Position(world.SeekerPosX, world.SeekerPosY, world.SeekerPosZ).ToBlockCoords().ToString());
+                player.Message("  &SGame Blocks: {0}", world.GameBlocks.JoinToString(", "));
                 return;
             }
             string action = cmd.Next();
@@ -1443,12 +1443,12 @@ namespace fCraft {
                         world.HiderPosX = player.Position.X;
                         world.HiderPosY = player.Position.Y;
                         world.HiderPosZ = player.Position.Z;
-                        player.Message("Hider Spawn for world (&a{0}&s) set to your location.", world.Name);
+                        player.Message("Hider Spawn for world (&a{0}&S) set to your location.", world.Name);
                         return;
                     }
                     else
                     {
-                        player.Message("You must be in the world (&a{0}&s) to set the spawn.", world.Name);
+                        player.Message("You must be in the world (&a{0}&S) to set the spawn.", world.Name);
                         return;
                     }
                 }
@@ -1457,12 +1457,12 @@ namespace fCraft {
                     world.HiderPosX = world.map.Spawn.X;
                     world.HiderPosY = world.map.Spawn.Y;
                     world.HiderPosZ = world.map.Spawn.Z;
-                    player.Message("Hider Spawn for world (&a{0}&s) has reset to world spawn.", world.Name);
+                    player.Message("Hider Spawn for world (&a{0}&S) has reset to world spawn.", world.Name);
                     return;
                 }
                 else if (action.CaselessEquals("display"))
                 {
-                    player.Message("Hider Spawn for world (&a{0}&s) is: {1}", world.Name, new Position(world.HiderPosX, world.HiderPosY, world.HiderPosZ).ToBlockCoords().ToString());
+                    player.Message("Hider Spawn for world (&a{0}&S) is: {1}", world.Name, new Position(world.HiderPosX, world.HiderPosY, world.HiderPosZ).ToBlockCoords().ToString());
                     return;
                 }
                 else
@@ -1480,12 +1480,12 @@ namespace fCraft {
                         world.SeekerPosX = player.Position.X;
                         world.SeekerPosY = player.Position.Y;
                         world.SeekerPosZ = player.Position.Z;
-                        player.Message("Seeker Spawn for world (&a{0}&s) set to your location.", world.Name);
+                        player.Message("Seeker Spawn for world (&a{0}&S) set to your location.", world.Name);
                         return;
                     }
                     else
                     {
-                        player.Message("You must be in the world (&a{0}&s) to set the spawn.", world.Name);
+                        player.Message("You must be in the world (&a{0}&S) to set the spawn.", world.Name);
                         return;
                     }
                 }
@@ -1494,12 +1494,12 @@ namespace fCraft {
                     world.SeekerPosX = world.map.Spawn.X;
                     world.SeekerPosY = world.map.Spawn.Y;
                     world.SeekerPosZ = world.map.Spawn.Z;
-                    player.Message("Seeker Spawn for world (&a{0}&s) has reset to world spawn.", world.Name);
+                    player.Message("Seeker Spawn for world (&a{0}&S) has reset to world spawn.", world.Name);
                     return;
                 }
                 else if (action.CaselessEquals("display"))
                 {
-                    player.Message("Seeker Spawn for world (&a{0}&s) is: {1}", world.Name, new Position(world.SeekerPosX, world.SeekerPosY, world.SeekerPosZ).ToBlockCoords().ToString());
+                    player.Message("Seeker Spawn for world (&a{0}&S) is: {1}", world.Name, new Position(world.SeekerPosX, world.SeekerPosY, world.SeekerPosZ).ToBlockCoords().ToString());
                     return;
                 }
                 else
@@ -1822,7 +1822,7 @@ namespace fCraft {
                 player.Message("{2} whitelist of world {0}&S cleared: {1}",
                                world.ClassyName, whitelist.JoinToClassyString(), type);
                 Logger.Log(LogType.UserActivity,
-                           "{0} {1} &scleared {4} whitelist of world {2}: {3}",
+                           "{0} {1} &Scleared {4} whitelist of world {2}: {3}",
                            player.Info.Rank.Name, player.Name, world.Name, 
                            whitelist.JoinToString(pi => pi.Name), type.ToLower());
                 return true;
@@ -1842,7 +1842,7 @@ namespace fCraft {
                 player.Message("{2} blacklist of world {0}&S cleared: {1}",
                                world.ClassyName, blacklist.JoinToClassyString(), type);
                 Logger.Log(LogType.UserActivity,
-                           "{0} {1} &scleared {4} blacklist of world {2}: {3}",
+                           "{0} {1} &Scleared {4} blacklist of world {2}: {3}",
                            player.Info.Rank.Name, player.Name, world.Name, 
                            blacklist.JoinToString(pi => pi.Name), type.ToLower());
                 return true;
@@ -2251,7 +2251,7 @@ namespace fCraft {
                 world.Players.Message(player, "{0}&S loaded a new map for this world.", player.ClassyName);
                 player.Message("New map loaded for the world {0}", world.ClassyName);
 
-                Logger.Log(LogType.UserActivity, "{0} {1} &sloaded new map for world \"{1}\" from \"{2}\"",
+                Logger.Log(LogType.UserActivity, "{0} {1} &Sloaded new map for world \"{1}\" from \"{2}\"",
                     player.Info.Rank.Name, player.Name, world.Name, fileName);
 
 
@@ -2327,7 +2327,7 @@ namespace fCraft {
                         world.Players.Message(player, "{0}&S loaded a new map for the world {1}", player.ClassyName,
                             world.ClassyName);
                         player.Message("New map for the world {0}&S has been loaded.", world.ClassyName);
-                        Logger.Log(LogType.UserActivity, "{0} {1} &sloaded new map for world \"{2}\" from \"{3}\"",
+                        Logger.Log(LogType.UserActivity, "{0} {1} &Sloaded new map for world \"{2}\" from \"{3}\"",
                             player.Info.Rank.Name, player.Name, world.Name, fullFileName);
 
                     } else {
@@ -2379,7 +2379,7 @@ namespace fCraft {
                         newWorld.LoadedOn = DateTime.UtcNow;
                         Server.Message("{0}&S created a new world named {1}", player.ClassyName, newWorld.ClassyName);
                         Logger.Log(LogType.UserActivity,
-                            "{0} {1} &screated a new world named \"{2}\" (loaded from \"{3}\")", player.Info.Rank.Name,
+                            "{0} {1} &Screated a new world named \"{2}\" (loaded from \"{3}\")", player.Info.Rank.Name,
                             player.Name, worldName, fileName);
                         WorldManager.SaveWorldList();
                         player.Message("Access is {0}+&S, and building is {1}+&S on {2}",
@@ -2436,7 +2436,7 @@ namespace fCraft {
                 catch (Exception ex)
                 {
                     player.Message("Could not load specified file: {0}: {1}", ex.GetType().Name, ex.Message);
-                    player.Message("Please use &h/WCS &sfirst on an empty map to create a backup for clearing.", ex.GetType().Name, ex.Message);
+                    player.Message("Please use &H/WCS &Sfirst on an empty map to create a backup for clearing.", ex.GetType().Name, ex.Message);
                     return;
                 }
                 World world = player.World;
@@ -2460,7 +2460,7 @@ namespace fCraft {
                 player.Message("New clear map loaded for {0}", world.ClassyName);
 
                 Logger.Log(LogType.UserActivity,
-                            "{0} {1} &scleared map for world \"{1}\" from \"{2}\"",
+                            "{0} {1} &Scleared map for world \"{1}\" from \"{2}\"",
                             player.Info.Rank.Name, player.Name, world.Name, player.World);
 
 
@@ -2519,7 +2519,7 @@ namespace fCraft {
                                                player.ClassyName, world.ClassyName);
                         player.Message("New map for the world {0}&S has been loaded.", world.ClassyName);
                         Logger.Log(LogType.UserActivity,
-                                    "{0} {1} &sloaded new map for world \"{2}\"",
+                                    "{0} {1} &Sloaded new map for world \"{2}\"",
                                     player.Info.Rank.Name, player.Name, world.Name, fullFileName);
 
                     }
@@ -2972,17 +2972,17 @@ namespace fCraft {
             Usage = "/WSet <World> <Variable> <Value>",
             Help = "Sets a world variable. Variables are: hide, backups, greeting, motd, buildable, deletable",
             HelpSections = new Dictionary<string, string>{
-                { "hide",       "&H/WSet <WorldName> Hide On/Off&n&S" +
+                { "hide",       "&H/WSet <WorldName> Hide On/Off&N&S" +
                                 "When a world is hidden, it does not show up on the &H/Worlds&S list. It can still be joined normally." },
-                { "backups",    "&H/WSet <World> Backups Off&S, &H/WSet <World> Backups Default&S, or &H/WSet <World> Backups <Time>&n&S" +
+                { "backups",    "&H/WSet <World> Backups Off&S, &H/WSet <World> Backups Default&S, or &H/WSet <World> Backups <Time>&N&S" +
                                 "Enables or disables periodic backups. Time is given in the compact format." },
-                { "greeting",   "&H/WSet <WorldName> Greeting <Text>&n&S" +
+                { "greeting",   "&H/WSet <WorldName> Greeting <Text>&N&S" +
                                 "Sets a greeting message. Message is shown whenever someone joins the map, and can also be viewed in &H/WInfo" },
-                { "motd",        "&H/WSet <WorldName> Motd <Text>&n&S" +
+                { "motd",        "&H/WSet <WorldName> Motd <Text>&N&S" +
                                 "Sets a message to be shown when joining/Loading a map." },
-                { "buildable",  "&H/WSet <WorldName> Buildable On/Off&n&S" +
+                { "buildable",  "&H/WSet <WorldName> Buildable On/Off&N&S" +
                                 "Whether any blocks can be placed by players in the world." },
-                { "deletable",  "&H/WSet <WorldName> Deletable On/Off&n&S" +
+                { "deletable",  "&H/WSet <WorldName> Deletable On/Off&N&S" +
                                 "Whether any blocks can be deleted by players in the world." },
             },
             Handler = WorldSetHandler
@@ -3179,7 +3179,7 @@ namespace fCraft {
                         if (world.Greeting.Length == 0)
                             player.Message("No greeting message is set for world {0}", world.ClassyName);
                         else
-                            player.Message("Greeting message for world {0}&s is: {1}", world.ClassyName, world.Greeting);
+                            player.Message("Greeting message for world {0}&S is: {1}", world.ClassyName, world.Greeting);
                         world.Greeting = null;
                     } else {
                         player.Message("No greeting message is set for world {0}", world.ClassyName);
@@ -3268,27 +3268,27 @@ namespace fCraft {
             IsConsoleSafe = false,
             IsHidden = true,
             Usage = "/ctf <start / stop / redspawn / bluespawn / redflag / blueflag / swapteam>",
-            Help = "Allows starting CTF / editing CTF properties. List of properties:&n" +
-                "Start, Stop, RedSpawn, BlueSpawn, RedFlag, BlueFlag, SwapTeam&n" +
+            Help = "Allows starting CTF / editing CTF properties. List of properties:&N" +
+                "Start, Stop, RedSpawn, BlueSpawn, RedFlag, BlueFlag, SwapTeam&N" +
                 "For detailed help see &H/Help CTF <Property>",
             HelpSections = new Dictionary<string, string>{
-                { "start",             "&H/CTF start&n&S" +
+                { "start",             "&H/CTF start&N&S" +
                         "Starts a CTF game on the current world of the player." },
-                { "stop",             "&H/CTF stop&n&S" +
+                { "stop",             "&H/CTF stop&N&S" +
                         "Stops the current CTF game. You needn't be in the same world." },
-                { "redspawn",       "&H/CTF redspawn&n&S" +
-                        "Sets the spawn of red team to your current position.&n" +
+                { "redspawn",       "&H/CTF redspawn&N&S" +
+                        "Sets the spawn of red team to your current position.&N" +
                         "Note that spawn positions are reset after the game is stopped."},
-                { "bluespawn",       "&H/CTF bluespawn&n&S" +
-                        "Sets the spawn of blue team to your current position.&n" +
+                { "bluespawn",       "&H/CTF bluespawn&N&S" +
+                        "Sets the spawn of blue team to your current position.&N" +
                         "Note that spawn positions are reset after the game is stopped."},
-                { "redflag",           "&H/CTF redflag&n&S" +
-                        "Sets the position of the red flag to your current position.&n" +
+                { "redflag",           "&H/CTF redflag&N&S" +
+                        "Sets the position of the red flag to your current position.&N" +
                         "Note that flag positions are reset after the game is stopped."},
-                { "blueflag",       "&H/CTF blueflag&n&S" +
-                        "Sets the position of the blue flag to your current position.&n" +
+                { "blueflag",       "&H/CTF blueflag&N&S" +
+                        "Sets the position of the blue flag to your current position.&N" +
                         "Note that flag positions are reset after the game is stopped."},
-                { "swapteam",       "&H/CTF swapteam&n&S" +
+                { "swapteam",       "&H/CTF swapteam&N&S" +
                         "Switches your team in the CTF game."}
             },
             Handler = CTFHandler
@@ -3432,27 +3432,27 @@ namespace fCraft {
             IsConsoleSafe = true,
             Permissions = new[] { Permission.Chat },
             Usage = "/PW [option] [args]",
-            Help = "Allows players to have their own personal world. List of options:&n" +
-                "BuildAccess, Create, Delete, Join, JoinAccess, List, Reset&n" +
+            Help = "Allows players to have their own personal world. List of options:&N" +
+                "BuildAccess, Create, Delete, Join, JoinAccess, List, Reset&N" +
                 "For detailed help see &H/Help PW <Option>",
             HelpSections = new Dictionary<string, string>{
-                { "create",     "&H/PW Create [size]&n" +
-                                "&sCreates a personal world with a specified size:&n" +
-                                "&bTiny/64 &f- &aNormal/128 &f- &sLarge/256 &f- &cHuge/512" },
-                { "reset",      "&H/PW reset [number]&n" +
-                                "&sResets your specified world back to when you created it.&n" +
+                { "create",     "&H/PW Create [size]&N" +
+                                "&SCreates a personal world with a specified size:&N" +
+                                "&bTiny/64 &f- &aNormal/128 &f- &SLarge/256 &f- &cHuge/512" },
+                { "reset",      "&H/PW reset [number]&N" +
+                                "&SResets your specified world back to when you created it.&N" +
                                 "&cCan't be undone!" },
-                { "delete",     "&H/PW delete [number]&n" +
-                                "&sDeleted your specified world so you can make a new one.&n" +
+                { "delete",     "&H/PW delete [number]&N" +
+                                "&SDeleted your specified world so you can make a new one.&N" +
                                 "&cCan't be undone!" },
-                { "join",       "&H/PW join [number] [player]&n" +
-                                "&sJoins your specified world or the specified world of the specified player if you have joining rights."},
-                { "buildaccess","&H/PW buildaccess +/-[Player] [number]&n" +
-                                "&sAdds/Removed a specified players building rights on your specified world."},
-                { "joinaccess", "&H/PW joinaccess +/-[Player] [number]&n" +
-                                "&sAdds/Removed a specified players joining rights on your specified world."},
-                { "list",       "&H/PW list&n" +
-                                "&sLists all your personal worlds. And the ones you have access to."}
+                { "join",       "&H/PW join [number] [player]&N" +
+                                "&SJoins your specified world or the specified world of the specified player if you have joining rights."},
+                { "buildaccess","&H/PW buildaccess +/-[Player] [number]&N" +
+                                "&SAdds/Removed a specified players building rights on your specified world."},
+                { "joinaccess", "&H/PW joinaccess +/-[Player] [number]&N" +
+                                "&SAdds/Removed a specified players joining rights on your specified world."},
+                { "list",       "&H/PW list&N" +
+                                "&SLists all your personal worlds. And the ones you have access to."}
             },
             Handler = MWHandler
         };
@@ -3546,7 +3546,7 @@ namespace fCraft {
                 newWorld.LoadedOn = DateTime.UtcNow;
                 newWorld.IsHidden = true;
                 Logger.Log(LogType.UserActivity,
-                           "{0} {1} &screated a new world named \"{2}\" (loaded from \"{3}\")", player.Info.Rank.Name,
+                           "{0} {1} &Screated a new world named \"{2}\" (loaded from \"{3}\")", player.Info.Rank.Name,
                            player.Name, mapName, mapName);
                 newWorld.AccessSecurity.Include(player.Info);
                 newWorld.BuildSecurity.Include(player.Info);
@@ -3565,10 +3565,10 @@ namespace fCraft {
             if (!cmd.IsConfirmed) {
                 if (!Entity.existsAny(player.World)) {
                     player.Confirm(cmd, "This will reset your personal world:   " + mapName +
-                                   "&n&cThis cannot be undone!");
+                                   "&N&cThis cannot be undone!");
                 } else {
                     player.Confirm(cmd, "This will reset your personal world:   " + mapName +
-                                   "&n&cThis cannot be undone!&NThis will also remove all the Entities/Bots on the world.");
+                                   "&N&cThis cannot be undone!&NThis will also remove all the Entities/Bots on the world.");
                 }
                 return;
             }
@@ -3590,7 +3590,7 @@ namespace fCraft {
             }
             if (!cmd.IsConfirmed) {
                 player.Confirm(cmd, "This will delete your personal world:   " + mapName +
-                               "&n&cThis cannot be undone!");
+                               "&N&cThis cannot be undone!");
                 return;
             }
             World world = WorldManager.FindWorldExact(mapName);
@@ -3685,7 +3685,7 @@ namespace fCraft {
             Rank prank = player.Info.Rank;
             if (player.Info.Rank == RankManager.HighestRank) {
                 if (rname == null) {
-                    player.Message("Rank ({0}&s) has a max of {1} personal worlds", prank.ClassyName,
+                    player.Message("Rank ({0}&S) has a max of {1} personal worlds", prank.ClassyName,
                         prank.MaxPersonalWorlds);
                     return;
                 }
@@ -3695,7 +3695,7 @@ namespace fCraft {
                     return;
                 }
                 if (rmax == null) {
-                    player.Message("Rank ({0}&s) has a max of {1} personal worlds.", rank.ClassyName,
+                    player.Message("Rank ({0}&S) has a max of {1} personal worlds.", rank.ClassyName,
                         rank.MaxPersonalWorlds);
                     return;
                 }
@@ -3706,12 +3706,12 @@ namespace fCraft {
                 }
                 if (rank != null) {
                     rank.MaxPersonalWorlds = max;
-                    player.Message("Set MaxPersonalWorlds for rank ({0}&s) to {1} personal worlds.", rank.ClassyName,
+                    player.Message("Set MaxPersonalWorlds for rank ({0}&S) to {1} personal worlds.", rank.ClassyName,
                         rank.MaxPersonalWorlds);
                     Config.Save();
                 }
             } else {
-                player.Message("Rank ({0}&s) has a max of {1} personal worlds.", prank.ClassyName,
+                player.Message("Rank ({0}&S) has a max of {1} personal worlds.", prank.ClassyName,
                     prank.MaxPersonalWorlds);
                 return;
             }
@@ -3734,20 +3734,20 @@ namespace fCraft {
             Permissions = new Permission[] { Permission.Chat },
             IsConsoleSafe = false,
             Usage = "/portal [create | remove | info | list | enable | disable ]",
-            Help = "Controls portals, options are: create, remove, list, info, enable, disable&n&S" +
+            Help = "Controls portals, options are: create, remove, list, info, enable, disable&N&S" +
                    "See &H/Help portal <option>&S for details about each option.",
             HelpSections = new Dictionary<string, string>() {
-                { "create",     "&H/portal create [world] [liquid] [portal name] [x y z r l]&n&S" +
+                { "create",     "&H/portal create [world] [liquid] [portal name] [x y z r l]&N&S" +
                                 "Creates a portal with specified options"},
-                { "remove",     "&H/portal remove [portal name]&n&S" +
+                { "remove",     "&H/portal remove [portal name]&N&S" +
                                 "Removes specified portal."},
-                { "list",       "&H/portal list&n&S" +
+                { "list",       "&H/portal list&N&S" +
                                 "Gives you a list of portals in the current world."},
-                { "info",       "&H/portal info [portal name]&n&S" +
+                { "info",       "&H/portal info [portal name]&N&S" +
                                 "Gives you information of the specified portal."},
-                { "enable",     "&H/portal enable&n&S" +
+                { "enable",     "&H/portal enable&N&S" +
                                 "Enables the use of portals, this is player specific."},
-                { "disable",     "&H/portal disable&n&S" +
+                { "disable",     "&H/portal disable&N&S" +
                                 "Disables the use of portals, this is player specific."},
             },
             Handler = PortalH

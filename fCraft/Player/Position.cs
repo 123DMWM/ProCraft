@@ -97,7 +97,7 @@ namespace fCraft {
 
         public override string ToString()
         {
-            return String.Format("&s(X:&f{0}&s Y:&f{1}&s Z:&f{2}&s R:&f{3}&s L:&f{4}&s)", X, Y, Z, R, L);
+            return String.Format("&S(X:&f{0}&S Y:&f{1}&S Z:&f{2}&S R:&f{3}&S L:&f{4}&S)", X, Y, Z, R, L);
         }
 
 

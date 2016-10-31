@@ -36,7 +36,7 @@ namespace fCraft {
                     return true;
                 
                 if (rank != null)
-                    player.Message("You must be {0}&s to {1} command zone.", RankManager.HighestRank.ClassyName, action);
+                    player.Message("You must be {0}&S to {1} command zone.", RankManager.HighestRank.ClassyName, action);
                 else
                     player.Message("No rank has permission to {1} command zone.", action);
                 return false;
@@ -45,7 +45,7 @@ namespace fCraft {
                     return true;
                 
                 if (rank != null)
-                    player.Message("You must be {0}&s to {1} special zone.", rank.ClassyName);
+                    player.Message("You must be {0}&S to {1} special zone.", rank.ClassyName);
                 else
                     player.Message("No rank has permission to {1} special zone.");
                 return false;
@@ -58,7 +58,7 @@ namespace fCraft {
             string message = backup;
             if (File.Exists(path)) {
                 string[] lines = File.ReadAllLines(path);
-                message = String.Join("&n", lines);
+                message = String.Join("&N", lines);
             }
             
             if ((DateTime.UtcNow - p.LastZoneNotification).Seconds > 2) {

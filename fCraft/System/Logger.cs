@@ -88,7 +88,7 @@ namespace fCraft {
                 return;
             }
 
-            message = "# " + "&s" + message;
+            message = "# " + "&S" + message;
             Log( LogType.ConsoleOutput, message );
         }
 
@@ -151,9 +151,9 @@ namespace fCraft {
                 case LogType.Error:
                     return "&cERROR: ";
                 case LogType.Warning:
-                    return "&sWarning: ";
+                    return "&SWarning: ";
                 case LogType.IrcStatus:
-                    return "&iIRC: ";
+                    return "&IIRC: ";
                 default:
                     return "";
             }

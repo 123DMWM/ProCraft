@@ -1045,8 +1045,8 @@ namespace fCraft {
             ConfirmCallback = callback;
             ConfirmParameter = callbackParameter;
             ConfirmRequestTime = DateTime.UtcNow;
-            Message( "{0}&n" + 
-                     "&sType &H/ok&S to confirm and continue.", String.Format( message, args ) );
+            Message( "{0}&N" + 
+                     "&SType &H/ok&S to confirm and continue.", String.Format( message, args ) );
         }
 
 
@@ -2216,9 +2216,9 @@ namespace fCraft {
             // actually kick
             string kickReason;
             if( reason != null ) {
-                kickReason = String.Format( "&sKicked by {0}&s: {1}", player.Name, reason );
+                kickReason = String.Format( "&SKicked by {0}&S: {1}", player.Name, reason );
             } else {
-                kickReason = String.Format( "&sKicked by {0}", player.Name );
+                kickReason = String.Format( "&SKicked by {0}", player.Name );
             }
             Kick( kickReason, context );
 

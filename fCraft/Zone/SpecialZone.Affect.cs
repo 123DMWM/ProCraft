@@ -37,7 +37,7 @@ namespace fCraft {
                 string path = "./signs/" + p.World.Name + "/" + zone.Name + ".txt";
                 if (File.Exists(path)) {
                     p.SignLines = File.ReadAllLines(path);
-                    p.Message(String.Join("&n", p.SignLines));
+                    p.Message(String.Join("&N", p.SignLines));
                     Logger.Log(LogType.Debug, "[Signs] {0} clicked on sign [{1}] On map [{2}]", p.Name, zone.Name, p.World.Name);
                 } else {
                     p.Message("&WThis zone, {0}&W, is marked as a signpost, but no text is added to the sign!", zone.ClassyName);

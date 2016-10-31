@@ -406,7 +406,7 @@ namespace fCraft.Drawing {
             if (AnnounceCompletion) {
                 if (BlocksDenied > 0) {
                     Player.Message(
-                        "{0}: Cancelled after {1}. Processed {2}, updated {3}. &wSkipped {4} due to permission issues.",
+                        "{0}: Cancelled after {1}. Processed {2}, updated {3}. &WSkipped {4} due to permission issues.",
                         Description,
                         DateTime.UtcNow.Subtract(StartTime).ToMiniString(),
                         BlocksProcessed,

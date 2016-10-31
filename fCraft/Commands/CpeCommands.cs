@@ -60,19 +60,19 @@ namespace fCraft {
             Usage = "/ent <create / remove / removeAll / model / list / bring / skin>",
             Help = "Commands for manipulating entities. For help and usage for the individual options, use /help ent <option>.",
             HelpSections = new Dictionary<string, string>{
-                { "create", "&H/Ent create <entity name> <model> <skin>&n&S" +
+                { "create", "&H/Ent create <entity name> <model> <skin>&N&S" +
                                 "Creates a new entity with the given name. Valid models are chibi, chicken, creeper, giant, human, pig, sheep, skeleton, spider, zombie, or any block ID/Name." },
-                { "remove", "&H/Ent remove <entity name> <world>&n&S" +
+                { "remove", "&H/Ent remove <entity name> <world>&N&S" +
                                 "Removes the given entity." },
-                { "removeall", "&H/Ent removeAll&n&S" +
+                { "removeall", "&H/Ent removeAll&N&S" +
                                 "Removes all entities from the world."},
-                { "model", "&H/Ent model <entity name> <model>&n&S" +
+                { "model", "&H/Ent model <entity name> <model>&N&S" +
                                 "Changes the model of an entity to the given model. Valid models are chibi, chicken, creeper, giant, human, pig, sheep, skeleton, spider, zombie, or any block ID/Name."},
-                { "list", "&H/Ent list <world>&n&S" +
+                { "list", "&H/Ent list <world>&N&S" +
                                 "Prints out a list of all the entites on the server."},
-                 { "bring", "&H/Ent bring <entity name>&n&S" +
+                 { "bring", "&H/Ent bring <entity name>&N&S" +
                                 "Brings the given entity to you."},
-                 { "skin", "&H/Ent skin <entity name> <skin url or name>&n&S" +
+                 { "skin", "&H/Ent skin <entity name> <skin url or name>&N&S" +
                                 "Changes the skin of a bot."}
             },
             Handler = EntityHandler,
@@ -94,7 +94,7 @@ namespace fCraft {
                 string search = cmd.Next() ?? player.World.Name;
                 World world = WorldManager.FindWorldOrPrintMatches(player, search);
                 if (world != null) {
-                    player.Message("Entities on &f{0}&s: ", world.Name);
+                    player.Message("Entities on &f{0}&S: ", world.Name);
                     player.Message("  &F" + Entity.Entities.Where(w => Entity.getWorld(w) == world).JoinToString("&S, &F", n => n.Name));
                 }
                 return;
@@ -104,7 +104,7 @@ namespace fCraft {
                 World world = WorldManager.FindWorldOrPrintMatches(player, search);
                 if (cmd.IsConfirmed) {
                     Entity.RemoveAll(world);
-                    player.Message("All entities on &f{0}&s removed.", player.World.Name);
+                    player.Message("All entities on &f{0}&S removed.", player.World.Name);
                 } else {
                     player.Confirm(cmd, "This will remove all the entites on {0}, are you sure?", player.World.Name);
                 }
@@ -162,7 +162,7 @@ namespace fCraft {
                         }
                     }
                     entity = Entity.CreateEntity(entityName, skinString1, requestedModel, player.World, player.Position, getNewID(player.World));
-                    player.Message("Successfully created entity {0}&s with id:{1} and skin {2}.", entity.Name, entity.ID, entity.Skin, entity.Name);
+                    player.Message("Successfully created entity {0}&S with id:{1} and skin {2}.", entity.Name, entity.ID, entity.Skin, entity.Name);
                     break;
                 case "remove":
                     player.Message("{0} was removed from {1}", entity.Name, player.World.Name);
@@ -306,8 +306,8 @@ namespace fCraft {
             Permissions = new[] { Permission.ReadStaffChat },
             Usage = "/Model [Player] [Model]",
             IsConsoleSafe = true,
-            Help = "Change the Model or Skin of [Player]!&n" +
-            "Valid models: &s[Any Block Name or ID#], Chibi, Chicken, Creeper, Giant, Humanoid, Pig, Sheep, Skeleton, Spider, Zombie",
+            Help = "Change the Model or Skin of [Player]!&N" +
+            "Valid models: &S[Any Block Name or ID#], Chibi, Chicken, Creeper, Giant, Humanoid, Pig, Sheep, Skeleton, Spider, Zombie",
             Handler = ModelHandler
         };
 
@@ -321,8 +321,8 @@ namespace fCraft {
             Permissions = new[] { Permission.Chat },
             Usage = "/AFKModel [Player] [Model]",
             IsConsoleSafe = true,
-            Help = "Changes the model of a player when they are AFK.&n" +
-    "Valid models: &s [Any Block Name or ID#], Chibi, Chicken, Creeper, Giant, Humanoid, Pig, Sheep, Skeleton, Spider, Zombie!",
+            Help = "Changes the model of a player when they are AFK.&N" +
+    "Valid models: &S [Any Block Name or ID#], Chibi, Chicken, Creeper, Giant, Humanoid, Pig, Sheep, Skeleton, Spider, Zombie!",
             Handler = AFKModelHandler
         };
 
@@ -340,7 +340,7 @@ namespace fCraft {
             if (!player.IsStaff && target != player.Info) {
                 Rank staffRank = RankManager.GetMinRankWithAnyPermission(Permission.ReadStaffChat);
                 if (staffRank != null) {
-                    player.Message("You must be {0}&s+ to change another player's {1}Model", 
+                    player.Message("You must be {0}&S+ to change another player's {1}Model", 
                                   staffRank.ClassyName, prefix);
                 } else {
                     player.Message("No ranks have the ReadStaffChat permission," +
@@ -365,22 +365,22 @@ namespace fCraft {
             }
             model = ParseModel(player, model);
             if (model == null) {
-                player.Message("Model not valid, see &h/Help {0}Model&s.", prefix.TrimEnd());
+                player.Message("Model not valid, see &H/Help {0}Model&S.", prefix.TrimEnd());
                 return;
             }
             if (getter(target).CaselessEquals(model)) {
-                player.Message("&f{0}&s's {0}model is already set to &f{1}", target.Name, model, prefix); 
+                player.Message("&f{0}&S's {0}model is already set to &f{1}", target.Name, model, prefix); 
                 return;
             }
             
             if (target.IsOnline) {
-                target.PlayerObject.Message("&f{0}&shanged your {3}model from &f{1} &sto &f{2}", 
-                                           (target.PlayerObject == player ? "&sC" : player.Name + " &sC"), 
+                target.PlayerObject.Message("&f{0}&SChanged your {3}model from &f{1} &Sto &f{2}", 
+                                           (target.PlayerObject == player ? "" : player.Name + " "), 
                                            getter(target), model, prefix);
                 target.PlayerObject.oldMob = target.Mob;
             }
             if (target.PlayerObject != player) {
-                player.Message("Changed {3}model of &f{0} &sfrom &f{1} &sto &f{2}", 
+                player.Message("Changed {3}model of &f{0} &Sfrom &f{1} &Sto &f{2}", 
                               target.Name, getter(target), model, prefix);
             }
             setter(target, model);
@@ -457,15 +457,15 @@ namespace fCraft {
             }
 
             if (p.skinName == skinString) {
-                player.Message("&f{0}&s's skin is already set to &f{1}", p.Name, skinString);
+                player.Message("&f{0}&S's skin is already set to &f{1}", p.Name, skinString);
                 return;
             }
             if (p.IsOnline) {
-                p.PlayerObject.Message("&f{0}&shanged your skin from &f{1} &sto &f{2}", (p.PlayerObject == player ? "&sC" : player.Name + " &sc"), p.PlayerObject.oldskinName, skinString);
+                p.PlayerObject.Message("&f{0}&Shanged your skin from &f{1} &Sto &f{2}", (p.PlayerObject == player ? "&SC" : player.Name + " &Sc"), p.PlayerObject.oldskinName, skinString);
                 p.PlayerObject.oldskinName = p.skinName;
             }
             if (p.PlayerObject != player) {
-                player.Message("Changed skin of &f{0} &sto &f{1}", p.Name, skinString);
+                player.Message("Changed skin of &f{0} &Sto &f{1}", p.Name, skinString);
             }
             p.skinName = skinString;
         }
@@ -492,7 +492,7 @@ namespace fCraft {
             if (!player.IsStaff && otherPlayer != player.Info) {
                 Rank staffRank = RankManager.GetMinRankWithAnyPermission(Permission.ReadStaffChat);
                 if (staffRank != null) {
-                    player.Message("You must be {0}&s+ to change another players reach distance", staffRank.ClassyName);
+                    player.Message("You must be {0}&S+ to change another players reach distance", staffRank.ClassyName);
                 } else {
                     player.Message("No ranks have the ReadStaffChat permission so no one can change other players reachdistance, yell at the owner.");
                 }
@@ -570,19 +570,19 @@ namespace fCraft {
             Permissions = new[] { Permission.Chat },
             Usage = "/ccols [type] [args]",
             IsConsoleSafe = true,
-            Help = "&sModifies the custom colors, or prints information about them.&n" +
-                "&sTypes are: add, free, list, remove&n" +
-                "&sSee &h/help ccols <type>&s for details about each type.",
+            Help = "&SModifies the custom colors, or prints information about them.&N" +
+                "&STypes are: add, free, list, remove&N" +
+                "&SSee &H/help ccols <type>&S for details about each type.",
             HelpSections = new Dictionary<string, string>{
-                { "add",     "&h/ccols add [code] [name] [fallback] [hex]&n" +
-                        "&scode is in ASCII. You cannot replace the standard color codes.&n" +
-                        "&sfallback is a standard color code, shown to non-supporting clients.&n" },
-                { "free",    "&h/ccols free&n" +
-                        "&sPrints a list of free/unused available color codes." },
-                { "list",    "&h/ccols list [offset]&n" +
-                        "&sPrints a list of the codes, names, and fallback codes of the custom colors. " },
-                { "remove",  "&h/ccols remove [code]&n" +
-                        "&sRemoves the custom color which has the given color code." }
+                { "add",     "&H/ccols add [code] [name] [fallback] [hex]&N" +
+                        "&Scode is in ASCII. You cannot replace the standard color codes.&N" +
+                        "&Sfallback is a standard color code, shown to non-supporting clients.&N" },
+                { "free",    "&H/ccols free&N" +
+                        "&SPrints a list of free/unused available color codes." },
+                { "list",    "&H/ccols list [offset]&N" +
+                        "&SPrints a list of the codes, names, and fallback codes of the custom colors. " },
+                { "remove",  "&H/ccols remove [code]&N" +
+                        "&SRemoves the custom color which has the given color code." }
             },
             Handler = CustomColorsHandler,
         };
@@ -626,7 +626,7 @@ namespace fCraft {
             }
             if (Color.IsColorCode(code)) {
                 p.Message("There is already a custom or server defined color with the code " + code +
-                                   ", you must either use a different code or use \"&h/ccols remove " + code + "&s\"");
+                                   ", you must either use a different code or use \"&H/ccols remove " + code + "&S\"");
                 return;
             }
 
@@ -674,7 +674,7 @@ namespace fCraft {
 
             if ((int)code >= 256 || Color.ExtColors[code].Undefined) {
                 p.Message("There is no custom color with the code " + code + ".");
-                p.Message("Use \"&h/ccols list\" &Sto see a list of custom colors.");
+                p.Message("Use \"&H/ccols list\" &Sto see a list of custom colors.");
                 return;
             }
             Color.RemoveExtColor(code);
@@ -692,11 +692,11 @@ namespace fCraft {
 
                 if (index >= offset) {
                     count++;
-                    const string format = "{0} - %{1} displays as &{1}{2}&s, and falls back to {3}.";
+                    const string format = "{0} - %{1} displays as &{1}{2}&S, and falls back to {3}.";
                     p.Message(format, col.Name, col.Code, Hex(col), col.Fallback);
 
                     if (count >= 8) {
-                        const string helpFormat = "To see the next set of custom colors, type &h/ccols list {0}";
+                        const string helpFormat = "To see the next set of custom colors, type &H/ccols list {0}";
                         p.Message(helpFormat, offset + 8);
                         return;
                     }
@@ -730,59 +730,59 @@ namespace fCraft {
             Name = "Env",
             Category = CommandCategory.CPE | CommandCategory.World,
             Permissions = new[] { Permission.ManageWorlds },
-            Help = "Prints or changes environmental variables for a world.&n" +
+            Help = "Prints or changes environmental variables for a world.&N" +
                    "Variables are: border, clouds, edge, fog, level, cloudsheight, shadow, sky, sunlight, " +
-            	   "texture, weather, maxfog, cloudspeed, weatherspeed, weatherfade.&n" +
-                   "See &H/Help env <Variable>&S for details about a variable.&n" +
+            	   "texture, weather, maxfog, cloudspeed, weatherspeed, weatherfade.&N" +
+                   "See &H/Help env <Variable>&S for details about a variable.&N" +
                    "Type &H/Env <WorldName> normal&S to reset everything.",
             HelpSections = new Dictionary<string, string>{
-                { "normal",     "&H/Env <WorldName> normal&n&S" +
+                { "normal",     "&H/Env <WorldName> normal&N&S" +
                                 "Resets all environment settings to their defaults for the given world." },
-                { "clouds",     "&H/Env <WorldName> clouds <Color>&n&S" +
+                { "clouds",     "&H/Env <WorldName> clouds <Color>&N&S" +
                                 "Sets color of the clouds." +
-                                "&nUse \"normal\" instead of color to reset." },
-                { "fog",        "&H/Env <WorldName> fog <Color>&n&S" +
+                                "&NUse \"normal\" instead of color to reset." },
+                { "fog",        "&H/Env <WorldName> fog <Color>&N&S" +
                                 "Sets color of the fog. Sky color blends with fog color in the distance. " +
-                                "&nUse \"normal\" instead of color to reset." },
-                { "shadow",     "&H/Env <WorldName> shadow <Color>&n&S" +
+                                "&NUse \"normal\" instead of color to reset." },
+                { "shadow",     "&H/Env <WorldName> shadow <Color>&N&S" +
                                 "Sets color of the shadowed areas. " +
-                                "&nUse \"normal\" instead of color to reset." },
-                { "sunlight",   "&H/Env <WorldName> sunlight <Color>&n&S" +
+                                "&NUse \"normal\" instead of color to reset." },
+                { "sunlight",   "&H/Env <WorldName> sunlight <Color>&N&S" +
                                 "Sets color of the lighted areas. " +
-                                "&nUse \"normal\" instead of color to reset." },
-                { "sky",        "&H/Env <WorldName> sky <Color>&n&S" +
+                                "&NUse \"normal\" instead of color to reset." },
+                { "sky",        "&H/Env <WorldName> sky <Color>&N&S" +
                                 "Sets color of the sky. Sky color blends with fog color in the distance. " +
-                                "&nUse \"normal\" instead of color to reset." },
-                { "level",      "&H/Env <WorldName> level <#>&n&S" +
+                                "&NUse \"normal\" instead of color to reset." },
+                { "level",      "&H/Env <WorldName> level <#>&N&S" +
                                 "Sets height of the map edges/water level, in terms of blocks from the bottom of the map. " +
-                                "&nUse \"normal\" instead of a number to reset to default (middle of the map)." },
-                { "cloudsheight","&H/Env <WorldName> cloudsheight <#>&n&S" +
+                                "&NUse \"normal\" instead of a number to reset to default (middle of the map)." },
+                { "cloudsheight","&H/Env <WorldName> cloudsheight <#>&N&S" +
                                 "Sets height of the clouds, in terms of blocks from the bottom of the map. " +
-                                "&nUse \"normal\" instead of a number to reset to default (map height + 2)." },
-                { "edge",       "&H/Env <WorldName> edge <BlockType>&n&S" +
+                                "&NUse \"normal\" instead of a number to reset to default (map height + 2)." },
+                { "edge",       "&H/Env <WorldName> edge <BlockType>&N&S" +
                                 "Changes the type of block that's visible beyond the map boundaries. "+
-                                "&nUse \"normal\" instead of a number to reset to default (water)." },
-                { "border",     "&H/Env <WorldName> border <BlockType>&n&S" +
+                                "&NUse \"normal\" instead of a number to reset to default (water)." },
+                { "border",     "&H/Env <WorldName> border <BlockType>&N&S" +
                                 "Changes the type of block that's visible on sides the map boundaries. "+
-                                "&nUse \"normal\" instead of a number to reset to default (bedrock)." },
-                { "texture",    "&H/Env <WorldName> texture <Texture .PNG Url>&n&S" +
+                                "&NUse \"normal\" instead of a number to reset to default (bedrock)." },
+                { "texture",    "&H/Env <WorldName> texture <Texture .PNG Url>&N&S" +
                                 "Changes the texture for all visible blocks on a map. "+
-                                "&nUse \"normal\" instead of a web link to reset to default (" + Server.DefaultTerrain + ")" },
-                { "weather",    "&H/Env <WorldName> weather <0,1,2/sun,rain,snow>&n&S" +
+                                "&NUse \"normal\" instead of a web link to reset to default (" + Server.DefaultTerrain + ")" },
+                { "weather",    "&H/Env <WorldName> weather <0,1,2/sun,rain,snow>&N&S" +
                                 "Changes the weather on a specified map. "+
-                                "&nUse \"normal\" instead to use default (0/sun)" },
-                { "maxfog",     "&H/Env <WorldName> maxfog <#>&n&S" +
+                                "&NUse \"normal\" instead to use default (0/sun)" },
+                { "maxfog",     "&H/Env <WorldName> maxfog <#>&N&S" +
                                 "Sets the maximum distance clients can see around them. " +
-                                "&nUse \"normal\" instead of a number to reset to default (0)." },
-                { "cloudspeed", "&H/Env <WorldName> cloudspeed <#>&n&S" +
+                                "&NUse \"normal\" instead of a number to reset to default (0)." },
+                { "cloudspeed", "&H/Env <WorldName> cloudspeed <#>&N&S" +
                                 "Sets how fast clouds travel across the sky, relative to normal speed. Can be negative." +
-                                "&nUse \"normal\" instead of a number to reset to default (0)." },
-                { "weatherspeed","&H/Env <WorldName> weatherspeed <#>&n&S" +
+                                "&NUse \"normal\" instead of a number to reset to default (0)." },
+                { "weatherspeed","&H/Env <WorldName> weatherspeed <#>&N&S" +
                                 "Sets how fast rain/snow falls, relative to normal speed. Can be negative." +
-                                "&nUse \"normal\" instead of a number to reset to default (0)." },
-                { "weatherfade","&H/Env <WorldName> weatherfade <#>&n&S" +
+                                "&NUse \"normal\" instead of a number to reset to default (0)." },
+                { "weatherfade","&H/Env <WorldName> weatherfade <#>&N&S" +
                                 "Sets how quickly rain/snow fades, relative to normal rate." +
-                                "&nUse \"normal\" instead of a number to reset to default (0)." }
+                                "&NUse \"normal\" instead of a number to reset to default (0)." }
             },
             Usage = "/Env <WorldName> <Variable>",
             IsConsoleSafe = true,
@@ -940,7 +940,7 @@ namespace fCraft {
                             return;
                         }
                         world.Weather = weather;
-                        player.Message("&aSet weather for {0}&a to {1} ({2}&a)", world.ClassyName, weather, weather == 0 ? "&sSun" : (weather == 1 ? "&1Rain" : "&fSnow"));
+                        player.Message("&aSet weather for {0}&a to {1} ({2}&a)", world.ClassyName, weather, weather == 0 ? "&SSun" : (weather == 1 ? "&1Rain" : "&fSnow"));
                     }
                     foreach (Player p in world.Players) {
                         if (p.Supports(CpeExt.EnvWeatherType)) {
@@ -1001,7 +1001,7 @@ namespace fCraft {
             Logger.Log(LogType.UserActivity,
                        "Env: {0} {1} reset environment settings for world {2}",
                        player.Info.Rank.Name, player.Name, world.Name);
-            player.Message("Enviroment settings for world {0} &swere reset.", world.ClassyName);
+            player.Message("Enviroment settings for world {0} &Swere reset.", world.ClassyName);
             WorldManager.SaveWorldList();
             foreach (Player p in world.Players) {
                 if (p.Supports(CpeExt.EnvMapAppearance) || p.Supports(CpeExt.EnvMapAppearance2)
@@ -1107,21 +1107,21 @@ namespace fCraft {
             Aliases = new[] { "EnvPresets", "EnvP" },
             Category = CommandCategory.CPE | CommandCategory.World,
             Permissions = new[] { Permission.ManageWorlds },
-            Help = "Environment preset commands&n" +
-                   "Options are: Delete, Edit, Info, List, Load, Save&n" +
+            Help = "Environment preset commands&N" +
+                   "Options are: Delete, Edit, Info, List, Load, Save&N" +
                    "See &H/Help EnvPreset <option>&S for details about each variable. ",
             HelpSections = new Dictionary<string, string>{
-                { "save",   "&H/EnvPreset Save <PresetName> &n&S" +
+                { "save",   "&H/EnvPreset Save <PresetName> &N&S" +
                             "Saves Env settings to a defined preset name." },
-                { "load",   "&H/EnvPreset Load <PresetName>&n&S" +
+                { "load",   "&H/EnvPreset Load <PresetName>&N&S" +
                             "Loads an Env preset to a specified world." },
-                { "delete", "&H/EnvPreset Delete <PresetName>&n&S" +
+                { "delete", "&H/EnvPreset Delete <PresetName>&N&S" +
                             "Deleted a defined Env preset." },
-                { "info",   "&H/EnvPreset Info <PresetName>&n&S" +
+                { "info",   "&H/EnvPreset Info <PresetName>&N&S" +
                             "Displays Env settings of a defined Preset." },
-                { "list",   "&H/EnvPreset List&n&S" +
+                { "list",   "&H/EnvPreset List&N&S" +
                             "Lists all Env presets by name."},
-                { "update", "&H/EnvPreset Update <PresetName>&n&S" +
+                { "update", "&H/EnvPreset Update <PresetName>&N&S" +
                             "Updates an Env preset with the current world settings."}
             },
             Usage = "/EnvPreset <Option> [Args]",
@@ -1210,7 +1210,7 @@ namespace fCraft {
                     }
                     break;
                 case "list":
-                    string list = "Presets: &n";
+                    string list = "Presets: &N";
                     foreach (EnvPresets env in EnvPresets.Presets.OrderBy(p => p.Name)) {
                         list = list + env.Name + ", ";
                     }
@@ -1267,34 +1267,34 @@ namespace fCraft {
         }
         
         static string MakeHelp(string scope, string name) {
-            return "&sModifies the " + scope + " custom blocks, or prints information about them.&n" +
-                   "&sTypes are: add, abort, duplicate, edit, info, list, remove, texture&n" +
-                   "&sSee &h/help " + name + " <type>&s for details about each type.";
+            return "&SModifies the " + scope + " custom blocks, or prints information about them.&N" +
+                   "&STypes are: add, abort, duplicate, edit, info, list, remove, texture&N" +
+                   "&SSee &H/help " + name + " <type>&S for details about each type.";
         }
         
         static Dictionary<string, string> MakeHelpSections(string scope, string name) {
             return new Dictionary<string, string>{
-                { "add",     "&h" + name + " add [id]&n" +
-                        "&sBegins the process of defining a " + scope + " custom block with the given block id." },
-                { "abort",   "&h" + name + " abort&n" +
-                        "&sAborts the custom block that was currently in the process of being " +
-                        "defined from the last &h" + name + " add &scall." },
-                { "duplicate",     "&h" + name + " duplicate [source id] [new id]&n" +
-                        "&sCreates a new custom block, using all the data of the given existing " + scope + " custom block. " },
-                { "edit",     "&h" + name + " edit [id] [option] {args}&n" +
-                        "&sEdits already defined blocks so you don't have to re-add them to change something. " +
+                { "add",     "&H" + name + " add [id]&N" +
+                        "&SBegins the process of defining a " + scope + " custom block with the given block id." },
+                { "abort",   "&H" + name + " abort&N" +
+                        "&SAborts the custom block that was currently in the process of being " +
+                        "defined from the last &H" + name + " add &Scall." },
+                { "duplicate",     "&H" + name + " duplicate [source id] [new id]&N" +
+                        "&SCreates a new custom block, using all the data of the given existing " + scope + " custom block. " },
+                { "edit",     "&H" + name + " edit [id] [option] {args}&N" +
+                        "&SEdits already defined blocks so you don't have to re-add them to change something. " +
                         "Options: Name, Solidity, Speed, AllId, TopId, SideID, BottomID, Light, Sound, FullBright, Shape, Draw, FogDensity, (FogHex or FogR, FogG, FogB), FallBack"},
-                { "reload",     "&h" + name + " reload&n" +
-                        "&sReloads all " + scope + " custom blocks from file. " },
-                { "info",     "&h" + name + " info [id]&n" +
-                        "&sDisplays information about the given " + scope + " custom block." },
-                { "list",    "&h" + name + " list [offset]&n" +
-                        "&sPrints a list of the names of the " + scope + " custom blocks, " +
+                { "reload",     "&H" + name + " reload&N" +
+                        "&SReloads all " + scope + " custom blocks from file. " },
+                { "info",     "&H" + name + " info [id]&N" +
+                        "&SDisplays information about the given " + scope + " custom block." },
+                { "list",    "&H" + name + " list [offset]&N" +
+                        "&SPrints a list of the names of the " + scope + " custom blocks, " +
                         "along with their corresponding block ids. " },
-                { "remove",  "&h" + name + " remove [id]&n" +
-                        "&sRemoves the " + scope + " custom block which as the given block id." },
-                { "texture",  "&h" + name + " tex&n" +
-                        "&sShows you the terrain link of the current world and a link of the default with ID's overlayed." },
+                { "remove",  "&H" + name + " remove [id]&N" +
+                        "&SRemoves the " + scope + " custom block which as the given block id." },
+                { "texture",  "&H" + name + " tex&N" +
+                        "&SShows you the terrain link of the current world and a link of the default with ID's overlayed." },
             };          
         } 
         
@@ -1345,7 +1345,7 @@ namespace fCraft {
                     BlockDefinition block = GetCustomBlock(global, defs, (byte)infoID);
                     if (block == null) {
                         p.Message("No {0} custom block by the Name/ID", scope);
-                        p.Message("Use \"&h{1} list\" &sto see a list of {0} custom blocks.", scope, name);
+                        p.Message("Use \"&H{1} list\" &Sto see a list of {0} custom blocks.", scope, name);
                         return;
                     }
                     Block fallback;
@@ -1397,8 +1397,8 @@ namespace fCraft {
             BlockDefinition def = GetCustomBlock(global, defs, (byte)blockId);
             if (def != null) {
                 p.Message("There is already a {0} custom block with that id.", scope);
-                p.Message("Use \"&h{1} remove {0}&s\" this block first.", blockId, name);
-                p.Message("Use \"&h{1} list&s\" to see a list of {0} custom blocks.", scope, name);
+                p.Message("Use \"&H{1} remove {0}&S\" this block first.", blockId, name);
+                p.Message("Use \"&H{1} list&S\" to see a list of {0} custom blocks.", scope, name);
                 return;
             }
 
@@ -1406,9 +1406,9 @@ namespace fCraft {
             p.currentBD.BlockID = (byte)blockId;
             p.currentBD.Version2 = true;
             p.Message("   &bSet block id to: " + blockId);
-            p.Message("From now on, use &h{0} [value]&s to enter arguments.", name);
+            p.Message("From now on, use &H{0} [value]&S to enter arguments.", name);
             p.Message("You can abort the currently partially " +
-                           "created custom block at any time by typing \"&h{0} abort&s\"", name);
+                           "created custom block at any time by typing \"&H{0} abort&S\"", name);
 
             p.currentBDStep = 0;
             PrintStepHelp(p);
@@ -1426,7 +1426,7 @@ namespace fCraft {
 
                 if (index >= offset) {
                     count++;
-                    p.Message("{2} custom block &h{0} &sname is &h{1}", def.BlockID, def.Name, scope);
+                    p.Message("{2} custom block &H{0} &Sname is &H{1}", def.BlockID, def.Name, scope);
 
                     if (count >= 8) {
                         p.Message("To see the next set of {1} custom blocks, " +
@@ -1450,16 +1450,16 @@ namespace fCraft {
             BlockDefinition def = GetCustomBlock(global, defs, (byte)blockID);
             if (def == null) {
                 p.Message("There is no {0} custom block with that name/id.", scope);
-                p.Message("Use \"&h{1} list\" &sto see a list of {0} custom blocks.", scope, name);
+                p.Message("Use \"&H{1} list\" &Sto see a list of {0} custom blocks.", scope, name);
                 return;
             }
 
             BlockDefinition.Remove(def, defs, p.World);
             if (global) {
-                Server.Message("{0} &sremoved the {3} custom block &h{1} &swith ID {2}",
+                Server.Message("{0} &Sremoved the {3} custom block &H{1} &Swith ID {2}",
                                    p.ClassyName, def.Name, def.BlockID, scope);
             } else {
-                p.World.Players.Message("{0} &sremoved the {3} custom block &h{1} &swith ID {2}",
+                p.World.Players.Message("{0} &Sremoved the {3} custom block &H{1} &Swith ID {2}",
                                    p.ClassyName, def.Name, def.BlockID, scope);            
             }
         }
@@ -1657,10 +1657,10 @@ namespace fCraft {
                         p.currentBD = null;
 
                         if (global) {
-                            Server.Message("{0} &screated a new {3} custom block &h{1} &swith ID {2}",
+                            Server.Message("{0} &Screated a new {3} custom block &H{1} &Swith ID {2}",
                                        p.ClassyName, def.Name, def.BlockID, scope);
                         } else {
-                            p.World.Players.Message("{0} &screated a new {3} custom block &h{1} &swith ID {2}",
+                            p.World.Players.Message("{0} &Screated a new {3} custom block &H{1} &Swith ID {2}",
                                        p.ClassyName, def.Name, def.BlockID, scope);
                         }
                     }
@@ -1679,7 +1679,7 @@ namespace fCraft {
 
             if (!Map.GetBlockByName(p.World, input1, false, out srcBlock) || srcBlock <= Map.MaxCustomBlockType) {
                 p.Message("There is no {1} custom block with the id or name: &a{0}", input1, scope);
-                p.Message("Use \"&h{1} list&s\" to see a list of {0} custom blocks.", scope, name);
+                p.Message("Use \"&h{1} list&S\" to see a list of {0} custom blocks.", scope, name);
                 return;
             }
             if (!Byte.TryParse(input2, out dstBlock) || dstBlock <= (byte)Map.MaxCustomBlockType) {
@@ -1689,14 +1689,14 @@ namespace fCraft {
             BlockDefinition srcDef = GetCustomBlock(global, defs, (byte)srcBlock);
             if (srcDef == null) {
                 p.Message("There is no {1} custom block with the id: &a{0}", (byte)srcBlock, scope);
-                p.Message("Use \"&h{1} list&s\" to see a list of {0} custom blocks.", scope, name);
+                p.Message("Use \"&H{1} list&S\" to see a list of {0} custom blocks.", scope, name);
                 return;
             }
             BlockDefinition dstDef = GetCustomBlock(global, defs, (byte)dstBlock);
             if (dstDef != null) {
                 p.Message("There is already a {1} custom block with the id: &a{0}", dstBlock, scope);
-                p.Message("Use \"&h{1} remove {0}&s\" on this block first.", dstBlock, name);
-                p.Message("Use \"&h{1} list&s\" to see a list of {0} custom blocks.", scope, name);
+                p.Message("Use \"&H{1} remove {0}&S\" on this block first.", dstBlock, name);
+                p.Message("Use \"&H{1} list&S\" to see a list of {0} custom blocks.", scope, name);
                 return;
             }
             
@@ -1704,10 +1704,10 @@ namespace fCraft {
             def.BlockID = (byte)dstBlock;
             BlockDefinition.Add(def, defs, p.World);
             if (global) {
-                Server.Message("{0} &screated a new {3} custom block &h{1} &swith ID {2}",
+                Server.Message("{0} &Screated a new {3} custom block &H{1} &Swith ID {2}",
                            p.ClassyName, def.Name, def.BlockID, scope);
             } else {
-                p.World.Players.Message("{0} &screated a new {3} custom block &h{1} &swith ID {2}",
+                p.World.Players.Message("{0} &Screated a new {3} custom block &H{1} &Swith ID {2}",
                            p.ClassyName, def.Name, def.BlockID, scope);            
             }
         }
@@ -1984,10 +1984,10 @@ namespace fCraft {
             if (!hasChanged) return;
             
             if (global) {
-                Server.Message("{0} &sedited a {3} custom block &a{1} &swith ID &a{2}",
+                Server.Message("{0} &Sedited a {3} custom block &a{1} &Swith ID &a{2}",
                                p.ClassyName, def.Name, def.BlockID, scope);
             } else {
-                p.World.Players.Message("{0} &sedited a {3} custom block &a{1} &swith ID &a{2}",
+                p.World.Players.Message("{0} &Sedited a {3} custom block &a{1} &Swith ID &a{2}",
                                         p.ClassyName, def.Name, def.BlockID, scope);
             }
             BlockDefinition.Add(def, defs, p.World);
@@ -2035,25 +2035,25 @@ namespace fCraft {
         }
 
         static string[][] blockSteps = new[] {
-            new [] { "&sEnter the name of the block. You can include spaces." },
-            new [] { "&sEnter the solidity of the block (0-2)",
-                "&s0 = walk through(air), 1 = swim through (water), 2 = solid" },
-            new [] { "&sEnter the movement speed of the new block. (0.25-3.96)" },
-            new [] { "&sEnter the terrain.png index for the top texture. (0-255)" },
-            new [] { "&sEnter the terrain.png index for the sides texture. (0-255)" },
-            new [] { "&sEnter the terrain.png index for the bottom texture. (0-255)" },
-            new [] { "&sEnter whether the block prevents sunlight from passing though. (true or false)" },
-            new [] { "&sEnter the walk sound index of the block. (0-11)",
-                "&s0 = no sound, 1 = wood, 2 = gravel, 3 = grass, 4 = stone,",
-                "&s5 = metal, 6 = glass, 7 = wool, 8 = sand, 9 = snow." },
-            new [] { "&sEnter whether the block is fully bright (i.e. like lava). (true or false)" },
-            new [] { "&sEnter the shape of the block. (0-16)",
-                "&s0 = sprite(e.g. roses), 1-16 = cube of the given height",
-                "&s(e.g. snow has height '2', slabs have height '8', dirt has height '16')" },
-            new [] { "&sEnter the block draw type of this block. (0-4)",
-                "&s0 = solid/opaque, 1 = transparent (like glass)",
-                "&s2 = transparent (like leaves), 3 = translucent (like water)",
-                "&s4 = gas (like air)" },
+            new [] { "&SEnter the name of the block. You can include spaces." },
+            new [] { "&SEnter the solidity of the block (0-2)",
+                "&S0 = walk through(air), 1 = swim through (water), 2 = solid" },
+            new [] { "&SEnter the movement speed of the new block. (0.25-3.96)" },
+            new [] { "&SEnter the terrain.png index for the top texture. (0-255)" },
+            new [] { "&SEnter the terrain.png index for the sides texture. (0-255)" },
+            new [] { "&SEnter the terrain.png index for the bottom texture. (0-255)" },
+            new [] { "&SEnter whether the block prevents sunlight from passing though. (true or false)" },
+            new [] { "&SEnter the walk sound index of the block. (0-11)",
+                "&S0 = no sound, 1 = wood, 2 = gravel, 3 = grass, 4 = stone,",
+                "&S5 = metal, 6 = glass, 7 = wool, 8 = sand, 9 = snow." },
+            new [] { "&SEnter whether the block is fully bright (i.e. like lava). (true or false)" },
+            new [] { "&SEnter the shape of the block. (0-16)",
+                "&S0 = sprite(e.g. roses), 1-16 = cube of the given height",
+                "&S(e.g. snow has height '2', slabs have height '8', dirt has height '16')" },
+            new [] { "&SEnter the block draw type of this block. (0-4)",
+                "&S0 = solid/opaque, 1 = transparent (like glass)",
+                "&S2 = transparent (like leaves), 3 = translucent (like water)",
+                "&S4 = gas (like air)" },
             new [] { "Enter the density of the fog for the block. (0-255)",
                 "0 is treated as no fog, 255 is thickest fog." },
             new [] { "Enter the red component of the fog colour. (0-255) or full hex value" },
@@ -2062,10 +2062,10 @@ namespace fCraft {
             new [] { "Enter the fallback block for this block.",
                 "This block is shown to clients that don't support BlockDefinitions." },
             new [] { "Enter the min X Y Z coords of this block,",
-                "Min = 0 Max = 15 Example: &h0 0 0",
-                "&h-1&s to make it a sprite" },
+                "Min = 0 Max = 15 Example: &H0 0 0",
+                "&H-1&S to make it a sprite" },
             new [] { "Enter the max X Y Z coords of this block,",
-                "Min = 1 Max = 16 Example: &h16 16 16" },
+                "Min = 1 Max = 16 Example: &H16 16 16" },
         };
         
         static BlockDefinition GetCustomBlock(bool global, BlockDefinition[] defs, byte id) {
@@ -2084,8 +2084,8 @@ namespace fCraft {
             Permissions = new[] { Permission.Chat },
             Usage = "/Hacks [Player] [Hack] [jumpheight(if needed)]",
             IsConsoleSafe = true,
-            Help = "Change the hacking abilities of [Player]&n" +
-            "Valid hacks: &aFlying&s, &aNoclip&s, &aSpeedhack&s, &aRespawn&s, &aThirdPerson&s and &aJumpheight",
+            Help = "Change the hacking abilities of [Player]&N" +
+            "Valid hacks: &aFlying&S, &aNoclip&S, &aSpeedhack&S, &aRespawn&S, &aThirdPerson&S and &aJumpheight",
             Handler = HackControlHandler
         };
 
@@ -2094,11 +2094,11 @@ namespace fCraft {
             PlayerInfo target = InfoCommands.FindPlayerInfo(player, cmd, false);
             if (target == null || player.Info.Rank != RankManager.HighestRank) {
                 player.Message("Current Hacks for {0}", player.ClassyName);
-                player.Message("    &sFlying: &a{0} &sNoclip: &a{1} &sSpeedhack: &a{2}",
+                player.Message("    &SFlying: &a{0} &SNoclip: &a{1} &SSpeedhack: &a{2}",
                                 player.Info.AllowFlying.ToString(),
                                 player.Info.AllowNoClip.ToString(),
                                 player.Info.AllowSpeedhack.ToString());
-                player.Message("    &sRespawn: &a{0} &sThirdPerson: &a{1} &sJumpHeight: &a{2}",
+                player.Message("    &SRespawn: &a{0} &SThirdPerson: &a{1} &SJumpHeight: &a{2}",
                                 player.Info.AllowRespawn.ToString(),
                                 player.Info.AllowThirdPerson.ToString(),
                                 player.Info.JumpHeight);
@@ -2111,11 +2111,11 @@ namespace fCraft {
 
             if (hack == "null") {
                 player.Message("Current Hacks for {0}", target.ClassyName);
-                player.Message("    &sFlying: &a{0} &sNoclip: &a{1} &sSpeedhack: &a{2}",
+                player.Message("    &SFlying: &a{0} &SNoclip: &a{1} &SSpeedhack: &a{2}",
                                 target.AllowFlying.ToString(),
                                 target.AllowNoClip.ToString(),
                                 target.AllowSpeedhack.ToString());
-                player.Message("    &sRespawn: &a{0} &sThirdPerson: &a{1} &sJumpHeight: &a{2}",
+                player.Message("    &SRespawn: &a{0} &SThirdPerson: &a{1} &SJumpHeight: &a{2}",
                                 target.AllowRespawn.ToString(),
                                 target.AllowThirdPerson.ToString(),
                                 target.JumpHeight);
@@ -2127,7 +2127,7 @@ namespace fCraft {
                 case "fly":
                 case "f":
                     player.Message("Hacks for {0}", target.ClassyName);
-                    player.Message("    Flying: &a{0} &s--> &a{1}", target.AllowFlying.ToString(), (!target.AllowFlying).ToString());
+                    player.Message("    Flying: &a{0} &S--> &a{1}", target.AllowFlying.ToString(), (!target.AllowFlying).ToString());
                     target.AllowFlying = !target.AllowFlying;
                     hackStr = "flying";
                     goto sendPacket;
@@ -2135,7 +2135,7 @@ namespace fCraft {
                 case "clip":
                 case "nc":
                     player.Message("Hacks for {0}", target.ClassyName);
-                    player.Message("    NoClip: &a{0} &s--> &a{1}", target.AllowNoClip.ToString(), (!target.AllowNoClip).ToString());
+                    player.Message("    NoClip: &a{0} &S--> &a{1}", target.AllowNoClip.ToString(), (!target.AllowNoClip).ToString());
                     target.AllowNoClip = !target.AllowNoClip;
                     hackStr = "noclip";
                     goto sendPacket;
@@ -2143,7 +2143,7 @@ namespace fCraft {
                 case "speed":
                 case "sh":
                     player.Message("Hacks for {0}", target.ClassyName);
-                    player.Message("    SpeedHack: &a{0} &s--> &a{1}", target.AllowSpeedhack.ToString(), (!target.AllowSpeedhack).ToString());
+                    player.Message("    SpeedHack: &a{0} &S--> &a{1}", target.AllowSpeedhack.ToString(), (!target.AllowSpeedhack).ToString());
                     target.AllowSpeedhack = !target.AllowSpeedhack;
                     hackStr = "speedhack";
                     goto sendPacket;
@@ -2151,7 +2151,7 @@ namespace fCraft {
                 case "spawn":
                 case "rs":
                     player.Message("Hacks for {0}", target.ClassyName);
-                    player.Message("    Respawn: &a{0} &s--> &a{1}", target.AllowRespawn.ToString(), (!target.AllowRespawn).ToString());
+                    player.Message("    Respawn: &a{0} &S--> &a{1}", target.AllowRespawn.ToString(), (!target.AllowRespawn).ToString());
                     target.AllowRespawn = !target.AllowRespawn;
                     hackStr = "respawn";
                     goto sendPacket;
@@ -2159,7 +2159,7 @@ namespace fCraft {
                 case "third":
                 case "tp":
                     player.Message("Hacks for {0}", target.ClassyName);
-                    player.Message("    ThirdPerson: &a{0} &s--> &a{1}", target.AllowThirdPerson.ToString(), (!target.AllowThirdPerson).ToString());
+                    player.Message("    ThirdPerson: &a{0} &S--> &a{1}", target.AllowThirdPerson.ToString(), (!target.AllowThirdPerson).ToString());
                     target.AllowThirdPerson = !target.AllowThirdPerson;
                     hackStr = "thirdperson";
                     goto sendPacket;
@@ -2171,11 +2171,11 @@ namespace fCraft {
                     string third = cmd.Next();
                     if (short.TryParse(third, out height)) {
                         player.Message("Hacks for {0}", target.ClassyName);
-                        player.Message("    JumpHeight: &a{0} &s--> &a{1}", target.JumpHeight, height);
+                        player.Message("    JumpHeight: &a{0} &S--> &a{1}", target.JumpHeight, height);
                         target.JumpHeight = height;
                         hackStr = "jumpheight";
                         goto sendPacket;
-                    } else player.Message("Error: Could not parse \"&a{0}&s\" as a short. Try something between &a0&s and &a32767", third);
+                    } else player.Message("Error: Could not parse \"&a{0}&S\" as a short. Try something between &a0&S and &a32767", third);
                     break;
                 default:
                     player.Message(CdHackControl.Help);
@@ -2185,7 +2185,7 @@ namespace fCraft {
         sendPacket:
             if (target.IsOnline) {
                 if (target.PlayerObject != player) {
-                    target.PlayerObject.Message("{0} has changed your {1} ability, use &h/Hacks &sto check them out.", player.Info.Name, hackStr);
+                    target.PlayerObject.Message("{0} has changed your {1} ability, use &H/Hacks &Sto check them out.", player.Info.Name, hackStr);
                 }
                 if (target.PlayerObject.Supports(CpeExt.HackControl)) {
                     target.PlayerObject.Send(Packet.HackControl(
@@ -2271,7 +2271,7 @@ namespace fCraft {
                     return;
                 }
             }
-            player.Message("Set max reach distance for world &f{0}&s to &f{1} &s(&f{2}&s blocks)", world.ClassyName, distance, distance / 32);
+            player.Message("Set max reach distance for world &f{0}&S to &f{1} &S(&f{2}&S blocks)", world.ClassyName, distance, distance / 32);
             world.maxReach = distance;
 
         }
@@ -2386,14 +2386,14 @@ namespace fCraft {
                 if (color.CaselessEquals("on") || color.CaselessEquals("true") || color.CaselessEquals("yes")) {
                     zone.ShowZone = true;
                     if (zone.Color != null) {
-                        player.Message("Zone ({0}&s) will now show its bounderies", zone.ClassyName);
+                        player.Message("Zone ({0}&S) will now show its bounderies", zone.ClassyName);
                         player.World.Players.Where(p => p.Supports(CpeExt.SelectionCuboid)).Send(Packet.MakeMakeSelection(zone.ZoneID, zone.Name, zone.Bounds,
                             zone.Color, zone.Alpha));
                     }
                     return;
                 } else if (color.CaselessEquals("off") || color.CaselessEquals("false") || color.CaselessEquals("no")) {
                     zone.ShowZone = false;
-                    player.Message("Zone ({0}&s) will no longer show its bounderies", zone.ClassyName);
+                    player.Message("Zone ({0}&S) will no longer show its bounderies", zone.ClassyName);
                     player.World.Players.Where(p => p.Supports(CpeExt.SelectionCuboid)).Send(Packet.MakeRemoveSelection(zone.ZoneID));
                     return;
                 } else {
@@ -2424,14 +2424,14 @@ namespace fCraft {
                 } else if (bol.CaselessEquals("on") || bol.CaselessEquals("true") || bol.CaselessEquals("1") ||
                            bol.CaselessEquals("yes")) {
                     zone.ShowZone = true;
-                    player.Message("Zone ({0}&s) color set! Bounderies: ON", zone.ClassyName);
+                    player.Message("Zone ({0}&S) color set! Bounderies: ON", zone.ClassyName);
                 } else if (bol.CaselessEquals("off") || bol.CaselessEquals("false") || bol.CaselessEquals("0") ||
                            bol.CaselessEquals("no")) {
                     zone.ShowZone = false;
-                    player.Message("Zone ({0}&s) color set! Bounderies: OFF", zone.ClassyName);
+                    player.Message("Zone ({0}&S) color set! Bounderies: OFF", zone.ClassyName);
                 }
             } else {
-                player.Message("Zone ({0}&s) color set!", zone.ClassyName);
+                player.Message("Zone ({0}&S) color set!", zone.ClassyName);
             }
             if (zone != null) {
                 foreach (Player p in player.World.Players) {

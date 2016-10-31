@@ -191,7 +191,7 @@ namespace fCraft {
                 player.Message( "Zone \"{0}\" created, {1} blocks total.",
                                 zone.Name, zone.Bounds.Volume );
                 Logger.Log( LogType.UserActivity,
-                            "{0} {1} &screated a new zone \"{2}\" containing {3} blocks.",
+                            "{0} {1} &Screated a new zone \"{2}\" containing {3} blocks.",
                             player.Info.Rank.Name,
                             player.Name,
                             zone.Name,
@@ -322,7 +322,7 @@ namespace fCraft {
                 player.Message("Sign \"{0}\" created, {1} blocks total.",
                                 zone.Name, zone.Bounds.Volume);
                 Logger.Log(LogType.UserActivity,
-                            "{0} {1} &screated a new Sign \"{2}\" containing {3} blocks.",
+                            "{0} {1} &Screated a new Sign \"{2}\" containing {3} blocks.",
                             player.Info.Rank.Name,
                             player.Name,
                             zone.Name,
@@ -397,7 +397,7 @@ namespace fCraft {
                         player.Message( "Whitelist of zone {0}&S cleared: {1}",
                                         zone.ClassyName, oldWhitelist.JoinToClassyString() );
                         Logger.Log( LogType.UserActivity,
-                                    "{0} {1} &scleared whitelist of zone {2} on world {3}: {4}",
+                                    "{0} {1} &Scleared whitelist of zone {2} on world {3}: {4}",
                                     player.Info.Rank.Name, player.Name, zone.Name, player.World.Name,
                                     oldWhitelist.JoinToString( pi => pi.Name ) );
                     } else {
@@ -415,7 +415,7 @@ namespace fCraft {
                         player.Message( "Blacklist of zone {0}&S cleared: {1}",
                                         zone.ClassyName, oldBlacklist.JoinToClassyString() );
                         Logger.Log( LogType.UserActivity,
-                                    "{0} {1} &scleared blacklist of zone {2} on world {3}: {4}",
+                                    "{0} {1} &Scleared blacklist of zone {2} on world {3}: {4}",
                                     player.Info.Rank.Name, player.Name, zone.Name, player.World.Name,
                                     oldBlacklist.JoinToString( pi => pi.Name ) );
                     } else {
@@ -774,9 +774,9 @@ namespace fCraft {
                 }
                 player.WorldMap.Zones.Clear();
                 Logger.Log( LogType.UserActivity,
-                            "{0} {1} &sremoved all zones on world {2}",
+                            "{0} {1} &Sremoved all zones on world {2}",
                             player.Info.Rank.Name, player.Name, player.World.Name );
-                Server.Message( "{0} {1}&S removed all zones on world {2}",
+                Server.Message( "{0} {1} &Sremoved all zones on world {2}",
                                 player.Info.Rank.Name, player.ClassyName, player.World.ClassyName );
                 return;
             }
@@ -812,7 +812,7 @@ namespace fCraft {
                             p.Send(Packet.MakeRemoveSelection(zone.ZoneID));
                     }
                     Logger.Log( LogType.UserActivity,
-                                "{0} {1} &sremoved zone {2} from world {3}",
+                                "{0} {1} &Sremoved zone {2} from world {3}",
                                 player.Info.Rank.Name, player.Name, zone.Name, player.World.Name );
                     player.Message( "Zone \"{0}\" removed.", zone.Name );
                 }
@@ -861,7 +861,7 @@ namespace fCraft {
                 if (zones.Remove(zone.Name))
                 {
                     Logger.Log(LogType.UserActivity,
-                                "{0} {1} &sremoved Sign {2} from world {3}",
+                                "{0} {1} &Sremoved Sign {2} from world {3}",
                                 player.Info.Rank.Name, player.Name, zone.Name, player.World.Name);
                     player.Message("Sign \"{0}\" removed.", zone.Name);
                 }
@@ -935,7 +935,7 @@ namespace fCraft {
             playerWorld.Players.Message( "&SZone \"{0}\" was renamed to \"{1}&S\" by {2}",
                                          fullOldName, oldZone.ClassyName, player.ClassyName );
             Logger.Log( LogType.UserActivity,
-                        "{0} {1} &srenamed zone \"{2}\" to \"{3}\" on world {4}",
+                        "{0} {1} &Srenamed zone \"{2}\" to \"{3}\" on world {4}",
                         player.Info.Rank.Name, player.Name, fullOldName, newName, playerWorld.Name );
         }
 
@@ -980,16 +980,16 @@ namespace fCraft {
             Usage = "/Door [option] [args]",
             Category = CommandCategory.Zone,
             Permissions = new[] { Permission.Build },
-            Help = "Command used for Door operations.&n" +
+            Help = "Command used for Door operations.&N" +
                 "Options: Create, Delete, List, Test",
             HelpSections = new Dictionary<string, string>{
-                { "create", "&H/Door create [name]&n&S" +
+                { "create", "&H/Door create [name]&N&S" +
                         "Creates a clickable door based on your next 2 selection." },
-                { "delete", "&H/Door delete [name]&n&S" +
+                { "delete", "&H/Door delete [name]&N&S" +
                         "Deletes a specified door." },
-                { "list", "&H/Door list {world name}&n&S" +
+                { "list", "&H/Door list {world name}&N&S" +
                         "Lists all doors on the specified world or the one you are on if not specified."},
-                { "test", "&H/Door test&n&S" +
+                { "test", "&H/Door test&N&S" +
                         "Tells you the name(if any) of the door in your next selection."}
             },
             Handler = Door

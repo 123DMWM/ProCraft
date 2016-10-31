@@ -272,7 +272,7 @@ namespace fCraft {
 
 
         public override string ToString() {
-            return String.Format("&s(X:&f{0}&s Y:&f{1}&s Z:&f{2}&s)", X, Y, Z);
+            return String.Format("&S(X:&f{0}&S Y:&f{1}&S Z:&f{2}&S)", X, Y, Z);
         }
 
 

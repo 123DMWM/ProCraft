@@ -270,41 +270,41 @@ namespace fCraft {
             Category = CommandCategory.New | CommandCategory.Chat,
             Permissions = new Permission[] { Permission.UseBot },
             Usage = "Bot [Option]",
-            Help = "Bot options are &hGo&s, &hServer&s, &hJoke&s, &hTime&s, &hPromos&s, &hBans&s, &hKicks&s, &hBlocks&s, &hProtip&s, &hFunfact&s, and &hIdea&s.&n" +
-                   "Type in &h/help bot [option] &sfor more information.&n" +
-                   "&6Bot&s is our Automated response system, so please don't abuse it.",
+            Help = "Bot options are &HGo&S, &HServer&S, &HJoke&S, &HTime&S, &HPromos&S, &HBans&S, &HKicks&S, &HBlocks&S, &HProtip&S, &HFunfact&S, and &HIdea&S.&N" +
+                   "Type in &H/help bot [option] &Sfor more information.&N" +
+                   "&6Bot&S is our Automated response system, so please don't abuse it.",
             NotRepeatable = true,
             IsConsoleSafe = true,
             HelpSections = new Dictionary<string, string>{
-                { "go",             "&sType: &f!Bot Go&n&S" +
+                { "go",             "&SType: &f!Bot Go&N&S" +
                                     "Sets a 5 second timer to be used for games." +
                                     "Most useful for when there are no staff on." },
-                { "server",         "&sType: &f!Bot Server&n&S" +
+                { "server",         "&SType: &f!Bot Server&N&S" +
                                     "Displays the server name."},
-                { "joke",           "&sType: &f!Bot Joke&n&S" +
+                { "joke",           "&SType: &f!Bot Joke&N&S" +
                                     "Displays a joke."},
-                { "time",           "&sType: &f!Bot Time&n&S" +
+                { "time",           "&SType: &f!Bot Time&N&S" +
                                     "Displays the time you spent this game session." +
-                                    "&sType: &f!Bot Time Total&n&S" +
+                                    "&SType: &f!Bot Time Total&N&S" +
                                     "Displays your Total Time spent on the server." },
-                { "promos",         "&sType: &f!Bot Promos&n&S" +
+                { "promos",         "&SType: &f!Bot Promos&N&S" +
                                     "Displays the amount of times you have promoted."},
-                { "demotes",        "&sType: &f!Bot Demotes&n&S" +
+                { "demotes",        "&SType: &f!Bot Demotes&N&S" +
                                     "Displays the amount of times you have demoted."},
-                { "bans",           "&sType: &f!Bot Bans&n&S" +
+                { "bans",           "&SType: &f!Bot Bans&N&S" +
                                     "Displays the amount of players you have banned."},
-                { "kicks",          "&sType: &f!Bot Kicks&n&S" +
+                { "kicks",          "&SType: &f!Bot Kicks&N&S" +
                                     "Displays the amount of players you have kicked."},
-                { "blocks",         "&sType: &f!Bot Blocks&n&S" +
+                { "blocks",         "&SType: &f!Bot Blocks&N&S" +
                                     "Displays the amount of blocks you have modified this session." +
-                                    "&sType: &f!Bot Blocks Total&n&S" +
+                                    "&SType: &f!Bot Blocks Total&N&S" +
                                     "Displays the amount of blocks you have modified in Total." },
-                { "protip",         "&sType: &f!Bot Protip&n&S" +
+                { "protip",         "&SType: &f!Bot Protip&N&S" +
                                     "Displays a life changing tip.*" +
                                     "*May or may not change your life" },
-                { "funfact",        "&sType: &f!Bot Funfact&n&S" +
+                { "funfact",        "&SType: &f!Bot Funfact&N&S" +
                                     "Displays a funfact."},
-                { "idea",           "&sType: &f!Bot Idea&n&S" +
+                { "idea",           "&SType: &f!Bot Idea&N&S" +
                                     "Displays a random building idea"}
                 
                 
@@ -339,7 +339,7 @@ namespace fCraft {
 			}
             if (player.Info.TimesUsedBot == 0) {
                 player.Message(
-                    "&6Bot&f: This is your first time using &6Bot&s, I suggest you use \"/Help Bot\" to further understand how I work.");
+                    "&6Bot&f: This is your first time using &6Bot&S, I suggest you use \"/Help Bot\" to further understand how I work.");
             }
             bool sentMessage = true;
             switch (option) {
@@ -916,7 +916,7 @@ namespace fCraft {
             Usage = "/Kick PlayerName [Reason]",
             Help = "Kicks the specified player from the server. " +
                    "Optional kick reason/message is shown to the kicked player and logged." +
-                   "Kicking will also make them spawn in &fTutorial &sworld next time they log in." +
+                   "Kicking will also make them spawn in &fTutorial &Sworld next time they log in." +
                    "(In the mean time it will show up as them not having read the rules in their info)",
             Handler = KickHandler
         };
@@ -1120,7 +1120,7 @@ namespace fCraft {
 			if (!silent && ConfigKey.ShowConnectionMessages.Enabled()) {
 				if (!quitMessage.Equals("")) {
 					player.quitmessage = quitMessage;
-					quitMessage = String.Format(" &s(Reason: {0})", player.quitmessage);
+					quitMessage = String.Format(" &S(Reason: {0})", player.quitmessage);
 					player.usedquit = true;
 				}
 				Server.Players.CantSee(player).Message(Server.MakePlayerDisconnectedMessage(player) + quitMessage);
@@ -1399,7 +1399,7 @@ namespace fCraft {
             Aliases = new[] { "teleport", "to" },
             Category = CommandCategory.New | CommandCategory.Moderation,
             Permissions = new[] { Permission.Teleport },
-            Usage = "/TP PlayerName&S or &H/TP X Y Z [R L]&s or &h/TP Random",
+            Usage = "/TP PlayerName&S or &H/TP X Y Z [R L]&S or &H/TP Random",
             Help = "Teleports you to a specified player's location. " +
                    "If coordinates are given, teleports to that location." +
                    "Or teleports you to a random location at your own height level.",
@@ -1719,7 +1719,7 @@ namespace fCraft {
             player.Info.JoinOnRankWorld = joinRankWorld;
             player.Message("JoinOnRankWorld: Set to " + (joinRankWorld ? "&2On" : "&4Off"));
             World world = joinRankWorld ? player.Info.Rank.MainWorld : WorldManager.MainWorld;
-            player.Message("You will now spawn on world {0}&s when you logon to the server.", world.ClassyName);
+            player.Message("You will now spawn on world {0}&S when you logon to the server.", world.ClassyName);
         }
         
         #endregion
@@ -1747,17 +1747,17 @@ namespace fCraft {
                 {
                     if (prank.MaxCaps != 0 && prank.MaxCaps != 1)
                     {
-                        player.Message("Rank ({0}&s) has a max of {1} uppercase letters/message.", prank.ClassyName, prank.MaxCaps);
+                        player.Message("Rank ({0}&S) has a max of {1} uppercase letters/message.", prank.ClassyName, prank.MaxCaps);
                         return;
                     }
                     else if (prank.MaxCaps == 0)
                     {
-                        player.Message("Rank ({0}&s) has no max.", prank.ClassyName);
+                        player.Message("Rank ({0}&S) has no max.", prank.ClassyName);
                         return;
                     }
                     else if (prank.MaxCaps == 1)
                     {
-                        player.Message("Rank ({0}&s) has a max of (RawMessage.Length / 2) uppercase letters/message.", prank.ClassyName);
+                        player.Message("Rank ({0}&S) has a max of (RawMessage.Length / 2) uppercase letters/message.", prank.ClassyName);
                         return;
                     }
                 }
@@ -1771,17 +1771,17 @@ namespace fCraft {
                 {
                     if (rank.MaxCaps != 0 && rank.MaxCaps != 1)
                     {
-                        player.Message("Rank ({0}&s) has a max of {1} uppercase letters/message.", rank.ClassyName, rank.MaxCaps);
+                        player.Message("Rank ({0}&S) has a max of {1} uppercase letters/message.", rank.ClassyName, rank.MaxCaps);
                         return;
                     }
                     else if (rank.MaxCaps == 0)
                     {
-                        player.Message("Rank ({0}&s) has no max.", rank.ClassyName);
+                        player.Message("Rank ({0}&S) has no max.", rank.ClassyName);
                         return;
                     }
                     else if (rank.MaxCaps == 1)
                     {
-                        player.Message("Rank ({0}&s) has a max of (RawMessage.Length / 2) uppercase letters/message.", rank.ClassyName);
+                        player.Message("Rank ({0}&S) has a max of (RawMessage.Length / 2) uppercase letters/message.", rank.ClassyName);
                         return;
                     }
                 }
@@ -1794,7 +1794,7 @@ namespace fCraft {
                 if (rank != null)
                 {
                     rank.MaxCaps = mcaps;
-                    player.Message("Set MaxCaps for rank ({0}&s) to {1} uppercase letters/message.", rank.ClassyName, rank.MaxCaps);
+                    player.Message("Set MaxCaps for rank ({0}&S) to {1} uppercase letters/message.", rank.ClassyName, rank.MaxCaps);
                     return;
                 }
             }
@@ -1802,17 +1802,17 @@ namespace fCraft {
             {
                 if (prank.MaxCaps != 0 && prank.MaxCaps != 1)
                 {
-                    player.Message("Rank ({0}&s) has a max of {1} uppercase letters/message.", prank.ClassyName, prank.MaxCaps);
+                    player.Message("Rank ({0}&S) has a max of {1} uppercase letters/message.", prank.ClassyName, prank.MaxCaps);
                     return;
                 }
                 else if (prank.MaxCaps == 0)
                 {
-                    player.Message("Rank ({0}&s) has no max.", prank.ClassyName);
+                    player.Message("Rank ({0}&S) has no max.", prank.ClassyName);
                     return;
                 }
                 else if (prank.MaxCaps == 1)
                 {
-                    player.Message("Rank ({0}&s) has a max of (RawMessage.Length / 2) uppercase letters/message.", prank.ClassyName);
+                    player.Message("Rank ({0}&S) has a max of (RawMessage.Length / 2) uppercase letters/message.", prank.ClassyName);
                     return;
                 }
                 return;
@@ -2451,9 +2451,9 @@ namespace fCraft {
             Usage = "/verify [PlayerName]",
             Help = "Used for when players with a last login date before Jan 1 2014 join with a classicube.net account, " +
                    "marks the account as verified as belonging to the person and allows them to use non-guest commands.&N" +
-                   "&cNote:&s This should only be used after you have contacted the old account owner and " +
+                   "&cNote:&S This should only be used after you have contacted the old account owner and " +
             	   "verified that they created a classicube.net account.&N" +
-            	   "&cNote:&s This command can only be used by players of the highest rank.",
+            	   "&cNote:&S This command can only be used by players of the highest rank.",
             Handler = VerifyHandler
         };
 

@@ -385,7 +385,7 @@ namespace fCraft {
             LastUsedBlockType = held;
             if (Supports(CpeExt.MessageType) && !IsPlayingCTF) {
                 Send(Packet.Message((byte)MessageType.BottomRight1, "Block:&f" + Map.GetBlockName(World, HeldBlock)
-                                    + " &sID:&f" + (byte)HeldBlock, true));
+                                    + " &SID:&f" + (byte)HeldBlock, true));
             }
         }
 
@@ -792,7 +792,7 @@ namespace fCraft {
 
 
             // ----==== Beyond this point, player is considered connected (authenticated and registered) ====----
-            Logger.Log(LogType.UserActivity, "{0} &sconnected from {1}.", Name, IP);
+            Logger.Log(LogType.UserActivity, "{0} &Sconnected from {1}.", Name, IP);
 
 
             // Figure out what the starting world should be
@@ -1153,11 +1153,11 @@ namespace fCraft {
         void SendJoinMessage(World oldWorld, World newWorld) {
             if (oldWorld == newWorld)
             {
-                Message("&sRejoined world {0}", newWorld.ClassyName);
+                Message("&SRejoined world {0}", newWorld.ClassyName);
             }
             else
             {
-                Message("&sJoined world {0}", newWorld.ClassyName);
+                Message("&SJoined world {0}", newWorld.ClassyName);
                 string greeting = newWorld.Greeting;
                 if (greeting != null)
                 {
@@ -1173,7 +1173,7 @@ namespace fCraft {
                         string GreetingMessage = "";
                         foreach (string line in Greeting)
                         {
-                            GreetingMessage += line + "&n";
+                            GreetingMessage += line + "&N";
                         }
                         Message(Chat.ReplaceTextKeywords(this, GreetingMessage));
                     }
@@ -1205,7 +1205,7 @@ namespace fCraft {
 
             if (Supports(CpeExt.MessageType) && !IsPlayingCTF) {
                 SendNow(Packet.Message((byte)MessageType.BottomRight1, "Block:&f" + Map.GetBlockName(World, HeldBlock)
-                                    + " &sID:&f" + (byte)HeldBlock, true));
+                                    + " &SID:&f" + (byte)HeldBlock, true));
             }
             if (Supports(CpeExt.MessageType)) {
                 SendNow(Packet.Message((byte)MessageType.Status1, ConfigKey.ServerName.GetString(), UseFallbackColors));

@@ -311,13 +311,13 @@ namespace fCraft
             	if (name.CaselessEquals("irc")) {
                     if (player.Info.ReadIRC) {
                         player.Info.ReadIRC = false;
-                        player.Message("You are now ignoring &iIRC");
+                        player.Message("You are now ignoring &IIRC");
                         string message = String.Format("\u212C&SPlayer {0}&S is now Ignoring IRC", player.ClassyName);
                         if (!player.Info.IsHidden) {
                             IRC.SendChannelMessage(message);
                         }
                     } else {
-                        player.Message("You are already ignoring &iIRC");
+                        player.Message("You are already ignoring &IIRC");
                     }
                     return;
                 }
@@ -370,13 +370,13 @@ namespace fCraft
             	if (name.CaselessEquals("irc")) {
                     if (!player.Info.ReadIRC) {
                         player.Info.ReadIRC = true;
-                        player.Message("You are no longer ignoring &iIRC");
+                        player.Message("You are no longer ignoring &IIRC");
                         string message = String.Format("\u212C&SPlayer {0}&S is no longer Ignoring IRC", player.ClassyName);
                         if (!player.Info.IsHidden) {
                             IRC.SendChannelMessage(message);
                         }
                     } else {
-                        player.Message("You are not currently ignoring &iIRC");
+                        player.Message("You are not currently ignoring &IIRC");
                     }
                     return;
                 }
@@ -458,10 +458,10 @@ namespace fCraft
             Category = CommandCategory.Chat,
             Permissions = new[] { Permission.Chat },
             IsConsoleSafe = true,
-            Help = "Gives random number between 1 and 100.&n" +
-                   "&H/Roll MaxNumber&n" +
-                   "  Gives number between 1 and max.&n" +
-                   "&H/Roll MinNumber MaxNumber&n" +
+            Help = "Gives random number between 1 and 100.&N" +
+                   "&H/Roll MaxNumber&N" +
+                   "  Gives number between 1 and max.&N" +
+                   "&H/Roll MinNumber MaxNumber&N" +
                    "  Gives number between min and max.",
             Handler = RollHandler
         };
@@ -550,7 +550,7 @@ namespace fCraft
 
         private static void sendChannelUsers(Player p) {
             foreach (var chan in IRC.Users) {
-                p.Message(" -&s{0}: &f{1}",
+                p.Message(" -&S{0}: &f{1}",
                                chan.Key, chan.Value.JoinToString(", "));
             }
         }
@@ -621,13 +621,13 @@ namespace fCraft
             Name = "Report",
             Category = CommandCategory.New | CommandCategory.Chat,
             Usage = "/Report <Message>",
-            Help = "Used to leave a report message only the Highest Rank can read.&n" +
-                   "Things to talk about: &n"+
-                   "  &fGriefers, Spammers, Trenchers&n" +
-                   "  &fAbusive Players, Abusive Admins&n" +
-                   "  &fBugs, Suggestions&n" +
-                   "  &fOr just a friendly message&n" +
-                   "&sRemember, everything is kept a secret unless stated otherwise.",
+            Help = "Used to leave a report message only the Highest Rank can read.&N" +
+                   "Things to talk about: &N"+
+                   "  &fGriefers, Spammers, Trenchers&N" +
+                   "  &fAbusive Players, Abusive Admins&N" +
+                   "  &fBugs, Suggestions&N" +
+                   "  &fOr just a friendly message&N" +
+                   "&SRemember, everything is kept a secret unless stated otherwise.",
 
             Handler = reportHandler
         };
@@ -652,8 +652,8 @@ namespace fCraft
                 CdReport.PrintUsage(player);
             } else {
                 player.Confirm(cmd,
-                    "&sYour message will show up like this: &n" + "&s[&1Report&s]&n" + "  &sFrom:&f {0}&n" +
-                    "  &sDate: &7{1} at {2}&n" + "  &sMessage:&f {3}", player.Name, DateTime.Now.ToShortDateString(),
+                    "&SYour message will show up like this: &N" + "&S[&1Report&S]&N" + "  &SFrom:&f {0}&N" +
+                    "  &SDate: &7{1} at {2}&N" + "  &SMessage:&f {3}", player.Name, DateTime.Now.ToShortDateString(),
                     DateTime.Now.ToLongTimeString(), message);
             }
 
@@ -710,8 +710,8 @@ namespace fCraft
                         foreach (Report r in Chat.Reports) {
                             if (r.Id == reportId) {
                                 player.Message(
-                                    "&s[&1Report&s] #&f{0}&n" + "  &sFrom:&f {1}&n" + "  &sDate: &7{2} at {3}&n" +
-                                    "  &sMessage:&f {4}", r.Id, r.Sender, r.Datesent.ToShortDateString(),
+                                    "&S[&1Report&S] #&f{0}&N" + "  &SFrom:&f {1}&N" + "  &SDate: &7{2} at {3}&N" +
+                                    "  &SMessage:&f {4}", r.Id, r.Sender, r.Datesent.ToShortDateString(),
                                     r.Datesent.ToLongTimeString(), r.Message);
                                 read = true;
                             }
@@ -729,7 +729,7 @@ namespace fCraft
                     } else {
                         player.Message("There are {0} reports:", Chat.Reports.Count);
                         foreach (Report r in Chat.Reports.OrderBy(r => r.Datesent)) {
-                            player.Message("[&1Report&s] #&f" + r.Id + " &sFrom:&f " + r.Sender);
+                            player.Message("[&1Report&S] #&f" + r.Id + " &SFrom:&f " + r.Sender);
                         }
                     }
                     break;
@@ -761,7 +761,7 @@ namespace fCraft
             Help = "Starts a timer with a given duration and message. " +
                    "As the timer counts down, announcements are shown globally. See also: &H/Help Timer Abort",
             HelpSections = new Dictionary<string, string> {
-                { "abort",  "&H/Timer Abort <TimerID>&n&S" +
+                { "abort",  "&H/Timer Abort <TimerID>&N&S" +
                             "Aborts a timer with the given ID number. " +
                             "To see a list of timers and their IDs, type &H/Timer&S (without any parameters)." }
             },
@@ -787,12 +787,12 @@ namespace fCraft
                     {
                         if (timer.Message.Equals(""))
                         {
-                            player.Message("  #{0} \"&7*CountDown*&s\" (started by {2}, {3} left)",
+                            player.Message("  #{0} \"&7*CountDown*&S\" (started by {2}, {3} left)",
                                             timer.ID, timer.Message, timer.StartedBy, timer.TimeLeft.ToMiniString());
                         }
                         else
                         {
-                            player.Message("  #{0} \"{1}&s\" (started by {2}, {3} left)",
+                            player.Message("  #{0} \"{1}&S\" (started by {2}, {3} left)",
                                             timer.ID, timer.Message, timer.StartedBy, timer.TimeLeft.ToMiniString());
                         }
                     }
@@ -901,16 +901,16 @@ namespace fCraft
             IsConsoleSafe = true,
             Category = CommandCategory.Chat,
             Usage = "/Filter {option} {args}",
-            Help = "Adds or removes a word and it's replacement to the chat filters&n" +
-                "Options: Add, Edit, Remove&n" + 
+            Help = "Adds or removes a word and it's replacement to the chat filters&N" +
+                "Options: Add, Edit, Remove&N" + 
                 "Writing nothing will display all filters.",
             HelpSections = new Dictionary<string, string> {
-                { "add",  "&H/Filter add <Word> <Replacement>&n&S" +
+                { "add",  "&H/Filter add <Word> <Replacement>&N&S" +
                             "Adds a Word and it's replacement to the filter list. " },
-                { "edit",  "&H/Filter edit <filterID> [word/replacement] [new string]&n&S" +
+                { "edit",  "&H/Filter edit <filterID> [word/replacement] [new string]&N&S" +
                             "Edits a filter with the given ID number. " +
                             "To see a list of filters and their IDs, type &H/filters" },
-                { "remove",  "&H/Filter remove <filterID>&n&S" +
+                { "remove",  "&H/Filter remove <filterID>&N&S" +
                             "Removes a filter with the given ID number. " +
                             "To see a list of filters and their IDs, type &H/filters" }
             },
@@ -1006,7 +1006,7 @@ namespace fCraft
                         default:
                             CdFilters.PrintUsage(player); return;
                     }
-                    Server.Message("&Y[Filters] {0}&Y edited a filter from &n(\"{1}\" -> \"{2}\") &nto (\"{3}\" -> \"{2}\")",
+                    Server.Message("&Y[Filters] {0}&Y edited a filter from &N(\"{1}\" -> \"{2}\") &Nto (\"{3}\" -> \"{2}\")",
                                    player.ClassyName, oldWord, oldReplacement, eFilter.Word, eFilter.Replacement);
                     ChatFilter.RemoveFilter(eID.ToString());
                     ChatFilter.Filters.Add(eFilter);
@@ -1095,7 +1095,7 @@ namespace fCraft
 				player.ChatRainbows = true;
 				player.ChatBWRainbows = false;
 				player.Message("Rainbow Chat: &2On");
-				player.Message("Your messages will now show up as &cR&4A&6I&eN&aB&2O&bW&3S&9!&s.");
+				player.Message("Your messages will now show up as &cR&4A&6I&eN&aB&2O&bW&3S&9!&S.");
 			}
 		}
         #endregion
@@ -1156,8 +1156,8 @@ namespace fCraft
             if (second == null) 
                 second = "";
             float percent = (1 - Chat.LDistance(first, second)) * 100;
-            player.Message( percent + "&s% similarity between:" );
-            player.Message( "  &7{0} &sand &7{1}", first, second );
+            player.Message( percent + "&S% similarity between:" );
+            player.Message( "  &7{0} &Sand &7{1}", first, second );
         }
 
         #endregion
@@ -1289,9 +1289,9 @@ namespace fCraft
             }
             
             if (cmd.IsConfirmed) {
-                Server.Players.Message("{0} &s{1} {2}", player.ClassyName, action, other.ClassyName);
+                Server.Players.Message("{0} &S{1} {2}", player.ClassyName, action, other.ClassyName);
             } else if (other != null) {
-                player.Confirm(cmd, "Your message will show up as: {0} &s{1} {2}", player.ClassyName, action, other.ClassyName);
+                player.Confirm(cmd, "Your message will show up as: {0} &S{1} {2}", player.ClassyName, action, other.ClassyName);
             }
         }
 

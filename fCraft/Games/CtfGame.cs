@@ -33,9 +33,9 @@ namespace fCraft.Games {
 				if (!other.IsPlayingCTF) continue;
 				if (p.Team != other.Team && p.Bounds.Intersects(other.Bounds)) {
 					if (p.Team.TaggingBounds.Intersects(other.Bounds))
-						Kill(p, other, " &stagged ");
+						Kill(p, other, " &Stagged ");
 					else if(other.Team.TaggingBounds.Intersects(p.Bounds))
-						Kill(other, p, " &stagged " );
+						Kill(other, p, " &Stagged " );
 				}
 			}
 		}
@@ -112,12 +112,12 @@ namespace fCraft.Games {
 				var flagholder = player.World.Players.Where(p => p.IsHoldingFlag);
 				string bottomRight2 = null;
 				if (flagholder.FirstOrDefault() == null) {
-					bottomRight2 = "&sNo one has the flag!";
+					bottomRight2 = "&SNo one has the flag!";
 				} else if (CTF.RedTeam.HasFlag) {
-					bottomRight2 = String.Format("{0} &shas the {1}&s flag!", 
+					bottomRight2 = String.Format("{0} &Shas the {1}&S flag!", 
 					                             flagholder.First().ClassyName, CTF.BlueTeam.ClassyName);
 				} else if (CTF.BlueTeam.HasFlag) {
-					bottomRight2 = String.Format("{0} &shas the {1}&s flag!", 
+					bottomRight2 = String.Format("{0} &Shas the {1}&S flag!", 
 					                             flagholder.First().ClassyName, CTF.RedTeam.ClassyName);
 				}
 				if (bottomRight2 != null && bottomRight2 != player.lastBottomRight2) {
@@ -217,9 +217,9 @@ namespace fCraft.Games {
 		
 		public static void SwitchTeamTo(Player player, CtfTeam newTeam, bool unbalanced) {
 			CtfTeam oldTeam = newTeam == RedTeam ? BlueTeam : RedTeam;
-			player.Message("You have switched to the {0}&s team.", newTeam.ClassyName);
+			player.Message("You have switched to the {0}&S team.", newTeam.ClassyName);
 			if (unbalanced)
-				player.Message( "&sThe teams are now unbalanced!");
+				player.Message( "&SThe teams are now unbalanced!");
 			
 			oldTeam.Players.Remove(player);
 			if (!newTeam.Has(player))
@@ -378,7 +378,7 @@ namespace fCraft.Games {
 			
 			if (world.IsLoaded)
 				world.Players.Message(
-					"&SThe game has ended! The scores are: &n" + "{0}{1} &7{2}{0}:&f{3} &S- {4}{5} &7{6}{4}:&f{7}",
+					"&SThe game has ended! The scores are: &N" + "{0}{1} &7{2}{0}:&f{3} &S- {4}{5} &7{6}{4}:&f{7}",
 					RedTeam.Color, RedTeam.Name, RedTeam.RoundsWon, RedTeam.Score,
 					BlueTeam.Color, BlueTeam.Name, BlueTeam.RoundsWon, BlueTeam.Score);
 			

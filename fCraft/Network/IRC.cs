@@ -346,7 +346,7 @@ namespace fCraft
                                 }
                                 foreach (Player player in Server.Players) {
                                     if (player.Info.ReadIRC) {
-                                        player.Message("&i(IRC) * {0} {1}", msg.Nick, processedMessage);
+                                        player.Message("&I(IRC) * {0} {1}", msg.Nick, processedMessage);
                                     }
                                 }
                                 Logger.Log(LogType.IrcChat, "{0}: * {1} {2}", msg.Channel, msg.Nick,
@@ -359,7 +359,7 @@ namespace fCraft
                                     IRCHandlers.lastIrcCommand = DateTime.UtcNow;
                                 }
                                 foreach (Player player in Server.Players.Where(player => player.Info.ReadIRC)) {
-                                    player.Message("&i(IRC) {0}{1}: {2}", msg.Nick, Color.White,
+                                    player.Message("&I(IRC) {0}{1}: {2}", msg.Nick, Color.White,
                                                    processedMessage);
                                 }
                             }
@@ -371,7 +371,7 @@ namespace fCraft
                                 IRCHandlers.lastIrcCommand = DateTime.UtcNow;
                             }
                             foreach (Player player in Server.Players.Where(player => player.Info.ReadIRC)) {
-                                player.Message("&i(IRC) {0}{1}: {2}", msg.Nick, Color.White,
+                                player.Message("&I(IRC) {0}{1}: {2}", msg.Nick, Color.White,
                                                processedMessage.Substring(1));
                             }
                             Logger.Log(LogType.IrcChat, "{0}: {1}: {2}", msg.Channel, msg.Nick,
@@ -383,7 +383,7 @@ namespace fCraft
                         if (!ResponsibleForInputParsing) return;
                         if (ConfigKey.IRCBotAnnounceIRCJoins.Enabled())
                         {
-                            Server.Message("&i(IRC) {0} joined the IRC channel ({1})",
+                            Server.Message("&I(IRC) {0} joined the IRC channel ({1})",
                                             msg.Nick,
                                             msg.Channel);
                             Logger.Log(LogType.IrcChat,
@@ -412,7 +412,7 @@ namespace fCraft
                             if (!ResponsibleForInputParsing) return;
                             // Someone else got kicked -- announce it
                             string kickMessage = ProcessMessageFromIRC(msg.Message);
-                            Server.Message("&i(IRC) {0} kicked {1} from the IRC channel ({3})",
+                            Server.Message("&I(IRC) {0} kicked {1} from the IRC channel ({3})",
                                             msg.Nick,
                                             kicked,
                                             msg.Channel,
@@ -441,7 +441,7 @@ namespace fCraft
                         // Announce parts/quits of IRC people (except the bots)
                         if (ConfigKey.IRCBotAnnounceIRCJoins.Enabled() && !IsBotNick(msg.Nick))
                         {
-                            Server.Message("&i(IRC) {0} left the IRC channel ({1})",
+                            Server.Message("&I(IRC) {0} left the IRC channel ({1})",
                                             msg.Nick,
                                             msg.Channel);
                             string quitMsg = (msg.Message == null)
@@ -470,7 +470,7 @@ namespace fCraft
                         else
                         {
                             if (!ResponsibleForInputParsing) return;
-                            Server.Message("&i(IRC) {0} is now known as {1}",
+                            Server.Message("&I(IRC) {0} is now known as {1}",
                                             msg.Nick,
                                             msg.Message);
                         }
@@ -561,7 +561,7 @@ namespace fCraft
                     case IRCMessageType.QueryMessage:
                         // TODO: PMs
                         if (acceptPMs && Player.Console.Info.ReadIRC) {
-                            Server.Players.Where(p => p.IsStaff).Message("&i{0} -> {1}&f: {2}", msg.Nick, botNick, msg.Message);
+                            Server.Players.Where(p => p.IsStaff).Message("&I{0} -> {1}&f: {2}", msg.Nick, botNick, msg.Message);
                         }
                         Logger.Log(LogType.IrcStatus, "QueryMessage: {0}", msg.RawMessage);
                         break;
@@ -969,7 +969,6 @@ namespace fCraft
             message = Chat.ReplaceNewlines(message);
 
             if (useColor) {
-				message = message.Replace("&t", ResetReplacement);
 				message = message.Replace("&T", ResetReplacement);
 				message = Color.MinecraftToIrcColors(message);
                 message = message.Replace(Bold, BoldReplacement);
@@ -1047,7 +1046,7 @@ namespace fCraft
                         
                     if (text != null) {
                         bool prefix = world != null && ((string)world).Length > 0;
-                        string template = prefix ? "&S[{1}on {5}{4}&s] {1}{0}{1}: {2}{3}" : "&S{1}{0}{1}: {2}{3}";
+                        string template = prefix ? "&S[{1}on {5}{4}&S] {1}{0}{1}: {2}{3}" : "&S{1}{0}{1}: {2}{3}";
                         string formatted = String.Format(template, args.Player.ClassyName,
                                                          Reset, text, ignored, world, Bold);
                         SendChannelMessage(formatted);                        

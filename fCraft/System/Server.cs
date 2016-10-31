@@ -888,7 +888,7 @@ namespace fCraft {
 				if (player.Supports(CpeExt.MessageType)) {
                     //double speed = (Math.Sqrt(player.Position.DistanceSquaredTo(player.lastSolidPos)) / 32);
                     //player.Send(Packet.Message((byte)MessageType.Announcement, string.Format("&eSpeed: &f{0:N2} &eBlocks/s", speed), player.UseFallbackColors));
-                    string bottomRight2 = player.Position.ToBlockCoordsExt() + "&s[" + compassString(player.Position.R) + "&s]";
+                    string bottomRight2 = player.Position.ToBlockCoordsExt() + "&S[" + compassString(player.Position.R) + "&S]";
                     if (bottomRight2 != player.lastBottomRight2) {
                         player.lastBottomRight2 = bottomRight2;
                         player.Send(Packet.Message((byte)MessageType.BottomRight2, bottomRight2, player.UseFallbackColors));
@@ -897,7 +897,7 @@ namespace fCraft {
                     if (player.LastDrawOp != null && !player.IsPlayingCTF)
                         if (player.LastDrawOp.PercentDone < 100) {
                             player.Send(Packet.Message((byte)MessageType.Status3, player.LastDrawOp.Description + 
-                    	                           " percent done: &f" + player.LastDrawOp.PercentDone + "&s%", true));
+                    	                           " percent done: &f" + player.LastDrawOp.PercentDone + "&S%", true));
                         } else if (player.LastDrawOp.PercentDone == 100 || player.LastDrawOp.IsDone) {
                             player.Send(Packet.Message((byte)MessageType.Status3, "", true));
                         }
@@ -1411,7 +1411,7 @@ namespace fCraft {
                 player.Info.ProcessLogout( player );
 
                 Logger.Log( LogType.UserActivity,
-                            "{0} &4disconnected &s({1}).", player.Name, player.LeaveReason );
+                            "{0} &4disconnected &S({1}).", player.Name, player.LeaveReason );
                 if (player.HasFullyConnected && ConfigKey.ShowConnectionMessages.Enabled())
                 {
                     Players.Where(p => !p.IsStaff).CanSee(player).Message("{0}{1}", MakePlayerDisconnectedMessage(player), player.usedquit ? " &cReason: " + player.quitmessage : "");
@@ -1482,7 +1482,7 @@ namespace fCraft {
         }
         
         static string GetGroup(Player p, IEnumerable<Player> canBeSeen) {
-            if (p.IsPlayingCTF) return "&sTeam " + p.Team.ClassyName;
+            if (p.IsPlayingCTF) return "&STeam " + p.Team.ClassyName;
             if (p.IsAFK) return "&SAway From Keyboard (&f" + canBeSeen.Where(pl => pl.IsAFK).Count() + "&S)";
             return "&S" + p.World.Name + " (&f" + canBeSeen.Where(pl => !pl.IsAFK && pl.World == p.World).Count() + "&S)";
         }

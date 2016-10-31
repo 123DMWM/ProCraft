@@ -29,7 +29,7 @@ namespace fCraft {
                 if (zone.Bounds.Contains(newPos.X / 32, newPos.Y / 32, (newPos.Z - 32) / 32)) {
                     deniedZone = true;
                     if (zone.Controller.MinRank.NextRankUp != null) {
-                        SendZoneMessage(p, zone, "&WYou must be at least rank " + zone.Controller.MinRank.NextRankUp.Name + "&w to enter this area.");
+                        SendZoneMessage(p, zone, "&WYou must be at least rank " + zone.Controller.MinRank.NextRankUp.Name + "&W to enter this area.");
                     } else {
                         SendZoneMessage(p, zone, "&WNo rank may enter this area.");
                     }

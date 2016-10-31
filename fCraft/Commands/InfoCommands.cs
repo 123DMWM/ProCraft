@@ -77,7 +77,7 @@ namespace fCraft {
                 player.BandwidthUseMode = newMode;
                 player.Info.BandwidthUseMode = newMode;
             } else {
-                player.Message("You need {0}&s to change your BandwidthUseMode", RankManager.GetMinRankWithAnyPermission(Permission.EditPlayerDB).ClassyName);
+                player.Message("You need {0}&S to change your BandwidthUseMode", RankManager.GetMinRankWithAnyPermission(Permission.EditPlayerDB).ClassyName);
             }
             
         }
@@ -465,9 +465,9 @@ namespace fCraft {
                         break;
                     case BanStatus.NotBanned:
                         if( ipBan != null ) {
-                            player.Message( "Player {0}&s is not banned, but their IP is.", info.ClassyName );
+                            player.Message( "Player {0}&S is not banned, but their IP is.", info.ClassyName );
                         } else {
-                            player.Message( "Player {0}&s is not banned.", info.ClassyName );
+                            player.Message( "Player {0}&S is not banned.", info.ClassyName );
                         }
                         break;
                 }
@@ -737,7 +737,7 @@ namespace fCraft {
         private static void RanksHandler([NotNull] Player player, [NotNull] CommandReader cmd) {
             player.Message("Below is a list of ranks. For detail see &H{0}", CdRankInfo.Usage);
             foreach (Rank rank in RankManager.Ranks) {
-                player.Message("    {0}  &s(&f{1}&s)", rank.ClassyName, rank.PlayerCount);
+                player.Message("    {0}  &S(&f{1}&S)", rank.ClassyName, rank.PlayerCount);
             }
         }
 
@@ -789,7 +789,7 @@ namespace fCraft {
             }
             if (Results.Count == 1)
             {
-                player.Message("{0} &shas the displayed name \"" + TargetDisplayedName + "\"", Results.ToArray()[0].Rank.Color + Results.ToArray()[0].Name);
+                player.Message("{0} &Shas the displayed name \"" + TargetDisplayedName + "\"", Results.ToArray()[0].Rank.Color + Results.ToArray()[0].Name);
             }
             if (Results.Count > 1)
             {
@@ -799,7 +799,7 @@ namespace fCraft {
                 }
                 whoislist = whoislist.Remove(whoislist.Length - 2);
                 whoislist += ".";
-                player.Message("The following players have the displayed name \"" + TargetDisplayedName + "\"&s: {0}", whoislist);
+                player.Message("The following players have the displayed name \"" + TargetDisplayedName + "\"&S: {0}", whoislist);
             }
         }
         #endregion
@@ -883,11 +883,11 @@ namespace fCraft {
                         {
                             Array.Sort(infos, new PlayerInfoComparer(player));
                             IClassy[] itemsEnumerated = infos;
-                            string nameList = itemsEnumerated.Take( 15 ).JoinToString( "&s, ", p => p.ClassyName );
+                            string nameList = itemsEnumerated.Take( 15 ).JoinToString( "&S, ", p => p.ClassyName );
                             if (rank.PlayerCount > 15) {
-                                player.Message( " {0} &s(&f{1}&s): {2}{3} &s{4} more", rank.ClassyName, rank.PlayerCount, rank.Color, nameList, (rank.PlayerCount - 15) );
+                                player.Message( " {0} &S(&f{1}&S): {2}{3} &S{4} more", rank.ClassyName, rank.PlayerCount, rank.Color, nameList, (rank.PlayerCount - 15) );
                             } else {
-                                player.Message( " {0} &s(&f{1}&s): {2}{3}", rank.ClassyName, rank.PlayerCount, rank.Color, nameList );
+                                player.Message( " {0} &S(&f{1}&S): {2}{3}", rank.ClassyName, rank.PlayerCount, rank.Color, nameList );
                             }
                         }
                     }
@@ -895,7 +895,7 @@ namespace fCraft {
             }
             else
             {
-                player.Message("Below is a list of ALL staff members of rank '" + ranktarget.ClassyName + "&s':");
+                player.Message("Below is a list of ALL staff members of rank '" + ranktarget.ClassyName + "&S':");
                 infos = PlayerDB.PlayerInfoList
                                 .Where(info => info.Rank == ranktarget)
                                 .ToArray();
@@ -905,9 +905,9 @@ namespace fCraft {
                     IClassy[] itemsEnumerated = infos;
                     string nameList = itemsEnumerated.Take(30).JoinToString(", ", p => p.ClassyName);
                     if (ranktarget.PlayerCount > 15) {
-                        player.Message( " {0} &s(&f{1}&s): {2}{3} &s{4} more", ranktarget.ClassyName, ranktarget.PlayerCount, ranktarget.Color, nameList, (ranktarget.PlayerCount - 30) );
+                        player.Message( " {0} &S(&f{1}&S): {2}{3} &S{4} more", ranktarget.ClassyName, ranktarget.PlayerCount, ranktarget.Color, nameList, (ranktarget.PlayerCount - 30) );
                     } else {
-                        player.Message( " {0} &s(&f{1}&s): {2}{3}", ranktarget.ClassyName, ranktarget.PlayerCount, ranktarget.Color, nameList );
+                        player.Message( " {0} &S(&f{1}&S): {2}{3}", ranktarget.ClassyName, ranktarget.PlayerCount, ranktarget.Color, nameList );
                     }
                 }
             }
@@ -929,7 +929,7 @@ namespace fCraft {
 
         static void RulesHandler(Player player, CommandReader cmd) {
             if (!player.Info.HasRTR) {
-                Server.Players.Can(Permission.ReadStaffChat).Message(player.ClassyName + " &sread the rules!");
+                Server.Players.Can(Permission.ReadStaffChat).Message(player.ClassyName + " &Sread the rules!");
                 player.Info.HasRTR = true;
                 player.Info.ReadIRC = true;
             }
@@ -1216,7 +1216,7 @@ namespace fCraft {
         public static string GetCompassString( byte rotation ) {
             int offset = (int)(rotation / 255f * 64f) + 32;
 
-            return String.Format( "&s[&f{0}&c{1}&f{2}&s]",
+            return String.Format( "&S[&f{0}&c{1}&f{2}&S]",
                                   Compass.Substring(offset - 9, 8),
                                   Compass.Substring(offset - 1, 3),
                                   Compass.Substring(offset + 2, 8));
@@ -1314,15 +1314,15 @@ namespace fCraft {
             string prefix;
             if (param == null) {
                 player.Message("Command Categories:");
-                player.Message("&h  /cmds All");
-                player.Message("&h  /cmds Building");
-                player.Message("&h  /cmds Chat");
-                player.Message("&h  /cmds CPE");
-                player.Message("&h  /cmds Info");
-                player.Message("&h  /cmds Maintenance");
-                player.Message("&h  /cmds Moderation");
-                player.Message("&h  /cmds New");
-                player.Message("&h  /cmds World");
+                player.Message("&H  /cmds All");
+                player.Message("&H  /cmds Building");
+                player.Message("&H  /cmds Chat");
+                player.Message("&H  /cmds CPE");
+                player.Message("&H  /cmds Info");
+                player.Message("&H  /cmds Maintenance");
+                player.Message("&H  /cmds Moderation");
+                player.Message("&H  /cmds New");
+                player.Message("&H  /cmds World");
                 return;
 			}
             
@@ -1331,7 +1331,7 @@ namespace fCraft {
             if (param.StartsWith("*") && param.EndsWith("*")) {
                 foreach (CommandDescriptor item in items) {
                     if (item.Name.ToLower().Contains(param.ToLower().Trim('*'))) {
-                        output += item.MinRank.Color + item.Name + "&s, ";
+                        output += item.MinRank.Color + item.Name + "&S, ";
                     }
                 }
                 player.Message("Commands containing \"{0}\":", param.Trim('*'));
@@ -1344,7 +1344,7 @@ namespace fCraft {
             } else if (param.EndsWith("*")) {
                 foreach (CommandDescriptor item in items) {
                     if (item.Name.CaselessStarts(param.ToLower().Trim('*'))) {
-                        output += item.MinRank.Color + item.Name + "&s, ";
+                        output += item.MinRank.Color + item.Name + "&S, ";
                     }
                 }
                 player.Message("Commands starting with \"{0}\":", param.Trim('*'));
@@ -1357,7 +1357,7 @@ namespace fCraft {
 			} else if (param.StartsWith("*")) {
                 foreach (CommandDescriptor item in items) {
                     if (item.Name.CaselessEnds(param.ToLower().Trim('*'))) {
-                        output += item.MinRank.Color + item.Name + "&s, ";
+                        output += item.MinRank.Color + item.Name + "&S, ";
                     }
                 }
                 player.Message("Commands ending with \"{0}\":", param.Trim('*'));
@@ -1480,7 +1480,7 @@ namespace fCraft {
                     orderer = p => p.BlocksDrawn; break;
                 case "time":
                 case "hours":
-                    formatter = p => string.Format("{0:N2}&sH", p.TotalTime.TotalHours);
+                    formatter = p => string.Format("{0:N2}&SH", p.TotalTime.TotalHours);
                     orderer = p => p.TotalTime.ToHours(); break;
                 case "kicks":
                 case "kicked":
@@ -1511,13 +1511,13 @@ namespace fCraft {
             player.Message("Top Players ({0}):", stat);
             for (int i = offset; i < offset + count; i++) {
                 PlayerInfo p = all[i];
-                player.Message(" &7{1}&s - {0}", p.ClassyName, formatter(p).PadLeft(pad, '0'));
+                player.Message(" &7{1}&S - {0}", p.ClassyName, formatter(p).PadLeft(pad, '0'));
             }
              
             int total = noRank ? PlayerDB.PlayerInfoList.Length : rank.PlayerCount;
             player.Message("Showing players{3}{0}-{1} (out of {2}).", offset + 1, 
                            offset + count, total, 
-                           (rank != null ? " in rank (" + rank.ClassyName + "&s)" : " "));
+                           (rank != null ? " in rank (" + rank.ClassyName + "&S)" : " "));
         }
 
         #endregion
@@ -1556,7 +1556,7 @@ namespace fCraft {
                 offset = Math.Max(0, infos.Count() - PlayersPerPage);
             }
             var playersPart = infos.Skip(offset).Take(10).ToArray();
-            player.Message("  Players in rank ({1}&s): {0}", playersPart.JoinToString((r => String.Format("&n{0}&S (Had rank for: {1})", r.ClassyName, r.TimeSinceRankChange.ToMiniString()))), rank.ClassyName);
+            player.Message("  Players in rank ({1}&S): {0}", playersPart.JoinToString((r => String.Format("&N{0}&S (Had rank for: {1})", r.ClassyName, r.TimeSinceRankChange.ToMiniString()))), rank.ClassyName);
             player.Message("Showing players {0}-{1} (out of {2}).", offset + 1, offset + playersPart.Length, infos.Count());
         }
 
@@ -1590,13 +1590,13 @@ namespace fCraft {
             }
             infos = PlayerDB.PlayerInfoList.Where(info => info.PreviousRank == rank).OrderBy(c => c.TimeSinceRankChange).ToArray();
             int offset;
-            if (!cmd.NextInt(out offset)) offset = 0;            
+            if (!cmd.NextInt(out offset)) offset = 0;
             if (offset >= infos.Count())
             {
                 offset = Math.Max(0, infos.Count() - PlayersPerPage);
             }
             var playersPart = infos.Skip(offset).Take(10).ToArray();
-            player.Message("  Players who previously had rank ({1}&s): {0}", playersPart.JoinToString((r => String.Format("&n{0}&S (Had current rank ({2}&s) for: {1})", r.ClassyName, r.TimeSinceRankChange.ToMiniString(), r.Rank.ClassyName))), rank.ClassyName);
+            player.Message("  Players who previously had rank ({1}&S): {0}", playersPart.JoinToString((r => String.Format("&N{0}&S (Had current rank ({2}&S) for: {1})", r.ClassyName, r.TimeSinceRankChange.ToMiniString(), r.Rank.ClassyName))), rank.ClassyName);
             player.Message("Showing players {0}-{1} (out of {2}).", offset + 1, offset + playersPart.Length, infos.Count());
         }
 
@@ -1669,8 +1669,8 @@ namespace fCraft {
             
             if (player.IsStaff) {
                 player.Message("Server colors:");
-                player.Message(" &r%r Announcement &h%h Help &i%i IRC &m%m Me");
-                player.Message(" &p%p PM &y%y Say &s%s System &w%w Warning");
+                player.Message(" &R%R Announcement &H%H Help &I%I IRC &M%M Me");
+                player.Message(" &P%P PM &Y%Y Say &S%S System &W%W Warning");
             }
             
             if (!player.Can(Permission.UseColorCodes)) {
@@ -1693,7 +1693,7 @@ namespace fCraft {
             IsConsoleSafe = true,
             UsableByFrozenPlayers = true,
             Help = "Shows a list of all available emotes and their keywords. " +
-                   "There are 34 emotes, spanning 3 pages. Use &h/emotes 2&s and &h/emotes 3&s to see pages 2 and 3.",
+                   "There are 34 emotes, spanning 3 pages. Use &H/emotes 2&S and &H/emotes 3&S to see pages 2 and 3.",
             Handler = EmotesHandler
         };
 
@@ -1768,7 +1768,7 @@ namespace fCraft {
             Player target = info.PlayerObject;
 
             player.Message("Extra Info about: {0}", info.ClassyName);
-            player.Message("  Times used &6Bot&s: {0}", info.TimesUsedBot);
+            player.Message("  Times used &6Bot&S: {0}", info.TimesUsedBot);
             player.Message("  Promoted: {0} Demoted: {1}", info.PromoCount, info.DemoCount);
             player.Message("  Reach Distance: {0} Model: {1}", info.ReachDistance, info.Mob);
             
@@ -1787,7 +1787,7 @@ namespace fCraft {
                     player.Message("    On world: &f{0}", info.LastWorld);
                     player.Message("    Player Position...");
                     player.Message("    {0}", info.LastWorldPos);
-                    player.Message("    (Use &h/TPP X Y Z R L&s)");
+                    player.Message("    (Use &H/TPP X Y Z R L&S)");
                 }
             }
             if (target != null && target.PingList.Any())
@@ -2032,10 +2032,10 @@ namespace fCraft {
             Player target = info.PlayerObject;
 
             if (target != null) {
-                player.Message("Player {0}&s has been &aOnline&s for {1}", info.ClassyName, info.TimeSinceLastLogin.ToMiniString());
+                player.Message("Player {0}&S has been &aOnline&S for {1}", info.ClassyName, info.TimeSinceLastLogin.ToMiniString());
                 player.Message("They are currently on world {0}", target.World.ClassyName);
             } else {
-                player.Message("Player {0}&s is &cOffline", info.ClassyName);
+                player.Message("Player {0}&S is &cOffline", info.ClassyName);
                 player.Message("Was last seen {0} ago on world &f{1}", info.TimeSinceLastSeen.ToMiniString(), info.LastWorld);
             }
         }
@@ -2121,7 +2121,7 @@ namespace fCraft {
             player.Message("Ping/Latency List:");
             for (int i = 0; i < playerList.Count(); i++) {
                 value = string.Format("Ping: {0}ms Avg: {1:N0}ms", playerList[i].PingList[9], playerList[i].PingList.Average());
-                player.Message(" &7{1}&s - {0}", playerList[i].Info.ClassyName, value.PadLeft(pad, '0'));
+                player.Message(" &7{1}&S - {0}", playerList[i].Info.ClassyName, value.PadLeft(pad, '0'));
             }
             player.Message("Showing players {0}-{1} (out of {2}).", offset + 1, offset + playerList.Length, visiblePlayers.Count());
         }
