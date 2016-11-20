@@ -609,7 +609,7 @@ namespace fCraft {
             Name = "Write",
             Aliases = new[] { "Text", "Wt" },
             Category = CommandCategory.New | CommandCategory.Building,
-            Permissions = new Permission[] { Permission.Draw },
+            Permissions = new Permission[] { Permission.DrawAdvanced },
             RepeatableSelection = true,
             IsConsoleSafe = false,
             Help = "/Write Sentence, then click 2 blocks. The first is the starting point, the second is the direction",
