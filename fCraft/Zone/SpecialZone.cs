@@ -16,14 +16,14 @@ namespace fCraft {
         public const string Death = "death_";
         
         public static bool IsSpecialAffect(string name) {
-            return name.StartsWith(Door) || name.StartsWith(Sign) ||
-                name.StartsWith(Command) || name.StartsWith(ConsoleCommand);
+            return name.CaselessStarts(Door) || name.CaselessStarts(Sign) ||
+                name.CaselessStarts(Command) || name.CaselessStarts(ConsoleCommand);
         }
         
         public static bool IsSpecialMove(string name) {
-            return name.StartsWith(Deny) || name.StartsWith(Text) ||
-                name.StartsWith(Respawn) || name.StartsWith(Checkpoint) ||
-                name.StartsWith(Deny);
+            return name.CaselessStarts(Deny) || name.CaselessStarts(Text) ||
+                name.CaselessStarts(Respawn) || name.CaselessStarts(Checkpoint) ||
+                name.CaselessStarts(Deny);
         }
 
         /// <summary> Checks if a zone name makes it a special zone, and if so, whether the player can manage the special zone. </summary>
@@ -31,7 +31,7 @@ namespace fCraft {
             if (name == null) return false;
             Rank rank = RankManager.GetMinRankWithAnyPermission(Permission.ManageSpecialZones);
             
-            if (name.StartsWith(Command) || name.StartsWith(ConsoleCommand)) {
+            if (name.CaselessStarts(Command) || name.CaselessStarts(ConsoleCommand)) {
                 if (player.Info.Rank == RankManager.HighestRank && player.Can(Permission.ManageSpecialZones))
                     return true;
                 

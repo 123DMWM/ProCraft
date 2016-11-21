@@ -7,15 +7,15 @@ namespace fCraft {
     public static partial class SpecialZone {
         
         internal static bool CheckMoveZone(Player p, Zone zone, ref bool deniedZone, Position newPos) {
-            if (zone.Name.StartsWith(Deny)) {
+            if (zone.Name.CaselessStarts(Deny)) {
                 return HandleDeny(p, zone, ref deniedZone, newPos);
-            } else if (zone.Name.StartsWith(Text)) {
+            } else if (zone.Name.CaselessStarts(Text)) {
                 return HandleText(p, zone, ref deniedZone, newPos);
-            } else if (zone.Name.StartsWith(Respawn)) {
+            } else if (zone.Name.CaselessStarts(Respawn)) {
                 return HandleRespawn(p, zone, ref deniedZone, newPos);
-            } else if (zone.Name.StartsWith(Checkpoint)) {
+            } else if (zone.Name.CaselessStarts(Checkpoint)) {
                 return HandleCheckpoint(p, zone, ref deniedZone, newPos);
-            } else if (zone.Name.StartsWith(Death)) {
+            } else if (zone.Name.CaselessStarts(Death)) {
                 return HandleDeath(p, zone, ref deniedZone, newPos);
             }
             return false;

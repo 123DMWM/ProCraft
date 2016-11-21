@@ -7,13 +7,13 @@ namespace fCraft {
     public static partial class SpecialZone {
         
         internal static bool CheckAffectZone(Player p, Zone zone, Vector3I coord) {
-            if (zone.Name.StartsWith(Door)) {
+            if (zone.Name.CaselessStarts(Door)) {
                 p.RevertBlockNow(coord);
                 HandleDoor(p, zone); return true;
-            } else if (zone.Name.StartsWith(Sign)) {
+            } else if (zone.Name.CaselessStarts(Sign)) {
                 p.RevertBlockNow(coord);
                 HandleSign(p, zone); return true;
-            } else if (zone.Name.StartsWith(Command) || zone.Name.StartsWith(ConsoleCommand)) {
+            } else if (zone.Name.CaselessStarts(Command) || zone.Name.CaselessStarts(ConsoleCommand)) {
                 p.RevertBlockNow(coord);
                 HandleCommandBlock(p, zone); return true;
             }
@@ -60,7 +60,7 @@ namespace fCraft {
                     p.SignLines = File.ReadAllLines(path);
                     
                     if (p.SignLines.Length >= 1) {
-                        if (!zone.Name.StartsWith(ConsoleCommand)) {
+                        if (!zone.Name.CaselessStarts(ConsoleCommand)) {
                             Scheduler.NewTask(CommandBlock).RunRepeating(p, new TimeSpan(0, 0, 0), new TimeSpan(0, 0, 1), p.SignLines.Length);
                         } else {
                             Scheduler.NewTask(CommandBlock).RunRepeating(p, new TimeSpan(0, 0, 0), new TimeSpan(0, 0, 0, 0, 1), p.SignLines.Length);
