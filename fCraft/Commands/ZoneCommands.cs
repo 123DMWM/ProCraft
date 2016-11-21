@@ -355,6 +355,10 @@ namespace fCraft {
                 player.Message( "No zone name specified. See &H/Help ZEdit" );
                 return;
             }
+            if (cmd.Count < 3) {
+                player.Message(CdZoneEdit.Help);
+                return;
+            }
 
             Zone zone = player.WorldMap.Zones.Find( zoneName );
             if( zone == null ) {
