@@ -163,8 +163,6 @@ namespace fCraft {
         /// <summary> All zones within a map. </summary>
         public ZoneCollection Zones { get; private set; }
 
-        public Map map;
-
         /// <summary> Creates an empty new map of given dimensions.
         /// Dimensions cannot be changed after creation. </summary>
         /// <param name="world"> World that owns this map. May be null, and may be changed later. </param>
