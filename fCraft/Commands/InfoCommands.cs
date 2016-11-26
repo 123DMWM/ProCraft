@@ -441,7 +441,7 @@ namespace fCraft {
                 }
 
             } else {
-                SearchOptions flags = SearchOptions.IncludeHidden | SearchOptions.IncludeSelf;
+                SearchOptions flags = SearchOptions.IncludeSelf;
                 info = PlayerDB.FindPlayerInfoOrPrintMatches( player, name, flags );
                 if( info == null ) return;
 
