@@ -578,23 +578,26 @@ namespace fCraft {
             bool noChanges = true;
             int worldsListed = 0, worldsNotListed = 0;
             Stopwatch sw = Stopwatch.StartNew();
+            BlockDBCounterProcessor counter = new BlockDBCounterProcessor();
 
-            foreach (World world in WorldManager.Worlds.Where(w => w.BlockDB.IsEnabled &&
-            DateTime.UtcNow.Subtract(File.GetLastAccessTimeUtc(w.MapFileName)) <= args.Player.TimeSinceFirstLogin)) {
+            foreach (World world in WorldManager.Worlds.Where(w => w.BlockDB.IsEnabled 
+                                                              && File.GetLastAccessTimeUtc(w.MapFileName) >= args.Player.FirstLoginDate)) {
                 if (worldsListed >= 10) {
                     worldsNotListed++;
                     continue;
                 }
-                BlockDBEntry[] results = world.BlockDB.Lookup(int.MaxValue, args.Player, false, args.Player.TimeSinceFirstLogin);
-                if (results.Length == 0) continue;                
+                
+                counter.Update(args.Player);
+                world.BlockDB.Traverse(counter);
+                if (counter.Placed == 0 && counter.Deleted == 0 && counter.Drawn == 0) continue;
+                
                 if (noChanges) {
                     args.Sender.Message("{0}&S has commited block changes on...", playerName);
                     noChanges = false;
                 }
-                int Built = results.Where(r => r.Context == BlockChangeContext.Manual && r.OldBlock == Block.Air).Count();
-                int Deleted = results.Where(r => r.Context == BlockChangeContext.Manual && r.OldBlock != Block.Air && r.NewBlock == Block.Air).Count();
-                int Drew = results.Where(r => r.Context == BlockChangeContext.Drawn).Count();
-                args.Sender.Message("  {0}&S: Built &F{1}&S, Deleted &F{2}&S, Drew &F{3}", world.ClassyName, Built, Deleted, Drew);
+                
+                args.Sender.Message("  {0}&S: Built &F{1}&S, Deleted &F{2}&S, Drew &F{3}", 
+                                    world.ClassyName, counter.Placed, counter.Deleted, counter.Drawn);
                 worldsListed++;
             }
 
@@ -605,6 +608,31 @@ namespace fCraft {
             } else {
                 args.Sender.Message("Showing &F{0}&S of &F{1}&S (Done in &F{2}&Sms)", worldsListed, worldsListed + worldsNotListed, sw.ElapsedMilliseconds);
             }
+        }
+        
+        class BlockDBCounterProcessor : IBlockDBQueryProcessor {
+            
+            long ticks;
+            int playerId;
+            public int Placed, Deleted, Drawn;
+            
+            public void Update(PlayerInfo player) {
+                ticks = player.FirstLoginDate.ToUnixTime();
+                playerId = player.ID;
+                Placed = 0; Deleted = 0; Drawn = 0;
+            }
+            
+            public bool ProcessEntry(BlockDBEntry e) {
+                if (e.Timestamp < ticks) return false;
+                if (e.PlayerID != playerId) return true;
+                
+                if (e.Context == BlockChangeContext.Drawn) Drawn++;
+                if (e.Context == BlockChangeContext.Manual && e.OldBlock == Block.Air) Placed++;
+                if (e.Context == BlockChangeContext.Manual && e.OldBlock != Block.Air && e.NewBlock == Block.Air) Deleted++;
+                return true;
+            }
+            
+            public BlockDBEntry[] GetResults() { return null; }
         }
 
         #endregion
