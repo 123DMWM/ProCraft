@@ -33,8 +33,6 @@ namespace fCraft {
                 "ServerWinService.exe",
                 "MapConverter.exe",
                 "MapRenderer.exe",
-                "customcolors.txt",
-                "EnvPresets.txt",
                 "LICENSE.txt",
                 "MOTDList.txt",
                 "README.txt",
@@ -52,7 +50,9 @@ namespace fCraft {
                 PortalDBFileName,
                 GlobalDefsFile,
                 FiltersFileName,
-                EntitiesFileName
+                EntitiesFileName,
+                EnvPresetsFileName,
+                CustomColorsFileName,
             };
 
             DataFilesToBackup = new[] {
@@ -139,6 +139,8 @@ namespace fCraft {
 
         public const string EnvPresetsFileName = "EnvPresets.txt";
 
+        public const string CustomColorsFileName = "customcolors.txt";
+                
         public const string FiltersFileName = "Filters.txt";
         public const string EntitiesFileName = "Entities.txt";
 
