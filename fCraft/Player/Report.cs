@@ -67,21 +67,20 @@ namespace fCraft {
                     if (!int.TryParse(idString, out id)) continue;
                     
                     string[] data = File.ReadAllLines(filename);
-                    Report rCreate = new Report();
-                    string sender = data[0];
-                    string message = data[2];
+                    Report report = new Report();
+                    report.Sender = data[0];
+                    report.Message = data[2];
                     
-                    DateTime dateSent = DateTime.MinValue;
                     long dateSentBinary;
                     if (long.TryParse(data[1], out dateSentBinary)) {
-                        dateSent = DateTime.FromBinary(dateSentBinary);
+                        report.Datesent = DateTime.FromBinary(dateSentBinary);
                     }
                     
-                    rCreate.AddReport(id, sender, dateSent, message);
+                    Reports.Add(report);
                     count++;
                 }
                 
-                Logger.Log(LogType.SystemActivity, "Report.LoadAll: Loaded " + count + " filters");
+                Logger.Log(LogType.SystemActivity, "Report.LoadAll: Loaded " + count + " reports");
             } catch (Exception ex) {
                 Logger.Log(LogType.Error, "Report.LoadAll: " + ex);
             }
