@@ -948,8 +948,8 @@ namespace fCraft {
                             Info.Rank.ClassyName);
             }
             if (Info.Rank == RankManager.HighestRank) {
-                if (Chat.Reports.Count() >= 1) {
-                    Message(Chat.Reports.Count() + " unread /Reports");
+                if (Report.Reports.Count >= 1) {
+                    Message(Report.Reports.Count + " unread /Reports");
                 }
             }
 

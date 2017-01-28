@@ -1,9 +1,9 @@
 ﻿// ProCraft Copyright 2014-2016 Joseph Beauvais <123DMWM@gmail.com>
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using ServiceStack.Text;
-using System.Diagnostics;
-using System.Collections.Generic;
 
 namespace fCraft {
 
@@ -14,12 +14,11 @@ namespace fCraft {
         public string Word { get; set; }
         public string Replacement { get; set; }
 
-
-
         public static List<ChatFilter> Filters = new List<ChatFilter>();
+        
 
         public static ChatFilter Find(string sid) {
-            int id; 
+            int id;
             int.TryParse(sid, out id);
             foreach (ChatFilter filter in Filters) {
                 if (filter.Id == id) return filter;
@@ -27,9 +26,9 @@ namespace fCraft {
             return null;
         }
 
-        public static bool exists(string word) {
+        public static bool Exists(string word) {
             foreach (ChatFilter filter in Filters) {
-        		if (filter.Word.CaselessEquals(word)) return true;
+                if (filter.Word.CaselessEquals(word)) return true;
             }
             return false;
         }
@@ -50,6 +49,7 @@ namespace fCraft {
                 SaveAll(false);
             }
         }
+        
 
         public static void ReloadAll() {
             Filters.Clear();
@@ -101,23 +101,21 @@ namespace fCraft {
                 Logger.Log(LogType.Error, "ChatFilter.Load: " + ex);
             }
         }
+        
         public static void OldLoad() {
-            string[] FilterFileList = Directory.GetFiles("./Filters");
-            foreach (string filename in FilterFileList) {
-                if (Path.GetExtension("./Filters/" + filename) == ".txt") {
-                    string[] filterData = File.ReadAllLines(filename);
-                    string idString = filename.Replace("./Filters\\", "").Replace(".txt", "");
-                    string word = filterData[0];
-                    string replacement = filterData[1];
-                    int id;
-                    if (int.TryParse(idString, out id)) {
-                        ChatFilter filter = new ChatFilter();
-                        filter.Id = id;
-                        filter.Word = word;
-                        filter.Replacement = replacement;
-                        Filters.Add(filter);
-                    }
-                }
+            string[] files = Directory.GetFiles("./Filters");
+            foreach (string filename in files) {
+                if (Path.GetExtension(filename) != ".txt") continue;
+                string idString = Path.GetFileNameWithoutExtension(filename);
+                int id;
+                if (!int.TryParse(idString, out id)) continue;
+                
+                string[] data = File.ReadAllLines(filename);
+                ChatFilter filter = new ChatFilter();
+                filter.Id = id;
+                filter.Word = data[0];
+                filter.Replacement = data[1];
+                Filters.Add(filter);
             }
         }
     }

@@ -637,7 +637,7 @@ namespace fCraft
             string message = cmd.NextAll();
             Report rCreate = new Report();
             if (cmd.IsConfirmed) {
-                rCreate.addReport(getNewReportId(), player.Name, DateTime.Now, message);
+                rCreate.AddReport(getNewReportId(), player.Name, DateTime.Now, message);
                 player.Message("Report sent!");
 				foreach (Player p in Server.Players.Where(q => q.Info.Rank == RankManager.HighestRank)) {
 					if (p.Supports(CpeExt.MessageType)) {
@@ -685,14 +685,14 @@ namespace fCraft
                     bool removed = false;
                     Report rRemove = null;
                     if (cmd.NextInt(out reportId)) {
-                        foreach (Report r in Chat.Reports)
+                        foreach (Report r in Report.Reports)
                             if (r.Id == reportId) {
                                 player.Message("  #{0} has been removed", r.Id);
                                 rRemove = r;
                                 removed = true;
                             }
                         if (rRemove != null) {
-                            rRemove.removeFilter();
+                            rRemove.RemoveReport();
                         }
                         if (!removed) {
                             player.Message("Given Report (#{0}) does not exist.", reportId);
@@ -707,7 +707,7 @@ namespace fCraft
 				case "view":
                     bool read = false;
                     if (cmd.NextInt(out reportId)) {
-                        foreach (Report r in Chat.Reports) {
+                        foreach (Report r in Report.Reports) {
                             if (r.Id == reportId) {
                                 player.Message(
                                     "&S[&1Report&S] #&f{0}&N" + "  &SFrom:&f {1}&N" + "  &SDate: &7{2} at {3}&N" +
@@ -724,11 +724,11 @@ namespace fCraft
                     }
                     break;
                 default:
-                    if (Chat.Reports.Count == 0) {
+                    if (Report.Reports.Count == 0) {
                         player.Message("There are no reports.");
                     } else {
-                        player.Message("There are {0} reports:", Chat.Reports.Count);
-                        foreach (Report r in Chat.Reports.OrderBy(r => r.Datesent)) {
+                        player.Message("There are {0} reports:", Report.Reports.Count);
+                        foreach (Report r in Report.Reports.OrderBy(r => r.Datesent)) {
                             player.Message("[&1Report&S] #&f" + r.Id + " &SFrom:&f " + r.Sender);
                         }
                     }
@@ -739,7 +739,7 @@ namespace fCraft
         public static int getNewReportId() {
             int i = 1;
         go:
-            foreach (Report r in Chat.Reports) {
+            foreach (Report r in Report.Reports) {
                 if (r.Id == i) {
                     i++;
                     goto go;
@@ -969,7 +969,7 @@ namespace fCraft
                     if (string.IsNullOrEmpty(word) || string.IsNullOrEmpty(replacement)) {
                         CdFilters.PrintUsage(player); return;
                     }
-                    if (!ChatFilter.exists(word)) {
+                    if (!ChatFilter.Exists(word)) {
                         Server.Message("&Y[Filters] \"{0}\" is now replaced by \"{1}\"", word, replacement);
                         ChatFilter.CreateFilter(getNewFilterId(), word, replacement);
                     } else {

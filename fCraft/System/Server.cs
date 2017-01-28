@@ -505,92 +505,11 @@ namespace fCraft {
             }
             #endregion
 
-            #region LoadReports
-
-            try {
-                if (Directory.Exists("./Reports")) {
-                    string[] ReportFileList = Directory.GetFiles("./Reports");
-                    int created = 0;
-                    foreach (string filename in ReportFileList) {
-                        Report rCreate = new Report();
-                        if (Path.GetExtension("./Reports/" + filename) == ".txt") {
-                            string[] reportData = File.ReadAllLines(filename);
-                            string idString = filename.Replace("./Reports\\", "").Replace(".txt", "").Split('-')[0];
-                            string sender = reportData[0];
-                            DateTime dateSent = DateTime.MinValue;
-                            long dateSentBinary;
-                            if (long.TryParse(reportData[1], out dateSentBinary)) {
-                                dateSent = DateTime.FromBinary(dateSentBinary);
-                            }
-                            string message = reportData[2];
-                            int id;
-                            if (int.TryParse(idString, out id)) {
-                                rCreate.addReport(id, sender, dateSent, message);
-                                created++;
-                            }
-
-                        }
-
-                    }
-                    if (created > 0)
-                        Player.Console.Message("All Reports Loaded. ({0})", created);
-                    else
-                        Player.Console.Message("No reports were loaded.");
-                }
-            } catch (Exception ex) {
-                Player.Console.Message("Report Loader Has Crashed: {0}", ex);
-            }
-
-            #endregion
-
-            #region LoadFilters
-
+            Report.LoadAll();
             ChatFilter.LoadAll();
-
-            #endregion
-
-            #region LoadEntities
-
             Entity.LoadAll();
-
-            #endregion
-
-            #region ResourceDownloads
-
-            if (!Directory.Exists("./Bot")) {
-                Directory.CreateDirectory("./Bot");
-            }
-			if (!File.Exists("Bot/Funfacts.txt")) {
-				(new WebClient()).DownloadFile("http://123dmwm.tk/ProCraft/resources/Funfacts.txt", "Bot/Funfacts.txt");
-            }
-			if (!File.Exists("Bot/Jokes.txt")) {
-				(new WebClient()).DownloadFile("http://123dmwm.tk/ProCraft/resources/Jokes.txt", "Bot/Jokes.txt");
-            }
-			if (!File.Exists("Bot/Protips.txt")) {
-				(new WebClient()).DownloadFile("http://123dmwm.tk/ProCraft/resources/Protips.txt", "Bot/Protips.txt");
-            }
-            if (!File.Exists("Bot/Adjectives.txt")) {
-				(new WebClient()).DownloadFile("http://123dmwm.tk/ProCraft/resources/Adjectives.txt", "Bot/Adjectives.txt");
-            }
-			if (!File.Exists("Bot/Nouns.txt")) {
-				(new WebClient()).DownloadFile("http://123dmwm.tk/ProCraft/resources/Nouns.txt", "Bot/Nouns.txt");
-			}
-
-			if (!File.Exists("./MOTDList.txt")) {
-				(new WebClient()).DownloadFile("http://123dmwm.tk/ProCraft/resources/MOTDList.txt", "MOTDList.txt");
-			}
-
-			if (!Directory.Exists("./fonts")) {
-				Directory.CreateDirectory("./fonts");
-				(new WebClient()).DownloadFile("http://123dmwm.tk/ProCraft/resources/comicsans.ttf", "fonts/comicsans.ttf");
-				(new WebClient()).DownloadFile("http://123dmwm.tk/ProCraft/resources/mcclassic.ttf", "fonts/mcclassic.ttf");
-				(new WebClient()).DownloadFile("http://123dmwm.tk/ProCraft/resources/microsoft.ttf", "fonts/microsoft.ttf");
-				(new WebClient()).DownloadFile("http://123dmwm.tk/ProCraft/resources/minecraft.ttf", "fonts/minecraft.ttf");
-			}
-
-            #endregion
-
-
+            DownloadResources();
+            
             PortalHandler.GetInstance();
             PortalDB.Load();
             EnvPresets.LoadAll();
@@ -620,6 +539,39 @@ namespace fCraft {
 
             RaiseEvent( Started );
             return true;
+        }
+        
+        static void DownloadResources() {
+            if (!Directory.Exists("./Bot")) {
+                Directory.CreateDirectory("./Bot");
+            }
+            if (!File.Exists("Bot/Funfacts.txt")) {
+                (new WebClient()).DownloadFile("http://123dmwm.tk/ProCraft/resources/Funfacts.txt", "Bot/Funfacts.txt");
+            }
+            if (!File.Exists("Bot/Jokes.txt")) {
+                (new WebClient()).DownloadFile("http://123dmwm.tk/ProCraft/resources/Jokes.txt", "Bot/Jokes.txt");
+            }
+            if (!File.Exists("Bot/Protips.txt")) {
+                (new WebClient()).DownloadFile("http://123dmwm.tk/ProCraft/resources/Protips.txt", "Bot/Protips.txt");
+            }
+            if (!File.Exists("Bot/Adjectives.txt")) {
+                (new WebClient()).DownloadFile("http://123dmwm.tk/ProCraft/resources/Adjectives.txt", "Bot/Adjectives.txt");
+            }
+            if (!File.Exists("Bot/Nouns.txt")) {
+                (new WebClient()).DownloadFile("http://123dmwm.tk/ProCraft/resources/Nouns.txt", "Bot/Nouns.txt");
+            }
+
+            if (!File.Exists("./MOTDList.txt")) {
+                (new WebClient()).DownloadFile("http://123dmwm.tk/ProCraft/resources/MOTDList.txt", "MOTDList.txt");
+            }
+
+            if (!Directory.Exists("./fonts")) {
+                Directory.CreateDirectory("./fonts");
+                (new WebClient()).DownloadFile("http://123dmwm.tk/ProCraft/resources/comicsans.ttf", "fonts/comicsans.ttf");
+                (new WebClient()).DownloadFile("http://123dmwm.tk/ProCraft/resources/mcclassic.ttf", "fonts/mcclassic.ttf");
+                (new WebClient()).DownloadFile("http://123dmwm.tk/ProCraft/resources/microsoft.ttf", "fonts/microsoft.ttf");
+                (new WebClient()).DownloadFile("http://123dmwm.tk/ProCraft/resources/minecraft.ttf", "fonts/minecraft.ttf");
+            }
         }
 
         #endregion
@@ -885,7 +837,7 @@ namespace fCraft {
             for (int i = 0; i < tempPlayerList.Length; i++) {
                 Player player = tempPlayerList[i];
 
-				if (player.Supports(CpeExt.MessageType)) {
+                if (player.Supports(CpeExt.MessageType)) {
                     //double speed = (Math.Sqrt(player.Position.DistanceSquaredTo(player.lastSolidPos)) / 32);
                     //player.Send(Packet.Message((byte)MessageType.Announcement, string.Format("&eSpeed: &f{0:N2} &eBlocks/s", speed), player.UseFallbackColors));
                     string bottomRight2 = player.Position.ToBlockCoordsExt() + "&S[" + compassString(player.Position.R) + "&S]";
@@ -893,11 +845,11 @@ namespace fCraft {
                         player.lastBottomRight2 = bottomRight2;
                         player.Send(Packet.Message((byte)MessageType.BottomRight2, bottomRight2, player.UseFallbackColors));
                     }
-                	
+                    
                     if (player.LastDrawOp != null && !player.IsPlayingCTF)
                         if (player.LastDrawOp.PercentDone < 100) {
                             player.Send(Packet.Message((byte)MessageType.Status3, player.LastDrawOp.Description + 
-                    	                           " percent done: &f" + player.LastDrawOp.PercentDone + "&S%", true));
+                                                   " percent done: &f" + player.LastDrawOp.PercentDone + "&S%", true));
                         } else if (player.LastDrawOp.PercentDone == 100 || player.LastDrawOp.IsDone) {
                             player.Send(Packet.Message((byte)MessageType.Status3, "", true));
                         }
@@ -930,30 +882,30 @@ namespace fCraft {
                     player.afkMob = player.Info.Mob;
                     player.ResetIdleTimer(); // to prevent kick from firing more than once
                 }
-			}
-			UpdateTabList(false);
+            }
+            UpdateTabList(false);
         }
         
-		public static string compassString(int rot) {
-			if (rot > 240 || rot < 15) {
-				return "&1S";
-			} else if (16 <= rot && rot <= 47) {
-				return "&9S&fW";
-			} else if (48 <= rot && rot <= 79) {
-				return "&fW";
-			} else if (80 <= rot && rot <= 111) {
-				return "&cN&fW";
-			} else if (112 <= rot && rot <= 143) {
-				return "&4N";
-			} else if (144 <= rot && rot <= 175) {
-				return "&cN&fE";
-			} else if (176 <= rot && rot <= 207) {
-				return "&fE";
-			} else if (208 <= rot && rot <= 239) {
-				return "&9S&fE";
-			} else
-				return "&fN/A";
-		}
+        public static string compassString(int rot) {
+            if (rot > 240 || rot < 15) {
+                return "&1S";
+            } else if (16 <= rot && rot <= 47) {
+                return "&9S&fW";
+            } else if (48 <= rot && rot <= 79) {
+                return "&fW";
+            } else if (80 <= rot && rot <= 111) {
+                return "&cN&fW";
+            } else if (112 <= rot && rot <= 143) {
+                return "&4N";
+            } else if (144 <= rot && rot <= 175) {
+                return "&cN&fE";
+            } else if (176 <= rot && rot <= 207) {
+                return "&fE";
+            } else if (208 <= rot && rot <= 239) {
+                return "&9S&fE";
+            } else
+                return "&fN/A";
+        }
 
         /*// checks for idle players
         static SchedulerTask setWeatherTask;
@@ -1390,9 +1342,9 @@ namespace fCraft {
 
         public static string MakePlayerDisconnectedMessage([NotNull] Player player)
         {
-			if (player == null)
-				throw new ArgumentNullException("player");
-			UpdateTabList(true);
+            if (player == null)
+                throw new ArgumentNullException("player");
+            UpdateTabList(true);
             return string.Format("&4(&C{0}&4) Disconnected.", 
                 (player.Info.TimeSinceFirstLogin <= TimeSpan.FromDays(1) ? Chat.newPlayerPrefix.ToString() : "") + player.Name);
 

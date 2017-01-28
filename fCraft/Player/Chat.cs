@@ -18,28 +18,9 @@ namespace fCraft {
         // Regex pattern courtesy of Matthew O'Riordan, updated by Matvei Stefarov
         static readonly Regex RegexURLMatcher = new Regex("\\(?(?:(?:[a-z]{2,9}:(?:\\/\\/)?)(?:[\\-;:&=\\+\\$,\\w]+@)?[a-z0-9\\-]+(?:\\.[a-z0-9\\-]+)+|www\\.[a-z0-9\\-]+(?:\\.[a-z0-9\\-]+)+)(?::\\d{1,5})?(?:\\/[\\+~%\\/\\.\\w\\-\\(\\)]*)?(?:\\?[\\-\\+=&;%@\\.\\w]*)?(?:#\\S*)?", RegexOptions.IgnoreCase);
         public static char newPlayerPrefix = '+';
-        #region Reports
-        public static List<Report> Reports = new List<Report>();
         public static List<string> fullUrls = new List<string>();
 
-        /// <summary>
-        /// Saves the report to be read by the owner with /reports
-        /// </summary>
-        /// <param name="report">Report being saved</param>
-        public static void SaveReport(Report report) {
-            try {
-                String[] reportData = {report.Sender, report.Datesent.ToBinary().ToString(), report.Message
-                };
-                if (!Directory.Exists("./Reports")) {
-                    Directory.CreateDirectory("./Reports");
-                }
-                File.WriteAllLines("./Reports/" + report.Id + "-" + report.Sender + ".txt", reportData);
-            } catch (Exception ex) {
-                Player.Console.Message("Report Saver Has Crashed: {0}", ex);
-            }
-        }
-
-        #endregion
+        
         /// <summary> Sends a global (white) chat. </summary>
         /// <param name="player"> Player writing the message. </param>
         /// <param name="rawMessage"> Message text. </param>
