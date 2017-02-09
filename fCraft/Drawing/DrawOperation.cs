@@ -248,6 +248,7 @@ namespace fCraft.Drawing {
             		players[i].SendBlock(Coords, newBlock);
             }
 
+            // Reuse instance to avoid memory allocations
             if (placeArgs == null)
                 placeArgs = new PlayerPlacedBlockEventArgs(Player, Map, Vector3I.Zero, Block.Air, Block.Air, Context);
             placeArgs.Coords = Coords;

@@ -196,7 +196,7 @@ namespace fCraft {
                   FirstVersionWithSectionTags = 139, // LEGACY
                   FirstVersionWithSettingsTag = 152; // LEGACY
 
-        const string ConfigXmlRootName = "ProCraftConfig";
+        const string ConfigXmlRootName = "ProCraftConfig", OldConfigXmlRootName = "fCraftConfig";
 
         // Mapping of keys to their values
         static readonly string[] Settings;
@@ -332,7 +332,7 @@ namespace fCraft {
             if( File.Exists( Paths.ConfigFileName ) ) {
                 try {
                     file = XDocument.Load( Paths.ConfigFileName );
-                    if( file.Root == null || file.Root.Name != ConfigXmlRootName ) {
+                    if( file.Root == null || !(file.Root.Name == ConfigXmlRootName || file.Root.Name == OldConfigXmlRootName) ) {
                         Logger.Log( LogType.Warning,
                                     "&WConfig.Load: Malformed or incompatible config file {0}. Loading defaults.",
                                     Paths.ConfigFileName );
