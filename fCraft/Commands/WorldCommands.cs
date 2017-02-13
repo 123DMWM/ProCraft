@@ -1381,7 +1381,7 @@ namespace fCraft {
 				player.LastPosition = player.Position;
 			}
             player.TeleportTo( player.World.LoadMap().getSpawnIfRandom());
-            if (player.WorldMap.Spawn == new Position(-1, -1, -1, 0, 0)) {
+            if (player.WorldMap.Spawn == Position.RandomSpawn) {
                 player.Message("Randomized Spawn!");
             }
         }

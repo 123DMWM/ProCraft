@@ -119,5 +119,7 @@ namespace fCraft {
         {
             return new Vector3I((X) / 32, (Y) / 32, (Z) / 32);
         }
+        
+        public static Position RandomSpawn = new Position(-1, -1, -1, 0, 0);
     }
 }

@@ -1130,7 +1130,7 @@ namespace fCraft {
 
             SendJoinMessage(oldWorld, newWorld);
             RaisePlayerJoinedWorldEvent(this, oldWorld, reason);
-            if (newWorld.map.Spawn == new Position(-1, -1, -1, 0, 0) && oldWorld != newWorld) {
+            if (newWorld.map.Spawn == Position.RandomSpawn && oldWorld != newWorld) {
                 Message("Randomized Spawn!");
             }
 

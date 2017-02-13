@@ -126,14 +126,14 @@ namespace fCraft.Portals {
                                                     e.Player.StopSpectating();
                                                     if (portal.TeleportPosX != 0 && portal.TeleportPosY != 0 && portal.TeleportPosZ != 0) {
                                                         e.Player.JoinWorld(WorldManager.FindWorldExact(portal.World), WorldChangeReason.Portal, 
-                                                            portal.tpPosition() == new Position(-1, -1, -1, 0, 0) 
+                                                            portal.tpPosition() == Position.RandomSpawn 
                                                             ? WorldManager.FindWorldExact(portal.World).map.getSpawnIfRandom() 
                                                             : portal.tpPosition());
                                                     } else {
                                                         e.Player.JoinWorld(WorldManager.FindWorldExact(portal.World), WorldChangeReason.Portal);
                                                     }
                                                     e.Player.Message("You used portal: " + portal.Name);
-                                                    if (e.Player.WorldMap.Spawn == new Position(-1, -1, -1, 0, 0)) {
+                                                    if (e.Player.WorldMap.Spawn == Position.RandomSpawn) {
                                                         e.Player.Message("Randomized Spawn!");
                                                     }
 

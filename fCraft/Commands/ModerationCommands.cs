@@ -1211,14 +1211,15 @@ namespace fCraft {
 
 
             string playerName = cmd.Next() ?? "null";
-            if(playerName.CaselessEquals("null") || playerName.CaselessEquals("random")) {
+            if (playerName.CaselessEquals("null") || playerName.CaselessEquals("random")) {
                 Map map = player.WorldMap;
-                Position newSpawn = playerName.CaselessEquals("random") ? new Position(-1, -1, -1, 0, 0) : player.Position;
+                Position newSpawn = playerName.CaselessEquals("random") ? Position.RandomSpawn : player.Position;
                 map.Spawn = newSpawn;
                 player.TeleportTo( map.getSpawnIfRandom());
-                if (newSpawn == new Position(-1, -1, -1, 0, 0)) {
+                if (newSpawn == Position.RandomSpawn) {
                     player.Message("Randomized Spawn!");
                 }
+                
                 if (player.Supports(CpeExt.ExtPlayerList2)) {
                     player.Send(Packet.MakeExtAddEntity2(Packet.SelfId, player.Info.Rank.Color + player.Name, (player.Info.skinName == "" ? player.Name : player.Info.skinName), player.Position, player));
                 } else {
@@ -1954,7 +1955,7 @@ namespace fCraft {
 					target.LastPosition = target.Position;
 				}
                 target.TeleportTo( target.WorldMap.getSpawnIfRandom());
-                if (target.WorldMap.Spawn == new Position(-1, -1, -1, 0, 0)) {
+                if (target.WorldMap.Spawn == Position.RandomSpawn) {
                     player.Message("Randomized Spawn!");
                 }
                 return;

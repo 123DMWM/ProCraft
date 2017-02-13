@@ -96,7 +96,7 @@ namespace fCraft {
                 return spawn;
             }
             set {
-                if (new Position(value.X, value.Y, value.Z, value.R, value.L) != new Position(-1, -1, -1, 0, 0)) {
+                if (value != Position.RandomSpawn) {
                     if (value.X > Width * 32 || value.Y > Length * 32 || value.X < 0 || value.Y < 0 || value.Z < 0) {
                         Logger.Log(LogType.Warning, "Map.Spawn: Coordinates are outside the map!");
                         return;
@@ -109,7 +109,7 @@ namespace fCraft {
         Position spawn;
 
         public Position getSpawnIfRandom() {
-            if (spawn == new Position(-1, -1, -1, 0, 0)) {
+            if (spawn == Position.RandomSpawn) {
                 Random rnd = new Random();
                 Vector3I P = HighestFreeSpace(rnd.Next(Width), rnd.Next(Length), Height);
                 return new Position((short)(P.X * 32), (short)(P.Y * 32), (short)(P.Z * 32), 0, 0);
