@@ -38,33 +38,33 @@ namespace fCraft {
                 if (rank != null)
                     player.Message("You must be {0}&S to {1} command zone.", RankManager.HighestRank.ClassyName, action);
                 else
-                    player.Message("No rank has permission to {1} command zone.", action);
+                    player.Message("No rank has permission to {0} command zone.", action);
                 return false;
             } else if (IsSpecialAffect(name) || IsSpecialMove(name)) {
                 if (player.Can(Permission.ManageSpecialZones))
                     return true;
                 
                 if (rank != null)
-                    player.Message("You must be {0}&S to {1} special zone.", rank.ClassyName);
+                    player.Message("You must be {0}&S to {1} special zone.", rank.ClassyName, action);
                 else
-                    player.Message("No rank has permission to {1} special zone.");
+                    player.Message("No rank has permission to {0} special zone.", action);
                 return false;
             }
             return true;
         }
         
-        static void SendZoneMessage(Player p, Zone zone, string backup) {
+        static string GetSignMessage(Player p, Zone zone) {
             string path = "./signs/" + p.World.Name + "/" + zone.Name + ".txt";
-            string message = backup;
-            if (File.Exists(path)) {
-                string[] lines = File.ReadAllLines(path);
-                message = String.Join("&N", lines);
-            }
+            if (!File.Exists(path)) return null;
             
-            if ((DateTime.UtcNow - p.LastZoneNotification).Seconds > 2) {
-                p.Message(message);
-                p.LastZoneNotification = DateTime.UtcNow;
-            }
+            string[] lines = File.ReadAllLines(path);
+            return String.Join("&N", lines);
+        }
+        
+        static void SendZoneMessage(Player p, string message) {
+            if ((DateTime.UtcNow - p.LastZoneNotification).Seconds <= 2) return;
+            p.Message(message);
+            p.LastZoneNotification = DateTime.UtcNow;
         }
     }
 }

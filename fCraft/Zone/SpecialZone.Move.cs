@@ -29,9 +29,9 @@ namespace fCraft {
                 if (zone.Bounds.Contains(newPos.X / 32, newPos.Y / 32, (newPos.Z - 32) / 32)) {
                     deniedZone = true;
                     if (zone.Controller.MinRank.NextRankUp != null) {
-                        SendZoneMessage(p, zone, "&WYou must be at least rank " + zone.Controller.MinRank.NextRankUp.Name + "&W to enter this area.");
+                        SendZoneMessage(p, "&WYou must be at least rank " + zone.Controller.MinRank.NextRankUp.Name + "&W to enter this area.");
                     } else {
-                        SendZoneMessage(p, zone, "&WNo rank may enter this area.");
+                        SendZoneMessage(p, "&WNo rank may enter this area.");
                     }
                     p.SendNow(Packet.MakeSelfTeleport(p.lastValidPosition));
                     return true;
@@ -43,7 +43,11 @@ namespace fCraft {
         static bool HandleText(Player p, Zone zone, ref bool deniedZone, Position newPos) {
             if (!zone.Controller.Check(p.Info) || zone.Controller.MinRank >= p.Info.Rank) {
                 if (zone.Bounds.Contains(newPos.X / 32, newPos.Y / 32, (newPos.Z - 32) / 32)) {
-                    SendZoneMessage(p, zone, "&WThis zone is marked as a text area, but no text is added to the message!");
+                    string message = GetSignMessage(p, zone);
+                    if (message == null)
+                        message = "&WThis zone is marked as a text area, but no text is added to the message!";
+                    
+                    SendZoneMessage(p, message);
                     return true;
                 }
             }
@@ -53,12 +57,8 @@ namespace fCraft {
         static bool HandleRespawn(Player p, Zone zone, ref bool deniedZone, Position newPos) {
             if (!zone.Controller.Check(p.Info) || zone.Controller.MinRank >= p.Info.Rank) {
                 if (zone.Bounds.Contains(newPos.X / 32, newPos.Y / 32, (newPos.Z - 32) / 32)) {
-                    SendZoneMessage(p, zone, "&WRespawned!");
+                    SendZoneMessage(p, "&WRespawned!");
                     p.TeleportTo(p.WorldMap.getSpawnIfRandom());
-                    
-                    if (p.WorldMap.Spawn == Position.RandomSpawn) {
-                        p.Message("Randomized Spawn!");
-                    }
                     return true;
                 }
             }
@@ -69,7 +69,7 @@ namespace fCraft {
             Position centre = new Position(zone.Bounds.XCentre * 32 + 16, zone.Bounds.YCentre * 32 + 16, zone.Bounds.ZCentre * 32 + 64);
             if (p.CheckPoint == centre) return false;
             if (zone.Bounds.Contains(newPos.X / 32, newPos.Y / 32, (newPos.Z - 32) / 32)) {
-                SendZoneMessage(p, zone, "&aCheckPoint &Sreached! This is now your respawn point.");
+                SendZoneMessage(p, "&aCheckPoint &Sreached! This is now your respawn point.");
                 p.CheckPoint = centre;
                 return true;
             }
@@ -78,7 +78,7 @@ namespace fCraft {
         
         static bool HandleDeath(Player p, Zone zone, ref bool deniedZone, Position newPos) {
             if (zone.Bounds.Contains(newPos.X / 32, newPos.Y / 32, (newPos.Z - 32) / 32)) {
-                SendZoneMessage(p, zone, "&WYou Died!");
+                SendZoneMessage(p, "&WYou Died!");
                 p.TeleportTo(p.CheckPoint != new Position(-1, -1, -1) ? p.CheckPoint : p.WorldMap.Spawn);
                 return true;
             }
