@@ -60,7 +60,7 @@ namespace fCraft {
         }
         
         void WritePacket() {
-            Packet.ToNetOrder((short)index, data, 1);
+            Packet.WriteI16((short)index, data, 1);
             data[1027] = (byte)(100 * (float)position / length);
             player.SendNow(new Packet(data));
             index = 0;

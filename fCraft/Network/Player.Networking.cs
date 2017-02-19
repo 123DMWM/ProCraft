@@ -204,15 +204,15 @@ namespace fCraft {
                         CheckBlock(ref blockUpdate.Block);
                         
                         if (!useBulk) {
-                            Packet.ToNetOrder(blockUpdate.X, blockPacket, 1);
-                            Packet.ToNetOrder(blockUpdate.Z, blockPacket, 3);
-                            Packet.ToNetOrder(blockUpdate.Y, blockPacket, 5);
+                            Packet.WriteI16(blockUpdate.X, blockPacket, 1);
+                            Packet.WriteI16(blockUpdate.Z, blockPacket, 3);
+                            Packet.WriteI16(blockUpdate.Y, blockPacket, 5);
                             blockPacket[7] = blockUpdate.Block;
                             writer.Write( blockPacket );
                             BytesSent += blockPacket.Length;
                         } else {
                             int index = currentMap.Index(blockUpdate.X, blockUpdate.Y, blockUpdate.Z);
-                            Packet.ToNetOrder(index, bulkBlockPacket, 2 + 4 * blockPacketsSent);
+                            Packet.WriteI32(index, bulkBlockPacket, 2 + 4 * blockPacketsSent);
                             bulkBlockPacket[2 + 1024 + blockPacketsSent] = blockUpdate.Block;
                         }
                         blockPacketsSent++;

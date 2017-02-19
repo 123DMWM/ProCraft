@@ -61,9 +61,9 @@ namespace fCraft {
         public static Packet MakeSetBlock( Vector3I coords, Block type ) {
             Packet packet = new Packet( OpCode.SetBlockServer );
             //Logger.Log(LogType.Debug, "Send: MakeSetBlock({0})({1})", coords, type);
-            ToNetOrder( (short)coords.X, packet.Bytes, 1 );
-            ToNetOrder( (short)coords.Z, packet.Bytes, 3 );
-            ToNetOrder( (short)coords.Y, packet.Bytes, 5 );
+            WriteI16( (short)coords.X, packet.Bytes, 1 );
+            WriteI16( (short)coords.Z, packet.Bytes, 3 );
+            WriteI16( (short)coords.Y, packet.Bytes, 5 );
             packet.Bytes[7] = (byte)type;
             return packet;
         }
@@ -81,9 +81,9 @@ namespace fCraft {
             //Logger.Log(LogType.Debug, "Send: MakeAddEntity({0}, {1}, {2})", id, name, spawnPosition);
             packet.Bytes[1] = (byte)id;
             PacketWriter.WriteString( name, packet.Bytes, 2, hasCP437 );
-            ToNetOrder( spawnPosition.X, packet.Bytes, 66 );
-            ToNetOrder( spawnPosition.Z, packet.Bytes, 68 );
-            ToNetOrder( spawnPosition.Y, packet.Bytes, 70 );
+            WriteI16( spawnPosition.X, packet.Bytes, 66 );
+            WriteI16( spawnPosition.Z, packet.Bytes, 68 );
+            WriteI16( spawnPosition.Y, packet.Bytes, 70 );
             packet.Bytes[72] = spawnPosition.R;
             packet.Bytes[73] = spawnPosition.L;
             return packet;
@@ -97,9 +97,9 @@ namespace fCraft {
             Packet packet = new Packet( OpCode.Teleport );
             //Logger.Log(LogType.Debug, "Send: MakeTeleport({0}, {1})", id, newPosition);
             packet.Bytes[1] = (byte)id;
-            ToNetOrder( newPosition.X, packet.Bytes, 2 );
-            ToNetOrder( newPosition.Z, packet.Bytes, 4 );
-            ToNetOrder( newPosition.Y, packet.Bytes, 6 );
+            WriteI16( newPosition.X, packet.Bytes, 2 );
+            WriteI16( newPosition.Z, packet.Bytes, 4 );
+            WriteI16( newPosition.Y, packet.Bytes, 6 );
             packet.Bytes[8] = newPosition.R;
             packet.Bytes[9] = newPosition.L;
             return packet;
@@ -210,16 +210,16 @@ namespace fCraft {
 
         #endregion
 
-        internal static void ToNetOrder( short number, [NotNull] byte[] arr, int offset ) {
-            arr[offset] = (byte)((number & 0xff00) >> 8);
-            arr[offset + 1] = (byte)(number & 0x00ff);
+        internal static void WriteI16( short number, [NotNull] byte[] arr, int offset ) {
+            arr[offset] =     (byte)((number & 0xff00) >> 8);
+            arr[offset + 1] = (byte)( number & 0x00ff);
         }
 
-        internal static void ToNetOrder( int number, [NotNull] byte[] arr, int offset ) {
-            arr[offset] = (byte)((number & 0xff000000) >> 24);
+        internal static void WriteI32( int number, [NotNull] byte[] arr, int offset ) {
+            arr[offset] =     (byte)((number & 0xff000000) >> 24);
             arr[offset + 1] = (byte)((number & 0x00ff0000) >> 16);
             arr[offset + 2] = (byte)((number & 0x0000ff00) >> 8);
-            arr[offset + 3] = (byte)(number & 0x000000ff);
+            arr[offset + 3] = (byte)( number & 0x000000ff);
         }
 
         static readonly int[] PacketSizes = {

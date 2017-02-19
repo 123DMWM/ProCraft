@@ -167,7 +167,7 @@ namespace fCraft {
             // send SMP KICK packet
             byte[] packet = new byte[3 + data.Length * 2];
             packet[0] = 255; // kick opcode
-            Packet.ToNetOrder((short)data.Length, packet, 1);
+            Packet.WriteI16((short)data.Length, packet, 1);
             Encoding.BigEndianUnicode.GetBytes(data, 0, data.Length, packet, 3);
             
             writer.Write(packet);

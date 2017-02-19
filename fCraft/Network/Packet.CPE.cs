@@ -13,7 +13,7 @@ namespace fCraft {
             //Logger.Log(LogType.Debug, "Send: ExtInfo({0} {1})", sname, extCount);
             Packet packet = new Packet( OpCode.ExtInfo );
             PacketWriter.WriteString( sname, packet.Bytes, 1, false );
-            ToNetOrder( extCount, packet.Bytes, 65 );
+            WriteI16( extCount, packet.Bytes, 65 );
             return packet;
         }
 
@@ -24,7 +24,7 @@ namespace fCraft {
             if( name == null ) throw new ArgumentNullException( "name" );
             Packet packet = new Packet( OpCode.ExtEntry );
             PacketWriter.WriteString( name, packet.Bytes, 1, false );
-            ToNetOrder( version, packet.Bytes, 65 );
+            WriteI32( version, packet.Bytes, 65 );
             return packet;
         }
 
@@ -33,7 +33,7 @@ namespace fCraft {
         public static Packet MakeSetClickDistance( short distance ) {
             if( distance < 0 ) throw new ArgumentOutOfRangeException( "distance" );
             Packet packet = new Packet( OpCode.SetClickDistance );
-            ToNetOrder( distance, packet.Bytes, 1 );
+            WriteI16( distance, packet.Bytes, 1 );
             return packet;
         }
 
@@ -63,7 +63,7 @@ namespace fCraft {
             Packet packet = new Packet( OpCode.SetTextHotKey );
             PacketWriter.WriteString( label, packet.Bytes,   1, hasCP437 );
             PacketWriter.WriteString( action, packet.Bytes, 65, hasCP437 );
-            ToNetOrder( keyCode, packet.Bytes, 129 );
+            WriteI32( keyCode, packet.Bytes, 129 );
             packet.Bytes[133] = keyMods;
             return packet;
         }
@@ -77,7 +77,7 @@ namespace fCraft {
             if( groupName == null ) throw new ArgumentNullException( "groupName" );
             Packet packet = new Packet( OpCode.ExtAddPlayerName );
             //Logger.Log(LogType.Debug, "Send: MakeExtAddPlayerName({0}, {1}, {2}, {3}, {4})", nameId, playerName, listName, groupName, groupRank);
-            ToNetOrder( nameId, packet.Bytes, 1 );
+            WriteI16( nameId, packet.Bytes, 1 );
             PacketWriter.WriteString( Color.SubstituteSpecialColors(playerName, useFallbacks), packet.Bytes,   3, hasCP437 );
             PacketWriter.WriteString( Color.SubstituteSpecialColors(listName, useFallbacks),   packet.Bytes,  67, hasCP437 );
             PacketWriter.WriteString( Color.SubstituteSpecialColors(groupName, useFallbacks),  packet.Bytes, 131, hasCP437 );
@@ -103,7 +103,7 @@ namespace fCraft {
         public static Packet MakeExtRemovePlayerName(short nameId) {
             Packet packet = new Packet( OpCode.ExtRemovePlayerName );
             //Logger.Log(LogType.Debug, "Send: MakeExtRemovePlayerName({0})", nameId);
-            ToNetOrder( nameId, packet.Bytes, 1 );
+            WriteI16( nameId, packet.Bytes, 1 );
             return packet;
         }
 
@@ -114,13 +114,13 @@ namespace fCraft {
             packet.Bytes[1] = (byte)variable;
             if (color != null) {
                 System.Drawing.Color col = System.Drawing.ColorTranslator.FromHtml("#" + color.ToUpper());
-                ToNetOrder((short) col.R, packet.Bytes, 2);
-                ToNetOrder((short) col.G, packet.Bytes, 4);
-                ToNetOrder((short) col.B, packet.Bytes, 6);
+                WriteI16((short) col.R, packet.Bytes, 2);
+                WriteI16((short) col.G, packet.Bytes, 4);
+                WriteI16((short) col.B, packet.Bytes, 6);
             } else {
-                ToNetOrder((short)-1, packet.Bytes, 2);
-                ToNetOrder((short)-1, packet.Bytes, 4);
-                ToNetOrder((short)-1, packet.Bytes, 6);
+                WriteI16((short)-1, packet.Bytes, 2);
+                WriteI16((short)-1, packet.Bytes, 4);
+                WriteI16((short)-1, packet.Bytes, 6);
             }
             return packet;
         }
@@ -135,18 +135,18 @@ namespace fCraft {
             packet.Bytes[1] = selectionId;
             PacketWriter.WriteString(label, packet.Bytes, 2, hasCP437);
             
-            ToNetOrder((short)bounds.XMin, packet.Bytes, 66);
-            ToNetOrder((short)bounds.ZMin, packet.Bytes, 68);
-            ToNetOrder((short)bounds.YMin, packet.Bytes, 70);
-            ToNetOrder((short)(bounds.XMax + 1), packet.Bytes, 72);
-            ToNetOrder((short)(bounds.ZMax + 1), packet.Bytes, 74);
-            ToNetOrder((short)(bounds.YMax + 1), packet.Bytes, 76);
+            WriteI16((short)bounds.XMin, packet.Bytes, 66);
+            WriteI16((short)bounds.ZMin, packet.Bytes, 68);
+            WriteI16((short)bounds.YMin, packet.Bytes, 70);
+            WriteI16((short)(bounds.XMax + 1), packet.Bytes, 72);
+            WriteI16((short)(bounds.ZMax + 1), packet.Bytes, 74);
+            WriteI16((short)(bounds.YMax + 1), packet.Bytes, 76);
             
             CustomColor c = Color.ParseHex(color);
-            ToNetOrder((short)c.R, packet.Bytes, 78);
-            ToNetOrder((short)c.G, packet.Bytes, 80);
-            ToNetOrder((short)c.B, packet.Bytes, 82);
-            ToNetOrder(opacity, packet.Bytes, 84);
+            WriteI16((short)c.R, packet.Bytes, 78);
+            WriteI16((short)c.G, packet.Bytes, 80);
+            WriteI16((short)c.B, packet.Bytes, 82);
+            WriteI16(opacity, packet.Bytes, 84);
             return packet;
         }
 
@@ -186,7 +186,7 @@ namespace fCraft {
             PacketWriter.WriteString( textureUrl, packet.Bytes, 1, hasCP437 );
             packet.Bytes[65] = sideBlock;
             packet.Bytes[66] = edgeBlock;
-            ToNetOrder( sideLevel, packet.Bytes, 67 );
+            WriteI16( sideLevel, packet.Bytes, 67 );
             return packet;
         }
         
@@ -199,9 +199,9 @@ namespace fCraft {
             PacketWriter.WriteString( textureUrl, packet, 1, hasCP437 );
             packet[65] = sideBlock;
             packet[66] = edgeBlock;
-            ToNetOrder( sideLevel, packet, 67 );
-            ToNetOrder( cloudsHeight, packet, 69 );
-            ToNetOrder( maxFog, packet, 71 );
+            WriteI16( sideLevel, packet, 67 );
+            WriteI16( cloudsHeight, packet, 69 );
+            WriteI16( maxFog, packet, 71 );
             return new Packet( packet );
         }
 
@@ -221,7 +221,7 @@ namespace fCraft {
             packet.Bytes[3] = (byte)(speedhack ? 1 : 0);
             packet.Bytes[4] = (byte)(respawn ? 1 : 0);
             packet.Bytes[5] = (byte)(thirdperson ? 1 : 0);
-            ToNetOrder(jumpheight, packet.Bytes, 6);
+            WriteI16(jumpheight, packet.Bytes, 6);
             return packet;
         }
 
@@ -234,9 +234,9 @@ namespace fCraft {
             packet.Bytes[1] = (byte) entityId;
             PacketWriter.WriteString(inGameName, packet.Bytes, 2, hasCP437);
             PacketWriter.WriteString(skin, packet.Bytes, 66, hasCP437);
-            ToNetOrder(spawnPosition.X, packet.Bytes, 130);
-            ToNetOrder(spawnPosition.Z, packet.Bytes, 132);
-            ToNetOrder(spawnPosition.Y, packet.Bytes, 134);
+            WriteI16(spawnPosition.X, packet.Bytes, 130);
+            WriteI16(spawnPosition.Z, packet.Bytes, 132);
+            WriteI16(spawnPosition.Y, packet.Bytes, 134);
             packet.Bytes[136] = spawnPosition.R;
             packet.Bytes[137] = spawnPosition.L;
             return packet;
@@ -334,7 +334,7 @@ namespace fCraft {
         public static Packet MakeEnvSetMapProperty( EnvProp prop, int value ) {
             Packet packet = new Packet( OpCode.SetEnvMapProperty );
             packet.Bytes[1] = (byte)prop;
-            ToNetOrder( value, packet.Bytes, 2 );
+            WriteI32( value, packet.Bytes, 2 );
             return packet;
         }
     }
