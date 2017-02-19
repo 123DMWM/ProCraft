@@ -578,9 +578,8 @@ namespace fCraft
                     player.Message("");
                 }
                   
-                bool fallback = !player.Supports(CpeExt.TextColors);
-                player.SendNow(Packet.Message(0, "Deafened mode: &2ON", fallback));
-                player.SendNow(Packet.Message(0, "You will not see ANY messages until you type &H/Deafen&S again.", fallback));
+                player.SendNow(Packet.Message(0, "Deafened mode: &2ON", player));
+                player.SendNow(Packet.Message(0, "You will not see ANY messages until you type &H/Deafen&S again.", player));
                 player.IsDeaf = true;
             } else {
                 player.IsDeaf = false;
@@ -642,7 +641,7 @@ namespace fCraft
 				foreach (Player p in Server.Players.Where(q => q.Info.Rank == RankManager.HighestRank)) {
 					if (p.Supports(CpeExt.MessageType)) {
 						p.Send(Packet.Message((byte)MessageType.Announcement, 
-                		                      String.Format("Player {0} has sent in a report!", player.Name), true));
+                		                      String.Format("Player {0} has sent in a report!", player.Name), player));
 					}
 					p.Message("Player {0} has sent in a report!", player.Name);
 				}
@@ -1054,7 +1053,7 @@ namespace fCraft
             string Msg = "/Quit" + (cmd.HasNext ? " " + cmd.NextAll() : "");
             player.usedquit = true;
             player.quitmessage = (Msg.Length > 70 ? Msg.Remove(70) : Msg);
-            player.Send(Packet.MakeKick(Msg));
+            player.Send(Packet.MakeKick(Msg, player.HasCP437));
             Logger.Log(LogType.UserActivity,
                         "{0} disconnected. Reason: {1}", player.Name, player.quitmessage);
         }

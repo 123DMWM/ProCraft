@@ -98,7 +98,7 @@ namespace fCraft.Games {
 		
 		public static void PrintCtfState(Player player) {
 			if (player.IsPlayingCTF && player.Supports(CpeExt.MessageType)) {
-				player.Send(Packet.Message((byte)MessageType.BottomRight1, "", true));
+				player.Send(Packet.Message((byte)MessageType.BottomRight1, "", player));
 				string op = "&d<=>";
 				if (CTF.RedTeam.TotalScore > CTF.BlueTeam.TotalScore) {
 					op = "&S-->";
@@ -126,10 +126,9 @@ namespace fCraft.Games {
 				}
 				
 				if (player.Team != null) {
-					player.Send(Packet.Message((byte)MessageType.Status3,
-					                           "Team: " + player.Team.ClassyName, player.UseFallbackColors));
+					player.Send(Packet.Message((byte)MessageType.Status3, "Team: " + player.Team.ClassyName, player));
 				} else {
-					player.Send(Packet.Message((byte)MessageType.Status3, "Team: &0None", true));
+					player.Send(Packet.Message((byte)MessageType.Status3, "Team: &0None", player));
 				}
 			}
 			
@@ -239,7 +238,7 @@ namespace fCraft.Games {
 
 		public static void RemovePlayer(Player player, World world) {
 			if (player.Supports(CpeExt.MessageType))
-				player.Send(Packet.Message((byte)MessageType.Status3, "", true));
+				player.Send(Packet.Message((byte)MessageType.Status3, "", player));
 			
 			if (BlueTeam.Has(player))
 				RemovePlayerFromTeam(player, RedTeam);
@@ -393,7 +392,7 @@ namespace fCraft.Games {
 				p.IsHoldingFlag = false;
 				
 				if (p.Supports(CpeExt.MessageType))
-					p.Send(Packet.Message((byte)MessageType.Status3, " ", true));
+					p.Send(Packet.Message((byte)MessageType.Status3, " ", p));
 				if (p.Supports(CpeExt.HeldBlock))
 					p.Send(Packet.MakeHoldThis(Block.Stone, false));
 			}

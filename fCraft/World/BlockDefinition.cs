@@ -151,11 +151,11 @@ namespace fCraft {
         
         static Packet GetPacket(Player p, BlockDefinition def) {
             if (p.Supports(CpeExt.BlockDefinitionsExt2) && def.Shape != 0) {
-                return Packet.MakeDefineBlockExt(def, true);
+                return Packet.MakeDefineBlockExt(def, true, p.HasCP437);
             } else if (p.Supports(CpeExt.BlockDefinitionsExt) && def.Shape != 0) {
-                return Packet.MakeDefineBlockExt(def, false);
+                return Packet.MakeDefineBlockExt(def, false, p.HasCP437);
             } else {
-                return Packet.MakeDefineBlock(def);
+                return Packet.MakeDefineBlock(def, p.HasCP437);
             }
         }
         #endregion

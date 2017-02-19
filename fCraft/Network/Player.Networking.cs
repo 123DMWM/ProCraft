@@ -64,7 +64,7 @@ namespace fCraft {
                 string bannedMessage = string.Format("IP-banned {0} ago by {1}: {2}",
                      DateTime.UtcNow.Subtract(ipBanInfo.BanDate).ToMiniString(),
                      ipBanInfo.BannedBy, ipBanInfo.BanReason);
-                tcpClient.Client.Send(Packet.MakeKick(bannedMessage).Bytes);
+                tcpClient.Client.Send(Packet.MakeKick(bannedMessage, false).Bytes);
                 return null;
             }
             return new Player( tcpClient );
@@ -385,7 +385,7 @@ namespace fCraft {
             LastUsedBlockType = held;
             if (Supports(CpeExt.MessageType) && !IsPlayingCTF) {
                 Send(Packet.Message((byte)MessageType.BottomRight1, "Block:&f" + Map.GetBlockName(World, HeldBlock)
-                                    + " &SID:&f" + (byte)HeldBlock, true));
+                                    + " &SID:&f" + (byte)HeldBlock, this));
             }
         }
 
@@ -508,11 +508,11 @@ namespace fCraft {
             if( !World.Map.InBounds( coords ) ) return;
             
             if ((action == ClickAction.Delete || type == 0) && !World.Deletable) {
-                SendNow(Packet.Message(0, "Deleting blocks is disabled in this world.", false));
+                SendNow(Packet.Message(0, "Deleting blocks is disabled in this world.", this));
                 RevertBlockNow(coords); 
                 return;
             } else if (action == ClickAction.Build && !World.Buildable) {
-                SendNow(Packet.Message(0, "Placing blocks is disabled in this world.", false));
+                SendNow(Packet.Message(0, "Placing blocks is disabled in this world.", this));
                 RevertBlockNow(coords); 
                 return;
             }
@@ -737,9 +737,8 @@ namespace fCraft {
             // Check if player is paid (if required)
             if (ConfigKey.PaidPlayersOnly.Enabled() && Info.AccountType != AccountType.Paid)
             {
-                SendNow(Packet.MakeHandshake(this,
-                                               ConfigKey.ServerName.GetString(),
-                                               "Please wait; Checking paid status..."));
+                SendNow(Packet.MakeHandshake(this, ConfigKey.ServerName.GetString(),
+                                               "Please wait; Checking paid status...", HasCP437));
                 writer.Flush();
 
                 Info.AccountType = CheckPaidStatus(Name);
@@ -818,7 +817,7 @@ namespace fCraft {
                     motd = "&0=&c=&e= " + motd + " &e=&c=&0=";
                 }
             }
-            SendNow(Packet.MakeHandshake(this, serverName, motd));
+            SendNow(Packet.MakeHandshake(this, serverName, motd, HasCP437));
 
             // AutoRank
             if (ConfigKey.AutoRankEnabled.Enabled())
@@ -970,7 +969,7 @@ namespace fCraft {
             RaisePlayerReadyEvent(this);
 
             if (Supports(CpeExt.MessageType))
-                Send(Packet.Message((byte)MessageType.Status1, ConfigKey.ServerName.GetString(), UseFallbackColors));
+                Send(Packet.Message((byte)MessageType.Status1, ConfigKey.ServerName.GetString(), this));
 
             short NID = 1;
             this.NameID = NID;
@@ -1091,7 +1090,7 @@ namespace fCraft {
 
             // Start sending over the level copy
             if (oldWorld != null) {
-                SendNow(Packet.MakeHandshake(this, textLine1, textLine2));
+                SendNow(Packet.MakeHandshake(this, textLine1, textLine2, HasCP437));
             }
             // needs to be sent before the client receives the map data
             if (Supports(CpeExt.BlockDefinitions)) {
@@ -1184,14 +1183,13 @@ namespace fCraft {
         void SendJoinCpeExtensions() {
             SendEnvSettings();
             if (Supports(CpeExt.ExtPlayerList2)) {
-                SendNow(Packet.MakeExtAddEntity2(Packet.SelfId, Info.Rank.Color + Name, 
-            	                                 (Info.skinName == "" ? Name : Info.skinName), Position, this));
+                SendNow(Packet.MakeExtAddEntity2(Packet.SelfId, Info.Rank.Color + Name, Info.Skin, Position, HasCP437));
             } else {
-                SendNow(Packet.MakeAddEntity(Packet.SelfId, Info.Rank.Color + Name, Position));
+                SendNow(Packet.MakeAddEntity(Packet.SelfId, Info.Rank.Color + Name, Position, HasCP437));
             }
 
             if (Supports(CpeExt.ChangeModel)) {
-                SendNow(Packet.MakeChangeModel(255, !IsAFK ? Info.Mob : AFKModel));
+                SendNow(Packet.MakeChangeModel(255, !IsAFK ? Info.Mob : AFKModel, HasCP437));
             }
 
             if (Supports(CpeExt.HackControl)) {
@@ -1205,16 +1203,16 @@ namespace fCraft {
 
             if (Supports(CpeExt.MessageType) && !IsPlayingCTF) {
                 SendNow(Packet.Message((byte)MessageType.BottomRight1, "Block:&f" + Map.GetBlockName(World, HeldBlock)
-                                    + " &SID:&f" + (byte)HeldBlock, true));
+                                    + " &SID:&f" + (byte)HeldBlock, this));
             }
             if (Supports(CpeExt.MessageType)) {
-                SendNow(Packet.Message((byte)MessageType.Status1, ConfigKey.ServerName.GetString(), UseFallbackColors));
+                SendNow(Packet.Message((byte)MessageType.Status1, ConfigKey.ServerName.GetString(), this));
             }
 
             if (Supports(CpeExt.SelectionCuboid)) {
                 foreach (Zone z in WorldMap.Zones) {
                     if (z.ShowZone)
-                        SendNow(Packet.MakeMakeSelection(z.ZoneID, z.Name, z.Bounds, z.Color, z.Alpha));
+                        SendNow(Packet.MakeMakeSelection(z.ZoneID, z.Name, z.Bounds, z.Color, z.Alpha, HasCP437));
                 }
             }
         }
@@ -1229,12 +1227,12 @@ namespace fCraft {
         internal void SendNewEntities(World world) {
             foreach (Entity entity in Entity.Entities.Where(e => Entity.getWorld(e) == world)) {
                 if (Supports(CpeExt.ExtPlayerList2)) {
-                    SendNow(Packet.MakeExtAddEntity2(entity.ID, entity.Name, entity.Skin, Entity.getPos(entity), this));
+                    SendNow(Packet.MakeExtAddEntity2(entity.ID, entity.Name, entity.Skin, Entity.getPos(entity), HasCP437));
                 } else {
-                    SendNow(Packet.MakeAddEntity(entity.ID, entity.Name, Entity.getPos(entity)));
+                    SendNow(Packet.MakeAddEntity(entity.ID, entity.Name, Entity.getPos(entity), HasCP437));
                 }
         		if (!entity.Model.CaselessEquals("humanoid") && Supports(CpeExt.ChangeModel))
-                    SendNow(Packet.MakeChangeModel((byte)entity.ID, entity.Model));
+                    SendNow(Packet.MakeChangeModel((byte)entity.ID, entity.Model, HasCP437));
             }
         }
         
@@ -1272,7 +1270,7 @@ namespace fCraft {
             CheckBlock(ref edge);
             
             if (Supports(CpeExt.EnvMapAspect)) {
-                Send(Packet.MakeEnvSetMapUrl(World.GetTexture()));
+                Send(Packet.MakeEnvSetMapUrl(World.GetTexture(), HasCP437));
                 Send(Packet.MakeEnvSetMapProperty(EnvProp.SidesBlock, side));
                 Send(Packet.MakeEnvSetMapProperty(EnvProp.EdgeBlock, edge));
                 Send(Packet.MakeEnvSetMapProperty(EnvProp.EdgeLevel, World.GetEdgeLevel()));
@@ -1283,9 +1281,9 @@ namespace fCraft {
                 Send(Packet.MakeEnvSetMapProperty(EnvProp.WeatherFade, World.WeatherFade));
             } else if (Supports(CpeExt.EnvMapAppearance2)) {
                 Send(Packet.MakeEnvSetMapAppearance2(World.GetTexture(), side, edge, World.GetEdgeLevel(),
-                                                     World.GetCloudsHeight(), World.MaxFogDistance));
+                                                     World.GetCloudsHeight(), World.MaxFogDistance, HasCP437));
             } else if (Supports(CpeExt.EnvMapAppearance)) {
-                Send(Packet.MakeEnvSetMapAppearance(World.GetTexture(), side, edge, World.GetEdgeLevel()));
+            	Send(Packet.MakeEnvSetMapAppearance(World.GetTexture(), side, edge, World.GetEdgeLevel(), HasCP437));
             }
 
             if (Supports(CpeExt.EnvColors)) {
@@ -1439,7 +1437,7 @@ namespace fCraft {
             ClearQueue(priorityOutputQueue);
 
             // bypassing Send() because canQueue is false
-            priorityOutputQueue.Enqueue( Packet.MakeKick( message ) );
+            priorityOutputQueue.Enqueue( Packet.MakeKick( message, HasCP437 ) );
         }
 
         /// <summary> Kick (synchronous). Immediately sends the kick packet.
@@ -1455,7 +1453,7 @@ namespace fCraft {
             canQueue = false;
             canReceive = false;
             canSend = false;
-            SendNow( Packet.MakeKick( message ) );
+            SendNow( Packet.MakeKick( message, HasCP437 ) );
             writer.Flush();
         }
 
@@ -1667,15 +1665,14 @@ namespace fCraft {
         
         void CheckOwnChange(sbyte id, Player otherPlayer) {
             if (oldskinName != Info.skinName && otherPlayer.Supports(CpeExt.ExtPlayerList2)) {
-                otherPlayer.Send(Packet.MakeExtAddEntity2(id, Info.Rank.Color + Name,
-                                                          (Info.skinName == "" ? Name : Info.skinName), Position, otherPlayer));
+                otherPlayer.Send(Packet.MakeExtAddEntity2(id, Info.Rank.Color + Name, Info.Skin, Position, otherPlayer.HasCP437));
                 //otherPlayer.Send(Packet.MakeTeleport(id, Position));
                 if (otherPlayer.Supports(CpeExt.ChangeModel)) {
                     string thisModel = IsAFK ? AFKModel : Info.Mob;
                     if (otherPlayer.Info.Rank.CanSee(Info.Rank) && (thisModel.CaselessEquals("air") || thisModel.CaselessEquals("0"))) {
                         thisModel = "Humanoid";
                     }
-                    otherPlayer.Send(Packet.MakeChangeModel((byte)id, thisModel));
+                    otherPlayer.Send(Packet.MakeChangeModel((byte)id, thisModel, otherPlayer.HasCP437));
                 }
             }
             if ((oldMob != Info.Mob || oldafkMob != afkMob) && otherPlayer.Supports(CpeExt.ChangeModel)) {
@@ -1683,7 +1680,7 @@ namespace fCraft {
                 if (otherPlayer.Info.Rank.CanSee(Info.Rank) && (thisModel.CaselessEquals("air") || thisModel.CaselessEquals("0"))) {
                     thisModel = "Humanoid";
                 }
-                otherPlayer.Send(Packet.MakeChangeModel((byte)id, thisModel));
+                otherPlayer.Send(Packet.MakeChangeModel((byte)id, thisModel, otherPlayer.HasCP437));
             }
         }
         
@@ -1700,12 +1697,10 @@ namespace fCraft {
                     pos = player.WorldMap.Spawn;
                 }
                 if (Supports(CpeExt.ExtPlayerList2)) {
-                    Send(Packet.MakeExtAddEntity2(newEntity.Id, player.Info.Rank.Color + player.Name,
-                        (player.Info.skinName == "" ? player.Name : player.Info.skinName), pos, this));
+                	Send(Packet.MakeExtAddEntity2(newEntity.Id, player.Info.Rank.Color + player.Name, player.Info.Skin, pos, HasCP437));
                     Send(Packet.MakeTeleport(newEntity.Id, player.Position));
                 } else {
-                    Send(Packet.MakeAddEntity(newEntity.Id, player.Info.Rank.Color + player.Name,
-                        player.WorldMap.Spawn));
+                    Send(Packet.MakeAddEntity(newEntity.Id, player.Info.Rank.Color + player.Name, pos, HasCP437));
                     Send(Packet.MakeTeleport(newEntity.Id, player.Position));
                 }
                 if (Supports(CpeExt.ChangeModel)) {
@@ -1713,7 +1708,7 @@ namespace fCraft {
                     if (Info.Rank.CanSee(player.Info.Rank) && (addedModel.CaselessEquals("air") || addedModel.CaselessEquals("0"))) {
                         addedModel = "Humanoid";
                     }
-                    Send(Packet.MakeChangeModel((byte)newEntity.Id, addedModel));
+                    Send(Packet.MakeChangeModel((byte)newEntity.Id, addedModel, HasCP437));
                 }
                 return newEntity;
             } else {
@@ -1751,12 +1746,10 @@ namespace fCraft {
 #endif
             SendNow( Packet.MakeRemoveEntity( entity.Id ) );
             if (Supports(CpeExt.ExtPlayerList2)) {
-                SendNow(Packet.MakeExtAddEntity2(entity.Id, player.Info.Rank.Color + player.Name, 
-                    (player.Info.skinName == "" ? player.Name : player.Info.skinName),
-                    player.WorldMap.Spawn, this));
+                SendNow(Packet.MakeExtAddEntity2(entity.Id, player.Info.Rank.Color + player.Name, player.Info.Skin, player.WorldMap.Spawn, HasCP437));
                 SendNow(Packet.MakeTeleport(entity.Id, player.Position));
             } else {
-                SendNow(Packet.MakeAddEntity(entity.Id, player.Info.Rank.Color + player.Name, player.WorldMap.Spawn));
+                SendNow(Packet.MakeAddEntity(entity.Id, player.Info.Rank.Color + player.Name, player.WorldMap.Spawn, HasCP437));
                 SendNow(Packet.MakeTeleport(entity.Id, player.Position));
             }
 
@@ -1765,7 +1758,7 @@ namespace fCraft {
                 if (Info.Rank.CanSee(player.Info.Rank) && (readdedModel.CaselessEquals("air") || readdedModel.CaselessEquals("0"))) {
                     readdedModel = "Humanoid";
                 }
-                SendNow(Packet.MakeChangeModel((byte)entity.Id, readdedModel));
+                SendNow(Packet.MakeChangeModel((byte)entity.Id, readdedModel, HasCP437));
             }
         }
 

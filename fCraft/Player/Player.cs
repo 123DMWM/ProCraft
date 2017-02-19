@@ -682,7 +682,7 @@ namespace fCraft {
                 Logger.LogToConsole( message );
             } else {
                 foreach (Packet p in LineWrapper.Wrap( Color.Sys + message, Supports(CpeExt.EmoteFix), 
-            	                                      Supports(CpeExt.FullCP437), UseFallbackColors)) {
+            	                                      HasCP437, FallbackColors)) {
                     Send( p );
                 }
             }
@@ -717,7 +717,7 @@ namespace fCraft {
             else
             {
                 foreach (Packet p in LineWrapper.Wrap( messageType, message, Supports(CpeExt.EmoteFix), 
-            	                                      Supports(CpeExt.FullCP437), UseFallbackColors))
+            	                                      HasCP437, FallbackColors))
                 {
                     Send(p);
                 }
@@ -750,7 +750,7 @@ namespace fCraft {
                 Logger.LogToConsole( message );
             } else {
                 foreach (Packet p in LineWrapper.WrapPrefixed( prefix, message, Supports(CpeExt.EmoteFix), 
-            	                                              Supports(CpeExt.FullCP437), UseFallbackColors)) {
+            	                                              Supports(CpeExt.FullCP437), FallbackColors)) {
                     Send( p );
                 }
             }
@@ -2145,9 +2145,9 @@ namespace fCraft {
         
         bool supportsBlockDefs, supportsCustomBlocks;
         
-        public bool UseFallbackColors {
-            get { return !Supports(CpeExt.TextColors); }
-        }
+        public bool FallbackColors { get { return !Supports(CpeExt.TextColors); } }
+        
+        public bool HasCP437 { get { return Supports(CpeExt.FullCP437); } }
         
         public bool Supports(CpeExt extension) {
             return supportedExts.Contains(extension);

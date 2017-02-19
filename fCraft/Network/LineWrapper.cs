@@ -22,7 +22,7 @@ namespace fCraft
 
         static LineWrapper()
         {
-            DefaultPrefix = Encoding.ASCII.GetBytes(DefaultPrefixString);
+            DefaultPrefix = GetBytes(DefaultPrefixString, false);
         }
 
 
@@ -38,7 +38,7 @@ namespace fCraft
              lastColor;     // used to detect duplicate color codes
 
         byte type = 0;        // messagetype cpe spec
-        bool emoteFix = false, fullCP437 = false, useFallbacks = false;
+        bool emoteFix = false, hasCP437 = false, useFallbacks = false;
 
         bool endsWithSymbol; // used to guarantee suffixes for symbols ("emotes")
 
@@ -74,42 +74,34 @@ namespace fCraft
             input = GetBytes(message, fullCP437);
             prefix = DefaultPrefix;
             emoteFix = emotefix;
-            this.fullCP437 = fullCP437;
+            this.hasCP437 = fullCP437;
             this.useFallbacks = fallbackCols;
             Reset();
         }
 
-        LineWrapper( [NotNull] string prefixString, [NotNull] string message, bool emotefix, bool fullCP437, bool fallbackCols ) {
+        LineWrapper( [NotNull] string prefixString, [NotNull] string message, bool emotefix, bool hasCP437, bool fallbackCols ) {
             if (prefixString == null)
                 throw new ArgumentNullException( "prefixString" );
-            prefix = Encoding.ASCII.GetBytes( prefixString );
+            prefix = GetBytes( prefixString, hasCP437 );
             if (prefix.Length > MaxPrefixSize)
                 throw new ArgumentException( "Prefix too long", "prefixString" );
             if (message == null)
                 throw new ArgumentNullException( "message" );
-            input = GetBytes(message, fullCP437);
+            input = GetBytes(message, hasCP437);
             emoteFix = emotefix;
-            this.fullCP437 = fullCP437;
+            this.hasCP437 = hasCP437;
             this.useFallbacks = fallbackCols;
             Reset();
         }
         
-         static byte[] GetBytes(string value, bool extChars) {
-        	byte[] buffer = new byte[value.Length];
-			for (int i = 0; i < value.Length; i++) {
-				char c = value[i];
-				int index = 0;
-				if (c >= ' ' && c <= '~') {
-					buffer[i] = (byte)c;
-				} else if((index = Chat.ControlCharReplacements.IndexOf(c)) >= 0 ) {
-					buffer[i] = (byte)index;
-				} else if(extChars && (index = Chat.ExtendedCharReplacements.IndexOf(c)) >= 0) {
-					buffer[i] = (byte)(index + 127);
-				} else {
-					buffer[i] = (byte)'?';
-				}
-			}
-			return buffer;
+         static byte[] GetBytes(string value, bool hasCP437) {
+            byte[] buffer = new byte[value.Length];
+            for (int i = 0; i < value.Length; i++) {
+                char c = value[i].UnicodeToCp437();
+                if (c >= '\u0080' && !hasCP437) c = '?';
+                buffer[i] = (byte)c;
+            }
+            return buffer;
         }
 
 

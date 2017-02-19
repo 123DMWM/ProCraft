@@ -405,7 +405,7 @@ namespace fCraft {
 
                 // clear undo, selection, and confirmations
                 if (player.LastDrawOp != null && player.Supports(CpeExt.MessageType))
-                    player.Send(Packet.Message((byte)MessageType.Status3, "", true));
+                    player.Send(Packet.Message((byte)MessageType.Status3, "", player));
                 player.LastDrawOp = null;
                 player.UndoClear();
                 player.RedoClear();

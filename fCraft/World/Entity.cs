@@ -79,12 +79,12 @@ namespace fCraft {
         public static void ShowEntity(Entity entity) {
             foreach (Player sendTo in getWorld(entity).Players) {
                 if (sendTo.Supports(CpeExt.ExtPlayerList2)) {
-                    sendTo.Send(Packet.MakeExtAddEntity2(entity.ID, entity.Name, entity.Skin, getPos(entity), sendTo));
+                    sendTo.Send(Packet.MakeExtAddEntity2(entity.ID, entity.Name, entity.Skin, getPos(entity), sendTo.HasCP437));
                 } else {
-                    sendTo.Send(Packet.MakeAddEntity(entity.ID, entity.Name, getPos(entity)));
+        			sendTo.Send(Packet.MakeAddEntity(entity.ID, entity.Name, getPos(entity), sendTo.HasCP437));
                 }
                 if (sendTo.Supports(CpeExt.ChangeModel)) {
-                    sendTo.Send(Packet.MakeChangeModel((byte)entity.ID, entity.Model));
+                    sendTo.Send(Packet.MakeChangeModel((byte)entity.ID, entity.Model, sendTo.HasCP437));
                 }
             }
         }
@@ -93,12 +93,12 @@ namespace fCraft {
             foreach (Entity entity in Entities) {
                 foreach (Player sendTo in Server.Players.Where(p => p.World == getWorld(entity))) {
                     if (sendTo.Supports(CpeExt.ExtPlayerList2)) {
-                        sendTo.Send(Packet.MakeExtAddEntity2(entity.ID, entity.Name, entity.Skin, getPos(entity), sendTo));
+                        sendTo.Send(Packet.MakeExtAddEntity2(entity.ID, entity.Name, entity.Skin, getPos(entity), sendTo.HasCP437));
                     } else {
-                        sendTo.Send(Packet.MakeAddEntity(entity.ID, entity.Name, getPos(entity)));
+                        sendTo.Send(Packet.MakeAddEntity(entity.ID, entity.Name, getPos(entity), sendTo.HasCP437));
                     }
                     if (sendTo.Supports(CpeExt.ChangeModel)) {
-                        sendTo.Send(Packet.MakeChangeModel((byte)entity.ID, entity.Model));
+                        sendTo.Send(Packet.MakeChangeModel((byte)entity.ID, entity.Model, sendTo.HasCP437));
                     }
                 }
             }

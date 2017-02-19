@@ -623,7 +623,7 @@ namespace fCraft {
             if (task.MaxRepeats == 1) {
                 foreach (Zone zone in args.Zones) {
                     if (zone.ShowZone) {
-                        args.Player.Send(Packet.MakeMakeSelection(zone.ZoneID, zone.Name, zone.Bounds, zone.Color, zone.Alpha));
+                        args.Player.Send(Packet.MakeMakeSelection(zone.ZoneID, zone.Name, zone.Bounds, zone.Color, zone.Alpha, args.Player.HasCP437));
                     } else {
                         args.Player.Send(Packet.MakeRemoveSelection(zone.ZoneID));
                     }
@@ -638,7 +638,7 @@ namespace fCraft {
             
             string c = new string(col, 6);
             foreach (Zone zone in args.Zones) {
-                args.Player.Send(Packet.MakeMakeSelection(zone.ZoneID, "ZInfo", zone.Bounds, c, 127));
+                args.Player.Send(Packet.MakeMakeSelection(zone.ZoneID, "ZInfo", zone.Bounds, c, 127, args.Player.HasCP437));
             }
         }
 

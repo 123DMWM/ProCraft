@@ -313,6 +313,18 @@ namespace fCraft {
         public static int IndexOfOrdinal( [NotNull] this string haystack, [NotNull] string needle ) {
             return haystack.IndexOf( needle, StringComparison.Ordinal );
         }
+        
+        public static char UnicodeToCp437(this char c) {
+            int cpIndex = 0;
+            if (c >= ' ' && c <= '~') {
+                return c;
+            } else if ((cpIndex = Chat.ControlCharReplacements.IndexOf(c)) >= 0 ) {
+                return (char)cpIndex;
+            } else if ((cpIndex = Chat.ExtendedCharReplacements.IndexOf(c)) >= 0 ) {
+                return (char)(cpIndex + 127);
+            }
+            return '?';
+        }
     }
 
 

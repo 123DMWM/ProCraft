@@ -418,6 +418,8 @@ namespace fCraft {
 
         public string Mob = "Humanoid";
         public string skinName = "";
+        
+        public string Skin { get { return skinName == "" ? Name : skinName; } }
 
         /// <summary> Whether player has read the rules or not.</summary>
         public bool HasRTR;

@@ -914,7 +914,7 @@ namespace fCraft {
                     world.Texture = value;
                     foreach (Player p in world.Players) {
                         if (p.Supports(CpeExt.EnvMapAspect))
-                            p.Send(Packet.MakeEnvSetMapUrl(world.GetTexture()));
+                            p.Send(Packet.MakeEnvSetMapUrl(world.GetTexture(), p.HasCP437));
                         else if (p.Supports(CpeExt.EnvMapAppearance) || p.Supports(CpeExt.EnvMapAppearance2))
                             p.SendEnvSettings();
                     }
@@ -2312,11 +2312,11 @@ namespace fCraft {
                     return;
                 }
             }
+            
             if (player.Supports(CpeExt.TextHotKey)) {
-                player.Send(Packet.MakeSetTextHotKey(Label, Action, KeyCode, KeyMod));
+                player.Send(Packet.MakeSetTextHotKey(Label, Action, KeyCode, KeyMod, player.HasCP437));
             } else {
                 player.Message("You do not support TextHotKey");
-                return;
             }
         }
 
@@ -2388,7 +2388,7 @@ namespace fCraft {
                     if (zone.Color != null) {
                         player.Message("Zone ({0}&S) will now show its bounderies", zone.ClassyName);
                         player.World.Players.Where(p => p.Supports(CpeExt.SelectionCuboid)).Send(Packet.MakeMakeSelection(zone.ZoneID, zone.Name, zone.Bounds,
-                            zone.Color, zone.Alpha));
+                            zone.Color, zone.Alpha, player.HasCP437));
                     }
                     return;
                 } else if (color.CaselessEquals("off") || color.CaselessEquals("false") || color.CaselessEquals("no")) {
@@ -2437,7 +2437,7 @@ namespace fCraft {
                 foreach (Player p in player.World.Players) {
                     if (p.Supports(CpeExt.SelectionCuboid)) {
                         if (zone.ShowZone) {
-                            p.Send(Packet.MakeMakeSelection(zone.ZoneID, zone.Name, zone.Bounds, zone.Color, alpha));
+                            p.Send(Packet.MakeMakeSelection(zone.ZoneID, zone.Name, zone.Bounds, zone.Color, alpha, p.HasCP437));
                         }
                     }
                 }

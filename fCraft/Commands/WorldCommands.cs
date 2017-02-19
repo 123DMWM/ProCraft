@@ -991,7 +991,7 @@ namespace fCraft {
 
             // generate the map
             int mapWidth = 0, mapLength = 0;
-            player.SendNow(Packet.Message(0, "Downloading file from: &9" + url, false));
+            player.SendNow(Packet.Message(0, "Downloading file from: &9" + url, player));
             heightmap = DownloadImage(url, player);
             if (heightmap == null) return;
             mapWidth = heightmap.Width;
@@ -1000,7 +1000,7 @@ namespace fCraft {
                 player.Message("Invalid image size along {0} &S(Must be inbetween 16 and 1024)", Map.IsValidDimension(mapWidth) ? "height: &F" + mapLength : "width: &F" + mapWidth);
                 return;
             }
-            player.SendNow(Packet.Message(0, "Generating HeightMap...", false));
+            player.SendNow(Packet.Message(0, "Generating HeightMap...", player));
             Map map = MapGenerator.GenerateEmpty(mapWidth, mapLength, 256);
             Generate(ref map, heightmap, themeName.ToLower());
             if (!noTrees) {
@@ -1349,7 +1349,7 @@ namespace fCraft {
                 }
 
             } else if( player.World != null ) {
-                world = player.World;
+            	world = player.World;
 
             } else {
                 player.Message( "When called from console, /WUnlock requires a world name." );

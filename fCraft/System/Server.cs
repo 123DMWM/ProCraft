@@ -843,15 +843,15 @@ namespace fCraft {
                     string bottomRight2 = player.Position.ToBlockCoordsExt() + "&S[" + compassString(player.Position.R) + "&S]";
                     if (bottomRight2 != player.lastBottomRight2) {
                         player.lastBottomRight2 = bottomRight2;
-                        player.Send(Packet.Message((byte)MessageType.BottomRight2, bottomRight2, player.UseFallbackColors));
+                        player.Send(Packet.Message((byte)MessageType.BottomRight2, bottomRight2, player));
                     }
                     
                     if (player.LastDrawOp != null && !player.IsPlayingCTF)
                         if (player.LastDrawOp.PercentDone < 100) {
                             player.Send(Packet.Message((byte)MessageType.Status3, player.LastDrawOp.Description + 
-                                                   " percent done: &f" + player.LastDrawOp.PercentDone + "&S%", true));
+                                                   " percent done: &f" + player.LastDrawOp.PercentDone + "&S%", player));
                         } else if (player.LastDrawOp.PercentDone == 100 || player.LastDrawOp.IsDone) {
-                            player.Send(Packet.Message((byte)MessageType.Status3, "", true));
+                            player.Send(Packet.Message((byte)MessageType.Status3, "", player));
                         }
                 }
                 CTF.PrintCtfState(player);
@@ -1050,7 +1050,7 @@ namespace fCraft {
                             line = line.Remove(0, 2);
                         }
                         pl.Send(Packet.Message((byte)MessageType.Announcement, 
-                                                     "&d" + Chat.ReplaceTextKeywords(Player.Console, line), pl.UseFallbackColors));
+                                                     "&d" + Chat.ReplaceTextKeywords(Player.Console, line), pl));
                     }
                     else
                     {
@@ -1397,7 +1397,7 @@ namespace fCraft {
                         p.Name + " on world " + p.World.ClassyName;
                     if (status2 != p.lastStatus2) {
                         p.lastStatus2 = status2;
-                        p.Send(Packet.Message((byte)MessageType.Status2, status2, p.UseFallbackColors));
+                        p.Send(Packet.Message((byte)MessageType.Status2, status2, p));
                     }
                 }
                 
@@ -1411,14 +1411,14 @@ namespace fCraft {
                         
                         IEnumerable<Player> plCanSee = Players.Where(other => pl.CanSee(other)).ToArray();
                         pl.Send(Packet.MakeExtAddPlayerName(
-                            p.NameID, p.Name, nick, GetGroup(p, plCanSee), (byte)p.Info.Rank.Index, pl.UseFallbackColors));
+                            p.NameID, p.Name, nick, GetGroup(p, plCanSee), (byte)p.Info.Rank.Index, pl.FallbackColors, pl.HasCP437));
                     }
                 } else {
                     var canBeSeenW = p.World.Players.Where(pl => pl.CanSee(p)).ToArray();
                     foreach (Player pl in canBeSeenW) {
                         if (!pl.Supports(CpeExt.ExtPlayerList) && !pl.Supports(CpeExt.ExtPlayerList2)) continue;
                         if (pl.IsPlayingCTF)
-                            pl.Send(Packet.MakeExtAddPlayerName(p.NameID, p.Name, nick, group, 0, p.UseFallbackColors));
+                            pl.Send(Packet.MakeExtAddPlayerName(p.NameID, p.Name, nick, group, 0, p.FallbackColors, pl.HasCP437));
                     }
                 }
             }

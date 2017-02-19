@@ -41,15 +41,15 @@ namespace fCraft {
         /// Used to determine DeleteAdmincrete permission, for client-side checks. May not be null. </param>
         /// <param name="motd"> Message-of-the-day (text displayed below the server name). May not be null. </param>
         /// <exception cref="ArgumentNullException"> player, serverName, or motd is null </exception>
-        public static Packet MakeHandshake( [NotNull] Player player, [NotNull] string serverName, [NotNull] string motd ) {
+        public static Packet MakeHandshake( [NotNull] Player player, [NotNull] string serverName, [NotNull] string motd, bool hasCP437 ) {
             if( serverName == null ) throw new ArgumentNullException( "serverName" );
             if( motd == null ) throw new ArgumentNullException( "motd" );
 
             Packet packet = new Packet( OpCode.Handshake );
             //Logger.Log(LogType.Debug, "Send: MakeHandshake({0}, {1}, {2})", player, serverName, motd);
             packet.Bytes[1] = Config.ProtocolVersion;
-            Encoding.ASCII.GetBytes( serverName.PadRight( 64 ), 0, 64, packet.Bytes, 2 );
-            Encoding.ASCII.GetBytes( motd.PadRight( 64 ), 0, 64, packet.Bytes, 66 );
+            PacketWriter.WriteString( serverName, packet.Bytes, 2, hasCP437 );
+            PacketWriter.WriteString( motd, packet.Bytes, 66, hasCP437 );
             packet.Bytes[130] = (byte)(player.Can( Permission.DeleteAdmincrete ) ? 100 : 0);
             return packet;
         }
@@ -74,13 +74,13 @@ namespace fCraft {
         /// <param name="name"> Entity name. May not be null. </param>
         /// <param name="spawnPosition"> Spawning position for the player. </param>
         /// <exception cref="ArgumentNullException"> name is null </exception>
-        public static Packet MakeAddEntity( sbyte id, [NotNull] string name, Position spawnPosition ) {
+        public static Packet MakeAddEntity( sbyte id, [NotNull] string name, Position spawnPosition, bool hasCP437 ) {
             if (name == null) throw new ArgumentNullException("name");
             
             Packet packet = new Packet( OpCode.AddEntity );
             //Logger.Log(LogType.Debug, "Send: MakeAddEntity({0}, {1}, {2})", id, name, spawnPosition);
             packet.Bytes[1] = (byte)id;
-            Encoding.ASCII.GetBytes( name.PadRight( 64 ), 0, 64, packet.Bytes, 2 );
+            PacketWriter.WriteString( name, packet.Bytes, 2, hasCP437 );
             ToNetOrder( spawnPosition.X, packet.Bytes, 66 );
             ToNetOrder( spawnPosition.Z, packet.Bytes, 68 );
             ToNetOrder( spawnPosition.Y, packet.Bytes, 70 );
@@ -170,22 +170,27 @@ namespace fCraft {
         /// <param name="type"> Message type. </param>
         /// <param name="message"> Message. </param>
         /// <param name="useFallbacks"> whether or not to use color fallback codes. </param>
-        public static Packet Message(byte type, string message, bool useFallbacks) {
+        public static Packet Message(byte type, string message, bool useFallbacks, bool hasCP437) {
             Packet packet = new Packet(OpCode.Message);
             packet.Bytes[1] = type;
             message = Color.Sys + Color.SubstituteSpecialColors(message, useFallbacks);
-            Encoding.ASCII.GetBytes(message.PadRight(64), 0, 64, packet.Bytes, 2);
+            PacketWriter.WriteString(message, packet.Bytes, 2, hasCP437);
             return packet;
+        }
+        
+        // avoid redundantly typing FallbackColors and HasCP437 all the time
+        public static Packet Message(byte type, string message, Player player) {
+            return Message(type, message, player.FallbackColors, player.HasCP437);
         }
 
         /// <summary> Creates a new Kick (0x0E) packet. </summary>
         /// <param name="reason"> Given reason. Only first 64 characters will be sent. May not be null. </param>
         /// <exception cref="ArgumentNullException"> reason is null </exception>
-        public static Packet MakeKick( [NotNull] string reason ) {
+        public static Packet MakeKick( [NotNull] string reason, bool hasCP437 ) {
             if( reason == null ) throw new ArgumentNullException( "reason" );
             reason = Color.SubstituteSpecialColors(reason, true);
             Packet packet = new Packet( OpCode.Kick );
-            Encoding.ASCII.GetBytes( reason.PadRight( 64 ), 0, 64, packet.Bytes, 1 );
+            PacketWriter.WriteString( reason, packet.Bytes, 1, hasCP437 );
             return packet;
         }
 
