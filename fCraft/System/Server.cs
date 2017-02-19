@@ -1035,27 +1035,18 @@ namespace fCraft {
             if( lines.Length == 0 ) return;
             string line = lines[new Random().Next( 0, lines.Length )].Trim();
             if( line.Length == 0 ) return;
-            var visiblePlayers = Server.Players
-                                            .Where(p => !p.Info.IsHidden)
-                                            .OrderBy(p => p.Name)
-                                            .ToArray();
-            if (visiblePlayers.Count() > 0)
-            {
-                foreach (Player pl in Server.Players)
-                {
-                    if (pl.Supports(CpeExt.MessageType))
-                    {
-                        if (line.CaselessStarts("&d"))
-                        {
-                            line = line.Remove(0, 2);
-                        }
-                        pl.Send(Packet.Message((byte)MessageType.Announcement, 
-                                                     "&d" + Chat.ReplaceTextKeywords(Player.Console, line), pl));
-                    }
-                    else
-                    {
-                        pl.Message("&d" + Chat.ReplaceTextKeywords(Player.Console, line));
-                    }
+            
+            Player[] players = Server.Players;
+            if ( players.Length == 0 ) return;
+            
+            foreach (Player pl in players) {
+                if (pl.Supports(CpeExt.MessageType)) {
+                    if (line.CaselessStarts("&d"))
+                        line = line.Remove(0, 2);
+                    pl.Send(Packet.Message((byte)MessageType.Announcement,
+                                           "&d" + Chat.ReplaceTextKeywords(pl, line), pl));
+                } else {
+                    pl.Message("&d" + Chat.ReplaceTextKeywords(pl, line));
                 }
             }
         }

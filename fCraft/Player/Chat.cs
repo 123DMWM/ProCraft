@@ -669,14 +669,13 @@ namespace fCraft {
             sb.Replace("{SERVER_NAME}", ConfigKey.ServerName.GetString());
             sb.Replace("{RANK}", player.Info.Rank.ClassyName);
 			sb.Replace("{TIME}", DateTime.Now.ToShortTimeString()); // localized
-            if (player.World == null)
-            {
+			
+            if (player.World == null) {
                 sb.Replace("{WORLD}", "(No World)");
-            }
-            else
-            {
+            } else {
                 sb.Replace("{WORLD}", player.World.ClassyName);
             }
+            
             sb.Replace("{WORLDS}", WorldManager.Worlds.Length.ToStringInvariant());
             sb.Replace("{MOTD}", ConfigKey.MOTD.GetString());
             sb.Replace("{VERSION}", "1.23");
