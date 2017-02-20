@@ -750,7 +750,7 @@ namespace fCraft {
                 Logger.LogToConsole( message );
             } else {
                 foreach (Packet p in LineWrapper.WrapPrefixed( prefix, message, Supports(CpeExt.EmoteFix), 
-            	                                              Supports(CpeExt.FullCP437), FallbackColors)) {
+            	                                              HasCP437, FallbackColors)) {
                     Send( p );
                 }
             }

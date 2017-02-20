@@ -647,7 +647,7 @@ namespace fCraft {
 
             string hex = cmd.Next();
             if (!IsValidHex(hex)) {
-            	p.Message("\"#{0}\" is not a valid hex color.", hex.Replace("#", "")); return;
+                p.Message("\"#{0}\" is not a valid hex color.", hex.Replace("#", "")); return;
             }
 
             CustomColor col = Color.ParseHex(hex);
@@ -732,7 +732,7 @@ namespace fCraft {
             Permissions = new[] { Permission.ManageWorlds },
             Help = "Prints or changes environmental variables for a world.&N" +
                    "Variables are: border, clouds, edge, fog, level, cloudsheight, shadow, sky, sunlight, " +
-            	   "texture, weather, maxfog, cloudspeed, weatherspeed, weatherfade.&N" +
+                   "texture, weather, maxfog, cloudspeed, weatherspeed, weatherfade.&N" +
                    "See &H/Help env <Variable>&S for details about a variable.&N" +
                    "Type &H/Env <WorldName> normal&S to reset everything.",
             HelpSections = new Dictionary<string, string>{
@@ -1069,7 +1069,7 @@ namespace fCraft {
 
         static void SetEnvAppearanceBlock(Player player, World world, string value, EnvProp prop,
                                           string name, Block defValue, ref byte target) {
-        	if (IsReset(value)) {
+            if (IsReset(value)) {
                 player.Message("Reset {0} for {1}&S to normal ({2})", name, world.ClassyName, defValue);
                 target = (byte)defValue;
             } else {
@@ -1081,17 +1081,17 @@ namespace fCraft {
                 target = (byte)block;
                 player.Message("Set {0} for {1}&S to {2}", name, world.ClassyName, block);
             }
-        	UpdateAppearance(world, prop, target);
+            UpdateAppearance(world, prop, target);
         }
         
         static bool IsReset(string value) {
-        	return value.Equals("-1") || value.CaselessEquals("normal") 
-        		|| value.CaselessEquals("reset") || value.CaselessEquals("default");
+            return value.Equals("-1") || value.CaselessEquals("normal") 
+                || value.CaselessEquals("reset") || value.CaselessEquals("default");
         }
         
         static void UpdateAppearance(World world, EnvProp prop, int target) {
-        	foreach (Player p in world.Players) {
-        		if (p.Supports(CpeExt.EnvMapAspect))
+            foreach (Player p in world.Players) {
+                if (p.Supports(CpeExt.EnvMapAspect))
                     p.Send(Packet.MakeEnvSetMapProperty(prop, target));
                 else if (p.Supports(CpeExt.EnvMapAppearance) || p.Supports(CpeExt.EnvMapAppearance2))
                     p.SendEnvSettings();
@@ -2388,7 +2388,7 @@ namespace fCraft {
                     if (zone.Color != null) {
                         player.Message("Zone ({0}&S) will now show its bounderies", zone.ClassyName);
                         player.World.Players.Where(p => p.Supports(CpeExt.SelectionCuboid)).Send(Packet.MakeMakeSelection(zone.ZoneID, zone.Name, zone.Bounds,
-                            zone.Color, zone.Alpha, player.HasCP437));
+                            zone.Color, zone.Alpha, p.HasCP437));
                     }
                     return;
                 } else if (color.CaselessEquals("off") || color.CaselessEquals("false") || color.CaselessEquals("no")) {
@@ -2435,10 +2435,8 @@ namespace fCraft {
             }
             if (zone != null) {
                 foreach (Player p in player.World.Players) {
-                    if (p.Supports(CpeExt.SelectionCuboid)) {
-                        if (zone.ShowZone) {
-                            p.Send(Packet.MakeMakeSelection(zone.ZoneID, zone.Name, zone.Bounds, zone.Color, alpha, p.HasCP437));
-                        }
+                    if (p.Supports(CpeExt.SelectionCuboid && zone.ShowZone)) {
+                        p.Send(Packet.MakeMakeSelection(zone.ZoneID, zone.Name, zone.Bounds, zone.Color, alpha, p.HasCP437));
                     }
                 }
             }
