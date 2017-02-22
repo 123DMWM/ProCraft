@@ -2388,7 +2388,7 @@ namespace fCraft {
                     if (zone.Color != null) {
                         player.Message("Zone ({0}&S) will now show its bounderies", zone.ClassyName);
                         player.World.Players.Where(p => p.Supports(CpeExt.SelectionCuboid)).Send(Packet.MakeMakeSelection(zone.ZoneID, zone.Name, zone.Bounds,
-                            zone.Color, zone.Alpha, p.HasCP437));
+                            zone.Color, zone.Alpha, player.HasCP437));
                     }
                     return;
                 } else if (color.CaselessEquals("off") || color.CaselessEquals("false") || color.CaselessEquals("no")) {
@@ -2435,7 +2435,7 @@ namespace fCraft {
             }
             if (zone != null) {
                 foreach (Player p in player.World.Players) {
-                    if (p.Supports(CpeExt.SelectionCuboid && zone.ShowZone)) {
+            		if (p.Supports(CpeExt.SelectionCuboid) && zone.ShowZone) {
                         p.Send(Packet.MakeMakeSelection(zone.ZoneID, zone.Name, zone.Bounds, zone.Color, alpha, p.HasCP437));
                     }
                 }

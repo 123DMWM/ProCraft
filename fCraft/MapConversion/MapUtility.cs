@@ -38,6 +38,7 @@ namespace fCraft.MapConversion {
             RegisterConverter( new MapOpticraft() );
             RegisterConverter( new MapRaw() );
             RegisterConverter( new MapMCF() );
+            RegisterConverter( new MapCW() );
         }
 
 

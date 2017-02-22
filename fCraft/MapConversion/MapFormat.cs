@@ -38,8 +38,11 @@ namespace fCraft.MapConversion {
 
         /// <summary> Format used by Opticraft v0.2+. Support contributed by Jared Klopper (LgZ-optical). </summary>
         Opticraft,
+        
+        /// <summary> Map format used by ClassicalSharp and ClassiCube clients </summary>
+        ClassicWorld,
 
-        Raw
+        Raw,
     }
 
 
