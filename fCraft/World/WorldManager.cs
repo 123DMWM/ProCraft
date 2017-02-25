@@ -262,10 +262,36 @@ namespace fCraft {
                 world.MapChangedOn = timestamp.ToDateTime();
             }
 
-            // load lock information
-            if ((tempAttr = el.Attribute("locked")) != null) {
+            LoadLockSettings(world, worldName, el);          
+            tempEl = el.Element("MOTD");
+            if (tempEl != null) world.MOTD = tempEl.Value;
+            
+            //XElement bhEl = el.Element("BlockHunt");
+            //if (bhEl != null) LoadBlockHuntSettings(world, worldName, bhEl);
+
+            foreach (XElement mainedRankEl in el.Elements(RankMainXmlTagName)) {
+                Rank rank = Rank.Parse(mainedRankEl.Value);
+                if (rank == null) continue;
+
+                if (rank < world.AccessSecurity.MinRank) {
+                    world.AccessSecurity.MinRank = rank;
+                    Logger.Log(LogType.Warning,
+                               "WorldManager: Lowered access MinRank of world {0} to allow it to be the main world for that rank.",
+                               rank.Name);
+                }
+                rank.MainWorld = world;
+            }
+            CheckMapFile(world);
+        }
+        
+        static void LoadLockSettings(World world, string worldName, XElement el) {
+            XAttribute attr;
+            XElement tempEl;
+            long timestamp;
+            
+            if ((attr = el.Attribute("locked")) != null) {
                 bool isLocked;
-                if (Boolean.TryParse(tempAttr.Value, out isLocked)) {
+                if (Boolean.TryParse(attr.Value, out isLocked)) {
                     world.IsLocked = isLocked;
                 }
                 tempEl = el.Element("LockedBy");
@@ -282,112 +308,6 @@ namespace fCraft {
                     world.UnlockedOn = timestamp.ToDateTime();
                 }
             }
-            tempEl = el.Element("MOTD");
-            if (tempEl != null) world.MOTD = tempEl.Value;
-            /* load BlockHunt settings
-            XElement tempBH = el.Element("BlockHunt");
-            if (tempBH != null)
-            {
-                if ((tempAttr = tempBH.Attribute("HiderPosX")) != null)
-                {
-                    if (!short.TryParse(tempAttr.Value, out world.HiderPosX))
-                    {
-                        world.HiderPosX = world.map.Spawn.X;
-                        Logger.Log(LogType.Warning,
-                                    "WorldManager: Could not parse \"HiderPosX\" attribute of Block Hunt settings for world \"{0}\", assuming default (spawn).",
-                                    worldName);
-                    }
-                }
-                if ((tempAttr = tempBH.Attribute("HiderPosY")) != null)
-                {
-                    if (!short.TryParse(tempAttr.Value, out world.HiderPosY))
-                    {
-                        world.HiderPosY = world.map.Spawn.Y;
-                        Logger.Log(LogType.Warning,
-                                    "WorldManager: Could not parse \"HiderPosY\" attribute of Block Hunt settings for world \"{0}\", assuming default (spawn).",
-                                    worldName);
-                    }
-                }
-                if ((tempAttr = tempBH.Attribute("HiderPosZ")) != null)
-                {
-                    if (!short.TryParse(tempAttr.Value, out world.HiderPosZ))
-                    {
-                        world.HiderPosZ = world.map.Spawn.Z;
-                        Logger.Log(LogType.Warning,
-                                    "WorldManager: Could not parse \"HiderPosZ\" attribute of Block Hunt settings for world \"{0}\", assuming default (spawn).",
-                                    worldName);
-                    }
-                }
-                if ((tempAttr = tempBH.Attribute("SeekerPosX")) != null)
-                {
-                    if (!short.TryParse(tempAttr.Value, out world.SeekerPosX))
-                    {
-                        world.SeekerPosX = world.map.Spawn.X;
-                        Logger.Log(LogType.Warning,
-                                    "WorldManager: Could not parse \"SeekerPosX\" attribute of Block Hunt settings for world \"{0}\", assuming default (spawn).",
-                                    worldName);
-                    }
-                }
-                if ((tempAttr = tempBH.Attribute("SeekerPosY")) != null)
-                {
-                    if (!short.TryParse(tempAttr.Value, out world.SeekerPosY))
-                    {
-                        world.SeekerPosY = world.map.Spawn.Y;
-                        Logger.Log(LogType.Warning,
-                                    "WorldManager: Could not parse \"SeekerPosY\" attribute of Block Hunt settings for world \"{0}\", assuming default (spawn).",
-                                    worldName);
-                    }
-                }
-                if ((tempAttr = tempBH.Attribute("SeekerPosZ")) != null)
-                {
-                    if (!short.TryParse(tempAttr.Value, out world.SeekerPosZ))
-                    {
-                        world.SeekerPosZ = world.map.Spawn.Z;
-                        Logger.Log(LogType.Warning,
-                                    "WorldManager: Could not parse \"SeekerPosZ\" attribute of Block Hunt settings for world \"{0}\", assuming default (spawn).",
-                                    worldName);
-                    }
-                }
-                if ((tempAttr = tempBH.Attribute("GameBlocks")) != null)
-                {
-                    string test = tempAttr.Value;
-                    List<Block> blocks = new List<Block>();
-                    String[] blockSplit = test.Split(',');
-                    try
-                    {
-                        for (int i = 0; i < blockSplit.Length; i++)
-                        {
-                            Block numParse;
-                            if (Map.GetBlockByName(blockSplit[i], false, out numParse))
-                            {
-                                blocks.Add(numParse);
-                            }
-                        }
-                        world.GameBlocks = blocks;
-                    }
-                    catch
-                    {
-                        world.GameBlocks = null;
-                        Logger.Log(LogType.Warning,
-                                    "WorldManager: Could not parse \"GameBlocks\" attribute of Block Hunt settings for world \"{0}\", assuming default (None).",
-                                    worldName);
-                    }
-                }
-            }*/
-
-            foreach (XElement mainedRankEl in el.Elements(RankMainXmlTagName)) {
-                Rank rank = Rank.Parse(mainedRankEl.Value);
-                if (rank == null) continue;
-
-                if (rank < world.AccessSecurity.MinRank) {
-                    world.AccessSecurity.MinRank = rank;
-                    Logger.Log(LogType.Warning,
-                               "WorldManager: Lowered access MinRank of world {0} to allow it to be the main world for that rank.",
-                               rank.Name);
-                }
-                rank.MainWorld = world;
-            }
-            CheckMapFile(world);
         }
         
         static void LoadEnvSettings(World world, string worldName, XElement el) {
@@ -445,6 +365,51 @@ namespace fCraft {
                 world.Weather = ParseByte(attr, worldName, 0, "sunny");
             }
         }
+        
+        /*static void LoadBlockHuntSettings(World world, string worldName, XElement el) {
+            XAttribute attr;
+            
+            if ((attr = el.Attribute("HiderPosX")) != null) {
+                world.HiderPosX = ParseShort(attr, worldName, world.map.Spawn.X, "spawn");
+            }
+            if ((attr = el.Attribute("HiderPosY")) != null) {
+                world.HiderPosX = ParseShort(attr, worldName, world.map.Spawn.Y, "spawn");
+            }
+            if ((attr = el.Attribute("HiderPosZ")) != null) {
+                world.HiderPosX = ParseShort(attr, worldName, world.map.Spawn.Z, "spawn");
+            }
+            
+            if ((attr = el.Attribute("SeekerPosX")) != null)  {
+                world.SeekerPosX = ParseShort(attr, worldName, world.map.Spawn.X, "spawn");
+            }
+            if ((attr = el.Attribute("SeekerPosY")) != null) {
+                world.SeekerPosY = ParseShort(attr, worldName, world.map.Spawn.Y, "spawn");
+            }
+            if ((attr = el.Attribute("SeekerPosZ")) != null) {
+                world.SeekerPosZ = ParseShort(attr, worldName, world.map.Spawn.Z, "spawn");
+            }
+            
+            if ((attr = el.Attribute("GameBlocks")) != null) {
+                List<Block> blocks = new List<Block>();
+                string[] names = attr.Value.Split(',');
+                
+                try {
+                    for (int i = 0; i < names.Length; i++) {
+                        Block block;
+                        if (Map.GetBlockByName(names[i], false, out block)) {
+                            blocks.Add(block);
+                        }
+                    }
+                    world.GameBlocks = blocks;
+                } catch {
+                    world.GameBlocks = null;
+                    Logger.Log(LogType.Warning,
+                               "WorldManager: Could not parse \"GameBlocks\" attribute of Block Hunt settings for world \"{0}\", assuming default (None).",
+                               worldName);
+                }
+            }
+        }*/
+            
         
         static string ParseString(XAttribute attrib, string world) {
             try {
