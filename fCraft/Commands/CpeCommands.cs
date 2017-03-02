@@ -1336,36 +1336,7 @@ namespace fCraft {
                     break;
                 case "i":
                 case "info":
-                    string input = cmd.Next() ?? "n/a";
-                    Block infoID;
-                    if (!Map.GetBlockByName(p.World, input, false, out infoID) || infoID < Map.MaxCustomBlockType) {
-                        p.Message("No blocks by that name or id!");
-                        return;
-                    }
-                    BlockDefinition block = GetCustomBlock(global, defs, (byte)infoID);
-                    if (block == null) {
-                        p.Message("No {0} custom block by the Name/ID", scope);
-                        p.Message("Use \"&H{1} list\" &Sto see a list of {0} custom blocks.", scope, name);
-                        return;
-                    }
-                    Block fallback;
-                    Map.GetBlockByName(block.FallBack.ToString(), false, out fallback);
-                    p.Message("&3---Name&3:&a{0} &3ID:&a{1}&3---", block.Name, block.BlockID);
-                    p.Message("   &3FallBack: &a{0}&3, Solidity: &a{2}&3, Speed: &a{1}",
-                        fallback.ToString(), block.Speed, block.CollideType);
-                    p.Message("   &3Top ID: &a{0}&3, Side ID: &a{1}&3, Bottom ID: &a{2}",
-                        block.TopTex, block.SideTex, block.BottomTex);
-                    p.Message("   &3Left ID: &a{0}&3, Right ID: &a{1}&3, Front ID: &a{2}&3, Back ID: &a{3}",
-                        block.LeftTex, block.RightTex, block.FrontTex, block.BackTex);
-                    p.Message("   &3Block Light: &a{0}&3, Sound: &a{1}&3, FullBright: &a{2}",
-                        block.BlocksLight, block.WalkSound, block.FullBright);
-                    p.Message("   &3Shape: &a{0}&3, Draw: &a{1}&3, Fog Density: &a{2}",
-                        block.Shape, block.BlockDraw, block.FogDensity);
-                    p.Message("   &3Fog Red: &a{0}&3, Fog Green: &a{1}&3, Fog Blue: &a{2}",
-                        block.FogR, block.FogG, block.FogB);
-                    p.Message("   &3Min X: &a{0}&3, Max X: &a{1}&3, Min Y: &a{2}&3, Max Y: &a{3}",
-                        block.MinX, block.MaxX, block.MinY, block.MaxY);
-                    break;
+                    CustomBlockInfoHandler(p, cmd, global, defs); break;
                 case "list":
                     CustomBlockListHandler(p, cmd, global, defs); break;
                 case "remove":
@@ -1414,6 +1385,42 @@ namespace fCraft {
             PrintStepHelp(p);
         }
 
+        static void CustomBlockInfoHandler(Player p, CommandReader cmd, bool global, BlockDefinition[] defs) {
+            string input = cmd.Next() ?? "n/a";
+            string scope = global ? "global" : "level";
+            string name = global ? "/gb" : "/lb";
+            
+            Block id;
+            if (!Map.GetBlockByName(p.World, input, false, out id) || id < Map.MaxCustomBlockType) {
+                p.Message("No blocks by that name or id!");
+                return;
+            }
+            
+            BlockDefinition def = GetCustomBlock(global, defs, (byte)id);
+            if (def == null) {
+                p.Message("No {0} custom block by the Name/ID", scope);
+                p.Message("Use \"&H{1} list\" &Sto see a list of {0} custom blocks.", scope, name);
+                return;
+            }
+            Block fallback = (Block)def.FallBack;
+            
+            p.Message("&3---Name&3:&a{0} &3ID:&a{1}&3---", def.Name, def.BlockID);
+            p.Message("   &3FallBack: &a{0}&3, Solidity: &a{2}&3, Speed: &a{1}",
+                      Map.GetBlockName(p.World, fallback), def.Speed, def.CollideType);
+            p.Message("   &3Top ID: &a{0}&3, Side ID: &a{1}&3, Bottom ID: &a{2}",
+                      def.TopTex, def.SideTex, def.BottomTex);
+            p.Message("   &3Left ID: &a{0}&3, Right ID: &a{1}&3, Front ID: &a{2}&3, Back ID: &a{3}",
+                      def.LeftTex, def.RightTex, def.FrontTex, def.BackTex);
+            p.Message("   &3Block Light: &a{0}&3, Sound: &a{1}&3, FullBright: &a{2}",
+                      def.BlocksLight, def.WalkSound, def.FullBright);
+            p.Message("   &3Shape: &a{0}&3, Draw: &a{1}&3, Fog Density: &a{2}",
+                      def.Shape, def.BlockDraw, def.FogDensity);
+            p.Message("   &3Fog Red: &a{0}&3, Fog Green: &a{1}&3, Fog Blue: &a{2}",
+                      def.FogR, def.FogG, def.FogB);
+            p.Message("   &3Min X: &a{0}&3, Max X: &a{1}&3, Min Y: &a{2}&3, Max Y: &a{3}",
+                      def.MinX, def.MaxX, def.MinY, def.MaxY);
+        }
+        
         static void CustomBlockListHandler(Player p, CommandReader cmd, bool global, BlockDefinition[] defs) {
             int offset = 0, index = 0, count = 0;
             cmd.NextInt(out offset);
