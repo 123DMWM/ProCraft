@@ -67,26 +67,49 @@ namespace fCraft.MapConversion {
             if( fileName == null ) throw new ArgumentNullException( "fileName" );
             using( FileStream mapStream = File.OpenRead( fileName ) ) {
                 GZipStream gs = new GZipStream( mapStream, CompressionMode.Decompress, true );
-                NBTag tag = NBTag.ReadStream( gs );
+                NBTag root = NBTag.ReadStream( gs );
 
                 // ReSharper disable UseObjectOrCollectionInitializer
                 Map map = new Map( null,
-                                   tag["X"].GetShort(),
-                                   tag["Z"].GetShort(),
-                                   tag["Y"].GetShort(),
-                                   false );
+                                  root["X"].GetShort(),
+                                  root["Z"].GetShort(),
+                                  root["Y"].GetShort(),
+                                  false );
                 // ReSharper restore UseObjectOrCollectionInitializer
                 
-                NBTag spawnTag = tag["Spawn"];
+                NBTag spawnTag = root["Spawn"];
                 map.Spawn = new Position {
-                	X = (short)(spawnTag["X"].GetShort() * 32),
-                	Y = (short)(spawnTag["Z"].GetShort() * 32),
-                	Z = (short)(spawnTag["Y"].GetShort() * 32),
-                	R = spawnTag["H"].GetByte(),
-                	L = spawnTag["P"].GetByte(),
+                    X = (short)(spawnTag["X"].GetShort() * 32),
+                    Y = (short)(spawnTag["Z"].GetShort() * 32),
+                    Z = (short)(spawnTag["Y"].GetShort() * 32),
+                    R = spawnTag["H"].GetByte(),
+                    L = spawnTag["P"].GetByte(),
                 };
+                
+                // read UUID
+                map.Guid = new Guid( root["UUID"].GetBytes() );
+                
+                // read creation/modification dates of the file (for fallback)
+                DateTime fileCreationDate = File.GetCreationTime( fileName );
+                DateTime fileModTime = File.GetCreationTime( fileName );
 
-                map.Blocks = tag["BlockArray"].GetBytes();
+                // try to read embedded creation date
+                if( root.Contains( "TimeCreated" ) ) {
+                    map.DateCreated = DateTimeUtil.ToDateTime( root["TimeCreated"].GetLong() );
+                } else {
+                    // for fallback, pick the older of two filesystem dates
+                    map.DateCreated = (fileModTime > fileCreationDate) ? fileCreationDate : fileModTime;
+                }
+
+                // try to read embedded modification date
+                if( root.Contains( "LastModified" ) ) {
+                    map.DateModified = DateTimeUtil.ToDateTime( root["LastModified"].GetLong() );
+                } else {
+                    // for fallback, use file modification date
+                    map.DateModified = fileModTime;
+                }
+
+                map.Blocks = root["BlockArray"].GetBytes();
                 return map;
             }
         }
