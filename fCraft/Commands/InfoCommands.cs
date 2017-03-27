@@ -1401,7 +1401,7 @@ namespace fCraft {
             IsConsoleSafe = true,
             Usage = "/Most <stat> [Rank] and/or [Offset]",
             Help = "Lists all players in order of a specefied statistic. Stats:" +
-                   "Banned, Built, Chat, Deleted, Demoted, Drawn, Hours, Kicked, Logins, Promoted",
+                   "Banned, Built, Chat, Deleted, Demoted, Drawn, Hours, HoursNow Kicked, Logins, Promoted",
             HelpSections = new Dictionary<string, string>{
                 { "Banned",     "/Most Banned [Args]" +
                                     "Lists the top players by playeres banned" },
