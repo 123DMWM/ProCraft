@@ -1633,7 +1633,7 @@ namespace fCraft {
             Handler = WorldsHandler
         };
 
-        static void WorldsHandler( Player player, CommandReader cmd ) {
+        static void WorldsHandler(Player player, CommandReader cmd) {
             string param = cmd.Next();
             World[] worlds;
 
@@ -1641,10 +1641,10 @@ namespace fCraft {
             string extraParam;
             int offset = 0;
 
-            if( param == null || Int32.TryParse( param, out offset ) ) {
+            if (param == null || Int32.TryParse(param, out offset)) {
                 listName = "available worlds";
                 extraParam = "";
-                worlds = WorldManager.Worlds.Where( player.CanSee ).ToArray();
+                worlds = WorldManager.Worlds.Where(player.CanSee).ToArray();
 
             } else if (param[0].Equals('@')) {
                 if (param.Length == 1) {
@@ -1697,34 +1697,34 @@ namespace fCraft {
                         CdWorlds.PrintUsage(player);
                         return;
                 }
-                if (cmd.HasNext && !cmd.NextInt(out offset)) {
-                    CdWorlds.PrintUsage(player);
-                    return;
-                }
+            }
+            if (cmd.HasNext && !cmd.NextInt(out offset)) {
+                CdWorlds.PrintUsage(player);
+                return;
             }
 
-            if( worlds.Length == 0 ) {
-                player.Message( "There are no {0}.", listName );
+            if (worlds.Length == 0) {
+                player.Message("There are no {0}.", listName);
 
-            } else if( worlds.Length <= WorldNamesPerPage || player.IsSuper ) {
+            } else if (worlds.Length <= WorldNamesPerPage || player.IsSuper) {
                 player.Message("  There are {0} {1}: {2}",
-                                        worlds.Length, listName, worlds.JoinToClassyString() );
+                                        worlds.Length, listName, worlds.JoinToClassyString());
 
             } else {
-                if( offset < 0 ) offset = 0;
-                if( offset >= worlds.Length ) {
-                    offset = Math.Max( 0, worlds.Length - WorldNamesPerPage );
+                if (offset < 0) offset = 0;
+                if (offset >= worlds.Length) {
+                    offset = Math.Max(0, worlds.Length - WorldNamesPerPage);
                 }
-                World[] worldsPart = worlds.Skip( offset ).Take( WorldNamesPerPage ).ToArray();
+                World[] worldsPart = worlds.Skip(offset).Take(WorldNamesPerPage).ToArray();
                 player.Message("  {0}: {1}",
-                                        listName.UppercaseFirst(), worldsPart.JoinToClassyString() );
+                                        listName.UppercaseFirst(), worldsPart.JoinToClassyString());
 
-                if( offset + worldsPart.Length < worlds.Length ) {
-                    player.Message( "Showing {0}-{1} (out of {2}). Next: &H/Worlds {3}{1}",
-                                    offset + 1, offset + worldsPart.Length, worlds.Length, extraParam );
+                if (offset + worldsPart.Length < worlds.Length) {
+                    player.Message("Showing {0}-{1} (out of {2}). Next: &H/Worlds {3}{1}",
+                                    offset + 1, offset + worldsPart.Length, worlds.Length, extraParam);
                 } else {
-                    player.Message( "Showing worlds {0}-{1} (out of {2}).",
-                                    offset + 1, offset + worldsPart.Length, worlds.Length );
+                    player.Message("Showing worlds {0}-{1} (out of {2}).",
+                                    offset + 1, offset + worldsPart.Length, worlds.Length);
                 }
             }
         }
