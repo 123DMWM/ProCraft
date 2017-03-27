@@ -88,6 +88,7 @@ namespace fCraft {
             foreach (Player p in world.Players) {
                 p.SendEnvSettings();
             }
+            WorldManager.SaveWorldList();
         }
 
         public static void RemoveEnvPreset(string name) {
