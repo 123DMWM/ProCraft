@@ -1417,8 +1417,6 @@ namespace fCraft {
                                     "Lists the top players by blocks drawn" },
                 { "Hours",      "/Most Hours [Args]" +
                                     "Lists the top players by total hours" },
-                { "HoursNow",      "/Most HoursNow [Args]" +
-                                    "Lists the top players by total hours this session" },
                 { "Kicked",     "/Most Kicked [Args]" +
                                     "Lists the top players by players kicked" },
                 { "Logins",     "/Most Logins [Args]" +
@@ -1459,7 +1457,6 @@ namespace fCraft {
             
             Func<PlayerInfo, long> orderer;
             Func<PlayerInfo, string> formatter;
-            bool online = false;
             switch (stat.ToLower()) {
                 case "bans":
                 case "banned":
@@ -1485,10 +1482,6 @@ namespace fCraft {
                 case "hours":
                     formatter = p => string.Format("{0:N2}&SH", p.TotalTime.TotalHours);
                     orderer = p => p.TotalTime.ToHours(); break;
-                case "timenow":
-                case "hoursnow":
-                    formatter = p => string.Format("{0:N2}&SM", p.TimeSinceLastLogin.TotalMinutes);
-                    orderer = p => p.TimeSinceLastLogin.ToMilliSeconds(); online = true; break;
                 case "kicks":
                 case "kicked":
                     formatter = p => string.Format("{0:N0}", p.TimesKickedOthers);
@@ -1504,7 +1497,7 @@ namespace fCraft {
                     return;
             }
             
-            PlayerInfo[] all = PlayerDB.PlayerInfoList.Where(p => (online ? p.IsOnline : true)).ToArray();
+            PlayerInfo[] all = PlayerDB.PlayerInfoList;
             if (noRank)
                 all = all.Where(p => orderer(p) >= 1).OrderBy(orderer).ToArray();
             else
