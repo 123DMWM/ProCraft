@@ -1480,8 +1480,8 @@ namespace fCraft {
                     orderer = p => p.BlocksDrawn; break;
                 case "time":
                 case "hours":
-                    formatter = p => string.Format("{0:N2}&SH", p.TotalTime.TotalHours);
-                    orderer = p => p.TotalTime.ToHours(); break;
+                    formatter = p => string.Format("{0:N2}&SH", p.TotalTimeOnline.TotalHours);
+                    orderer = p => p.TotalTimeOnline.ToHours(); break;
                 case "kicks":
                 case "kicked":
                     formatter = p => string.Format("{0:N0}", p.TimesKickedOthers);

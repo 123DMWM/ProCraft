@@ -245,9 +245,18 @@ namespace fCraft {
 
         /// <summary> Total amount of time the player spent on this server. </summary>
         public TimeSpan TotalTime;
+        public TimeSpan TotalTimeOnline { get
+            {
+                if (PlayerObject != null) {
+                    return TotalTime.Add(TimeSinceLastLogin);
+                } else {
+                    return TotalTime;
+                }
+            }
+        }
 
-        /// <summary> Total number of blocks manually built or painted by the player. </summary>
-        public int BlocksBuilt;
+    /// <summary> Total number of blocks manually built or painted by the player. </summary>
+    public int BlocksBuilt;
 
         /// <summary> Total number of blocks manually deleted by the player. </summary>
         public int BlocksDeleted;
