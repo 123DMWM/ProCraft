@@ -14,13 +14,13 @@ namespace fCraft{
         public readonly int PlayerID;
 
         /// <summary> X coordinate (horizontal), in terms of blocks. </summary>
-        public readonly short X;
+        public readonly ushort X;
 
         /// <summary> Y coordinate (horizontal), in terms of blocks. </summary>
-        public readonly short Y;
+        public readonly ushort Y;
 
         /// <summary> Z coordinate (vertical), in terms of blocks. </summary>
-        public readonly short Z;
+        public readonly ushort Z;
 
         /// <summary> Block that previously occupied this coordinate </summary>
         public readonly Block OldBlock;
@@ -37,7 +37,7 @@ namespace fCraft{
         public readonly BlockChangeContext Context;
 
 
-        public BlockDBEntry( int timestamp, int playerID, short x, short y, short z,
+        public BlockDBEntry( int timestamp, int playerID, ushort x, ushort y, ushort z,
                             Block oldBlock, Block newBlock, BlockChangeContext flags ) {
             Timestamp = timestamp;
             PlayerID = playerID;
@@ -53,9 +53,9 @@ namespace fCraft{
                             Block oldBlock, Block newBlock, BlockChangeContext flags ) {
             Timestamp = timestamp;
             PlayerID = playerID;
-            X = (short)coords.X;
-            Y = (short)coords.Y;
-            Z = (short)coords.Z;
+            X = (ushort)coords.X;
+            Y = (ushort)coords.Y;
+            Z = (ushort)coords.Z;
             OldBlock = oldBlock;
             NewBlock = newBlock;
             Context = flags;
