@@ -70,6 +70,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DocumentationFile>..\bin\Debug\fCraft.XML</DocumentationFile>
     <Prefer32Bit>false</Prefer32Bit>
+    <LangVersion>5</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug_IRC|AnyCPU' ">
     <OutputPath>..\bin\Debug\</OutputPath>
