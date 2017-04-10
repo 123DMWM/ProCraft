@@ -336,12 +336,12 @@ namespace fCraft.Games {
 			if (map.Metadata.ContainsGroup("CTF_data")) {
 				// TODO: Load from metadata, perhaps using ; as a separator.
 			} else {
-				RedTeam.Spawn = new Position((short)(((map.Bounds.XMin + 5) * 32)),
-				                             (short)((map.Bounds.Length / 2) * 32),
-				                             (short)(3 * 32), 128, 0);
-				BlueTeam.Spawn = new Position((short)(((map.Bounds.XMax - 5) * 32)),
-				                              (short)((map.Bounds.Length / 2) * 32),
-				                              (short)(3 * 32), 0, 0);
+				RedTeam.Spawn = new Position((((map.Bounds.XMin + 5) * 32)),
+				                             ((map.Bounds.Length / 2) * 32),
+				                             (3 * 32), 128, 0);
+				BlueTeam.Spawn = new Position((((map.Bounds.XMax - 5) * 32)),
+				                              ((map.Bounds.Length / 2) * 32),
+				                              (3 * 32), 0, 0);
 				
 				RedTeam.FlagPos = new Vector3I(map.Bounds.XMin + 5, map.Bounds.Length / 2, 10);
 				CTF.map.QueueUpdate(new BlockUpdate(Player.Console,

@@ -1453,9 +1453,9 @@ namespace fCraft {
 					player.LastPosition = player.Position;
 				}
                 player.TeleportTo(new Position {
-                    X = (short)(P.X * 32 + 16),
-                    Y = (short)(P.Y * 32 + 16),
-                    Z = (short)(P.Z * 32 + (51 + 1)),
+                    X = (P.X * 32 + 16),
+                    Y = (P.Y * 32 + 16),
+                    Z = (P.Z * 32 + (51 + 1)),
                     R = player.Position.R,
                     L = player.Position.L
                 });
@@ -1492,9 +1492,9 @@ namespace fCraft {
 							player.LastPosition = player.Position;
 						}
                         player.TeleportTo(new Position {
-                            X = (short) (x*32 + 16),
-                            Y = (short) (y*32 + 16),
-                            Z = (short) (z*32 + 48),
+                            X = (x*32 + 16),
+                            Y = (y*32 + 16),
+                            Z = (z*32 + 48),
                             R = (byte) rot,
                             L = (byte) lot
                         });
@@ -1644,8 +1644,7 @@ namespace fCraft {
                         player.LastWorld = player.World;
                         player.LastPosition = player.Position;
                     }
-                    player.TeleportTo(new Position((short)x, (short)y, (short)z, 
-                                                   (byte)rot, (byte)lot));
+                    player.TeleportTo(new Position(x, y, z, (byte)rot, (byte)lot));
                 }
             } else {
                 CdTeleportP.PrintUsage(player);
@@ -1671,9 +1670,9 @@ namespace fCraft {
             Vector3I P = player.World.map.HighestFreeSpace(x, y, z);
 
             player.TeleportTo(new Position {
-                X = (short) (P.X * 32 + 16),
-                Y = (short) (P.Y * 32 + 16),
-                Z = (short) (P.Z * 32 + (51 + 1)),
+                X = (P.X * 32 + 16),
+                Y = (P.Y * 32 + 16),
+                Z = (P.Z * 32 + (51 + 1)),
                 R = player.Position.R,
                 L = player.Position.L
             });

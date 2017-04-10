@@ -404,9 +404,9 @@ namespace fCraft {
 
             // calculate difference between old and new positions
             Position delta = new Position {
-                X = (short)( newPos.X - oldPos.X ),
-                Y = (short)( newPos.Y - oldPos.Y ),
-                Z = (short)( newPos.Z - oldPos.Z ),
+                X = newPos.X - oldPos.X,
+                Y = newPos.Y - oldPos.Y,
+                Z = newPos.Z - oldPos.Z,
                 R = (byte)Math.Abs( newPos.R - oldPos.R ),
                 L = (byte)Math.Abs( newPos.L - oldPos.L )
             };
@@ -1780,9 +1780,9 @@ namespace fCraft {
 
             // calculate difference between old and new positions
             Position delta = new Position {
-                X = (short)( newPos.X - oldPos.X ),
-                Y = (short)( newPos.Y - oldPos.Y ),
-                Z = (short)( newPos.Z - oldPos.Z ),
+                X = newPos.X - oldPos.X,
+                Y = newPos.Y - oldPos.Y,
+                Z = newPos.Z - oldPos.Z,
                 R = (byte)Math.Abs( newPos.R - oldPos.R ),
                 L = (byte)Math.Abs( newPos.L - oldPos.L )
             };
@@ -1876,9 +1876,9 @@ namespace fCraft {
         void DenyMovement() {
             SendNow( Packet.MakeSelfTeleport(new Position
                 {
-                    X = (short)(lastValidPosition.X),
-                    Y = (short)(lastValidPosition.Y),
-                    Z = (short)(lastValidPosition.Z + 22),
+                    X = (lastValidPosition.X),
+                    Y = (lastValidPosition.Y),
+                    Z = (lastValidPosition.Z + 22),
                     R = lastValidPosition.R,
                     L = lastValidPosition.L
                 }));

@@ -3822,23 +3822,23 @@ namespace fCraft {
                                 if (cmd.HasNext) {
                                     int x, y, z, rot = player.Position.R, lot = player.Position.L;
                                     if (cmd.NextInt(out x) && cmd.NextInt(out y) && cmd.NextInt(out z)) {
-                                        if (cmd.HasNext && cmd.HasNext) {
-                                            if (cmd.NextInt(out rot) && cmd.NextInt(out lot)) {
-                                                if (rot > 255 || rot < 0) {
-                                                    player.Message("R must be inbetween 0 and 255. Set to player R");
-                                                    rot = player.Position.R;
-                                                }
-                                                if (lot > 255 || lot < 0) {
-                                                    player.Message("L must be inbetween 0 and 255. Set to player L");
-                                                    lot = player.Position.L;
-                                                }
+                                        if (cmd.CountRemaining >= 2 && cmd.NextInt(out rot) && cmd.NextInt(out lot)) {
+                                            if (rot > 255 || rot < 0) {
+                                                player.Message("R must be inbetween 0 and 255. Set to player R");
+                                                rot = player.Position.R;
+                                            }
+                                    		
+                                            if (lot > 255 || lot < 0) {
+                                                player.Message("L must be inbetween 0 and 255. Set to player L");
+                                                lot = player.Position.L;
                                             }
                                         }
+                                    	
                                         if (x < 0 || x >= 1024 || y < 0 || y >= 1024 || z < 0 || z >= 1024) {
                                             player.Message("Coordinates are outside the valid range!");
                                             return;
                                         } else {
-                                            player.PortalTPPos = new Position((short)(x * 32), (short)(y * 32), (short)(z * 32), (byte)rot, (byte)lot);
+                                            player.PortalTPPos = new Position(x * 32, y * 32, z * 32, (byte)rot, (byte)lot);
                                         }
                                     } else {
                                         player.PortalTPPos = tpWorld.map == null ? new Position(0, 0, 0) : tpWorld.map.Spawn;

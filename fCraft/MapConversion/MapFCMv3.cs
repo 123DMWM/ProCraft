@@ -172,9 +172,9 @@ namespace fCraft.MapConversion {
 
             // read spawn
             map.Spawn = new Position {
-                X = (short)reader.ReadInt32(),
-                Z = (short)reader.ReadInt32(),
-                Y = (short)reader.ReadInt32(),
+                X = reader.ReadInt32(),
+                Z = reader.ReadInt32(),
+                Y = reader.ReadInt32(),
                 R = reader.ReadByte(),
                 L = reader.ReadByte()
             };

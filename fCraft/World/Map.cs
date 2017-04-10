@@ -112,7 +112,7 @@ namespace fCraft {
             if (spawn == Position.RandomSpawn) {
                 Random rnd = new Random();
                 Vector3I P = HighestFreeSpace(rnd.Next(Width), rnd.Next(Length), Height);
-                return new Position((short)(P.X * 32), (short)(P.Y * 32), (short)(P.Z * 32), 0, 0);
+                return new Position(P.X * 32, P.Y * 32, P.Z * 32, 0, 0);
             }
             return spawn;
         }

@@ -120,9 +120,9 @@ namespace fCraft.MapConversion {
 
             if( metaFile.Contains( "spawn", "x", "y", "z", "h" ) ) {
                 map.Spawn = new Position {
-                    X = (short)( Int16.Parse( metaFile["spawn", "x"] ) * 32 + 16 ),
-                    Y = (short)( Int16.Parse( metaFile["spawn", "z"] ) * 32 + 16 ),
-                    Z = (short)( Int16.Parse( metaFile["spawn", "y"] ) * 32 + 16 ),
+                    X = Int16.Parse( metaFile["spawn", "x"] * 32 + 16,
+                    Y = Int16.Parse( metaFile["spawn", "z"] * 32 + 16,
+                    Z = Int16.Parse( metaFile["spawn", "y"] * 32 + 16,
                     R = (byte)( Int32.Parse( metaFile["spawn", "h"] ) * 255 / 360 ),
                     L = 0
                 };

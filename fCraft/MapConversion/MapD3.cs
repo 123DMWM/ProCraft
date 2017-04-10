@@ -86,18 +86,18 @@ namespace fCraft.MapConversion {
                 case 1010:
                     break;
                 case 1020:
-                    spawn.X = (short)( bs.ReadInt16() * 32 );
-                    spawn.Y = (short)( bs.ReadInt16() * 32 );
-                    spawn.Z = (short)( bs.ReadInt16() * 32 );
+                    spawn.X = bs.ReadInt16() * 32;
+                    spawn.Y = bs.ReadInt16() * 32;
+                    spawn.Z = bs.ReadInt16() * 32;
                     map.Spawn = spawn;
                     break;
                 //case 1030:
                 //case 1040:
                 //case 1050:
                 default:
-                    spawn.X = (short)( bs.ReadInt16() * 32 );
-                    spawn.Y = (short)( bs.ReadInt16() * 32 );
-                    spawn.Z = (short)( bs.ReadInt16() * 32 );
+                    spawn.X = bs.ReadInt16() * 32;
+                    spawn.Y = bs.ReadInt16() * 32;
+                    spawn.Z = bs.ReadInt16() * 32;
                     spawn.R = (byte)bs.ReadInt16();
                     spawn.L = (byte)bs.ReadInt16();
                     map.Spawn = spawn;
