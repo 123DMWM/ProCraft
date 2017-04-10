@@ -2142,8 +2142,10 @@ namespace fCraft {
         const string BulkBlockUpdateExtName = "BulkBlockUpdate";        
         const string TextColorsExtName = "TextColors";
         const string EnvMapAspectExtName = "EnvMapAspect";
+        const string ExtPlayerPositionsExtName = "ExtPlayerPositions";
         
         bool supportsBlockDefs, supportsCustomBlocks;
+        internal bool supportsExtPlayerPositions;
         
         public bool FallbackColors { get { return !Supports(CpeExt.TextColors); } }
         

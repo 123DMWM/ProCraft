@@ -212,7 +212,7 @@ namespace fCraft {
         
         bool NegotiateProtocolExtension() {
             // write our ExtInfo and ExtEntry packets
-            writer.Write(Packet.MakeExtInfo("ProCraft", 24).Bytes);
+            writer.Write(Packet.MakeExtInfo("ProCraft", 25).Bytes);
             writer.Write(Packet.MakeExtEntry(ClickDistanceExtName, 1).Bytes);
             writer.Write(Packet.MakeExtEntry(CustomBlocksExtName, 1).Bytes);
             writer.Write(Packet.MakeExtEntry(HeldBlockExtName, 1).Bytes);
@@ -243,6 +243,8 @@ namespace fCraft {
             
             writer.Write(Packet.MakeExtEntry(TextColorsExtName, 1).Bytes);
             writer.Write(Packet.MakeExtEntry(EnvMapAspectExtName, 1).Bytes);
+            writer.Write(Packet.MakeExtEntry(ExtPlayerPositionsExtName, 1).Bytes);
+            
             // Fix for ClassiCube Client which violates the spec -
             // If server supports version > 1 but client version 1, client should reply with version 1.
             // ClassiCube just doesn't reply at all in that case.
@@ -374,6 +376,11 @@ namespace fCraft {
                     case EnvMapAspectExtName:
                         if (extVersion == 1)
                             addedExt = CpeExt.EnvMapAspect;
+                        break;
+                    case ExtPlayerPositionsExtName:
+                        if (extVersion == 1)
+                            addedExt = CpeExt.EnvMapAspect;
+                        supportsExtPlayerPositions = true;
                         break;
                 }
                 if (addedExt != CpeExt.None)

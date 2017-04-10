@@ -234,9 +234,8 @@ namespace fCraft {
             packet.Bytes[1] = (byte) entityId;
             PacketWriter.WriteString(inGameName, packet.Bytes, 2, hasCP437);
             PacketWriter.WriteString(skin, packet.Bytes, 66, hasCP437);
-            WriteI16(spawnPosition.X, packet.Bytes, 130);
-            WriteI16(spawnPosition.Z, packet.Bytes, 132);
-            WriteI16(spawnPosition.Y, packet.Bytes, 134);
+            
+            WritePos(spawnPosition, packet.Bytes, 130);
             packet.Bytes[136] = spawnPosition.R;
             packet.Bytes[137] = spawnPosition.L;
             return packet;

@@ -14,9 +14,9 @@ namespace fCraft {
         public string Name { get; set; }
         public string Skin { get; set; }
         public string World { get; set; }
-        public short X { get; set; }
-        public short Y { get; set; }
-        public short Z { get; set; }
+        public int X { get; set; }
+        public int Y { get; set; }
+        public int Z { get; set; }
         public byte R { get; set; }
         public byte L { get; set; }
         public sbyte ID { get; set; }
@@ -215,13 +215,15 @@ namespace fCraft {
                     entity.Name = entityData[0] ?? entity.ID.ToString();
                     entity.Skin = entityData[1] ?? entity.Name;
                     Position pos;
-                    if (!short.TryParse(entityData[5], out pos.X)) {
+                    
+                    
+                    if (!int.TryParse(entityData[5], out pos.X)) {
                         pos.X = world.map.Spawn.X;
                     }
-                    if (!short.TryParse(entityData[6], out pos.Y)) {
+                    if (!int.TryParse(entityData[6], out pos.Y)) {
                         pos.Y = world.map.Spawn.Y;
                     }
-                    if (!short.TryParse(entityData[7], out pos.Z)) {
+                    if (!int.TryParse(entityData[7], out pos.Z)) {
                         pos.Z = world.map.Spawn.Z;
                     }
                     if (!byte.TryParse(entityData[8], out pos.L)) {
