@@ -379,7 +379,7 @@ namespace fCraft {
                         break;
                     case ExtPlayerPositionsExtName:
                         if (extVersion == 1)
-                            addedExt = CpeExt.EnvMapAspect;
+                            addedExt = CpeExt.ExtPlayerPositions;
                         supportsExtPlayerPositions = true;
                         break;
                 }
