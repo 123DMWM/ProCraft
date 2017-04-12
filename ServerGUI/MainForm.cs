@@ -333,7 +333,7 @@ namespace fCraft.ServerGUI {
 
         // CopyMenuOnClickHandler and CopyMenuPopupHandler by Jonty800
         private void CopyMenuOnClickHandler( object sender, EventArgs e ) {
-            if( logBox.SelectedLength > 0 ) {
+            if( logBox.SelectionLength > 0 ) {
                 Clipboard.SetText( logBox.SelectedText, TextDataFormat.Text );
             }
         }
@@ -342,7 +342,7 @@ namespace fCraft.ServerGUI {
         private void CopyMenuPopupHandler( object sender, EventArgs e ) {
             ContextMenu menu = sender as ContextMenu;
             if( menu != null ) {
-                menu.MenuItems[0].Enabled = (logBox.SelectedLength > 0);
+                menu.MenuItems[0].Enabled = (logBox.SelectionLength > 0);
             }
         }
     }
