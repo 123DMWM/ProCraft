@@ -233,7 +233,7 @@ namespace fCraft.ServerGUI {
 
         static void AppendNextPart( ref char code, ref int start, string message, RichTextBox logBox ) {
             int nextAnd = message.IndexOf( '&', start );
-            int total = logBox.Text.Length;
+            int total = logBox.TextLength;
             
             if( nextAnd == -1 || nextAnd == (message.Length - 1) ) {
                 string part = message.Substring( start );
