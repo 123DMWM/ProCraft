@@ -181,11 +181,11 @@ namespace fCraft.ServerGUI {
                     // store user's selection
                     int userSelectionStart = logBox.SelectionStart;
                     int userSelectionLength = logBox.SelectionLength;
-                    bool userSelecting = (logBox.SelectionStart != logBox.Text.Length && logBox.Focused ||
+                    bool userSelecting = (logBox.SelectionStart != logBox.TextLength && logBox.Focused ||
                                           logBox.SelectionLength > 0);
 
                     // insert and color a new message
-                    int oldLength = logBox.Text.Length;
+                    int oldLength = logBox.TextLength;
                     char initialcolor = 'f';
                     switch( e.MessageType ) {
                         case LogType.Warning:
@@ -223,7 +223,7 @@ namespace fCraft.ServerGUI {
                     if( userSelecting ) {
                         logBox.Select( userSelectionStart, userSelectionLength );
                     } else {
-                        logBox.SelectionStart = logBox.Text.Length;
+                        logBox.SelectionStart = logBox.TextLength;
                         logBox.ScrollToCaret();
                     }
                 }
@@ -333,7 +333,7 @@ namespace fCraft.ServerGUI {
 
         // CopyMenuOnClickHandler and CopyMenuPopupHandler by Jonty800
         private void CopyMenuOnClickHandler( object sender, EventArgs e ) {
-            if( logBox.SelectedText.Length > 0 ) {
+            if( logBox.SelectedLength > 0 ) {
                 Clipboard.SetText( logBox.SelectedText, TextDataFormat.Text );
             }
         }
@@ -342,7 +342,7 @@ namespace fCraft.ServerGUI {
         private void CopyMenuPopupHandler( object sender, EventArgs e ) {
             ContextMenu menu = sender as ContextMenu;
             if( menu != null ) {
-                menu.MenuItems[0].Enabled = (logBox.SelectedText.Length > 0);
+                menu.MenuItems[0].Enabled = (logBox.SelectedLength > 0);
             }
         }
     }
