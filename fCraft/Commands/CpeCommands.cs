@@ -391,6 +391,7 @@ namespace fCraft {
             float scale = 0.0f;
             string scalestr = "";
             int sepIndex = model.IndexOf('|');
+            
             if (sepIndex >= 0) {
                 scalestr = model.Substring(sepIndex + 1);
                 model = model.Substring(0, sepIndex);
@@ -400,22 +401,13 @@ namespace fCraft {
                 if (scale > 3f) scale = 3f;
             }
             
-            if (!validEntities.Contains(model.ToLower()) && !model.CaselessStarts("dev:")) {
-                byte blockId;
-                Block block;
-                if (byte.TryParse(model, out blockId)) {
-                } else if (Map.GetBlockByName(model, false, out block)) {
-                    model = ((byte)block).ToString();
-                } else {
-                    return null;
-                }
+            byte blockId;
+            Block block;
+            if (byte.TryParse(model, out blockId)) {
+            } else if (Map.GetBlockByName(model, false, out block)) {
+                model = ((byte)block).ToString();
             }
             
-            if (model.CaselessStarts("dev:")) {
-                if (player != null)
-                    player.Message("&cBe careful with development models, as they could crash others.");
-                model = model.Remove(0, 4);
-            }
             return scale == 0 ? model : model + "|" + scale;
         }
 
@@ -2442,7 +2434,7 @@ namespace fCraft {
             }
             if (zone != null) {
                 foreach (Player p in player.World.Players) {
-            		if (p.Supports(CpeExt.SelectionCuboid) && zone.ShowZone) {
+                    if (p.Supports(CpeExt.SelectionCuboid) && zone.ShowZone) {
                         p.Send(Packet.MakeMakeSelection(zone.ZoneID, zone.Name, zone.Bounds, zone.Color, alpha, p.HasCP437));
                     }
                 }

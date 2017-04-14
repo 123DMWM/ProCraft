@@ -1993,7 +1993,7 @@ namespace fCraft {
             // this way players using clients not supporting ExtPlayerPositions can move past +/- 1024, just not spawn
             if (!extPlayerPositions) {
                 delta.X = (short)(newPos.X - oldPos.X);
-                delta.Y = (short)(newPos.X - oldPos.X);
+                delta.Y = (short)(newPos.Y - oldPos.Y);
                 delta.Z = (short)(newPos.Z - oldPos.Z);
             }
             return delta;
