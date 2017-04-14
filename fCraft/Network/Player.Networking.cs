@@ -392,24 +392,24 @@ namespace fCraft {
         void ProcessMovementPacket() {
             BytesReceived += 10;
             UpdateHeldBlock();
-            Position newPos = new Position {
-                X = reader.ReadInt16(),
-                Z = reader.ReadInt16(),
-                Y = reader.ReadInt16(),
-                R = reader.ReadByte(),
-                L = reader.ReadByte()
-            };
-
+            Position newPos = default(Position);
+            
+            if (supportsExtPlayerPositions) {
+                newPos.X = reader.ReadInt32();
+                newPos.Z = reader.ReadInt32();
+                newPos.Y = reader.ReadInt32();
+            } else {
+                newPos.X = reader.ReadInt16();
+                newPos.Z = reader.ReadInt16();
+                newPos.Y = reader.ReadInt16();
+            }
+            
+            newPos.R = reader.ReadByte();
+            newPos.L = reader.ReadByte();
             Position oldPos = Position;
 
             // calculate difference between old and new positions
-            Position delta = new Position {
-                X = newPos.X - oldPos.X,
-                Y = newPos.Y - oldPos.Y,
-                Z = newPos.Z - oldPos.Z,
-                R = (byte)Math.Abs( newPos.R - oldPos.R ),
-                L = (byte)Math.Abs( newPos.L - oldPos.L )
-            };
+            Position delta = CalcDelta(oldPos, newPos, supportsExtPlayerPositions);
 
             // skip everything if player hasn't moved
             if( delta.IsZero ) return;
@@ -1094,8 +1094,8 @@ namespace fCraft {
             }
             // needs to be sent before the client receives the map data
             if (Supports(CpeExt.BlockDefinitions)) {
-            	if (oldWorld != null)
-            	    BlockDefinition.SendNowRemoveOldBlocks(this, oldWorld);
+                if (oldWorld != null)
+                    BlockDefinition.SendNowRemoveOldBlocks(this, oldWorld);
                 BlockDefinition.SendNowBlocks(this);
             }
             if (Supports(CpeExt.BlockPermissions))
@@ -1146,7 +1146,7 @@ namespace fCraft {
             if (supportsCustomBlocks && supportsBlockDefs)
                 map.CompressMap(this);
             else
-            	map.CompressAndConvertMap((byte)maxLegal, this);
+                map.CompressAndConvertMap((byte)maxLegal, this);
         }
         
         void SendJoinMessage(World oldWorld, World newWorld) {
@@ -1231,7 +1231,7 @@ namespace fCraft {
                 } else {
                     SendNow(Packet.MakeAddEntity(entity.ID, entity.Name, Entity.getPos(entity), HasCP437));
                 }
-        		if (!entity.Model.CaselessEquals("humanoid") && Supports(CpeExt.ChangeModel))
+                if (!entity.Model.CaselessEquals("humanoid") && Supports(CpeExt.ChangeModel))
                     SendNow(Packet.MakeChangeModel((byte)entity.ID, entity.Model, HasCP437));
             }
         }
@@ -1283,7 +1283,7 @@ namespace fCraft {
                 Send(Packet.MakeEnvSetMapAppearance2(World.GetTexture(), side, edge, World.GetEdgeLevel(),
                                                      World.GetCloudsHeight(), World.MaxFogDistance, HasCP437));
             } else if (Supports(CpeExt.EnvMapAppearance)) {
-            	Send(Packet.MakeEnvSetMapAppearance(World.GetTexture(), side, edge, World.GetEdgeLevel(), HasCP437));
+                Send(Packet.MakeEnvSetMapAppearance(World.GetTexture(), side, edge, World.GetEdgeLevel(), HasCP437));
             }
 
             if (Supports(CpeExt.EnvColors)) {
@@ -1539,7 +1539,8 @@ namespace fCraft {
                 if (otherPlayer != this) {
                     entity = CheckEntity(this, otherPlayer);
                 } else {
-                    entity = new VisibleEntity(Position, -1, Info.Rank);
+                    entity = new VisibleEntity(Position, Packet.SelfId, Info.Rank);
+                    entity.SupportsExtPlayerPositions = supportsExtPlayerPositions;
                 }
                 CheckOwnChange(entity.Id, otherPlayer);
                 
@@ -1657,7 +1658,7 @@ namespace fCraft {
             }
             if (SpectatedPlayer.HeldBlock != HeldBlock && SpectatedPlayer.Supports(CpeExt.HeldBlock))
             {
-            	byte block = (byte)SpectatedPlayer.HeldBlock;
+                byte block = (byte)SpectatedPlayer.HeldBlock;
                 CheckBlock(ref block);
                 SendNow(Packet.MakeHoldThis((Block)block, false));
             }
@@ -1688,6 +1689,7 @@ namespace fCraft {
             if( player == null ) throw new ArgumentNullException( "player" );
             if (freePlayerIDs.Count > 0) {
                 var newEntity = new VisibleEntity(VisibleEntity.HiddenPosition, freePlayerIDs.Pop(), player.Info.Rank);
+                newEntity.SupportsExtPlayerPositions = player.supportsExtPlayerPositions;
                 entities.Add(player, newEntity);
 #if DEBUG_MOVEMENT
                 Logger.Log( LogType.Debug, "AddEntity: {0} added {1} ({2})", Name, newEntity.Id, player.Name );
@@ -1697,7 +1699,7 @@ namespace fCraft {
                     pos = player.WorldMap.Spawn;
                 }
                 if (Supports(CpeExt.ExtPlayerList2)) {
-                	Send(Packet.MakeExtAddEntity2(newEntity.Id, player.Info.Rank.Color + player.Name, player.Info.Skin, pos, HasCP437));
+                    Send(Packet.MakeExtAddEntity2(newEntity.Id, player.Info.Rank.Color + player.Name, player.Info.Skin, pos, HasCP437));
                     Send(Packet.MakeTeleport(newEntity.Id, player.Position));
                 } else {
                     Send(Packet.MakeAddEntity(newEntity.Id, player.Info.Rank.Color + player.Name, pos, HasCP437));
@@ -1779,14 +1781,7 @@ namespace fCraft {
             Position oldPos = entity.LastKnownPosition;
 
             // calculate difference between old and new positions
-            Position delta = new Position {
-                X = newPos.X - oldPos.X,
-                Y = newPos.Y - oldPos.Y,
-                Z = newPos.Z - oldPos.Z,
-                R = (byte)Math.Abs( newPos.R - oldPos.R ),
-                L = (byte)Math.Abs( newPos.L - oldPos.L )
-            };
-
+            Position delta = CalcDelta( oldPos, newPos, entity.SupportsExtPlayerPositions );
             bool posChanged = ( delta.X != 0 ) || ( delta.Y != 0 ) || ( delta.Z != 0 );
             bool rotChanged = ( delta.R != 0 ) || ( delta.L != 0 );
 
@@ -1855,6 +1850,7 @@ namespace fCraft {
             public bool Hidden;
             public bool MarkedForRetention;
             public bool SkippedLastMove;
+            public bool SupportsExtPlayerPositions = true;
         }
 
         internal Position lastValidPosition; // used in speedhack detection
@@ -1986,6 +1982,26 @@ namespace fCraft {
             lastBytesReceived = BytesReceived;
             lastMeasurementDate = DateTime.UtcNow;
         }
-        #endregion                      
+        #endregion      
+
+        internal static Position CalcDelta(Position oldPos, Position newPos, bool extPlayerPositions) {
+            // calculate difference between old and new positions
+            Position delta = new Position {
+                X = newPos.X - oldPos.X,
+                Y = newPos.Y - oldPos.Y,
+                Z = newPos.Z - oldPos.Z,
+                R = (byte)Math.Abs( newPos.R - oldPos.R ),
+                L = (byte)Math.Abs( newPos.L - oldPos.L )
+            };
+            
+            // we still want relative position deltas if possible
+            // this way players using clients not supporting ExtPlayerPositions can move past +/- 1024, just not spawn
+            if (!extPlayerPositions) {
+                delta.X = (short)(newPos.X - oldPos.X);
+            	delta.Y = (short)(newPos.X - oldPos.X);
+            	delta.Z = (short)(newPos.Z - oldPos.Z);
+            }
+            return delta;
+        }
     }
 }
