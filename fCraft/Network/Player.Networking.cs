@@ -392,24 +392,24 @@ namespace fCraft {
         void ProcessMovementPacket() {
             BytesReceived += 10;
             UpdateHeldBlock();
-            Position newPos = new Position {
-                X = reader.ReadInt16(),
-                Z = reader.ReadInt16(),
-                Y = reader.ReadInt16(),
-                R = reader.ReadByte(),
-                L = reader.ReadByte()
-            };
-
+            Position newPos = default(Position);
+            
+            if (supportsExtPositions) {
+                newPos.X = reader.ReadInt32();
+                newPos.Z = reader.ReadInt32();
+                newPos.Y = reader.ReadInt32();
+            } else {
+                newPos.X = reader.ReadInt16();
+                newPos.Z = reader.ReadInt16();
+                newPos.Y = reader.ReadInt16();
+            }
+            
+            newPos.R = reader.ReadByte();
+            newPos.L = reader.ReadByte();
             Position oldPos = Position;
 
             // calculate difference between old and new positions
-            Position delta = new Position {
-                X = (short)( newPos.X - oldPos.X ),
-                Y = (short)( newPos.Y - oldPos.Y ),
-                Z = (short)( newPos.Z - oldPos.Z ),
-                R = (byte)Math.Abs( newPos.R - oldPos.R ),
-                L = (byte)Math.Abs( newPos.L - oldPos.L )
-            };
+            Position delta = CalcDelta(oldPos, newPos, supportsExtPositions);
 
             // skip everything if player hasn't moved
             if( delta.IsZero ) return;
@@ -432,7 +432,7 @@ namespace fCraft {
                 // special handling for frozen players
                 if( delta.X * delta.X + delta.Y * delta.Y > AntiSpeedMaxDistanceSquared ||
                     Math.Abs( delta.Z ) > 40 ) {
-                    SendNow( Packet.MakeSelfTeleport( Position ) );
+                    SendNow( TeleportPacket( Packet.SelfId, Position ) );
                 }
                 newPos.X = Position.X;
                 newPos.Y = Position.Y;
@@ -1094,8 +1094,8 @@ namespace fCraft {
             }
             // needs to be sent before the client receives the map data
             if (Supports(CpeExt.BlockDefinitions)) {
-            	if (oldWorld != null)
-            	    BlockDefinition.SendNowRemoveOldBlocks(this, oldWorld);
+                if (oldWorld != null)
+                    BlockDefinition.SendNowRemoveOldBlocks(this, oldWorld);
                 BlockDefinition.SendNowBlocks(this);
             }
             if (Supports(CpeExt.BlockPermissions))
@@ -1124,7 +1124,7 @@ namespace fCraft {
             // Teleport player to the target location
             // This allows preserving spawn rotation/look, and allows
             // teleporting player to a specific location (e.g. /TP or /Bring)
-            writer.Write(Packet.MakeTeleport(Packet.SelfId, Position).Bytes);
+            writer.Write(TeleportPacket(Packet.SelfId, Position).Bytes);
             BytesSent += 10;
 
             SendJoinMessage(oldWorld, newWorld);
@@ -1146,7 +1146,7 @@ namespace fCraft {
             if (supportsCustomBlocks && supportsBlockDefs)
                 map.CompressMap(this);
             else
-            	map.CompressAndConvertMap((byte)maxLegal, this);
+                map.CompressAndConvertMap((byte)maxLegal, this);
         }
         
         void SendJoinMessage(World oldWorld, World newWorld) {
@@ -1182,11 +1182,7 @@ namespace fCraft {
         
         void SendJoinCpeExtensions() {
             SendEnvSettings();
-            if (Supports(CpeExt.ExtPlayerList2)) {
-                SendNow(Packet.MakeExtAddEntity2(Packet.SelfId, Info.Rank.Color + Name, Info.Skin, Position, HasCP437));
-            } else {
-                SendNow(Packet.MakeAddEntity(Packet.SelfId, Info.Rank.Color + Name, Position, HasCP437));
-            }
+            SendNow(SpawnPacket(Packet.SelfId, Info.Rank.Color + Name, Info.Skin, Position));
 
             if (Supports(CpeExt.ChangeModel)) {
                 SendNow(Packet.MakeChangeModel(255, !IsAFK ? Info.Mob : AFKModel, HasCP437));
@@ -1226,12 +1222,9 @@ namespace fCraft {
         
         internal void SendNewEntities(World world) {
             foreach (Entity entity in Entity.Entities.Where(e => Entity.getWorld(e) == world)) {
-                if (Supports(CpeExt.ExtPlayerList2)) {
-                    SendNow(Packet.MakeExtAddEntity2(entity.ID, entity.Name, entity.Skin, Entity.getPos(entity), HasCP437));
-                } else {
-                    SendNow(Packet.MakeAddEntity(entity.ID, entity.Name, Entity.getPos(entity), HasCP437));
-                }
-        		if (!entity.Model.CaselessEquals("humanoid") && Supports(CpeExt.ChangeModel))
+                SendNow(SpawnPacket(entity.ID, entity.Name, entity.Skin, Entity.getPos(entity)));
+                
+                if (!entity.Model.CaselessEquals("humanoid") && Supports(CpeExt.ChangeModel))
                     SendNow(Packet.MakeChangeModel((byte)entity.ID, entity.Model, HasCP437));
             }
         }
@@ -1283,7 +1276,7 @@ namespace fCraft {
                 Send(Packet.MakeEnvSetMapAppearance2(World.GetTexture(), side, edge, World.GetEdgeLevel(),
                                                      World.GetCloudsHeight(), World.MaxFogDistance, HasCP437));
             } else if (Supports(CpeExt.EnvMapAppearance)) {
-            	Send(Packet.MakeEnvSetMapAppearance(World.GetTexture(), side, edge, World.GetEdgeLevel(), HasCP437));
+                Send(Packet.MakeEnvSetMapAppearance(World.GetTexture(), side, edge, World.GetEdgeLevel(), HasCP437));
             }
 
             if (Supports(CpeExt.EnvColors)) {
@@ -1374,6 +1367,22 @@ namespace fCraft {
             if (packet.OpCode == OpCode.SetBlockServer)
                 CheckBlock(ref packet.Bytes[7]);
             if( canQueue ) priorityOutputQueue.Enqueue( packet );
+        }
+        
+        
+        /// <summary> Returns an appropriate spawn packet for this player. </summary>
+        public Packet SpawnPacket(sbyte id, string name, string skin, Position pos) {
+            if (Supports(CpeExt.ExtPlayerList2)) {
+                return Packet.MakeExtAddEntity2(id, name, skin, pos, HasCP437, supportsExtPositions);
+            } else {
+                return Packet.MakeAddEntity(id, name, pos, HasCP437, supportsExtPositions);
+            }
+        }
+        
+        /// <summary> Returns an appropriate spawn packet for this player. </summary>
+        public Packet TeleportPacket(sbyte id, Position pos) {
+            if (id == Packet.SelfId) pos = pos.GetFixed();
+            return Packet.MakeTeleport(id, pos, supportsExtPositions);
         }
         
         
@@ -1539,7 +1548,8 @@ namespace fCraft {
                 if (otherPlayer != this) {
                     entity = CheckEntity(this, otherPlayer);
                 } else {
-                    entity = new VisibleEntity(Position, -1, Info.Rank);
+                    entity = new VisibleEntity(Position, Packet.SelfId, Info.Rank);
+                    entity.SupportsExtPlayerPositions = supportsExtPositions;
                 }
                 CheckOwnChange(entity.Id, otherPlayer);
                 
@@ -1653,11 +1663,11 @@ namespace fCraft {
                     spectatedPlayer = null;
                 }
             } else if( spectatePos != Position ) {
-                SendNow( Packet.MakeSelfTeleport( spectatePos ) );
+                SendNow( TeleportPacket( Packet.SelfId, spectatePos ) );
             }
             if (SpectatedPlayer.HeldBlock != HeldBlock && SpectatedPlayer.Supports(CpeExt.HeldBlock))
             {
-            	byte block = (byte)SpectatedPlayer.HeldBlock;
+                byte block = (byte)SpectatedPlayer.HeldBlock;
                 CheckBlock(ref block);
                 SendNow(Packet.MakeHoldThis((Block)block, false));
             }
@@ -1665,7 +1675,7 @@ namespace fCraft {
         
         void CheckOwnChange(sbyte id, Player otherPlayer) {
             if (oldskinName != Info.skinName && otherPlayer.Supports(CpeExt.ExtPlayerList2)) {
-                otherPlayer.Send(Packet.MakeExtAddEntity2(id, Info.Rank.Color + Name, Info.Skin, Position, otherPlayer.HasCP437));
+                otherPlayer.Send(otherPlayer.SpawnPacket(id, Info.Rank.Color + Name, Info.Skin, Position));
                 //otherPlayer.Send(Packet.MakeTeleport(id, Position));
                 if (otherPlayer.Supports(CpeExt.ChangeModel)) {
                     string thisModel = IsAFK ? AFKModel : Info.Mob;
@@ -1688,6 +1698,7 @@ namespace fCraft {
             if( player == null ) throw new ArgumentNullException( "player" );
             if (freePlayerIDs.Count > 0) {
                 var newEntity = new VisibleEntity(VisibleEntity.HiddenPosition, freePlayerIDs.Pop(), player.Info.Rank);
+                newEntity.SupportsExtPlayerPositions = player.supportsExtPositions;
                 entities.Add(player, newEntity);
 #if DEBUG_MOVEMENT
                 Logger.Log( LogType.Debug, "AddEntity: {0} added {1} ({2})", Name, newEntity.Id, player.Name );
@@ -1696,13 +1707,10 @@ namespace fCraft {
                 if (player.World != null) {
                     pos = player.WorldMap.Spawn;
                 }
-                if (Supports(CpeExt.ExtPlayerList2)) {
-                	Send(Packet.MakeExtAddEntity2(newEntity.Id, player.Info.Rank.Color + player.Name, player.Info.Skin, pos, HasCP437));
-                    Send(Packet.MakeTeleport(newEntity.Id, player.Position));
-                } else {
-                    Send(Packet.MakeAddEntity(newEntity.Id, player.Info.Rank.Color + player.Name, pos, HasCP437));
-                    Send(Packet.MakeTeleport(newEntity.Id, player.Position));
-                }
+                
+                Send(SpawnPacket(newEntity.Id, player.Info.Rank.Color + player.Name, player.Info.Skin, pos));
+                Send(TeleportPacket(newEntity.Id, player.Position));
+                
                 if (Supports(CpeExt.ChangeModel)) {
                     string addedModel = player.IsAFK ? player.AFKModel : player.Info.Mob;
                     if (Info.Rank.CanSee(player.Info.Rank) && (addedModel.CaselessEquals("air") || addedModel.CaselessEquals("0"))) {
@@ -1723,7 +1731,7 @@ namespace fCraft {
 #endif
             entity.Hidden = true;
             entity.LastKnownPosition = VisibleEntity.HiddenPosition;
-            SendNow( Packet.MakeTeleport( entity.Id, VisibleEntity.HiddenPosition ) );
+            SendNow( TeleportPacket( entity.Id, VisibleEntity.HiddenPosition ) );
         }
 
 
@@ -1734,7 +1742,7 @@ namespace fCraft {
 #endif
             entity.Hidden = false;
             entity.LastKnownPosition = newPos;
-            SendNow( Packet.MakeTeleport( entity.Id, newPos ) );
+            SendNow( TeleportPacket( entity.Id, newPos ) );
         }
 
 
@@ -1745,13 +1753,8 @@ namespace fCraft {
             Logger.Log( LogType.Debug, "ReAddEntity: {0} re-added {1} ({2})", Name, entity.Id, player.Name );
 #endif
             SendNow( Packet.MakeRemoveEntity( entity.Id ) );
-            if (Supports(CpeExt.ExtPlayerList2)) {
-                SendNow(Packet.MakeExtAddEntity2(entity.Id, player.Info.Rank.Color + player.Name, player.Info.Skin, player.WorldMap.Spawn, HasCP437));
-                SendNow(Packet.MakeTeleport(entity.Id, player.Position));
-            } else {
-                SendNow(Packet.MakeAddEntity(entity.Id, player.Info.Rank.Color + player.Name, player.WorldMap.Spawn, HasCP437));
-                SendNow(Packet.MakeTeleport(entity.Id, player.Position));
-            }
+            SendNow(SpawnPacket(entity.Id, player.Info.Rank.Color + player.Name, player.Info.Skin, player.WorldMap.Spawn));
+            SendNow(TeleportPacket(entity.Id, player.Position));
 
             if (Supports(CpeExt.ChangeModel)) {
                 string readdedModel = player.IsAFK ? player.AFKModel : player.Info.Mob;
@@ -1779,14 +1782,7 @@ namespace fCraft {
             Position oldPos = entity.LastKnownPosition;
 
             // calculate difference between old and new positions
-            Position delta = new Position {
-                X = (short)( newPos.X - oldPos.X ),
-                Y = (short)( newPos.Y - oldPos.Y ),
-                Z = (short)( newPos.Z - oldPos.Z ),
-                R = (byte)Math.Abs( newPos.R - oldPos.R ),
-                L = (byte)Math.Abs( newPos.L - oldPos.L )
-            };
-
+            Position delta = CalcDelta( oldPos, newPos, entity.SupportsExtPlayerPositions );
             bool posChanged = ( delta.X != 0 ) || ( delta.Y != 0 ) || ( delta.Z != 0 );
             bool rotChanged = ( delta.R != 0 ) || ( delta.L != 0 );
 
@@ -1829,7 +1825,7 @@ namespace fCraft {
 
             } else {
                 // full (absolute position + absolute rotation) update
-                packet = Packet.MakeTeleport( entity.Id, newPos );
+                packet = TeleportPacket( entity.Id, newPos );
             }
 
             entity.LastKnownPosition = newPos;
@@ -1855,6 +1851,7 @@ namespace fCraft {
             public bool Hidden;
             public bool MarkedForRetention;
             public bool SkippedLastMove;
+            public bool SupportsExtPlayerPositions = true;
         }
 
         internal Position lastValidPosition; // used in speedhack detection
@@ -1874,14 +1871,8 @@ namespace fCraft {
 
 
         void DenyMovement() {
-            SendNow( Packet.MakeSelfTeleport(new Position
-                {
-                    X = (short)(lastValidPosition.X),
-                    Y = (short)(lastValidPosition.Y),
-                    Z = (short)(lastValidPosition.Z + 22),
-                    R = lastValidPosition.R,
-                    L = lastValidPosition.L
-                }));
+            SendNow( TeleportPacket( Packet.SelfId, lastValidPosition ) );
+        	
             if( DateTime.UtcNow.Subtract( antiSpeedLastNotification ).Seconds > 1 ) {
                 Message( "&WYou are not allowed to speedhack." );
                 antiSpeedLastNotification = DateTime.UtcNow;
@@ -1986,6 +1977,26 @@ namespace fCraft {
             lastBytesReceived = BytesReceived;
             lastMeasurementDate = DateTime.UtcNow;
         }
-        #endregion                      
+        #endregion      
+
+        internal static Position CalcDelta(Position oldPos, Position newPos, bool extPlayerPositions) {
+            // calculate difference between old and new positions
+            Position delta = new Position {
+                X = newPos.X - oldPos.X,
+                Y = newPos.Y - oldPos.Y,
+                Z = newPos.Z - oldPos.Z,
+                R = (byte)Math.Abs( newPos.R - oldPos.R ),
+                L = (byte)Math.Abs( newPos.L - oldPos.L )
+            };
+            
+            // we still want relative position deltas if possible
+            // this way players using clients not supporting ExtPlayerPositions can move past +/- 1024, just not spawn
+            if (!extPlayerPositions) {
+                delta.X = (short)(newPos.X - oldPos.X);
+                delta.Y = (short)(newPos.Y - oldPos.Y);
+                delta.Z = (short)(newPos.Z - oldPos.Z);
+            }
+            return delta;
+        }
     }
 }

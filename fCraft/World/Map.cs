@@ -112,7 +112,7 @@ namespace fCraft {
             if (spawn == Position.RandomSpawn) {
                 Random rnd = new Random();
                 Vector3I P = HighestFreeSpace(rnd.Next(Width), rnd.Next(Length), Height);
-                return new Position((short)(P.X * 32), (short)(P.Y * 32), (short)(P.Z * 32), 0, 0);
+                return new Position(P.X * 32, P.Y * 32, P.Z * 32, 0, 0);
             }
             return spawn;
         }
@@ -567,9 +567,9 @@ namespace fCraft {
 
         #region Utilities
         /// <summary> Checks if a given map dimension (width, height, or length) is acceptable.
-        /// Values between 1 and 2047 are technically allowed. </summary>
+        /// Values between 1 and 16384 are technically allowed. </summary>
         public static bool IsValidDimension( int dimension ) {
-            return dimension >= 16 && dimension <= 1024;
+            return dimension >= 16 && dimension <= 16384;
         }
 
 

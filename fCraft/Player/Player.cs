@@ -2085,7 +2085,7 @@ namespace fCraft {
         /// <summary> Teleports player to a given coordinate within this map. </summary>
         public void TeleportTo( Position pos ) {
             StopSpectating();
-            Send( Packet.MakeSelfTeleport( pos ) );
+            Send( TeleportPacket( Packet.SelfId, pos ) );
             Position = pos;
         }
 
@@ -2142,8 +2142,10 @@ namespace fCraft {
         const string BulkBlockUpdateExtName = "BulkBlockUpdate";        
         const string TextColorsExtName = "TextColors";
         const string EnvMapAspectExtName = "EnvMapAspect";
+        const string ExtPlayerPositionsExtName = "ExtEntityPositions";
         
         bool supportsBlockDefs, supportsCustomBlocks;
+        internal bool supportsExtPositions;
         
         public bool FallbackColors { get { return !Supports(CpeExt.TextColors); } }
         

@@ -194,15 +194,16 @@ namespace fCraft {
         public static Packet MakeEnvSetMapAppearance2( [NotNull] string textureUrl, byte sideBlock, byte edgeBlock,
                                                       short sideLevel, short cloudsHeight, short maxFog, bool hasCP437 ) {
             if( textureUrl == null ) throw new ArgumentNullException( "textureUrl" );
-            byte[] packet = new byte[73];
-            packet[0] = (byte)OpCode.EnvMapAppearance;
-            PacketWriter.WriteString( textureUrl, packet, 1, hasCP437 );
-            packet[65] = sideBlock;
-            packet[66] = edgeBlock;
-            WriteI16( sideLevel, packet, 67 );
-            WriteI16( cloudsHeight, packet, 69 );
-            WriteI16( maxFog, packet, 71 );
-            return new Packet( packet );
+            int size = PacketSizes[(byte)OpCode.EnvMapAppearance] + 4;
+            Packet packet = new Packet( OpCode.EnvMapAppearance, size );
+            
+            PacketWriter.WriteString( textureUrl, packet.Bytes, 1, hasCP437 );
+            packet.Bytes[65] = sideBlock;
+            packet.Bytes[66] = edgeBlock;
+            WriteI16( sideLevel, packet.Bytes, 67 );
+            WriteI16( cloudsHeight, packet.Bytes, 69 );
+            WriteI16( maxFog, packet.Bytes, 71 );
+            return packet;
         }
 
         [Pure]
@@ -227,18 +228,21 @@ namespace fCraft {
 
 
         [Pure]
-        public static Packet MakeExtAddEntity2(sbyte entityId, string inGameName, string skin, Position spawnPosition, bool hasCP437) {
+        public static Packet MakeExtAddEntity2(sbyte entityId, string inGameName, string skin, Position spawn, 
+                                               bool hasCP437, bool extPos) {
             if (inGameName == null) inGameName = entityId.ToString();
-            if (skin == null) skin = inGameName ;
-            Packet packet = new Packet(OpCode.ExtAddEntity2);
+            if (skin == null) skin = inGameName;
+            
+            int size = PacketSizes[(byte)OpCode.ExtAddEntity2];
+            if (extPos) size += 6;
+            Packet packet = new Packet(OpCode.ExtAddEntity2, size);
             packet.Bytes[1] = (byte) entityId;
             PacketWriter.WriteString(inGameName, packet.Bytes, 2, hasCP437);
             PacketWriter.WriteString(skin, packet.Bytes, 66, hasCP437);
-            WriteI16(spawnPosition.X, packet.Bytes, 130);
-            WriteI16(spawnPosition.Z, packet.Bytes, 132);
-            WriteI16(spawnPosition.Y, packet.Bytes, 134);
-            packet.Bytes[136] = spawnPosition.R;
-            packet.Bytes[137] = spawnPosition.L;
+            
+            int posSize = WritePos(spawn, packet.Bytes, 130, extPos);
+            packet.Bytes[130 + posSize] = spawn.R;
+            packet.Bytes[131 + posSize] = spawn.L;
             return packet;
         }
         

@@ -75,9 +75,9 @@ namespace fCraft.MapConversion {
 
             // read spawn location and orientation
             Position spawn = new Position {
-                X = (short)( IPAddress.NetworkToHostOrder( bs.ReadInt16() ) * 32 ),
-                Z = (short)( IPAddress.NetworkToHostOrder( bs.ReadInt16() ) * 32 ),
-                Y = (short)( IPAddress.NetworkToHostOrder( bs.ReadInt16() ) * 32 ),
+                X = IPAddress.NetworkToHostOrder( bs.ReadInt16() ) * 32,
+                Z = IPAddress.NetworkToHostOrder( bs.ReadInt16() ) * 32,
+                Y = IPAddress.NetworkToHostOrder( bs.ReadInt16() ) * 32,
                 R = bs.ReadByte(),
                 L = bs.ReadByte()
             };

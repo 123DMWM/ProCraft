@@ -94,6 +94,9 @@ namespace fCraft
         /// <summary> This extension allows the server to specify custom terrain textures,
         /// and various aspects of the map's environment. </summary>
         EnvMapAspect,
+        
+        /// <summary> Allows for players to be moved to and see other players, below -1024 or above 1024 or any axis. </summary>
+        ExtPlayerPositions,
     }
 
 

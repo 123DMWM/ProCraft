@@ -148,11 +148,11 @@ namespace fCraft.MapConversion {
                         } else if( BufferUtil.MemCmp( data, pointer, "height" ) ) {
                             length = (ushort)IPAddress.HostToNetworkOrder( BitConverter.ToInt32( temp, 0 ) );
                         } else if( BufferUtil.MemCmp( data, pointer, "xSpawn" ) ) {
-                            spawn.X = (short)( IPAddress.HostToNetworkOrder( BitConverter.ToInt32( temp, 0 ) ) * 32 + 16 );
+                            spawn.X = IPAddress.HostToNetworkOrder( BitConverter.ToInt32( temp, 0 ) ) * 32 + 16;
                         } else if( BufferUtil.MemCmp( data, pointer, "ySpawn" ) ) {
-                            spawn.Z = (short)( IPAddress.HostToNetworkOrder( BitConverter.ToInt32( temp, 0 ) ) * 32 + 16 );
+                            spawn.Z = IPAddress.HostToNetworkOrder( BitConverter.ToInt32( temp, 0 ) ) * 32 + 16;
                         } else if( BufferUtil.MemCmp( data, pointer, "zSpawn" ) ) {
-                            spawn.Y = (short)( IPAddress.HostToNetworkOrder( BitConverter.ToInt32( temp, 0 ) ) * 32 + 16 );
+                            spawn.Y = IPAddress.HostToNetworkOrder( BitConverter.ToInt32( temp, 0 ) ) * 32 + 16;
                         }
 
                         pointer += skip;

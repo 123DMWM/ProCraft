@@ -25,9 +25,9 @@ namespace fCraft.Portals {
         public string World { get; set; }
         public PortalRange Range { get; set; }
         public string Place { get; set; }
-        public short TeleportPosX { get; set; }
-        public short TeleportPosY { get; set; }
-        public short TeleportPosZ { get; set; }
+        public int TeleportPosX { get; set; }
+        public int TeleportPosY { get; set; }
+        public int TeleportPosZ { get; set; }
         public byte TeleportPosR { get; set; }
         public byte TeleportPosL { get; set; }
 
@@ -50,7 +50,7 @@ namespace fCraft.Portals {
             return new Position(TeleportPosX, TeleportPosY, TeleportPosZ, TeleportPosR, TeleportPosL);
         }
         public Position tpPosition() {
-            return new Position(TeleportPosX, TeleportPosY, (short)(TeleportPosZ + 64), TeleportPosR, TeleportPosL);
+            return new Position(TeleportPosX, TeleportPosY, TeleportPosZ + 64, TeleportPosR, TeleportPosL);
         }
 
         public bool IsInRange(Player player) {

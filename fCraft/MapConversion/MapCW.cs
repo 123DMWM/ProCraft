@@ -79,9 +79,9 @@ namespace fCraft.MapConversion {
                 
                 NBTag spawnTag = root["Spawn"];
                 map.Spawn = new Position {
-                    X = (short)(spawnTag["X"].GetShort() * 32),
-                    Y = (short)(spawnTag["Z"].GetShort() * 32),
-                    Z = (short)(spawnTag["Y"].GetShort() * 32),
+                    X = (spawnTag["X"].GetShort() * 32),
+                    Y = (spawnTag["Z"].GetShort() * 32),
+                    Z = (spawnTag["Y"].GetShort() * 32),
                     R = spawnTag["H"].GetByte(),
                     L = spawnTag["P"].GetByte(),
                 };

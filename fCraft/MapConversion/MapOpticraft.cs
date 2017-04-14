@@ -142,9 +142,9 @@ namespace fCraft.MapConversion {
             Map mapFile = new Map( null, metaData.X, metaData.Y, metaData.Z, false );
             // ReSharper restore UseObjectOrCollectionInitializer
             mapFile.Spawn = new Position {
-                X = (short)( metaData.SpawnX ),
-                Y = (short)( metaData.SpawnY ),
-                Z = (short)( metaData.SpawnZ ),
+                X = metaData.SpawnX,
+                Y = metaData.SpawnY,
+                Z = metaData.SpawnZ,
                 R = metaData.SpawnOrientation,
                 L = metaData.SpawnPitch
             };

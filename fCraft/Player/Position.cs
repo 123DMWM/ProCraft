@@ -13,25 +13,19 @@ namespace fCraft {
         /// <summary> Position at (0,0,0) with R=0 and L=0. </summary>
         public static readonly Position Zero = new Position( 0, 0, 0 );
 
-        public short X, Y, Z;
+        public int X, Y, Z;
         public byte R, L;
 
 
-        public Position( short x, short y, short z, byte r, byte l ) {
-            X = x;
-            Y = y;
-            Z = z;
-            R = r;
-            L = l;
+        public Position( int x, int y, int z, byte r, byte l ) {
+            X = x; Y = y; Z = z;
+            R = r; L = l;
         }
 
 
         public Position( int x, int y, int z ) {
-            X = (short)x;
-            Y = (short)y;
-            Z = (short)z;
-            R = 0;
-            L = 0;
+            X = x; Y = y; Z = z;
+            R = 0; L = 0;
         }
 
 
@@ -54,7 +48,7 @@ namespace fCraft {
             return new Position {
                 X = ( X ),
                 Y = ( Y ),
-                Z = (short)( Z - 22 ),
+                Z = ( Z - 22 ),
                 R = R,
                 L = L
             };

@@ -33,6 +33,11 @@ namespace fCraft {
             Bytes[0] = (byte)opCode;
         }
 
+        Packet( OpCode opCode, int size ) {
+            Bytes = new byte[size];
+            Bytes[0] = (byte)opCode;
+        }
+
         #region Making regular packets
 
         /// <summary> Creates a new Handshake (0x00) packet. </summary>
@@ -72,20 +77,22 @@ namespace fCraft {
         /// <summary> Creates a new AddEntity (0x07) packet. </summary>
         /// <param name="id"> Entity ID. Negative values refer to "self". </param>
         /// <param name="name"> Entity name. May not be null. </param>
-        /// <param name="spawnPosition"> Spawning position for the player. </param>
+        /// <param name="spawn"> Spawning position for the player. </param>
         /// <exception cref="ArgumentNullException"> name is null </exception>
-        public static Packet MakeAddEntity( sbyte id, [NotNull] string name, Position spawnPosition, bool hasCP437 ) {
+        public static Packet MakeAddEntity( sbyte id, [NotNull] string name, Position spawn, 
+                                           bool hasCP437, bool extPos ) {
             if (name == null) throw new ArgumentNullException("name");
             
-            Packet packet = new Packet( OpCode.AddEntity );
+            int size = PacketSizes[(byte)OpCode.AddEntity];
+            if (extPos) size += 6;
+            Packet packet = new Packet( OpCode.AddEntity, size );
             //Logger.Log(LogType.Debug, "Send: MakeAddEntity({0}, {1}, {2})", id, name, spawnPosition);
             packet.Bytes[1] = (byte)id;
             PacketWriter.WriteString( name, packet.Bytes, 2, hasCP437 );
-            WriteI16( spawnPosition.X, packet.Bytes, 66 );
-            WriteI16( spawnPosition.Z, packet.Bytes, 68 );
-            WriteI16( spawnPosition.Y, packet.Bytes, 70 );
-            packet.Bytes[72] = spawnPosition.R;
-            packet.Bytes[73] = spawnPosition.L;
+            
+            int posSize = WritePos( spawn, packet.Bytes, 66, extPos );
+            packet.Bytes[66 + posSize] = spawn.R;
+            packet.Bytes[67 + posSize] = spawn.L;
             return packet;
         }
 
@@ -93,23 +100,24 @@ namespace fCraft {
         /// <summary> Creates a new Teleport (0x08) packet. </summary>
         /// <param name="id"> Entity ID. Negative values refer to "self". </param>
         /// <param name="newPosition"> Position to teleport the entity to. </param>
-        public static Packet MakeTeleport( sbyte id, Position newPosition ) {
-            Packet packet = new Packet( OpCode.Teleport );
+        public static Packet MakeTeleport( sbyte id, Position newPosition, bool extPos ) {
+            int size = PacketSizes[(byte)OpCode.Teleport];
+            if (extPos) size += 6;
+            Packet packet = new Packet( OpCode.Teleport, size );
+            
             //Logger.Log(LogType.Debug, "Send: MakeTeleport({0}, {1})", id, newPosition);
             packet.Bytes[1] = (byte)id;
-            WriteI16( newPosition.X, packet.Bytes, 2 );
-            WriteI16( newPosition.Z, packet.Bytes, 4 );
-            WriteI16( newPosition.Y, packet.Bytes, 6 );
-            packet.Bytes[8] = newPosition.R;
-            packet.Bytes[9] = newPosition.L;
+            int posSize = WritePos( newPosition, packet.Bytes, 2, extPos );
+            packet.Bytes[2 + posSize] = newPosition.R;
+            packet.Bytes[3 + posSize] = newPosition.L;
             return packet;
         }
 
 
         /// <summary> Creates a new Teleport (0x08) packet, and sets ID to -1 ("self"). </summary>
         /// <param name="newPosition"> Position to teleport player to. </param>
-        public static Packet MakeSelfTeleport( Position newPosition ) {
-            return MakeTeleport( -1, newPosition.GetFixed() );
+        public static Packet MakeSelfTeleport( Position newPosition, bool extPos ) {
+            return MakeTeleport( -1, newPosition.GetFixed(), extPos );
         }
 
 
@@ -209,6 +217,19 @@ namespace fCraft {
         }
 
         #endregion
+        
+        internal static int WritePos( Position pos, [NotNull] byte[] arr, int offset, bool extPos ) {
+            if (!extPos) {
+                WriteI16( (short)pos.X, arr, offset + 0 );
+                WriteI16( (short)pos.Z, arr, offset + 2 );
+                WriteI16( (short)pos.Y, arr, offset + 4 );
+            } else {
+                WriteI32( (int)pos.X, arr, offset + 0 );
+                WriteI32( (int)pos.Z, arr, offset + 4 );
+                WriteI32( (int)pos.Y, arr, offset + 8 );
+            }
+            return extPos ? 12 : 6;
+        }
 
         internal static void WriteI16( short number, [NotNull] byte[] arr, int offset ) {
             arr[offset] =     (byte)((number & 0xff00) >> 8);
