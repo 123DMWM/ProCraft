@@ -2142,7 +2142,7 @@ namespace fCraft {
         const string BulkBlockUpdateExtName = "BulkBlockUpdate";        
         const string TextColorsExtName = "TextColors";
         const string EnvMapAspectExtName = "EnvMapAspect";
-        const string ExtPlayerPositionsExtName = "ExtPlayerPositions";
+        const string ExtPlayerPositionsExtName = "ExtEntityPositions";
         
         bool supportsBlockDefs, supportsCustomBlocks;
         internal bool supportsExtPositions;

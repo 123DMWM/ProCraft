@@ -750,7 +750,7 @@ namespace fCraft {
 
             // Check map dimensions
             const string dimensionRecommendation =
-                "Dimensions must be between 16 and 2047. " + "Recommended values: 16, 32, 64, 128, 256, 512, and 1024.";
+                "Dimensions must be between 16 and 16384. " + "Recommended values: 16, 32, 64, 128, 256, 512, and 1024.";
             if (!Map.IsValidDimension(mapWidth)) {
                 player.Message("Cannot make map with width {0}. {1}", mapWidth, dimensionRecommendation);
                 return;
