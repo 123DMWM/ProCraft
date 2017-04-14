@@ -1220,11 +1220,7 @@ namespace fCraft {
                     player.Message("Randomized Spawn!");
                 }
                 
-                if (player.Supports(CpeExt.ExtPlayerList2)) {
-                    player.Send(Packet.MakeExtAddEntity2(Packet.SelfId, player.Info.Rank.Color + player.Name, player.Info.Skin, player.Position, player.HasCP437));
-                } else {
-                    player.Send(Packet.MakeAddEntity(Packet.SelfId, player.Name, player.Position, player.HasCP437));
-                }
+                player.Send(player.SpawnPacket(Packet.SelfId, player.Info.Rank.Color + player.Name, player.Info.Skin, player.Position));
                 player.Message( "New spawn point saved." );
                 Logger.Log( LogType.UserActivity,
                             "{0} changed the spawned point.",
@@ -1235,12 +1231,9 @@ namespace fCraft {
                 if( infos.Length == 1 ) {
                     Player target = infos[0];
                     player.LastUsedPlayerName = target.Name;
+                    
                     if( player.Can( Permission.Bring, target.Info.Rank ) ) {
-                        if (target.Supports(CpeExt.ExtPlayerList2)) {
-                            target.Send(Packet.MakeExtAddEntity2(Packet.SelfId, target.Info.Rank.Color + target.Name, target.Info.Skin, player.Position, target.HasCP437));
-                        } else {
-                            target.Send(Packet.MakeAddEntity(Packet.SelfId, target.Name, player.Position, target.HasCP437));
-                        }
+                        target.Send(target.SpawnPacket(Packet.SelfId, target.Info.Rank.Color + target.Name, target.Info.Skin, player.Position));
                     } else {
                         player.Message( "You may only set spawn of players ranked {0}&S or lower.",
                                         player.Info.Rank.GetLimit( Permission.Bring ).ClassyName );

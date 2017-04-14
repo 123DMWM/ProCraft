@@ -33,7 +33,7 @@ namespace fCraft {
                     } else {
                         SendZoneMessage(p, "&WNo rank may enter this area.");
                     }
-                    p.SendNow(Packet.MakeSelfTeleport(p.lastValidPosition));
+                    p.SendNow(p.TeleportPacket(Packet.SelfId, p.lastValidPosition));
                     return true;
                 }
             }

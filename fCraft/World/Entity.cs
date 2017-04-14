@@ -78,11 +78,8 @@ namespace fCraft {
 
         public static void ShowEntity(Entity entity) {
             foreach (Player sendTo in getWorld(entity).Players) {
-                if (sendTo.Supports(CpeExt.ExtPlayerList2)) {
-                    sendTo.Send(Packet.MakeExtAddEntity2(entity.ID, entity.Name, entity.Skin, getPos(entity), sendTo.HasCP437));
-                } else {
-        			sendTo.Send(Packet.MakeAddEntity(entity.ID, entity.Name, getPos(entity), sendTo.HasCP437));
-                }
+                sendTo.Send(sendTo.SpawnPacket(entity.ID, entity.Name, entity.Skin, getPos(entity)));
+               
                 if (sendTo.Supports(CpeExt.ChangeModel)) {
                     sendTo.Send(Packet.MakeChangeModel((byte)entity.ID, entity.Model, sendTo.HasCP437));
                 }
@@ -92,11 +89,8 @@ namespace fCraft {
         public static void ShowAll() {
             foreach (Entity entity in Entities) {
                 foreach (Player sendTo in Server.Players.Where(p => p.World == getWorld(entity))) {
-                    if (sendTo.Supports(CpeExt.ExtPlayerList2)) {
-                        sendTo.Send(Packet.MakeExtAddEntity2(entity.ID, entity.Name, entity.Skin, getPos(entity), sendTo.HasCP437));
-                    } else {
-                        sendTo.Send(Packet.MakeAddEntity(entity.ID, entity.Name, getPos(entity), sendTo.HasCP437));
-                    }
+                    sendTo.Send(sendTo.SpawnPacket(entity.ID, entity.Name, entity.Skin, getPos(entity)));
+                    
                     if (sendTo.Supports(CpeExt.ChangeModel)) {
                         sendTo.Send(Packet.MakeChangeModel((byte)entity.ID, entity.Model, sendTo.HasCP437));
                     }
@@ -106,7 +100,9 @@ namespace fCraft {
         }
 
         public static void TeleportEntity(Entity entity, Position p) {
-            getWorld(entity).Players.Send(Packet.MakeTeleport(entity.ID, p));
+        	Player[] players = getWorld(entity).Players;
+        	foreach (Player pl in players) { pl.Send(pl.TeleportPacket(entity.ID, p)); }
+
             setPos(entity, p);
             SaveAll(false);
         }

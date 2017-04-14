@@ -380,7 +380,7 @@ namespace fCraft {
                     case ExtPlayerPositionsExtName:
                         if (extVersion == 1)
                             addedExt = CpeExt.ExtPlayerPositions;
-                        supportsExtPlayerPositions = true;
+                        supportsExtPositions = true;
                         break;
                 }
                 if (addedExt != CpeExt.None)
