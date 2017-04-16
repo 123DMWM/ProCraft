@@ -748,6 +748,9 @@ namespace fCraft {
                 { "level",      "&H/Env <WorldName> level <#>&N&S" +
                                 "Sets height of the map edges/water level, in terms of blocks from the bottom of the map. " +
                                 "&NUse \"normal\" instead of a number to reset to default (middle of the map)." },
+                { "sideoffset", "&H/Env <WorldName> sideoffset <#>&N&S" +
+                                "Sets height of the map sides/bedrock level, in terms of offset vertically from map edges height. " +
+                                "&NUse \"normal\" instead of a number to reset to default (-2)." },
                 { "cloudsheight","&H/Env <WorldName> cloudsheight <#>&N&S" +
                                 "Sets height of the clouds, in terms of blocks from the bottom of the map. " +
                                 "&NUse \"normal\" instead of a number to reset to default (map height + 2)." },
@@ -856,6 +859,12 @@ namespace fCraft {
                 case "cloudsheight":
                     SetEnvAppearanceShort(player, world, value, EnvProp.CloudsLevel,
                                           "clouds height", 0, ref world.CloudsHeight);
+                    break;
+                case "sideoffset":
+                case "sidesoffset":
+                case "bedrockoffset":
+                    SetEnvAppearanceShort(player, world, value, EnvProp.SidesOffset,
+                                          "bedrock offset", -2, ref world.SidesOffset);
                     break;
                 case "fogdist":
                 case "maxfog":
@@ -981,6 +990,7 @@ namespace fCraft {
             world.ShadowColor = null;
             world.LightColor = null;
             world.EdgeLevel = -1;
+            world.SidesOffset = -2;
             world.CloudsHeight = short.MinValue;
             world.MaxFogDistance = 0;
             world.EdgeBlock = (byte)Block.Admincrete;

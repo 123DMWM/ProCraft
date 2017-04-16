@@ -134,5 +134,7 @@ namespace fCraft
         CloudsSpeed = 5,
         WeatherSpeed = 6,
         WeatherFade = 7,
+        ExpFog = 8,
+        SidesOffset = 9,
     }
 }

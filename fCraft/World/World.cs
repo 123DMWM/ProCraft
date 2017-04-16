@@ -229,6 +229,7 @@ namespace fCraft {
                     CloudColor = CloudColor,
                     SkyColor = SkyColor,
                     EdgeLevel = EdgeLevel,
+                    SidesOffset = SidesOffset,
                     CloudsHeight = CloudsHeight,
                     MaxFogDistance = MaxFogDistance,
                     EdgeBlock = EdgeBlock,
@@ -929,6 +930,9 @@ namespace fCraft {
 
         /// <summary> Elevation of the "ocean" that surrounds maps. Set to -1 to use client default (halfway up the map). </summary>
         public short EdgeLevel = -1;
+        
+        /// <summary> Offset of the "bedrock" borders of the map vertically from "ocean" elevation. </summary>
+        public short SidesOffset = -2;
 
         public short GetEdgeLevel() {
         	return (EdgeLevel == -1 && map != null) ? (short)(map.Height / 2) : EdgeLevel;

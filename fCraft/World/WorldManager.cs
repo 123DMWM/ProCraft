@@ -336,11 +336,14 @@ namespace fCraft {
                 world.EdgeBlock = ParseByte(attr, worldName, (byte)Block.Admincrete, "Bedrock");
             }
             if ((attr = el.Attribute("level")) != null) {
-                world.EdgeLevel = ParseShort(attr, worldName, -1, "normal height / 2");
+                world.EdgeLevel = ParseShort(attr, worldName, -1, "world height / 2");
+            }
+            if ((attr = el.Attribute("sidesoffset")) != null) {
+                world.SidesOffset = ParseShort(attr, worldName, -2, "-2");
             }
             
             if ((attr = el.Attribute("cloudsheight")) != null) {
-                world.CloudsHeight = ParseShort(attr, worldName, short.MinValue, "normal height + 2");
+                world.CloudsHeight = ParseShort(attr, worldName, short.MinValue, "world height + 2");
             }
             if ((attr = el.Attribute("maxfog")) != null) {
                 world.MaxFogDistance = ParseShort(attr, worldName, 0, "no limit");
@@ -611,6 +614,7 @@ namespace fCraft {
                 elEnv.Add(new XAttribute("light", world.LightColor));
             
             elEnv.Add(new XAttribute("level", world.EdgeLevel));
+            elEnv.Add(new XAttribute("sidesoffset", world.SidesOffset));
             elEnv.Add(new XAttribute("water", world.HorizonBlock.GetHashCode()));
             elEnv.Add(new XAttribute("bedrock", world.EdgeBlock.GetHashCode()));
             if (world.Texture != null) 
