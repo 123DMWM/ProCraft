@@ -1,14 +1,13 @@
 ﻿// ProCraft Copyright 2014-2016 Joseph Beauvais <123DMWM@gmail.com>
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using ServiceStack.Text;
-using System.Diagnostics;
-using System.Collections.Generic;
 
 namespace fCraft {
 
     public sealed class EnvPresets {
-
 
         public string Name { get; set; }
 
@@ -28,8 +27,8 @@ namespace fCraft {
         public short MaxViewDistance { get; set; }
         // EnvWeatherType
         public byte WeatherType { get; set; }
-
-
+        
+        public short SidesOffset { get; set; }
 
         public static List<EnvPresets> Presets = new List<EnvPresets>();
 
@@ -59,6 +58,7 @@ namespace fCraft {
             preset.BorderBlock = (byte)world.EdgeBlock;
             preset.HorizonBlock = (byte)world.HorizonBlock;
             preset.HorizonLevel = (world.EdgeLevel == world.map.Height/2 ? (short)-1 : world.EdgeLevel);
+            preset.SidesOffset = world.SidesOffset;
             preset.CloudLevel = (world.CloudsHeight == world.map.Height+2 ? short.MinValue : world.CloudsHeight);
             preset.MaxViewDistance = world.MaxFogDistance;
             preset.WeatherType = world.Weather;
@@ -82,6 +82,7 @@ namespace fCraft {
             world.EdgeBlock = (byte)Border;
             world.HorizonBlock = (byte)Horizon;
             world.EdgeLevel = preset.HorizonLevel;
+            world.SidesOffset = preset.SidesOffset;
             world.CloudsHeight = preset.CloudLevel;
             world.MaxFogDistance = preset.MaxViewDistance;
             world.Weather = preset.WeatherType;
