@@ -7,7 +7,7 @@ namespace fCraft {
     /// <summary> Handlers for commands and PM from IRC. </summary>
     internal static class IRCHandlers {
         
-        internal static DateTime lastIrcCommand;
+        internal static DateTime lastIrcCommand, lastUrlExpand;
         const string Reset = "\u211C", Bold = "\u212C";
         
         static string Formatter(Player p) {
@@ -19,7 +19,7 @@ namespace fCraft {
         
         public static bool HandleCommand(string nick, string userNick, string rawMessage) {
             nick = nick.ToLower();
-            if (!(rawMessage[0] == '!' || rawMessage.CaselessStarts(nick)))
+            if (!(rawMessage[0] == '!' || rawMessage[0] == '.' || rawMessage.CaselessStarts(nick)))
                 return false;
             
             string cmd = rawMessage.ToLower();
