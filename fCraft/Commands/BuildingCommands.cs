@@ -2375,46 +2375,14 @@ namespace fCraft {
             }
 
             // Produce a brief param description for BlockDBDrawOperation
-            string description;
-            if( args.CountLimit > 0 ) {
-                if( args.Targets.Length == 0 ) {
-                    description = args.CountLimit.ToStringInvariant();
-                } else if( args.Not ) {
-                    description = String.Format( "{0} by everyone except {1}",
-                                                 args.CountLimit,
-                                                 args.Targets.JoinToString( p => p.Name ) );
-                } else {
-                    description = String.Format( "{0} by {1}",
-                                                 args.CountLimit,
-                                                 args.Targets.JoinToString( p => p.Name ) );
-                }
-            } else {
-                if( args.Targets.Length == 0 ) {
-                    description = args.AgeLimit.ToMiniString();
-                } else if( args.Not ) {
-                    description = String.Format( "{0} by everyone except {1}",
-                                                 args.AgeLimit.ToMiniString(),
-                                                 args.Targets.JoinToString( p => p.Name ) );
-                } else {
-                    description = String.Format( "{0} by {1}",
-                                                 args.AgeLimit.ToMiniString(),
-                                                 args.Targets.JoinToString( p => p.Name ) );
-                }
-            }
+            string description = BlockDBDescription( args );
 
             // start undoing (using DrawOperation infrastructure)
             var op = new BlockDBDrawOperation( player, cmdName, description, coords.Length );
             op.Prepare( coords, args.Entries );
 
             // log operation
-            string targetList;
-            if( args.Targets.Length == 0 ) {
-                targetList = "(everyone)";
-            } else if( args.Not ) {
-                targetList = "(everyone) except " + args.Targets.JoinToClassyString();
-            } else {
-                targetList = args.Targets.JoinToClassyString();
-            }
+            string targetList = BlockDBTargetList(args);
             Logger.Log( LogType.UserActivity,
                         "{0}: Player {1} will undo {2} changes (limit of {3}) by {4} on world {5}",
                         cmdName,
@@ -2425,6 +2393,44 @@ namespace fCraft {
                         args.World.Name );
 
             op.Begin();
+        }
+        
+        static string BlockDBDescription( BlockDBUndoArgs args ) {
+            if( args.CountLimit > 0 ) {
+                if( args.Targets.Length == 0 ) {
+                    return args.CountLimit.ToStringInvariant();
+                } else if( args.Not ) {
+                    return String.Format( "{0} by everyone except {1}",
+                                         args.CountLimit,
+                                         args.Targets.JoinToString( p => p.Name ) );
+                } else {
+                    return String.Format( "{0} by {1}",
+                                         args.CountLimit,
+                                         args.Targets.JoinToString( p => p.Name ) );
+                }
+            } else {
+                if( args.Targets.Length == 0 ) {
+                    return args.AgeLimit.ToMiniString();
+                } else if( args.Not ) {
+                    return String.Format( "{0} by everyone except {1}",
+                                         args.AgeLimit.ToMiniString(),
+                                         args.Targets.JoinToString( p => p.Name ) );
+                } else {
+                    return String.Format( "{0} by {1}",
+                                         args.AgeLimit.ToMiniString(),
+                                         args.Targets.JoinToString( p => p.Name ) );
+                }
+            }
+        }
+        
+        static string BlockDBTargetList( BlockDBUndoArgs args ) {
+            if( args.Targets.Length == 0 ) {
+                return "EVERYONE";
+            } else if( args.Not ) {
+                return "EVERYONE except " + args.Targets.JoinToClassyString();
+            } else {
+                return args.Targets.JoinToClassyString();
+            }
         }
 
         #region UndoArea
@@ -2492,18 +2498,10 @@ namespace fCraft {
         // Looks up the changes in BlockDB and prints a confirmation prompt. Runs on a background thread.
         static void UndoAreaLookup( SchedulerTask task ) {
             BlockDBUndoArgs args = (BlockDBUndoArgs)task.UserState;
-            bool allPlayers = (args.Targets.Length == 0);
             string cmdName = ( args.Not ? "UndoAreaNot" : "UndoArea" );
 
             // prepare to look up
-            string targetList;
-            if( allPlayers ) {
-                targetList = "EVERYONE";
-            } else if( args.Not ) {
-                targetList = "EVERYONE except " + args.Targets.JoinToClassyString();
-            }else{
-                targetList = args.Targets.JoinToClassyString();
-            }
+            string targetList = BlockDBTargetList( args );
             BlockDBEntry[] changes;
 
             if( args.CountLimit > 0 ) {
@@ -2594,18 +2592,10 @@ namespace fCraft {
         // Looks up the changes in BlockDB and prints a confirmation prompt. Runs on a background thread.
         static void UndoPlayerLookup( SchedulerTask task ) {
             BlockDBUndoArgs args = (BlockDBUndoArgs)task.UserState;
-            bool allPlayers = ( args.Targets.Length == 0 );
             string cmdName = ( args.Not ? "UndoPlayerNot" : "UndoPlayer" );
 
             // prepare to look up
-            string targetList;
-            if( allPlayers ) {
-                targetList = "EVERYONE";
-            } else if( args.Not ) {
-                targetList = "EVERYONE except " + args.Targets.JoinToClassyString();
-            } else {
-                targetList = args.Targets.JoinToClassyString();
-            }
+            string targetList = BlockDBTargetList( args );
             BlockDBEntry[] changes;
 
             if( args.CountLimit > 0 ) {
