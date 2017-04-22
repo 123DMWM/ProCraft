@@ -2669,7 +2669,8 @@ namespace fCraft {
                         targetList, args.World.Name );
 
             Vector3I coords;
-            for( int i = 0; i < args.Entries.Length; i++ ) {
+            // iterate from oldest to newest
+            for( int i = args.Entries.Length - 1; i >= 0; i-- ) {
                 BlockDBEntry e = args.Entries[i];
                 coords.X = e.X; coords.Y = e.Y; coords.Z = e.Z;
                 

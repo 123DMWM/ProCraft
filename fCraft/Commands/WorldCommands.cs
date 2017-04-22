@@ -487,57 +487,58 @@ namespace fCraft {
                 return;
             }
             BlockDBEntry[] results = args.World.BlockDB.Lookup( MaxBlockChangesToList, args.Coordinate );
-            if( results.Length > 0 ) {
-                Array.Reverse( results );
-                foreach( BlockDBEntry entry in results ) {
-                    string date = DateTime.UtcNow.Subtract( DateTimeUtil.ToDateTime( entry.Timestamp ) ).ToMiniString();
+            if( results.Length == 0 ) {
+                args.Player.Message( "BlockInfo: No results for {0}", args.Coordinate );
+                return;
+            }
+            
+            // iterate from oldest to newest
+            for( int i = results.Length - 1; i >= 0; i-- ) {
+                BlockDBEntry entry = results[i];
+                string date = DateTime.UtcNow.Subtract( DateTimeUtil.ToDateTime( entry.Timestamp ) ).ToMiniString();
 
-                    PlayerInfo info = PlayerDB.FindPlayerInfoByID( entry.PlayerID );
-                    string playerName;
-                    if( info == null ) {
-                        playerName = "?&S";
+                PlayerInfo info = PlayerDB.FindPlayerInfoByID( entry.PlayerID );
+                string playerName;
+                if( info == null ) {
+                    playerName = "?&S";
+                } else {
+                    Player target = info.PlayerObject;
+                    if( target != null && args.Player.CanSee( target ) ) {
+                        playerName = info.Rank.Color + info.Name + "&S(&aOn&S)";
                     } else {
-                        Player target = info.PlayerObject;
-                        if( target != null && args.Player.CanSee( target ) ) {
-                            playerName = info.Rank.Color + info.Name + "&S(&aOn&S)";
-                        } else {
-							playerName = info.Rank.Color + info.Name + "&S(&7Off&S)";
-                        }
-                    }
-                    string contextString;
-                    if( entry.Context == BlockChangeContext.Manual ) {
-                        contextString = "";
-                    } else if( entry.Context == ( BlockChangeContext.Manual | BlockChangeContext.Replaced ) ) {
-                        contextString = "(Painted)";
-                    } else if( ( entry.Context & BlockChangeContext.Drawn ) == BlockChangeContext.Drawn &&
-                               entry.Context != BlockChangeContext.Drawn ) {
-                        if( entry.Context ==
-                            ( BlockChangeContext.Drawn | BlockChangeContext.UndoneSelf | BlockChangeContext.Redone ) ) {
-                            contextString = "(Redone)";
-                        } else {
-                            contextString = "(" + ( entry.Context & ~BlockChangeContext.Drawn ) + ")";
-                        }
-                    } else {
-                        contextString = "(" + entry.Context + ")";
-                    }
-
-                    if( entry.OldBlock == (byte)Block.Air ) {
-						args.Player.Message(" {0} ago {1} placed {2} {3}",
-                                             date, playerName, Map.GetBlockName(args.World, entry.NewBlock), 
-                                             contextString);
-                    } else if( entry.NewBlock == (byte)Block.Air ) {
-						args.Player.Message(" {0} ago {1} deleted {2} {3}",
-                                             date, playerName, Map.GetBlockName(args.World, entry.OldBlock), 
-                                             contextString);
-                    } else {
-                        args.Player.Message(" {0} ago {1} replaced {2} with {3} {4}",
-                                             date, playerName, Map.GetBlockName(args.World, entry.OldBlock), 
-                                             Map.GetBlockName(args.World, entry.NewBlock), contextString);
+                        playerName = info.Rank.Color + info.Name + "&S(&7Off&S)";
                     }
                 }
-            } else {
-                args.Player.Message( "BlockInfo: No results for {0}",
-                                     args.Coordinate );
+                string contextString;
+                if( entry.Context == BlockChangeContext.Manual ) {
+                    contextString = "";
+                } else if( entry.Context == ( BlockChangeContext.Manual | BlockChangeContext.Replaced ) ) {
+                    contextString = "(Painted)";
+                } else if( ( entry.Context & BlockChangeContext.Drawn ) == BlockChangeContext.Drawn &&
+                          entry.Context != BlockChangeContext.Drawn ) {
+                    if( entry.Context ==
+                       ( BlockChangeContext.Drawn | BlockChangeContext.UndoneSelf | BlockChangeContext.Redone ) ) {
+                        contextString = "(Redone)";
+                    } else {
+                        contextString = "(" + ( entry.Context & ~BlockChangeContext.Drawn ) + ")";
+                    }
+                } else {
+                    contextString = "(" + entry.Context + ")";
+                }
+
+                if( entry.OldBlock == Block.Air ) {
+                    args.Player.Message(" {0} ago {1} placed {2} {3}",
+                                        date, playerName, Map.GetBlockName(args.World, entry.NewBlock),
+                                        contextString);
+                } else if( entry.NewBlock == Block.Air ) {
+                    args.Player.Message(" {0} ago {1} deleted {2} {3}",
+                                        date, playerName, Map.GetBlockName(args.World, entry.OldBlock),
+                                        contextString);
+                } else {
+                    args.Player.Message(" {0} ago {1} replaced {2} with {3} {4}",
+                                        date, playerName, Map.GetBlockName(args.World, entry.OldBlock),
+                                        Map.GetBlockName(args.World, entry.NewBlock), contextString);
+                }
             }
         }
 
