@@ -181,8 +181,14 @@ namespace fCraft {
             return list.Substring(2);
         }
         
-
+        internal static bool ArrayAny<TSource>(this TSource[] source, Func<TSource, bool> predicate) {
+            for (int i = 0; i < source.Length; i++) {
+                if (predicate(source[i])) return true;
+            }
+            return false;
+        }
     }
+    
     
     /// <summary> Provides utility methods for working with strings. </summary>
     public static class StringUtil {

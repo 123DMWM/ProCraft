@@ -2450,7 +2450,7 @@ namespace fCraft {
             args.Entries = changes;
             
             string targetList = BlockDBTargetList( args );
-            action = Char.ToUpper( action[0] ) + action.Substring(1); // capitalise it
+            action = action.UppercaseFirst();
             
             if( args.CountLimit > 0 ) {
                 args.Player.Confirm( callback, args,
@@ -2693,7 +2693,7 @@ namespace fCraft {
                                                      entry => true );
                 } else {
                     return args.World.BlockDB.Lookup( args.CountLimit, BlockDBSearchType.ReturnAll,
-                                                     entry => infos.Any( t => entry.PlayerID == t.ID ) );
+                                                     entry => infos.ArrayAny( t => entry.PlayerID == t.ID ) );
                 }
             } else {
                 long ticks = DateTime.UtcNow.Subtract( args.AgeLimit ).ToUnixTime();               
@@ -2703,7 +2703,7 @@ namespace fCraft {
                                                      entry => entry.Timestamp >= ticks );
                 } else {
                     return args.World.BlockDB.Lookup( Int32.MaxValue, BlockDBSearchType.ReturnAll,
-                                                     entry => entry.Timestamp >= ticks && infos.Any( t => entry.PlayerID == t.ID ) );
+                                                     entry => entry.Timestamp >= ticks && infos.ArrayAny( t => entry.PlayerID == t.ID ) );
                 }
             }
         }

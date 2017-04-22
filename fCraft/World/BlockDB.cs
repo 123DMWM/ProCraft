@@ -967,10 +967,10 @@ namespace fCraft {
             if( exclude ) {
                 processor = new ExcludingReturnOldestProcessor( dims, max,
                                                                 entry => true,
-                                                                entry => infos.Any( t => entry.PlayerID == t.ID ) );
+                                                                entry => infos.ArrayAny( t => entry.PlayerID == t.ID ) );
             } else {
                 processor = new ReturnOldestProcessor( dims, max,
-                                                       entry => infos.Any( t => entry.PlayerID == t.ID ) );
+                                                       entry => infos.ArrayAny( t => entry.PlayerID == t.ID ) );
             }
             Traverse( processor );
             return processor.GetResults();
@@ -990,12 +990,12 @@ namespace fCraft {
                 // ReSharper disable ImplicitlyCapturedClosure
                 processor = new ExcludingReturnOldestProcessor( dims, max,
                                                                 entry => entry.Timestamp >= ticks,
-                                                                entry => infos.Any( t => entry.PlayerID == t.ID ) );
+                                                                entry => infos.ArrayAny( t => entry.PlayerID == t.ID ) );
                 // ReSharper restore ImplicitlyCapturedClosure
             } else {
                 processor = new ReturnOldestProcessor( dims, max,
                                                        entry => entry.Timestamp >= ticks &&
-                                                                infos.Any( t => entry.PlayerID == t.ID ) );
+                                                                infos.ArrayAny( t => entry.PlayerID == t.ID ) );
             }
             Traverse( processor );
             return processor.GetResults();
@@ -1064,12 +1064,12 @@ namespace fCraft {
                 // ReSharper disable ImplicitlyCapturedClosure
                 processor = new ExcludingReturnOldestProcessor( dims, max,
                                                                 entry => area.Contains( entry.X, entry.Y, entry.Z ),
-                                                                entry => infos.Any( t => entry.PlayerID == t.ID ) );
+                                                                entry => infos.ArrayAny( t => entry.PlayerID == t.ID ) );
                 // ReSharper restore ImplicitlyCapturedClosure
             } else {
                 processor = new ReturnOldestProcessor( dims, max,
                                                        entry => area.Contains( entry.X, entry.Y, entry.Z ) &&
-                                                                infos.Any( t => entry.PlayerID == t.ID ) );
+                                                                infos.ArrayAny( t => entry.PlayerID == t.ID ) );
             }
             Traverse( processor );
             return processor.GetResults();
@@ -1091,13 +1091,13 @@ namespace fCraft {
                 processor = new ExcludingReturnOldestProcessor( dims, max,
                                                                 entry => entry.Timestamp >= ticks &&
                                                                          area.Contains( entry.X, entry.Y, entry.Z ),
-                                                                entry => infos.Any( t => entry.PlayerID == t.ID ) );
+                                                                entry => infos.ArrayAny( t => entry.PlayerID == t.ID ) );
                 // ReSharper restore ImplicitlyCapturedClosure
             } else {
                 processor = new ReturnOldestProcessor( dims, max,
                                                        entry => entry.Timestamp >= ticks &&
                                                                 area.Contains( entry.X, entry.Y, entry.Z ) &&
-                                                                infos.Any( t => entry.PlayerID == t.ID ) );
+                                                                infos.ArrayAny( t => entry.PlayerID == t.ID ) );
             }
             Traverse( processor );
             return processor.GetResults();
