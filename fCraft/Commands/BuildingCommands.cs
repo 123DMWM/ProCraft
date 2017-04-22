@@ -2692,8 +2692,8 @@ namespace fCraft {
                     return args.World.BlockDB.Lookup( args.CountLimit, BlockDBSearchType.ReturnAll, 
                                                      entry => true );
                 } else {
-                    return args.World.BlockDB.Lookup( args.CountLimit, BlockDBSearchType.ReturnAll,
-                                                     entry => infos.ArrayAny( t => entry.PlayerID == t.ID ) );
+                    BlockDB.LookupID lookup = new BlockDB.LookupID { Infos = infos };
+                    return args.World.BlockDB.Lookup( args.CountLimit, BlockDBSearchType.ReturnAll, lookup.Select );
                 }
             } else {
                 long ticks = DateTime.UtcNow.Subtract( args.AgeLimit ).ToUnixTime();               
@@ -2702,11 +2702,12 @@ namespace fCraft {
                     return args.World.BlockDB.Lookup( Int32.MaxValue, BlockDBSearchType.ReturnAll, 
                                                      entry => entry.Timestamp >= ticks );
                 } else {
-                    return args.World.BlockDB.Lookup( Int32.MaxValue, BlockDBSearchType.ReturnAll,
-                                                     entry => entry.Timestamp >= ticks && infos.ArrayAny( t => entry.PlayerID == t.ID ) );
+                    BlockDB.LookupTimeAndID lookup = new BlockDB.LookupTimeAndID { Infos = infos, Ticks = ticks };
+                    return args.World.BlockDB.Lookup( Int32.MaxValue, BlockDBSearchType.ReturnAll, lookup.Select );
                 }
             }
         }
+        
         
         #endregion
         

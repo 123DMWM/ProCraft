@@ -732,6 +732,35 @@ namespace fCraft {
 
 
         #region Lookup processors
+        
+        // Special purpose classes, to avoid temp memory allocations from anonymous lambdas
+        // that doing   entry => infos.ArrayAny( t => entry.PlayerID == t.ID ) ); causes
+        internal sealed class LookupID {
+            public PlayerInfo[] Infos;
+            
+            public bool Select( BlockDBEntry entry ) {
+                for (int i = 0; i < Infos.Length; i++) {
+                    if (Infos[i].ID == entry.PlayerID) return true;
+                }
+                return false;
+            }
+        }
+        
+        
+        internal sealed class LookupTimeAndID {
+            public long Ticks;
+            public PlayerInfo[] Infos;
+            
+            public bool Select( BlockDBEntry entry ) {
+                if (entry.Timestamp < Ticks) return false;
+                
+                for (int i = 0; i < Infos.Length; i++) {
+                    if (Infos[i].ID == entry.PlayerID) return true;
+                }
+                return false;
+            }
+        }
+        
 
         sealed class ReturnAllProcessor : IBlockDBQueryProcessor {
             int count;
@@ -964,13 +993,11 @@ namespace fCraft {
             Vector3I dims = GetMapDimensions();
 
             IBlockDBQueryProcessor processor;
+            LookupID lookup = new LookupID { Infos = infos };            
             if( exclude ) {
-                processor = new ExcludingReturnOldestProcessor( dims, max,
-                                                                entry => true,
-                                                                entry => infos.ArrayAny( t => entry.PlayerID == t.ID ) );
+                processor = new ExcludingReturnOldestProcessor( dims, max, entry => true, lookup.Select );
             } else {
-                processor = new ReturnOldestProcessor( dims, max,
-                                                       entry => infos.ArrayAny( t => entry.PlayerID == t.ID ) );
+                processor = new ReturnOldestProcessor( dims, max, lookup.Select );
             }
             Traverse( processor );
             return processor.GetResults();
@@ -988,14 +1015,13 @@ namespace fCraft {
             IBlockDBQueryProcessor processor;
             if( exclude ) {
                 // ReSharper disable ImplicitlyCapturedClosure
+                LookupID lookup = new LookupID { Infos = infos };
                 processor = new ExcludingReturnOldestProcessor( dims, max,
-                                                                entry => entry.Timestamp >= ticks,
-                                                                entry => infos.ArrayAny( t => entry.PlayerID == t.ID ) );
+                                                                entry => entry.Timestamp >= ticks, lookup.Select );
                 // ReSharper restore ImplicitlyCapturedClosure
             } else {
-                processor = new ReturnOldestProcessor( dims, max,
-                                                       entry => entry.Timestamp >= ticks &&
-                                                                infos.ArrayAny( t => entry.PlayerID == t.ID ) );
+                LookupTimeAndID lookup = new LookupTimeAndID { Infos = infos, Ticks = ticks };
+                processor = new ReturnOldestProcessor( dims, max, lookup.Select );
             }
             Traverse( processor );
             return processor.GetResults();
