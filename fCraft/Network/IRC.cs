@@ -561,7 +561,7 @@ namespace fCraft
                     case IRCMessageType.QueryMessage:
                         // TODO: PMs
                         if (acceptPMs && Player.Console.Info.ReadIRC) {
-                            Server.Players.Where(p => p.IsStaff).Message("&I{0} -> {1}&f: {2}", msg.Nick, botNick, msg.Message);
+                            Server.Players.Where(p => p.IsStaff && p.Info.ReadIRC).Message("&I{0} -> {1}&f: {2}", msg.Nick, botNick, msg.Message);
                         }
                         Logger.Log(LogType.IrcStatus, "QueryMessage: {0}", msg.RawMessage);
                         break;
