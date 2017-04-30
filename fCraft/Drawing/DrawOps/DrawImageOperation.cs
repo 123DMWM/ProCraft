@@ -158,10 +158,8 @@ namespace fCraft.Drawing {
                     throw new InvalidOperationException(
                         "Either ImageBitmap or ImageUrl must be set before calling Prepare()");
                 }
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(ImageUrl);
-                request.Timeout = (int)DownloadTimeout.TotalMilliseconds;
-                request.ServicePoint.BindIPEndPointDelegate = Server.BindIPEndPointCallback;
-                request.UserAgent = Updater.UserAgent;
+            	
+            	HttpWebRequest request = HttpUtil.CreateRequest(ImageUrl, DownloadTimeout);
                 using (HttpWebResponse response = (HttpWebResponse)request.GetResponse()) {
                     // Check that the remote file was found. The ContentType
                     // check is performed since a request for a non-existent

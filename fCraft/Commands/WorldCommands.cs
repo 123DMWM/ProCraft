@@ -1141,11 +1141,7 @@ namespace fCraft {
                 return null;
             }
 
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-            request.Timeout = (int)TimeSpan.FromSeconds(6).TotalMilliseconds;
-            request.ServicePoint.BindIPEndPointDelegate = Server.BindIPEndPointCallback;
-            request.UserAgent = Updater.UserAgent;
-
+            HttpWebRequest request = HttpUtil.CreateRequest(new Uri(url), TimeSpan.FromSeconds(6));
             using (HttpWebResponse response = (HttpWebResponse)request.GetResponse()) {
                 if ((response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.Moved ||
                      response.StatusCode == HttpStatusCode.Redirect) &&

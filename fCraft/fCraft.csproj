@@ -151,6 +151,7 @@
     <Compile Include="MapConversion\MapFCMv3.cs" />
     <Compile Include="MapConversion\MapMCF.cs" />
     <Compile Include="Network\CpeConstants.cs" />
+    <Compile Include="Network\HttpUtil.cs" />
     <Compile Include="Network\IRCHandlers.cs" />
     <Compile Include="Network\LevelChunkStream.cs" />
     <Compile Include="Network\Packet.CPE.cs" />
@@ -174,7 +175,6 @@
     <Compile Include="System\Utils\BitMap3D.cs" />
     <Compile Include="System\Utils\ConcurrentQueue.cs" />
     <Compile Include="System\Utils\Direction.cs" />
-    <Compile Include="System\Utils\HttpUtil.cs" />
     <Compile Include="System\Utils\NameMatcher.cs" />
     <Compile Include="System\Utils\Paths.cs" />
     <Compile Include="System\Scheduler.cs" />

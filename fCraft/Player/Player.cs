@@ -2006,9 +2006,8 @@ namespace fCraft {
         public static AccountType CheckPaidStatus( [NotNull] string name ) {
             if( name == null ) throw new ArgumentNullException( "name" );
 
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create( PaidCheckUri + Uri.EscapeDataString( name ) );
-            request.ServicePoint.BindIPEndPointDelegate = Server.BindIPEndPointCallback;
-            request.Timeout = PaidCheckTimeout;
+            Uri uri = new Uri( PaidCheckUri + Uri.EscapeDataString( name ) );
+            HttpWebRequest request = HttpUtil.CreateRequest( uri, TimeSpan.FromMilliseconds( PaidCheckTimeout ) );
             request.CachePolicy = new RequestCachePolicy( RequestCacheLevel.NoCacheNoStore );
 
             try {
