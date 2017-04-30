@@ -37,46 +37,7 @@ namespace fCraft
         [NotNull]
         public static string Salt { get; internal set; }
 
-
-        // Dns lookup, to make sure that IPv4 is preferred for heartbeats
-        static readonly Dictionary<string, IPAddress> TargetAddresses = new Dictionary<string, IPAddress>();
-        static DateTime nextDnsLookup = DateTime.MinValue;
-        static readonly TimeSpan DnsRefreshInterval = TimeSpan.FromMinutes(30);
         public static bool sendUptime = false;
-
-
-        static IPAddress RefreshTargetAddress([NotNull] Uri requestUri)
-        {
-            if (requestUri == null) throw new ArgumentNullException("requestUri");
-
-            string hostName = requestUri.Host.ToLowerInvariant();
-            IPAddress targetAddress;
-            if (!TargetAddresses.TryGetValue(hostName, out targetAddress) || DateTime.UtcNow >= nextDnsLookup) {
-                IPAddress[] allAddresses = null;
-                try {
-                    // Perform a DNS lookup on given host. Throws SocketException if no host found.
-                    try {
-                        allAddresses = Dns.GetHostAddresses(requestUri.Host);
-                    } catch {
-                        return null;
-                    }
-                    // Find a suitable IPv4 address. Throws InvalidOperationException if none found.
-                    targetAddress = allAddresses.First(ip => ip.AddressFamily == AddressFamily.InterNetwork);
-                } catch (SocketException ex) {
-                    Logger.Log(LogType.Error,
-                        "Heartbeat.RefreshTargetAddress: Error looking up heartbeat server URLs: {0}", ex);
-                } catch (InvalidOperationException) {
-                    Logger.Log(LogType.Warning, "Heartbeat.RefreshTargetAddress: {0} does not have an IPv4 address!",
-                        requestUri.Host);
-                } catch (UriFormatException) {
-                    Logger.Log(LogType.Warning, "Invalid URI: The hostname could not be parsed.");
-                    
-                }
-                TargetAddresses[hostName] = targetAddress;
-                nextDnsLookup = DateTime.UtcNow + DnsRefreshInterval;
-            }
-            return targetAddress;
-        }
 
 
         static Heartbeat()
@@ -157,16 +118,8 @@ namespace fCraft
         [NotNull]
         public static HttpWebRequest CreateRequest([NotNull] Uri uri) {
             if (uri == null) throw new ArgumentNullException("uri");
-            HttpWebRequest request = (HttpWebRequest) WebRequest.Create(uri);
+            HttpWebRequest request = HttpUtil.CreateRequest(uri, Timeout);
             request.CachePolicy = Server.CachePolicy;
-            request.Method = "GET";
-            request.ReadWriteTimeout = (int) Timeout.TotalMilliseconds;
-            request.ServicePoint.BindIPEndPointDelegate = Server.BindIPEndPointCallback;
-            request.Timeout = (int) Timeout.TotalMilliseconds;
-            request.UserAgent = Updater.UserAgent;
-            if (uri.Scheme == "http") {
-                request.Proxy = new WebProxy("http://" + RefreshTargetAddress(uri) + ":" + uri.Port);
-            }
             return request;
         }
 

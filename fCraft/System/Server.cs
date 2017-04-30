@@ -1168,7 +1168,7 @@ namespace fCraft {
         }
 
 
-        static readonly Uri IPCheckUri = new Uri("http://fcraft.net/ipcheck.php");
+        static readonly Uri IPCheckUri = new Uri("http://www.classicube.net/api/myip");
         const int IPCheckTimeout = 20000;
 
 
@@ -1176,12 +1176,9 @@ namespace fCraft {
         [CanBeNull]
         static IPAddress CheckExternalIP()
         {
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(IPCheckUri);
+        	HttpWebRequest request = HttpUtil.CreateRequest(IPCheckUri, 
+        	                                                TimeSpan.FromMilliseconds(IPCheckTimeout));
             request.CachePolicy = new RequestCachePolicy(RequestCacheLevel.BypassCache);
-            request.ReadWriteTimeout = IPCheckTimeout;
-            request.ServicePoint.BindIPEndPointDelegate = BindIPEndPointCallback;
-            request.Timeout = IPCheckTimeout;
-            request.UserAgent = Updater.UserAgent;
 
             try
             {
@@ -1189,33 +1186,26 @@ namespace fCraft {
                 {
                     if (response.StatusCode != HttpStatusCode.OK)
                     {
-                        Logger.Log(LogType.Warning,
-                                    "Could not check external IP: {0}",
+                        Logger.Log(LogType.Warning, "Could not check external IP: {0}",
                                     response.StatusDescription);
                         return null;
                     }
+                    
                     // ReSharper disable AssignNullToNotNullAttribute
                     using (StreamReader responseReader = new StreamReader(response.GetResponseStream()))
                     {
                         // ReSharper restore AssignNullToNotNullAttribute
                         string responseString = responseReader.ReadToEnd();
                         IPAddress result;
-                        if (IPAddress.TryParse(responseString, out result))
-                        {
-                            return result;
-                        }
-                        else
-                        {
-                            return null;
-                        }
+                        
+                        if (IPAddress.TryParse(responseString, out result)) return result;
+                        return null;
                     }
                 }
             }
             catch (WebException ex)
             {
-                Logger.Log(LogType.Warning,
-                            "Could not check external IP: {0}",
-                            ex);
+                Logger.Log(LogType.Warning, "Could not check external IP: {0}", ex);
                 return null;
             }
         }
@@ -1223,12 +1213,8 @@ namespace fCraft {
         /// <summary> Safely downloads data. </summary>
         [CanBeNull]
         public static string downloadDatastring(string url) {
-            HttpWebRequest request = Heartbeat.CreateRequest(new Uri(url));
+            HttpWebRequest request = HttpUtil.CreateRequest(new Uri(url), TimeSpan.FromSeconds(5));
             request.CachePolicy = new RequestCachePolicy(RequestCacheLevel.BypassCache);
-            request.ReadWriteTimeout = 5000;
-            request.ServicePoint.BindIPEndPointDelegate = BindIPEndPointCallback;
-            request.Timeout = 5000;
-            request.UserAgent = Updater.UserAgent;
 
             try {
                 using (HttpWebResponse response = (HttpWebResponse)request.GetResponse()) {
@@ -1249,6 +1235,14 @@ namespace fCraft {
         // Callback for setting the local IP binding. Implements System.Net.BindIPEndPoint delegate.
         public static IPEndPoint BindIPEndPointCallback( ServicePoint servicePoint, IPEndPoint remoteEndPoint,
                                                          int retryCount ) {
+            // InternalIP is ipv4 address, so we can't use it when connecting to a website via ipv6
+            // Otherwise it gets stuck trying to bind to an ipv4 address with this:
+            /* System.Net.Sockets Error: 0 : [1696] Socket#13869071::UpdateStatusAfterSocketError() - Fault
+               System.Net.Sockets Error: 0 : [1696] Exception in Socket#13869071::DoBind - The system detected an invalid pointer address in attempting to use a pointer argument in a call.
+               System.Net.Sockets Verbose: 0 : [1696] Socket#13869071::InternalBind(0.0.0.0:0#0) 
+             */
+            if (remoteEndPoint.AddressFamily != AddressFamily.InterNetwork) return null;
+            
             return new IPEndPoint( InternalIP, 0 );
         }
         internal static readonly RequestCachePolicy CachePolicy = new RequestCachePolicy(RequestCacheLevel.BypassCache);
