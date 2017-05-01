@@ -345,6 +345,7 @@ namespace fCraft {
                 Server.UpdateTabList(true);
             }
 
+            string originalMessage = rawMessage;
             if( partialMessage != null ) {
                 rawMessage = partialMessage + rawMessage;
                 partialMessage = null;
@@ -398,7 +399,8 @@ namespace fCraft {
                 case RawMessageType.LongerMessage:
                     partialMessage = rawMessage.Substring(0, rawMessage.Length - 1);
                     // Spaces at the end are trimmed by default, so we need to insert one.
-                    if (partialMessage.Length != 64) partialMessage += " ";
+                    // +1 to length to account for λ at end
+                    if (originalMessage.Length != (64 + 1)) partialMessage += " ";
                     break;
 
                 case RawMessageType.Invalid:
@@ -446,7 +448,7 @@ namespace fCraft {
                 } else {
                     Message("There is no command to confirm.");
                 }
-                break;
+                return;
             }
             if (rawMessage.EndsWith("//")) {
                 rawMessage = rawMessage.Substring(0, rawMessage.Length - 1);
@@ -602,7 +604,7 @@ namespace fCraft {
                 rank = RankManager.FindRank( rankName );
                 if( rank == null ) {
                     MessageNoRank( rankName );
-                    break;
+                    return;
                 }
             }
 
