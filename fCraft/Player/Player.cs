@@ -351,15 +351,13 @@ namespace fCraft {
             }
             
             // replace %-codes with &-codes
-            if (Can(Permission.UseColorCodes))
-            {
+            if (Can(Permission.UseColorCodes)) {
                 rawMessage = Chat.ReplacePercentColorCodes(rawMessage, true);
-            }
-            else
-            {
+            } else {
                 rawMessage = Chat.ReplacePercentColorCodes(rawMessage, false);
                 rawMessage = Color.StripColors(rawMessage);
             }
+            
             // replace emotes
             if( Can( Permission.UseEmotes ) ) {
                 rawMessage = Chat.ReplaceEmoteKeywords( rawMessage );
@@ -367,283 +365,279 @@ namespace fCraft {
             rawMessage = Chat.UnescapeBackslashes( rawMessage );
 
             switch( Chat.GetRawMessageType( rawMessage ) ) {
-                case RawMessageType.Chat: {
-                        if( !Can( Permission.Chat ) ) return;
-
-                        if (Info.IsMuted)
-                        {
-                            MessageMuted();
-                            return;
-                        }
-
-                        if( DetectChatSpam() ) return;
-
-                        // Escaped slash removed AFTER logging, to avoid confusion with real commands
-                        if( rawMessage.StartsWith( "//" ) ) {
-                            rawMessage = rawMessage.Substring( 1 );
-                        }
-
-                        if( rawMessage.EndsWith( " //" ) ) {
-                            rawMessage = rawMessage.Substring( 0, rawMessage.Length - 1 );
-						}
-
-						if (rawMessage.EndsWith(@" /\")) {
-							rawMessage = rawMessage.Substring(0, rawMessage.Length - 2) + @"\";
-						}
-
-                        Chat.SendGlobal( this, rawMessage );
-                    } break;
-
-
-                case RawMessageType.Command:
-                    {
-                        if (rawMessage.CaselessEquals("/ok")) {
-                            if (Info.IsFrozen) {
-                                Message("&WYou cannot use any commands while frozen.");
-                                return;
-                            }
-                            if (ConfirmCallback != null) {
-                                if (DateTime.UtcNow.Subtract(ConfirmRequestTime) < ConfirmationTimeout) {
-                                    Logger.Log(LogType.UserCommand, "{0}: /ok", Name);
-                                    SendToSpectators("/ok");
-                                    ConfirmCallback(this, ConfirmParameter, fromConsole);
-                                    ConfirmCancel();
-                                } else {
-                                    Message("Confirmation timed out. Enter the command again.");
-                                }
-                            } else {
-                                Message("There is no command to confirm.");
-                            }
-                            break;
-                        }
-                        if (rawMessage.EndsWith("//")) {
-                            rawMessage = rawMessage.Substring(0, rawMessage.Length - 1);
-                        }
-                        CommandReader cmd = new CommandReader(rawMessage);
-                        CommandDescriptor commandDescriptor = CommandManager.GetDescriptor(cmd.Name, true);
-
-                        if (commandDescriptor == null) {
-                            Message("Unknown command \"{0}\". See &H/Commands", cmd.Name);
-                            Logger.Log(LogType.UserCommand, "{0}[Not A CMD]: {1}", Name, rawMessage);
-                        } else if (IsPlayingCTF && commandDescriptor.Permissions != null &&
-                                   (commandDescriptor.Permissions.Contains(Permission.Build) ||
-                                    commandDescriptor.Permissions.Contains(Permission.Draw) ||
-                                    commandDescriptor.Permissions.Contains(Permission.DrawAdvanced) ||
-                                    commandDescriptor.Permissions.Contains(Permission.CopyAndPaste) ||
-                                    commandDescriptor.Permissions.Contains(Permission.UndoOthersActions) ||
-                                    commandDescriptor.Permissions.Contains(Permission.UndoAll) ||
-                                    commandDescriptor.Permissions.Contains(Permission.Teleport) ||
-                                    commandDescriptor.Permissions.Contains(Permission.Bring) ||
-                                    commandDescriptor.Permissions.Contains(Permission.BringAll))) {
-                            Message("&WYou cannot use this command while playing CTF");
-                        } else if (Info.IsFrozen && !commandDescriptor.UsableByFrozenPlayers) {
-                            Message("&WYou cannot use this command while frozen.");
-                            Logger.Log(LogType.UserCommand, "{0}[Frozen]: {1}", Name, rawMessage);
-                        } else {
-                            if (!commandDescriptor.DisableLogging && !(fromConsole && rawMessage.CaselessStarts("/place"))) {
-                                Logger.Log(LogType.UserCommand, "{0}: {1}", Name, rawMessage);
-                            }
-                            if (commandDescriptor.RepeatableSelection) {
-                                selectionRepeatCommand = cmd;
-                            }
-                            SendToSpectators(cmd.RawMessage);
-                            CommandManager.ParseCommand(this, cmd, fromConsole);
-                            if (!commandDescriptor.NotRepeatable) {
-                                LastCommand = cmd;
-                            }
-                        }
-                    } break;
-
-                case RawMessageType.RepeatCommand: {
-                        if( LastCommand == null ) {
-                            Message( "No command to repeat." );
-                        } else {
-                            if (Info.IsFrozen && !LastCommand.Descriptor.UsableByFrozenPlayers)
-                            {
-                                Message( "&WYou cannot use this command while frozen." );
-                                return;
-                            }
-                            LastCommand.Rewind();
-                            Logger.Log( LogType.UserCommand,
-                                        "{0} repeated: {1}",
-                                        Name, LastCommand.RawMessage );
-                            Message( "Repeat: {0}", LastCommand.RawMessage );
-                            SendToSpectators( LastCommand.RawMessage );
-                            CommandManager.ParseCommand( this, LastCommand, fromConsole );
-                        }
-                    } break;
-
-
-                case RawMessageType.PrivateChat: {
-                        if( !Can( Permission.Chat ) ) return;
-
-                        if (Info.IsMuted)
-                        {
-                            MessageMuted();
-                            return;
-                        }
-
-                        if( DetectChatSpam() ) return;
-
-                        if( rawMessage.EndsWith( "//" ) ) {
-                            rawMessage = rawMessage.Substring( 0, rawMessage.Length - 1 );
-                        }
-
-                        string otherPlayerName, messageText;
-                        if( rawMessage[1] == ' ' ) {
-                            otherPlayerName = rawMessage.Substring( 2, rawMessage.IndexOf( ' ', 2 ) - 2 );
-                            messageText = rawMessage.Substring( rawMessage.IndexOf( ' ', 2 ) + 1 );
-                        } else {
-                            otherPlayerName = rawMessage.Substring( 1, rawMessage.IndexOf( ' ' ) - 1 );
-                            messageText = rawMessage.Substring( rawMessage.IndexOf( ' ' ) + 1 );
-                        }
-
-                        if( otherPlayerName == "-" ) {
-                            if( LastUsedPlayerName != null ) {
-                                otherPlayerName = LastUsedPlayerName;
-                            } else {
-                                Message( "Cannot repeat player name: you haven't used any names yet." );
-                                return;
-                            }
-                        }
-
-                        if (otherPlayerName.CaselessEquals("irc"))
-                        {
-							IRC.SendChannelMessage("\u211C\u212C(PM)\u211C" + Name + ": " + messageText);
-                            Message("&P(PM)" + ClassyName + " &P-> IRC&P: " + messageText);
-                            return;
-                        }
-                        // first, find ALL players (visible and hidden)
-                        Player[] allPlayers = Server.FindPlayers(this, otherPlayerName, SearchOptions.IncludeHidden);
-
-                        // if there is more than 1 target player, exclude hidden players
-                        if( allPlayers.Length > 1 ) {
-                            allPlayers = Server.FindPlayers(this, otherPlayerName, SearchOptions.Default );
-                        }
-
-                        if( allPlayers.Length == 1 ) {
-                            Player target = allPlayers[0];
-                            if (target == this)
-                            {
-                                Message( "Trying to talk to yourself?" );
-                                return;
-                            }
-                            if( !target.IsIgnoring( Info ) && !target.IsDeaf ) {
-                                Chat.SendPM( this, target, messageText );
-                                SendToSpectators( "to {0}&F: {1}", target.ClassyName, messageText );
-                            }
-
-                            if( !CanSee( target ) ) {
-                                // message was sent to a hidden player
-                                MessageNoPlayer( otherPlayerName );
-
-                            } else {
-                                // message was sent normally
-                                LastUsedPlayerName = target.Name;
-                                if( target.IsIgnoring( Info ) ) {
-                                    if( CanSee( target ) ) {
-                                        Message( "&WCannot PM {0}&W: you are ignored.", target.ClassyName );
-                                    }
-                                } else if( target.IsDeaf ) {
-                                    Message( "&SCannot PM {0}&S: they are currently deaf.", target.ClassyName );
-                                } else {
-                                    Message( "&Pto {0}: {1}",
-                                                target.Name, messageText );
-                                }
-                            }
-
-                        } else if( allPlayers.Length == 0 ) {
-                            MessageNoPlayer( otherPlayerName );
-
-                        } else {
-                            MessageManyMatches( "player", allPlayers );
-                        }
-                    } break;
-
-
-                case RawMessageType.RankChat: {
-                        if( !Can( Permission.Chat ) ) return;
-
-                        if (Info.IsMuted)
-                        {
-                            MessageMuted();
-                            return;
-                        }
-
-                        if( DetectChatSpam() ) return;
-
-                        if( rawMessage.EndsWith( "//" ) ) {
-                            rawMessage = rawMessage.Substring( 0, rawMessage.Length - 1 );
-                        }
-
-                        Rank rank;
-                        if( rawMessage[2] == ' ' ) {
-                            rank = Info.Rank;
-                        } else {
-                            string rankName = rawMessage.Substring( 2, rawMessage.IndexOf( ' ' ) - 2 );
-                            rank = RankManager.FindRank( rankName );
-                            if( rank == null ) {
-                                MessageNoRank( rankName );
-                                break;
-                            }
-                        }
-
-                        string messageText = rawMessage.Substring( rawMessage.IndexOf( ' ' ) + 1 );
-
-                        Player[] spectators = Server.Players.NotRanked( Info.Rank )
-                                                            .Where( p => p.spectatedPlayer == this )
-                                                            .ToArray();
-                        if( spectators.Length > 0 ) {
-                            spectators.Message( "[Spectate]: to rank {0}&F: {1}", rank.ClassyName, messageText );
-                        }
-
-                        Chat.SendRank( this, rank, messageText );
-                    } break;
-
-
+                case RawMessageType.Chat: 
+                    ParseChat( rawMessage, fromConsole );
+                    break;
+                case RawMessageType.Command: 
+                    ParseCommand( rawMessage, fromConsole ); 
+                    break;
+                case RawMessageType.RepeatCommand:
+                    ParseRepeatCommand( rawMessage, fromConsole ); 
+                    break;
+                case RawMessageType.PrivateChat: 
+                    ParsePrivateMessage( rawMessage, fromConsole ); 
+                    break;
+                case RawMessageType.RankChat: 
+                    ParseRankMessage( rawMessage, fromConsole ); 
+                    break;
                 case RawMessageType.Confirmation:
-                    {//No longer used
-                        if (Info.IsFrozen) {
-                            Message("&WYou cannot use any commands while frozen.");
-                            return;
-                        }
-                        if (ConfirmCallback != null) {
-                            if (DateTime.UtcNow.Subtract(ConfirmRequestTime) < ConfirmationTimeout) {
-                                Logger.Log(LogType.UserCommand, "{0}: /ok", Name);
-                                SendToSpectators("/ok");
-                                ConfirmCallback(this, ConfirmParameter, fromConsole);
-                                ConfirmCancel();
-                            } else {
-                                Message("Confirmation timed out. Enter the command again.");
-                            }
-                        } else {
-                            Message("There is no command to confirm.");
-                        }
-                    } break;
+                    ParseConfirmation( rawMessage, fromConsole ); 
+                    break;
 
 
                 case RawMessageType.PartialMessage:
                     partialMessage = rawMessage.Substring( 0, rawMessage.Length - 1 );
                     Message( "Partial: &F{0}", partialMessage );
-					break;
+                    break;
 
-				case RawMessageType.PartialMessageNoSpace:
-					partialMessage = rawMessage.Substring(0, rawMessage.Length - 2);
-					Message("Partial: &F{0}", partialMessage);
-					break;
+                case RawMessageType.PartialMessageNoSpace:
+                    partialMessage = rawMessage.Substring(0, rawMessage.Length - 2);
+                    Message("Partial: &F{0}", partialMessage);
+                    break;
 
-				case RawMessageType.LongerMessage:
-					partialMessage = rawMessage.Substring(0, rawMessage.Length - 1);
-					// Spaces at the end are trimmed by default, so we need to insert one.
+                case RawMessageType.LongerMessage:
+                    partialMessage = rawMessage.Substring(0, rawMessage.Length - 1);
+                    // Spaces at the end are trimmed by default, so we need to insert one.
                     if (partialMessage.Length != 64) partialMessage += " ";
-					break;
+                    break;
 
                 case RawMessageType.Invalid:
                     Message( "Could not parse message." );
                     break;
             }
         }
+        
+        void ParseChat( string rawMessage, bool fromConsole ) {
+            if( !Can( Permission.Chat ) ) return;
+            if( Info.IsMuted ) { MessageMuted(); return; }
+            if( DetectChatSpam() ) return;
 
+            // Escaped slash removed AFTER logging, to avoid confusion with real commands
+            if( rawMessage.StartsWith( "//" ) ) {
+                rawMessage = rawMessage.Substring( 1 );
+            }
+
+            if( rawMessage.EndsWith( " //" ) ) {
+                rawMessage = rawMessage.Substring( 0, rawMessage.Length - 1 );
+            }
+
+            if (rawMessage.EndsWith(@" /\")) {
+                rawMessage = rawMessage.Substring(0, rawMessage.Length - 2) + @"\";
+            }
+
+            Chat.SendGlobal( this, rawMessage );
+        }
+        
+        void ParseCommand( string rawMessage, bool fromConsole ) {
+            if (rawMessage.CaselessEquals("/ok")) {
+                if (Info.IsFrozen) {
+                    Message("&WYou cannot use any commands while frozen.");
+                    return;
+                }
+                if (ConfirmCallback != null) {
+                    if (DateTime.UtcNow.Subtract(ConfirmRequestTime) < ConfirmationTimeout) {
+                        Logger.Log(LogType.UserCommand, "{0}: /ok", Name);
+                        SendToSpectators("/ok");
+                        ConfirmCallback(this, ConfirmParameter, fromConsole);
+                        ConfirmCancel();
+                    } else {
+                        Message("Confirmation timed out. Enter the command again.");
+                    }
+                } else {
+                    Message("There is no command to confirm.");
+                }
+                break;
+            }
+            if (rawMessage.EndsWith("//")) {
+                rawMessage = rawMessage.Substring(0, rawMessage.Length - 1);
+            }
+            CommandReader cmd = new CommandReader(rawMessage);
+            CommandDescriptor commandDescriptor = CommandManager.GetDescriptor(cmd.Name, true);
+
+            if (commandDescriptor == null) {
+                Message("Unknown command \"{0}\". See &H/Commands", cmd.Name);
+                Logger.Log(LogType.UserCommand, "{0}[Not A CMD]: {1}", Name, rawMessage);
+            } else if (IsPlayingCTF && commandDescriptor.Permissions != null &&
+                       (commandDescriptor.Permissions.Contains(Permission.Build) ||
+                        commandDescriptor.Permissions.Contains(Permission.Draw) ||
+                        commandDescriptor.Permissions.Contains(Permission.DrawAdvanced) ||
+                        commandDescriptor.Permissions.Contains(Permission.CopyAndPaste) ||
+                        commandDescriptor.Permissions.Contains(Permission.UndoOthersActions) ||
+                        commandDescriptor.Permissions.Contains(Permission.UndoAll) ||
+                        commandDescriptor.Permissions.Contains(Permission.Teleport) ||
+                        commandDescriptor.Permissions.Contains(Permission.Bring) ||
+                        commandDescriptor.Permissions.Contains(Permission.BringAll))) {
+                Message("&WYou cannot use this command while playing CTF");
+            } else if (Info.IsFrozen && !commandDescriptor.UsableByFrozenPlayers) {
+                Message("&WYou cannot use this command while frozen.");
+                Logger.Log(LogType.UserCommand, "{0}[Frozen]: {1}", Name, rawMessage);
+            } else {
+                if (!commandDescriptor.DisableLogging && !(fromConsole && rawMessage.CaselessStarts("/place"))) {
+                    Logger.Log(LogType.UserCommand, "{0}: {1}", Name, rawMessage);
+                }
+                if (commandDescriptor.RepeatableSelection) {
+                    selectionRepeatCommand = cmd;
+                }
+                SendToSpectators(cmd.RawMessage);
+                CommandManager.ParseCommand(this, cmd, fromConsole);
+                if (!commandDescriptor.NotRepeatable) {
+                    LastCommand = cmd;
+                }
+            }
+        }
+        
+        void ParseRepeatCommand( string rawMessage, bool fromConsole ) {
+            if( LastCommand == null ) {
+                Message( "No command to repeat." );
+            } else {
+                if (Info.IsFrozen && !LastCommand.Descriptor.UsableByFrozenPlayers)
+                {
+                    Message( "&WYou cannot use this command while frozen." );
+                    return;
+                }
+                LastCommand.Rewind();
+                Logger.Log( LogType.UserCommand,
+                           "{0} repeated: {1}",
+                           Name, LastCommand.RawMessage );
+                Message( "Repeat: {0}", LastCommand.RawMessage );
+                SendToSpectators( LastCommand.RawMessage );
+                CommandManager.ParseCommand( this, LastCommand, fromConsole );
+            }
+        }
+        
+        void ParsePrivateMessage( string rawMessage, bool fromConsole ) {
+            if( !Can( Permission.Chat ) ) return;
+            if( Info.IsMuted ) { MessageMuted(); return; }
+            if( DetectChatSpam() ) return;
+
+            if( rawMessage.EndsWith( "//" ) ) {
+                rawMessage = rawMessage.Substring( 0, rawMessage.Length - 1 );
+            }
+
+            string otherPlayerName, messageText;
+            if( rawMessage[1] == ' ' ) {
+                otherPlayerName = rawMessage.Substring( 2, rawMessage.IndexOf( ' ', 2 ) - 2 );
+                messageText = rawMessage.Substring( rawMessage.IndexOf( ' ', 2 ) + 1 );
+            } else {
+                otherPlayerName = rawMessage.Substring( 1, rawMessage.IndexOf( ' ' ) - 1 );
+                messageText = rawMessage.Substring( rawMessage.IndexOf( ' ' ) + 1 );
+            }
+
+            if( otherPlayerName == "-" ) {
+                if( LastUsedPlayerName != null ) {
+                    otherPlayerName = LastUsedPlayerName;
+                } else {
+                    Message( "Cannot repeat player name: you haven't used any names yet." );
+                    return;
+                }
+            }
+
+            if (otherPlayerName.CaselessEquals("irc"))
+            {
+                IRC.SendChannelMessage("\u211C\u212C(PM)\u211C" + Name + ": " + messageText);
+                Message("&P(PM)" + ClassyName + " &P-> IRC&P: " + messageText);
+                return;
+            }
+            // first, find ALL players (visible and hidden)
+            Player[] allPlayers = Server.FindPlayers(this, otherPlayerName, SearchOptions.IncludeHidden);
+
+            // if there is more than 1 target player, exclude hidden players
+            if( allPlayers.Length > 1 ) {
+                allPlayers = Server.FindPlayers(this, otherPlayerName, SearchOptions.Default );
+            }
+
+            if( allPlayers.Length == 1 ) {
+                Player target = allPlayers[0];
+                if (target == this)
+                {
+                    Message( "Trying to talk to yourself?" );
+                    return;
+                }
+                if( !target.IsIgnoring( Info ) && !target.IsDeaf ) {
+                    Chat.SendPM( this, target, messageText );
+                    SendToSpectators( "to {0}&F: {1}", target.ClassyName, messageText );
+                }
+
+                if( !CanSee( target ) ) {
+                    // message was sent to a hidden player
+                    MessageNoPlayer( otherPlayerName );
+
+                } else {
+                    // message was sent normally
+                    LastUsedPlayerName = target.Name;
+                    if( target.IsIgnoring( Info ) ) {
+                        if( CanSee( target ) ) {
+                            Message( "&WCannot PM {0}&W: you are ignored.", target.ClassyName );
+                        }
+                    } else if( target.IsDeaf ) {
+                        Message( "&SCannot PM {0}&S: they are currently deaf.", target.ClassyName );
+                    } else {
+                        Message( "&Pto {0}: {1}",
+                                target.Name, messageText );
+                    }
+                }
+
+            } else if( allPlayers.Length == 0 ) {
+                MessageNoPlayer( otherPlayerName );
+
+            } else {
+                MessageManyMatches( "player", allPlayers );
+            }
+        }
+        
+        void ParseRankMessage( string rawMessage, bool fromConsole ) {
+            if( !Can( Permission.Chat ) ) return;
+            if( Info.IsMuted ) { MessageMuted(); return; }
+            if( DetectChatSpam() ) return;
+
+            if( rawMessage.EndsWith( "//" ) ) {
+                rawMessage = rawMessage.Substring( 0, rawMessage.Length - 1 );
+            }
+
+            Rank rank;
+            if( rawMessage[2] == ' ' ) {
+                rank = Info.Rank;
+            } else {
+                string rankName = rawMessage.Substring( 2, rawMessage.IndexOf( ' ' ) - 2 );
+                rank = RankManager.FindRank( rankName );
+                if( rank == null ) {
+                    MessageNoRank( rankName );
+                    break;
+                }
+            }
+
+            string messageText = rawMessage.Substring( rawMessage.IndexOf( ' ' ) + 1 );
+
+            Player[] spectators = Server.Players.NotRanked( Info.Rank )
+                .Where( p => p.spectatedPlayer == this )
+                .ToArray();
+            if( spectators.Length > 0 ) {
+                spectators.Message( "[Spectate]: to rank {0}&F: {1}", rank.ClassyName, messageText );
+            }
+
+            Chat.SendRank( this, rank, messageText );
+        }
+        
+        void ParseConfirmation( string rawMessage, bool fromConsole ) {
+            if (Info.IsFrozen) {
+                Message("&WYou cannot use any commands while frozen.");
+                return;
+            }
+            if (ConfirmCallback != null) {
+                if (DateTime.UtcNow.Subtract(ConfirmRequestTime) < ConfirmationTimeout) {
+                    Logger.Log(LogType.UserCommand, "{0}: /ok", Name);
+                    SendToSpectators("/ok");
+                    ConfirmCallback(this, ConfirmParameter, fromConsole);
+                    ConfirmCancel();
+                } else {
+                    Message("Confirmation timed out. Enter the command again.");
+                }
+            } else {
+                Message("There is no command to confirm.");
+            }
+        }       
+        
+        
         /// <summary> Sends a message to all players who are spectating this player, e.g. to forward typed-in commands and PMs. </summary>
         /// <param name="message"> Message to be displayed </param>
         /// <param name="args"> Additional arguments </param>
