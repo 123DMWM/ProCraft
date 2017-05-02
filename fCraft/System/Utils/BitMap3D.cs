@@ -9,7 +9,7 @@ namespace fCraft
     /// with an easy way to enumerate all set coords. Used by /Fill3D and related commands. </summary>
     public class BitMap3D : IEnumerable<Vector3I>
     {
-        const int BitCoordMask = 31;
+        const int BitCoordMask = 31, BitCoordShift = 5;
 
         readonly uint[] store;
         readonly Vector3I offset,
@@ -33,8 +33,8 @@ namespace fCraft
             Bounds = bounds;
 
             // round capacity up to nearest multiple of 32
-            int bitCapacity = (int)((bounds.Volume + sizeof(uint) - 1) & (uint.MaxValue ^ BitCoordMask));
-            int intCapacity = bitCapacity / sizeof(uint);
+            // 32 bits fit into one uint
+            int intCapacity = (int)(((long)bounds.Volume + BitCoordMask) >> BitCoordShift);
             store = new uint[intCapacity];
         }
 
@@ -43,7 +43,7 @@ namespace fCraft
         {
             Vector3I localCoord = coord - offset;
             int index = (localCoord.Z * dimensions.Y + localCoord.Y) * dimensions.X + localCoord.X;
-            intIndex = (index >> 5);
+            intIndex = (index >> BitCoordShift);
             int bitIndex = index & BitCoordMask;
             bitMask = 1u << bitIndex;
         }
