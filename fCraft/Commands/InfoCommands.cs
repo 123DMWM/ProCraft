@@ -1514,9 +1514,8 @@ namespace fCraft {
                 player.Message(" &7{1}&S - {0}", p.ClassyName, formatter(p).PadLeft(pad, '0'));
             }
              
-            int total = noRank ? PlayerDB.PlayerInfoList.Length : rank.PlayerCount;
             player.Message("Showing players{3}{0}-{1} (out of {2}).", offset + 1, 
-                           offset + count, total, 
+                           offset + count, all.Length, 
                            (rank != null ? " in rank (" + rank.ClassyName + "&S)" : " "));
         }
 
