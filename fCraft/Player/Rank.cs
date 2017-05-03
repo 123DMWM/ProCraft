@@ -616,7 +616,13 @@ namespace fCraft {
         /// <summary> Total number of players of this rank (online and offline). </summary>
         public int PlayerCount {
             get {
-                return PlayerDB.PlayerInfoList.Count( t => t.Rank == this );
+                PlayerInfo[] info = PlayerDB.PlayerInfoList;
+                int count = 0;
+                // Inline Enumerable.Count for max performance
+                for (int i = 0; i < info.Length; i++) {
+                    if (info[i].Rank == this) count++;
+                }
+                return count;
             }
         }
 
