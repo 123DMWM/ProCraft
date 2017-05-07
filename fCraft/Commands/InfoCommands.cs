@@ -2054,13 +2054,13 @@ namespace fCraft {
 
         static void clpHandler(Player player, CommandReader cmd)
         {
-            var all = player.World.Players.Where(z => z != player && !z.Info.IsHidden).OrderBy(p => player.Position.DistanceSquaredTo(p.Position));
-            if (all.Count() != 0)
-            {
-                player.Message(all.Take(1).JoinToString((r => string.Format("Closest: {0} ({1:N0} Blocks)", r.Name, (Math.Sqrt(player.Position.DistanceSquaredTo(r.Position)) / 32) / 1))));
-            }
-            else
-            {
+            Player closest = player.World.Players.CanBeSeen(player)
+                .OrderBy(p => player.Position.DistanceSquaredTo(p.Position)).FirstOrDefault();
+            
+            if (closest != null) {
+                player.Message("Closest: {0} ({1:N0} Blocks)", closest.Name, 
+                               Math.Sqrt(player.Position.DistanceSquaredTo(closest.Position)) / 32);
+            } else {
                 player.Message("There is no one near you.");
             }
         }
