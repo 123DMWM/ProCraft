@@ -91,7 +91,12 @@ namespace fCraft {
 
                     List<PlayerInfo> rankPlayers = new List<PlayerInfo>();
                     foreach( Rank rank in RankManager.Ranks ) {
-                        rankPlayers.AddRange( infos.Where( t => t.Rank == rank ) );
+                        // Inlined AddRange( infos.Where( t => t.Rank == rank ) );
+                        for( int i = 0; i < infos.Length; i++ ) {
+                            if( infos[i].Rank != rank ) continue;
+                            rankPlayers.Add( infos[i] );
+                        }
+
                         if( rankPlayers.Count == 0 ) {
                             writer.WriteLine( "{0}: 0 players, 0 banned, 0 inactive", rank.Name );
                             writer.WriteLine();
@@ -113,10 +118,21 @@ namespace fCraft {
             }
 
             int totalCount = infos.Count;
-            int bannedCount = infos.Count( info => info.IsBanned );
-            int inactiveCount = infos.Count( info => info.TimeSinceLastSeen.TotalDays >= 30 );
-            infos = infos.Where( info => (info.TimeSinceLastSeen.TotalDays < 30 && !info.IsBanned) ).ToList();
+            int bannedCount = 0;
+            // Inlined infos.Count( info => info.IsBanned );
+            foreach( PlayerInfo info in infos ) {
+                if ( info.IsBanned ) bannedCount++;
+            }
 
+            // Inlined infos.Count( info => info.TimeSinceLastSeen.TotalDays >= 30 );
+            int inactiveCount = 0;
+            DateTime now = DateTime.UtcNow;
+            foreach( PlayerInfo info in infos ) {
+                TimeSpan timeSinceLastSeen = now.Subtract( info.LastSeen );
+                if ( timeSinceLastSeen.TotalDays >= 30 ) inactiveCount++;
+            }
+            
+            infos = infos.Where( info => (info.TimeSinceLastSeen.TotalDays < 30 && !info.IsBanned) ).ToList();
             if( infos.Count == 0 ) {
                 writer.WriteLine( "{0}: {1} players, {2} banned, {3} inactive",
                                   groupName, totalCount, bannedCount, inactiveCount );
@@ -140,21 +156,17 @@ namespace fCraft {
             }
             stat.BlockRatio = stat.BlocksBuilt / (double)Math.Max( stat.BlocksDeleted, 1 );
             stat.BlocksChanged = stat.BlocksDeleted + stat.BlocksBuilt;
-
-            stat.TimeSinceFirstLoginMedian = DateTime.UtcNow.Subtract( infos.OrderByDescending( info => info.FirstLoginDate )
-                                                                            .ElementAt( infos.Count / 2 ).FirstLoginDate );
-            stat.TimeSinceLastLoginMedian = DateTime.UtcNow.Subtract( infos.OrderByDescending( info => info.LastLoginDate )
-                                                                           .ElementAt( infos.Count / 2 ).LastLoginDate );
-            stat.TotalTimeMedian = infos.OrderByDescending( info => info.TotalTime ).ElementAt( infos.Count / 2 ).TotalTime;
-            PlayerInfo medianBlockRatioPlayerInfo = infos.OrderByDescending( info => (info.BlocksBuilt / (double)Math.Max( info.BlocksDeleted, 1 )) )
-                                                    .ElementAt( infos.Count / 2 );
-            stat.BlockRatioMedian = medianBlockRatioPlayerInfo.BlocksBuilt / (double)Math.Max( medianBlockRatioPlayerInfo.BlocksDeleted, 1 );
-
+            
             stat.TopTimeSinceFirstLogin = infos.OrderBy( info => info.FirstLoginDate ).ToArray();
             stat.TopTimeSinceLastLogin = infos.OrderBy( info => info.LastLoginDate ).ToArray();
             stat.TopTotalTime = infos.OrderByDescending( info => info.TotalTime ).ToArray();
             stat.TopBlockRatio = infos.OrderByDescending( info => (info.BlocksBuilt / (double)Math.Max( info.BlocksDeleted, 1 )) ).ToArray();
-
+            
+            stat.TimeSinceFirstLoginMedian = DateTime.UtcNow.Subtract( stat.TopTimeSinceFirstLogin[infos.Count / 2].FirstLoginDate );
+            stat.TimeSinceLastLoginMedian = DateTime.UtcNow.Subtract( stat.TopTimeSinceLastLogin[infos.Count / 2].LastLoginDate );
+            stat.TotalTimeMedian = stat.TopTotalTime[infos.Count / 2].TotalTime;
+            PlayerInfo medianBlockRatio = stat.TopBlockRatio[infos.Count / 2];
+            stat.BlockRatioMedian = medianBlockRatio.BlocksBuilt / (double)Math.Max( medianBlockRatio.BlocksDeleted, 1 );
 
             writer.WriteLine( "{0}: {1} players, {2} banned, {3} inactive",
                               groupName, totalCount, bannedCount, inactiveCount );
@@ -219,7 +231,7 @@ namespace fCraft {
         	writer.WriteLine( "    {3}: " + summaryFormat, mean, median, sum, group );
         	string infoLine = "        " + infoFormat + "  {1}";
         	
-            if( infos.Count() > TopPlayersToList * 2 + 1 ) {
+            if( infos.Count > TopPlayersToList * 2 + 1 ) {
                 foreach( PlayerInfo info in items.Take( TopPlayersToList ) ) {
         			writer.WriteLine( infoLine, itemGetter( info ), info.Name );
                 }
