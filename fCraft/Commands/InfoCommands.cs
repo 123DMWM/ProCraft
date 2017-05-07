@@ -817,25 +817,18 @@ namespace fCraft {
 
         static void OnlineStaffHandler(Player player, CommandReader cmd)
         {
-            Player[] onlineStaff = Server.Players.Where(p => p.IsStaff && player.CanSee(p)).ToArray();
-            if (!onlineStaff.Any())
-            {
+            Player[] staff = Server.Players.CanBeSeen(player).Union(player)
+                .Where(p => p.IsStaff).ToArray();
+            if (staff.Length == 0) {
                 player.Message("There are no online staff at the moment");
                 return;
             }
 
             player.Message("Below is a list of online staff members:");
             foreach (Rank rank in RankManager.Ranks.Where(r => r.IsStaff)) {
-                string StaffListTemporary = "";
-                foreach (Player stafflistplayer in onlineStaff.Where(r => r.Info.Rank == rank)) {
-                    StaffListTemporary += stafflistplayer.ClassyName + ", ";
-                }
-                if (StaffListTemporary.Length > 2) {
-                    StaffListTemporary = StaffListTemporary.Remove((StaffListTemporary.Length - 2), 2);
-                    StaffListTemporary += ".";
-                    StaffListTemporary = rank.ClassyName + ": " + StaffListTemporary;
-                    player.Message(StaffListTemporary);
-                }
+                string members = staff.Where(t => t.Info.Rank == rank).JoinToString(", ", t => t.ClassyName);
+                if (members == "") continue;
+                player.Message("{0}: {1}.", rank.ClassyName, members);
             }
         }
 
@@ -854,7 +847,7 @@ namespace fCraft {
 
         static void ListStaffHandler(Player player, CommandReader cmd)
         {
-            Rank ranktarget;
+            Rank ranktarget = null;
             if (cmd.HasNext)
             {
                 string rankName = cmd.Next();
@@ -865,7 +858,6 @@ namespace fCraft {
                     return;
                 }
             }
-            else ranktarget = null;
 
             PlayerInfo[] infos;
 
