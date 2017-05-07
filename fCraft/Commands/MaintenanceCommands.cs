@@ -138,44 +138,22 @@ namespace fCraft {
                 stat.TimesBannedOthers += infos[i].TimesBannedOthers;
                 if( infos[i].PreviousRank != null ) stat.PreviousRank[infos[i].PreviousRank]++;
             }
-
             stat.BlockRatio = stat.BlocksBuilt / (double)Math.Max( stat.BlocksDeleted, 1 );
             stat.BlocksChanged = stat.BlocksDeleted + stat.BlocksBuilt;
-
 
             stat.TimeSinceFirstLoginMedian = DateTime.UtcNow.Subtract( infos.OrderByDescending( info => info.FirstLoginDate )
                                                                             .ElementAt( infos.Count / 2 ).FirstLoginDate );
             stat.TimeSinceLastLoginMedian = DateTime.UtcNow.Subtract( infos.OrderByDescending( info => info.LastLoginDate )
                                                                            .ElementAt( infos.Count / 2 ).LastLoginDate );
             stat.TotalTimeMedian = infos.OrderByDescending( info => info.TotalTime ).ElementAt( infos.Count / 2 ).TotalTime;
-            stat.BlocksBuiltMedian = infos.OrderByDescending( info => info.BlocksBuilt ).ElementAt( infos.Count / 2 ).BlocksBuilt;
-            stat.BlocksDeletedMedian = infos.OrderByDescending( info => info.BlocksDeleted ).ElementAt( infos.Count / 2 ).BlocksDeleted;
-            stat.BlocksDrawnMedian = infos.OrderByDescending( info => info.BlocksDrawn ).ElementAt( infos.Count / 2 ).BlocksDrawn;
-            PlayerInfo medianBlocksChangedPlayerInfo = infos.OrderByDescending( info => (info.BlocksDeleted + info.BlocksBuilt) ).ElementAt( infos.Count / 2 );
-            stat.BlocksChangedMedian = medianBlocksChangedPlayerInfo.BlocksDeleted + medianBlocksChangedPlayerInfo.BlocksBuilt;
             PlayerInfo medianBlockRatioPlayerInfo = infos.OrderByDescending( info => (info.BlocksBuilt / (double)Math.Max( info.BlocksDeleted, 1 )) )
                                                     .ElementAt( infos.Count / 2 );
             stat.BlockRatioMedian = medianBlockRatioPlayerInfo.BlocksBuilt / (double)Math.Max( medianBlockRatioPlayerInfo.BlocksDeleted, 1 );
-            stat.TimesVisitedMedian = infos.OrderByDescending( info => info.TimesVisited ).ElementAt( infos.Count / 2 ).TimesVisited;
-            stat.MessagesWrittenMedian = infos.OrderByDescending( info => info.MessagesWritten ).ElementAt( infos.Count / 2 ).MessagesWritten;
-            stat.TimesKickedMedian = infos.OrderByDescending( info => info.TimesKicked ).ElementAt( infos.Count / 2 ).TimesKicked;
-            stat.TimesKickedOthersMedian = infos.OrderByDescending( info => info.TimesKickedOthers ).ElementAt( infos.Count / 2 ).TimesKickedOthers;
-            stat.TimesBannedOthersMedian = infos.OrderByDescending( info => info.TimesBannedOthers ).ElementAt( infos.Count / 2 ).TimesBannedOthers;
-
 
             stat.TopTimeSinceFirstLogin = infos.OrderBy( info => info.FirstLoginDate ).ToArray();
             stat.TopTimeSinceLastLogin = infos.OrderBy( info => info.LastLoginDate ).ToArray();
             stat.TopTotalTime = infos.OrderByDescending( info => info.TotalTime ).ToArray();
-            stat.TopBlocksBuilt = infos.OrderByDescending( info => info.BlocksBuilt ).ToArray();
-            stat.TopBlocksDeleted = infos.OrderByDescending( info => info.BlocksDeleted ).ToArray();
-            stat.TopBlocksDrawn = infos.OrderByDescending( info => info.BlocksDrawn ).ToArray();
-            stat.TopBlocksChanged = infos.OrderByDescending( info => (info.BlocksDeleted + info.BlocksBuilt) ).ToArray();
             stat.TopBlockRatio = infos.OrderByDescending( info => (info.BlocksBuilt / (double)Math.Max( info.BlocksDeleted, 1 )) ).ToArray();
-            stat.TopTimesVisited = infos.OrderByDescending( info => info.TimesVisited ).ToArray();
-            stat.TopMessagesWritten = infos.OrderByDescending( info => info.MessagesWritten ).ToArray();
-            stat.TopTimesKicked = infos.OrderByDescending( info => info.TimesKicked ).ToArray();
-            stat.TopTimesKickedOthers = infos.OrderByDescending( info => info.TimesKickedOthers ).ToArray();
-            stat.TopTimesBannedOthers = infos.OrderByDescending( info => info.TimesBannedOthers ).ToArray();
 
 
             writer.WriteLine( "{0}: {1} players, {2} banned, {3} inactive",
@@ -197,58 +175,39 @@ namespace fCraft {
                            TimeSpan.FromTicks( stat.TotalTime.Ticks / infos.Count ).ToCompactString(), 
                            stat.TotalTime.ToCompactString(), stat.TotalTimeMedian.ToCompactString(),
                            stat.TopTotalTime, info => info.TotalTime.ToCompactString(),
-                           "{0} mean,  {1} median,  {2} total");
-            
+                           "{0} mean,  {1} median,  {2} total");            
 
-            DumpPlayerStat(writer, infos, "BlocksBuilt",
-                           stat.BlocksBuilt / (double)infos.Count, stat.BlocksBuilt, stat.BlocksBuiltMedian,
-                           stat.TopBlocksBuilt, info => info.BlocksBuilt);
-            
-            DumpPlayerStat(writer, infos, "BlocksDeleted",
-                           stat.BlocksDeleted / (double)infos.Count, stat.BlocksDeleted, stat.BlocksDeletedMedian,
-                           stat.TopBlocksDeleted, info => info.BlocksDeleted);
-
-            DumpPlayerStat(writer, infos, "BlocksChanged",
-                           stat.BlocksChanged / (double)infos.Count, stat.BlocksChanged, stat.BlocksChangedMedian,
-                           stat.TopBlocksChanged, info => info.BlocksDeleted + info.BlocksBuilt);
-
-            DumpPlayerStat(writer, infos, "BlocksDrawn",
-                           stat.BlocksDrawn / (double)infos.Count, stat.BlocksDrawn, stat.BlocksDrawnMedian,
-                           stat.TopBlocksDrawn, info => info.BlocksDrawn);
-            
+            DumpInt32Stat(writer, infos, "BlocksBuilt", stat.BlocksBuilt, info => info.BlocksBuilt);          
+            DumpInt32Stat(writer, infos, "BlocksDeleted", stat.BlocksDeleted, info => info.BlocksDeleted);
+            DumpInt32Stat(writer, infos, "BlocksChanged", stat.BlocksChanged, info => info.BlocksDeleted + info.BlocksBuilt);
+            DumpInt64Stat(writer, infos, "BlocksDrawn", stat.BlocksDrawn, info => info.BlocksDrawn);            
 
             DumpPlayerStat(writer, infos, "BlockRatio",
                            stat.BlockRatio, null, stat.BlockRatioMedian,
                            stat.TopBlockRatio, info => info.BlocksBuilt / (double)Math.Max( info.BlocksDeleted, 1 ),
-                           "{0:0.000} mean,  {1:0.000} median", "{0,20:0.000}");
-            
+                           "{0:0.000} mean,  {1:0.000} median", "{0,20:0.000}");            
 
-            DumpPlayerStat(writer, infos, "TimesVisited", 
-                           stat.TimesVisited / (double)infos.Count, stat.TimesVisited, stat.TimesVisitedMedian,
-                           stat.TopTimesVisited, info => info.TimesVisited);
-            
-            DumpPlayerStat(writer, infos, "MessagesWritten",
-                           stat.MessagesWritten / (double)infos.Count, stat.MessagesWritten, stat.MessagesWrittenMedian,
-                           stat.TopMessagesWritten, info => info.MessagesWritten);
-            
-            DumpPlayerStat(writer, infos, "TimesKicked", 
-                           stat.TimesKicked / (double)infos.Count, stat.TimesKicked, stat.TimesKickedMedian,
-                           stat.TopTimesKicked, info => info.TimesKicked);
-            
-            DumpPlayerStat(writer, infos, "TimesKickedOthers", 
-                           stat.TimesKicked / (double)infos.Count, stat.TimesKickedOthers, stat.TimesKickedOthersMedian,
-                           stat.TopTimesKickedOthers, info => info.TimesKickedOthers);
-            
-            DumpPlayerStat(writer, infos, "TimesBannedOthers", 
-                           stat.TimesBannedOthers / (double)infos.Count, stat.TimesBannedOthers, stat.TimesBannedOthersMedian,
-                           stat.TopTimesBannedOthers, info => info.TimesBannedOthers);
+            DumpInt32Stat(writer, infos, "TimesVisited", stat.TimesVisited, info => info.TimesVisited);          
+            DumpInt32Stat(writer, infos, "MessagesWritten", stat.MessagesWritten, info => info.MessagesWritten);
+            DumpInt32Stat(writer, infos, "TimesKicked", stat.TimesKicked, info => info.TimesKicked);           
+            DumpInt32Stat(writer, infos, "TimesKickedOthers", stat.TimesKicked, info => info.TimesKickedOthers);            
+            DumpInt32Stat(writer, infos, "TimesBannedOthers", stat.TimesBannedOthers, info => info.TimesBannedOthers);
         }
         
-        static void DumpPlayerInteger( TextWriter writer, IList<PlayerInfo> infos, string group,
-                                      long sum, long median,
-                                      PlayerInfo[] items, Func<PlayerInfo, int> itemGetter) {
+        static void DumpInt32Stat( TextWriter writer, IList<PlayerInfo> infos, string group, 
+                                    long sum, Func<PlayerInfo, int> itemGetter ) {
+        	PlayerInfo[] items = infos.OrderByDescending( itemGetter ).ToArray();
         	double mean = sum / (double)infos.Count;
-        	//DumpPlayerStat( writer, infos, group, mean, sum, median, items, itemGetter );
+        	int median = itemGetter( items[infos.Count / 2] );    	
+        	DumpPlayerStat( writer, infos, group, mean, sum, median, items, itemGetter );
+        }
+        
+        static void DumpInt64Stat( TextWriter writer, IList<PlayerInfo> infos, string group, 
+                                    long sum, Func<PlayerInfo, long> itemGetter ) {
+        	PlayerInfo[] items = infos.OrderByDescending( itemGetter ).ToArray();
+        	double mean = sum / (double)infos.Count;
+        	long median = itemGetter( items[infos.Count / 2] );    	
+        	DumpPlayerStat( writer, infos, group, mean, sum, median, items, itemGetter );
         }
         
         static void DumpPlayerStat<T>( TextWriter writer, IList<PlayerInfo> infos, string group,
@@ -296,30 +255,12 @@ namespace fCraft {
             public TimeSpan TimeSinceFirstLoginMedian;
             public TimeSpan TimeSinceLastLoginMedian;
             public TimeSpan TotalTimeMedian;
-            public int BlocksBuiltMedian;
-            public int BlocksDeletedMedian;
-            public int BlocksChangedMedian;
-            public long BlocksDrawnMedian;
             public double BlockRatioMedian;
-            public int TimesVisitedMedian;
-            public int MessagesWrittenMedian;
-            public int TimesKickedMedian;
-            public int TimesKickedOthersMedian;
-            public int TimesBannedOthersMedian;
 
             public PlayerInfo[] TopTimeSinceFirstLogin;
             public PlayerInfo[] TopTimeSinceLastLogin;
             public PlayerInfo[] TopTotalTime;
-            public PlayerInfo[] TopBlocksBuilt;
-            public PlayerInfo[] TopBlocksDeleted;
-            public PlayerInfo[] TopBlocksChanged;
-            public PlayerInfo[] TopBlocksDrawn;
             public PlayerInfo[] TopBlockRatio;
-            public PlayerInfo[] TopTimesVisited;
-            public PlayerInfo[] TopMessagesWritten;
-            public PlayerInfo[] TopTimesKicked;
-            public PlayerInfo[] TopTimesKickedOthers;
-            public PlayerInfo[] TopTimesBannedOthers;
         }
 
         #endregion
