@@ -2828,39 +2828,49 @@ namespace fCraft {
             } else if( !fileName.CaselessEnds( ".fcm" ) ) {
                 fileName += ".fcm";
             }
+            
+            string fullFileName = WorldSaveFullFileName( player, world, Paths.MapPath, "WorldSave", fileName );
+            if( fullFileName == null ) return;
+
+            player.Message( "Saving map to {0}", fileName );
+            WorldSave( player, world, "WorldSave", fullFileName );
+        }
+        
+        static string WorldSaveFullFileName( Player player, World world, string basePath, 
+                                            string cmd, string fileName ) {
             if( !Paths.IsValidPath( fileName ) ) {
                 player.Message( "Invalid file name." );
-                return;
+                return null;
             }
-            string fullFileName = Path.Combine( Paths.MapPath, fileName );
-            if( !Paths.Contains( Paths.MapPath, fullFileName ) ) {
+            
+            string fullFileName = Path.Combine( basePath, fileName );
+            if( !Paths.Contains( basePath, fullFileName ) ) {
                 player.MessageUnsafePath();
-                return;
+                return null;
             }
 
             // Ask for confirmation if overwriting
-            if( File.Exists( fullFileName ) ) {
-                FileInfo targetFile = new FileInfo( fullFileName );
-                FileInfo sourceFile = new FileInfo( world.MapFileName );
-                if( !targetFile.FullName.CaselessEquals( sourceFile.FullName ) ) {
-                    if( !cmd.IsConfirmed ) {
-                        Logger.Log( LogType.UserActivity,
-                                    "WSave: Asked {0} to confirm overwriting map file \"{1}\"",
-                                    player.Name, targetFile.FullName );
-                        player.Confirm( cmd, "Target file \"{0}\" already exists, and will be overwritten.", targetFile.Name );
-                        return;
-                    }
-                }
-            }
-
+            if( !File.Exists( fullFileName ) ) return fullFileName;
+            
+            FileInfo target = new FileInfo( fullFileName );
+            FileInfo source = new FileInfo( world.MapFileName );
+            if ( target.FullName.CaselessEquals( source.FullName ) ) return fullFileName;
+            if ( cmd.IsConfirmed ) return fullFileName;
+            
+            Logger.Log(LogType.UserActivity,
+                       cmd + ": Asked {0} to confirm overwriting map file \"{1}\"",
+                       player.Name, target.FullName);
+            player.Confirm(cmd, "Target file \"{0}\" already exists, and will be overwritten.", target.Name);
+            return null;
+        }
+        
+        static void WorldSave( Player player, World world, string cmd, string fullFileName ) {
             // Create the target directory if it does not exist
             string dirName = fullFileName.Substring( 0, fullFileName.LastIndexOf( Path.DirectorySeparatorChar ) );
             if( !Directory.Exists( dirName ) ) {
                 Directory.CreateDirectory( dirName );
             }
-
-            player.Message( "Saving map to {0}", fileName );
-
+            
             const string mapSavingErrorMessage = "Map saving failed. See server logs for details.";
             Map map = world.Map;
             if( map == null ) {
@@ -2869,12 +2879,12 @@ namespace fCraft {
                         File.Copy( world.MapFileName, fullFileName, true );
                     } catch( Exception ex ) {
                         Logger.Log( LogType.Error,
-                                    "WorldCommands.WorldSave: Error occurred while trying to copy an unloaded map: {0}", ex );
+                                    "WorldCommands." + cmd + ": Error occurred while trying to copy an unloaded map: {0}", ex );
                         player.Message( mapSavingErrorMessage );
                     }
                 } else {
                     Logger.Log( LogType.Error,
-                                "WorldCommands.WorldSave: Map for world \"{0}\" is unloaded, and file does not exist.",
+                                "WorldCommands." + cmd + ": Map for world \"{0}\" is unloaded, and file does not exist.",
                                 world.Name );
                     player.Message( mapSavingErrorMessage );
                 }
@@ -2882,9 +2892,9 @@ namespace fCraft {
                 player.Message( "Map saved succesfully." );
             } else {
                 Logger.Log( LogType.Error,
-                            "WorldCommands.WorldSave: Saving world \"{0}\" failed.", world.Name );
+                            "WorldCommands." + cmd + ": Saving world \"{0}\" failed.", world.Name );
                 player.Message( mapSavingErrorMessage );
-            }
+            }            
         }
 
         #endregion
@@ -2916,74 +2926,11 @@ namespace fCraft {
                 return;
             }
             
-            string fullFileName = Path.Combine(Paths.WClearPath, fileName);
-            if (!Paths.Contains(Paths.WClearPath, fullFileName)) {
-                player.MessageUnsafePath();
-                return;
-            }
-
-            // Ask for confirmation if overwriting
-            if (File.Exists(fullFileName))
-            {
-                FileInfo targetFile = new FileInfo(fullFileName);
-                FileInfo sourceFile = new FileInfo(world.MapFileName);
-                if (!targetFile.FullName.CaselessEquals(sourceFile.FullName))
-                {
-                    if (!cmd.IsConfirmed)
-                    {
-                        Logger.Log(LogType.UserActivity,
-                                    "WCSave: Asked {0} to confirm overwriting map file \"{1}\"",
-                                    player.Name, targetFile.FullName);
-                        player.Confirm(cmd, "Target file \"{0}\" already exists, and will be overwritten.", targetFile.Name);
-                        return;
-                    }
-                }
-            }
-
-            // Create the target directory if it does not exist
-            string dirName = fullFileName.Substring(0, fullFileName.LastIndexOf(Path.DirectorySeparatorChar));
-            if (!Directory.Exists(dirName))
-            {
-                Directory.CreateDirectory(dirName);
-            }
+            string fullFileName = WorldSaveFullFileName( player, world, Paths.WClearPath, "WClearSave", fileName );
+            if( fullFileName == null ) return;
 
             player.Message("Saving map to {0}", fileName);
-
-            const string mapSavingErrorMessage = "Map saving failed. See server logs for details.";
-            Map map = world.Map;
-            if (map == null)
-            {
-                if (File.Exists(world.MapFileName))
-                {
-                    try
-                    {
-                        File.Copy(world.MapFileName, fullFileName, true);
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Log(LogType.Error,
-                                    "WorldCommands.WorldCSave: Error occurred while trying to copy an unloaded map: {0}", ex);
-                        player.Message(mapSavingErrorMessage);
-                    }
-                }
-                else
-                {
-                    Logger.Log(LogType.Error,
-                                "WorldCommands.WorldCSave: Map for world \"{0}\" is unloaded, and file does not exist.",
-                                world.Name);
-                    player.Message(mapSavingErrorMessage);
-                }
-            }
-            else if (map.Save(fullFileName))
-            {
-                player.Message("Map saved succesfully.");
-            }
-            else
-            {
-                Logger.Log(LogType.Error,
-                            "WorldCommands.WorldCSave: Saving world \"{0}\" failed.", world.Name);
-                player.Message(mapSavingErrorMessage);
-            }
+            WorldSave(player, world, "WClearSave", fullFileName);
         }
 
         #endregion
