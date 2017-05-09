@@ -557,11 +557,10 @@ namespace fCraft {
                 case "rankchangetype":
                 case "rct":
                     RankChangeType oldType = info.RankChangeType;
-                    try {
-                        info.RankChangeType = (RankChangeType)Enum.Parse( typeof( RankChangeType ), valName, true );
-                    } catch( ArgumentException ) {
+                    RankChangeType newType;
+                    if( !EnumUtil.TryParse( valName, out newType, true ) ) {
                         player.Message( "SetInfo: Could not parse RankChangeType. Allowed values: {0}",
-                                        String.Join( ", ", Enum.GetNames( typeof( RankChangeType ) ) ) );
+                    	               Enum.GetNames( typeof( RankChangeType ) ).JoinToString() );
                         return;
                     }
                     player.Message( "SetInfo: RankChangeType for {0}&S changed from {1} to {2}",

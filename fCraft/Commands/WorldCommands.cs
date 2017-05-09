@@ -2829,15 +2829,16 @@ namespace fCraft {
                 fileName += ".fcm";
             }
             
-            string fullFileName = WorldSaveFullFileName( player, world, Paths.MapPath, "WorldSave", fileName );
+            string fullFileName = WorldSaveFullFileName( cmd, player, world, 
+                                                        Paths.MapPath, "WorldSave", fileName );
             if( fullFileName == null ) return;
 
             player.Message( "Saving map to {0}", fileName );
             WorldSave( player, world, "WorldSave", fullFileName );
         }
         
-        static string WorldSaveFullFileName( Player player, World world, string basePath, 
-                                            string cmd, string fileName ) {
+        static string WorldSaveFullFileName( CommandReader cmd, Player player, World world, 
+                                            string basePath, string cmdName, string fileName ) {
             if( !Paths.IsValidPath( fileName ) ) {
                 player.Message( "Invalid file name." );
                 return null;
@@ -2858,7 +2859,7 @@ namespace fCraft {
             if ( cmd.IsConfirmed ) return fullFileName;
             
             Logger.Log(LogType.UserActivity,
-                       cmd + ": Asked {0} to confirm overwriting map file \"{1}\"",
+                       cmdName + ": Asked {0} to confirm overwriting map file \"{1}\"",
                        player.Name, target.FullName);
             player.Confirm(cmd, "Target file \"{0}\" already exists, and will be overwritten.", target.Name);
             return null;
@@ -2926,7 +2927,8 @@ namespace fCraft {
                 return;
             }
             
-            string fullFileName = WorldSaveFullFileName( player, world, Paths.WClearPath, "WClearSave", fileName );
+            string fullFileName = WorldSaveFullFileName( cmd, player, world, 
+                                                        Paths.WClearPath, "WClearSave", fileName );
             if( fullFileName == null ) return;
 
             player.Message("Saving map to {0}", fileName);
