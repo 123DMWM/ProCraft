@@ -2242,7 +2242,7 @@ namespace fCraft {
 
             // Loading map into current world
             if (worldName == null) {
-                WorldLoadReplaceMap( cmd, player, world, fileName, fullFileName );
+                WorldLoadReplaceMap( cmd, player, player.World, fileName, fullFileName, false );
             } else {
                 // Loading to some other (or new) world
                 if (!World.IsValidName(worldName)) {
@@ -2283,7 +2283,7 @@ namespace fCraft {
                     World world = WorldManager.FindWorldExact(worldName);
                     if (world != null) {
                         player.LastUsedWorldName = world.Name;
-                        WorldLoadReplaceMap( cmd, player, world, fileName, fullFileName );
+                        WorldLoadReplaceMap( cmd, player, world, fileName, fullFileName, false );
                     } else {
                         // Adding a new world
                         string targetFullFileName = Path.Combine(Paths.MapPath, worldName + ".fcm");
@@ -2345,17 +2345,16 @@ namespace fCraft {
             Server.RequestGC();
         }
         
-        static void WorldLoadReplaceMap( CommandReader cmd, Player player, World world, string fileName, string fullFileName ) {
+        static void WorldLoadReplaceMap( CommandReader cmd, Player player, World world, 
+                                        string fileName, string fullFileName, bool clear ) {
             // Replacing existing world's map
             string mapName = player.World == world ? "THIS MAP" : "map for " + world.ClassyName;
             if (!cmd.IsConfirmed) {
-                Logger.Log(LogType.UserActivity,
-                           "WLoad: Asked {0} to confirm replacing the map of world {1}", player.Name, world.Name);
-                if (!Entity.existsAny(world)) {
-                    player.Confirm(cmd, "Replace {0}&S with \"{1}\"?", mapName, fileName);
-                } else {
-                    player.Confirm(cmd, "Replace {0}&S with \"{1}\"?&NThis will also remove all Entities/Bots on that world", mapName, fileName);
-                }
+                Logger.Log(LogType.UserActivity, "WLoad: Asked {0} to confirm {2} the map of world {1}", 
+                           player.Name, world.Name, clear ? "clearing" : "replacing");
+                
+                string actionMsg = clear ? "Clear {0}&S?" : "Replace {0}&S with \"{1}\"?";
+                player.Confirm(cmd, actionMsg, mapName, fileName);
                 return;
             }
 
@@ -2364,6 +2363,7 @@ namespace fCraft {
                 map = MapUtility.Load(fullFileName);
             } catch (Exception ex) {
                 player.Message("Could not load specified file: {0}: {1}", ex.GetType().Name, ex.Message);
+                if (clear) player.Message("Please use &H/WCS &Sfirst on an empty map to create a backup for clearing.");
                 return;
             }
 
@@ -2372,14 +2372,15 @@ namespace fCraft {
                 world.ChangeMap(map);
             } catch (WorldOpException ex) {
                 Logger.Log(LogType.Error, "Could not complete WorldLoad operation: {0}", ex.Message);
-                player.Message("&WWLoad: {0}", ex.Message);
+                player.Message("&W{1}: {0}", ex.Message, clear ? "WClear" : "WLoad");
                 return;
             }
 
-            world.Players.Message(player, "{0}&S loaded a new map for this world", player.ClassyName);
-            player.Message("New map loaded for the world {0}", world.ClassyName);
-            Logger.Log(LogType.UserActivity, "{0} {1} &Sloaded new map for world \"{2}\" from \"{3}\"",
-                       player.Info.Rank.Name, player.Name, world.Name, fileName);
+            string action = clear ? "cleared" : "loaded a new";
+            world.Players.Message(player, "{0}&S {1} map for this world", player.ClassyName, action);
+            player.Message("{1} map for the world {0}", world.ClassyName, action);
+            Logger.Log(LogType.UserActivity, "{0} {1} &S{4} map for world \"{2}\" from \"{3}\"",
+                       player.Info.Rank.Name, player.Name, world.Name, fileName, action);
         }
 
         #endregion
@@ -2400,122 +2401,9 @@ namespace fCraft {
         static void WorldClearHandler(Player player, CommandReader cmd)
         {
             string fullFileName = WorldManager.FindMapClearFile(player, player.World + "clear");
-
             if (fullFileName == null) return;
-
-            // Loading map into current world
-            if (player.World == null)
-            {
-                if (!cmd.IsConfirmed)
-                {
-                    Logger.Log(LogType.UserActivity,
-                                "WLoad: Asked {0} to confirm clearing the map of world {1} (\"this map\")",
-                                player.Name, player.World.Name);
-                    if (!Entity.existsAny(player.World)) {
-                        player.Confirm(cmd, "Clear \"{0}\"?", player.World);
-                    } else {
-                        player.Confirm(cmd, "Clear \"{0}\"?&NThis will also remove all the Entities/Bots on the world.", player.World);
-                    }
-                    return;
-                }
-                Map map;
-                try
-                {
-                    map = MapUtility.Load(fullFileName);
-                }
-                catch (Exception ex)
-                {
-                    player.Message("Could not load specified file: {0}: {1}", ex.GetType().Name, ex.Message);
-                    player.Message("Please use &H/WCS &Sfirst on an empty map to create a backup for clearing.", ex.GetType().Name, ex.Message);
-                    return;
-                }
-                World world = player.World;
-
-                // Loading to current world
-                try
-                {
-                    world.MapChangedBy = player.Name;
-                    world.ChangeMap(map);
-                }
-                catch (WorldOpException ex)
-                {
-                    Logger.Log(LogType.Error,
-                                "Could not complete WorldLoad operation: {0}", ex.Message);
-                    player.Message("&WWClear: {0}", ex.Message);
-                    return;
-                }
-
-                world.Players.Message(player, "{0}&S cleared this world.",
-                                              player.ClassyName);
-                player.Message("New clear map loaded for {0}", world.ClassyName);
-
-                Logger.Log(LogType.UserActivity,
-                            "{0} {1} &Scleared map for world \"{1}\" from \"{2}\"",
-                            player.Info.Rank.Name, player.Name, world.Name, player.World);
-
-
-            }
-            else
-            {             
-                // Retype world name, if needed
-                
-                lock (WorldManager.SyncRoot)
-                {
-                    World world = player.World;
-                    if (world != null)
-                    {
-                        player.LastUsedWorldName = world.Name;
-                        // Replacing existing world's map
-                        if (!cmd.IsConfirmed)
-                        {
-                            Logger.Log(LogType.UserActivity,
-                                        "WClear: Asked {0} to confirm replacing the map of world {1}",
-                                        player.Name, world.Name);
-                            if (!Entity.existsAny(player.World)) {
-                                player.Confirm(cmd, "Clear {0}&S map?",
-                                                world.ClassyName, player.World);
-                            } else {
-                                player.Confirm(cmd, "Clear {0}&S map?&NThis will also remove all the Entities/Bots on the world.",
-                                                world.ClassyName, player.World);
-                            }
-                            return;
-                        }
-
-                        Map map;
-                        try
-                        {
-                            map = MapUtility.Load(fullFileName);
-                        }
-                        catch (Exception ex)
-                        {
-                            player.Message("Could not load specified file: {0}: {1}", ex.GetType().Name, ex.Message);
-                            return;
-                        }
-
-                        try
-                        {
-                            world.MapChangedBy = player.Name;
-                            world.ChangeMap(map);
-                        }
-                        catch (WorldOpException ex)
-                        {
-                            Logger.Log(LogType.Error,
-                                        "Could not complete WorldClear operation: {0}", ex.Message);
-                            player.Message("&WWClear: {0}", ex.Message);
-                            return;
-                        }
-
-                        world.Players.Message(player, "{0}&S cleared the map for world {1}",
-                                               player.ClassyName, world.ClassyName);
-                        player.Message("New map for the world {0}&S has been loaded.", world.ClassyName);
-                        Logger.Log(LogType.UserActivity,
-                                    "{0} {1} &Sloaded new map for world \"{2}\"",
-                                    player.Info.Rank.Name, player.Name, world.Name, fullFileName);
-
-                    }
-                }
-            }
-
+            WorldLoadReplaceMap( cmd, player, player.World, 
+                                Path.GetFileName(fullFileName), fullFileName, true );
             Server.RequestGC();
         }
 
