@@ -921,7 +921,7 @@ namespace fCraft {
             string[] themes = { "arctic", "desert", "forest", "grass", "hell", "swamp" };
 
             if (themes.Contains(themeName.ToLower())) {
-            	if (themeName.CaselessEquals("forest") || themeName.CaselessEquals("swamp")) {
+                if (themeName.CaselessEquals("forest") || themeName.CaselessEquals("swamp")) {
                     noTrees = false;
                 }
                 url = cmd.Next();
@@ -1235,7 +1235,7 @@ namespace fCraft {
                             player.JoinWorldNow(world, true, WorldChangeReason.ManualJoin);
                             return;
                         }
-                		if (player.World.Name.CaselessEquals("tutorial") && !player.Info.HasRTR) {
+                        if (player.World.Name.CaselessEquals("tutorial") && !player.Info.HasRTR) {
                             player.Confirm(cmd,
                                 "&SYou are choosing to skip the rules, if you continue you will spawn here the next time you log in.");
                             return;
@@ -1346,7 +1346,7 @@ namespace fCraft {
                 }
 
             } else if( player.World != null ) {
-            	world = player.World;
+                world = player.World;
 
             } else {
                 player.Message( "When called from console, /WUnlock requires a world name." );
@@ -1373,10 +1373,10 @@ namespace fCraft {
 
         static void SpawnHandler( Player player, CommandReader cmd ) {
             if( player.World == null ) PlayerOpException.ThrowNoWorld( player );
-			if (player.World != null) {
-				player.LastWorld = player.World;
-				player.LastPosition = player.Position;
-			}
+            if (player.World != null) {
+                player.LastWorld = player.World;
+                player.LastPosition = player.Position;
+            }
             player.TeleportTo( player.World.LoadMap().getSpawnIfRandom());
             if (player.WorldMap.Spawn == Position.RandomSpawn) {
                 player.Message("Randomized Spawn!");
@@ -1773,9 +1773,9 @@ namespace fCraft {
             // Print information about the current world
             if (worldName == null) {
                 if (player.World == null) {
-            		player.Message("When calling /{0} from console, you must specify a world name.", build ? "WBuild" : "WAccess");
+                    player.Message("When calling /{0} from console, you must specify a world name.", build ? "WBuild" : "WAccess");
                 } else {
-            		SecurityController controller = build ? player.World.BuildSecurity : player.World.AccessSecurity;
+                    SecurityController controller = build ? player.World.BuildSecurity : player.World.AccessSecurity;
                     player.Message(controller.GetDescription(player.World, "world", verb));
                 }
                 return;
@@ -1788,8 +1788,8 @@ namespace fCraft {
             // If no parameters were given, print info
             string token = cmd.Next();
             if (token == null) {
-            	SecurityController controller = build ? world.BuildSecurity : world.AccessSecurity;
-            	player.Message(controller.GetDescription(world, "world", verb));
+                SecurityController controller = build ? world.BuildSecurity : world.AccessSecurity;
+                player.Message(controller.GetDescription(world, "world", verb));
                 return;
             }
 
@@ -1838,7 +1838,7 @@ namespace fCraft {
         }
 
         static bool ClearWhitelist(Player player, World world, bool build) {
-        	SecurityController controller = build ? world.BuildSecurity : world.AccessSecurity;
+            SecurityController controller = build ? world.BuildSecurity : world.AccessSecurity;
             PlayerInfo[] whitelist = controller.ExceptionList.Included.ToArray();
             string type = build ? "Build" : "Access";
             
@@ -2242,44 +2242,7 @@ namespace fCraft {
 
             // Loading map into current world
             if (worldName == null) {
-                if (!cmd.IsConfirmed) {
-                    Logger.Log(LogType.UserActivity,
-                        "WLoad: Asked {0} to confirm replacing the map of world {1} (\"this map\")", player.Name,
-                        player.World.Name);
-
-                    if (!Entity.existsAny(player.World)) {
-                        player.Confirm(cmd, "Replace THIS MAP with \"{0}\"?", fileName);
-                    } else {
-                        player.Confirm(cmd, "Replace THIS MAP with \"{0}\"?&NThis will also remove all the Entities/Bots on the world.", fileName);
-                    }
-                    return;
-                }
-                Map map;
-                try {
-                    map = MapUtility.Load(fullFileName);
-                } catch (Exception ex) {
-                    player.Message("Could not load specified file: {0}: {1}", ex.GetType().Name, ex.Message);
-                    return;
-                }
-                World world = player.World;
-
-                // Loading to current world
-                try {
-                    world.MapChangedBy = player.Name;
-                    world.ChangeMap(map);
-                    } catch (WorldOpException ex) {
-                    Logger.Log(LogType.Error, "Could not complete WorldLoad operation: {0}", ex.Message);
-                    player.Message("&WWLoad: {0}", ex.Message);
-                    return;
-                }
-
-                world.Players.Message(player, "{0}&S loaded a new map for this world.", player.ClassyName);
-                player.Message("New map loaded for the world {0}", world.ClassyName);
-
-                Logger.Log(LogType.UserActivity, "{0} {1} &Sloaded new map for world \"{1}\" from \"{2}\"",
-                    player.Info.Rank.Name, player.Name, world.Name, fileName);
-
-
+                WorldLoadReplaceMap( cmd, player, world, fileName, fullFileName );
             } else {
                 // Loading to some other (or new) world
                 if (!World.IsValidName(worldName)) {
@@ -2320,41 +2283,7 @@ namespace fCraft {
                     World world = WorldManager.FindWorldExact(worldName);
                     if (world != null) {
                         player.LastUsedWorldName = world.Name;
-                        // Replacing existing world's map
-                        if (!cmd.IsConfirmed) {
-                            Logger.Log(LogType.UserActivity,
-                                "WLoad: Asked {0} to confirm replacing the map of world {1}", player.Name, world.Name);
-                            if (!Entity.existsAny(world)) {
-                                player.Confirm(cmd, "Replace map for {0}&S with \"{1}\"?", world.ClassyName, fileName);
-                            } else {
-                                player.Confirm(cmd, "Replace map for {0}&S with \"{1}\"?&NThis will also remove all Entities/Bots on that world", world.ClassyName, fileName);
-                            }
-                            return;
-                        }
-
-                        Map map;
-                        try {
-                            map = MapUtility.Load(fullFileName);
-                        } catch (Exception ex) {
-                            player.Message("Could not load specified file: {0}: {1}", ex.GetType().Name, ex.Message);
-                            return;
-                        }
-
-                        try {
-                            world.MapChangedBy = player.Name;
-                            world.ChangeMap(map);
-                        } catch (WorldOpException ex) {
-                            Logger.Log(LogType.Error, "Could not complete WorldLoad operation: {0}", ex.Message);
-                            player.Message("&WWLoad: {0}", ex.Message);
-                            return;
-                        }
-
-                        world.Players.Message(player, "{0}&S loaded a new map for the world {1}", player.ClassyName,
-                            world.ClassyName);
-                        player.Message("New map for the world {0}&S has been loaded.", world.ClassyName);
-                        Logger.Log(LogType.UserActivity, "{0} {1} &Sloaded new map for world \"{2}\" from \"{3}\"",
-                            player.Info.Rank.Name, player.Name, world.Name, fullFileName);
-
+                        WorldLoadReplaceMap( cmd, player, world, fileName, fullFileName );
                     } else {
                         // Adding a new world
                         string targetFullFileName = Path.Combine(Paths.MapPath, worldName + ".fcm");
@@ -2413,8 +2342,44 @@ namespace fCraft {
                     }
                 }
             }
-
             Server.RequestGC();
+        }
+        
+        static void WorldLoadReplaceMap( CommandReader cmd, Player player, World world, string fileName, string fullFileName ) {
+            // Replacing existing world's map
+            string mapName = player.World == world ? "THIS MAP" : "map for " + world.ClassyName;
+            if (!cmd.IsConfirmed) {
+                Logger.Log(LogType.UserActivity,
+                           "WLoad: Asked {0} to confirm replacing the map of world {1}", player.Name, world.Name);
+                if (!Entity.existsAny(world)) {
+                    player.Confirm(cmd, "Replace {0}&S with \"{1}\"?", mapName, fileName);
+                } else {
+                    player.Confirm(cmd, "Replace {0}&S with \"{1}\"?&NThis will also remove all Entities/Bots on that world", mapName, fileName);
+                }
+                return;
+            }
+
+            Map map;
+            try {
+                map = MapUtility.Load(fullFileName);
+            } catch (Exception ex) {
+                player.Message("Could not load specified file: {0}: {1}", ex.GetType().Name, ex.Message);
+                return;
+            }
+
+            try {
+                world.MapChangedBy = player.Name;
+                world.ChangeMap(map);
+            } catch (WorldOpException ex) {
+                Logger.Log(LogType.Error, "Could not complete WorldLoad operation: {0}", ex.Message);
+                player.Message("&WWLoad: {0}", ex.Message);
+                return;
+            }
+
+            world.Players.Message(player, "{0}&S loaded a new map for this world", player.ClassyName);
+            player.Message("New map loaded for the world {0}", world.ClassyName);
+            Logger.Log(LogType.UserActivity, "{0} {1} &Sloaded new map for world \"{2}\" from \"{3}\"",
+                       player.Info.Rank.Name, player.Name, world.Name, fileName);
         }
 
         #endregion
@@ -2977,7 +2942,7 @@ namespace fCraft {
                 case "hide":
                 case "hidden":
                     SetWorldBool(player, world, value, world.IsHidden, "hidden",
-            		             v => world.IsHidden = v);
+                                 v => world.IsHidden = v);
                     break;
                 case "build":
                 case "buildable":
@@ -3121,7 +3086,7 @@ namespace fCraft {
                     player.Message("  " + world.MOTD);
                 }
                 return;
-            }        	
+            }            
             if (value.Length > 64)
                 value = value.Substring(0, 64);
             
@@ -3318,7 +3283,7 @@ namespace fCraft {
             switch (options) {
                 case "start":
                     if (!CTF.GameRunning) {
-        				if (!player.World.Name.CaselessEquals("ctf")) {
+                        if (!player.World.Name.CaselessEquals("ctf")) {
                             player.Message("You can only start a game on the CTF map.");
                         } else {
                             player.Message("Started CTF game on world {0}", player.World.ClassyName);
@@ -3481,15 +3446,15 @@ namespace fCraft {
                 default:
                     size = 128; sizeName = "Normal"; break;
             }
-            World[] existing = WorldManager.FindWorlds(Player.Console, "PW_" + player.Name + "_");
-            if (existing.Length >= player.Info.Rank.MaxPersonalWorlds &&
-                player.Info.Rank != RankManager.HighestRank) {
+            
+            World[] curRealms = WorldManager.FindWorlds(Player.Console, "PW_" + player.Name + "_");
+            if (curRealms.Length >= player.Info.Rank.MaxPersonalWorlds && player.Info.Rank != RankManager.HighestRank) {
                 player.Message("You can only have a maximum of {0} personal worlds. Sorry!",
                                player.Info.Rank.MaxPersonalWorlds);
                 return;
             }
-            string mapNum = (existing.Any()) ? "" + (existing.Count() + 1) : "1";
-            string mapName = "PW_" + player.Name + "_" + mapNum;
+
+            string mapName = "PW_" + player.Name + "_" + (curRealms.Length + 1);
             player.Message("Creating your {0}({1}) personal world: {2}", sizeName, size, mapName);
             Map map = MapGenerator.GenerateFlatgrass(size, size, size);
             Server.RequestGC();
@@ -3773,13 +3738,13 @@ namespace fCraft {
                                                 player.Message("R must be inbetween 0 and 255. Set to player R");
                                                 rot = player.Position.R;
                                             }
-                                    		
+                                            
                                             if (lot > 255 || lot < 0) {
                                                 player.Message("L must be inbetween 0 and 255. Set to player L");
                                                 lot = player.Position.L;
                                             }
                                         }
-                                    	
+                                        
                                         if (x < 0 || x >= 1024 || y < 0 || y >= 1024 || z < 0 || z >= 1024) {
                                             player.Message("Coordinates are outside the valid range!");
                                             return;
