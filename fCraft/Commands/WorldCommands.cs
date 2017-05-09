@@ -2242,7 +2242,7 @@ namespace fCraft {
 
             // Loading map into current world
             if (worldName == null) {
-                WorldLoadReplaceMap( cmd, player, player.World, fileName, fullFileName, false );
+                WorldLoadReplace( cmd, player, player.World, fileName, fullFileName, false );
             } else {
                 // Loading to some other (or new) world
                 if (!World.IsValidName(worldName)) {
@@ -2283,7 +2283,7 @@ namespace fCraft {
                     World world = WorldManager.FindWorldExact(worldName);
                     if (world != null) {
                         player.LastUsedWorldName = world.Name;
-                        WorldLoadReplaceMap( cmd, player, world, fileName, fullFileName, false );
+                        WorldLoadReplace( cmd, player, world, fileName, fullFileName, false );
                     } else {
                         // Adding a new world
                         string targetFullFileName = Path.Combine(Paths.MapPath, worldName + ".fcm");
@@ -2310,31 +2310,10 @@ namespace fCraft {
                             return;
                         }
 
-                        World newWorld;
-                        try {
-                            newWorld = WorldManager.AddWorld(player, worldName, map, false);
-                        } catch (WorldOpException ex) {
-                            player.Message("WLoad: {0}", ex.Message);
-                            return;
-                        }
-
-                        player.LastUsedWorldName = worldName;
-                        newWorld.BuildSecurity.MinRank = buildRank;
-                        if (accessRank == null) {
-                            newWorld.AccessSecurity.ResetMinRank();
-                        } else {
-                            newWorld.AccessSecurity.MinRank = accessRank;
-                        }
-                        newWorld.BlockDB.AutoToggleIfNeeded();
-                        if (BlockDB.IsEnabledGlobally && newWorld.BlockDB.IsEnabled) {
-                            player.Message("BlockDB is now auto-enabled on world {0}", newWorld.ClassyName);
-                        }
-                        newWorld.LoadedBy = player.Name;
-                        newWorld.LoadedOn = DateTime.UtcNow;
-                        Server.Message("{0}&S created a new world named {1}", player.ClassyName, newWorld.ClassyName);
-                        Logger.Log(LogType.UserActivity,
-                            "{0} {1} &Screated a new world named \"{2}\" (loaded from \"{3}\")", player.Info.Rank.Name,
-                            player.Name, worldName, fileName);
+                        World newWorld = WorldLoadAdd( cmd, player, map, worldName, fileName, accessRank, buildRank );
+                        if( newWorld == null ) return;
+                        
+                        Server.Message("{0}&S created a new world named {1}", player.ClassyName, newWorld.ClassyName);                     
                         WorldManager.SaveWorldList();
                         player.Message("Access is {0}+&S, and building is {1}+&S on {2}",
                             newWorld.AccessSecurity.MinRank.ClassyName, newWorld.BuildSecurity.MinRank.ClassyName,
@@ -2344,9 +2323,41 @@ namespace fCraft {
             }
             Server.RequestGC();
         }
+
+        static World WorldLoadAdd( CommandReader cmd, Player player, Map map, string name, 
+                                  string fileName, Rank accessRank, Rank buildRank) {
+            World world;
+            try {
+                world = WorldManager.AddWorld(player, name, map, false);
+            } catch (WorldOpException ex) {
+                player.Message("WLoad: {0}", ex.Message);
+                return null;
+            }
+            player.LastUsedWorldName = name;
+            
+            world.BuildSecurity.MinRank = buildRank;
+            if (accessRank == null) {
+                world.AccessSecurity.ResetMinRank();
+            } else {
+                world.AccessSecurity.MinRank = accessRank;
+            }
+            
+            world.BlockDB.AutoToggleIfNeeded();
+            if (BlockDB.IsEnabledGlobally && world.BlockDB.IsEnabled) {
+                player.Message("BlockDB is now auto-enabled on world {0}", world.ClassyName);
+            }
+            
+            world.LoadedBy = player.Name;
+            world.LoadedOn = DateTime.UtcNow;
+            
+            Logger.Log(LogType.UserActivity,
+                       "{0} {1} &Screated a new world named \"{2}\" (loaded from \"{3}\")",
+                       player.Info.Rank.Name, player.Name, world.Name, fileName);
+            return world;
+        }
         
-        static void WorldLoadReplaceMap( CommandReader cmd, Player player, World world, 
-                                        string fileName, string fullFileName, bool clear ) {
+        static void WorldLoadReplace( CommandReader cmd, Player player, World world, 
+                                     string fileName, string fullFileName, bool clear ) {
             // Replacing existing world's map
             string mapName = player.World == world ? "THIS MAP" : "map for " + world.ClassyName;
             if (!cmd.IsConfirmed) {
@@ -2378,7 +2389,7 @@ namespace fCraft {
 
             string action = clear ? "cleared" : "loaded a new";
             world.Players.Message(player, "{0}&S {1} map for this world", player.ClassyName, action);
-            player.Message("{1} map for the world {0}", world.ClassyName, action);
+            player.Message("{1} map for the world {0}", world.ClassyName, action.UppercaseFirst());
             Logger.Log(LogType.UserActivity, "{0} {1} &S{4} map for world \"{2}\" from \"{3}\"",
                        player.Info.Rank.Name, player.Name, world.Name, fileName, action);
         }
@@ -2402,7 +2413,7 @@ namespace fCraft {
         {
             string fullFileName = WorldManager.FindMapClearFile(player, player.World + "clear");
             if (fullFileName == null) return;
-            WorldLoadReplaceMap( cmd, player, player.World, 
+            WorldLoadReplace( cmd, player, player.World, 
                                 Path.GetFileName(fullFileName), fullFileName, true );
             Server.RequestGC();
         }
@@ -3351,30 +3362,12 @@ namespace fCraft {
             else
                 player.Message("&WAn error occurred while saving generated map to {0}.fcm", mapName);
                 
-            Rank buildRank = RankManager.HighestRank;
-            Rank accessRank = RankManager.HighestRank;
+            Rank rank = RankManager.HighestRank;
             lock (WorldManager.SyncRoot) {
-                World newWorld;
-                try {
-                    newWorld = WorldManager.AddWorld(player, mapName, map, false);
-                } catch (WorldOpException ex) {
-                    player.Message("WLoad: {0}", ex.Message);
-                    return;
-                }
-
-                player.LastUsedWorldName = mapName;
-                newWorld.BuildSecurity.MinRank = buildRank;
-                if (accessRank == null) 
-                    newWorld.AccessSecurity.ResetMinRank();
-                else
-                    newWorld.AccessSecurity.MinRank = accessRank;
-                newWorld.BlockDB.AutoToggleIfNeeded();
-                newWorld.LoadedBy = player.Name;
-                newWorld.LoadedOn = DateTime.UtcNow;
+                World newWorld = WorldLoadAdd(cmd, player, map, mapName, mapName + ".fcm", rank, rank );
+                if (newWorld == null) return;
+                
                 newWorld.IsHidden = true;
-                Logger.Log(LogType.UserActivity,
-                           "{0} {1} &Screated a new world named \"{2}\" (loaded from \"{3}\")", player.Info.Rank.Name,
-                           player.Name, mapName, mapName);
                 newWorld.AccessSecurity.Include(player.Info);
                 newWorld.BuildSecurity.Include(player.Info);
                 WorldManager.SaveWorldList();
