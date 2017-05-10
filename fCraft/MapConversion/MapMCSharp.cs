@@ -132,9 +132,9 @@ namespace fCraft.MapConversion {
                     bs.Write( (short)mapToSave.Height );
 
                     // Write the spawn location
-                    bs.Write( (short)( mapToSave.Spawn.X / 32 ) );
-                    bs.Write( (short)( mapToSave.Spawn.Z / 32 ) );
-                    bs.Write( (short)( mapToSave.Spawn.Y / 32 ) );
+                    bs.Write( (short)mapToSave.Spawn.BlockX );
+                    bs.Write( (short)mapToSave.Spawn.BlockZ );
+                    bs.Write( (short)mapToSave.Spawn.BlockY );
 
                     //Write the spawn orientation
                     bs.Write( mapToSave.Spawn.R );

@@ -72,8 +72,8 @@ namespace fCraft.Portals {
 
         static void Player_Moved(object sender, Events.PlayerMovedEventArgs e) {
             //abuse portal moved event and add in message blocks right here
-            Vector3I oldPos = e.OldPosition.ToBlockCoordsExt(); //get positions as block coords
-            Vector3I newPos = e.NewPosition.ToBlockCoordsExt();
+            Vector3I oldPos = e.OldPosition.ToBlockCoordsRaw(); //get positions as block coords
+            Vector3I newPos = e.NewPosition.ToBlockCoordsRaw();
 
             /*if (oldPos.X != newPos.X || oldPos.Y != newPos.Y || oldPos.Z != newPos.Z) //check if player has moved at least one block
             {
@@ -231,9 +231,9 @@ namespace fCraft.Portals {
             if (player.Info.Rank == RankManager.HighestRank)
                 return false;
             
-            int dx = (world.Map.Spawn.X / 32) - block.X;
-            int dy = (world.Map.Spawn.Y / 32) - block.Y;
-            int dz = (world.Map.Spawn.Z / 32) - block.Z;
+            int dx = world.Map.Spawn.BlockX - block.X;
+            int dy = world.Map.Spawn.BlockY - block.Y;
+            int dz = world.Map.Spawn.BlockZ - block.Z;
             return Math.Abs(dx) <= 10 && Math.Abs(dy) <= 10 && Math.Abs(dz) <= 10;
         }
     }

@@ -93,25 +93,18 @@ namespace fCraft {
         {
             return String.Format("&S(X:&f{0}&S Y:&f{1}&S Z:&f{2}&S R:&f{3}&S L:&f{4}&S)", X, Y, Z, R, L);
         }
-
-
-        public static explicit operator Vector3I( Position a ) {
-            return new Vector3I( a.X, a.Y, a.Z );
-        }
-
-
-        public Vector3I ToVector3I() {
-            return new Vector3I( X, Y, Z );
-        }
+        
+        public int BlockX { get { return X >> 5; } }
+        public int BlockY { get { return Y >> 5; } }
+        public int BlockZ { get { return Z >> 5; } }
 
 
         public Vector3I ToBlockCoords() {
             return new Vector3I( ( X - 16 ) / 32, ( Y - 16 ) / 32, ( Z - 16 ) / 32 );
         }
 
-        public Vector3I ToBlockCoordsExt()
-        {
-            return new Vector3I((X) / 32, (Y) / 32, (Z) / 32);
+        public Vector3I ToBlockCoordsRaw() {
+            return new Vector3I(BlockX, BlockY, BlockZ);
         }
         
         public static Position RandomSpawn = new Position(-1, -1, -1, 0, 0);

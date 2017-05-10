@@ -877,7 +877,7 @@ namespace fCraft {
                         return;
                     }
                 }
-                coords = new Vector3I(player.Position.X / 32, player.Position.Y / 32, (player.Position.Z - 64) / 32);
+                coords = new Vector3I(player.Position.BlockX, player.Position.BlockY, (player.Position.Z - 64) / 32);
             }
             World world;
             if (player == Player.Console) {
@@ -2915,7 +2915,7 @@ namespace fCraft {
                 }
             }
             Random dir = new Random();
-            Vector3I posStart = new Vector3I(player.Position.X / 32, player.Position.Y / 32, player.Position.Z / 32);
+            Vector3I posStart = new Vector3I(player.Position.BlockX, player.Position.BlockY, player.Position.BlockZ);
 
             if (player.World != null && player.World.Map != null) {
                 int blocksDrawn = 0, blocksSkipped = 0;

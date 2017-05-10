@@ -3203,24 +3203,24 @@ namespace fCraft {
                     break;
 
                 case "redspawn":
-                    player.Message("Red team's spawn set to {0}.", player.Position.ToBlockCoordsExt());
+                    player.Message("Red team's spawn set to {0}.", player.Position.ToBlockCoordsRaw());
                     CTF.RedTeam.Spawn = player.Position;
                     break;
                 case "bluespawn":
-                    player.Message("Blue team's spawn set to {0}", player.Position.ToBlockCoordsExt());
+                    player.Message("Blue team's spawn set to {0}", player.Position.ToBlockCoordsRaw());
                     CTF.BlueTeam.Spawn = player.Position;
                     break;
                 case "redflag":
-                    CTF.RedTeam.FlagPos = player.Position.ToBlockCoordsExt();
+                    CTF.RedTeam.FlagPos = player.Position.ToBlockCoordsRaw();
                     CTF.map.QueueUpdate(new BlockUpdate(Player.Console,
                                                         CTF.RedTeam.FlagPos, CTF.RedTeam.FlagBlock));
-                    player.Message("Red flag positon set to {0}", player.Position.ToBlockCoordsExt());
+                    player.Message("Red flag positon set to {0}", player.Position.ToBlockCoordsRaw());
                     break;
                 case "blueflag":
-                    CTF.BlueTeam.FlagPos = player.Position.ToBlockCoordsExt();
+                    CTF.BlueTeam.FlagPos = player.Position.ToBlockCoordsRaw();
                     CTF.map.QueueUpdate(new BlockUpdate(Player.Console,
                                                         CTF.BlueTeam.FlagPos, CTF.BlueTeam.FlagBlock));
-                    player.Message("Blue flag positon set to {0}", player.Position.ToBlockCoordsExt());
+                    player.Message("Blue flag positon set to {0}", player.Position.ToBlockCoordsRaw());
                     break;
                 case "swapteam":
                 case "switchteam":

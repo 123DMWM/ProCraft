@@ -840,7 +840,7 @@ namespace fCraft {
                 if (player.Supports(CpeExt.MessageType)) {
                     //double speed = (Math.Sqrt(player.Position.DistanceSquaredTo(player.lastSolidPos)) / 32);
                     //player.Send(Packet.Message((byte)MessageType.Announcement, string.Format("&eSpeed: &f{0:N2} &eBlocks/s", speed), player.UseFallbackColors));
-                    string bottomRight2 = player.Position.ToBlockCoordsExt() + "&S[" + compassString(player.Position.R) + "&S]";
+                    string bottomRight2 = player.Position.ToBlockCoordsRaw() + "&S[" + compassString(player.Position.R) + "&S]";
                     if (bottomRight2 != player.lastBottomRight2) {
                         player.lastBottomRight2 = bottomRight2;
                         player.Send(Packet.Message((byte)MessageType.BottomRight2, bottomRight2, player));

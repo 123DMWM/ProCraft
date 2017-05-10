@@ -54,8 +54,8 @@ namespace fCraft.Portals {
         }
 
         public bool IsInRange(Player player) {
-            if ((player.Position.X / 32) <= Range.Xmax && (player.Position.X / 32) >= Range.Xmin) {
-                if ((player.Position.Y / 32) <= Range.Ymax && (player.Position.Y / 32) >= Range.Ymin) {
+            if ((player.Position.BlockX) <= Range.Xmax && (player.Position.BlockX) >= Range.Xmin) {
+                if ((player.Position.BlockY) <= Range.Ymax && (player.Position.BlockY) >= Range.Ymin) {
                     if (((player.Position.Z / 32) - 1) <= Range.Zmax && ((player.Position.Z / 32) - 1) >= Range.Zmin) {
                         return true;
                     }
