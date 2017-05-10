@@ -26,38 +26,32 @@ using System.Runtime.Serialization;
 
 namespace fCraft.Portals {
     public class PortalDB {
-        private static TimeSpan SaveInterval = TimeSpan.FromSeconds(120);
-        private static readonly object SaveLoadLock = new object();
+        static TimeSpan SaveInterval = TimeSpan.FromSeconds(120);
+        static readonly object IOLock = new object();
 
         public static void Save() {
             try {
-                lock (SaveLoadLock) {
+                lock (IOLock) {
                     Stopwatch stopwatch = Stopwatch.StartNew();
                     int worlds = 0;
                     int portals = 0;
 
-                    using (StreamWriter fs = new StreamWriter(Paths.PortalDBFileName, false)) {
-                        ArrayList portalsList = new ArrayList();
+                    using (StreamWriter w = new StreamWriter(Paths.PortalDBFileName, false)) {
                         World[] worldsCopy = WorldManager.Worlds;
-
                         foreach (World world in worldsCopy) {
-                            if (world.Portals != null) {
-                                ArrayList portalsCopy = world.Portals;
-                                worlds++;
+                            if (world.Portals == null) continue;
+                            
+                            ArrayList portalsCopy = world.Portals;
+                            worlds++;
 
-                                foreach (Portal portal in portalsCopy) {
-                                    portals++;
-                                    fs.WriteLine(JsonSerializer.SerializeToString(portal));
-                                }
+                            foreach (Portal portal in portalsCopy) {
+                                portals++;
+                                w.WriteLine(JsonSerializer.SerializeToString(portal));
                             }
                         }
-
-                        fs.Flush();
-                        fs.Close();
                     }
 
                     stopwatch.Stop();
-
                     Logger.Log(LogType.Debug, "PortalDB.Save: Saved {0} portal(s) of {1} world(s) in {2}ms", portals, worlds, stopwatch.ElapsedMilliseconds);
                 }
             } catch (Exception ex) {
@@ -67,26 +61,25 @@ namespace fCraft.Portals {
 
         public static void Load() {
             try {
-                lock (SaveLoadLock) {
-                    using (StreamReader fs = new StreamReader(Paths.PortalDBFileName)) {
+                lock (IOLock) {
+                    using (StreamReader r = new StreamReader(Paths.PortalDBFileName)) {
                         String line;
                         int count = 0;
 
-                        while ((line = fs.ReadLine()) != null) {
+                        while ((line = r.ReadLine()) != null) {
                             Portal portal = (Portal)JsonSerializer.DeserializeFromString(line, typeof(Portal));
                             World world = WorldManager.FindWorldExact(portal.Place);
-                            if (world != null) {
+                            if (world == null) continue;
 
-                                if (world.Portals == null) {
-                                    world.Portals = new ArrayList();
-                                }
-
-                                lock (world.Portals.SyncRoot) {
-                                    world.Portals.Add(portal);
-                                }
-
-                                count++;
+                            if (world.Portals == null) {
+                                world.Portals = new ArrayList();
                             }
+
+                            lock (world.Portals.SyncRoot) {
+                                world.Portals.Add(portal);
+                            }
+
+                            count++;
                         }
 
                         if (count > 0) {

@@ -59,8 +59,8 @@ namespace fCraft {
             
             string data = null;
             if (nextState == 1) { // status state
-                int players = Server.CountPlayers(false), max = ConfigKey.MaxPlayers.GetInt();
                 string name = Chat.ReplacePercentColorCodes(ConfigKey.ServerName.GetString(), false).Replace('&', '§');
+                
                 data = @"{""version"": { ""name"": ""0.30c"", ""protocol"": " + protocolVer + @" }, ""players"": " + 
                     ServiceStack.Text.JsonSerializer.SerializeToString(new Players()) + @", ""description"": {""text"": ""§6" + 
                     name + "\n§EPlease join us at §9http://ClassiCube.net/" + @"""},""favicon"": """ + CheckForFavicon() + @"""}";
@@ -90,18 +90,9 @@ namespace fCraft {
 
 
         public string CheckForFavicon() {
-            Image image;
-            if (File.Exists("server-icon.png")) {
-                image = Image.FromFile("server-icon.png");
-                if (image.Width * image.Height == 4096) {
-                    using (MemoryStream ms = new MemoryStream()) {
-                        image.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
-                        byte[] imageBytes = ms.ToArray();
-                        image.Dispose();
-                        return "data:image/png;base64," + Convert.ToBase64String(imageBytes);
-                    }
-                }
-            }
+            string favicon = ImageFromFavicon();
+            if (favicon != null) return favicon;
+            
             // Base64 encoding of http://123dmwm.tk/I/299.png;
             return "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwgAADsI" +
                    "BFShKgAAAABl0RVh0U29mdHdhcmUAcGFpbnQubmV0IDQuMC4xMK0KCsAAAAoJSURBVHhe7ZoJcFVXHcYf27CWpZ2OzrS2Tkft1KpTR6u12mrV" +
@@ -137,6 +128,20 @@ namespace fCraft {
                    "4kBiNtfqNGWeCgukHhNhaKPZIQ+M7cpwysZYIXLAHYDDLCGyIDOnTubTp06RRdIiWHOkwE8A8AAjMQATEQs9/KsBatXr7aLId/xpIg7SB6ZlU" +
                    "/91BmwO2IObJf4LQGbZYKyokTvDxdF7GKEASxuGECKhtcABGGAWwM4H2AA2yQGkBEYwKMqDGCOIxaDGHFW+xMnTtjv3O0ud5DlUz92A4z5L9j" +
                    "2II10x3D2AAAAAElFTkSuQmCC";
+        }
+        
+        static string ImageFromFavicon() {
+            if (!File.Exists("server-icon.png")) return null;
+            
+            using (Image image = Image.FromFile("server-icon.png")) {
+                if (image.Width != 64 || image.Height != 64) return null;
+                
+                using (MemoryStream ms = new MemoryStream()) {
+                    image.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+                    byte[] data = ms.ToArray();
+                    return "data:image/png;base64," + Convert.ToBase64String(data);
+                }
+            }
         }
 
         public class Sample {

@@ -962,7 +962,6 @@ namespace fCraft
                 case "a":
                 case "add":
                 case "create":
-                    ChatFilter aFilter = new ChatFilter();
                     string word = cmd.Next();
                     string replacement = cmd.NextAll();
                     if (string.IsNullOrEmpty(word) || string.IsNullOrEmpty(replacement)) {
