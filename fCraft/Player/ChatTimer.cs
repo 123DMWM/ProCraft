@@ -74,14 +74,12 @@ namespace fCraft {
             task.RunRepeating( TimeSpan.Zero,
                                TimeSpan.FromSeconds( 1 ),
                                oneSecondRepeats );
-            try
-            {
-                if (!(Directory.Exists("./Timers"))) Directory.CreateDirectory("./Timers");
-                string[] output = { "StartDate: " + StartTime.ToString(), "EndDate: " + EndTime.ToString(), "CreatedBy: " + StartedBy, "Message: " + Message };
-                File.WriteAllLines("./Timers/" + EndTime.Year.ToString() + "_" + EndTime.Month.ToString() + "_" + EndTime.Day.ToString() + "_" + EndTime.Hour.ToString() + "_" + EndTime.Minute.ToString() + "_" + EndTime.Second.ToString() + ".txt", output);
-            }
-            catch (Exception ex)
-            {
+            
+            try {
+                if (!Directory.Exists("./Timers")) Directory.CreateDirectory("./Timers");
+                string[] output = { "StartDate: " + StartTime, "EndDate: " + EndTime, "CreatedBy: " + StartedBy, "Message: " + Message };
+                File.WriteAllLines("./Timers/" + TimerFilename(this), output);
+            } catch (Exception ex) {
                 Player.Console.Message("Timer Writer Has Crashed: {0}", ex);
             }
         }
@@ -131,23 +129,25 @@ namespace fCraft {
 
 
         void Stop( bool aborted ) {
-            try
-            {
-                if (!(Directory.Exists("./Timers"))) Directory.CreateDirectory("./Timers");
-                if (File.Exists("./Timers/" + EndTime.Year.ToString() + "_" + EndTime.Month.ToString() + "_" + EndTime.Day.ToString() + "_" + EndTime.Hour.ToString() + "_" + EndTime.Minute.ToString() + "_" + EndTime.Second.ToString() + ".txt"))
-                {
-                    File.Delete("./Timers/" + EndTime.Year.ToString() + "_" + EndTime.Month.ToString() + "_" + EndTime.Day.ToString() + "_" + EndTime.Hour.ToString() + "_" + EndTime.Minute.ToString() + "_" + EndTime.Second.ToString() + ".txt");
+            try  {
+                if (!Directory.Exists("./Timers")) Directory.CreateDirectory("./Timers");
+                if (File.Exists("./Timers/" + TimerFilename(this))) {
+                    File.Delete("./Timers/" + TimerFilename(this));
                 }
-            }
-            catch (Exception ex)
-            {
+            }  catch (Exception ex) {
                 Player.Console.Message("Timer Deleter Has Crashed: {0}", ex);
             }
+        	
             Aborted = aborted;
             IsRunning = false;
             task.Stop();
             RemoveTimerFromList( this );
             RaiseStoppedEvent( this );
+        }
+        
+        static string TimerFilename(ChatTimer timer) {
+            DateTime endTime = timer.EndTime;
+            return endTime.Year + "_" + endTime.Month + "_" + endTime.Day + "_" + endTime.Hour + "_" + endTime.Minute + "_" + endTime.Second + ".txt";
         }
 
 
@@ -243,6 +243,61 @@ namespace fCraft {
                 } else {
                     return null;
                 }
+            }
+        }
+        
+        
+        internal static void LoadAll() {
+            try {
+                if (!Directory.Exists("./Timers")) return;
+                
+                string[] files = Directory.GetFiles("./Timers");
+                foreach (string file in files) {
+                    if (Path.GetExtension("./Timers/" + file) != ".txt") continue;
+                    string[] data = File.ReadAllLines(file);
+                    
+                    DateTime start = default(DateTime);
+                    DateTime end = default(DateTime);
+                    PlayerInfo creator = null;
+                    string message = null;
+                    
+                    foreach (string line in data) {
+                        if (line.Contains("StartDate: ")) {
+                            string date = line.Remove(0, "StartDate: ".Length);
+                            DateTime.TryParse(date, out start);
+                        } else if (line.Contains("EndDate: ")) {
+                            string date = line.Remove(0, "EndDate: ".Length);
+                            DateTime.TryParse(date, out end);
+                        } else if (line.Contains("CreatedBy: ")) {
+                            string creatorName = line.Remove(0, "CreatedBy: ".Length);
+                            creator = PlayerDB.FindPlayerInfoExact(creatorName);
+                        } else if (line.Contains("Message: ")) {
+                            message = line.Remove(0, "Creator: ".Length);
+                        }
+                    }
+                    
+                    if (creator == null) creator = Player.Console.Info;
+                    if (start.Ticks == 0 || end.Ticks == 0 || message == null) {
+                        Player.Console.Message("Error starting a Timer: {0}, {1}, {2}, {3}", start, end, creator.Name, message);
+                        continue;
+                    }
+                    
+                    if (end < DateTime.UtcNow) {
+                        Player.Console.Message("Timer Expired: {0}, {1}, {2}, {3} Time Now: {4}", start, end, creator.Name, message, DateTime.UtcNow);
+                        File.Delete(file);
+                        continue;
+                    }
+                    
+                    ChatTimer.Start((end - DateTime.UtcNow), message, creator.Name);
+                }
+                
+                if (files.Length > 0) {
+                    Player.Console.Message("All Timers Loaded. ({0})", files.Length);
+                } else {
+                    Player.Console.Message("No Timers Were Loaded.");
+                }
+            } catch (Exception ex) {
+                Player.Console.Message("Timer Loader Has Crashed: {0}", ex);
             }
         }
 

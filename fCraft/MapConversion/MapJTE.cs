@@ -121,9 +121,9 @@ namespace fCraft.MapConversion {
                     bs.Write( (byte)0x01 );
 
                     // Write the spawn location
-                    bs.Write( IPAddress.NetworkToHostOrder( (short)mapToSave.Spawn.BlockX );
-                    bs.Write( IPAddress.NetworkToHostOrder( (short)mapToSave.Spawn.BlockZ );
-                    bs.Write( IPAddress.NetworkToHostOrder( (short)mapToSave.Spawn.BlockY );
+                    bs.Write( IPAddress.NetworkToHostOrder( (short)mapToSave.Spawn.BlockX ) );
+                    bs.Write( IPAddress.NetworkToHostOrder( (short)mapToSave.Spawn.BlockZ ) );
+                    bs.Write( IPAddress.NetworkToHostOrder( (short)mapToSave.Spawn.BlockY ) );
 
                     //Write the spawn orientation
                     bs.Write( mapToSave.Spawn.R );

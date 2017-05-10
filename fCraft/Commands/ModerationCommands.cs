@@ -1658,7 +1658,7 @@ namespace fCraft {
 
         static void TopHandler(Player player, CommandReader cmd) {
             int x = player.Position.BlockX;
-            int y = player.Position.Y / 32;
+            int y = player.Position.BlockY;
             int z = (player.Position.Z - 51) / 32;
             Vector3I P = player.World.map.HighestFreeSpace(x, y, z);
 
