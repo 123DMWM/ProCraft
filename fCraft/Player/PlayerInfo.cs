@@ -89,7 +89,7 @@ namespace fCraft {
 
         /// <summary> Begins to asynchronously check player's account type. </summary>
         public void CheckAccountType() {
-            if( AccountType != AccountType.Paid && ConfigKey.HeartbeatUrl.ToString().ToLower().Contains("minecraft.net")) {
+            if( AccountType != AccountType.Paid && ConfigKey.HeartbeatUrl.GetString().CaselessContains("minecraft.net")) {
                 Scheduler.NewBackgroundTask( CheckPaidStatusCallback ).RunOnce( this, TimeSpan.Zero );
             }
         }

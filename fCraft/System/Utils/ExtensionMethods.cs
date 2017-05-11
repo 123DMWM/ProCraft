@@ -217,6 +217,11 @@ namespace fCraft {
         public static bool CaselessEnds(this string a, string b) {
             return a.EndsWith(b, StringComparison.OrdinalIgnoreCase);
         }
+        
+        /// <summary> Returns whether 'a' caselessly contains 'b'. </summary>
+        public static bool CaselessContains(this string a, string b) {
+            return a.IndexOf(b, StringComparison.OrdinalIgnoreCase) >= 0;
+        }
     }
 
 

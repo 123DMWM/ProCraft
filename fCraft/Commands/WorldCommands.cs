@@ -1161,7 +1161,7 @@ namespace fCraft {
         }
 
         public static bool parseUrl(ref string urlString, Player player) {
-            if (string.IsNullOrWhiteSpace(urlString)) {
+            if (urlString.NullOrWhiteSpace()) {
                 player.Message("You must provide a url to a heightmap image.");
                 return false;
             }
