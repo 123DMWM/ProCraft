@@ -205,7 +205,7 @@ namespace fCraft {
         static readonly CommandDescriptor CdSignAdd = new CommandDescriptor
         {
             Name = "SAdd",
-            Category = CommandCategory.Zone,
+            Category = CommandCategory.Zone | CommandCategory.New,
             Aliases = new[] { "SignAdd", "sign" },
             Permissions = new[] { Permission.ManageSigns },
             Usage = "/SAdd [Sign name or Number] [Message]",
@@ -833,7 +833,7 @@ namespace fCraft {
         {
             Name = "SRemove",
             Aliases = new[] { "Sdelete" },
-            Category = CommandCategory.Zone,
+            Category = CommandCategory.Zone | CommandCategory.New,
             Permissions = new[] { Permission.ManageSigns },
             Usage = "/SRemove [Sign Name or number]",
             Help = "Removes a sign with the specified name from the map.",
@@ -982,7 +982,7 @@ namespace fCraft {
             Name = "Door",
             Aliases = new[] { "doorlist", "removedoor", "rdoor", "doortest" },
             Usage = "/Door [option] [args]",
-            Category = CommandCategory.Zone,
+            Category = CommandCategory.Zone | CommandCategory.New,
             Permissions = new[] { Permission.Build },
             Help = "Command used for Door operations.&N" +
                 "Options: Create, Delete, List, Test",

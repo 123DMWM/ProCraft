@@ -56,7 +56,7 @@ namespace fCraft {
             Name = "Entity",
             Aliases = new[] { "AddEntity", "AddEnt", "Ent" },
             Permissions = new[] { Permission.BringAll },
-            Category = CommandCategory.CPE | CommandCategory.World,
+            Category = CommandCategory.CPE | CommandCategory.World | CommandCategory.New,
             Usage = "/ent <create / remove / removeAll / model / list / bring / skin>",
             Help = "Commands for manipulating entities. For help and usage for the individual options, use /help ent <option>.",
             HelpSections = new Dictionary<string, string>{
@@ -302,7 +302,7 @@ namespace fCraft {
         static readonly CommandDescriptor CdChangeModel = new CommandDescriptor {
             Name = "Model",
             Aliases = new[] { "ChangeModel", "cm" },
-            Category = CommandCategory.CPE | CommandCategory.Moderation,
+            Category = CommandCategory.CPE | CommandCategory.Moderation | CommandCategory.New,
             Permissions = new[] { Permission.ReadStaffChat },
             Usage = "/Model [Player] [Model]",
             IsConsoleSafe = true,
@@ -471,7 +471,7 @@ namespace fCraft {
             Aliases = new[] { "Reach", "rd" },
             Permissions = new[] { Permission.DrawAdvanced },
             IsConsoleSafe = true,
-            Category = CommandCategory.CPE | CommandCategory.World,
+            Category = CommandCategory.CPE | CommandCategory.World | CommandCategory.New,
             Help = "Changes player reach distance. Every 32 is one block. Default: 160",
             Usage = "/reach [Player] [distance or reset]",
             Handler = ClickDistanceHandler
@@ -558,7 +558,7 @@ namespace fCraft {
         static readonly CommandDescriptor CdCustomColors = new CommandDescriptor {
             Name = "CustomColors",
             Aliases = new[] { "ccols" },
-            Category = CommandCategory.CPE | CommandCategory.Chat,
+            Category = CommandCategory.CPE | CommandCategory.Chat | CommandCategory.New,
             Permissions = new[] { Permission.Chat },
             Usage = "/ccols [type] [args]",
             IsConsoleSafe = true,
@@ -720,7 +720,7 @@ namespace fCraft {
 
         static readonly CommandDescriptor CdEnv = new CommandDescriptor {
             Name = "Env",
-            Category = CommandCategory.CPE | CommandCategory.World,
+            Category = CommandCategory.CPE | CommandCategory.World | CommandCategory.New,
             Permissions = new[] { Permission.ManageWorlds },
             Help = "Prints or changes environmental variables for a world.&N" +
                    "Variables are: border, clouds, edge, fog, level, cloudsheight, shadow, sky, sunlight, " +
@@ -1107,7 +1107,7 @@ namespace fCraft {
         static readonly CommandDescriptor CdEnvPreset = new CommandDescriptor {
             Name = "EnvPreset",
             Aliases = new[] { "EnvPresets", "EnvP" },
-            Category = CommandCategory.CPE | CommandCategory.World,
+            Category = CommandCategory.CPE | CommandCategory.World | CommandCategory.New,
             Permissions = new[] { Permission.ManageWorlds },
             Help = "Environment preset commands&N" +
                    "Options are: Delete, Edit, Info, List, Load, Save&N" +
@@ -1239,7 +1239,7 @@ namespace fCraft {
         static readonly CommandDescriptor CdGlobalBlock = new CommandDescriptor {
             Name = "GlobalBlock",
             Aliases = new string[] { "global", "block", "gb" },
-            Category = CommandCategory.CPE | CommandCategory.World,
+            Category = CommandCategory.CPE | CommandCategory.World | CommandCategory.New,
             IsConsoleSafe = true,
             Permissions = new[] { Permission.DefineCustomBlocks },
             Usage = "/gb [type/value] {args}",
@@ -2089,7 +2089,7 @@ namespace fCraft {
         static readonly CommandDescriptor CdHackControl = new CommandDescriptor {
             Name = "HackControl",
             Aliases = new[] { "hacks", "hack", "hax" },
-            Category = CommandCategory.CPE | CommandCategory.Moderation,
+            Category = CommandCategory.CPE | CommandCategory.Moderation | CommandCategory.New,
             Permissions = new[] { Permission.Chat },
             Usage = "/Hacks [Player] [Hack] [jumpheight(if needed)]",
             IsConsoleSafe = true,
@@ -2211,7 +2211,7 @@ namespace fCraft {
         static readonly CommandDescriptor CdListClients = new CommandDescriptor {
             Name = "ListClients",
             Aliases = new[] { "pclients", "clients", "whoisanewb" },
-            Category = CommandCategory.CPE | CommandCategory.Info,
+            Category = CommandCategory.CPE | CommandCategory.Info | CommandCategory.New,
             IsConsoleSafe = true,
             Help = "Shows a list of currently clients users are using.",
             Handler = ListClientsHandler
@@ -2249,7 +2249,7 @@ namespace fCraft {
         static readonly CommandDescriptor CdMRD = new CommandDescriptor {
             Name = "MaxReachDistance",
             Aliases = new[] { "MaxReach", "MRD" },
-            Category = CommandCategory.CPE | CommandCategory.World,
+            Category = CommandCategory.CPE | CommandCategory.World | CommandCategory.New,
             Permissions = new[] { Permission.ManageWorlds },
             Help = "Changes the max reachdistance for a world",
             Usage = "/MRD [Distance] (world)",
@@ -2292,7 +2292,7 @@ namespace fCraft {
         static readonly CommandDescriptor CdtextHotKey = new CommandDescriptor {
             Name = "TextHotKey",
             Aliases = new[] { "HotKey", "thk", "hk" },
-            Category = CommandCategory.CPE | CommandCategory.Chat,
+            Category = CommandCategory.CPE | CommandCategory.Chat | CommandCategory.New,
             Permissions = new[] { Permission.ReadStaffChat },
             Usage = "/TextHotKey [Label] [Action] [KeyCode] [KeyMods]",
             Help = "Sets up TextHotKeys. Use http://minecraftwiki.net/Key_Codes for keycodes",
@@ -2337,7 +2337,7 @@ namespace fCraft {
             Name = "texture",
             Aliases = new[] { "texturepack", "tex" },
             Permissions = new[] { Permission.Chat },
-            Category = CommandCategory.CPE | CommandCategory.Chat,
+            Category = CommandCategory.CPE | CommandCategory.Chat | CommandCategory.New,
             Help = "Tells you information about our custom texture pack.",
             Handler = textureHandler
         };
@@ -2360,7 +2360,7 @@ namespace fCraft {
             Name = "ZoneSelection",
             Aliases = new[] { "zselection", "zbox", "zshow", "zs" },
             Permissions = new[] { Permission.ManageZones },
-            Category = CommandCategory.CPE | CommandCategory.Zone,
+            Category = CommandCategory.CPE | CommandCategory.Zone | CommandCategory.New,
             Help = "Lets you configure zone selections.",
             Usage = "/ZShow [Zone Name] [Color or On/Off] [Alpha] [On/Off]",
             Handler = zshowHandler

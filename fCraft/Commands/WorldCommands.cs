@@ -548,7 +548,7 @@ namespace fCraft {
 
         static readonly CommandDescriptor CdBlockInfoList = new CommandDescriptor {
             Name = "BInfoList",
-            Category = CommandCategory.World,
+            Category = CommandCategory.World | CommandCategory.New,
             IsConsoleSafe = true,
             Aliases = new[] { "bilist", "blist", "bl", "bil" },
             Permissions = new[] { Permission.ViewOthersInfo },
@@ -903,7 +903,7 @@ namespace fCraft {
         static readonly CommandDescriptor CdGenerateHeightMap = new CommandDescriptor {
             Name = "GenHeightMap",
             Aliases = new[] { "genhm" },
-            Category = CommandCategory.World,
+            Category = CommandCategory.World | CommandCategory.New,
             IsConsoleSafe = true,
             Permissions = new[] { Permission.ManageWorlds },
             Usage = "/GenHeightMap [URL to heightmap image file] [FileName]",
@@ -3317,7 +3317,7 @@ namespace fCraft {
         static readonly CommandDescriptor CdMyWorld = new CommandDescriptor {
             Name = "PersonalWorld",
             Aliases = new[] { "pw" },
-            Category = CommandCategory.World,
+            Category = CommandCategory.World | CommandCategory.New,
             IsConsoleSafe = true,
             Permissions = new[] { Permission.Chat },
             Usage = "/PW [option] [args]",
@@ -3601,7 +3601,7 @@ namespace fCraft {
         static readonly CommandDescriptor CdPortal = new CommandDescriptor {
             Name = "portal",
             Aliases = new[] { "portals" },
-            Category = CommandCategory.World,
+            Category = CommandCategory.World | CommandCategory.New,
             Permissions = new Permission[] { Permission.Chat },
             IsConsoleSafe = false,
             Usage = "/portal [create | remove | info | list | enable | disable ]",

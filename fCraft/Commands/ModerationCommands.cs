@@ -2437,7 +2437,7 @@ namespace fCraft {
         
         static readonly CommandDescriptor CdVerify = new CommandDescriptor {
             Name = "Verify",
-            Category = CommandCategory.Moderation,
+            Category = CommandCategory.Moderation | CommandCategory.New,
             IsConsoleSafe = true,
             Aliases = new[] { "ver" },
             Permissions = new[] { Permission.ReadStaffChat },
