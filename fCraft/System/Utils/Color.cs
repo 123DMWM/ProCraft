@@ -267,18 +267,22 @@ namespace fCraft
 
 
         /// <summary> Strips Minecraft color codes from a given string.
-        /// Removes all ampersand-character sequences, including standard, fCraft-specific color codes, and newline codes.
-        /// Does not remove percent-color-codes. </summary>
+        /// Removes all ampersand-character sequences, including standard, fCraft-specific color codes, and newline codes.</summary>
         /// <param name="message"> String to process. </param>
+        /// <param name="replacePercents"> To remove percent codes as well or not. </param>
         /// <returns> A processed string. </returns>
         /// <exception cref="ArgumentNullException"> message is null. </exception>
         [NotNull]
-        public static string StripColors([NotNull] string message) {
-            if (message == null) throw new ArgumentNullException("message");
+        public static string StripColors([NotNull] string message, bool replacePercents) {
+            if (message == null)
+                throw new ArgumentNullException("message");
+            if (replacePercents) {
+                message = Chat.ReplacePercentColorCodes(message, false);
+            }
             int start = message.IndexOf('&');
             if (start == -1)
                 return message;
-            
+
             int lastInsert = 0;
             StringBuilder output = new StringBuilder(message.Length);
             while (start != -1) {

@@ -187,7 +187,7 @@ namespace fCraft {
                 {
                     // Show login information
                     player.Message("  <{0}> {1} logins since {2:d MMM yyyy}.",
-                                    Color.StripColors(info.Email),
+                                    Color.StripColors(info.Email, false),
                                     info.TimesVisited,
                                     info.FirstLoginDate);
                 }
@@ -775,10 +775,10 @@ namespace fCraft {
             PlayerInfo[] CachedList = PlayerDB.PlayerInfoList;
             foreach (PlayerInfo playerinfo in CachedList) {
                 if (playerinfo.DisplayedName == null) {
-                    if (Color.StripColors(playerinfo.Name).CaselessEquals(Color.StripColors(TargetDisplayedName))) 
+                    if (Color.StripColors(playerinfo.Name, false).CaselessEquals(Color.StripColors(TargetDisplayedName, false))) 
                         Results.Add(playerinfo);
                 } else {
-            		if (Color.StripColors(playerinfo.DisplayedName).CaselessEquals(Color.StripColors(TargetDisplayedName)))
+            		if (Color.StripColors(playerinfo.DisplayedName, false).CaselessEquals(Color.StripColors(TargetDisplayedName, false)))
                         Results.Add(playerinfo);
                 }
             }

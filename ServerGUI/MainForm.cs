@@ -100,7 +100,7 @@ namespace fCraft.ServerGUI {
 
 
         void OnInitSuccess() {
-            Text = "ProCraft " + Updater.CurrentRelease.VersionString + " - " + Color.StripColors(ConfigKey.ServerName.GetString());
+            Text = "ProCraft " + Updater.CurrentRelease.VersionString + " - " + Color.StripColors(ConfigKey.ServerName.GetString(), false);
         }
 
 

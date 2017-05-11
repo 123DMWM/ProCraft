@@ -698,7 +698,7 @@ namespace fCraft {
             }
             Server.Players.Message("&6Bot&f: " + message);
             Logger.Log(LogType.UserActivity, "&6Bot&f: " + message);
-            IRC.SendChannelMessage("\u212C&6Bot\u211C: " + Color.StripColors(Chat.ReplacePercentColorCodes(message, false)));
+            IRC.SendChannelMessage("\u212C&6Bot\u211C: " + Color.StripColors(message, true));
         }
 
         #endregion
@@ -1332,7 +1332,7 @@ namespace fCraft {
             if (p.IsPlayingCTF) return "&f" + p.Name;
             if (p.Info.DisplayedName == null) return p.Name;
             
-            string nick = Color.StripColors(Chat.ReplacePercentColorCodes(p.Info.DisplayedName, false));
+            string nick = Color.StripColors(p.Info.DisplayedName, true);
             bool nickSame = nick.CaselessEquals(p.Info.Name);
             return nickSame ? Color.White + p.Name : Color.White + p.Name + " &S(&7" + nick + "&S)";
         }

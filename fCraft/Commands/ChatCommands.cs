@@ -1122,7 +1122,7 @@ namespace fCraft
                     player.Message("You have to greet someone else before you can greet {0} again.", last.Name);
                     return;
                 }
-                string message = "Welcome to " + Color.StripColors(ConfigKey.ServerName.GetString()) + ", " + last.Name + "!";
+                string message = "Welcome to " + Color.StripColors(ConfigKey.ServerName.GetString(), false) + ", " + last.Name + "!";
                 player.ParseMessage(message, false);
                 player.LastServerMessageDate = DateTime.UtcNow;
                 player.LastPlayerGreeted = last;
@@ -1365,14 +1365,14 @@ namespace fCraft
                                     valName);
                 return;
             }
-            if (valName != null && !Color.StripColors(Chat.ReplacePercentColorCodes(valName, false)).CaselessEquals(info.Name))
+            if (valName != null && !Color.StripColors(valName, true).CaselessEquals(info.Name))
             {
                 player.Message("CapColor: You may not change your name to something else");
                 return;
             }
             if (!player.Can(Permission.ChangeNameColor))
             {
-                valName = Color.StripColors(Chat.ReplacePercentColorCodes(valName, false));
+                valName = Color.StripColors(valName, true);
             }
             if (cmd.IsConfirmed)
             {

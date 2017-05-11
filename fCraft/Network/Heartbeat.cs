@@ -82,7 +82,7 @@ namespace fCraft
                     Server.Port.ToStringInvariant(),
                     Server.CountPlayers( false ).ToStringInvariant(),
                     ConfigKey.MaxPlayers.GetString(),
-                    Color.StripColors(ConfigKey.ServerName.GetString()),
+                    Color.StripColors(ConfigKey.ServerName.GetString(), false),
                     ConfigKey.IsPublic.GetString(),
                     ConfigKey.HeartbeatUrl.GetString()
                 };
@@ -260,7 +260,7 @@ namespace fCraft
             Port = Server.Port;
             ProtocolVersion = Config.ProtocolVersion;
             Salt = Heartbeat.Salt;
-            ServerName = Color.StripColors(ConfigKey.ServerName.GetString());
+            ServerName = Color.StripColors(ConfigKey.ServerName.GetString(), false);
             
             if (Heartbeat.sendUptime) {
                 string uptime = "[Uptime: " + (DateTime.UtcNow.Subtract(Server.StartTime)).ToMiniString() + "]";

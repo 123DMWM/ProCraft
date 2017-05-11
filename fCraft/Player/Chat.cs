@@ -90,7 +90,7 @@ namespace fCraft {
 
             Scheduler.NewTask(t => getUrls(rawMessage)).RunOnce();
 
-            rawMessage = Color.StripColors(rawMessage);
+            rawMessage = Color.StripColors(rawMessage, false);
             checkBotResponses(player, rawMessage);
 
             Logger.Log(LogType.GlobalChat,
@@ -138,7 +138,7 @@ namespace fCraft {
             StringBuilder sb = new StringBuilder();
             int i = 0;
             
-            foreach (char c in Color.StripColors(str)) {
+            foreach (char c in Color.StripColors(str, false)) {
                 if (!Char.IsWhiteSpace(c)) {
                     sb.Append('&').Append(table[i % table.Length]);
                     i++;

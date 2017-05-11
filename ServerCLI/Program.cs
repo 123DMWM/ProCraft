@@ -162,7 +162,7 @@ namespace fCraft.ServerCLI {
         [DebuggerStepThrough]
         static void OnLogged( object sender, LogEventArgs e ) {
             if( !e.WriteToConsole ) return;
-            string text = Color.StripColors( e.Message );
+            string text = Color.StripColors( e.Message, false );
             switch( e.MessageType ) {
                 case LogType.Error:
                     if( useColor ) Console.ForegroundColor = ConsoleColor.Red;

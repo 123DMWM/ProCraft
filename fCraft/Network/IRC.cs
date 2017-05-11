@@ -172,7 +172,7 @@ namespace fCraft
 
                         // register
                         Send(IRCCommands.Nick(ActualBotNick));
-                        string serverName = Color.StripColors(Chat.ReplacePercentColorCodes(ConfigKey.ServerName.GetString(), false));
+                        string serverName = Color.StripColors(ConfigKey.ServerName.GetString(), true);
                         Send(IRCCommands.User(ActualBotNick, 8, "ProCraft Server: " + serverName));
                         lastNickAttempt = DateTime.UtcNow;
                         nickTry = 0;
@@ -939,14 +939,14 @@ namespace fCraft
                 message = Chat.ReplaceUnicodeWithEmotes(message);
                 message = Chat.ReplaceEmoteKeywords(message);
                 // strips minecraft colors and newlines
-                message = Color.StripColors(message);
+                message = Color.StripColors(message, false);
             }
             else
             {
                 // strips emotes
                 message = IRCColorsAndNonStandardChars.Replace(message, "");
                 // strips minecraft colors and newlines
-                message = Color.StripColors(message);
+                message = Color.StripColors(message, false);
             }
 
             message = Chat.UnescapeBackslashes(message);
@@ -978,7 +978,7 @@ namespace fCraft
             {
                 message = message.Replace(Bold, "");
                 message = message.Replace(Reset, "");
-                message = Color.StripColors(message);
+                message = Color.StripColors(message, false);
             }
             return message.Trim();
         }

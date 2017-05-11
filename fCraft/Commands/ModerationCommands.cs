@@ -1624,7 +1624,7 @@ namespace fCraft {
                 } else {
                     Position pos = Position.FromString(info.LastWorldPos);
                     if (pos != Position.Zero) {
-                        if (player.World.Name.ToLower() == Color.StripColors(Chat.ReplacePercentColorCodes(info.LastWorld.ToLower(), false))) {
+                        if (player.World.Name.ToLower() == Color.StripColors(info.LastWorld.ToLower(), true)) {
                             if (player.World != null) {
                                 player.LastWorld = player.World;
                                 player.LastPosition = player.Position;
@@ -1633,7 +1633,7 @@ namespace fCraft {
                             return;
                         } else {
                             player.Message("That users last known position is not on this world");
-                            player.Message("Please use &H/j {0} &Sto go there", Color.StripColors(Chat.ReplacePercentColorCodes(info.LastWorld, false)));
+                            player.Message("Please use &H/j {0} &Sto go there", Color.StripColors(info.LastWorld, true));
                             return;
                         }
                     } else {

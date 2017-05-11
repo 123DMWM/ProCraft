@@ -356,7 +356,7 @@ namespace fCraft {
                 rawMessage = Chat.ReplacePercentColorCodes(rawMessage, true);
             } else {
                 rawMessage = Chat.ReplacePercentColorCodes(rawMessage, false);
-                rawMessage = Color.StripColors(rawMessage);
+                rawMessage = Color.StripColors(rawMessage, false);
             }
             
             // replace emotes

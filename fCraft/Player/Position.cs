@@ -100,7 +100,7 @@ namespace fCraft {
             try {
                 string pat = @"\(X:(.*)Y:(.*) Z:(.*) R:(.*) L:(.*)\)";
                 Regex r = new Regex(pat, RegexOptions.IgnoreCase);
-                text = Color.StripColors(Chat.ReplacePercentColorCodes(text, false));
+                text = Color.StripColors(text, true);
                 Match m = r.Match(text);
                 while (m.Success) {
                     for (int i = 1; i <= 5; i++) {

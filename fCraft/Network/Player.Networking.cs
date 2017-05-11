@@ -343,7 +343,7 @@ namespace fCraft {
             }
 
             if((message.IndexOf('&') != -1) && (!(Can(Permission.UseColorCodes)))) {
-                message = Color.StripColors( message );
+                message = Color.StripColors( message, false);
             }
             if (longerMessage == 1) {
                 message = message + "λ";
