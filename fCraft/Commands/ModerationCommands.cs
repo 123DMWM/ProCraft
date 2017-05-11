@@ -1630,6 +1630,7 @@ namespace fCraft {
                                 player.LastPosition = player.Position;
                             }
                             player.TeleportTo(pos);
+                            player.Message("Teleported to {0}'s last black change", info.Name);
                             return;
                         } else {
                             player.Message("That users last known position is not on this world");
