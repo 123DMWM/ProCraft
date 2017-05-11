@@ -1778,7 +1778,7 @@ namespace fCraft {
                     player.Message("    On world: &f{0}", info.LastWorld);
                     player.Message("    Player Position...");
                     player.Message("    {0}", info.LastWorldPos);
-                    player.Message("    (Use &H/TPP X Y Z R L&S)");
+                    player.Message("    (Use &H/TPP X Y Z R L&S or &H/TPP {0}&S)", info.Name);
                 }
             }
             if (target != null && target.PingList.Any())

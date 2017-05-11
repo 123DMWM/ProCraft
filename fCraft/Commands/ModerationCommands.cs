@@ -1611,11 +1611,38 @@ namespace fCraft {
             Handler = TeleportPHandler
         };
 
-        static void TeleportPHandler(Player player, CommandReader cmd)
-        {
+        static void TeleportPHandler(Player player, CommandReader cmd) {
             int x, y, z;
             int rot = player.Position.R;
             int lot = player.Position.L;
+
+
+            if (cmd.Count == 2) {
+                PlayerInfo info = InfoCommands.FindPlayerInfo(player, cmd, true);
+                if (info == null) {
+                    return;
+                } else {
+                    Position pos = Position.FromString(info.LastWorldPos);
+                    if (pos != Position.Zero) {
+                        if (player.World.Name.ToLower() == Color.StripColors(Chat.ReplacePercentColorCodes(info.LastWorld.ToLower(), false))) {
+                            if (player.World != null) {
+                                player.LastWorld = player.World;
+                                player.LastPosition = player.Position;
+                            }
+                            player.TeleportTo(pos);
+                            return;
+                        } else {
+                            player.Message("That users last known position is not on this world");
+                            player.Message("Please use &H/j {0} &Sto go there", Color.StripColors(Chat.ReplacePercentColorCodes(info.LastWorld, false)));
+                            return;
+                        }
+                    } else {
+                        player.Message("That user does not have a last known position");
+                        return;
+                    }
+                }
+            }
+            cmd.Rewind();
             
             if (cmd.NextInt(out x) && cmd.NextInt(out y) && cmd.NextInt(out z)) {
                 if (cmd.NextInt(out rot) && cmd.NextInt(out lot)) {

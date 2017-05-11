@@ -1,6 +1,7 @@
 ﻿// Part of fCraft | Copyright 2009-2015 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt //Copyright (c) 2011-2013 Jon Baker, Glenn Marien and Lao Tszy <Jonty800@gmail.com> //Copyright (c) <2012-2014> <LeChosenOne, DingusBungus> | ProCraft Copyright 2014-2016 Joseph Beauvais <123DMWM@gmail.com>
 using System;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 
 namespace fCraft {
     /// <summary> Struct representing a position AND orientation in 3D space.
@@ -94,6 +95,45 @@ namespace fCraft {
             return String.Format("&S(X:&f{0}&S Y:&f{1}&S Z:&f{2}&S R:&f{3}&S L:&f{4}&S)", X, Y, Z, R, L);
         }
         
+        public static Position FromString(string text) {
+            Position pos = new Position();
+            try {
+                string pat = @"\(X:(.*)Y:(.*) Z:(.*) R:(.*) L:(.*)\)";
+                Regex r = new Regex(pat, RegexOptions.IgnoreCase);
+                text = Color.StripColors(Chat.ReplacePercentColorCodes(text, false));
+                Match m = r.Match(text);
+                while (m.Success) {
+                    for (int i = 1; i <= 5; i++) {
+                        string g = m.Groups[i].ToString();
+                        switch (i) {
+                            case 1:
+                                pos.X = int.Parse(g);
+                                break;
+                            case 2:
+                                pos.Y = int.Parse(g);
+                                break;
+                            case 3:
+                                pos.Z = int.Parse(g);
+                                break;
+                            case 4:
+                                pos.R = byte.Parse(g);
+                                break;
+                            case 5:
+                                pos.L = byte.Parse(g);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    m = m.NextMatch();
+                }
+            } catch (Exception ex) {
+                Logger.Log(LogType.Error, "Position.FromString() failed to get a position");
+                Logger.Log(LogType.Error, ex.ToString());
+            }
+            return pos;
+        }
+
         public int BlockX { get { return X >> 5; } }
         public int BlockY { get { return Y >> 5; } }
         public int BlockZ { get { return Z >> 5; } }
