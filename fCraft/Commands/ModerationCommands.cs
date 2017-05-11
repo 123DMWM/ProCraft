@@ -1624,7 +1624,7 @@ namespace fCraft {
                 } else {
                     Position pos = Position.FromString(info.LastWorldPos);
                     if (pos != Position.Zero) {
-                        if (player.World.Name.ToLower() == Color.StripColors(info.LastWorld.ToLower(), true)) {
+                        if (player.World.Name.CaselessEquals(Color.StripColors(info.LastWorld, true))) {
                             if (player.World != null) {
                                 player.LastWorld = player.World;
                                 player.LastPosition = player.Position;

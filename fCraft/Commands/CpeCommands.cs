@@ -120,7 +120,7 @@ namespace fCraft {
 
             Entity entity = new Entity();
             if (option != "create" && option != "add") {
-                entity = Entity.Find(player.World, entityName.ToLower());
+                entity = Entity.Find(player.World, entityName);
                 if (entity == null) {
                     player.Message(
                         "Could not find {0}! Please make sure you spelled the entities name correctly. To view all the entities, type /ent list.",

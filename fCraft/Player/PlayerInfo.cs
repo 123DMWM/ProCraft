@@ -1365,7 +1365,7 @@ namespace fCraft {
         public void ProcessBlockPlaced( byte type ) {
             LastModified = DateTime.UtcNow;
             if (PlayerObject != null) {
-                if (PlayerObject.World.Name.ToLower() == "grief" || PlayerObject.World.Name.ToLower() == "spleef") return;
+                if (PlayerObject.World.Name.CaselessEquals("grief") || PlayerObject.World.Name.CaselessEquals("spleef")) return;
                 
                 if (type == 0) { // air
                     Interlocked.Increment(ref PlayerObject.BlocksDeletedThisSession);
@@ -1385,7 +1385,7 @@ namespace fCraft {
         public void ProcessDrawCommand( int blocksDrawn ) {
             LastModified = DateTime.UtcNow;
             if (PlayerObject != null) {
-                if (PlayerObject.World.Name.ToLower() == "grief" || PlayerObject.World.Name.ToLower() == "spleef") return;
+                if (PlayerObject.World.Name.CaselessEquals("grief") || PlayerObject.World.Name.CaselessEquals("spleef")) return;
             }
             Interlocked.Add( ref BlocksDrawn, blocksDrawn );
         }
