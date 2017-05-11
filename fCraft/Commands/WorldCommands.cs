@@ -29,6 +29,7 @@ namespace fCraft {
             CommandManager.RegisterCommand( CdGenerate );
             CommandManager.RegisterCommand( CdGenerateHeightMap );
             CommandManager.RegisterCommand( CdJoin );
+            CommandManager.RegisterCommand( CdJoinr );
             CommandManager.RegisterCommand( CdWorldLock );
             CommandManager.RegisterCommand( CdWorldUnlock );
             CommandManager.RegisterCommand( CdSpawn );
@@ -1255,6 +1256,56 @@ namespace fCraft {
                 }
             } else {
                 player.MessageNoWorld(worldName);
+            }
+        }
+
+        #endregion
+        #region Join Random
+
+        static readonly CommandDescriptor CdJoinr = new CommandDescriptor
+        {
+            Name = "JoinRandom",
+            Aliases = new[] { "jr" },
+            Category = CommandCategory.World | CommandCategory.New,
+            Usage = "/JoinRandom [@minrank]",
+            Help = "Teleports the player to a random world." +
+            "If a rank is specified it chooses from only the worlds that rank can access.",
+            Handler = JoinrHandler
+        };
+
+        private static void JoinrHandler([NotNull] Player player, [NotNull] CommandReader cmd) {
+            string rankStr = cmd.Next() ?? player.Info.Rank.Name;
+            Rank rank = RankManager.FindRank(rankStr.Replace("@", ""));
+            if (rank == null) {
+                player.MessageNoRank(rankStr.Replace("@", ""));
+                return;
+            }
+            World[] worlds = WorldManager.Worlds.Where(w => w.AccessSecurity.MinRank <= rank).ToArray();
+            World world = worlds[new Random(Environment.TickCount).Next(0, worlds.Length)];
+            if (world != null) { //'should' never be null, but whatever, null checks are always good
+                switch (world.AccessSecurity.CheckDetailed(player.Info)) {
+                    case SecurityCheckResult.Allowed:
+                    case SecurityCheckResult.WhiteListed:
+                        if (world.IsFull) {
+                            player.Message("Cannot join {0}&S: world is full.", world.ClassyName);
+                            return;
+                        }
+                        player.StopSpectating();
+                        if (!player.JoinWorldNow(world, true, WorldChangeReason.ManualJoin)) {
+                            player.Message("ERROR: Failed to join world. See log for details.");
+                        }
+                        break;
+                    case SecurityCheckResult.BlackListed:
+                        player.Message("Cannot join world {0}&S: you are blacklisted.", world.ClassyName);
+                        break;
+                    case SecurityCheckResult.RankTooLow:
+                        player.Message("Cannot join world {0}&S: must be {1}+", world.ClassyName,
+                            world.AccessSecurity.MinRank.ClassyName);
+                        break;
+                }
+            } else {
+                player.Message("World was null, shouldn't happen, Why'd you break it?");
+                return;
             }
         }
 
