@@ -1138,11 +1138,11 @@ namespace fCraft {
             try {
                 using (HttpWebResponse response = (HttpWebResponse)request.GetResponse()) {
                     if (response.StatusCode != HttpStatusCode.OK) {
-                        Logger.Log(LogType.Warning, "Could not downlaod data: {0}", response.StatusDescription);
+                        Logger.Log(LogType.Warning, "Could not download data: {0}", response.StatusDescription);
                         return null;
                     }
-                    using (StreamReader responseReader = new StreamReader(response.GetResponseStream())) {
-                        return responseReader.ReadToEnd();
+                    using (StreamReader reader = new StreamReader(response.GetResponseStream())) {
+                        return reader.ReadToEnd();
                     }
                 }
             } catch (WebException ex) {
