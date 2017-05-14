@@ -1,2 +1,6 @@
 language: csharp
 solution: ProCraft.sln
+script:
+    - zip -r ${build_number}.zip /home/travis/build/123DMWM/ProCraft/ConfigGUI/obj/Release/
+after_success:
+    "curl --ftp-create-dirs -T ${build_number}.zip -u $FTP_USER:$FTP_PASSWORD ftp://mc.123dmwm.tk/${build_number}.zip"
