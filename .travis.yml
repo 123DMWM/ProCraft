@@ -7,5 +7,5 @@ script:
     - xbuild /p:Configuration=Release ProCraft.sln
     - zip ${zip_} ${loc_}*.exe ${loc_}*.dll ${loc_}*.txt
 after_success:
-    "curl -T ${zip_} ftp://${FTP_IP}/Latest.zip --user ${user_}"
-    "curl -T ${zip_} ftp://${FTP_IP}/${zip_} --user ${user_}"
+    curl -T ${zip_} ftp://${FTP_IP}/Latest.zip --user ${user_}
+    curl -T ${zip_} ftp://${FTP_IP}/${zip_} --user ${user_}
