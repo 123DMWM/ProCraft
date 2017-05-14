@@ -1395,7 +1395,7 @@ namespace fCraft {
             current = File.GetLastWriteTime(Process.GetCurrentProcess().MainModule.FileName);
             TimeSpan zipTime = TimeSpan.Zero, currentTime = (DateTime.Now - current);
             try {
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://123DMWM.tk/ProCraft/ProCraft.zip?");
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://123DMWM.tk/ProCraft/Builds/Latest.zip?");
                 request.Method = "HEAD";
 
                 using (var resp = (HttpWebResponse)request.GetResponse()) {
@@ -1411,7 +1411,7 @@ namespace fCraft {
             player.Message("Server file last update (&7" + currentTime.ToMiniString() + " &Sago):");
             player.Message("    &7" + current.ToLongDateString() + " &Sat &7" + current.ToLongTimeString());
 
-            player.Message("Download updated Zip here: &9http://123DMWM.tk/ProCraft/ProCraft.zip");
+            player.Message("Download updated Zip here: &9http://123DMWM.tk/ProCraft/Builds/Latest.zip");
         }
         #endregion
     }

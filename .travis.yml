@@ -2,10 +2,11 @@ language: csharp
 solution: ProCraft.sln
 script:
     - loc_=/home/travis/build/123DMWM/ProCraft/bin/Release/
-    - zip_=${TRAVIS_BUILD_NUMBER}.zip
+    - ploc_=/home/travis/build/123DMWM/ProCraft/
+    - zip_=${TRAVIS_COMMIT}.zip
     - user_=${FTP_USER}:${FTP_PASSWORD}
     - xbuild /p:Configuration=Release ProCraft.sln
-    - zip -j ${zip_} ${loc_}*.exe ${loc_}*.dll ${loc_}*.txt
+    - zip -j ${zip_} ${loc_}*.exe ${loc_}*.dll ${ploc_}LICENSE.txt ${ploc_}README.txt
 after_success:
     - curl -T ${zip_} ftp://${FTP_IP}/Latest.zip --user ${user_}
     - curl -T ${zip_} ftp://${FTP_IP}/${zip_} --user ${user_}
