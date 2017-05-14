@@ -12,9 +12,12 @@ namespace fCraft.ConfigGUI {
     sealed partial class ChatPreview : UserControl {
 
         struct ColorPair {
-            public ColorPair( int r, int g, int b, int sr, int sg, int sb ) {
+            public ColorPair( int r, int g, int b ) {
                 Foreground = new SolidBrush( System.Drawing.Color.FromArgb( r, g, b ) );
-                Shadow = new SolidBrush( System.Drawing.Color.FromArgb( sr, sg, sb ) );
+                
+                // 25% opacity for shadow/background colour
+                r /= 4; g /= 4; b /= 4;
+                Shadow = new SolidBrush( System.Drawing.Color.FromArgb( r, g, b ) );
             }
             public readonly Brush Foreground, Shadow;
         }
@@ -30,23 +33,23 @@ namespace fCraft.ConfigGUI {
             }
             MinecraftFont = new Font( Fonts.Families[0], 12, FontStyle.Regular );
             ColorPairs = new[]{
-                new ColorPair(0,0,0,0,0,0),
-                new ColorPair(0,0,191,0,0,47),
-                new ColorPair(0,191,0,0,47,0),
-                new ColorPair(0,191,191,0,47,47),
-                new ColorPair(191,0,0,47,0,0),
-                new ColorPair(191,0,191,47,0,47),
-                new ColorPair(191,191,0,47,47,0),
-                new ColorPair(191,191,191,47,47,47),
+                new ColorPair(0,0,0),
+                new ColorPair(0,0,191),
+                new ColorPair(0,191,0),
+                new ColorPair(0,191,191),
+                new ColorPair(191,0,0),
+                new ColorPair(191,0,191),
+                new ColorPair(191,191,0),
+                new ColorPair(191,191,191),
 
-                new ColorPair(64,64,64,16,16,16),
-                new ColorPair(64,64,255,16,16,63),
-                new ColorPair(64,255,64,16,63,16),
-                new ColorPair(64,255,255,16,63,63),
-                new ColorPair(255,64,64,63,16,16),
-                new ColorPair(255,64,255,63,16,63),
-                new ColorPair(255,255,64,63,63,16),
-                new ColorPair(255,255,255,63,63,63)
+                new ColorPair(64,64,64),
+                new ColorPair(64,64,255),
+                new ColorPair(64,255,64),
+                new ColorPair(64,255,255),
+                new ColorPair(255,64,64),
+                new ColorPair(255,64,255),
+                new ColorPair(255,255,64),
+                new ColorPair(255,255,255)
             };
         }
 
