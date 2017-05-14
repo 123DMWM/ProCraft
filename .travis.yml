@@ -1,7 +1,11 @@
 language: csharp
 solution: ProCraft.sln
 script:
+    - loc_=/home/travis/build/123DMWM/ProCraft/bin/Release/
+    - zip_=${TRAVIS_BUILD_NUMBER}.zip
+    - user_="${FTP_USER}:${FTP_PASSWORD}"
     - xbuild /p:Configuration=Release ProCraft.sln
-    - zip Latest.zip /home/travis/build/123DMWM/ProCraft/bin/Release/*.exe /home/travis/build/123DMWM/ProCraft/bin/Release/*.dll
+    - zip ${zip_} ${loc_}*.exe ${loc_}*.dll ${loc_}*.txt
 after_success:
-    "curl --ftp-create-dirs -T Latest.zip -u $FTP_USER:$FTP_PASSWORD ftp://mc.123dmwm.tk/Latest.zip"
+    "curl -T ${zip_} ftp://${FTP_IP}/Latest.zip --user ${user_}"
+    "curl -T ${zip_} ftp://${FTP_IP}/${zip_} --user ${user_}"
