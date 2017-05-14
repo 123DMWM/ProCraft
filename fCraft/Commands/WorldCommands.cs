@@ -3445,7 +3445,9 @@ namespace fCraft {
             }
             
             World world = WorldManager.FindWorldExact(mapName);
-            Map newMap = MapGenerator.GenerateFlatgrass(world.map.Width, world.map.Length, world.map.Height);
+            Vector3I dims = world.GetOrLoadDimensions();
+            
+            Map newMap = MapGenerator.GenerateFlatgrass(dims.X, dims.Y, dims.Z);
             world.MapChangedBy = player.Name;
             world.ChangeMap(newMap);
             player.Message("Your personal world({0}) has been reset to flatgrass!", num);

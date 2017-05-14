@@ -1130,25 +1130,13 @@ namespace fCraft {
         }
         
         Vector3I GetMapDimensions() {
-            Map map = World.Map;
-            if (map != null) return new Vector3I(map.Width, map.Length, map.Height);
-            
-            lock (World.SyncRoot) {
-                if (!File.Exists(World.MapFileName)) {
-                    Logger.Log( LogType.Warning, "BlockDB.GetMapDimensions: Map file missing for " +
-                               "world {0}, assuming default map size.",World.Name );
-                    return new Vector3I(128, 128, 64);
-                }
-                
-                try {
-                    map = MapUtility.LoadHeader( World.MapFileName );
-                    return new Vector3I(map.Width, map.Length, map.Height);
-                } catch( Exception ex ) {
-                    Logger.Log( LogType.Error, "BlockDB.GetMapDimensions: " +
-                               "Failed to load map header ({0}): {1}", World.MapFileName, ex );
-                    return new Vector3I(128, 128, 64);
-                }
+            Vector3I dims = World.GetOrLoadDimensions();
+            if (dims == Vector3I.Zero) {
+                Logger.Log( LogType.Warning, "BlockDB.GetMapDimensions: Failed loading " +
+                           "world {0}, assuming default map size.",World.Name );
+                return new Vector3I(128, 128, 64);
             }
+            return dims;
         }
 
         #endregion

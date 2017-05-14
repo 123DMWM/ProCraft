@@ -139,7 +139,27 @@ namespace fCraft {
 
         /// <summary> Whether the map is currently loaded. </summary>
         public bool IsLoaded { get { return Map != null; } }
+        
+        /// <summary> Either retrieves map dimensions from loaded map, or loads map dimensions from disc. </summary>
+        public Vector3I GetOrLoadDimensions() {
+            var temp = Map;
+            if( temp != null ) return temp.Bounds.Dimensions;
 
+            lock( SyncRoot ) {
+                if( Map != null ) return Map.Bounds.Dimensions;
+                if( !File.Exists( MapFileName ) ) return Vector3I.Zero;
+                
+                try {
+                    temp = MapUtility.LoadHeader( MapFileName );
+                    return temp.Bounds.Dimensions;
+                } catch( Exception ex ) {
+                    Logger.Log( LogType.Error,
+                               "World.GetOrLoadDimensions: Failed to load map header ({0}): {1}",
+                               MapFileName, ex );
+                }
+                return Vector3I.Zero;
+            }
+        }
 
         /// <summary> Loads the map file, if needed.
         /// Generates a default map if mapfile is missing or not loadable.
@@ -935,14 +955,16 @@ namespace fCraft {
         public short SidesOffset = -2;
 
         public short GetEdgeLevel() {
-        	return (EdgeLevel == -1 && map != null) ? (short)(map.Height / 2) : EdgeLevel;
+            Vector3I dims = GetOrLoadDimensions();
+            return (EdgeLevel == -1) ? (short)(dims.Z / 2) : EdgeLevel;
         }
                 
         /// <summary> Elevation of the clouds height of the map. The default height is map.Height + 2. </summary>
         public short CloudsHeight = short.MinValue;
         
         public short GetCloudsHeight() {
-        	return (CloudsHeight == short.MinValue && map != null) ? (short)(map.Height + 2) : CloudsHeight;
+            Vector3I dims = GetOrLoadDimensions();
+            return (CloudsHeight == short.MinValue) ? (short)(dims.Z + 2) : CloudsHeight;
         }
         
         /// <summary> Maximum fog distance that can be seen by the player. The default value is 0. </summary>
