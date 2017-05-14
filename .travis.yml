@@ -3,7 +3,7 @@ solution: ProCraft.sln
 script:
     - loc_=/home/travis/build/123DMWM/ProCraft/bin/Release/
     - zip_=${TRAVIS_BUILD_NUMBER}.zip
-    - user_="${FTP_USER}:${FTP_PASSWORD}"
+    - user_=${FTP_USER}:${FTP_PASSWORD}
     - xbuild /p:Configuration=Release ProCraft.sln
     - zip ${zip_} ${loc_}*.exe ${loc_}*.dll ${loc_}*.txt
 after_success:
