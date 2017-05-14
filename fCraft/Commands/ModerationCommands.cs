@@ -237,26 +237,19 @@ namespace fCraft {
 
         static void SudoHandler(Player player, CommandReader cmd)
         {
-            string ply = cmd.Next();
-            if (!cmd.HasNext)
-            {
+            string name = cmd.Next();
+            if (!cmd.HasNext) {
                 CdSudo.PrintUsage(player);
                 return;
             }
+            
             string sudocmd = cmd.NextAll();
-            PlayerInfo p = PlayerDB.FindPlayerInfoOrPrintMatches(player, ply, SearchOptions.IncludeSelf);
-            if (p == null)
-            {
-                return;
-            }
-            if (p.PlayerObject == null)
-            {
-                player.Message("This player is offline!");
-                return;
-            }
+            Player target = Server.FindPlayerOrPrintMatches(player, name, SearchOptions.IncludeSelf);
+            if (target == null) return;
+            
             try {
-                p.PlayerObject.ParseMessage(sudocmd, false);
-                player.Message("Forced {0} to type in \"{1}\"", p.Name, sudocmd);
+                target.ParseMessage(sudocmd, false);
+                player.Message("Forced {0} to type in \"{1}\"", target.Name, sudocmd);
             } catch {
                 player.Message("Cannot use that command with /sudo");
             }

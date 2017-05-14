@@ -86,7 +86,7 @@ namespace fCraft {
                 givenZoneName = givenZoneName.Substring( 1 );
 
                 // Find the target player
-                PlayerInfo info = PlayerDB.FindPlayerInfoOrPrintMatches( player, givenZoneName, SearchOptions.IncludeHidden );
+                PlayerInfo info = PlayerDB.FindPlayerInfoOrPrintMatches( player, givenZoneName, SearchOptions.ReturnSelfIfOnlyMatch );
                 if( info == null ) return;
 
                 // Make sure that the name is not taken already.
