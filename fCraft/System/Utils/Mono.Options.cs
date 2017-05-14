@@ -214,7 +214,7 @@ namespace Mono.Options
         }
 
         private static int GetLineEnd( int start, int length, string description ) {
-            int end = Math.Min( start + length, description.Length );
+            int end = System.Math.Min( start + length, description.Length );
             int sep = -1;
             for( int i = start; i < end; ++i ) {
                 if( description[i] == '\n' )
