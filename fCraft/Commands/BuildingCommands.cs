@@ -766,7 +766,7 @@ namespace fCraft {
 
         private static void DisPlace(Player player, CommandReader cmd) {
             Block block;
-            if (cmd.Count <= 2) {
+            if (cmd.CountRemaining < 2) {
                 CdDisPlace.PrintUsage(player);
                 return;
             }

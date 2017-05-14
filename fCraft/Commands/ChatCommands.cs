@@ -1308,25 +1308,27 @@ namespace fCraft
         };
 
         private static void WarningHandler(Player player, CommandReader cmd) {
-            if (player.Info.IsMuted) {
-                player.MessageMuted();
-                return;
+            if (player.Info.IsMuted) { player.MessageMuted(); return; }
+            if (player.DetectChatSpam()) return;
+            
+            string name = cmd.Next();
+            string reason = cmd.NextAll().Trim();
+            if (name == null || reason == "") {
+            	CdWarn.PrintUsage(player);
+            	return;
             }
-            if (player.DetectChatSpam())
-                return;
-            string searchplayer = cmd.Next();
-            string warning = cmd.NextAll().Trim();
-            Player other = Server.FindPlayerOrPrintMatches(player, searchplayer, SearchOptions.Default);
-            if (other == player) {
-                player.Message("Cannot warn yourself");
-                return;
-            }
-            if (!(cmd.Count <= 2) && cmd.IsConfirmed) {
-                Server.Players.Message("{0} &chas warned {1}&c: &4{2}", player.ClassyName, other.ClassyName, warning);
-                return;
-            }
-            if (other != null) {
-                player.Confirm(cmd, "Your warning will display as: \"{0} &chas warned {1}&c: &4{2}\"", player.ClassyName, other.ClassyName, warning);
+               
+            Player target = Server.FindPlayerOrPrintMatches(player, name, SearchOptions.ReturnSelfIfOnlyMatch);
+            if (target == null) return;
+            
+            if (target == player) {
+                player.Message("You cannot &H/Warn&S yourself."); return;
+            } else if (cmd.IsConfirmed) {
+                Server.Players.Message("{0} &chas warned {1}&c: &4{2}", 
+            	                       player.ClassyName, target.ClassyName, reason);
+            } else {
+                player.Confirm(cmd, "Your warning will display as: \"{0} &chas warned {1}&c: &4{2}\"", 
+            	               player.ClassyName, target.ClassyName, reason);
             }
         }
 

@@ -598,7 +598,7 @@ namespace fCraft {
         }
 
         static void AddCustomColorsHandler(Player p, CommandReader cmd) {
-            if (cmd.Count < 4) { p.Message("Usage: &H/ccols add [code] [name] [fallback] [hex]"); return; }
+            if (cmd.CountRemaining < 4) { p.Message("Usage: &H/ccols add [code] [name] [fallback] [hex]"); return; }
             if (!p.Can(Permission.DefineCustomBlocks)) {
                 p.MessageNoAccess(Permission.DefineCustomBlocks); return;
             }
@@ -649,7 +649,7 @@ namespace fCraft {
         }
 
         static void RemoveCustomColorsHandler(Player p, CommandReader cmd) {
-            if (cmd.Count < 2) { p.Message("Usage: &H/ccols remove [code]"); return; }
+            if (cmd.CountRemaining < 2) { p.Message("Usage: &H/ccols remove [code]"); return; }
             if (cmd.RawMessage.Split()[2].Contains("\"")) {
                 p.Message("Color code cannot be \"");
                 return;
