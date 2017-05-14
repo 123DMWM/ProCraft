@@ -2,6 +2,6 @@ language: csharp
 solution: ProCraft.sln
 script:
     - xbuild /p:Configuration=Release ProCraft.sln
-    - zip -r "$TRAVIS_BUILD_NUMBER".zip /home/travis/build/123DMWM/ProCraft/bin/Release/
+    - zip -r ${TRAVIS_BUILD_NUMBER}.zip /home/travis/build/123DMWM/ProCraft/bin/Release/
 after_success:
-    "curl --ftp-create-dirs -T "$TRAVIS_BUILD_NUMBER".zip -u "$FTP_USER":"$FTP_PASSWORD" ftp://mc.123dmwm.tk/"$TRAVIS_BUILD_NUMBER".zip"
+    "curl --ftp-create-dirs -T ${TRAVIS_BUILD_NUMBER}.zip -u ${FTP_USER}:${FTP_PASSWORD} ftp://mc.123dmwm.tk/${TRAVIS_BUILD_NUMBER}.zip"
