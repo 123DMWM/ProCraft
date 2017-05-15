@@ -1132,7 +1132,7 @@ namespace fCraft {
         /// <summary> Safely downloads data. </summary>
         [CanBeNull]
         public static string downloadDatastring(string url) {
-            HttpWebRequest request = HttpUtil.CreateRequest(new Uri(url), TimeSpan.FromSeconds(5));
+            HttpWebRequest request = HttpUtil.CreateRequest(new Uri(url), TimeSpan.FromSeconds(10));
             request.CachePolicy = new RequestCachePolicy(RequestCacheLevel.BypassCache);
 
             try {
