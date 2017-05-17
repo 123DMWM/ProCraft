@@ -770,7 +770,7 @@ namespace fCraft {
                 return false;
             }
 
-            if (string.IsNullOrEmpty(ClientName) || !ClientName.ToLower().Contains("classicalsharp")) {
+            if (string.IsNullOrEmpty(ClientName) || !ClientName.CaselessContains("classicalsharp")) {
                 Message("&bIt is recommended that you use the ClassicalSharp client!");
                 Message("&9http://123dmwm.tk/cs &bredirects to the official download.");
             }

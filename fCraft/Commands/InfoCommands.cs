@@ -692,8 +692,8 @@ namespace fCraft {
                                 Environment.Version );
             }
 
-            double bytesReceivedRate = Server.Players.Aggregate( 0d, ( i, p ) => i + p.BytesReceivedRate );
-            double bytesSentRate = Server.Players.Aggregate( 0d, ( i, p ) => i + p.BytesSentRate );
+            double bytesReceivedRate = Server.Players.Sum( p => p.BytesReceivedRate );
+            double bytesSentRate = Server.Players.Sum( p => p.BytesSentRate );
             player.Message( "  Bandwidth: {0:0.0} KB/s up, {1:0.0} KB/s down",
                             bytesSentRate / 1000, bytesReceivedRate / 1000 );
 
@@ -1322,7 +1322,7 @@ namespace fCraft {
 			string output = "";
             if (param.StartsWith("*") && param.EndsWith("*")) {
                 foreach (CommandDescriptor item in items) {
-                    if (item.Name.ToLower().Contains(param.ToLower().Trim('*'))) {
+                    if (item.Name.CaselessContains(param.Trim('*'))) {
                         output += item.MinRank.Color + item.Name + "&S, ";
                     }
                 }
@@ -1335,7 +1335,7 @@ namespace fCraft {
                 return;
             } else if (param.EndsWith("*")) {
                 foreach (CommandDescriptor item in items) {
-                    if (item.Name.CaselessStarts(param.ToLower().Trim('*'))) {
+                    if (item.Name.CaselessStarts(param.Trim('*'))) {
                         output += item.MinRank.Color + item.Name + "&S, ";
                     }
                 }
@@ -1348,7 +1348,7 @@ namespace fCraft {
                 return;
 			} else if (param.StartsWith("*")) {
                 foreach (CommandDescriptor item in items) {
-                    if (item.Name.CaselessEnds(param.ToLower().Trim('*'))) {
+                    if (item.Name.CaselessEnds(param.Trim('*'))) {
                         output += item.MinRank.Color + item.Name + "&S, ";
                     }
                 }

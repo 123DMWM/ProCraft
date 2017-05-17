@@ -159,7 +159,6 @@
     <Compile Include="Player\ChatFilter.cs" />
     <Compile Include="Player\PlayerHacks.cs" />
     <Compile Include="Player\Report.cs" />
-    <Compile Include="Player\Replace.cs" />
     <Compile Include="Player\SearchOptions.cs" />
     <Compile Include="Player\SecurityController.cs" />
     <Compile Include="Plugins\Plugin.cs" />

@@ -43,7 +43,7 @@ namespace fCraft {
             }
 
             foreach (ChatFilter Swear in ChatFilter.Filters) {
-                if (rawMessage.ToLower().Contains(Swear.Word.ToLower())) {
+                if (rawMessage.CaselessContains(Swear.Word)) {
                     rawMessage = rawMessage.ReplaceString(Swear.Word, Swear.Replacement, StringComparison.InvariantCultureIgnoreCase);
                 }
             }
@@ -113,7 +113,7 @@ namespace fCraft {
                             using (var reader = new StreamReader(responseStream, encoding))
                                 fullUrl = reader.ReadToEnd();
                         }
-                        if (!fullUrl.ToLower().Contains(match.ToString().ToLower()) && !match.ToString().ToLower().Contains(fullUrl.ToLower())) {
+                        if (!fullUrl.CaselessContains(match.ToString()) && !match.ToString().CaselessContains(fullUrl)) {
                             fullUrls.Add(fullUrl);
                         }
                     }

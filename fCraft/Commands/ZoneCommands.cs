@@ -696,7 +696,7 @@ namespace fCraft {
             player.Message( "   Type &H/ZInfo ZoneName&S for details." );
             
             if (player.IsSuper || !player.Supports(CpeExt.SelectionCuboid)) return;
-            if (showZones.ToLower() !="yes") return;
+            if (!showZones.CaselessEquals("yes")) return;
             
             HighlightZoneArgs args = new HighlightZoneArgs() { Player = player, Zones = zones };
             Scheduler.NewTask(HighlightZones, args)

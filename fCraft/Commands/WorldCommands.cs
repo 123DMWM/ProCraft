@@ -1711,7 +1711,7 @@ namespace fCraft {
             } else if (param.EndsWith("*") && param.StartsWith("*")) {
                 listName = "worlds containing \"" + param.ToLower().Replace("*", "") + "\"";
                 extraParam = param.ToLower();
-                worlds = WorldManager.Worlds.Where(w => w.Name.ToLower().Contains(param.ToLower().Replace("*", ""))).ToArray();
+                worlds = WorldManager.Worlds.Where(w => w.Name.CaselessContains(param.Replace("*", ""))).ToArray();
             } else if (param.EndsWith("*")) {
                 listName = "worlds starting with \"" + param.ToLower().Replace("*", "") + "\"";
                 extraParam = param.ToLower();
@@ -3504,14 +3504,15 @@ namespace fCraft {
                 WorldManager.Worlds.Where( w =>
                     w.Name.StartsWith("PW_") && w.AccessSecurity.Check(player.Info) &&
                     !w.Name.StartsWith(mapName)).ToArray();
-            if (own.Any()) {
+            
+            if (own.Length > 0) {
                 player.Message("Your personal worlds: {0}", own.JoinToClassyString());
             }
-            if (others.Any()) {
+            if (others.Length > 0) {
                 player.Message("Player personal worlds you have access to: {0}",
                                others.JoinToClassyString());
             }
-            if (!own.Any() && !others.Any()) {
+            if (own.Length == 0 && others.Length == 0) {
                 player.Message("You do not have access to any personal worlds.");
             }
         }
