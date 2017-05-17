@@ -1087,7 +1087,7 @@ namespace fCraft {
         }
 
 
-        static readonly Uri IPCheckUri = new Uri("http://www.classicube.net/api/myip");
+        static readonly Uri IPCheckUri = new Uri("http://www.classicube.net/api/myip/");
         const int IPCheckTimeout = 20000;
 
 
