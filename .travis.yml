@@ -14,6 +14,6 @@ script:
     - xbuild /p:Configuration=Release ProCraft.sln
     - zip -j ${zip_} ${loc_}*.exe ${loc_}*.dll ${ploc_}LICENSE.txt ${ploc_}README.txt
 after_success:
-    - sshpass -p '${SFTP_PASSWORD}' rsync -avH ${zip_} -e ssh ${SFTP_USER}@${SFTP_IP}:${SFTP_LOC}/Latest.zip
-    - sshpass -p '${SFTP_PASSWORD}' rsync -avH ${zip_} -e ssh ${SFTP_USER}@${SFTP_IP}:${SFTP_LOC}/${zip_}
+    - sudo sshpass -p '${SFTP_PASSWORD}' scp -o stricthostchecking=no ${zip_} ${SFTP_USER}@${SFTP_IP}:${SFTP_LOC}
+    - sudo sshpass -p '${SFTP_PASSWORD}' scp -o stricthostchecking=no ${zip_} ${SFTP_USER}@${SFTP_IP}:${SFTP_LOC}/Latest.zip
     
