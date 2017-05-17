@@ -225,19 +225,16 @@ namespace fCraft
 
         static void ReviewHandler(Player player, CommandReader cmd)
         {
-            if (player.Info.IsMuted)
-            {
-                player.MessageMuted();
-                return;
-            }
-
+            if (player.Info.IsMuted) { player.MessageMuted(); return; }
             if (player.DetectChatSpam()) return;
-            var staff = Server.Players.Where(p => p.IsStaff);
-            if (staff != null && staff.Any()) {
+            
+            var staff = Server.Players.CanBeSeen(player).Union(player).Where(p => p.IsStaff);
+            if (staff.Any()) {
                 player.Message("Your review request has been sent to the Moderators. They will be with you shortly");
-                Server.Players.Where(p => p.IsStaff).Message("Player " + player.ClassyName + " &Srequests a building review.");
+                Server.Players.CanSee(player).Where(p => p.IsStaff)
+                    .Message("Player " + player.ClassyName + " &Srequests a building review.");
             } else {
-                player.Message("There are no staff on! Sorry!");
+                player.Message("There are no staff currently online.");
             }
         }
 
