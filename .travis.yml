@@ -1,12 +1,19 @@
 language: csharp
 solution: ProCraft.sln
+addons:
+  apt:
+    packages:
+    - lftp
+notifications:
+  slack:
+    on_success: change
 script:
     - loc_=/home/travis/build/123DMWM/ProCraft/bin/Release/
     - ploc_=/home/travis/build/123DMWM/ProCraft/
     - zip_=${TRAVIS_COMMIT}.zip
-    - user_=${FTP_USER}:${FTP_PASSWORD}
+    - user_=${SFTP_USER}:${SFTP_PASSWORD}
     - xbuild /p:Configuration=Release ProCraft.sln
     - zip -j ${zip_} ${loc_}*.exe ${loc_}*.dll ${ploc_}LICENSE.txt ${ploc_}README.txt
 after_success:
-    - curl -T ${zip_} ftp://${FTP_IP}/Latest.zip --user ${user_}
-    - curl -T ${zip_} ftp://${FTP_IP}/${zip_} --user ${user_}
+    - lftp sftp://${user_}:${SFTP_IP} -e "put {$zip_} -o Latest.zip; bye"
+    - lftp sftp://${user_}:${SFTP_IP} -e "put {$zip_} -o ${zip_}; bye"
