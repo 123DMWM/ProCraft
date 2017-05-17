@@ -1151,15 +1151,11 @@ namespace fCraft {
 				player.Message("You are not currently hidden.");
 				return;
 			}
+			
 			bool silent = cmd.HasNext;
-
 			// for aware players: notify
-			Server.Players
-				  .CanSee(player)
-				  .Message("Player {0}&S is no longer hidden.",
-							player.ClassyName);
+			Server.Players.CanSee(player).Message("Player {0}&S is no longer hidden.", player.ClassyName);
 
-			player.Info.IsHidden = false;
 			player.quitmessage = "/Quit";
 			player.usedquit = false;
 			if (silent) {
@@ -1167,15 +1163,15 @@ namespace fCraft {
 			} else {
 				player.Message("&8You are no longer hidden.");
 			}
+			
             // for unaware players: fake a join message
-            if (!silent) {
-                if (ConfigKey.ShowConnectionMessages.Enabled()) {
-                    player.Info.GeoipLogin();
-                    string msg = Server.MakePlayerConnectedMessage(player, false);
-                    Server.Players.CantSee(player).Message(msg);
-                }
+            if (!silent && ConfigKey.ShowConnectionMessages.Enabled()) {
+                player.Info.GeoipLogin();
+                string msg = Server.MakePlayerConnectedMessage(player, false);
+                Server.Players.CantSee(player).Message(msg);
             }
-
+        
+            player.Info.IsHidden = false;
 			Player.RaisePlayerHideChangedEvent(player, false, silent);
 			foreach (Player p1 in Server.Players) {
 				if (p1.Supports(CpeExt.ExtPlayerList) || p1.Supports(CpeExt.ExtPlayerList2)) {
