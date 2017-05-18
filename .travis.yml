@@ -1,7 +1,7 @@
 language: csharp
 solution: ProCraft.sln
 addons:
-  ssh_known_hosts: ${SFTP_IP}
+  ssh_known_hosts: 123DMWM.tk
   apt:
     packages:
     - sshpass
@@ -15,6 +15,6 @@ script:
     - xbuild /p:Configuration=Release ProCraft.sln
     - zip -j ${zip_} ${loc_}*.exe ${loc_}*.dll ${ploc_}LICENSE.txt ${ploc_}README.txt
 after_success:
-    - sshpass -p '${SFTP_PASSWORD}' scp -o stricthostkeychecking=no ${zip_} ${SFTP_USER}@${SFTP_IP}:${SFTP_LOC}
-    - sshpass -p '${SFTP_PASSWORD}' scp -o stricthostkeychecking=no ${zip_} ${SFTP_USER}@${SFTP_IP}:${SFTP_LOC}/Latest.zip
+    - sshpass -p '${SFTP_PASSWORD}' scp ${zip_} ${SFTP_USER}@123DMWM.tk:${SFTP_LOC}
+    - sshpass -p '${SFTP_PASSWORD}' scp ${zip_} ${SFTP_USER}@123DMWM.tk:${SFTP_LOC}/Latest.zip
     
