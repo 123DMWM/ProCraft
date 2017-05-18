@@ -1,6 +1,7 @@
 language: csharp
 solution: ProCraft.sln
 addons:
+  ssh_known_hosts: ${SFTP_IP}
   apt:
     packages:
     - sshpass
