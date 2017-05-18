@@ -185,11 +185,6 @@ namespace fCraft
             }
         }
 
-        // Called when the heartbeat server responds.
-        static void ResponseKickCallback([NotNull] IAsyncResult result)
-        {
-        }
-
         #region Events
 
         /// <summary> Occurs when a heartbeat is about to be sent (cancelable). </summary>
