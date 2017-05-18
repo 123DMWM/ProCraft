@@ -6,9 +6,9 @@ notifications:
 script:
     - loc_=/home/travis/build/123DMWM/ProCraft/bin/Release/
     - ploc_=/home/travis/build/123DMWM/ProCraft/
-    - zip_=${TRAVIS_COMMIT}.zip
+    - zip_=/home/travis/build/123DMWM/${TRAVIS_COMMIT}.zip
     - xbuild /p:Configuration=Release ProCraft.sln
     - zip -j ${zip_} ${loc_}*.exe ${loc_}*.dll ${ploc_}LICENSE.txt ${ploc_}README.txt
 after_success:
-    - curl -F fileToUpload=@/${zip_} -F key=${keyPhrase} http://123DMWM.tk/${php_link}
+    - curl -i -F fileToUpload=@${zip_} -F key=${keyPhrase} http://123DMWM.tk/${php_link}
     
