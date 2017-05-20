@@ -1414,10 +1414,10 @@ namespace fCraft {
                     Vector3I P = player.World.map.HighestFreeSpace(zone.Bounds.XCentre,
                                                                    zone.Bounds.YCentre, zone.Bounds.ZCentre);
                     Position zPos = new Position(P.X * 32 + 16, P.Y * 32 + 16, P.Z * 32 + (51 + 1));
-					if (player.World != null) {
-						player.LastWorld = player.World;
-						player.LastPosition = player.Position;
-					}
+                    if (player.World != null) {
+                        player.LastWorld = player.World;
+                        player.LastPosition = player.Position;
+                    }
                     player.TeleportTo((zPos));
                     player.Message("Teleporting you to zone " + zone.ClassyName);
                     return;
@@ -1430,10 +1430,10 @@ namespace fCraft {
                 int z = (player.Position.Z - 51) / 32;
                 Vector3I P = player.WorldMap.HighestFreeSpace(x, y, z);
 
-				if (player.World != null) {
-					player.LastWorld = player.World;
-					player.LastPosition = player.Position;
-				}
+                if (player.World != null) {
+                    player.LastWorld = player.World;
+                    player.LastPosition = player.Position;
+                }
                 player.TeleportTo(new Position {
                     X = (P.X * 32 + 16),
                     Y = (P.Y * 32 + 16),
@@ -1465,22 +1465,18 @@ namespace fCraft {
                             }
                         }
                     }
-                    if (x <= -1024 || x >= 1024 || y <= -1024 || y >= 1024 || z <= -1024 || z >= 1024) {
-                        player.Message("Coordinates are outside the valid range!");
-
-					} else {
-						if (player.World != null) {
-							player.LastWorld = player.World;
-							player.LastPosition = player.Position;
-						}
-                        player.TeleportTo(new Position {
-                            X = (x*32 + 16),
-                            Y = (y*32 + 16),
-                            Z = (z*32 + 48),
-                            R = (byte) rot,
-                            L = (byte) lot
-                        });
+                    
+                    if (player.World != null) {
+                        player.LastWorld = player.World;
+                        player.LastPosition = player.Position;
                     }
+                    player.TeleportTo(new Position {
+                                          X = (x*32 + 16),
+                                          Y = (y*32 + 16),
+                                          Z = (z*32 + 52),
+                                          R = (byte) rot,
+                                          L = (byte) lot
+                                      });
                 } else {
                     CdTeleport.PrintUsage(player);
                 }
@@ -1514,11 +1510,11 @@ namespace fCraft {
                         return;
                     }
 
-					if (targetWorld == player.World) {
-						if (player.World != null) {
-							player.LastWorld = player.World;
-							player.LastPosition = player.Position;
-						}
+                    if (targetWorld == player.World) {
+                        if (player.World != null) {
+                            player.LastWorld = player.World;
+                            player.LastPosition = player.Position;
+                        }
                         player.TeleportTo(target.Position);
 
                     } else {

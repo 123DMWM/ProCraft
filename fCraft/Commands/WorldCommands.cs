@@ -3678,13 +3678,7 @@ namespace fCraft {
                                                 lot = player.Position.L;
                                             }
                                         }
-                                        
-                                        if (x < 0 || x >= 1024 || y < 0 || y >= 1024 || z < 0 || z >= 1024) {
-                                            player.Message("Coordinates are outside the valid range!");
-                                            return;
-                                        } else {
-                                            player.PortalTPPos = new Position(x * 32, y * 32, z * 32, (byte)rot, (byte)lot);
-                                        }
+                                        player.PortalTPPos = new Position(x * 32, y * 32, z * 32, (byte)rot, (byte)lot);
                                     } else {
                                         player.PortalTPPos = tpWorld.map == null ? new Position(0, 0, 0) : tpWorld.map.Spawn;
                                     }
