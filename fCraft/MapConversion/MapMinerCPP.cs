@@ -79,9 +79,9 @@ namespace fCraft.MapConversion {
             // Read in the map dimesions
             // Saved in big endian for who-knows-what reason.
             // XYZ(?)
-            int width = IPAddress.NetworkToHostOrder( bs.ReadInt16() );
-            int height = IPAddress.NetworkToHostOrder( bs.ReadInt16() );
-            int length = IPAddress.NetworkToHostOrder( bs.ReadInt16() );
+            int width = (ushort)IPAddress.NetworkToHostOrder( bs.ReadInt16() );
+            int height = (ushort)IPAddress.NetworkToHostOrder( bs.ReadInt16() );
+            int length = (ushort)IPAddress.NetworkToHostOrder( bs.ReadInt16() );
 
             // ReSharper disable UseObjectOrCollectionInitializer
             Map map = new Map( null, width, length, height, false );

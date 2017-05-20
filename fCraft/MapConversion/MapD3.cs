@@ -73,9 +73,9 @@ namespace fCraft.MapConversion {
             int formatVersion = bs.ReadInt32();
 
             // Read in the map dimesions
-            int width = bs.ReadInt16();
-            int length = bs.ReadInt16();
-            int height = bs.ReadInt16();
+            int width = bs.ReadUInt16();
+            int length = bs.ReadUInt16();
+            int height = bs.ReadUInt16();
 
             Map map = new Map( null, width, length, height, false );
 

@@ -66,9 +66,9 @@ namespace fCraft {
         public static Packet MakeSetBlock( Vector3I coords, Block type ) {
             Packet packet = new Packet( OpCode.SetBlockServer );
             //Logger.Log(LogType.Debug, "Send: MakeSetBlock({0})({1})", coords, type);
-            WriteI16( (short)coords.X, packet.Bytes, 1 );
-            WriteI16( (short)coords.Z, packet.Bytes, 3 );
-            WriteI16( (short)coords.Y, packet.Bytes, 5 );
+            WriteU16( (ushort)coords.X, packet.Bytes, 1 );
+            WriteU16( (ushort)coords.Z, packet.Bytes, 3 );
+            WriteU16( (ushort)coords.Y, packet.Bytes, 5 );
             packet.Bytes[7] = (byte)type;
             return packet;
         }
@@ -235,6 +235,11 @@ namespace fCraft {
             arr[offset] =     (byte)((number & 0xff00) >> 8);
             arr[offset + 1] = (byte)( number & 0x00ff);
         }
+        
+        internal static void WriteU16( ushort number, [NotNull] byte[] arr, int offset ) {
+            arr[offset] =     (byte)((number & 0xff00) >> 8);
+            arr[offset + 1] = (byte)( number & 0x00ff);
+        }
 
         internal static void WriteI32( int number, [NotNull] byte[] arr, int offset ) {
             arr[offset] =     (byte)((number & 0xff000000) >> 24);
@@ -292,16 +297,16 @@ namespace fCraft {
     }
     
     public struct SetBlockData {
-        public short X, Y, Z;
+        public ushort X, Y, Z;
         public byte Block;
         
         public SetBlockData(int x, int y, int z, byte block) {
-            X = (short)x; Y = (short)y; Z = (short)z;
+            X = (ushort)x; Y = (ushort)y; Z = (ushort)z;
             Block = block;
         }
         
         public SetBlockData(Vector3I p, byte block) {
-            X = (short)p.X; Y = (short)p.Y; Z = (short)p.Z;
+            X = (ushort)p.X; Y = (ushort)p.Y; Z = (ushort)p.Z;
             Block = block;
         }
     }

@@ -18,7 +18,12 @@ namespace fCraft {
         public override short ReadInt16() {
             return IPAddress.NetworkToHostOrder( base.ReadInt16() );
         }
-
+        
+        
+        public override ushort ReadUInt16() {
+            return (ushort)IPAddress.NetworkToHostOrder( base.ReadInt16() );
+        }
+        
 
         public override int ReadInt32()
         {

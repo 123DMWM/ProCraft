@@ -19,7 +19,12 @@ namespace fCraft {
         public override void Write( short data ) {
             base.Write( IPAddress.HostToNetworkOrder( data ) );
         }
+        
 
+        public override void Write( ushort data ) {
+            base.Write( IPAddress.HostToNetworkOrder( (short)data ) );
+        }
+        
 
         public override void Write( string str ) {
             if( str == null ) throw new ArgumentNullException( "str" );

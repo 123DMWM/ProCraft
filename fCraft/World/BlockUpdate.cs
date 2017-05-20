@@ -9,12 +9,12 @@ namespace fCraft {
         /// <summary> Player who initiated the block change. Can be null. </summary>
         [CanBeNull] public readonly Player Origin;
 
-        public readonly short X, Y, Z;
+        public readonly ushort X, Y, Z;
 
         /// <summary> Type of block to set at the given coordinates. </summary>
         public readonly Block BlockType;
 
-        public BlockUpdate( Player origin, short x, short y, short z, Block blockType ) {
+        public BlockUpdate( Player origin, ushort x, ushort y, ushort z, Block blockType ) {
             Origin = origin;
             X = x;
             Y = y;
@@ -24,9 +24,9 @@ namespace fCraft {
 
         public BlockUpdate( Player origin, Vector3I coord, Block blockType ) {
             Origin = origin;
-            X = (short)coord.X;
-            Y = (short)coord.Y;
-            Z = (short)coord.Z;
+            X = (ushort)coord.X;
+            Y = (ushort)coord.Y;
+            Z = (ushort)coord.Z;
             BlockType = blockType;
         }
     }

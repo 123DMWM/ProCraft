@@ -74,9 +74,9 @@ namespace fCraft.MapConversion {
             }
 
             // Read in the map dimesions
-            int width = reader.ReadInt16();
-            int length = reader.ReadInt16();
-            int height = reader.ReadInt16();
+            int width = reader.ReadUInt16();
+            int length = reader.ReadUInt16();
+            int height = reader.ReadUInt16();
 
             // ReSharper disable UseObjectOrCollectionInitializer
             Map map = new Map( null, width, length, height, false );

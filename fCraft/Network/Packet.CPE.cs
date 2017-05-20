@@ -114,13 +114,13 @@ namespace fCraft {
             packet.Bytes[1] = (byte)variable;
             if (color != null) {
                 System.Drawing.Color col = System.Drawing.ColorTranslator.FromHtml("#" + color.ToUpper());
-                WriteI16((short) col.R, packet.Bytes, 2);
-                WriteI16((short) col.G, packet.Bytes, 4);
-                WriteI16((short) col.B, packet.Bytes, 6);
+                WriteI16(col.R, packet.Bytes, 2);
+                WriteI16(col.G, packet.Bytes, 4);
+                WriteI16(col.B, packet.Bytes, 6);
             } else {
-                WriteI16((short)-1, packet.Bytes, 2);
-                WriteI16((short)-1, packet.Bytes, 4);
-                WriteI16((short)-1, packet.Bytes, 6);
+                WriteI16(-1, packet.Bytes, 2);
+                WriteI16(-1, packet.Bytes, 4);
+                WriteI16(-1, packet.Bytes, 6);
             }
             return packet;
         }
@@ -143,9 +143,9 @@ namespace fCraft {
             WriteI16((short)(bounds.YMax + 1), packet.Bytes, 76);
             
             CustomColor c = Color.ParseHex(color);
-            WriteI16((short)c.R, packet.Bytes, 78);
-            WriteI16((short)c.G, packet.Bytes, 80);
-            WriteI16((short)c.B, packet.Bytes, 82);
+            WriteI16(c.R, packet.Bytes, 78);
+            WriteI16(c.G, packet.Bytes, 80);
+            WriteI16(c.B, packet.Bytes, 82);
             WriteI16(opacity, packet.Bytes, 84);
             return packet;
         }

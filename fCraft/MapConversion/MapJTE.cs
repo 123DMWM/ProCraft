@@ -83,9 +83,9 @@ namespace fCraft.MapConversion {
             };
 
             // Read in the map dimesions
-            int width = IPAddress.NetworkToHostOrder( bs.ReadInt16() );
-            int length = IPAddress.NetworkToHostOrder( bs.ReadInt16() );
-            int height = IPAddress.NetworkToHostOrder( bs.ReadInt16() );
+            int width = (ushort)IPAddress.NetworkToHostOrder( bs.ReadInt16() );
+            int length = (ushort)IPAddress.NetworkToHostOrder( bs.ReadInt16() );
+            int height = (ushort)IPAddress.NetworkToHostOrder( bs.ReadInt16() );
 
             return new Map( null, width, length, height, false ) { Spawn = spawn };
         }

@@ -204,9 +204,9 @@ namespace fCraft {
                         CheckBlock(ref blockUpdate.Block);
                         
                         if (!useBulk) {
-                            Packet.WriteI16(blockUpdate.X, blockPacket, 1);
-                            Packet.WriteI16(blockUpdate.Z, blockPacket, 3);
-                            Packet.WriteI16(blockUpdate.Y, blockPacket, 5);
+                            Packet.WriteU16(blockUpdate.X, blockPacket, 1);
+                            Packet.WriteU16(blockUpdate.Z, blockPacket, 3);
+                            Packet.WriteU16(blockUpdate.Y, blockPacket, 5);
                             blockPacket[7] = blockUpdate.Block;
                             writer.Write( blockPacket );
                             BytesSent += blockPacket.Length;
@@ -488,9 +488,9 @@ namespace fCraft {
                 Server.UpdateTabList(true);
             }
             ResetIdleTimer();
-            short x = reader.ReadInt16();
-            short z = reader.ReadInt16();
-            short y = reader.ReadInt16();
+            ushort x = reader.ReadUInt16();
+            ushort z = reader.ReadUInt16();
+            ushort y = reader.ReadUInt16();
             ClickAction action = ( reader.ReadByte() == 1 ) ? ClickAction.Build : ClickAction.Delete;
             byte type = reader.ReadByte();
 
@@ -1113,9 +1113,9 @@ namespace fCraft {
 
             // Done sending over level copy
             writer.Write(OpCode.MapEnd);
-            writer.Write((short)map.Width);
-            writer.Write((short)map.Height);
-            writer.Write((short)map.Length);
+            writer.Write((ushort)map.Width);
+            writer.Write((ushort)map.Height);
+            writer.Write((ushort)map.Length);
             BytesSent += 7;
 
             SendJoinCpeExtensions();
