@@ -52,10 +52,13 @@ namespace fCraft.ConfigGUI {
             StartPosition = FormStartPosition.CenterParent;
             
             SuspendLayout();
-            for (char code = '0'; code <= '9'; code++)
+            for( char code = '0'; code <= '9'; code++ )
                 MakeButton(code);
-            for (char code = 'a'; code <= 'f'; code++)
+            for ( char code = 'a'; code <= 'f'; code++ )
                 MakeButton(code);
+            for (int i = 0; i < Color.ExtColors.Length; i++) {
+            	if (!Color.ExtColors[i].Undefined) MakeButton(Color.ExtColors[i].Code);
+            }
             MakeCancelButton();
             MakeWindow( title );
             ResumeLayout( false );
@@ -63,9 +66,10 @@ namespace fCraft.ConfigGUI {
         
         
         const int btnWidth = 130, btnHeight = 40;
+        int index = 0;
         void MakeButton( char colCode ) {
-            int hex = Color.Hex( colCode );
-            int row = hex / 8, col = hex % 8;
+            int row = index / 8, col = index % 8;
+            index++;
             
             Button btn = new Button();
             SysCol textCol;          
@@ -73,8 +77,8 @@ namespace fCraft.ConfigGUI {
             btn.ForeColor = textCol;
             btn.Location = new System.Drawing.Point( 9 + row * btnWidth, 7 + col * btnHeight );
             btn.Size = new System.Drawing.Size( btnWidth, btnHeight );
-            btn.Name = "b" + hex;
-            btn.TabIndex = hex;
+            btn.Name = "b" + index;
+            btn.TabIndex = index;
             btn.Text = ColorName(colCode) + " - " + colCode;
             btn.Click += delegate { ColorCode = colCode; DialogResult = DialogResult.OK; Close(); };
             btn.Margin = new Padding( 0 );
@@ -90,7 +94,7 @@ namespace fCraft.ConfigGUI {
             bCancel.Location = new System.Drawing.Point( 88, 330 );
             bCancel.Name = "bCancel";
             bCancel.Size = new System.Drawing.Size( 100, 25 );
-            bCancel.TabIndex = 16;
+            bCancel.TabIndex = 260;
             bCancel.Text = "Cancel";
             bCancel.UseVisualStyleBackColor = true;
             Controls.Add( bCancel );

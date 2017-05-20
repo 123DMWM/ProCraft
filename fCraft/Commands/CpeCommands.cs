@@ -649,8 +649,9 @@ namespace fCraft {
         }
 
         static void RemoveCustomColorsHandler(Player p, CommandReader cmd) {
-            if (cmd.CountRemaining < 2) { p.Message("Usage: &H/ccols remove [code]"); return; }
-            if (cmd.RawMessage.Split()[2].Contains("\"")) {
+            string fullCode = cmd.Next();
+            if (fullCode == null) { p.Message("Usage: &H/ccols remove [code]"); return; }
+            if (fullCode.Contains("\"")) {
                 p.Message("Color code cannot be \"");
                 return;
             }
@@ -659,7 +660,7 @@ namespace fCraft {
                 return;
             }
 
-            char code = cmd.Next()[0];
+            char code = fullCode[0];
             if (Color.IsStandardColorCode(code)) {
                 p.Message(code + " is a standard color, and thus cannot be removed."); return;
             }
