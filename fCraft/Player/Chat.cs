@@ -561,14 +561,13 @@ namespace fCraft {
             return true;
         }
 
-        /// <summary> Replaces newline codes (&amp;n and &amp;N) with actual newlines (\n). </summary>
+        /// <summary> Replaces newline codes (&amp;N) with actual newlines (\n). </summary>
         /// <param name="message"> Message to process. </param>
         /// <returns> Processed message. </returns>
         /// <exception cref="ArgumentNullException"> message is null. </exception>
         [NotNull, Pure]
         public static string ReplaceNewlines( [NotNull] string message ) {
             if( message == null ) throw new ArgumentNullException( "message" );
-            message = message.Replace( "&n", "\n" );
             message = message.Replace( "&N", "\n" );
             return message;
         }
@@ -812,7 +811,7 @@ namespace fCraft {
             {"grave", '`'}, {"'", '`'}
         };
 
-        /// <summary> Removes newlines (\n) and newline codes (&amp;n and &amp;N). </summary>
+        /// <summary> Removes newlines (\n) and newline codes (&amp;N). </summary>
         /// <param name="message"> Message to process. </param>
         /// <returns> Processed message. </returns>
         /// <exception cref="ArgumentNullException"> message is null. </exception>
@@ -821,7 +820,6 @@ namespace fCraft {
         {
             if (message == null) throw new ArgumentNullException("message");
             message = message.Replace("\n", "");
-            message = message.Replace("&n", "");
             message = message.Replace("&N", "");
             return message;
         }
@@ -931,7 +929,7 @@ namespace fCraft {
                 }
                 // extract the colorcode
                 char colorCode = message[startIndex + 1];
-                if (Color.IsColorCode(colorCode) || allowNewlines && (colorCode == 'n' || colorCode == 'N'))
+                if (Color.IsColorCode(colorCode) || allowNewlines && colorCode == 'N')
                 {
                     if (escaped)
                     {

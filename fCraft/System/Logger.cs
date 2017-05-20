@@ -74,13 +74,13 @@ namespace fCraft {
         }
 
 
-        static string[] split = new string[] { "&N", "&n" };
+        static string[] split = new string[] { "&N" };
         /// <summary> Logs a message of type ConsoleOutput, strips colors,
         /// and splits into multiple messages at newlines.
         /// Use this method for all messages of LogType.ConsoleOutput </summary>
         public static void LogToConsole( [NotNull] string message ) {
             if( message == null ) throw new ArgumentNullException( "message" );
-            if( message.Contains( "&N" ) || message.Contains( "&n" ) ) {
+            if( message.Contains( "&N" ) ) {
                 foreach( string line in message.Split( split, 
             	                                      StringSplitOptions.RemoveEmptyEntries ) ) {
                     LogToConsole( line );

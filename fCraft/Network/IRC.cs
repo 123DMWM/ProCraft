@@ -850,12 +850,12 @@ namespace fCraft
         }
 
 
-        static string[] split = new string[] { "&N", "&n", "\n" };
+        static string[] split = new string[] { "&N", "\n" };
         public static void SendRawMessage(string prefix, [NotNull] string line, string suffix)
         {
             if (line == null) throw new ArgumentNullException("line");
             // handle newlines
-            if (line.Contains("&N") || line.Contains("&n") || line.Contains("\n"))
+            if (line.Contains("&N") || line.Contains("\n"))
             {
                 string[] segments = line.Split(split, StringSplitOptions.RemoveEmptyEntries);
                 SendRawMessage(prefix, segments[0], suffix);

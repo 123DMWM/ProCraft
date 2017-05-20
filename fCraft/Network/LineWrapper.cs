@@ -250,7 +250,7 @@ namespace fCraft
                     if (expectingColor)
                     {
                         expectingColor = false;
-                        if (ch == 'N' || ch == 'n')
+                        if (ch == 'N')
                         {
                             // newline
                             inputIndex++;

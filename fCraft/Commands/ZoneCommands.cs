@@ -272,7 +272,7 @@ namespace fCraft {
                 {
                     if (!Directory.Exists("./Signs/")) Directory.CreateDirectory("./Signs/");
                     if (!Directory.Exists("./Signs/" + player.World.Name + "/")) Directory.CreateDirectory("./Signs/" + player.World.Name + "/");
-                    File.WriteAllText("./Signs/" + player.World.Name + "/" + newZone.Name + ".txt", cmd.NextAll().Replace("%n", "/n"));
+                    File.WriteAllText("./Signs/" + player.World.Name + "/" + newZone.Name + ".txt", cmd.NextAll());
                     player.Message("Message for sign {0}&S is: {1}", newZone.ClassyName, newZone.Sign);
                     newZone.Sign = null;
                 }
@@ -384,7 +384,7 @@ namespace fCraft {
                     {
                         if (!Directory.Exists("./Signs/")) Directory.CreateDirectory("./Signs/");
                         if (!Directory.Exists("./Signs/" + player.World.Name + "/")) Directory.CreateDirectory("./Signs/" + player.World.Name + "/"); 
-                        File.WriteAllText("./Signs/" + player.World.Name + "/" + zone.Name + ".txt", cmd.NextAll().Substring(1).Replace("%n", "/n"));
+                        File.WriteAllText("./Signs/" + player.World.Name + "/" + zone.Name + ".txt", cmd.NextAll().Substring(1));
                         player.Message("Sign Text for zone {0}&S changed to {1}", zone.ClassyName, zone.Sign);
                         zone.Sign = null;
                     }
