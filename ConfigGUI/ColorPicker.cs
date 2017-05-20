@@ -54,10 +54,12 @@ namespace fCraft.ConfigGUI {
             SuspendLayout();
             for( char code = '0'; code <= '9'; code++ )
                 MakeButton(code);
-            for ( char code = 'a'; code <= 'f'; code++ )
+            for( char code = 'a'; code <= 'f'; code++ )
                 MakeButton(code);
-            for (int i = 0; i < Color.ExtColors.Length; i++) {
-                if (!Color.ExtColors[i].Undefined) MakeButton(Color.ExtColors[i].Code);
+            
+            for( int i = 0; i < Color.ExtColors.Length; i++ ) {
+                if( Color.ExtColors[i].Undefined ) continue;
+                MakeButton(Color.ExtColors[i].Code);
             }
             MakeCancelButton();
             MakeWindow( title );
@@ -98,7 +100,7 @@ namespace fCraft.ConfigGUI {
             if ((rows & 1) == 0) {
                 x = (rows * btnWidth) / 2 - (100 / 2);
             } else {
-            	x = ((rows / 2) * btnWidth) + (btnWidth - 100) / 2;
+                x = ((rows / 2) * btnWidth) + (btnWidth - 100) / 2;
             }
             
             bCancel.Location = new System.Drawing.Point( 8 + x, 10 + btnHeight * btnsPerCol );

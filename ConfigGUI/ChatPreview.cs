@@ -81,7 +81,7 @@ namespace fCraft.ConfigGUI {
                             if( plainTextSegments[j].Length == 0 ) continue;
                             if( plainTextSegments[j][0] == '&' ) {
                                 colorCode = plainTextSegments[j][1];
-                                // Conver system color codes into actual color codes
+                                // Convert system color codes into actual color codes
                                 string converted = Color.Parse( colorCode );
                                 if( converted != null ) colorCode = converted[1];
                             } else {

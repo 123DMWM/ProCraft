@@ -651,10 +651,6 @@ namespace fCraft {
         static void RemoveCustomColorsHandler(Player p, CommandReader cmd) {
             string fullCode = cmd.Next();
             if (fullCode == null) { p.Message("Usage: &H/ccols remove [code]"); return; }
-            if (fullCode.Contains("\"")) {
-                p.Message("Color code cannot be \"");
-                return;
-            }
             if (!p.Can(Permission.DefineCustomBlocks)) {
                 p.MessageNoAccess(Permission.DefineCustomBlocks);
                 return;

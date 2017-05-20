@@ -143,16 +143,16 @@ namespace fCraft
         }
         
         internal static char ConvertNonStandard(char code) {
-        	switch (Char.ToLower(code)) {
-                case 's': return Sys[1];
-                case 'y': return Say[1];
-                case 'p': return PM[1];
-                case 'r': return Announcement[1];
-                case 'h': return Help[1];
-                case 'w': return Warning[1];
-                case 'm': return Me[1];
-                case 'i': return IRC[1];
-                case 't': return White[1];
+        	switch (code) {
+                case 'S': return Sys[1];
+                case 'Y': return Say[1];
+                case 'P': return PM[1];
+                case 'R': return Announcement[1];
+                case 'H': return Help[1];
+                case 'W': return Warning[1];
+                case 'M': return Me[1];
+                case 'I': return IRC[1];
+                case 'T': return White[1];
                 default:
                     char fallback = GetFallback(code);
                     return fallback == '\0' ? '\0' : code;
@@ -199,12 +199,10 @@ namespace fCraft
         [Pure]
         public static bool IsColorCode(char code) {
             return (code >= '0' && code <= '9') || (code >= 'a' && code <= 'f') ||
-                   (code >= 'A' && code <= 'F') || code == 'H' || code == 'h' ||
-                   code == 'I' || code == 'i' || code == 'M' || code == 'm' ||
-                   code == 'N' || code == 'n' || code == 'P' || code == 'p' || 
-                   code == 'R' || code == 'r' || code == 'S' || code == 's' || 
-                   code == 'T' || code == 't' || code == 'W' || code == 'w' ||
-                   code == 'Y' || code == 'y' || GetFallback(code) != '\0';
+                   (code >= 'A' && code <= 'F') || code == 'H' || code == 'I' || 
+                   code == 'M' || code == 'N' || code == 'P' || code == 'R' || 
+                   code == 'S' || code == 'T' || code == 'W' || code == 'Y' || 
+                   GetFallback(code) != '\0';
         }
 
 
@@ -221,16 +219,16 @@ namespace fCraft
             for (int i = sb.Length - 1; i > 0; i--) {
                 if (sb[i - 1] != '&') continue;
                 
-                switch (Char.ToLower(sb[i])) {
-                    case 's': sb[i] = Sys[1]; break;
-                    case 'y': sb[i] = Say[1]; break;
-                    case 'p': sb[i] = PM[1]; break;
-                    case 'r': sb[i] = Announcement[1]; break;
-                    case 'h': sb[i] = Help[1]; break;
-                    case 'w': sb[i] = Warning[1]; break;
-                    case 'm': sb[i] = Me[1]; break;
-                    case 'i': sb[i] = IRC[1]; break;
-                    case 't': sb[i] = White[1]; break;
+                switch (sb[i]) {
+                    case 'S': sb[i] = Sys[1]; break;
+                    case 'Y': sb[i] = Say[1]; break;
+                    case 'P': sb[i] = PM[1]; break;
+                    case 'R': sb[i] = Announcement[1]; break;
+                    case 'H': sb[i] = Help[1]; break;
+                    case 'W': sb[i] = Warning[1]; break;
+                    case 'M': sb[i] = Me[1]; break;
+                    case 'I': sb[i] = IRC[1]; break;
+                    case 'T': sb[i] = White[1]; break;
                 }
                 
                 char fallback = GetFallback(sb[i]);
