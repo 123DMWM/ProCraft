@@ -103,10 +103,11 @@ namespace fCraft
             if (IsStandardColorCode(code))
                 return ColorNames[Char.ToLower(code)];
             
-            string color = ConvertNonStandard(code);
-            if (color == null) return null;
-            return IsStandardColorCode(color[1]) ? 
-                ColorNames[Char.ToLower(color[1])] : ExtColors[color[1]].Name;
+            code = ConvertNonStandard(code);
+            if (code == '\0') return null;
+            
+            return IsStandardColorCode(code) ? 
+                ColorNames[Char.ToLower(code)] : ExtColors[code].Name;
         }
 
 
@@ -121,8 +122,8 @@ namespace fCraft
             if (color == null) return null;
             else if (color.Length == 0) return "";
             
-            string parsedColor = Parse(color);
-            return parsedColor == null ? null : GetName(parsedColor[1]);
+            string colorCode = Parse(color);
+            return colorCode == null ? null : GetName(colorCode[1]);
         }
 
 
@@ -136,16 +137,12 @@ namespace fCraft
         public static string Parse(char code) {
         	if (IsStandardColorCode(code))
                 return "&" + Char.ToLower(code);
-            else
-                return "&" + ConvertNonStandard(code);
-        }
-        
-        static string ConvertNonStandard(char code) {
-            char col = ConvertNonStandardRaw(code);
+
+            char col = ConvertNonStandard(code);
             return col == '\0' ? null : "&" + col;
         }
         
-        internal static char ConvertNonStandardRaw(char code) {
+        internal static char ConvertNonStandard(char code) {
         	switch (Char.ToLower(code)) {
                 case 's': return Sys[1];
                 case 'y': return Say[1];

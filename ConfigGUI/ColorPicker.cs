@@ -1,65 +1,122 @@
 ﻿// Part of fCraft | Copyright 2009-2015 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt //Copyright (c) 2011-2013 Jon Baker, Glenn Marien and Lao Tszy <Jonty800@gmail.com> //Copyright (c) <2012-2014> <LeChosenOne, DingusBungus> | ProCraft Copyright 2014-2016 Joseph Beauvais <123DMWM@gmail.com>
 using System.Collections.Generic;
 using System.Windows.Forms;
+using SysCol = System.Drawing.Color;
+using fCraft;
 
 namespace fCraft.ConfigGUI {
     internal sealed partial class ColorPicker : Form {
-        public static readonly Dictionary<int, ColorPair> ColorPairs = new Dictionary<int, ColorPair>();
-        public int ColorIndex;
+        public char ColorCode;
 
-
-        static ColorPicker() {
-            ColorPairs.Add( 0, new ColorPair( System.Drawing.Color.White, System.Drawing.Color.Black ) );
-            ColorPairs.Add( 8, new ColorPair( System.Drawing.Color.White, System.Drawing.Color.DimGray ) );
-            ColorPairs.Add( 1, new ColorPair( System.Drawing.Color.White, System.Drawing.Color.Navy ) );
-            ColorPairs.Add( 9, new ColorPair( System.Drawing.Color.White, System.Drawing.Color.RoyalBlue ) );
-            ColorPairs.Add( 2, new ColorPair( System.Drawing.Color.White, System.Drawing.Color.Green ) );
-            ColorPairs.Add( 10, new ColorPair( System.Drawing.Color.Black, System.Drawing.Color.Lime ) );
-            ColorPairs.Add( 3, new ColorPair( System.Drawing.Color.White, System.Drawing.Color.Teal ) );
-            ColorPairs.Add( 11, new ColorPair( System.Drawing.Color.Black, System.Drawing.Color.Aqua ) );
-            ColorPairs.Add( 4, new ColorPair( System.Drawing.Color.White, System.Drawing.Color.Maroon ) );
-            ColorPairs.Add( 12, new ColorPair( System.Drawing.Color.White, System.Drawing.Color.Red ) );
-            ColorPairs.Add( 5, new ColorPair( System.Drawing.Color.White, System.Drawing.Color.Purple ) );
-            ColorPairs.Add( 13, new ColorPair( System.Drawing.Color.Black, System.Drawing.Color.Magenta ) );
-            ColorPairs.Add( 6, new ColorPair( System.Drawing.Color.White, System.Drawing.Color.Olive ) );
-            ColorPairs.Add( 14, new ColorPair( System.Drawing.Color.Black, System.Drawing.Color.Yellow ) );
-            ColorPairs.Add( 7, new ColorPair( System.Drawing.Color.Black, System.Drawing.Color.Silver ) );
-            ColorPairs.Add( 15, new ColorPair( System.Drawing.Color.Black, System.Drawing.Color.White ) );
+        internal static SysCol LookupColor( char colCode, out SysCol textCol ) {
+            SysCol col = default(SysCol);
+            CustomColor custom = Color.ExtColors[colCode];
+            
+            if( Color.IsStandardColorCode( colCode ) ) {
+                int hex = Color.Hex( colCode );
+                col = SysCol.FromArgb(
+                    191 * ((hex >> 2) & 1) + 64 * (hex >> 3),
+                    191 * ((hex >> 1) & 1) + 64 * (hex >> 3),
+                    191 * ((hex >> 0) & 1) + 64 * (hex >> 3));
+            } else if( custom.Undefined ) {
+                col = SysCol.White;
+            } else {
+                col = SysCol.FromArgb( custom.R, custom.G, custom.B );
+            }
+            
+            double r = Map( col.R ), g = Map( col.G ), b = Map( col.B );
+            double L = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+            textCol = L > 0.179 ? SysCol.Black : SysCol.White;
+            return col;
         }
 
-
-        public ColorPicker( string title, int oldColorIndex ) {
-            InitializeComponent();
-            Text = title;
-            ColorIndex = oldColorIndex;
-            StartPosition = FormStartPosition.CenterParent;
-
-            b0.Click += delegate { ColorIndex = 0; DialogResult = DialogResult.OK; Close(); };
-            b1.Click += delegate { ColorIndex = 1; DialogResult = DialogResult.OK; Close(); };
-            b2.Click += delegate { ColorIndex = 2; DialogResult = DialogResult.OK; Close(); };
-            b3.Click += delegate { ColorIndex = 3; DialogResult = DialogResult.OK; Close(); };
-            b4.Click += delegate { ColorIndex = 4; DialogResult = DialogResult.OK; Close(); };
-            b5.Click += delegate { ColorIndex = 5; DialogResult = DialogResult.OK; Close(); };
-            b6.Click += delegate { ColorIndex = 6; DialogResult = DialogResult.OK; Close(); };
-            b7.Click += delegate { ColorIndex = 7; DialogResult = DialogResult.OK; Close(); };
-            b8.Click += delegate { ColorIndex = 8; DialogResult = DialogResult.OK; Close(); };
-            b9.Click += delegate { ColorIndex = 9; DialogResult = DialogResult.OK; Close(); };
-            ba.Click += delegate { ColorIndex = 10; DialogResult = DialogResult.OK; Close(); };
-            bb.Click += delegate { ColorIndex = 11; DialogResult = DialogResult.OK; Close(); };
-            bc.Click += delegate { ColorIndex = 12; DialogResult = DialogResult.OK; Close(); };
-            bd.Click += delegate { ColorIndex = 13; DialogResult = DialogResult.OK; Close(); };
-            be.Click += delegate { ColorIndex = 14; DialogResult = DialogResult.OK; Close(); };
-            bf.Click += delegate { ColorIndex = 15; DialogResult = DialogResult.OK; Close(); };
+        static double Map( double c ) {
+            c /= 255.0;
+            if ( c <= 0.03928 ) return c / 12.92;
+            return System.Math.Pow( (c + 0.055) / 1.055, 2.4 );
         }
-
-
+        
+        
         internal struct ColorPair {
-            public ColorPair( System.Drawing.Color foreground, System.Drawing.Color background ) {
+            public ColorPair( SysCol foreground, SysCol background ) {
                 Foreground = foreground;
                 Background = background;
             }
             public System.Drawing.Color Foreground;
             public System.Drawing.Color Background;
+        }
+
+
+        public ColorPicker( string title, char oldColorCode ) {
+            ColorCode = oldColorCode;
+            StartPosition = FormStartPosition.CenterParent;
+            
+            SuspendLayout();
+            for (char code = '0'; code <= '9'; code++)
+                MakeButton(code);
+            for (char code = 'a'; code <= 'f'; code++)
+                MakeButton(code);
+            MakeCancelButton();
+            MakeWindow( title );
+            ResumeLayout( false );
+        }
+        
+        
+        const int btnWidth = 130, btnHeight = 40;
+        void MakeButton( char colCode ) {
+            int hex = Color.Hex( colCode );
+            int row = hex / 8, col = hex % 8;
+            
+            Button btn = new Button();
+            SysCol textCol;          
+            btn.BackColor = LookupColor( colCode, out textCol );
+            btn.ForeColor = textCol;
+            btn.Location = new System.Drawing.Point( 9 + row * btnWidth, 7 + col * btnHeight );
+            btn.Size = new System.Drawing.Size( btnWidth, btnHeight );
+            btn.Name = "b" + hex;
+            btn.TabIndex = hex;
+            btn.Text = ColorName(colCode) + " - " + colCode;
+            btn.Click += delegate { ColorCode = colCode; DialogResult = DialogResult.OK; Close(); };
+            btn.Margin = new Padding( 0 );
+            btn.UseVisualStyleBackColor = false;
+            Controls.Add( btn );
+        }
+        
+        
+        void MakeCancelButton() {
+            Button bCancel = new System.Windows.Forms.Button();
+            bCancel.DialogResult = DialogResult.Cancel;
+            bCancel.Font = new System.Drawing.Font( "Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0 );
+            bCancel.Location = new System.Drawing.Point( 88, 330 );
+            bCancel.Name = "bCancel";
+            bCancel.Size = new System.Drawing.Size( 100, 25 );
+            bCancel.TabIndex = 16;
+            bCancel.Text = "Cancel";
+            bCancel.UseVisualStyleBackColor = true;
+            Controls.Add( bCancel );
+        }
+        
+        
+        void MakeWindow(string title) {
+            AutoScaleDimensions = new System.Drawing.SizeF( 8F, 13F );
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new System.Drawing.Size( 278, 367 );
+            Font = new System.Drawing.Font( "Lucida Console", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0 );
+            FormBorderStyle = FormBorderStyle.FixedDialog;
+            Margin = new Padding( 4, 3, 4, 3 );
+            MaximizeBox = false;
+            MinimizeBox = false;
+            Name = "ColorPicker";
+            ShowIcon = false;
+            StartPosition = FormStartPosition.CenterParent;
+            Text = title;
+        }
+        
+        
+        static string ColorName(char colCode) {
+            char[] a = Color.GetName(colCode).ToCharArray();
+            a[0] = char.ToUpper( a[0] );
+            return new string( a );
         }
     }
 }

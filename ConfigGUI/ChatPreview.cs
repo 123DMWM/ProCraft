@@ -11,20 +11,10 @@ using fCraft.ConfigGUI.Properties;
 namespace fCraft.ConfigGUI {
     sealed partial class ChatPreview : UserControl {
 
-        struct ColorPair {
-            public ColorPair( int r, int g, int b ) {
-                Foreground = new SolidBrush( System.Drawing.Color.FromArgb( r, g, b ) );
-                
-                // 25% opacity for shadow/background colour
-                r /= 4; g /= 4; b /= 4;
-                Shadow = new SolidBrush( System.Drawing.Color.FromArgb( r, g, b ) );
-            }
-            public readonly Brush Foreground, Shadow;
-        }
-
+        struct ColorPair { public Brush Foreground, Shadow; }
         static readonly PrivateFontCollection Fonts;
         static readonly Font MinecraftFont;
-        static readonly ColorPair[] ColorPairs;
+        static Dictionary<char, ColorPair> brushes = new Dictionary<char, ColorPair>();
 
         unsafe static ChatPreview() {
             Fonts = new PrivateFontCollection();
@@ -32,25 +22,6 @@ namespace fCraft.ConfigGUI {
                 Fonts.AddMemoryFont( (IntPtr)fontPointer, Resources.MinecraftFont.Length );
             }
             MinecraftFont = new Font( Fonts.Families[0], 12, FontStyle.Regular );
-            ColorPairs = new[]{
-                new ColorPair(0,0,0),
-                new ColorPair(0,0,191),
-                new ColorPair(0,191,0),
-                new ColorPair(0,191,191),
-                new ColorPair(191,0,0),
-                new ColorPair(191,0,191),
-                new ColorPair(191,191,0),
-                new ColorPair(191,191,191),
-
-                new ColorPair(64,64,64),
-                new ColorPair(64,64,255),
-                new ColorPair(64,255,64),
-                new ColorPair(64,255,255),
-                new ColorPair(255,64,64),
-                new ColorPair(255,64,255),
-                new ColorPair(255,255,64),
-                new ColorPair(255,255,255)
-            };
         }
 
 
@@ -62,12 +33,31 @@ namespace fCraft.ConfigGUI {
 
         sealed class TextSegment {
             public string Text;
-            public ColorPair Color;
+            public char ColorCode;
             public int X, Y;
 
             public void Draw( Graphics g ) {
-                g.DrawString( Text, MinecraftFont, Color.Shadow, X + 2, Y + 2 );
-                g.DrawString( Text, MinecraftFont, Color.Foreground, X, Y );
+                ColorPair pair;
+                if( !brushes.TryGetValue( ColorCode, out pair ) ) {
+                    pair = MakeColorPair();
+                    brushes[ColorCode] = pair;
+                }
+                
+                g.DrawString( Text, MinecraftFont, pair.Shadow, X + 2, Y + 2 );
+                g.DrawString( Text, MinecraftFont, pair.Foreground, X, Y );
+            }
+            
+            ColorPair MakeColorPair() {
+                ColorPair pair;
+                System.Drawing.Color textCol;
+                
+                System.Drawing.Color c = ColorPicker.LookupColor( ColorCode, out textCol );
+                pair.Foreground = new SolidBrush( System.Drawing.Color.FromArgb( c.R, c.G, c.B ) );
+                
+                // 25% opacity for shadow/background colour
+                c = System.Drawing.Color.FromArgb( c.R / 4, c.G / 4, c.B / 4 );
+                pair.Shadow = new SolidBrush( System.Drawing.Color.FromArgb( c.R, c.G, c.B ) );
+                return pair;
             }
         }
 
@@ -86,19 +76,21 @@ namespace fCraft.ConfigGUI {
                         int x = 5;
                         string[] plainTextSegments = SplitByColorRegex.Split( lines[i] );
 
-                        int color = MainForm.ParseToIndex( Color.White );
-
+                        char colorCode = 'f';
                         for( int j = 0; j < plainTextSegments.Length; j++ ) {
                             if( plainTextSegments[j].Length == 0 ) continue;
                             if( plainTextSegments[j][0] == '&' ) {
-                                color = MainForm.ParseToIndex( plainTextSegments[j] );
+                                colorCode = plainTextSegments[j][1];
+                                // Conver system color codes into actual color codes
+                                string converted = Color.Parse( colorCode );
+                                if( converted != null ) colorCode = converted[1];
                             } else {
                                 newSegments.Add( new TextSegment {
-                                    Color = ColorPairs[color],
-                                    Text = plainTextSegments[j],
-                                    X = x,
-                                    Y = y
-                                } );
+                                                    ColorCode = colorCode,
+                                                    Text = plainTextSegments[j],
+                                                    X = x,
+                                                    Y = y
+                                                } );
                                 x += (int)g.MeasureString( plainTextSegments[j], MinecraftFont ).Width;
                             }
                         }

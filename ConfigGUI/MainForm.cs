@@ -588,7 +588,7 @@ Your rank is {RANK}&S. Type &H/Help&S for help." );
             selectedRank = rank;
             tRankName.Text = rank.Name;
 
-            ApplyColor( bColorRank, ParseToIndex( rank.Color ) );
+            ApplyColor( bColorRank, ParseColor( rank.Color ) );
 
             tPrefix.Text = rank.Prefix;
 
@@ -1357,84 +1357,85 @@ Your rank is {RANK}&S. Type &H/Help&S for help." );
 
 
         #region Colors
-        int colorSys, colorSay, colorHelp, colorAnnouncement, colorPM, colorIRC, colorMe, colorWarning;
+        char colorSys, colorSay, colorHelp, colorAnnouncement, colorPM, colorIRC, colorMe, colorWarning;
 
-        void ApplyColor( Button button, int color ) {
-            button.Text = GetName( color );
-            button.BackColor = ColorPicker.ColorPairs[color].Background;
-            button.ForeColor = ColorPicker.ColorPairs[color].Foreground;
+        void ApplyColor( Button btn, char colorCode ) {
+            btn.Text = GetName( colorCode );
+            System.Drawing.Color textCol;
+            btn.BackColor = ColorPicker.LookupColor( colorCode, out textCol );
+            btn.ForeColor = textCol;
             bApply.Enabled = true;
         }
 
         private void bColorSys_Click( object sender, EventArgs e ) {
             ColorPicker picker = new ColorPicker( "System message color", colorSys );
             picker.ShowDialog();
-            colorSys = picker.ColorIndex;
+            colorSys = picker.ColorCode;
             ApplyColor( bColorSys, colorSys );
-            Color.Sys = Parse( colorSys );
+            Color.Sys = "&" + colorSys;
         }
 
         private void bColorHelp_Click( object sender, EventArgs e ) {
             ColorPicker picker = new ColorPicker( "Help message color", colorHelp );
             picker.ShowDialog();
-            colorHelp = picker.ColorIndex;
+            colorHelp = picker.ColorCode;
             ApplyColor( bColorHelp, colorHelp );
-            Color.Help = Parse( colorHelp );
+            Color.Help = "&" + colorHelp;
         }
 
         private void bColorSay_Click( object sender, EventArgs e ) {
             ColorPicker picker = new ColorPicker( "/Say message color", colorSay );
             picker.ShowDialog();
-            colorSay = picker.ColorIndex;
+            colorSay = picker.ColorCode;
             ApplyColor( bColorSay, colorSay );
-            Color.Say = Parse( colorSay );
+            Color.Say = "&" + colorSay;
         }
 
         private void bColorAnnouncement_Click( object sender, EventArgs e ) {
             ColorPicker picker = new ColorPicker( "Announcement color", colorAnnouncement );
             picker.ShowDialog();
-            colorAnnouncement = picker.ColorIndex;
+            colorAnnouncement = picker.ColorCode;
             ApplyColor( bColorAnnouncement, colorAnnouncement );
-            Color.Announcement = Parse( colorAnnouncement );
+            Color.Announcement = "&" + colorAnnouncement;
         }
 
         private void bColorPM_Click( object sender, EventArgs e ) {
             ColorPicker picker = new ColorPicker( "Private / rank chat color", colorPM );
             picker.ShowDialog();
-            colorPM = picker.ColorIndex;
+            colorPM = picker.ColorCode;
             ApplyColor( bColorPM, colorPM );
-            Color.PM = Parse( colorPM );
+            Color.PM = "&" + colorPM;
         }
 
         private void bColorWarning_Click( object sender, EventArgs e ) {
             ColorPicker picker = new ColorPicker( "Warning / Error message color", colorWarning );
             picker.ShowDialog();
-            colorWarning = picker.ColorIndex;
+            colorWarning = picker.ColorCode;
             ApplyColor( bColorWarning, colorWarning );
-            Color.Warning = Parse( colorWarning );
+            Color.Warning = "&" + colorWarning;
         }
 
         private void bColorMe_Click( object sender, EventArgs e ) {
             ColorPicker picker = new ColorPicker( "/Me command color", colorMe );
             picker.ShowDialog();
-            colorMe = picker.ColorIndex;
+            colorMe = picker.ColorCode;
             ApplyColor( bColorMe, colorMe );
-            Color.Me = Parse( colorMe );
+            Color.Me = "&" + colorMe;
         }
 
         private void bColorIRC_Click( object sender, EventArgs e ) {
             ColorPicker picker = new ColorPicker( "IRC message color", colorIRC );
             picker.ShowDialog();
-            colorIRC = picker.ColorIndex;
+            colorIRC = picker.ColorCode;
             ApplyColor( bColorIRC, colorIRC );
-            Color.IRC = Parse( colorIRC );
+            Color.IRC = "&" + colorIRC;
         }
 
         private void bColorRank_Click( object sender, EventArgs e ) {
-            ColorPicker picker = new ColorPicker( "Rank color for \"" + selectedRank.Name + "\"", ParseToIndex( selectedRank.Color ) );
+            ColorPicker picker = new ColorPicker( "Rank color for \"" + selectedRank.Name + "\"", ParseColor( selectedRank.Color ) );
             picker.ShowDialog();
-            ApplyColor( bColorRank, picker.ColorIndex );
-            selectedRank.Color = Parse( picker.ColorIndex );
+            ApplyColor( bColorRank, picker.ColorCode );
+            selectedRank.Color = "&" + picker.ColorCode;
         }
 
 
@@ -1650,52 +1651,16 @@ Your rank is {RANK}&S. Type &H/Help&S for help." );
         }
 
 
-        public static int ParseToIndex( [NotNull] string color ) {
+        public static char ParseColor( [NotNull] string color ) {
             if( color == null ) throw new ArgumentNullException( "color" );
-            color = color.ToLower();
-            if( color.Length == 2 && color[0] == '&' ) {
-                if( Color.ColorNames.ContainsKey( color[1] ) ) {
-                    return Color.ColorNames.IndexOfKey( color[1] );
-                } else {
-                    switch( color ) {
-                        case "&s": return Color.ColorNames.IndexOfKey( Color.Sys[1] );
-                        case "&y": return Color.ColorNames.IndexOfKey( Color.Say[1] );
-                        case "&p": return Color.ColorNames.IndexOfKey( Color.PM[1] );
-                        case "&r": return Color.ColorNames.IndexOfKey( Color.Announcement[1] );
-                        case "&h": return Color.ColorNames.IndexOfKey( Color.Help[1] );
-                        case "&w": return Color.ColorNames.IndexOfKey( Color.Warning[1] );
-                        case "&m": return Color.ColorNames.IndexOfKey( Color.Me[1] );
-                        case "&i": return Color.ColorNames.IndexOfKey( Color.IRC[1] );
-                        default: return 15;
-                    }
-                }
-            } else if( Color.ColorNames.ContainsValue( color ) ) {
-                return Color.ColorNames.IndexOfValue( color );
-            } else {
-                return 15; // white
-            }
+            string parsed = Color.Parse( color );
+            return parsed == null ? 'f' : parsed[1];
         }
 
         [CanBeNull, Pure]
-        public static string GetName(int index)
-        {
-            if (index >= 0 && index <= 15)
-            {
-                return Color.ColorNames.Values[index];
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        [CanBeNull]
-        public static string Parse( int index ) {
-            if( index >= 0 && index <= 15 ) {
-                return "&" + Color.ColorNames.Keys[index];
-            } else {
-                return null;
-            }
+        public static string GetName( char colorCode ) {
+            string name = Color.GetName( colorCode );
+            return name == null ? "White" : name;
         }
     }
 }

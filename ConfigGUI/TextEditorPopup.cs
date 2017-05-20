@@ -42,9 +42,9 @@ namespace fCraft.ConfigGUI {
 
         ColorPicker colorPicker;
         private void bInsertColor_Click( object sender, EventArgs e ) {
-            if( colorPicker == null ) colorPicker = new ColorPicker("Insert color",0);
-            if( colorPicker.ShowDialog() == DialogResult.OK){
-                string colorToInsert = MainForm.Parse( colorPicker.ColorIndex );
+            if( colorPicker == null ) colorPicker = new ColorPicker(" Insert color", 'f' );
+            if( colorPicker.ShowDialog() == DialogResult.OK ) {
+                string colorToInsert = "&" + colorPicker.ColorCode;
                 int selectionStart = tText.SelectionStart;
                 tText.Paste( colorToInsert );
                 tText.Select( selectionStart, 2 );

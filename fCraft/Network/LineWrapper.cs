@@ -435,7 +435,7 @@ namespace fCraft
                 ch >= (byte)'0' && ch <= (byte)'9')
                 return true;
             
-            char conv = Color.ConvertNonStandardRaw((char)ch);
+            char conv = Color.ConvertNonStandard((char)ch);
             if (ch != '\0') {
             	ch = (byte)conv;
             	if (!useFallbacks) return true;

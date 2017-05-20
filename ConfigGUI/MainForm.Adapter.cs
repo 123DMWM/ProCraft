@@ -153,33 +153,33 @@ namespace fCraft.ConfigGUI {
             xShowJoinedWorldMessages.Checked = ConfigKey.ShowJoinedWorldMessages.Enabled();
             xShowConnectionMessages.Checked = ConfigKey.ShowConnectionMessages.Enabled();
 
-            colorSys = ParseToIndex( ConfigKey.SystemMessageColor.GetString() );
+            colorSys = ParseColor( ConfigKey.SystemMessageColor.GetString() );
             ApplyColor( bColorSys, colorSys );
-            Color.Sys = Parse( colorSys );
+            Color.Sys = "&" + colorSys;
 
-            colorHelp = ParseToIndex( ConfigKey.HelpColor.GetString() );
+            colorHelp = ParseColor( ConfigKey.HelpColor.GetString() );
             ApplyColor( bColorHelp, colorHelp );
-            Color.Help = Parse( colorHelp );
+            Color.Help = "&" + colorHelp;
 
-            colorSay = ParseToIndex( ConfigKey.SayColor.GetString() );
+            colorSay = ParseColor( ConfigKey.SayColor.GetString() );
             ApplyColor( bColorSay, colorSay );
-            Color.Say = Parse( colorSay );
+            Color.Say = "&" + colorSay;
 
-            colorAnnouncement = ParseToIndex( ConfigKey.AnnouncementColor.GetString() );
+            colorAnnouncement = ParseColor( ConfigKey.AnnouncementColor.GetString() );
             ApplyColor( bColorAnnouncement, colorAnnouncement );
-            Color.Announcement = Parse( colorAnnouncement );
+            Color.Announcement = "&" + colorAnnouncement;
 
-            colorPM = ParseToIndex( ConfigKey.PrivateMessageColor.GetString() );
+            colorPM = ParseColor( ConfigKey.PrivateMessageColor.GetString() );
             ApplyColor( bColorPM, colorPM );
-            Color.PM = Parse( colorPM );
+            Color.PM = "&" + colorPM;
 
-            colorWarning = ParseToIndex( ConfigKey.WarningColor.GetString() );
+            colorWarning = ParseColor( ConfigKey.WarningColor.GetString() );
             ApplyColor( bColorWarning, colorWarning );
-            Color.Warning = Parse( colorWarning );
+            Color.Warning = "&" + colorWarning;
 
-            colorMe = ParseToIndex( ConfigKey.MeColor.GetString() );
+            colorMe = ParseColor( ConfigKey.MeColor.GetString() );
             ApplyColor( bColorMe, colorMe );
-            Color.Me = Parse( colorMe );
+            Color.Me = "&" + colorMe;
 
             tNewPlayerPrefix.Text = ConfigKey.NewPlayerPrefix.GetString();
 
@@ -367,9 +367,9 @@ namespace fCraft.ConfigGUI {
             xIRCShowColorsFromIRC.Checked = ConfigKey.IRCShowColorsFromIRC.Enabled();
             xIRCShowColorsFromServer.Checked = ConfigKey.IRCShowColorsFromServer.Enabled();
 
-            colorIRC = ParseToIndex( ConfigKey.IRCMessageColor.GetString() );
+            colorIRC = ParseColor( ConfigKey.IRCMessageColor.GetString() );
             ApplyColor( bColorIRC, colorIRC );
-            Color.IRC = Parse( colorIRC );
+            Color.IRC = "&" + colorIRC;
             xIRCBotAnnounceServerEvents.Checked = ConfigKey.IRCBotAnnounceServerEvents.Enabled();
         }
 
