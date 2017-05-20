@@ -57,7 +57,7 @@ namespace fCraft.ConfigGUI {
             for ( char code = 'a'; code <= 'f'; code++ )
                 MakeButton(code);
             for (int i = 0; i < Color.ExtColors.Length; i++) {
-            	if (!Color.ExtColors[i].Undefined) MakeButton(Color.ExtColors[i].Code);
+                if (!Color.ExtColors[i].Undefined) MakeButton(Color.ExtColors[i].Code);
             }
             MakeCancelButton();
             MakeWindow( title );
@@ -65,10 +65,10 @@ namespace fCraft.ConfigGUI {
         }
         
         
-        const int btnWidth = 130, btnHeight = 40;
+        const int btnWidth = 130, btnHeight = 40, btnsPerCol = 8;
         int index = 0;
         void MakeButton( char colCode ) {
-            int row = index / 8, col = index % 8;
+            int row = index / btnsPerCol, col = index % btnsPerCol;
             index++;
             
             Button btn = new Button();
@@ -91,7 +91,17 @@ namespace fCraft.ConfigGUI {
             Button bCancel = new System.Windows.Forms.Button();
             bCancel.DialogResult = DialogResult.Cancel;
             bCancel.Font = new System.Drawing.Font( "Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0 );
-            bCancel.Location = new System.Drawing.Point( 88, 330 );
+            
+            int rows = 1 + (index / btnsPerCol);
+            int x = 0;
+            // Centre if even count, align under row if odd count
+            if ((rows & 1) == 0) {
+                x = (rows * btnWidth) / 2 - (100 / 2);
+            } else {
+            	x = ((rows / 2) * btnWidth) + (btnWidth - 100) / 2;
+            }
+            
+            bCancel.Location = new System.Drawing.Point( 8 + x, 10 + btnHeight * btnsPerCol );
             bCancel.Name = "bCancel";
             bCancel.Size = new System.Drawing.Size( 100, 25 );
             bCancel.TabIndex = 260;
@@ -104,7 +114,8 @@ namespace fCraft.ConfigGUI {
         void MakeWindow(string title) {
             AutoScaleDimensions = new System.Drawing.SizeF( 8F, 13F );
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new System.Drawing.Size( 278, 367 );
+            int rows = 1 + (index / btnsPerCol);
+            ClientSize = new System.Drawing.Size( 18 + btnWidth * rows, 47 + btnHeight * btnsPerCol );
             Font = new System.Drawing.Font( "Lucida Console", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0 );
             FormBorderStyle = FormBorderStyle.FixedDialog;
             Margin = new Padding( 4, 3, 4, 3 );
