@@ -2066,23 +2066,15 @@ namespace fCraft {
 			Permissions = new Permission[] { Permission.Chat },
 			IsConsoleSafe = true,
 			Usage = "/Plugins",
-			Help = "Displays all plugins on the server.",
-			Handler = PluginsHandler
-		};
+            Help = "Displays all plugins on the server.",
+            Handler = PluginsHandler
+        };
 
-		static void PluginsHandler(Player player, CommandReader cmd) {
-			List<string> plugins = new List<string>();
-			player.Message("&c_Current plugins on {0}&c_", ConfigKey.ServerName.GetString());
-
-			//Sloppy :P, PluginManager.Plugins adds ".Init", so this should split the ".Init" from the plugin name
-			foreach (Plugin plugin in PluginManager.Plugins) {
-				String pluginString = plugin.ToString();
-				string[] splitPluginString = pluginString.Split('.');
-				plugins.Add(splitPluginString[0]);
-			}
-			player.Message(String.Join(", ", plugins.ToArray()));
-		}
-		#endregion
+        static void PluginsHandler(Player player, CommandReader cmd) {
+            player.Message("Plugins in {0}&S:", ConfigKey.ServerName.GetString());
+            player.Message(PluginManager.Plugins.JoinToString(plugin => plugin.Name));
+        }
+        #endregion
         #region PingList
 
         static readonly CommandDescriptor CdPingList = new CommandDescriptor {
