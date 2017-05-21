@@ -1413,7 +1413,7 @@ namespace fCraft {
 
                     Vector3I P = player.World.map.HighestFreeSpace(zone.Bounds.XCentre,
                                                                    zone.Bounds.YCentre, zone.Bounds.ZCentre);
-                    Position zPos = new Position(P.X * 32 + 16, P.Y * 32 + 16, P.Z * 32 + (51 + 1));
+                    Position zPos = new Position(P.X * 32 + 16, P.Y * 32 + 16, P.Z * 32 + Player.CharacterHeight);
                     if (player.World != null) {
                         player.LastWorld = player.World;
                         player.LastPosition = player.Position;
@@ -1427,7 +1427,7 @@ namespace fCraft {
                 Random rand = new Random();
                 int x = rand.Next(0, player.WorldMap.Width);
                 int y = rand.Next(0, player.WorldMap.Length);
-                int z = (player.Position.Z - 51) / 32;
+                int z = (player.Position.Z - Player.CharacterHeight) / 32;
                 Vector3I P = player.WorldMap.HighestFreeSpace(x, y, z);
 
                 if (player.World != null) {
@@ -1437,7 +1437,7 @@ namespace fCraft {
                 player.TeleportTo(new Position {
                     X = (P.X * 32 + 16),
                     Y = (P.Y * 32 + 16),
-                    Z = (P.Z * 32 + (51 + 1)),
+                    Z = (P.Z * 32 + Player.CharacterHeight),
                     R = player.Position.R,
                     L = player.Position.L
                 });
@@ -1672,13 +1672,13 @@ namespace fCraft {
         static void TopHandler(Player player, CommandReader cmd) {
             int x = player.Position.BlockX;
             int y = player.Position.BlockY;
-            int z = (player.Position.Z - 51) / 32;
+            int z = (player.Position.Z - Player.CharacterHeight) / 32;
             Vector3I P = player.World.map.HighestFreeSpace(x, y, z);
 
             player.TeleportTo(new Position {
                 X = (P.X * 32 + 16),
                 Y = (P.Y * 32 + 16),
-                Z = (P.Z * 32 + (51 + 1)),
+                Z = (P.Z * 32 + Player.CharacterHeight),
                 R = player.Position.R,
                 L = player.Position.L
             });

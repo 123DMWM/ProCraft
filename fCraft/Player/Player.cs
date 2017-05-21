@@ -41,6 +41,9 @@ namespace fCraft {
         /// Note that Player.Console.World is always null,
         /// and that prevents console from calling certain commands (like /TP). </summary>
         public static Player Console, AutoRank;
+        
+        /// <summary> Height of in-game player model, necessary as Position works in head position. </summary>
+        public const byte CharacterHeight = 51;
 
 
         #region Properties
@@ -267,7 +270,7 @@ namespace fCraft {
         			bb = new BoundingBox(Vector3I.Zero, Vector3I.Zero);
         		bb.XMin = Position.X - 6; bb.XMax = Position.X + 6;
         		bb.YMin = Position.Y - 6; bb.YMax = Position.Y + 6;
-        		bb.ZMin = Position.Z - 51; bb.ZMax = Position.Z;	
+        		bb.ZMin = Position.Z - CharacterHeight; bb.ZMax = Position.Z;	
         		return bb;
         	}
         }

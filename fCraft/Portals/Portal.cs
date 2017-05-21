@@ -50,7 +50,7 @@ namespace fCraft.Portals {
             return new Position(TeleportPosX, TeleportPosY, TeleportPosZ, TeleportPosR, TeleportPosL);
         }
         public Position tpPosition() {
-            return new Position(TeleportPosX, TeleportPosY, TeleportPosZ + 64, TeleportPosR, TeleportPosL);
+            return new Position(TeleportPosX, TeleportPosY, TeleportPosZ + Player.CharacterHeight, TeleportPosR, TeleportPosL);
         }
 
         public bool IsInRange(Player player) {
