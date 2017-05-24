@@ -7,8 +7,8 @@ namespace fCraft
 {
     /// <summary> A text scanner that aids parsing chat commands and their arguments.
     /// Breaks up a message into tokens at spaces. Treats quoted strings as whole tokens. </summary>
-    public sealed class CommandReader : ICloneable
-    {
+    public sealed class CommandReader : ICloneable {
+        
         /// <summary> Command descriptor associated with this command.
         /// May be null of command was not recognized by name. </summary>
         [CanBeNull]
@@ -30,8 +30,7 @@ namespace fCraft
 
 
         /// <summary> Creates a copy of an existing command. </summary>
-        public CommandReader([NotNull] CommandReader other)
-        {
+        public CommandReader([NotNull] CommandReader other) {
             if (other == null) throw new ArgumentNullException("other");
             Offset = other.Offset;
             Descriptor = other.Descriptor;
@@ -42,8 +41,7 @@ namespace fCraft
 
 
         /// <summary> Creates a command from a raw message. </summary>
-        public CommandReader([NotNull] string rawMessage)
-        {
+        public CommandReader([NotNull] string rawMessage) {
             if (rawMessage == null) throw new ArgumentNullException("rawMessage");
             Offset = 1;
             RawMessage = rawMessage;
@@ -59,8 +57,7 @@ namespace fCraft
 
         /// <summary> Creates a copy of this command.
         /// Use the copy constructor instead of this, if possible. </summary>
-        public object Clone()
-        {
+        public object Clone() {
             return new CommandReader(this);
         }
 
@@ -71,21 +68,16 @@ namespace fCraft
         /// <returns> Next argument (string), or null if there are no more arguments. </returns>
         [DebuggerStepThrough]
         [CanBeNull]
-        public string Next()
-        {
-            for (; Offset < RawMessage.Length; Offset++)
-            {
+        public string Next() {
+            for (; Offset < RawMessage.Length; Offset++) {
                 int t, j;
-                if (RawMessage[Offset] == '"')
-                {
+                if (RawMessage[Offset] == '"') {
                     j = Offset + 1;
                     for (; j < RawMessage.Length && RawMessage[j] != '"'; j++) { }
                     t = Offset;
                     Offset = j;
                     return RawMessage.Substring(t + 1, Offset - t - 1);
-                }
-                else if (RawMessage[Offset] != ' ')
-                {
+                } else if (RawMessage[Offset] != ' ') {
                     j = Offset;
                     for (; j < RawMessage.Length && RawMessage[j] != ' '; j++) { }
                     t = Offset;
@@ -99,11 +91,9 @@ namespace fCraft
 
         /// <summary> Checks whether there is another argument available.
         /// Does not modify the offset. </summary>
-        public bool HasNext
-        {
+        public bool HasNext {
             [DebuggerStepThrough]
-            get
-            {
+            get {
                 return Offset < RawMessage.Length;
             }
         }
@@ -115,16 +105,12 @@ namespace fCraft
         /// <returns> Returns true if parsing succeeded,
         /// and false if parsing failed or if there are no more arguments. </returns>
         [DebuggerStepThrough]
-        public bool NextInt(out int number)
-        {
+        public bool NextInt(out int number) {
             string nextVal = Next();
-            if (nextVal == null)
-            {
+            if (nextVal == null) {
                 number = 0;
                 return false;
-            }
-            else
-            {
+            } else {
                 return Int32.TryParse(nextVal, out number);
             }
         }
@@ -144,7 +130,7 @@ namespace fCraft
             }
             
             if (nextVal.StartsWith("~")){
-                int delta = 0; 
+                int delta = 0;
                 bool success = int.TryParse(nextVal.Remove(0, 1), out delta);
                 number = original + delta;
                 return success;
@@ -156,31 +142,20 @@ namespace fCraft
 
         /// <summary> Checks whether there there is an int argument available.
         /// Does not modify the offset. </summary>
-        public bool HasInt
-        {
+        public bool HasInt {
             [DebuggerStepThrough]
-            get
-            {
-                if (HasNext)
-                {
+            get {
+                if (HasNext) {
                     int startOffset = Offset;
                     string nextVal = Next();
-                    if (nextVal != null)
-                    {
-                        int number;
-                        if (Int32.TryParse(nextVal, out number))
-                        {
-                            Offset = startOffset;
-                            return true;
-                        }
-                    }
                     Offset = startOffset;
-                    return false;
+                    
+                    if (nextVal != null) {
+                        int number;
+                        return Int32.TryParse(nextVal, out number);
+                    }
                 }
-                else
-                {
-                    return false;
-                }
+                return false;
             }
         }
 
@@ -191,10 +166,8 @@ namespace fCraft
         /// <returns> The rest of the command, or an empty string. </returns>
         [NotNull]
         [DebuggerStepThrough]
-        public string NextAll()
-        {
-            for (; Offset < RawMessage.Length; Offset++)
-            {
+        public string NextAll() {
+            for (; Offset < RawMessage.Length; Offset++) {
                 if (RawMessage[Offset] != ' ')
                     return RawMessage.Substring(Offset);
             }
@@ -204,10 +177,8 @@ namespace fCraft
 
         /// <summary> Counts the number of arguments left in this command.
         /// Does not modify the offset. </summary>
-        public int CountRemaining
-        {
-            get
-            {
+        public int CountRemaining {
+            get {
                 int startOffset = Offset;
                 int i = 0;
                 while (Next() != null) i++;
@@ -219,10 +190,8 @@ namespace fCraft
 
         /// <summary> Counts the total number of arguments.
         /// Does not modify the offset. </summary>
-        public int Count
-        {
-            get
-            {
+        public int Count {
+            get {
                 int startOffset = Offset;
                 Rewind();
                 int i = 1;
@@ -235,8 +204,7 @@ namespace fCraft
 
         /// <summary> Resets the argument offset.
         /// After calling Rewind, arguments can be read from the beginning again. </summary>
-        public void Rewind()
-        {
+        public void Rewind() {
             Offset = 1;
             Next();
         }
@@ -253,12 +221,16 @@ namespace fCraft
         /// if next parameter could not be parsed as a block name;
         /// or if "none" blocktype was given and allowNoneBlock is false. </returns>
         [DebuggerStepThrough]
-        public bool NextBlock([CanBeNull] Player player, bool allowNoneBlock, out Block block)
-        {
+        public bool NextBlock([CanBeNull] Player player, bool allowNoneBlock, out Block block) {
             string blockName = Next();
             block = Block.None;
             if (blockName == null) return false;
             
+            return ParseBlock(blockName, player, allowNoneBlock, ref block);
+        }
+        
+        
+        bool ParseBlock(string blockName, [CanBeNull] Player player, bool allowNoneBlock, ref Block block) {
             World world = player == null ? null : player.World;
             if (Map.GetBlockByName(world, blockName, true, out block)) {
                 if (block != Block.None || allowNoneBlock) {
@@ -286,8 +258,7 @@ namespace fCraft
         /// if next parameter could not be parsed as a block name;
         /// if optional parameter was given but was not an integer;
         /// or if "none" blocktype was given and allowNoneBlock is false. </returns>
-        public bool NextBlockWithParam([CanBeNull] Player player, bool allowNoneBlock, out Block block, out int param)
-        {
+        public bool NextBlockWithParam([CanBeNull] Player player, bool allowNoneBlock, out Block block, out int param) {
             block = Block.None;
             param = 1;
 
@@ -296,53 +267,17 @@ namespace fCraft
             World world = player == null ? null : player.World;
 
             int slashIndex = jointString.IndexOf('/');
-            if (slashIndex != -1)
-            {
-                string blockName = jointString.Substring(0, slashIndex);
-                string paramString = jointString.Substring(slashIndex + 1);
-
-                
-                if (Map.GetBlockByName(world, blockName, true, out block))
-                {
-                    if (block == Block.None && !allowNoneBlock)
-                    {
-                        if (player != null)
-                        {
-                            player.Message("The \"none\" block is not allowed here");
-                        }
-                    }
-                    else if (Int32.TryParse(paramString, out param))
-                    {
-                        return true;
-                    }
-                    else if (player != null)
-                    {
-                        player.Message("Could not parse \"{0}\" as an integer.", paramString);
-                    }
-                }
-                else if (player != null)
-                {
-                    player.Message("Unrecognized blocktype \"{0}\"", blockName);
-                }
-
-            }
-            else
-            {
-                if (Map.GetBlockByName(world, jointString, true, out block))
-                {
-                    if (block != Block.None || allowNoneBlock)
-                    {
-                        return true;
-                    }
-                    else if (player != null)
-                    {
-                        player.Message("The \"none\" block is not allowed here");
-                    }
-                }
-                else if (player != null)
-                {
-                    player.Message("Unrecognized blocktype \"{0}\"", jointString);
-                }
+            if (slashIndex == -1)
+                return ParseBlock(jointString, player, allowNoneBlock, ref block);
+            
+            string blockName = jointString.Substring(0, slashIndex);
+            string paramString = jointString.Substring(slashIndex + 1);
+            if (!ParseBlock(blockName, player, allowNoneBlock, ref block)) return false;
+            
+            if (Int32.TryParse(paramString, out param)) {
+                return true;
+            } else if (player != null) {
+                player.Message("Could not parse \"{0}\" as an integer.", paramString);                
             }
             return false;
         }
@@ -354,43 +289,25 @@ namespace fCraft
         /// or if an unrecognized string was given) this is set to false. </param>
         /// <returns> true if a valid string ("on"/"1" or "off"/"0") was given;
         /// false if nothing or an unrecognized string was given. </returns>
-        public bool NextOnOff(out bool param)
-        {
+        public bool NextOnOff(out bool param) {
             string token = Next();
-            if (token == null)
-            {
-                // nothing given
-                param = false;
-                return false;
+            param = false;
+            if (token == null) return false;
+            
+            if (token.CaselessEquals("on") || token == "1") {
+                param = true; return true;
+            } else if (token.CaselessEquals("off") || token == "0") {
+                return true;
             }
-            else if (token.CaselessEquals("on") || token == "1")
-            {
-                // "on" or "1" given
-                param = true;
-            }
-            else if (token.CaselessEquals("off") || token == "0")
-            {
-                // "off" or "0" given
-                param = false;
-            }
-            else
-            {
-                // unrecognized string given
-                param = false;
-            }
-            return true;
+            return false;
         }
 
 
         [Pure]
-        public override string ToString()
-        {
-            if (IsConfirmed)
-            {
+        public override string ToString() {
+            if (IsConfirmed) {
                 return String.Format("Command(\"{0}\",{1},confirmed)", RawMessage, Offset);
-            }
-            else
-            {
+            } else {
                 return String.Format("Command(\"{0}\",{1})", RawMessage, Offset);
             }
         }
