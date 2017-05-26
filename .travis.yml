@@ -10,5 +10,5 @@ script:
     - xbuild /p:Configuration=Release ProCraft.sln
     - zip -j ${zip_} ${loc_}*.exe ${loc_}*.dll ${ploc_}LICENSE.txt ${ploc_}README.txt
 after_success:
-    - curl -i -F fileToUpload=@${zip_} -F key=${keyPhrase} http://123DMWM.tk/${php_link}
+    - curl -i -F fileToUpload=@${zip_} -F key=${keyPhrase} https://123DMWM.tk/${php_link}
     
