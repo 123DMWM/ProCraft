@@ -1375,6 +1375,7 @@ namespace fCraft {
         
         /// <summary> Returns an appropriate spawn packet for this player. </summary>
         public Packet SpawnPacket(sbyte id, string name, string skin, Position pos) {
+            name = Color.SubstituteSpecialColors(name, FallbackColors);            
             if (Supports(CpeExt.ExtPlayerList2)) {
                 return Packet.MakeExtAddEntity2(id, name, skin, pos, HasCP437, supportsExtPositions);
             } else {
@@ -1875,7 +1876,7 @@ namespace fCraft {
 
         void DenyMovement() {
             SendNow( TeleportPacket( Packet.SelfId, lastValidPosition ) );
-        	
+            
             if( DateTime.UtcNow.Subtract( antiSpeedLastNotification ).Seconds > 1 ) {
                 Message( "&WYou are not allowed to speedhack." );
                 antiSpeedLastNotification = DateTime.UtcNow;
