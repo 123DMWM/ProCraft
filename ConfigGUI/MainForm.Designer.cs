@@ -96,7 +96,7 @@ namespace fCraft.ConfigGUI {
             this.chatPreview = new fCraft.ConfigGUI.ChatPreview();
             this.tabWorlds = new System.Windows.Forms.TabPage();
             this.tDefaultTerrain = new System.Windows.Forms.TextBox();
-            this.label1 = new System.Windows.Forms.Label();
+            this.lDefaultTerrain = new System.Windows.Forms.Label();
             this.xWoMEnableEnvExtensions = new System.Windows.Forms.CheckBox();
             this.bMapPath = new System.Windows.Forms.Button();
             this.xMapPath = new System.Windows.Forms.CheckBox();
@@ -290,8 +290,8 @@ namespace fCraft.ConfigGUI {
             this.gIRCFormatting = new System.Windows.Forms.GroupBox();
             this.bColorIRC = new System.Windows.Forms.Button();
             this.lColorIRC = new System.Windows.Forms.Label();
-            this.lblMCtoIRC = new System.Windows.Forms.Label();
-            this.lblIRCtoMC = new System.Windows.Forms.Label();
+            this.lMCtoIRC = new System.Windows.Forms.Label();
+            this.lIRCtoMC = new System.Windows.Forms.Label();
             this.xIRCShowEmotesFromServer = new System.Windows.Forms.CheckBox();
             this.xIRCShowEmotesFromIRC = new System.Windows.Forms.CheckBox();
             this.xIRCShowColorsFromIRC = new System.Windows.Forms.CheckBox();
@@ -1087,7 +1087,7 @@ namespace fCraft.ConfigGUI {
             // tabWorlds
             // 
             this.tabWorlds.Controls.Add(this.tDefaultTerrain);
-            this.tabWorlds.Controls.Add(this.label1);
+            this.tabWorlds.Controls.Add(this.lDefaultTerrain);
             this.tabWorlds.Controls.Add(this.xWoMEnableEnvExtensions);
             this.tabWorlds.Controls.Add(this.bMapPath);
             this.tabWorlds.Controls.Add(this.xMapPath);
@@ -1116,14 +1116,14 @@ namespace fCraft.ConfigGUI {
             this.tDefaultTerrain.TabIndex = 24;
             this.tDefaultTerrain.Text = "http://123dmwm.tk/TexturePacks/64xDefault.zip";
             // 
-            // label1
+            // lDefaultTerrain
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(5, 458);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(88, 15);
-            this.label1.TabIndex = 23;
-            this.label1.Text = "Default Terrain";
+            this.lDefaultTerrain.AutoSize = true;
+            this.lDefaultTerrain.Location = new System.Drawing.Point(5, 458);
+            this.lDefaultTerrain.Name = "lDefaultTerrain";
+            this.lDefaultTerrain.Size = new System.Drawing.Size(88, 15);
+            this.lDefaultTerrain.TabIndex = 23;
+            this.lDefaultTerrain.Text = "Default Terrain";
             // 
             // xWoMEnableEnvExtensions
             // 
@@ -3369,8 +3369,8 @@ namespace fCraft.ConfigGUI {
             // 
             this.gIRCFormatting.Controls.Add(this.bColorIRC);
             this.gIRCFormatting.Controls.Add(this.lColorIRC);
-            this.gIRCFormatting.Controls.Add(this.lblMCtoIRC);
-            this.gIRCFormatting.Controls.Add(this.lblIRCtoMC);
+            this.gIRCFormatting.Controls.Add(this.lMCtoIRC);
+            this.gIRCFormatting.Controls.Add(this.lIRCtoMC);
             this.gIRCFormatting.Controls.Add(this.xIRCShowEmotesFromServer);
             this.gIRCFormatting.Controls.Add(this.xIRCShowEmotesFromIRC);
             this.gIRCFormatting.Controls.Add(this.xIRCShowColorsFromIRC);
@@ -3401,25 +3401,25 @@ namespace fCraft.ConfigGUI {
             this.lColorIRC.TabIndex = 16;
             this.lColorIRC.Text = "IRC message color";
             // 
-            // lblMCtoIRC
+            // lMCtoIRC
             // 
-            this.lblMCtoIRC.AutoSize = true;
-            this.lblMCtoIRC.Location = new System.Drawing.Point(52, 24);
-            this.lblMCtoIRC.Name = "lblMCtoIRC";
-            this.lblMCtoIRC.Size = new System.Drawing.Size(267, 15);
-            this.lblMCtoIRC.TabIndex = 8;
-            this.lblMCtoIRC.Text = "For messages sent from Minecraft to IRC, show:";
-            this.lblMCtoIRC.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            this.lMCtoIRC.AutoSize = true;
+            this.lMCtoIRC.Location = new System.Drawing.Point(52, 24);
+            this.lMCtoIRC.Name = "lMCtoIRC";
+            this.lMCtoIRC.Size = new System.Drawing.Size(267, 15);
+            this.lMCtoIRC.TabIndex = 8;
+            this.lMCtoIRC.Text = "For messages sent from Minecraft to IRC, show:";
+            this.lMCtoIRC.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
-            // lblIRCtoMC
+            // lIRCtoMC
             // 
-            this.lblIRCtoMC.AutoSize = true;
-            this.lblIRCtoMC.Location = new System.Drawing.Point(52, 49);
-            this.lblIRCtoMC.Name = "lblIRCtoMC";
-            this.lblIRCtoMC.Size = new System.Drawing.Size(267, 15);
-            this.lblIRCtoMC.TabIndex = 7;
-            this.lblIRCtoMC.Text = "For messages sent from IRC to Minecraft, show:";
-            this.lblIRCtoMC.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            this.lIRCtoMC.AutoSize = true;
+            this.lIRCtoMC.Location = new System.Drawing.Point(52, 49);
+            this.lIRCtoMC.Name = "lIRCtoMC";
+            this.lIRCtoMC.Size = new System.Drawing.Size(267, 15);
+            this.lIRCtoMC.TabIndex = 7;
+            this.lIRCtoMC.Text = "For messages sent from IRC to Minecraft, show:";
+            this.lIRCtoMC.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
             // xIRCShowEmotesFromServer
             // 
@@ -3567,8 +3567,8 @@ namespace fCraft.ConfigGUI {
         private System.Windows.Forms.CheckBox xIRCShowColorsFromIRC;
         private System.Windows.Forms.CheckBox xIRCShowEmotesFromIRC;
         private System.Windows.Forms.CheckBox xIRCShowEmotesFromServer;
-        private System.Windows.Forms.Label lblIRCtoMC;
-        private System.Windows.Forms.Label lblMCtoIRC;
+        private System.Windows.Forms.Label lIRCtoMC;
+        private System.Windows.Forms.Label lMCtoIRC;
         private System.Windows.Forms.GroupBox gIRCFormatting;
 
         #endregion
@@ -3825,7 +3825,7 @@ namespace fCraft.ConfigGUI {
         private CheckBox xDonor;
         private CheckBox xUptime;
         private TextBox tDefaultTerrain;
-        private Label label1;
+        private Label lDefaultTerrain;
         private TextBox tNewPlayerPrefix;
         private Label lNewPlayerPrefix;
     }
