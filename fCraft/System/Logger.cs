@@ -115,6 +115,8 @@ namespace fCraft {
                 }
             }
             if( !Enabled ) return;
+            
+            message = Color.StripColors( message, true );
             string line = DateTime.Now.ToString( TimeFormat ) + " > " + GetPrefix( type ) + message; // localized
 
             lock( LogLock ) {
