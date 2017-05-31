@@ -91,8 +91,8 @@ namespace fCraft.MapConversion {
                 L = bs.ReadByte(),
             };
 
-            stream.ReadByte();
-            stream.ReadByte();
+            stream.ReadByte(); // pervisit permission
+            stream.ReadByte(); // perbuild permission
             return map;
         }
 
@@ -110,7 +110,31 @@ namespace fCraft.MapConversion {
 
                     map.ConvertBlockTypes( Mapping );
 
+                    if( gs.ReadByte() != 0xBD ) return map;
+                    ReadCustomBlocks( gs, map );
                     return map;
+                }
+            }
+        }
+
+        const byte customTile = 163;
+        static void ReadCustomBlocks( Stream s, Map map) {
+            byte[] chunk = new byte[16 * 16 * 16];
+            
+            for( int z = 0; z < map.Height; z += 16 )
+                for( int y = 0; y < map.Length; y += 16 )
+                    for( int x = 0; x < map.Width; x += 16 )
+            {
+                if( s.ReadByte() != 1 ) continue;
+                s.Read( chunk, 0, chunk.Length );
+                
+                int baseIndex = map.Index( x, y, z );
+                for( int i = 0; i < chunk.Length; i++ ) {
+                    int xx = i & 0xF, yy = (i >> 4) & 0xF, zz = (i >> 8) & 0xF;
+                    int index = baseIndex + map.Index( xx, yy, zz );
+                    
+                    if (map.Blocks[index] != customTile) continue;
+                    map.Blocks[index] = chunk[i];
                 }
             }
         }
@@ -140,7 +164,7 @@ namespace fCraft.MapConversion {
                     bs.Write( mapToSave.Spawn.R );
                     bs.Write( mapToSave.Spawn.L );
 
-                    // Write the VistPermission and BuildPermission bytes
+                    // Write the VisitPermission and BuildPermission bytes
                     bs.Write( (byte)0 );
                     bs.Write( (byte)0 );
 
@@ -157,11 +181,42 @@ namespace fCraft.MapConversion {
         protected static readonly byte[] Mapping = new byte[256];
 
         static MapMCSharp() {
+            Mapping[70] = (byte)Block.BrownMushroom;// flagbase            
+            Mapping[71] = (byte)Block.White;        // fallsnow
+            Mapping[72] = (byte)Block.White;        // snow
+            Mapping[73] = (byte)Block.StillLava;    // fastdeathlava            
+            Mapping[74] = (byte)Block.TNT;          // c4
+            Mapping[75] = (byte)Block.Red;          // c4det
+
+            // 76-79 unused
+            Mapping[80] = (byte) Block.Cobblestone; // door_cobblestone
+            // 81 = door_cobblestone_air
+            
+            // 82 unused
+            Mapping[83] = (byte)Block.Red;          // door_red;
+            // 84 = door_red_air
+            Mapping[85] = (byte)Block.Orange;       // door_orange
+            Mapping[86] = (byte)Block.Yellow;       // door_yellow
+            Mapping[87] = (byte)Block.Lime;         // door_lightgreen
+            
+            // 88 unused
+            Mapping[89] = (byte)Block.Teal;         // door_aquagreen
+            Mapping[90] = (byte)Block.Cyan;         // door_cyan
+            Mapping[91] = (byte)Block.Aqua;         // door_lightblue
+            Mapping[92] = (byte)Block.Indigo;       // door_purple
+            Mapping[93] = (byte)Block.Violet;       // door_lightpurple
+            Mapping[94] = (byte)Block.Magenta;      // door_pink
+            Mapping[95] = (byte)Block.Pink;         // door_darkpink
+            Mapping[96] = (byte)Block.Black;        // door_darkgray
+            Mapping[97] = (byte)Block.Gray;         // door_lightgray
+            Mapping[98] = (byte)Block.White;        // door_white
+            
+            // 99 unused            
             Mapping[100] = (byte)Block.Glass;       // op_glass
             Mapping[101] = (byte)Block.Obsidian;    // opsidian
-            Mapping[102] = (byte)Block.Brick;      // op_brick
+            Mapping[102] = (byte)Block.Brick;       // op_brick
             Mapping[103] = (byte)Block.Stone;       // op_stone
-            Mapping[104] = (byte)Block.Cobblestone;       // op_cobblestone
+            Mapping[104] = (byte)Block.Cobblestone; // op_cobblestone
             // 105 = op_air
             Mapping[106] = (byte)Block.Water;       // op_water
 
@@ -227,7 +282,8 @@ namespace fCraft.MapConversion {
             Mapping[161] = (byte)Block.Water;       // water_portal
             Mapping[162] = (byte)Block.Lava;        // lava_portal
 
-            // 163 unused
+            Mapping[customTile] = customTile; // handled specially
+            
             Mapping[164] = (byte)Block.Air;         // air_door
             Mapping[165] = (byte)Block.Air;         // air_switch
             Mapping[166] = (byte)Block.Water;       // water_door
