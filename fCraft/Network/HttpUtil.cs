@@ -42,7 +42,6 @@ namespace fCraft {
                 Logger.Log(LogType.Warning, "HttpUtil.LookupIPv4: {0} does not have an IPv4 address!", uri.Host);
             } catch (UriFormatException) {
                 Logger.Log(LogType.Warning, "Invalid URI: The hostname could not be parsed.");
-                
             }
             
             lock (dnsLock) { cache[hostName] = ip; }

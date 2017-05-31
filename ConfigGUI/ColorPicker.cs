@@ -1,11 +1,9 @@
-﻿// Part of fCraft | Copyright 2009-2015 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt //Copyright (c) 2011-2013 Jon Baker, Glenn Marien and Lao Tszy <Jonty800@gmail.com> //Copyright (c) <2012-2014> <LeChosenOne, DingusBungus> | ProCraft Copyright 2014-2016 Joseph Beauvais <123DMWM@gmail.com>
-using System.Collections.Generic;
+﻿// Part of fCraft | Copyright 2009-2015 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt | ProCraft Copyright 2014-2016 Joseph Beauvais <123DMWM@gmail.com>
 using System.Windows.Forms;
 using SysCol = System.Drawing.Color;
-using fCraft;
 
 namespace fCraft.ConfigGUI {
-    internal sealed partial class ColorPicker : Form {
+    internal sealed class ColorPicker : Form {
         public char ColorCode;
 
         internal static SysCol LookupColor( char colCode, out SysCol textCol ) {
@@ -36,16 +34,6 @@ namespace fCraft.ConfigGUI {
             return System.Math.Pow( (c + 0.055) / 1.055, 2.4 );
         }
         
-        
-        internal struct ColorPair {
-            public ColorPair( SysCol foreground, SysCol background ) {
-                Foreground = foreground;
-                Background = background;
-            }
-            public System.Drawing.Color Foreground;
-            public System.Drawing.Color Background;
-        }
-
 
         public ColorPicker( string title, char oldColorCode ) {
             ColorCode = oldColorCode;
@@ -53,14 +41,14 @@ namespace fCraft.ConfigGUI {
             
             SuspendLayout();
             for( char code = '0'; code <= '9'; code++ )
-                MakeButton(code);
+                MakeButton( code );
             for( char code = 'a'; code <= 'f'; code++ )
-                MakeButton(code);
-            
+                MakeButton( code );           
             for( int i = 0; i < Color.ExtColors.Length; i++ ) {
                 if( Color.ExtColors[i].Undefined ) continue;
-                MakeButton(Color.ExtColors[i].Code);
+                MakeButton( Color.ExtColors[i].Code );
             }
+            
             MakeCancelButton();
             MakeWindow( title );
             ResumeLayout( false );
@@ -130,8 +118,8 @@ namespace fCraft.ConfigGUI {
         }
         
         
-        static string ColorName(char colCode) {
-            char[] a = Color.GetName(colCode).ToCharArray();
+        static string ColorName( char colCode ) {
+            char[] a = Color.GetName( colCode ).ToCharArray();
             a[0] = char.ToUpper( a[0] );
             return new string( a );
         }
