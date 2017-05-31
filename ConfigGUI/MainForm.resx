@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <data name="pictureBox1.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+  <data name="pLogo.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAABlMAAAGkCAYAAACl59NWAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
         vAAADrwBlbxySQAAABp0RVh0U29mdHdhcmUAUGFpbnQuTkVUIHYzLjUuMTFH80I3AABKdElEQVR4Xu3d
@@ -467,18 +467,16 @@
     <value>17, 6</value>
   </metadata>
   <data name="xUpperCharLimit.ToolTip" xml:space="preserve">
-    <value>Determine how many uppercase letters a player can
-    have in their message if the message length is
-    over 10 digits long. If they go over the set amount
-    it sets their whole message to lowercase.
+    <value>Sets how many uppercase letters a player can have in a message, 
+ when it is over 10 characters long. 
+If they go over the set amount, the whole messge is set to lowercase.
 Set to 1 for default, which is (rawMessage.Length / 2)
 </value>
   </data>
   <data name="nUpperCharLimit.ToolTip" xml:space="preserve">
-    <value>Determine how many uppercase letters a player can
-    have in their message if the message length is
-    over 10 digits long. If they go over the set amount
-    it sets their whole message to lowercase.
+    <value>Sets how many uppercase letters a player can have in a message, 
+ when it is over 10 characters long. 
+If they go over the set amount, the whole messge is set to lowercase.
 Set to 1 for default, which is (rawMessage.Length / 2)
 
 </value>

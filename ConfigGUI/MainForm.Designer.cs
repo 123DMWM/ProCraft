@@ -41,7 +41,7 @@ namespace fCraft.ConfigGUI {
             this.lHeartbeatUrlWarning = new System.Windows.Forms.Label();
             this.cHeartbeatUrl = new System.Windows.Forms.ComboBox();
             this.lHeartbeatUrl = new System.Windows.Forms.Label();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.pLogo = new System.Windows.Forms.PictureBox();
             this.gInformation = new System.Windows.Forms.GroupBox();
             this.bGreeting = new System.Windows.Forms.Button();
             this.lAnnouncementsUnits = new System.Windows.Forms.Label();
@@ -299,7 +299,7 @@ namespace fCraft.ConfigGUI {
             this.tabs.SuspendLayout();
             this.tabGeneral.SuspendLayout();
             this.gHeartbeatUrl.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pLogo)).BeginInit();
             this.gInformation.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nAnnouncements)).BeginInit();
             this.gBasic.SuspendLayout();
@@ -383,7 +383,7 @@ namespace fCraft.ConfigGUI {
             // tabGeneral
             // 
             this.tabGeneral.Controls.Add(this.gHeartbeatUrl);
-            this.tabGeneral.Controls.Add(this.pictureBox1);
+            this.tabGeneral.Controls.Add(this.pLogo);
             this.tabGeneral.Controls.Add(this.gInformation);
             this.tabGeneral.Controls.Add(this.gBasic);
             this.tabGeneral.Location = new System.Drawing.Point(4, 24);
@@ -447,16 +447,16 @@ namespace fCraft.ConfigGUI {
             this.lHeartbeatUrl.TabIndex = 0;
             this.lHeartbeatUrl.Text = "Heartbeat URL:";
             // 
-            // pictureBox1
+            // pLogo
             // 
-            this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
-            this.pictureBox1.Location = new System.Drawing.Point(8, 314);
-            this.pictureBox1.Margin = new System.Windows.Forms.Padding(2);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(636, 159);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox1.TabIndex = 5;
-            this.pictureBox1.TabStop = false;
+            this.pLogo.Image = ((System.Drawing.Image)(resources.GetObject("pLogo.Image")));
+            this.pLogo.Location = new System.Drawing.Point(8, 314);
+            this.pLogo.Margin = new System.Windows.Forms.Padding(2);
+            this.pLogo.Name = "pLogo";
+            this.pLogo.Size = new System.Drawing.Size(636, 159);
+            this.pLogo.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pLogo.TabIndex = 5;
+            this.pLogo.TabStop = false;
             // 
             // gInformation
             // 
@@ -3481,7 +3481,7 @@ namespace fCraft.ConfigGUI {
             this.tabGeneral.ResumeLayout(false);
             this.gHeartbeatUrl.ResumeLayout(false);
             this.gHeartbeatUrl.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pLogo)).EndInit();
             this.gInformation.ResumeLayout(false);
             this.gInformation.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nAnnouncements)).EndInit();
@@ -3815,7 +3815,7 @@ namespace fCraft.ConfigGUI {
         private CheckBox xAntispamMuteDuration;
         private CheckBox xUpperCharLimit;
         private NumericUpDown nUpperCharLimit;
-        private PictureBox pictureBox1;
+        private PictureBox pLogo;
         private GroupBox gHeartbeatUrl;
         private Label lHeartbeatUrlWarning;
         private ComboBox cHeartbeatUrl;
