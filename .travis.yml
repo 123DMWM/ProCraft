@@ -4,6 +4,8 @@ notifications:
   slack:
     on_success: change
   irc:
+    template:
+      - "%{message}"
     channels:
       - "irc.esper.net#ProCraft"
     on_success: change
