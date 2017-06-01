@@ -45,6 +45,7 @@ namespace fCraft {
         /// <param name="player"> Player to whom this packet is being sent.
         /// Used to determine DeleteAdmincrete permission, for client-side checks. May not be null. </param>
         /// <param name="motd"> Message-of-the-day (text displayed below the server name). May not be null. </param>
+        /// <param name="hasCP437"> If packet contains characters from CodePage 437 </param>
         /// <exception cref="ArgumentNullException"> player, serverName, or motd is null </exception>
         public static Packet MakeHandshake( [NotNull] Player player, [NotNull] string serverName, [NotNull] string motd, bool hasCP437 ) {
             if( serverName == null ) throw new ArgumentNullException( "serverName" );
@@ -78,6 +79,8 @@ namespace fCraft {
         /// <param name="id"> Entity ID. Negative values refer to "self". </param>
         /// <param name="name"> Entity name. May not be null. </param>
         /// <param name="spawn"> Spawning position for the player. </param>
+        /// <param name="hasCP437"> If packet contains characters from CodePage 437 </param>
+        /// <param name="extPos"> If player supports Extended Positions </param>
         /// <exception cref="ArgumentNullException"> name is null </exception>
         public static Packet MakeAddEntity( sbyte id, [NotNull] string name, Position spawn, 
                                            bool hasCP437, bool extPos ) {
@@ -100,6 +103,7 @@ namespace fCraft {
         /// <summary> Creates a new Teleport (0x08) packet. </summary>
         /// <param name="id"> Entity ID. Negative values refer to "self". </param>
         /// <param name="newPosition"> Position to teleport the entity to. </param>
+        /// <param name="extPos"> If player supports Extended Positions </param>
         public static Packet MakeTeleport( sbyte id, Position newPosition, bool extPos ) {
             int size = PacketSizes[(byte)OpCode.Teleport];
             if (extPos) size += 6;
@@ -116,6 +120,7 @@ namespace fCraft {
 
         /// <summary> Creates a new Teleport (0x08) packet, and sets ID to -1 ("self"). </summary>
         /// <param name="newPosition"> Position to teleport player to. </param>
+        /// <param name="extPos"> If player supports Extended Positions </param>
         public static Packet MakeSelfTeleport( Position newPosition, bool extPos ) {
             return MakeTeleport( -1, newPosition.GetFixed(), extPos );
         }
@@ -178,6 +183,7 @@ namespace fCraft {
         /// <param name="type"> Message type. </param>
         /// <param name="message"> Message. </param>
         /// <param name="useFallbacks"> whether or not to use color fallback codes. </param>
+        /// <param name="hasCP437"> If packet contains characters from CodePage 437 </param>
         public static Packet Message(byte type, string message, bool useFallbacks, bool hasCP437) {
             Packet packet = new Packet(OpCode.Message);
             packet.Bytes[1] = type;
@@ -193,6 +199,7 @@ namespace fCraft {
 
         /// <summary> Creates a new Kick (0x0E) packet. </summary>
         /// <param name="reason"> Given reason. Only first 64 characters will be sent. May not be null. </param>
+        /// <param name="hasCP437"> If packet contains characters from CodePage 437 </param>
         /// <exception cref="ArgumentNullException"> reason is null </exception>
         public static Packet MakeKick( [NotNull] string reason, bool hasCP437 ) {
             if( reason == null ) throw new ArgumentNullException( "reason" );

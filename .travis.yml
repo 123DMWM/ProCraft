@@ -3,6 +3,10 @@ solution: ProCraft.sln
 notifications:
   slack:
     on_success: change
+  irc:
+    channels:
+      - "irc.esper.net#ProCraft"
+    on_success: change
 script:
     - loc_=/home/travis/build/123DMWM/ProCraft/bin/Release/
     - ploc_=/home/travis/build/123DMWM/ProCraft/
