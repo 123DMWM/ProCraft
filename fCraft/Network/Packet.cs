@@ -45,7 +45,7 @@ namespace fCraft {
         /// <param name="player"> Player to whom this packet is being sent.
         /// Used to determine DeleteAdmincrete permission, for client-side checks. May not be null. </param>
         /// <param name="motd"> Message-of-the-day (text displayed below the server name). May not be null. </param>
-        /// <param name="hasCP437"> If packet contains characters from CodePage 437 </param>
+        /// <param name="hasCP437"> Whether client supports extended code page 437 characters. </param>
         /// <exception cref="ArgumentNullException"> player, serverName, or motd is null </exception>
         public static Packet MakeHandshake( [NotNull] Player player, [NotNull] string serverName, [NotNull] string motd, bool hasCP437 ) {
             if( serverName == null ) throw new ArgumentNullException( "serverName" );
@@ -183,7 +183,7 @@ namespace fCraft {
         /// <param name="type"> Message type. </param>
         /// <param name="message"> Message. </param>
         /// <param name="useFallbacks"> whether or not to use color fallback codes. </param>
-        /// <param name="hasCP437"> If packet contains characters from CodePage 437 </param>
+        /// <param name="hasCP437"> Whether client supports extended code page 437 characters. </param>
         public static Packet Message(byte type, string message, bool useFallbacks, bool hasCP437) {
             Packet packet = new Packet(OpCode.Message);
             packet.Bytes[1] = type;
@@ -199,7 +199,7 @@ namespace fCraft {
 
         /// <summary> Creates a new Kick (0x0E) packet. </summary>
         /// <param name="reason"> Given reason. Only first 64 characters will be sent. May not be null. </param>
-        /// <param name="hasCP437"> If packet contains characters from CodePage 437 </param>
+        /// <param name="hasCP437"> Whether client supports extended code page 437 characters. </param>
         /// <exception cref="ArgumentNullException"> reason is null </exception>
         public static Packet MakeKick( [NotNull] string reason, bool hasCP437 ) {
             if( reason == null ) throw new ArgumentNullException( "reason" );
