@@ -157,7 +157,7 @@ namespace fCraft.MapConversion {
         }
         
         
-        protected static void SaveHeader( Map map, BinaryWriter bs ) {
+        protected static void SaveHeader( Map mapToSave, BinaryWriter bs ) {
             // Write the magic number
             bs.Write( (ushort)0x752 );
 
