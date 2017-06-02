@@ -2829,47 +2829,6 @@ namespace fCraft {
             }
         }
         #endregion
-        #region cuboid test
-
-        static readonly CommandDescriptor Cdctest = new CommandDescriptor
-        {
-            Name = "ctest",
-            Permissions = new[] { Permission.Chat },
-            Category = CommandCategory.New | CommandCategory.Building,
-            Help = "Tells you information about our custom texture pack.",
-            Handler = textureHandler
-        };
-
-        static void textureHandler(Player player, CommandReader cmd)
-        {            
-            Zone zone = player.World.Map.Zones.Find("ctest");
-            int X = zone.Bounds.XMin;
-            int Y = zone.Bounds.YMin;
-            int Z = zone.Bounds.ZMin;
-
-            for (int a = 0; a < zone.Bounds.Width; a++)
-            {
-                player.WorldMap.SetBlock(X + a, Y, Z, Block.Stone);
-                BlockUpdate blockUpdatea = new BlockUpdate(null, new Vector3I(X + a, Y, Z), Block.Stone);
-                player.WorldMap.QueueUpdate(blockUpdatea);
-                for (int b = 0; b < zone.Bounds.Length; b++)
-                {
-                    player.WorldMap.SetBlock(X + a, Y + b, Z, Block.Stone);
-                    BlockUpdate blockUpdateb = new BlockUpdate(null, new Vector3I(X + a, Y + b, Z), Block.Stone);
-                    player.WorldMap.QueueUpdate(blockUpdateb);
-                    for (int c = 0; c < zone.Bounds.Height; c++)
-                    {
-                        player.WorldMap.SetBlock(X + a, Y + b, Z + c, Block.Stone);
-                        BlockUpdate blockUpdatec = new BlockUpdate(null, new Vector3I(X + a, Y + b, Z + c), Block.Stone);
-                        player.WorldMap.QueueUpdate(blockUpdatec);
-                    }
-                }
-            }
-            player.Message("Done.");
-            return;
-        }
-
-        #endregion
         #region snake
         private static readonly CommandDescriptor CdSnake = new CommandDescriptor {
             Name = "Snake",

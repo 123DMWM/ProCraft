@@ -3,7 +3,7 @@ using System;
 using System.IO;
 
 namespace fCraft.MapConversion {
-    /// <summary> D3 map conversion implementation, for converting D3 map format into fCraft's default map format. </summary>
+    /// <summary> Saves the raw blocks of a map to disc, uncompressed. Does not save dimensions. </summary>
     public sealed class MapRaw : IMapExporter {
 
         public string ServerName {
