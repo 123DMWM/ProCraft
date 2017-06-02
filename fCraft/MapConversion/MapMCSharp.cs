@@ -146,45 +146,48 @@ namespace fCraft.MapConversion {
             using( FileStream mapStream = File.Create( fileName ) ) {
                 using( GZipStream gs = new GZipStream( mapStream, CompressionMode.Compress ) ) {
                     BinaryWriter bs = new BinaryWriter( gs );
-
-                    // Write the magic number
-                    bs.Write( (ushort)0x752 );
-
-                    // Write the map dimensions
-                    bs.Write( (short)mapToSave.Width );
-                    bs.Write( (short)mapToSave.Length );
-                    bs.Write( (short)mapToSave.Height );
-
-                    // Write the spawn location
-                    bs.Write( (short)mapToSave.Spawn.BlockX );
-                    bs.Write( (short)mapToSave.Spawn.BlockZ );
-                    bs.Write( (short)mapToSave.Spawn.BlockY );
-
-                    //Write the spawn orientation
-                    bs.Write( mapToSave.Spawn.R );
-                    bs.Write( mapToSave.Spawn.L );
-
-                    // Write the VisitPermission and BuildPermission bytes
-                    bs.Write( (byte)0 );
-                    bs.Write( (byte)0 );
-
+                    SaveHeader( mapToSave, bs );
+                    
                     // Write the map data
                     bs.Write( mapToSave.Blocks, 0, mapToSave.Blocks.Length );
-
                     bs.Close();
                 }
                 return true;
             }
+        }
+        
+        
+        protected static void SaveHeader( Map map, BinaryWriter bs ) {
+            // Write the magic number
+            bs.Write( (ushort)0x752 );
+
+            // Write the map dimensions
+            bs.Write( (short)mapToSave.Width );
+            bs.Write( (short)mapToSave.Length );
+            bs.Write( (short)mapToSave.Height );
+
+            // Write the spawn location
+            bs.Write( (short)mapToSave.Spawn.BlockX );
+            bs.Write( (short)mapToSave.Spawn.BlockZ );
+            bs.Write( (short)mapToSave.Spawn.BlockY );
+
+            //Write the spawn orientation
+            bs.Write( mapToSave.Spawn.R );
+            bs.Write( mapToSave.Spawn.L );
+
+            // Write the VisitPermission and BuildPermission bytes
+            bs.Write( (byte)0 );
+            bs.Write( (byte)0 );
         }
 
 
         protected static readonly byte[] Mapping = new byte[256];
 
         static MapMCSharp() {
-            Mapping[70] = (byte)Block.BrownMushroom;// flagbase            
+            Mapping[70] = (byte)Block.BrownMushroom;// flagbase
             Mapping[71] = (byte)Block.White;        // fallsnow
             Mapping[72] = (byte)Block.White;        // snow
-            Mapping[73] = (byte)Block.StillLava;    // fastdeathlava            
+            Mapping[73] = (byte)Block.StillLava;    // fastdeathlava
             Mapping[74] = (byte)Block.TNT;          // c4
             Mapping[75] = (byte)Block.Red;          // c4det
 
@@ -211,7 +214,7 @@ namespace fCraft.MapConversion {
             Mapping[97] = (byte)Block.Gray;         // door_lightgray
             Mapping[98] = (byte)Block.White;        // door_white
             
-            // 99 unused            
+            // 99 unused
             Mapping[100] = (byte)Block.Glass;       // op_glass
             Mapping[101] = (byte)Block.Obsidian;    // opsidian
             Mapping[102] = (byte)Block.Brick;       // op_brick

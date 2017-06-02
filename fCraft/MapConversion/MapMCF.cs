@@ -18,15 +18,15 @@ namespace fCraft.MapConversion {
         }
 
         public override bool ClaimsName( string fileName ) {
-            if ( fileName == null ) throw new ArgumentNullException( "fileName" );
-            return fileName.CaselessEnds( "mcf" );
+            if( fileName == null ) throw new ArgumentNullException( "fileName" );
+            return fileName.CaselessEnds( ".mcf" );
         }
 
         public override Map Load( string fileName ) {
-            if ( fileName == null ) throw new ArgumentNullException( "fileName" );
-            using ( FileStream mapStream = File.OpenRead( fileName ) ) {
-                using ( var gs = new GZipStream( mapStream, CompressionMode.Decompress ) ) {
-                    Map map = LoadHeaderInternal(gs);
+            if( fileName == null ) throw new ArgumentNullException( "fileName" );
+            using( FileStream mapStream = File.OpenRead( fileName ) ) {
+                using( GZipStream gs = new GZipStream( mapStream, CompressionMode.Decompress ) ) {
+                    Map map = LoadHeaderInternal( gs );
                     map.Blocks = new byte[map.Volume];
 
                     int i = 0, lo, hi;
@@ -43,42 +43,22 @@ namespace fCraft.MapConversion {
                 }
             }
         }
+    	
 
-        public override bool Save( Map mapToSave, string fileName )
-        {
-            if ( mapToSave == null ) throw new ArgumentNullException( "mapToSave" );
-            if ( fileName == null ) throw new ArgumentNullException( "fileName" );
-            using ( FileStream mapStream = File.Create( fileName ) ) {
-                using ( GZipStream gs = new GZipStream( mapStream, CompressionMode.Compress ) ) {
+        public override bool Save( Map mapToSave, string fileName ) {
+            if( mapToSave == null ) throw new ArgumentNullException( "mapToSave" );
+            if( fileName == null ) throw new ArgumentNullException( "fileName" );
+            using( FileStream mapStream = File.Create( fileName ) ) {
+                using( GZipStream gs = new GZipStream( mapStream, CompressionMode.Compress ) ) {
                     BinaryWriter bs = new BinaryWriter( gs );
-
-                    // Write the magic number
-                    bs.Write((ushort)0x752);
-
-                    // Write the map dimensions
-                    bs.Write((short)mapToSave.Width);
-                    bs.Write((short)mapToSave.Length);
-                    bs.Write((short)mapToSave.Height);
-
-                    // Write the spawn location
-                    bs.Write((short)mapToSave.Spawn.BlockX);
-                    bs.Write((short)mapToSave.Spawn.BlockZ);
-                    bs.Write((short)mapToSave.Spawn.BlockY);
-
-                    //Write the spawn orientation
-                    bs.Write(mapToSave.Spawn.R);
-                    bs.Write(mapToSave.Spawn.L);
-
-                    // Write the VistPermission and BuildPermission bytes
-                    bs.Write((byte)0);
-                    bs.Write((byte)0);
+                    SaveHeader( mapToSave, bs );
 
                     // Convert byte array to short array, as the MCF file stores an array of shorts for blocks
                     byte[] src = mapToSave.Blocks;
                     byte[] blocks = new byte[src.Length * 2];                   
-                    for (int i = 0; i < src.Length; i++)
+                    for( int i = 0; i < src.Length; i++ )
                     	blocks[i * 2] = src[i];
-                    bs.Write(blocks);
+                    bs.Write( blocks );
 
                     bs.Close();
                 }

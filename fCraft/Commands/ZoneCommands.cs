@@ -169,7 +169,7 @@ namespace fCraft {
             }
 
             Zone zone = (Zone)tag;
-            if (zone.Name.CaselessStarts("checkpoint"))
+            if (zone.Name.CaselessStarts(SpecialZone.Checkpoint))
             {
                 if (marks[0].X != marks[1].X || marks[0].Y != marks[1].Y || marks[1].Z - marks[0].Z != 1)
                 {
