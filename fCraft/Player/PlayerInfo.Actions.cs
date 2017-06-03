@@ -794,12 +794,7 @@ namespace fCraft {
 						&& !target.IsStaff) ? target.World.maxReach : ReachDistance));
                 }
                 if (target.Supports(CpeExt.BlockPermissions)) {
-                    target.Send(Packet.MakeSetBlockPermission(Block.Admincrete, target.Can(Permission.PlaceAdmincrete), target.Can(Permission.PlaceAdmincrete)));
-                    target.Send(Packet.MakeSetBlockPermission(Block.Water, target.Can(Permission.PlaceWater), true));
-                    target.Send(Packet.MakeSetBlockPermission(Block.StillWater, target.Can(Permission.PlaceWater), true));
-                    target.Send(Packet.MakeSetBlockPermission(Block.Lava, target.Can(Permission.PlaceLava), true));
-                    target.Send(Packet.MakeSetBlockPermission(Block.StillLava, target.Can(Permission.PlaceLava), true));
-                    target.Send(Packet.MakeSetBlockPermission(Block.Grass, target.Can(Permission.PlaceGrass), true));
+                    target.SendBlockPermissions();
                 }
 
                 // inform the player of the rank change
