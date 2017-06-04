@@ -78,7 +78,17 @@ namespace fCraft.ServerCLI {
                     Console.WriteLine( "** Server is now ready. Type /Shutdown to exit safely. **" );
 
                     while( !Server.IsShuttingDown ) {
-                        string cmd = Console.ReadLine();
+                        string cmd = null;
+                        try {
+                            cmd = Console.ReadLine();
+                        } catch (ArgumentException ex) {
+                            // ArgumentException is raised on Mono when you type a message into a large CLI window,
+                            // resize the CLI window to be smaller, and try to backspace when the message is biger
+                            // than the smaller resized CLI window
+                            Logger.Log(LogType.Error, "Error when reading input: " + ex);
+                            continue;
+                        }
+                        
                         if( cmd == null ) {
                             Console.WriteLine(
                                 "*** Received EOF from console. You will not be able to type anything in console any longer. ***" );
