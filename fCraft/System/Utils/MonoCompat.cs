@@ -48,7 +48,7 @@ namespace fCraft {
                         int minor = Int32.Parse( versionMatch.Groups[2].Value );
                         int revision = Int32.Parse( versionMatch.Groups[3].Value );
                         MonoVersion = new Version( major, minor, revision );
-                        IsSGenCapable = (major == 2 && minor >= 8);
+                        IsSGenCapable = (major >= 2 && minor >= 8);
                     } catch( Exception ex ) {
                         throw new Exception( UnsupportedMessage, ex );
                     }
