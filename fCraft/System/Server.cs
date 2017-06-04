@@ -461,35 +461,33 @@ namespace fCraft {
         }
         
         static void DownloadResources() {
-            if (!Directory.Exists("./Bot")) {
-                Directory.CreateDirectory("./Bot");
-            }
-            if (!File.Exists("Bot/Funfacts.txt")) {
-                (new WebClient()).DownloadFile("http://123dmwm.tk/ProCraft/resources/Funfacts.txt", "Bot/Funfacts.txt");
-            }
-            if (!File.Exists("Bot/Jokes.txt")) {
-                (new WebClient()).DownloadFile("http://123dmwm.tk/ProCraft/resources/Jokes.txt", "Bot/Jokes.txt");
-            }
-            if (!File.Exists("Bot/Protips.txt")) {
-                (new WebClient()).DownloadFile("http://123dmwm.tk/ProCraft/resources/Protips.txt", "Bot/Protips.txt");
-            }
-            if (!File.Exists("Bot/Adjectives.txt")) {
-                (new WebClient()).DownloadFile("http://123dmwm.tk/ProCraft/resources/Adjectives.txt", "Bot/Adjectives.txt");
-            }
-            if (!File.Exists("Bot/Nouns.txt")) {
-                (new WebClient()).DownloadFile("http://123dmwm.tk/ProCraft/resources/Nouns.txt", "Bot/Nouns.txt");
-            }
-
-            if (!File.Exists("./MOTDList.txt")) {
-                (new WebClient()).DownloadFile("http://123dmwm.tk/ProCraft/resources/MOTDList.txt", "MOTDList.txt");
-            }
-
-            if (!Directory.Exists("./fonts")) {
-                Directory.CreateDirectory("./fonts");
-                (new WebClient()).DownloadFile("http://123dmwm.tk/ProCraft/resources/comicsans.ttf", "fonts/comicsans.ttf");
-                (new WebClient()).DownloadFile("http://123dmwm.tk/ProCraft/resources/mcclassic.ttf", "fonts/mcclassic.ttf");
-                (new WebClient()).DownloadFile("http://123dmwm.tk/ProCraft/resources/microsoft.ttf", "fonts/microsoft.ttf");
-                (new WebClient()).DownloadFile("http://123dmwm.tk/ProCraft/resources/minecraft.ttf", "fonts/minecraft.ttf");
+            if (!Directory.Exists("./Bot")) Directory.CreateDirectory("./Bot");
+            if (!Directory.Exists("./fonts")) Directory.CreateDirectory("./fonts");            
+       
+            DownloadResource("http://123dmwm.tk/ProCraft/resources/Funfacts.txt", "./Bot/Funfacts.txt");
+            DownloadResource("http://123dmwm.tk/ProCraft/resources/Jokes.txt", "./Bot/Jokes.txt");
+            DownloadResource("http://123dmwm.tk/ProCraft/resources/Protips.txt", "./Bot/Protips.txt");
+            DownloadResource("http://123dmwm.tk/ProCraft/resources/Adjectives.txt", "./Bot/Adjectives.txt");
+            DownloadResource("http://123dmwm.tk/ProCraft/resources/Nouns.txt", "./Bot/Nouns.txt");
+            
+            DownloadResource("http://123dmwm.tk/ProCraft/resources/MOTDList.txt", "./MOTDList.txt");
+            DownloadResource("http://123dmwm.tk/ProCraft/resources/comicsans.ttf", "./fonts/comicsans.ttf");
+            DownloadResource("http://123dmwm.tk/ProCraft/resources/mcclassic.ttf", "./fonts/mcclassic.ttf");
+            DownloadResource("http://123dmwm.tk/ProCraft/resources/microsoft.ttf", "./fonts/microsoft.ttf");
+            DownloadResource("http://123dmwm.tk/ProCraft/resources/minecraft.ttf", "./fonts/minecraft.ttf");
+        }
+        
+        static void DownloadResource(string url, string file) {
+            if (File.Exists(file)) return;
+            
+            try {
+                new WebClient().DownloadFile(url, file);
+            } catch (WebException ex) {
+                WebResponse resp = ex.Response;
+                if (resp != null) resp.Close();
+                
+                Logger.Log(LogType.Warning, "Error downloading resource {0}: {1}",
+                           file, ex);
             }
         }
 
@@ -1095,8 +1093,8 @@ namespace fCraft {
         [CanBeNull]
         static IPAddress CheckExternalIP()
         {
-        	HttpWebRequest request = HttpUtil.CreateRequest(IPCheckUri, 
-        	                                                TimeSpan.FromMilliseconds(IPCheckTimeout));
+            HttpWebRequest request = HttpUtil.CreateRequest(IPCheckUri, 
+                                                            TimeSpan.FromMilliseconds(IPCheckTimeout));
             request.CachePolicy = new RequestCachePolicy(RequestCacheLevel.BypassCache);
 
             try
