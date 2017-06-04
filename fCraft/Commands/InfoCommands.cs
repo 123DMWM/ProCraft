@@ -1983,8 +1983,7 @@ namespace fCraft {
             result.TryGetValue("registered", out registered1);
             double registered2;
             double.TryParse(registered1, out registered2);
-            var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-            DateTime registered3 = epoch.AddSeconds(registered2);
+            DateTime registered3 = DateTimeUtil.UnixEpoch.AddSeconds(registered2);
             string username;
             result.TryGetValue("username", out username);
 
