@@ -676,7 +676,7 @@ namespace fCraft {
             
             sb.Replace("{WORLDS}", WorldManager.Worlds.Length.ToStringInvariant());
             sb.Replace("{MOTD}", ConfigKey.MOTD.GetString());
-            sb.Replace("{VERSION}", "1.23");
+            sb.Replace("{VERSION}",  Updater.LatestStable);
             sb.Replace("{TIMESPLAYED}", player.Info.TimesVisited.ToString());
             sb.Replace("{TOTALTIME}", player.Info.TotalTime.ToMiniString());
             if (input.IndexOfOrdinal("{PLAYER") != -1)

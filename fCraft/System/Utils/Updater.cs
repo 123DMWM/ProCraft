@@ -25,6 +25,10 @@ namespace fCraft {
             | ReleaseFlags.Dev
 #endif
             );
+        
+        static Updater() {
+            UserAgent = "ProCraft " + LatestStable;
+        }
 
         /// <summary> User-agent value used for HTTP requests (heartbeat, updater, external IP check, etc). 
         /// Defaults to "ProCraft + VersionString of the current release. </summary>
