@@ -1925,34 +1925,39 @@ namespace fCraft {
                 CdApi.PrintUsage(player);
                 return;
             }
+            
             string value = cmd.Next();
-            if (value == null) {
-                value = "player/" + player.Name;
-            }
+            if (value == null) { value = type; type = "player"; }
             int id;
+            
             switch (type.ToLower()) {
                 case "id":
                 case "i":
                     if (!int.TryParse(value, out id)) {
                         player.Message("ID not valid integer!");
                         return;
-                    } else {
-                        value = "id/" + id;
                     }
+                    
+                    value = "id/" + id;
                     break;
+                    
                 case "player":
                 case "p":
+                    if (!Player.IsValidPlayerName(value)) {
+                        player.Message("Name not a valid player name!");
+                        return;
+                    }
+                    
                     value = "player/" + value;
                     break;
-                default:
-                    value = "player/" + player.Name;
-                    break;
             }
+            
             string data = Server.downloadDatastring("http://www.classicube.net/api/" + value);
             if (string.IsNullOrEmpty(data) || !data.Contains("username")) {
                 player.Message("Player not found!");
                 return;
             }
+            
             JsonObject result = JsonObject.Parse(data);   
             string error;
             result.TryGetValue("error", out error);
