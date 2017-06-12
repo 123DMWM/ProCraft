@@ -58,8 +58,7 @@ namespace fCraft.ConfigGUI {
         const int btnWidth = 130, btnHeight = 40, btnsPerCol = 8;
         int index = 0;
         void MakeButton( char colCode ) {
-            int rows = index / btnsPerCol;
-            if ((index % btnsPerCol) != 0) rows++; // round up
+            int row = index / btnsPerCol, col = index % btnsPerCol;
             index++;
             
             Button btn = new Button();
@@ -83,7 +82,9 @@ namespace fCraft.ConfigGUI {
             bCancel.DialogResult = DialogResult.Cancel;
             bCancel.Font = new System.Drawing.Font( "Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0 );
             
-            int rows = 1 + (index / btnsPerCol);
+            int rows = index / btnsPerCol;
+            if ((index % btnsPerCol) != 0) rows++; // round up
+            
             int x = 0;
             // Centre if even count, align under row if odd count
             if ((rows & 1) == 0) {
@@ -105,7 +106,9 @@ namespace fCraft.ConfigGUI {
         void MakeWindow(string title) {
             AutoScaleDimensions = new System.Drawing.SizeF( 8F, 13F );
             AutoScaleMode = AutoScaleMode.Font;
-            int rows = 1 + (index / btnsPerCol);
+            int rows = index / btnsPerCol;
+            if ((index % btnsPerCol) != 0) rows++; // round up
+            
             ClientSize = new System.Drawing.Size( 18 + btnWidth * rows, 47 + btnHeight * btnsPerCol );
             Font = new System.Drawing.Font( "Lucida Console", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0 );
             FormBorderStyle = FormBorderStyle.FixedDialog;
