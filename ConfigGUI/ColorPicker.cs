@@ -58,7 +58,8 @@ namespace fCraft.ConfigGUI {
         const int btnWidth = 130, btnHeight = 40, btnsPerCol = 8;
         int index = 0;
         void MakeButton( char colCode ) {
-            int row = index / btnsPerCol, col = index % btnsPerCol;
+            int rows = index / btnsPerCol;
+            if ((index % btnsPerCol) != 0) rows++; // round up
             index++;
             
             Button btn = new Button();
