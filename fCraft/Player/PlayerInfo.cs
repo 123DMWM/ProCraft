@@ -425,7 +425,7 @@ namespace fCraft {
         /// Use Player.CanSee() method to check visibility to specific observers. </summary>
         public bool IsHidden;
 
-        public string Mob = "Humanoid";
+        public string Model = "Humanoid";
         public string skinName = "";
         
         public string Skin { get { return skinName == "" ? Name : skinName; } }
@@ -714,7 +714,7 @@ namespace fCraft {
                 Int32.TryParse(fields[59], out info.DemoCount);
             }
 
-            if (count > 60) info.Mob = fields[60];
+            if (count > 60) info.Model = fields[60];
 
             if (count > 61)
             {
@@ -1229,7 +1229,7 @@ namespace fCraft {
             sb.Append(DemoCount); // 59
             sb.Append(',');
 
-            sb.Append(Mob); // 60
+            sb.Append(Model); // 60
             sb.Append(',');
 
             sb.Append(ReachDistance); // 61
@@ -1324,8 +1324,8 @@ namespace fCraft {
             IsOnline = true;
             PlayerObject = player;
             LastModified = DateTime.UtcNow;
-            if (Mob == null)
-                Mob = "humanoid";
+            if (Model == null)
+                Model = "humanoid";
         }
 
 

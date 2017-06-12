@@ -51,6 +51,7 @@ namespace fCraft {
         public bool IsSuper;
 
         public bool usedquit = false;
+        public int RotX, RotZ, oldRotX, oldRotZ;
 
         public string quitmessage = "/Quit";
 
@@ -344,7 +345,7 @@ namespace fCraft {
                 Message("&SYou are no longer AFK");
                 IsAFK = false;
                 oldafkMob = afkMob;
-                afkMob = Info.Mob;
+                afkMob = Info.Model;
                 Server.UpdateTabList(true);
             }
 

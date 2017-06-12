@@ -2694,7 +2694,7 @@ namespace fCraft {
             player.LastUsedWorldName = newName;
             Logger.Log(LogType.UserActivity, "{0} renamed the world \"{1}\" to \"{2}\".", player.Name, oldName, newName);
             Server.Message("{0}&S renamed the world \"{1}\" to \"{2}\"", player.ClassyName, oldName, newName);
-            foreach(Entity bot in Entity.Entities.Where(e => oldName.CaselessEquals(e.World))) {
+            foreach(Entity bot in Entity.EntityList.Where(e => oldName.CaselessEquals(e.World))) {
                 Entity.UpdateEntityWorld(bot, newName);
             }
         }

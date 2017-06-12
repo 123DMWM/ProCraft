@@ -1761,7 +1761,7 @@ namespace fCraft {
             player.Message("Extra Info about: {0}", info.ClassyName);
             player.Message("  Times used &6Bot&S: {0}", info.TimesUsedBot);
             player.Message("  Promoted: {0} Demoted: {1}", info.PromoCount, info.DemoCount);
-            player.Message("  Reach Distance: {0} Model: {1}", info.ReachDistance, info.Mob);
+            player.Message("  Reach Distance: {0} Model: {1}", info.ReachDistance, info.Model);
             
             if (target != null && target.ClientName != null)
                 player.Message("  Client Name: &F{0}", target.ClientName);

@@ -1209,7 +1209,7 @@ namespace fCraft {
                     player.Message("Randomized Spawn!");
                 }
                 
-                player.Send(player.SpawnPacket(Packet.SelfId, player.Info.Rank.Color + player.Name, player.Info.Skin, player.Position));
+                Entities.Spawn( player, false, player, Packet.SelfId );
                 player.Message( "New spawn point saved." );
                 Logger.Log( LogType.UserActivity,
                             "{0} changed the spawned point.",
@@ -1222,7 +1222,8 @@ namespace fCraft {
                     player.LastUsedPlayerName = target.Name;
                     
                     if( player.Can( Permission.Bring, target.Info.Rank ) ) {
-                        target.Send(target.SpawnPacket(Packet.SelfId, target.Info.Rank.Color + target.Name, target.Info.Skin, player.Position));
+                    	target.Position = player.Position;
+                        Entities.Spawn( target, false, target, Packet.SelfId );
                     } else {
                         player.Message( "You may only set spawn of players ranked {0}&S or lower.",
                                         player.Info.Rank.GetLimit( Permission.Bring ).ClassyName );
@@ -1231,7 +1232,6 @@ namespace fCraft {
 
                 } else if( infos.Length > 0 ) {
                     player.MessageManyMatches( "player", infos );
-
                 } else {
                     infos = Server.FindPlayers(player, playerName, SearchOptions.IncludeSelf);
                     if( infos.Length > 0 ) {

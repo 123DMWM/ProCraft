@@ -363,6 +363,7 @@ namespace fCraft {
                     case ExtPlayerPositionsExtName:
                         if (version == 1) ext = CpeExt.ExtPlayerPositions;
                         supportsExtPositions = true;
+                        break;
                     case EntityPropertyExtName:
                         if (version == 1) ext = CpeExt.EntityProperty;
                         break;

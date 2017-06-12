@@ -484,7 +484,7 @@ namespace fCraft {
                 Message("&SYou are no longer AFK");
                 IsAFK = false;
                 oldafkMob = afkMob;
-                afkMob = Info.Mob;
+                afkMob = Info.Model;
                 Server.UpdateTabList(true);
             }
             ResetIdleTimer();
@@ -1182,11 +1182,7 @@ namespace fCraft {
         
         void SendJoinCpeExtensions() {
             SendEnvSettings();
-            SendNow(SpawnPacket(Packet.SelfId, Info.Rank.Color + Name, Info.Skin, Position));
-
-            if (Supports(CpeExt.ChangeModel)) {
-                SendNow(Packet.MakeChangeModel(255, !IsAFK ? Info.Mob : AFKModel, HasCP437));
-            }
+            Entities.Spawn(this, true, this, Packet.SelfId);
 
             if (Supports(CpeExt.HackControl)) {
                 SendNow(PlayerHacks.MakePacket(this, World.MOTD));
@@ -1215,17 +1211,14 @@ namespace fCraft {
         
         internal void RemoveOldEntities(World world) {
             if (world == null) return;
-            foreach (Entity entity in Entity.Entities.Where(e => Entity.getWorld(e) == world)) {
+            foreach (Entity entity in Entity.EntityList.Where(e => Entity.getWorld(e) == world)) {
                 SendNow(Packet.MakeRemoveEntity(entity.ID));
             } 
         }
         
         internal void SendNewEntities(World world) {
-            foreach (Entity entity in Entity.Entities.Where(e => Entity.getWorld(e) == world)) {
-                SendNow(SpawnPacket(entity.ID, entity.Name, entity.Skin, Entity.getPos(entity)));
-                
-                if (!entity.Model.CaselessEquals("humanoid") && Supports(CpeExt.ChangeModel))
-                    SendNow(Packet.MakeChangeModel((byte)entity.ID, entity.Model, HasCP437));
+            foreach (Entity entity in Entity.EntityList.Where(e => Entity.getWorld(e) == world)) {
+                Entities.Spawn(this, true, entity);
             }
         }
         
@@ -1370,17 +1363,6 @@ namespace fCraft {
             if (packet.OpCode == OpCode.SetBlockServer)
                 CheckBlock(ref packet.Bytes[7]);
             if( canQueue ) priorityOutputQueue.Enqueue( packet );
-        }
-        
-        
-        /// <summary> Returns an appropriate spawn packet for this player. </summary>
-        public Packet SpawnPacket(sbyte id, string name, string skin, Position pos) {
-            name = Color.SubstituteSpecialColors(name, FallbackColors);            
-            if (Supports(CpeExt.ExtPlayerList2)) {
-                return Packet.MakeExtAddEntity2(id, name, skin, pos, HasCP437, supportsExtPositions);
-            } else {
-                return Packet.MakeAddEntity(id, name, pos, HasCP437, supportsExtPositions);
-            }
         }
         
         /// <summary> Returns an appropriate spawn packet for this player. </summary>
@@ -1596,9 +1578,13 @@ namespace fCraft {
                     }
                 }
             }
+            
             oldskinName = Info.skinName;
-            oldMob = Info.Mob;
+            oldMob = Info.Model;
             oldafkMob = afkMob;
+            oldRotX = RotX;
+            oldRotZ = RotZ;
+            
             lock (entitiesLock)
                 RemoveNonRetainedEntities();
 
@@ -1669,32 +1655,28 @@ namespace fCraft {
             } else if( spectatePos != Position ) {
                 SendNow( TeleportPacket( Packet.SelfId, spectatePos ) );
             }
-            if (SpectatedPlayer.HeldBlock != HeldBlock && SpectatedPlayer.Supports(CpeExt.HeldBlock))
-            {
+            
+            if (SpectatedPlayer.HeldBlock != HeldBlock && SpectatedPlayer.Supports(CpeExt.HeldBlock)) {
                 byte block = (byte)SpectatedPlayer.HeldBlock;
                 CheckBlock(ref block);
                 SendNow(Packet.MakeHoldThis((Block)block, false));
             }
         }
         
-        void CheckOwnChange(sbyte id, Player otherPlayer) {
-            if (oldskinName != Info.skinName && otherPlayer.Supports(CpeExt.ExtPlayerList2)) {
-                otherPlayer.Send(otherPlayer.SpawnPacket(id, Info.Rank.Color + Name, Info.Skin, Position));
-                //otherPlayer.Send(Packet.MakeTeleport(id, Position));
-                if (otherPlayer.Supports(CpeExt.ChangeModel)) {
-                    string thisModel = IsAFK ? AFKModel : Info.Mob;
-                    if (otherPlayer.Info.Rank.CanSee(Info.Rank) && (thisModel.CaselessEquals("air") || thisModel.CaselessEquals("0"))) {
-                        thisModel = "Humanoid";
-                    }
-                    otherPlayer.Send(Packet.MakeChangeModel((byte)id, thisModel, otherPlayer.HasCP437));
-                }
+        void CheckOwnChange(sbyte id, Player other) {
+            bool needsUpdate = false;
+            if (oldskinName != Info.skinName && other.Supports(CpeExt.ExtPlayerList2)) needsUpdate = true;
+            if ((oldRotX != RotX || oldRotZ != RotZ) && other.Supports(CpeExt.EntityProperty)) needsUpdate = true;
+            
+            if (needsUpdate) {
+                Entities.Spawn(other, false, this, id);
+                // need to send teleport packet for correct position
+                other.Send(TeleportPacket(id, Position));
             }
-            if ((oldMob != Info.Mob || oldafkMob != afkMob) && otherPlayer.Supports(CpeExt.ChangeModel)) {
-                string thisModel = IsAFK ? AFKModel : Info.Mob;
-                if (otherPlayer.Info.Rank.CanSee(Info.Rank) && (thisModel.CaselessEquals("air") || thisModel.CaselessEquals("0"))) {
-                    thisModel = "Humanoid";
-                }
-                otherPlayer.Send(Packet.MakeChangeModel((byte)id, thisModel, otherPlayer.HasCP437));
+            
+            if ((oldMob != Info.Model || oldafkMob != afkMob) && other.Supports(CpeExt.ChangeModel)) {
+                string model = Entities.ModelFor(other, this);
+                other.Send(Packet.MakeChangeModel(id, model, other.HasCP437));
             }
         }
         
@@ -1712,16 +1694,8 @@ namespace fCraft {
                     pos = player.WorldMap.Spawn;
                 }
                 
-                Send(SpawnPacket(newEntity.Id, player.Info.Rank.Color + player.Name, player.Info.Skin, pos));
+                Entities.Spawn( this, false, player, newEntity.Id );
                 Send(TeleportPacket(newEntity.Id, player.Position));
-                
-                if (Supports(CpeExt.ChangeModel)) {
-                    string addedModel = player.IsAFK ? player.AFKModel : player.Info.Mob;
-                    if (Info.Rank.CanSee(player.Info.Rank) && (addedModel.CaselessEquals("air") || addedModel.CaselessEquals("0"))) {
-                        addedModel = "Humanoid";
-                    }
-                    Send(Packet.MakeChangeModel((byte)newEntity.Id, addedModel, HasCP437));
-                }
                 return newEntity;
             } else {
                 throw new InvalidOperationException("Player.AddEntity: Ran out of entity IDs.");
@@ -1757,16 +1731,9 @@ namespace fCraft {
             Logger.Log( LogType.Debug, "ReAddEntity: {0} re-added {1} ({2})", Name, entity.Id, player.Name );
 #endif
             SendNow( Packet.MakeRemoveEntity( entity.Id ) );
-            SendNow(SpawnPacket(entity.Id, player.Info.Rank.Color + player.Name, player.Info.Skin, player.WorldMap.Spawn));
-            SendNow(TeleportPacket(entity.Id, player.Position));
-
-            if (Supports(CpeExt.ChangeModel)) {
-                string readdedModel = player.IsAFK ? player.AFKModel : player.Info.Mob;
-                if (Info.Rank.CanSee(player.Info.Rank) && (readdedModel.CaselessEquals("air") || readdedModel.CaselessEquals("0"))) {
-                    readdedModel = "Humanoid";
-                }
-                SendNow(Packet.MakeChangeModel((byte)entity.Id, readdedModel, HasCP437));
-            }
+            Entities.Spawn( this, true, player, entity.Id );
+            // need to send teleport packet for correct position
+            SendNow( TeleportPacket( entity.Id, player.Position ) );
         }
 
 

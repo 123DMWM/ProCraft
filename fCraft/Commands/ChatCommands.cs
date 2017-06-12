@@ -253,7 +253,7 @@ namespace fCraft
                     e.Player.Message("You are no longer AFK");
                     e.Player.IsAFK = false;
                     e.Player.oldafkMob = e.Player.afkMob;
-                    e.Player.afkMob = e.Player.Info.Mob;
+                    e.Player.afkMob = e.Player.Info.Model;
                     Server.UpdateTabList(true);
                 }
                 e.Player.ResetIdleTimer();
@@ -283,7 +283,7 @@ namespace fCraft
                 msg.Length > 0 ? " (" + (msg.Length > 32 ? msg.Remove(32) : msg) + ")" : "");
             player.IsAFK = !player.IsAFK;
             player.oldafkMob = player.afkMob;
-            player.afkMob = player.IsAFK ? player.AFKModel : player.Info.Mob;
+            player.afkMob = player.IsAFK ? player.AFKModel : player.Info.Model;
             Server.UpdateTabList(true);
             player.ResetIdleTimer();
         }

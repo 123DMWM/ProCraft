@@ -216,6 +216,7 @@
     <Compile Include="Player\PlayerDB.cs" />
     <Compile Include="Player\PlayerInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="World\Entities.cs" />
     <Compile Include="Zone\SpecialZone.Affect.cs" />
     <Compile Include="Zone\SpecialZone.cs" />
     <Compile Include="Zone\SpecialZone.Move.cs" />

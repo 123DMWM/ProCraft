@@ -22,7 +22,7 @@ namespace fCraft {
         public sbyte ID { get; set; }
         public string Model { get; set; }
 
-        public static List<Entity> Entities = new List<Entity>();
+        public static List<Entity> EntityList = new List<Entity>();
 
         public static World getWorld(Entity entity) {
             return WorldManager.FindWorldExact(entity.World);
@@ -40,7 +40,7 @@ namespace fCraft {
         }
 
         public static Entity Find(World world, string name) {
-            foreach (Entity entity in Entities.Where(w => w.World == world.Name)) {
+            foreach (Entity entity in EntityList.Where(w => w.World == world.Name)) {
                 if (entity.Name.CaselessEquals(name)) {
                     return entity;
                 }
@@ -49,14 +49,14 @@ namespace fCraft {
         }
 
         public static bool exists(World world, string name) {
-            foreach(Entity e in Entities.Where(w => w.World == world.Name)) {
+            foreach(Entity e in EntityList.Where(w => w.World == world.Name)) {
                 if (e.Name.CaselessEquals(name)) return true;
             }
             return false;
         }
 
         public static bool existsAny(World world) {
-            foreach (Entity e in Entities) {
+            foreach (Entity e in EntityList) {
                 if (e.World.CaselessEquals(world.Name)) return true;
             }
             return false;
@@ -70,38 +70,25 @@ namespace fCraft {
             entity.World = world.Name;
             setPos(entity, pos);
             entity.ID = entityID;
-            Entities.Add(entity);
+            EntityList.Add(entity);
             ShowEntity(entity);
             SaveAll(false);
             return entity;
         }
 
         public static void ShowEntity(Entity entity) {
-            foreach (Player sendTo in getWorld(entity).Players) {
-                sendTo.Send(sendTo.SpawnPacket(entity.ID, entity.Name, entity.Skin, getPos(entity)));
-               
-                if (sendTo.Supports(CpeExt.ChangeModel)) {
-                    sendTo.Send(Packet.MakeChangeModel((byte)entity.ID, entity.Model, sendTo.HasCP437));
-                }
-            }
+            Player[] players = getWorld(entity).Players;
+            foreach (Player pl in players) { Entities.Spawn(pl, false, entity); }
         }
 
         public static void ShowAll() {
-            foreach (Entity entity in Entities) {
-                foreach (Player sendTo in Server.Players.Where(p => p.World == getWorld(entity))) {
-                    sendTo.Send(sendTo.SpawnPacket(entity.ID, entity.Name, entity.Skin, getPos(entity)));
-                    
-                    if (sendTo.Supports(CpeExt.ChangeModel)) {
-                        sendTo.Send(Packet.MakeChangeModel((byte)entity.ID, entity.Model, sendTo.HasCP437));
-                    }
-                }
-            }
+            foreach (Entity entity in EntityList) { ShowEntity(entity); }
             SaveAll(false);
         }
 
         public static void TeleportEntity(Entity entity, Position p) {
-        	Player[] players = getWorld(entity).Players;
-        	foreach (Player pl in players) { pl.Send(pl.TeleportPacket(entity.ID, p)); }
+            Player[] players = getWorld(entity).Players;
+            foreach (Player pl in players) { pl.Send(pl.TeleportPacket(entity.ID, p)); }
 
             setPos(entity, p);
             SaveAll(false);
@@ -129,23 +116,23 @@ namespace fCraft {
 
         public static void RemoveEntity(Entity entity) {
             getWorld(entity).Players.Send(Packet.MakeRemoveEntity(entity.ID));
-            Entities.Remove(entity);
+            EntityList.Remove(entity);
             SaveAll(false);
         }
 
         public static void RemoveAll(World world) {
-            foreach (Entity e in Entities.Where(e => getWorld(e) == world)) {
+            foreach (Entity e in EntityList.Where(e => getWorld(e) == world)) {
                 world.Players.Send(Packet.MakeRemoveEntity(e.ID));
             }
-            Entities.RemoveAll(w => getWorld(w) == world);
+            EntityList.RemoveAll(w => getWorld(w) == world);
             SaveAll(false);
         }
 
         public static void ReloadAll() {
-            foreach (Entity entity in Entities) {
+            foreach (Entity entity in EntityList) {
                 getWorld(entity).Players.Send(Packet.MakeRemoveEntity(entity.ID));
             }
-            Entities.Clear();
+            EntityList.Clear();
             LoadAll();
             ShowAll();
         }
@@ -154,7 +141,7 @@ namespace fCraft {
             try {
                 Stopwatch sw = Stopwatch.StartNew();
                 using (Stream s = File.Create(Paths.EntitiesFileName)) {
-                    JsonSerializer.SerializeToStream(Entities.ToArray(), s);
+                    JsonSerializer.SerializeToStream(EntityList.ToArray(), s);
                 }
                 sw.Stop();
                 if (verbose) {
@@ -175,23 +162,23 @@ namespace fCraft {
 
             try {
                 using (Stream s = File.OpenRead(Paths.EntitiesFileName)) {
-                    Entities = (List<Entity>)
+                    EntityList = (List<Entity>)
                         JsonSerializer.DeserializeFromStream(typeof(List<Entity>), s);
                 }
                 int count = 0;
-                for (int i = 0; i < Entities.Count; i++) {
-                    if (Entities[i] == null)
+                for (int i = 0; i < EntityList.Count; i++) {
+                    if (EntityList[i] == null)
                         continue;
                     // fixup for servicestack not writing out null entries
-                    if (Entities[i].Name == null) {
-                        Entities[i] = null; continue;
+                    if (EntityList[i].Name == null) {
+                        EntityList[i] = null; continue;
                     }
                     count++;
                 }
                 Logger.Log(LogType.SystemActivity, "Entity.Load: Loaded " + count + " entities");
                 SaveAll(true);
             } catch (Exception ex) {
-                Entities = null;
+                EntityList = null;
                 Logger.Log(LogType.Error, "Entity.Load: " + ex);
             }
         }
@@ -229,7 +216,7 @@ namespace fCraft {
                         pos.R = world.map.Spawn.R;
                     }
                     setPos(entity, pos);
-                    Entities.Add(entity);
+                    EntityList.Add(entity);
                 }
             }
         }

@@ -796,7 +796,7 @@ namespace fCraft {
                     player.Info.TotalTime = player.Info.TotalTime - player.IdleTime;
                     player.IsAFK = false;
                     player.oldafkMob = player.afkMob;
-                    player.afkMob = player.Info.Mob;
+                    player.afkMob = player.Info.Model;
                     player.ResetIdleTimer(); // to prevent kick from firing more than once
                 }
             }

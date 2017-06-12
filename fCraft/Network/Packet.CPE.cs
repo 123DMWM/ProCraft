@@ -169,11 +169,11 @@ namespace fCraft {
         }
 
         [Pure]
-        public static Packet MakeChangeModel( byte entityId, [NotNull] string modelName, bool hasCP437) {
+        public static Packet MakeChangeModel( sbyte id, [NotNull] string modelName, bool hasCP437) {
             if( modelName == null ) throw new ArgumentNullException( "modelName" );
             //Logger.Log(LogType.Debug, "Send: MakeChangeModel({0}, {1})", entityId, modelName);
             Packet packet = new Packet( OpCode.ChangeModel );
-            packet.Bytes[1] = entityId;
+            packet.Bytes[1] = (byte)id;
             PacketWriter.WriteString( modelName, packet.Bytes, 2, hasCP437 );
             return packet;
         }
