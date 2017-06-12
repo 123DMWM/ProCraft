@@ -250,6 +250,8 @@ namespace fCraft {
             writer.Write(Packet.MakeExtEntry(EnvMapAspectExtName, 1).Bytes);
             writer.Write(Packet.MakeExtEntry(ExtPlayerPositionsExtName, 1).Bytes);
             
+            writer.Write(Packet.MakeExtEntry(EntityPropertyExtName, 1).Bytes);            
+            
             // Fix for ClassiCube Client which violates the spec -
             // If server supports version > 1 but client version 1, client should reply with version 1.
             // ClassiCube just doesn't reply at all in that case.
@@ -275,121 +277,98 @@ namespace fCraft {
                     return false;
                 }
                 string extName = reader.ReadString();
-                int extVersion = reader.ReadInt32();
-                CpeExt addedExt = CpeExt.None;
+                int version = reader.ReadInt32();
+                CpeExt ext = CpeExt.None;
                 
                 switch (extName) {
                     case CustomBlocksExtName:
-                        if (extVersion == 1)
-                            addedExt = CpeExt.CustomBlocks;
+                        if (version == 1) ext = CpeExt.CustomBlocks;
                         break;
                     case BlockPermissionsExtName:
-                        if (extVersion == 1)
-                            addedExt = CpeExt.BlockPermissions;
+                        if (version == 1) ext = CpeExt.BlockPermissions;
                         break;
                     case ClickDistanceExtName:
-                        if (extVersion == 1) {
-                            addedExt = CpeExt.ClickDistance;
-                        }
+                        if (version == 1) ext = CpeExt.ClickDistance;
                         break;
                     case EnvColorsExtName:
-                        if (extVersion == 1)
-                            addedExt = CpeExt.EnvColors;
+                        if (version == 1) ext = CpeExt.EnvColors;
                         break;
                     case ChangeModelExtName:
-                        if (extVersion == 1)
-                            addedExt = CpeExt.ChangeModel;
-                        break;
+                        if (version == 1) ext = CpeExt.ChangeModel;
+                        break;                        
                     case EnvMapAppearanceExtName:
-                        if (extVersion == 1) {
-                            addedExt = CpeExt.EnvMapAppearance;
-                        } else if (extVersion == 2) {
-                            addedExt = CpeExt.EnvMapAppearance2;
-                        }
-                        break;
+                        if (version == 1) ext = CpeExt.EnvMapAppearance;
+                        if (version == 2) ext = CpeExt.EnvMapAppearance2;
+                        break;                      
                     case EnvWeatherTypeExtName:
-                        if (extVersion == 1)
-                            addedExt = CpeExt.EnvWeatherType;
+                        if (version == 1) ext = CpeExt.EnvWeatherType;
                         break;
                     case HeldBlockExtName:
-                        if (extVersion == 1)
-                            addedExt = CpeExt.HeldBlock;
+                        if (version == 1) ext = CpeExt.HeldBlock;
                         break;
+                        
                     case ExtPlayerListExtName:
-                        if (extVersion == 1) {
-                            addedExt = CpeExt.ExtPlayerList;
+                        if (version == 1) {
+                            ext = CpeExt.ExtPlayerList;
                             if (Supports(CpeExt.ExtPlayerList2)) {
-                                addedExt = CpeExt.ExtPlayerList2;
+                                ext = CpeExt.ExtPlayerList2;
                             }
-                        } else if (extVersion == 2) {
-                            addedExt = CpeExt.ExtPlayerList2;
+                        } else if (version == 2) {
+                            ext = CpeExt.ExtPlayerList2;
                             if (Supports(CpeExt.ExtPlayerList)) {
                                 supportedExts.Remove(CpeExt.ExtPlayerList);
                             }
                         }
                         break;
                     case SelectionCuboidExtName:
-                        if (extVersion == 1)
-                            addedExt = CpeExt.SelectionCuboid;
+                        if (version == 1) ext = CpeExt.SelectionCuboid;
                         break;
                     case MessageTypesExtName:
-                        if (extVersion == 1)
-                            addedExt = CpeExt.MessageType;
+                        if (version == 1) ext = CpeExt.MessageType;
                         break;
                     case HackControlExtName:
-                        if (extVersion == 1)
-                            addedExt = CpeExt.HackControl;
+                        if (version == 1) ext = CpeExt.HackControl;
                         break;
                     case EmoteFixExtName:
-                        if (extVersion == 1)
-                            addedExt = CpeExt.EmoteFix;
+                        if (version == 1) ext = CpeExt.EmoteFix;
                         break;
                     case TextHotKeyExtName:
-                        if (extVersion == 1)
-                            addedExt = CpeExt.TextHotKey;
+                        if (version == 1) ext = CpeExt.TextHotKey;
                         break;
                     case PlayerClickExtName:
-                        if (extVersion == 1)
-                            addedExt = CpeExt.PlayerClick;
+                        if (version == 1) ext = CpeExt.PlayerClick;
                         break;
                     case LongerMessagesExtName:
-                        if (extVersion == 1)
-                            addedExt = CpeExt.LongerMessages;
+                        if (version == 1) ext = CpeExt.LongerMessages;
                         break;
                     case FullCP437ExtName:
-                        if (extVersion == 1)
-                            addedExt = CpeExt.FullCP437;
+                        if (version == 1) ext = CpeExt.FullCP437;
                         break;
                     case BlockDefinitionsExtName:
-                        if (extVersion == 1)
-                            addedExt = CpeExt.BlockDefinitions;
+                        if (version == 1) ext = CpeExt.BlockDefinitions;
                         break;
                     case BlockDefinitionsExtExtName:
-                        if (extVersion == 1)
-                            addedExt = CpeExt.BlockDefinitionsExt;
-                        else if (extVersion == 2)
-                            addedExt = CpeExt.BlockDefinitionsExt2;
+                        if (version == 1) ext = CpeExt.BlockDefinitionsExt;
+                        if (version == 2) ext = CpeExt.BlockDefinitionsExt2;
                         break;
                     case BulkBlockUpdateExtName:
-                        if (extVersion == 1)
-                            addedExt = CpeExt.BulkBlockUpdate;
+                        if (version == 1) ext = CpeExt.BulkBlockUpdate;
                         break;
                     case TextColorsExtName:
-                        if (extVersion == 1)
-                            addedExt = CpeExt.TextColors;
+                        if (version == 1) ext = CpeExt.TextColors;
                         break;
                     case EnvMapAspectExtName:
-                        if (extVersion == 1)
-                            addedExt = CpeExt.EnvMapAspect;
+                        if (version == 1) ext = CpeExt.EnvMapAspect;
                         break;
                     case ExtPlayerPositionsExtName:
-                        if (extVersion == 1)
-                            addedExt = CpeExt.ExtPlayerPositions;
+                        if (version == 1) ext = CpeExt.ExtPlayerPositions;
                         supportsExtPositions = true;
+                    case EntityPropertyExtName:
+                        if (version == 1) ext = CpeExt.EntityProperty;
                         break;
                 }
-                if (addedExt != CpeExt.None)
-                    supportedExts.Add(addedExt);
+                if (ext != CpeExt.None)
+                    supportedExts.Add(ext);
             }
             supportsCustomBlocks = Supports(CpeExt.CustomBlocks);
             supportsBlockDefs = Supports(CpeExt.BlockDefinitions);

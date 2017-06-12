@@ -341,5 +341,14 @@ namespace fCraft {
             WriteI32( value, packet.Bytes, 2 );
             return packet;
         }
+        
+        [Pure]
+        public static Packet MakeEntityProperty( sbyte id, EntityProp prop, int value ) {
+            Packet packet = new Packet( OpCode.SetEntityProperty );
+            packet.Bytes[1] = (byte)id;
+            packet.Bytes[2] = (byte)prop;
+            WriteI32( value, packet.Bytes, 3 );
+            return packet;
+        }
     }
 }

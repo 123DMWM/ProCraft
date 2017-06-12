@@ -256,50 +256,51 @@ namespace fCraft {
         }
 
         static readonly int[] PacketSizes = {
-            131, // Handshake
-            1, // Ping
-            1, // MapBegin
+            131,  // Handshake
+            1,    // Ping
+            1,    // MapBegin
             1028, // MapChunk
-            7, // MapEnd
-            9, // SetBlockClient
-            8, // SetBlockServer
-            74, // AddEntity
-            10, // Teleport
-            7, // MoveRotate
-            5, // Move
-            4, // Rotate
-            2, // RemoveEntity
-            66, // Message
-            65, // Kick
-            2, // SetPermission
+            7,    // MapEnd
+            9,    // SetBlockClient
+            8,    // SetBlockServer
+            74,   // AddEntity
+            10,   // Teleport
+            7,    // MoveRotate
+            5,    // Move
+            4,    // Rotate
+            2,    // RemoveEntity
+            66,   // Message
+            65,   // Kick
+            2,    // SetPermission
 
-            67, // ExtInfo
-            69, // ExtEntry
+            67,   // ExtInfo
+            69,   // ExtEntry
 
-            3, // SetClickDistance
-            2, // CustomBlockSupportLevel
-            3, // HoldThis
-            134, // SetTextHotKey
-            196, // ExtAddPlayerName
-            130, // ExtAddEntity
-            3, // ExtRemovePlayerName
-            8, // EnvSetColor
-            86, // MakeSelection
-            2, // RemoveSelection
-            4, // SetBlockPermission
-            66, // ChangeModel
-            69, // EnvMapAppearance
-            2, // EnvSetWeatherType
-            8, // HackControl
-            138, // ExtAddEntity2
+            3,    // SetClickDistance
+            2,    // CustomBlockSupportLevel
+            3,    // HoldThis
+            134,  // SetTextHotKey
+            196,  // ExtAddPlayerName
+            130,  // ExtAddEntity
+            3,    // ExtRemovePlayerName
+            8,    // EnvSetColor
+            86,   // MakeSelection
+            2,    // RemoveSelection
+            4,    // SetBlockPermission
+            66,   // ChangeModel
+            69,   // EnvMapAppearance
+            2,    // EnvSetWeatherType
+            8,    // HackControl
+            138,  // ExtAddEntity2
             0,
-            80, // DefineBlock
-            2, // RemoveBlockDefinition
-            85, // DefineBlockExt
+            80,   // DefineBlock
+            2,    // RemoveBlockDefinition
+            85,   // DefineBlockExt
             1282, // BulkBlockUpdate
-            6, // SetTextColor
-            65, // SetEnvMapUrl
-            6, // SetEnvMapProperty
+            6,    // SetTextColor
+            65,   // SetEnvMapUrl
+            6,    // SetEnvMapProperty
+            7,    // SetEntityProperty
         };
     }
     

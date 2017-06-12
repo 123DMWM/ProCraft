@@ -131,8 +131,11 @@ namespace fCraft
         /// <summary> Packet telling to the client about the custom texture pack used. </summary>
         SetEnvMapUrl = 40,
         
-        /// <summary> Packet telling the client to update an environmental aspect of the current map. </summary>
+        /// <summary> Packet telling the client to update an environment aspect of the current map. </summary>
         SetEnvMapProperty = 41,
+        
+        /// <summary> Packet telling the client to update an aspect of the given entity. </summary>
+        SetEntityProperty = 42,
     }
 }
 

@@ -7,11 +7,11 @@ namespace fCraft
     public enum CpeExt
     {
         None,
-        /// <summary> Used to extend or restrict the distance at which client may click blocks,
-        /// controlled by the server. </summary>
+        
+        /// <summary> Extend or restricts the distance at which the user may click blocks. </summary>
         ClickDistance,
 
-        /// <summary> Used to add support for custom block types. </summary>
+        /// <summary> Indicates the client supports the predefined CPE custom blocks. </summary>
         CustomBlocks,
 
         /// <summary> Provides a way for the client to notify the server about the block type that it is
@@ -35,39 +35,37 @@ namespace fCraft
         /// entities (spawned player models) and names on the player list. </summary>
         ExtPlayerList2,
 
-        /// <summary> Allows server to alter some of the colors used by the client in
-        /// environment rendering. </summary>
+        /// <summary> Sets environment colors used by the client when rendering. </summary>
         EnvColors,
 
-        /// <summary> Allows the server to highlight parts of a world. Applications include zoning,
+        /// <summary> Allows highlighting parts of a world. Applications include zoning,
         /// previewing draw command size, previewing undo commands. </summary>
         SelectionCuboid,
 
-        /// <summary> This extension allows the server to instruct the player that certain block
-        /// types are allowed/disallowed to be placed or deleted. </summary>
+        /// <summary> Allows disabling placing/deleting blocks client side. </summary>
         BlockPermissions,
 
         /// <summary> Allows changing appearance of player models in supporting clients. </summary>
         ChangeModel,
 
-        /// <summary> This extension allows the server to specify custom terrain textures,
-        /// and tweak appearance of map edges. </summary>
+        /// <summary> Allows specifying custom terrain textures, and tweaking appearance 
+        /// of map edges. </summary>
         EnvMapAppearance,
         
-        /// <summary> This extension allows the server to specify custom terrain textures,
-        /// and tweak appearance of map edges, clouds height, and max fog distance. </summary>
+        /// <summary> Allows specifying custom terrain textures, and tweaking appearance 
+        /// of map edges, clouds height, and max fog distance. </summary>
         EnvMapAppearance2,
 
-        /// <summary> Allows changing appearance of player models in supporting clients. </summary>
+        /// <summary> Allows changing weather in the world. </summary>
         EnvWeatherType,
 
-        /// <summary> Allows changing of the player shacking abilities. </summary>
+        /// <summary> Allows changing the user's hacking abilities. </summary>
         HackControl,
 
-        /// <summary> This extension allows the server to send different message types. </summary>
+        /// <summary> Allows the server to send different message types. </summary>
         MessageType,
 
-        /// <summary> This extension tells teh server extended information about when a player clicks. </summary>
+        /// <summary> Tells the server extended information about when a player clicks. </summary>
         PlayerClick,
 
         /// <summary> This extension lets the player send longer chat messages </summary>
@@ -76,19 +74,19 @@ namespace fCraft
         /// <summary> This extension lets the player send characters from Code Page 437 </summary>
         FullCP437,
         
-        /// <summary> This extension lets users define their own custom blocks. </summary>
+        /// <summary> Lets users define their own custom blocks. </summary>
         BlockDefinitions,
         
-        /// <summary> This extension lets users define their own custom blocks. </summary>
+        /// <summary> Lets users define their own custom blocks. </summary>
         BlockDefinitionsExt,
         
-        /// <summary> This extension lets users define their own custom blocks. </summary>
+        /// <summary> Lets users define their own custom blocks. </summary>
         BlockDefinitionsExt2,
         
-        /// <summary> This extension lets servers send multiple block updates much more efficiently. </summary>
+        /// <summary> Lets servers send multiple block updates much more efficiently. </summary>
         BulkBlockUpdate,
         
-        /// <summary> This extension allows users to define their own custom text colors displayed in chat. </summary>
+        /// <summary> Allows users to define their own custom text colors displayed in chat. </summary>
         TextColors,
         
         /// <summary> This extension allows the server to specify custom terrain textures,
@@ -97,6 +95,9 @@ namespace fCraft
         
         /// <summary> Allows for players to be moved to and see other players, below -1024 or above 1024 or any axis. </summary>
         ExtPlayerPositions,
+        
+        /// <summary> Allows for setting entity properties, such as rotation on X/Z axis. </summary>
+        EntityProperty,
     }
 
 
@@ -136,5 +137,11 @@ namespace fCraft
         WeatherFade = 7,
         ExpFog = 8,
         SidesOffset = 9,
+    }
+    
+    public enum EntityProp : byte {
+        RotationX = 0,
+        RotationY = 1,
+        RotationZ = 2,
     }
 }
