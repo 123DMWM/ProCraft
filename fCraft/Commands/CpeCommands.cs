@@ -2468,23 +2468,8 @@ namespace fCraft {
             string name = cmd.Next(), axis = cmd.Next();
             if (name == null || axis == null) { CdEntityRot.PrintUsage(player); return; }
             
-            if (name == "-") {
-                if (player.LastUsedPlayerName != null) {
-                    name = player.LastUsedPlayerName;
-                } else {
-                    player.Message("Cannot repeat player name: you haven't used any names yet.");
-                    return;
-                }
-            }
-            
-            Player[] matches = Server.FindPlayers(player, name, SearchOptions.ReturnSelfIfOnlyMatch);
-            if (matches.Length == 0) {
-                player.Message("No player found by the name \"{0}\"", name); return;
-            } else if (matches.Length > 1) {
-                player.MessageManyMatches("player", matches); return;
-            }
-            
-            Player target = matches[0];
+            Player target = Server.FindPlayerOrPrintMatches(player, name, SearchOptions.IncludeSelf);
+            if (target == null) return;
             if (target.Info.Rank.Index < player.Info.Rank.Index) {
                 player.Message("Cannot change the rotation of someone ranked higher than you."); return;
             }
