@@ -559,7 +559,7 @@ namespace fCraft {
         };
 
         static void BlockInfoListHandler(Player player, CommandReader cmd) {
-            PlayerInfo info = InfoCommands.FindPlayerInfo(player, cmd, true);
+            PlayerInfo info = InfoCommands.FindPlayerInfo(player, cmd);
             if (info == null) return;
             var args = new BlockInfoListLookupArgs {
                 Player = info,

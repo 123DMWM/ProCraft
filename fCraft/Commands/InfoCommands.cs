@@ -135,7 +135,7 @@ namespace fCraft {
 
         static void InfoHandler( Player player, CommandReader cmd ) {
             if( player == null ) throw new ArgumentNullException( "player" );
-            PlayerInfo info = FindPlayerInfo(player, cmd, true);
+            PlayerInfo info = FindPlayerInfo(player, cmd);
             if (info == null) return;
             Player target = info.PlayerObject;
 
@@ -1754,7 +1754,7 @@ namespace fCraft {
 
         private static void ExtraInfoHandler(Player player, CommandReader cmd) {
             if (player == null) throw new ArgumentNullException("player");
-			PlayerInfo info = FindPlayerInfo(player, cmd, true);
+			PlayerInfo info = FindPlayerInfo(player, cmd);
             if (info == null) return;
             Player target = info.PlayerObject;
 
@@ -1807,7 +1807,7 @@ namespace fCraft {
 			if (!player.Can(Permission.ViewPlayerIPs)) { 
 				info = player.Info;
 			} else {
-				info = FindPlayerInfo(player, cmd, true);
+				info = FindPlayerInfo(player, cmd);
 			}
             if (info == null) return;
 			if (info.GeoIP != info.LastIP.ToString() || info.Accuracy == 0) {
@@ -2022,7 +2022,7 @@ namespace fCraft {
         };
 
         static void SeenHandler(Player player, CommandReader cmd) {
-            PlayerInfo info = FindPlayerInfo(player, cmd, true);
+            PlayerInfo info = FindPlayerInfo(player, cmd);
             if (info == null) return;
             Player target = info.PlayerObject;
 
@@ -2122,7 +2122,7 @@ namespace fCraft {
 
         #endregion
         #region FindPlayerInfo
-        public static PlayerInfo FindPlayerInfo(Player player, CommandReader cmd, bool canBeOffline) {
+        public static PlayerInfo FindPlayerInfo(Player player, CommandReader cmd) {
 			string name = cmd.Next();
 
             if (string.IsNullOrEmpty(name)) {
@@ -2211,16 +2211,12 @@ namespace fCraft {
                     infos = new[] { tempInfo };
                 }
             }
-
-            infos = (canBeOffline ? infos : infos.Where(p => p.IsOnline).ToArray()); //Reduce to only online players is specified
-
             Array.Sort(infos, new PlayerInfoComparer(player));
 
             if (infos.Length == 1) {
                 // only one match found; print it right away
                 player.LastUsedPlayerName = infos[0].Name;
                 return infos[0];
-
             }
             if (infos.Length > 1) {
                 // multiple matches found

@@ -752,10 +752,8 @@ namespace fCraft {
             Handler = NickHandler
         };
 
-        static void NickHandler(Player player, CommandReader cmd)
-        {
-
-            PlayerInfo info = InfoCommands.FindPlayerInfo(player, cmd, true);
+        static void NickHandler(Player player, CommandReader cmd) {
+            PlayerInfo info = InfoCommands.FindPlayerInfo(player, cmd);
             if (info == null) return;
             if (!cmd.HasNext) {
                 CdNick.PrintUsage(player);

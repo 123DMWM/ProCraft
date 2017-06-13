@@ -50,6 +50,12 @@ namespace fCraft {
             }
             return true;
         }
+        
+        static Player FindPlayer(Player player, CommandReader cmd) {
+            string name = cmd.Next();
+            if (name == null) name = player.Name;
+            return Server.FindPlayerOrPrintMatches(player, name, SearchOptions.IncludeSelf);
+        }
 
         #region AddEntity
 
@@ -151,17 +157,8 @@ namespace fCraft {
                     }
 
                     string skinString1 = (cmd.Next() ?? entityName);
-                    if (skinString1 != null) {
-                        if (skinString1.StartsWith("--")) {
-                            skinString1 = string.Format("http://minecraft.net/skin/{0}.png", skinString1.Replace("--", ""));
-                        }
-                        if (skinString1.StartsWith("-+")) {
-                            skinString1 = string.Format("http://skins.minecraft.net/MinecraftSkins/{0}.png", skinString1.Replace("-+", ""));
-                        }
-                        if (skinString1.StartsWith("++")) {
-                            skinString1 = string.Format("http://i.imgur.com/{0}.png", skinString1.Replace("++", ""));
-                        }
-                    }
+                    if (skinString1 != null) skinString1 = ParseSkin(skinString1);
+                    
                     entity = Entity.CreateEntity(entityName, skinString1, requestedModel, player.World, player.Position, getNewID(player.World));
                     player.Message("Successfully created entity {0}&S with id:{1} and skin {2}.", entity.Name, entity.ID, entity.Skin, entity.Name);
                     break;
@@ -265,15 +262,7 @@ namespace fCraft {
                         player.Message("Please specify a skin URL/Name.");
                         break;
                     } else {
-                        if (skinString3.StartsWith("--")) {
-                            skinString3 = string.Format("http://minecraft.net/skin/{0}.png", skinString3.Replace("--", ""));
-                        }
-                        if (skinString3.StartsWith("-+")) {
-                            skinString3 = string.Format("http://skins.minecraft.net/MinecraftSkins/{0}.png", skinString3.Replace("-+", ""));
-                        }
-                        if (skinString3.StartsWith("++")) {
-                            skinString3 = string.Format("http://i.imgur.com/{0}.png", skinString3.Replace("++", ""));
-                        }
+                        skinString3 = ParseSkin(skinString3);
                     }
                     player.Message("Changed entity skin to {0}.", skinString3 ?? entity.Name);
                     Entity.ChangeEntitySkin(entity, skinString3);
@@ -313,7 +302,7 @@ namespace fCraft {
         };
 
         private static void ModelHandler(Player player, CommandReader cmd) {
-            SetModel(player, cmd, "", p => p.Model, (p, value) => p.Model = value);
+            SetModel(player, cmd, "", p => p.Info.Model, (p, value) => p.Info.Model = value);
         }
 
         static readonly CommandDescriptor CdAFKModel = new CommandDescriptor {
@@ -329,16 +318,16 @@ namespace fCraft {
 
         private static void AFKModelHandler(Player player, CommandReader cmd) {
             SetModel(player, cmd, "AFK ",
-                     p => p.PlayerObject.AFKModel,
-                     (p, value) => p.PlayerObject.AFKModel = value);
+                     p => p.AFKModel,
+                     (p, value) => p.AFKModel = value);
         }
         
         static void SetModel(Player player, CommandReader cmd, string prefix,
-                             Func<PlayerInfo, string> getter, Action<PlayerInfo, string> setter) {
-            PlayerInfo target = InfoCommands.FindPlayerInfo(player, cmd, false);
+                             Func<Player, string> getter, Action<Player, string> setter) {
+            Player target = FindPlayer(player, cmd);
             if (target == null) return;
 
-            if (!player.IsStaff && target != player.Info) {
+            if (!player.IsStaff && target != player) {
                 Rank staffRank = RankManager.GetMinRankWithAnyPermission(Permission.ReadStaffChat);
                 if (staffRank != null) {
                     player.Message("You must be {0}&S+ to change another player's {1}Model",
@@ -349,21 +338,16 @@ namespace fCraft {
                 }
                 return;
             }
-            if (target.Rank.Index < player.Info.Rank.Index) {
+            if (target.Info.Rank.Index < player.Info.Rank.Index) {
                 player.Message("Cannot change the {0}Model of someone higher rank than you.", prefix); return;
             }
-            if (target != null && !target.IsOnline) {
-                player.Message("Player is not currently online."); return;
-            }
-            if (target == null) {
-                player.Message("Your current {0}Model: &f{1}", prefix, getter(player.Info)); return;
-            }
-            
+
             string model = cmd.Next();
             if (string.IsNullOrEmpty(model)) {
                 player.Message("Current {2}Model for {0}: &f{1}", target.Name, getter(target), prefix);
                 return;
             }
+            
             model = ParseModel(player, model);
             if (model == null) {
                 player.Message("Model not valid, see &H/Help {0}Model&S.", prefix.TrimEnd());
@@ -374,16 +358,15 @@ namespace fCraft {
                 return;
             }
             
-            if (target.IsOnline) {
-                target.PlayerObject.Message("&f{0}&SChanged your {3}model from &f{1} &Sto &f{2}",
-                                            (target.PlayerObject == player ? "" : player.Name + " "),
-                                            getter(target), model, prefix);
-                target.PlayerObject.oldMob = target.Model;
-            }
-            if (target.PlayerObject != player) {
+            target.Message("&f{0}&SChanged your {3}model from &f{1} &Sto &f{2}",
+                           (target == player ? "" : player.Name + " "), getter(target), model, prefix);
+            if (target != player) {
                 player.Message("Changed {3}model of &f{0} &Sfrom &f{1} &Sto &f{2}",
                                target.Name, getter(target), model, prefix);
             }
+            
+            target.oldMob = target.Info.Model;
+            target.oldafkMob = target.afkMob;
             setter(target, model);
         }
         
@@ -424,43 +407,41 @@ namespace fCraft {
         };
 
         private static void SkinHandler(Player player, CommandReader cmd) {
-            if (!cmd.HasNext) {
-                CdChangeSkin.PrintUsage(player);
+            if (!cmd.HasNext) { CdChangeSkin.PrintUsage(player); return; }            
+            Player target = FindPlayer(player, cmd);
+            if (target == null) return;
+
+            string skin = cmd.Next();
+            if (skin == null) { CdChangeSkin.PrintUsage(player); return; }            
+            
+            skin = ParseSkin(skin);
+            if (target.Info.skinName == skin) {
+                player.Message("&f{0}&S's skin is already set to &f{1}", target.Name, skin);
                 return;
             }
-
-            PlayerInfo p = InfoCommands.FindPlayerInfo(player, cmd, false);
-            if (p == null) return;
-
-            if (!cmd.HasNext) {
-                CdChangeSkin.PrintUsage(player);
-                return;
+            
+            target.Message("&f{0}&Shanged your skin from &f{1} &Sto &f{2}", 
+                           (target == player ? "&SC" : player.Name + " &Sc"), target.oldskinName, skin);
+            
+            if (player != target) {
+                player.Message("Changed skin of &f{0} &Sto &f{1}", target.Name, skin);
             }
-            string skinString = cmd.Next();
-            if (skinString != null) {
-                if (skinString.StartsWith("--")) {
-                    skinString = string.Format("http://minecraft.net/skin/{0}.png", skinString.Replace("--", ""));
-                }
-                if (skinString.StartsWith("-+")) {
-                    skinString = string.Format("http://skins.minecraft.net/MinecraftSkins/{0}.png", skinString.Replace("-+", ""));
-                }
-                if (skinString.StartsWith("++")) {
-                    skinString = string.Format("http://i.imgur.com/{0}.png", skinString.Replace("++", ""));
-                }
+            
+            target.oldskinName = target.Info.skinName;
+            target.Info.skinName = skin;
+        }
+        
+        static string ParseSkin(string skin) {
+            if (skin.StartsWith("--")) {
+                return "http://minecraft.net/skin/" + skin.Substring(2) + ".png";
             }
-
-            if (p.skinName == skinString) {
-                player.Message("&f{0}&S's skin is already set to &f{1}", p.Name, skinString);
-                return;
+            if (skin.StartsWith("-+")) {
+                return "http://skins.minecraft.net/MinecraftSkins/" + skin.Substring(2) + ".png";
             }
-            if (p.IsOnline) {
-                p.PlayerObject.Message("&f{0}&Shanged your skin from &f{1} &Sto &f{2}", (p.PlayerObject == player ? "&SC" : player.Name + " &Sc"), p.PlayerObject.oldskinName, skinString);
-                p.PlayerObject.oldskinName = p.skinName;
+            if (skin.StartsWith("++")) {
+                return "http://i.imgur.com/" + skin.Substring(2) + ".png";
             }
-            if (p.PlayerObject != player) {
-                player.Message("Changed skin of &f{0} &Sto &f{1}", p.Name, skinString);
-            }
-            p.skinName = skinString;
+            return skin;
         }
 
         #endregion
@@ -479,10 +460,10 @@ namespace fCraft {
         };
 
         static void ClickDistanceHandler(Player player, CommandReader cmd) {
-            PlayerInfo otherPlayer = InfoCommands.FindPlayerInfo(player, cmd, false);
-            if (otherPlayer == null) return;
+            Player target = FindPlayer(player, cmd);
+            if (target == null) return;
 
-            if (!player.IsStaff && otherPlayer != player.Info) {
+            if (!player.IsStaff && target != player) {
                 Rank staffRank = RankManager.GetMinRankWithAnyPermission(Permission.ReadStaffChat);
                 if (staffRank != null) {
                     player.Message("You must be {0}&S+ to change another players reach distance", staffRank.ClassyName);
@@ -491,64 +472,64 @@ namespace fCraft {
                 }
                 return;
             }
-            if (otherPlayer.Rank.Index < player.Info.Rank.Index) {
+            if (target.Info.Rank.Index < player.Info.Rank.Index) {
                 player.Message("Cannot change the Reach Distance of someone higher rank than you.");
                 return;
             }
-            string second = cmd.Next();
-            if (string.IsNullOrEmpty(second)) {
-                if (otherPlayer == player.Info) {
+            
+            string rawDist = cmd.Next();
+            if (string.IsNullOrEmpty(rawDist)) {
+                if (target == player) {
                     player.Message("Your current ReachDistance: {0} blocks [Units: {1}]", player.Info.ReachDistance / 32, player.Info.ReachDistance);
                 } else {
-                    player.Message("Current ReachDistance for {2}: {0} blocks [Units: {1}]", otherPlayer.ReachDistance / 32, otherPlayer.ReachDistance, otherPlayer.Name);
+                    player.Message("Current ReachDistance for {2}: {0} blocks [Units: {1}]", target.Info.ReachDistance / 32, target.Info.ReachDistance, target.Name);
                 }
                 return;
             }
+            
             short distance;
-            if (!short.TryParse(second, out distance)) {
-                if (second != "reset") {
+            if (!short.TryParse(rawDist, out distance)) {
+                if (rawDist != "reset") {
                     player.Message("Please try something inbetween 0 and 32767");
                     return;
                 } else {
                     distance = 160;
-                }
+            	}
             }
             if (distance < 0 || distance > 32767) {
                 player.Message("Reach distance must be between 0 and 32767");
                 return;
             }
-
-            if (distance != otherPlayer.ReachDistance) {
-                if (otherPlayer != player.Info) {
-                    if (otherPlayer.IsOnline) {
-                        if (otherPlayer.PlayerObject.Supports(CpeExt.ClickDistance)) {
-                            otherPlayer.PlayerObject.Message("{0} set your reach distance from {1} to {2} blocks [Units: {3}]", player.Name, otherPlayer.ReachDistance / 32, distance / 32, distance);
-                            player.Message("Set reach distance for {0} from {1} to {2} blocks [Units: {3}]", otherPlayer.Name, otherPlayer.ReachDistance / 32, distance / 32, distance);
-                            otherPlayer.ReachDistance = distance;
-                            otherPlayer.PlayerObject.Send(Packet.MakeSetClickDistance(distance));
-                        } else {
-                            player.Message("This player does not support ReachDistance packet");
-                        }
-                    } else {
-                        player.Message("Set reach distance for {0} from {1} to {2} blocks [Units: {3}]", otherPlayer.Name, otherPlayer.ReachDistance / 32, distance / 32, distance);
-                        otherPlayer.ReachDistance = distance;
-                    }
+            
+            if (distance == target.Info.ReachDistance) {
+                if (player != target) {
+                    player.Message("{0}'s reach distance is already set to {1}", target.ClassyName, target.Info.ReachDistance);
                 } else {
-                    if (player.Supports(CpeExt.ClickDistance)) {
-                        player.Message("Set own reach distance from {0} to {1} blocks [Units: {2}]", player.Info.ReachDistance / 32, distance / 32, distance);
-                        player.Info.ReachDistance = distance;
-                        player.Send(Packet.MakeSetClickDistance(distance));
-                    } else {
-                        player.Message("You don't support ReachDistance packet");
-                    }
-                }
-            } else {
-                if (otherPlayer != player.Info) {
-                    player.Message("{0}'s reach distance is already set to {1}", otherPlayer.ClassyName, otherPlayer.ReachDistance);
-                } else {
-                    player.Message("Your reach distance is already set to {0}", otherPlayer.ReachDistance);
+                    player.Message("Your reach distance is already set to {0}", target.Info.ReachDistance);
                 }
                 return;
+            }
+
+            if (player != target) {
+                if (target.Supports(CpeExt.ClickDistance)) {
+                    target.Message("{0} set your reach distance from {1} to {2} blocks [Units: {3}]", 
+            		               player.Name, target.Info.ReachDistance / 32, distance / 32, distance);
+                    player.Message("Set reach distance for {0} from {1} to {2} blocks [Units: {3}]", 
+            		               target.Name, target.Info.ReachDistance / 32, distance / 32, distance);
+                    target.Info.ReachDistance = distance;
+                    target.Send(Packet.MakeSetClickDistance(distance));
+                } else {
+                    player.Message("This player does not support ReachDistance packet");
+                }
+            } else {
+                if (player.Supports(CpeExt.ClickDistance)) {
+                    player.Message("Set own reach distance from {0} to {1} blocks [Units: {2}]", 
+            		               player.Info.ReachDistance / 32, distance / 32, distance);
+                    player.Info.ReachDistance = distance;
+                    player.Send(Packet.MakeSetClickDistance(distance));
+                } else {
+                    player.Message("You don't support ReachDistance packet");
+                }
             }
         }
 
@@ -2097,35 +2078,20 @@ namespace fCraft {
         };
 
         static void HackControlHandler(Player player, CommandReader cmd) {
-
-            PlayerInfo target = InfoCommands.FindPlayerInfo(player, cmd, false);
-            if (target == null || player.Info.Rank != RankManager.HighestRank) {
+            Player targetPlayer = FindPlayer(player, cmd);            
+            if (targetPlayer == null || player.Info.Rank != RankManager.HighestRank) {
                 player.Message("Current Hacks for {0}", player.ClassyName);
-                player.Message("    &SFlying: &a{0} &SNoclip: &a{1} &SSpeedhack: &a{2}",
-                               player.Info.AllowFlying.ToString(),
-                               player.Info.AllowNoClip.ToString(),
-                               player.Info.AllowSpeedhack.ToString());
-                player.Message("    &SRespawn: &a{0} &SThirdPerson: &a{1} &SJumpHeight: &a{2}",
-                               player.Info.AllowRespawn.ToString(),
-                               player.Info.AllowThirdPerson.ToString(),
-                               player.Info.JumpHeight);
+                PrintPlayerHacks(player, player.Info);
                 return;
             }
 
-
             string hack = (cmd.Next() ?? "null");
             string hackStr = "hack";
-
+            PlayerInfo target = targetPlayer.Info;
+            
             if (hack == "null") {
                 player.Message("Current Hacks for {0}", target.ClassyName);
-                player.Message("    &SFlying: &a{0} &SNoclip: &a{1} &SSpeedhack: &a{2}",
-                               target.AllowFlying.ToString(),
-                               target.AllowNoClip.ToString(),
-                               target.AllowSpeedhack.ToString());
-                player.Message("    &SRespawn: &a{0} &SThirdPerson: &a{1} &SJumpHeight: &a{2}",
-                               target.AllowRespawn.ToString(),
-                               target.AllowThirdPerson.ToString(),
-                               target.JumpHeight);
+                PrintPlayerHacks(player, target);
                 return;
             }
 
@@ -2134,7 +2100,7 @@ namespace fCraft {
                 case "fly":
                 case "f":
                     player.Message("Hacks for {0}", target.ClassyName);
-                    player.Message("    Flying: &a{0} &S--> &a{1}", target.AllowFlying.ToString(), (!target.AllowFlying).ToString());
+                    player.Message("    Flying: &a{0} &S--> &a{1}", target.AllowFlying, !target.AllowFlying);
                     target.AllowFlying = !target.AllowFlying;
                     hackStr = "flying";
                     goto sendPacket;
@@ -2142,7 +2108,7 @@ namespace fCraft {
                 case "clip":
                 case "nc":
                     player.Message("Hacks for {0}", target.ClassyName);
-                    player.Message("    NoClip: &a{0} &S--> &a{1}", target.AllowNoClip.ToString(), (!target.AllowNoClip).ToString());
+                    player.Message("    NoClip: &a{0} &S--> &a{1}", target.AllowNoClip, !target.AllowNoClip);
                     target.AllowNoClip = !target.AllowNoClip;
                     hackStr = "noclip";
                     goto sendPacket;
@@ -2150,7 +2116,7 @@ namespace fCraft {
                 case "speed":
                 case "sh":
                     player.Message("Hacks for {0}", target.ClassyName);
-                    player.Message("    SpeedHack: &a{0} &S--> &a{1}", target.AllowSpeedhack.ToString(), (!target.AllowSpeedhack).ToString());
+                    player.Message("    SpeedHack: &a{0} &S--> &a{1}", target.AllowSpeedhack, !target.AllowSpeedhack);
                     target.AllowSpeedhack = !target.AllowSpeedhack;
                     hackStr = "speedhack";
                     goto sendPacket;
@@ -2158,7 +2124,7 @@ namespace fCraft {
                 case "spawn":
                 case "rs":
                     player.Message("Hacks for {0}", target.ClassyName);
-                    player.Message("    Respawn: &a{0} &S--> &a{1}", target.AllowRespawn.ToString(), (!target.AllowRespawn).ToString());
+                    player.Message("    Respawn: &a{0} &S--> &a{1}", target.AllowRespawn, !target.AllowRespawn);
                     target.AllowRespawn = !target.AllowRespawn;
                     hackStr = "respawn";
                     goto sendPacket;
@@ -2166,7 +2132,7 @@ namespace fCraft {
                 case "third":
                 case "tp":
                     player.Message("Hacks for {0}", target.ClassyName);
-                    player.Message("    ThirdPerson: &a{0} &S--> &a{1}", target.AllowThirdPerson.ToString(), (!target.AllowThirdPerson).ToString());
+                    player.Message("    ThirdPerson: &a{0} &S--> &a{1}", target.AllowThirdPerson, !target.AllowThirdPerson);
                     target.AllowThirdPerson = !target.AllowThirdPerson;
                     hackStr = "thirdperson";
                     goto sendPacket;
@@ -2189,17 +2155,28 @@ namespace fCraft {
                     break;
             }
             return;
-        sendPacket:
-            if (target.IsOnline) {
-                if (target.PlayerObject != player) {
-                    target.PlayerObject.Message("{0} has changed your {1} ability, use &H/Hacks &Sto check them out.", player.Info.Name, hackStr);
-                }
-                if (target.PlayerObject.Supports(CpeExt.HackControl)) {
-                    target.PlayerObject.Send(Packet.HackControl(
-                        target.AllowFlying, target.AllowNoClip, target.AllowSpeedhack,
-                        target.AllowRespawn, target.AllowThirdPerson, target.JumpHeight));
-                }
+            
+         sendPacket:
+            if (player != targetPlayer) {
+                targetPlayer.Message("{0} has changed your {1} ability, use &H/Hacks &Sto check them out.", player.Info.Name, hackStr);
             }
+            if (targetPlayer.Supports(CpeExt.HackControl)) {
+                targetPlayer.Send(Packet.HackControl(
+                    target.AllowFlying, target.AllowNoClip, target.AllowSpeedhack,
+                    target.AllowRespawn, target.AllowThirdPerson, target.JumpHeight));
+            }
+        }
+        
+        
+        static void PrintPlayerHacks(Player player, PlayerInfo target) {
+            player.Message("    &SFlying: &a{0} &SNoclip: &a{1} &SSpeedhack: &a{2}",
+                           target.AllowFlying.ToString(),
+                           target.AllowNoClip.ToString(),
+                           target.AllowSpeedhack.ToString());
+            player.Message("    &SRespawn: &a{0} &SThirdPerson: &a{1} &SJumpHeight: &a{2}",
+                           target.AllowRespawn.ToString(),
+                           target.AllowThirdPerson.ToString(),
+                           target.JumpHeight);
         }
 
         #endregion

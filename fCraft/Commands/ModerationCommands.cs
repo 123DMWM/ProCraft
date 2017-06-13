@@ -1589,9 +1589,8 @@ namespace fCraft {
             int rot = player.Position.R;
             int lot = player.Position.L;
 
-
             if (cmd.Count == 2) {
-                PlayerInfo info = InfoCommands.FindPlayerInfo(player, cmd, true);
+                PlayerInfo info = InfoCommands.FindPlayerInfo(player, cmd);
                 if (info == null) {
                     return;
                 } else {
