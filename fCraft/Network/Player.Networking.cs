@@ -1211,13 +1211,14 @@ namespace fCraft {
         
         internal void RemoveOldEntities(World world) {
             if (world == null) return;
-            foreach (Entity entity in Entity.EntityList.Where(e => Entity.getWorld(e) == world)) {
+            
+            foreach (Entity entity in Entity.AllIn(world)) {
                 SendNow(Packet.MakeRemoveEntity(entity.ID));
             } 
         }
         
         internal void SendNewEntities(World world) {
-            foreach (Entity entity in Entity.EntityList.Where(e => Entity.getWorld(e) == world)) {
+            foreach (Entity entity in Entity.AllIn(world)) {
                 Entities.Spawn(this, true, entity);
             }
         }

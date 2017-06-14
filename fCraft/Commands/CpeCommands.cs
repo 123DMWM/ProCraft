@@ -102,7 +102,7 @@ namespace fCraft {
                 World world = WorldManager.FindWorldOrPrintMatches(player, search);
                 if (world != null) {
                     player.Message("Entities on &f{0}&S: ", world.Name);
-                    player.Message("  &F" + Entity.EntityList.Where(w => Entity.getWorld(w) == world).JoinToString("&S, &F", n => n.Name));
+                    player.Message("  &F" + Entity.AllIn(world).JoinToString("&S, &F", n => n.Name));
                 }
                 return;
             }
@@ -110,7 +110,7 @@ namespace fCraft {
                 string search = cmd.Next() ?? player.World.Name;
                 World world = WorldManager.FindWorldOrPrintMatches(player, search);
                 if (cmd.IsConfirmed) {
-                    Entity.RemoveAll(world);
+                    Entity.RemoveAllIn(world);
                     player.Message("All entities on &f{0}&S removed.", player.World.Name);
                 } else {
                     player.Confirm(cmd, "This will remove all the entites on {0}, are you sure?", player.World.Name);
@@ -151,7 +151,7 @@ namespace fCraft {
                     }
 
                     //if a botname has already been chosen, ask player for a new name
-                    if (Entity.exists(player.World, entityName)) {
+                    if (Entity.Exists(player.World, entityName)) {
                         player.Message("An entity with that name already exists! To view all entities, type /ent list.");
                         return;
                     }
@@ -159,12 +159,12 @@ namespace fCraft {
                     string skinString1 = (cmd.Next() ?? entityName);
                     if (skinString1 != null) skinString1 = ParseSkin(skinString1);
                     
-                    entity = Entity.CreateEntity(entityName, skinString1, requestedModel, player.World, player.Position, getNewID(player.World));
+                    entity = Entity.Create(entityName, skinString1, requestedModel, player.World, player.Position, getNewID(player.World));
                     player.Message("Successfully created entity {0}&S with id:{1} and skin {2}.", entity.Name, entity.ID, entity.Skin, entity.Name);
                     break;
                 case "remove":
                     player.Message("{0} was removed from {1}", entity.Name, player.World.Name);
-                    Entity.RemoveEntity(entity);
+                    Entity.Remove(entity);
                     break;
                 case "model":
                     if (cmd.HasNext) {
@@ -181,24 +181,24 @@ namespace fCraft {
                             break;
                         }
                         player.Message("Changed entity model to {0}.", model);
-                        Entity.ChangeEntityModel(entity, model);
+                        entity.ChangeModel(model);
                     } else {
                         player.Message(
                             "Usage is /Ent model <bot> <model>. Valid models are chibi, chicken, creeper, giant, human, pig, sheep, skeleton, spider, zombie, or any block ID/Name.");
                     }
                     break;
                 case "bring":
-                    Entity.TeleportEntity(entity, player.Position);
+                    entity.TeleportTo(player.Position);
                     break;
                 case "tp":
                 case "teleport":
-                    World targetWorld = Entity.getWorld(entity);
+                    World targetWorld = entity.WorldIn();
                     if (targetWorld == player.World) {
                         if (player.World != null) {
                             player.LastWorld = player.World;
                             player.LastPosition = player.Position;
                         }
-                        player.TeleportTo(Entity.getPos(entity));
+                        player.TeleportTo(entity.GetPos());
                     } else {
                         if (targetWorld.Name.StartsWith("PW_") &&
                             !targetWorld.AccessSecurity.ExceptionList.Included.Contains(player.Info)) {
@@ -223,7 +223,7 @@ namespace fCraft {
                                     break;
                                 }
                                 player.StopSpectating();
-                                player.JoinWorld(targetWorld, WorldChangeReason.Tp, Entity.getPos(entity));
+                                player.JoinWorld(targetWorld, WorldChangeReason.Tp, entity.GetPos());
                                 break;
                             case SecurityCheckResult.BlackListed:
                                 player.Message("Cannot teleport to {0}&S because you are blacklisted on world {1}",
@@ -246,7 +246,7 @@ namespace fCraft {
                                         break;
                                     }
                                     player.StopSpectating();
-                                    player.JoinWorld(targetWorld, WorldChangeReason.Tp, Entity.getPos(entity));
+                                    player.JoinWorld(targetWorld, WorldChangeReason.Tp, entity.GetPos());
                                     break;
                                 }
                                 player.Message("Cannot teleport to {0}&S because world {1}&S requires {2}+&S to join.",
@@ -265,7 +265,7 @@ namespace fCraft {
                         skinString3 = ParseSkin(skinString3);
                     }
                     player.Message("Changed entity skin to {0}.", skinString3 ?? entity.Name);
-                    Entity.ChangeEntitySkin(entity, skinString3);
+                    entity.ChangeSkin(skinString3);
                     break;
                 default:
                     CdEntity.PrintUsage(player);
@@ -276,7 +276,7 @@ namespace fCraft {
         public static sbyte getNewID(World world) {
             sbyte i = 1;
         go:
-            foreach (Entity entity in Entity.EntityList.Where(e => Entity.getWorld(e) == world)) {
+            foreach (Entity entity in Entity.AllIn(world)) {
                 if (entity.ID == i) {
                     i++;
                     goto go;

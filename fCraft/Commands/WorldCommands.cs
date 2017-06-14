@@ -807,7 +807,7 @@ namespace fCraft {
                     Logger.Log(LogType.UserActivity,
                         "Gen: Asked {0} to confirm replacing the map of world {1} (\"this map\").",
                         player.Name, playerWorld.Name);
-                    if (!Entity.existsAny(player.World)) {
+                    if (!Entity.AnyIn(player.World)) {
                         player.Confirm(cmd, "Replace THIS MAP with a generated one ({0})?", templateFullName);
                     } else {
                         player.Confirm(cmd, "Replace THIS MAP with a generated one ({0})?&NThis will also remove all the Entities/Bots on the world.", templateFullName);
@@ -949,7 +949,7 @@ namespace fCraft {
                     Logger.Log(LogType.UserActivity,
                         "GenHM: Asked {0} to confirm replacing the map of world {1} (\"this map\").",
                         player.Name, playerWorld.Name);
-                    if (!Entity.existsAny(player.World)) {
+                    if (!Entity.AnyIn(player.World)) {
                         player.Confirm(cmd, "Replace THIS MAP with a generated one (HeightMap: &9{0}&S)?", url);
                     } else {
                         player.Confirm(cmd, "Replace THIS MAP with a generated one (HeightMap: &9{0}&S)?&NThis will also remove all the Entities/Bots on the world.", url);
@@ -2694,8 +2694,9 @@ namespace fCraft {
             player.LastUsedWorldName = newName;
             Logger.Log(LogType.UserActivity, "{0} renamed the world \"{1}\" to \"{2}\".", player.Name, oldName, newName);
             Server.Message("{0}&S renamed the world \"{1}\" to \"{2}\"", player.ClassyName, oldName, newName);
-            foreach(Entity bot in Entity.EntityList.Where(e => oldName.CaselessEquals(e.World))) {
-                Entity.UpdateEntityWorld(bot, newName);
+            
+            foreach (Entity e in Entity.AllIn(oldName)) {
+                e.ChangeWorld(newName);
             }
         }
 
@@ -3433,7 +3434,7 @@ namespace fCraft {
                 player.Message("You have no personal worlds by that number: {0}", num); return;
             }
             if (!cmd.IsConfirmed) {
-                if (!Entity.existsAny(player.World)) {
+                if (!Entity.AnyIn(player.World)) {
                     player.Confirm(cmd, "This will reset your personal world:   " + mapName +
                                    "&N&cThis cannot be undone!");
                 } else {
