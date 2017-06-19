@@ -135,7 +135,7 @@ namespace fCraft
         /// <returns> Standard Minecraft ampersand-color-code if input code was recognized; otherwise null. </returns>
         [CanBeNull, Pure]
         public static string Parse(char code) {
-        	if (IsStandardColorCode(code))
+            if (IsStandardColorCode(code))
                 return "&" + Char.ToLower(code);
 
             char col = ConvertNonStandard(code);
@@ -143,7 +143,7 @@ namespace fCraft
         }
         
         internal static char ConvertNonStandard(char code) {
-        	switch (code) {
+            switch (code) {
                 case 'S': return Sys[1];
                 case 'Y': return Say[1];
                 case 'P': return PM[1];

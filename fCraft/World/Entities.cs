@@ -25,7 +25,7 @@ namespace fCraft {
         
         public static void Spawn(Player dst, bool sendNow, Entity entity) {
             Spawn(dst, sendNow, entity.ID, entity.Name, entity.Skin,
-    		      entity.Model, entity.GetPos(), 0, 0);
+                  entity.Model, entity.GetPos(), 0, 0);
         }
         
         public static void Spawn(Player dst, bool sendNow, sbyte id, string name,

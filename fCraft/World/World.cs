@@ -253,7 +253,7 @@ namespace fCraft {
                     CloudsHeight = CloudsHeight,
                     MaxFogDistance = MaxFogDistance,
                     EdgeBlock = EdgeBlock,
-					HorizonBlock = HorizonBlock,
+                    HorizonBlock = HorizonBlock,
                     LightColor = LightColor,
                     ShadowColor = ShadowColor,
                     Weather = Weather,

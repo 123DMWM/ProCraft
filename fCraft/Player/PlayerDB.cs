@@ -218,7 +218,7 @@ namespace fCraft {
         }
         
         unsafe static void Split(string line, ref string[] fields, out int count) {
-        	// Effectively string.split(',') but without the two passes and memory allocations.
+            // Effectively string.split(',') but without the two passes and memory allocations.
             count = 0;
             fixed (char* ptr = line) {
                 int start = 0, len = 0;

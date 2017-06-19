@@ -208,18 +208,18 @@ namespace fCraft {
         
         static void DumpInt32Stat( TextWriter writer, IList<PlayerInfo> infos, string group, 
                                     long sum, Func<PlayerInfo, int> itemGetter ) {
-        	PlayerInfo[] items = infos.OrderByDescending( itemGetter ).ToArray();
-        	double mean = sum / (double)infos.Count;
-        	int median = itemGetter( items[infos.Count / 2] );    	
-        	DumpPlayerStat( writer, infos, group, mean, sum, median, items, itemGetter );
+            PlayerInfo[] items = infos.OrderByDescending( itemGetter ).ToArray();
+            double mean = sum / (double)infos.Count;
+            int median = itemGetter( items[infos.Count / 2] );        
+            DumpPlayerStat( writer, infos, group, mean, sum, median, items, itemGetter );
         }
         
         static void DumpInt64Stat( TextWriter writer, IList<PlayerInfo> infos, string group, 
                                     long sum, Func<PlayerInfo, long> itemGetter ) {
-        	PlayerInfo[] items = infos.OrderByDescending( itemGetter ).ToArray();
-        	double mean = sum / (double)infos.Count;
-        	long median = itemGetter( items[infos.Count / 2] );    	
-        	DumpPlayerStat( writer, infos, group, mean, sum, median, items, itemGetter );
+            PlayerInfo[] items = infos.OrderByDescending( itemGetter ).ToArray();
+            double mean = sum / (double)infos.Count;
+            long median = itemGetter( items[infos.Count / 2] );        
+            DumpPlayerStat( writer, infos, group, mean, sum, median, items, itemGetter );
         }
         
         static void DumpPlayerStat<T>( TextWriter writer, IList<PlayerInfo> infos, string group,
@@ -227,13 +227,13 @@ namespace fCraft {
                                    PlayerInfo[] items, Func<PlayerInfo, T> itemGetter,
                                    string summaryFormat = "{0:0.0} mean,  {1} median,  {2} total",
                                    string infoFormat = "{0,20}" ) {
-        	
-        	writer.WriteLine( "    {3}: " + summaryFormat, mean, median, sum, group );
-        	string infoLine = "        " + infoFormat + "  {1}";
-        	
+            
+            writer.WriteLine( "    {3}: " + summaryFormat, mean, median, sum, group );
+            string infoLine = "        " + infoFormat + "  {1}";
+            
             if( infos.Count > TopPlayersToList * 2 + 1 ) {
                 foreach( PlayerInfo info in items.Take( TopPlayersToList ) ) {
-        			writer.WriteLine( infoLine, itemGetter( info ), info.Name );
+                    writer.WriteLine( infoLine, itemGetter( info ), info.Name );
                 }
                 writer.WriteLine( "                           ...." );
                 foreach( PlayerInfo info in items.Reverse().Take( TopPlayersToList ).Reverse() ) {
@@ -560,7 +560,7 @@ namespace fCraft {
                     RankChangeType newType;
                     if( !EnumUtil.TryParse( valName, out newType, true ) ) {
                         player.Message( "SetInfo: Could not parse RankChangeType. Allowed values: {0}",
-                    	               Enum.GetNames( typeof( RankChangeType ) ).JoinToString() );
+                                       Enum.GetNames( typeof( RankChangeType ) ).JoinToString() );
                         return;
                     }
                     player.Message( "SetInfo: RankChangeType for {0}&S changed from {1} to {2}",

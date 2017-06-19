@@ -242,10 +242,10 @@ namespace fCraft.Drawing {
 
             World world = Map.World;
             if (world != null && !world.IsFlushing) {
-            	// cannot reuse packet as each player may require different modifications to block field
-            	Player[] players = world.Players;
-            	for (int i = 0; i < players.Length; i++)
-            		players[i].SendBlock(Coords, newBlock);
+                // cannot reuse packet as each player may require different modifications to block field
+                Player[] players = world.Players;
+                for (int i = 0; i < players.Length; i++)
+                    players[i].SendBlock(Coords, newBlock);
             }
 
             // Reuse instance to avoid memory allocations
@@ -388,17 +388,17 @@ namespace fCraft.Drawing {
                 }
             }
             if (AnnounceCompletion && Map.World != null) {
-				Logger.Log(LogType.UserActivity,
-						   "Player {0} executed {1} on world {2} (between (X:{3} Y:{4} Z:{5}) and (X:{6} Y:{7} Z:{8})). Processed {9}, Updated {10}, Skipped {11}, Denied {12} blocks.",
-						   Player.Name,
-						   Description,
-						   Map.World.Name,
-						   Bounds.MinVertex.X, Bounds.MinVertex.Y, Bounds.MinVertex.Z,
-						   Bounds.MaxVertex.X, Bounds.MaxVertex.Y, Bounds.MaxVertex.Z,
-						   BlocksProcessed,
-						   BlocksUpdated,
-						   BlocksSkipped,
-						   BlocksDenied);
+                Logger.Log(LogType.UserActivity,
+                           "Player {0} executed {1} on world {2} (between (X:{3} Y:{4} Z:{5}) and (X:{6} Y:{7} Z:{8})). Processed {9}, Updated {10}, Skipped {11}, Denied {12} blocks.",
+                           Player.Name,
+                           Description,
+                           Map.World.Name,
+                           Bounds.MinVertex.X, Bounds.MinVertex.Y, Bounds.MinVertex.Z,
+                           Bounds.MaxVertex.X, Bounds.MaxVertex.Y, Bounds.MaxVertex.Z,
+                           BlocksProcessed,
+                           BlocksUpdated,
+                           BlocksSkipped,
+                           BlocksDenied);
             }
         }
 

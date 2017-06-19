@@ -438,7 +438,7 @@ namespace fCraft {
                     if( World.IsFlushing ) canFlush = true;
                     break;
                 }
-            	
+                
                 HasChangedSinceSave = true;
                 if( !InBounds( update.X, update.Y, update.Z ) ) continue;
                 int blockIndex = Index( update.X, update.Y, update.Z );

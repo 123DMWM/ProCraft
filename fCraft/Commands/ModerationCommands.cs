@@ -305,116 +305,116 @@ namespace fCraft {
             Handler = LeBotHandler,
         };
 
-		private static void LeBotHandler(Player player, CommandReader cmd) {
-			string cmdchat = cmd.Next();
-			string option = cmd.Next();
-			string helper = cmd.Next();
-			if (cmdchat == null) {
-				player.Message(CdBot.Help);
-				return;
-			}
-			if (option != null)
-				option = option.ToLower();
-			if (cmdchat != "<CalledFromChat>") {
-				cmd.Rewind();
-				option = cmd.Next().ToLower();
-				helper = cmd.Next();
-				player.ParseMessage(string.Format("Bot {0} {1}", option ?? "", helper ?? ""), (player == Player.Console));
+        private static void LeBotHandler(Player player, CommandReader cmd) {
+            string cmdchat = cmd.Next();
+            string option = cmd.Next();
+            string helper = cmd.Next();
+            if (cmdchat == null) {
+                player.Message(CdBot.Help);
                 return;
-			}
-			if (player.TimeSinceLastServerMessage.TotalSeconds < 5) {
-				player.getLeftOverTime(5, cmd);
-				return;
-			}
-			if (option == null) {
-				player.Message(CdBot.Help);
-				return;
-			}
+            }
+            if (option != null)
+                option = option.ToLower();
+            if (cmdchat != "<CalledFromChat>") {
+                cmd.Rewind();
+                option = cmd.Next().ToLower();
+                helper = cmd.Next();
+                player.ParseMessage(string.Format("Bot {0} {1}", option ?? "", helper ?? ""), (player == Player.Console));
+                return;
+            }
+            if (player.TimeSinceLastServerMessage.TotalSeconds < 5) {
+                player.getLeftOverTime(5, cmd);
+                return;
+            }
+            if (option == null) {
+                player.Message(CdBot.Help);
+                return;
+            }
             if (player.Info.TimesUsedBot == 0) {
                 player.Message(
                     "&6Bot&f: This is your first time using &6Bot&S, I suggest you use \"/Help Bot\" to further understand how I work.");
             }
             bool sentMessage = true;
             switch (option) {
-				case "go":
-					Scheduler.NewTask(t => Server.BotMessage("5")).RunOnce(TimeSpan.FromSeconds(0));
-					Scheduler.NewTask(t => Server.BotMessage("4")).RunOnce(TimeSpan.FromSeconds(1));
-					Scheduler.NewTask(t => Server.BotMessage("3")).RunOnce(TimeSpan.FromSeconds(2));
-					Scheduler.NewTask(t => Server.BotMessage("2")).RunOnce(TimeSpan.FromSeconds(3));
-					Scheduler.NewTask(t => Server.BotMessage("1")).RunOnce(TimeSpan.FromSeconds(4));
-					Scheduler.NewTask(t => Server.BotMessage("Go!")).RunOnce(TimeSpan.FromSeconds(5));
-					break;
-				case "server":
-					Server.BotMessage("The name of this server is " + ConfigKey.ServerName.GetString() + ".");
-					break;
-				case "joke":
-					FileInfo jokeList = new FileInfo("./Bot/Jokes.txt");
-					string[] jokeStrings;
-					if (jokeList.Exists) {
-						jokeStrings = File.ReadAllLines("./Bot/Jokes.txt");
-					} else {
-						Server.BotMessage("I cannot tell a joke at this time!");
-						return;
-					}
-					Random RandjokeString = new Random();
-					string joker = jokeStrings[RandjokeString.Next(0, jokeStrings.Length)];
-					Server.BotMessage(joker);
-					break;
-				case "idea":
-					FileInfo adjectiveList = new FileInfo("./Bot/Adjectives.txt");
-					FileInfo nounList = new FileInfo("./Bot/Nouns.txt");
-					string[] adjectiveStrings;
-					string[] nounStrings;
-					if (adjectiveList.Exists && nounList.Exists) {
-						adjectiveStrings = File.ReadAllLines("./Bot/Adjectives.txt");
-						nounStrings = File.ReadAllLines("./Bot/Nouns.txt");
-					} else {
-						Server.BotMessage("I cannot tell you a build idea at this time!");
-						return;
-					}
-					Random randAdjectiveString = new Random();
-					Random randNounString = new Random();
-					string adjective = adjectiveStrings[randAdjectiveString.Next(0, adjectiveStrings.Length)];
-					string noun = nounStrings[randNounString.Next(0, nounStrings.Length)];
-					string ana = "a";
-					if (adjective.StartsWith("a") || adjective.StartsWith("e") || adjective.StartsWith("i") ||
-						adjective.StartsWith("o") || adjective.StartsWith("u")) {
-						ana = "an";
-					}
+                case "go":
+                    Scheduler.NewTask(t => Server.BotMessage("5")).RunOnce(TimeSpan.FromSeconds(0));
+                    Scheduler.NewTask(t => Server.BotMessage("4")).RunOnce(TimeSpan.FromSeconds(1));
+                    Scheduler.NewTask(t => Server.BotMessage("3")).RunOnce(TimeSpan.FromSeconds(2));
+                    Scheduler.NewTask(t => Server.BotMessage("2")).RunOnce(TimeSpan.FromSeconds(3));
+                    Scheduler.NewTask(t => Server.BotMessage("1")).RunOnce(TimeSpan.FromSeconds(4));
+                    Scheduler.NewTask(t => Server.BotMessage("Go!")).RunOnce(TimeSpan.FromSeconds(5));
+                    break;
+                case "server":
+                    Server.BotMessage("The name of this server is " + ConfigKey.ServerName.GetString() + ".");
+                    break;
+                case "joke":
+                    FileInfo jokeList = new FileInfo("./Bot/Jokes.txt");
+                    string[] jokeStrings;
+                    if (jokeList.Exists) {
+                        jokeStrings = File.ReadAllLines("./Bot/Jokes.txt");
+                    } else {
+                        Server.BotMessage("I cannot tell a joke at this time!");
+                        return;
+                    }
+                    Random RandjokeString = new Random();
+                    string joker = jokeStrings[RandjokeString.Next(0, jokeStrings.Length)];
+                    Server.BotMessage(joker);
+                    break;
+                case "idea":
+                    FileInfo adjectiveList = new FileInfo("./Bot/Adjectives.txt");
+                    FileInfo nounList = new FileInfo("./Bot/Nouns.txt");
+                    string[] adjectiveStrings;
+                    string[] nounStrings;
+                    if (adjectiveList.Exists && nounList.Exists) {
+                        adjectiveStrings = File.ReadAllLines("./Bot/Adjectives.txt");
+                        nounStrings = File.ReadAllLines("./Bot/Nouns.txt");
+                    } else {
+                        Server.BotMessage("I cannot tell you a build idea at this time!");
+                        return;
+                    }
+                    Random randAdjectiveString = new Random();
+                    Random randNounString = new Random();
+                    string adjective = adjectiveStrings[randAdjectiveString.Next(0, adjectiveStrings.Length)];
+                    string noun = nounStrings[randNounString.Next(0, nounStrings.Length)];
+                    string ana = "a";
+                    if (adjective.StartsWith("a") || adjective.StartsWith("e") || adjective.StartsWith("i") ||
+                        adjective.StartsWith("o") || adjective.StartsWith("u")) {
+                        ana = "an";
+                    }
                     if (noun.EndsWith("s")) {
-						ana = "some";
-					}
-					Server.BotMessage("Build " + ana + " " + adjective + " " + noun);
-					break;
-				case "protip":
-					FileInfo tipList = new FileInfo("./Bot/Protips.txt");
-					string[] tipStrings;
-					if (tipList.Exists) {
-						tipStrings = File.ReadAllLines("./Bot/Protips.txt");
-					} else {
-						Server.BotMessage("I cannot tell a protip at this time!");
-						return;
-					}
-					Random RandtipString = new Random();
-					string tipper = tipStrings[RandtipString.Next(0, tipStrings.Length)];
-					Server.BotMessage(tipper);
-					break;
-				case "time":
-					TimeSpan time = player.Info.TotalTime;
-					TimeSpan timenow = player.Info.TimeSinceLastLogin;
-					if (helper == "total") {
-						Server.BotMessage(player.ClassyName + "&f has spent a total of {0:F2} hours on this server.", time.TotalHours);
-					} else {
-						Server.BotMessage(player.ClassyName + "&f has played a total of {0:F2} minutes this session.", timenow.TotalMinutes);
-					}
-					break;
-				case "promos":
-					if (player.Info.Rank.Can(Permission.Promote) || player.Info.PromoCount != 0) {
-						Server.BotMessage(player.ClassyName + "&f has promoted {0} times.", player.Info.PromoCount);
-					} else {
-						Server.BotMessage(player.ClassyName + "&f cannot promote players yet");
-					}
-					break;
+                        ana = "some";
+                    }
+                    Server.BotMessage("Build " + ana + " " + adjective + " " + noun);
+                    break;
+                case "protip":
+                    FileInfo tipList = new FileInfo("./Bot/Protips.txt");
+                    string[] tipStrings;
+                    if (tipList.Exists) {
+                        tipStrings = File.ReadAllLines("./Bot/Protips.txt");
+                    } else {
+                        Server.BotMessage("I cannot tell a protip at this time!");
+                        return;
+                    }
+                    Random RandtipString = new Random();
+                    string tipper = tipStrings[RandtipString.Next(0, tipStrings.Length)];
+                    Server.BotMessage(tipper);
+                    break;
+                case "time":
+                    TimeSpan time = player.Info.TotalTime;
+                    TimeSpan timenow = player.Info.TimeSinceLastLogin;
+                    if (helper == "total") {
+                        Server.BotMessage(player.ClassyName + "&f has spent a total of {0:F2} hours on this server.", time.TotalHours);
+                    } else {
+                        Server.BotMessage(player.ClassyName + "&f has played a total of {0:F2} minutes this session.", timenow.TotalMinutes);
+                    }
+                    break;
+                case "promos":
+                    if (player.Info.Rank.Can(Permission.Promote) || player.Info.PromoCount != 0) {
+                        Server.BotMessage(player.ClassyName + "&f has promoted {0} times.", player.Info.PromoCount);
+                    } else {
+                        Server.BotMessage(player.ClassyName + "&f cannot promote players yet");
+                    }
+                    break;
                 case "demotes":
                     if (player.Info.Rank.Can(Permission.Demote) || player.Info.DemoCount != 0) {
                         Server.BotMessage(player.ClassyName + "&f has demoted {0} times.", player.Info.PromoCount);
@@ -423,17 +423,17 @@ namespace fCraft {
                     }
                     break;
                 case "bans":
-					if (player.Info.Rank.Can(Permission.Ban) || player.Info.TimesBannedOthers != 0) {
-						Server.BotMessage(player.ClassyName + "&f has banned {0} players.", player.Info.TimesBannedOthers);
-					} else {
-						Server.BotMessage(player.ClassyName + "&f cannot ban yet");
-					}
-					break;
-				case "kicks":
-					if (player.Info.Rank.Can(Permission.Kick) || player.Info.TimesKickedOthers != 0) {
-						Server.BotMessage(player.ClassyName + "&f has kicked {0} players.", player.Info.TimesKickedOthers);
-					} else {
-						Server.BotMessage(player.ClassyName + "&f cannot kick yet");
+                    if (player.Info.Rank.Can(Permission.Ban) || player.Info.TimesBannedOthers != 0) {
+                        Server.BotMessage(player.ClassyName + "&f has banned {0} players.", player.Info.TimesBannedOthers);
+                    } else {
+                        Server.BotMessage(player.ClassyName + "&f cannot ban yet");
+                    }
+                    break;
+                case "kicks":
+                    if (player.Info.Rank.Can(Permission.Kick) || player.Info.TimesKickedOthers != 0) {
+                        Server.BotMessage(player.ClassyName + "&f has kicked {0} players.", player.Info.TimesKickedOthers);
+                    } else {
+                        Server.BotMessage(player.ClassyName + "&f cannot kick yet");
                     }
                     if (player.Info.TimesKicked != 0) {
                         Server.BotMessage(player.ClassyName + "&f has been kicked {0} times.", player.Info.TimesKicked);
@@ -441,38 +441,38 @@ namespace fCraft {
                         Server.BotMessage(player.ClassyName + "&f has been a good player and wasn't kicked yet.");
                     }
                     break;
-				case "blocks":
-					if (helper == "total") {
-						Server.BotMessage(player.ClassyName + "&f has built {0} blocks, deleted {1} and drew {2}.",
+                case "blocks":
+                    if (helper == "total") {
+                        Server.BotMessage(player.ClassyName + "&f has built {0} blocks, deleted {1} and drew {2}.",
                             player.Info.BlocksBuilt, player.Info.BlocksDeleted, player.Info.BlocksDrawnString);
-					} else {
-						Server.BotMessage(player.ClassyName + "&f has built {0} blocks and deleted {1} blocks this session.", 
+                    } else {
+                        Server.BotMessage(player.ClassyName + "&f has built {0} blocks and deleted {1} blocks this session.", 
                             player.BlocksPlacedThisSession, player.BlocksDeletedThisSession);
-					}
-					break;
-				case "funfact":
-					FileInfo factList = new FileInfo("./Bot/Funfacts.txt");
-					string[] factStrings;
-					if (factList.Exists) {
-						factStrings = File.ReadAllLines("./Bot/Funfacts.txt");
-					} else {
-						Server.BotMessage("I cannot tell a funfact at this time!");
-						return;
-					}
-					Random RandfactString = new Random();
-					string facter = factStrings[RandfactString.Next(0, factStrings.Length)];
-					Server.BotMessage(facter);
-					break;
-				default:
+                    }
+                    break;
+                case "funfact":
+                    FileInfo factList = new FileInfo("./Bot/Funfacts.txt");
+                    string[] factStrings;
+                    if (factList.Exists) {
+                        factStrings = File.ReadAllLines("./Bot/Funfacts.txt");
+                    } else {
+                        Server.BotMessage("I cannot tell a funfact at this time!");
+                        return;
+                    }
+                    Random RandfactString = new Random();
+                    string facter = factStrings[RandfactString.Next(0, factStrings.Length)];
+                    Server.BotMessage(facter);
+                    break;
+                default:
                     player.Message(CdBot.Help);
                     sentMessage = false;
-					break;
-			}
+                    break;
+            }
             if (sentMessage) {
                 player.LastServerMessageDate = DateTime.UtcNow;
                 player.Info.TimesUsedBot++;
             }
-		}
+        }
 
         #endregion        
         #region Ban / Unban
@@ -1094,41 +1094,41 @@ namespace fCraft {
             Handler = HideHandler
         };
 
-		static void HideHandler([NotNull] Player player, [NotNull] CommandReader cmd) {
-			if (player.Info.IsHidden) {
-				player.Message("You are already hidden.");
-				return;
-			}
+        static void HideHandler([NotNull] Player player, [NotNull] CommandReader cmd) {
+            if (player.Info.IsHidden) {
+                player.Message("You are already hidden.");
+                return;
+            }
 
-			string silentString = cmd.NextAll();
-			bool silent = (silentString.CaselessEquals("silent") || silentString.CaselessEquals("s"));
+            string silentString = cmd.NextAll();
+            bool silent = (silentString.CaselessEquals("silent") || silentString.CaselessEquals("s"));
 
-			player.Info.IsHidden = true;
-			player.Message(silent ? "&8You are now hidden (silent)." : "&8You are now hidden.");
+            player.Info.IsHidden = true;
+            player.Message(silent ? "&8You are now hidden (silent)." : "&8You are now hidden.");
 
-			// to make it look like player just logged out in /Info
-			player.Info.LastSeen = DateTime.UtcNow;
-			String quitMessage = (silentString.Length < 1 ? "" : "/Quit " + (silentString.Length > 64 ? silentString.Remove(64) : silentString));
+            // to make it look like player just logged out in /Info
+            player.Info.LastSeen = DateTime.UtcNow;
+            String quitMessage = (silentString.Length < 1 ? "" : "/Quit " + (silentString.Length > 64 ? silentString.Remove(64) : silentString));
 
-			if (!silent && ConfigKey.ShowConnectionMessages.Enabled()) {
-				if (!quitMessage.Equals("")) {
-					player.quitmessage = quitMessage;
-					quitMessage = String.Format(" &S(Reason: {0})", player.quitmessage);
-					player.usedquit = true;
-				}
-				Server.Players.CantSee(player).Message(Server.MakePlayerDisconnectedMessage(player) + quitMessage);
-			}
+            if (!silent && ConfigKey.ShowConnectionMessages.Enabled()) {
+                if (!quitMessage.Equals("")) {
+                    player.quitmessage = quitMessage;
+                    quitMessage = String.Format(" &S(Reason: {0})", player.quitmessage);
+                    player.usedquit = true;
+                }
+                Server.Players.CantSee(player).Message(Server.MakePlayerDisconnectedMessage(player) + quitMessage);
+            }
 
-			// for aware players: notify
-			Server.Players.CanSee(player).Message("Player {0}&S is now hidden. {1}", player.ClassyName, quitMessage);
-			Player.RaisePlayerHideChangedEvent(player, true, silent);
-			foreach (Player p1 in Server.Players) {
-				if (p1.Supports(CpeExt.ExtPlayerList) || p1.Supports(CpeExt.ExtPlayerList2)) {
-					p1.Send(Packet.MakeExtRemovePlayerName(player.NameID));
-				}
-			}
-			Server.UpdateTabList(true);
-		}
+            // for aware players: notify
+            Server.Players.CanSee(player).Message("Player {0}&S is now hidden. {1}", player.ClassyName, quitMessage);
+            Player.RaisePlayerHideChangedEvent(player, true, silent);
+            foreach (Player p1 in Server.Players) {
+                if (p1.Supports(CpeExt.ExtPlayerList) || p1.Supports(CpeExt.ExtPlayerList2)) {
+                    p1.Send(Packet.MakeExtRemovePlayerName(player.NameID));
+                }
+            }
+            Server.UpdateTabList(true);
+        }
 
 
         static readonly CommandDescriptor CdUnhide = new CommandDescriptor
@@ -1142,28 +1142,28 @@ namespace fCraft {
             Handler = UnhideHandler
         };
 
-		static void UnhideHandler([NotNull] Player player, [NotNull] CommandReader cmd) {
-			World playerWorld = player.World;
-			if (playerWorld == null)
-				PlayerOpException.ThrowNoWorld(player);
+        static void UnhideHandler([NotNull] Player player, [NotNull] CommandReader cmd) {
+            World playerWorld = player.World;
+            if (playerWorld == null)
+                PlayerOpException.ThrowNoWorld(player);
 
-			if (!player.Info.IsHidden) {
-				player.Message("You are not currently hidden.");
-				return;
-			}
-			
-			bool silent = cmd.HasNext;
-			// for aware players: notify
-			Server.Players.CanSee(player).Message("Player {0}&S is no longer hidden.", player.ClassyName);
+            if (!player.Info.IsHidden) {
+                player.Message("You are not currently hidden.");
+                return;
+            }
+            
+            bool silent = cmd.HasNext;
+            // for aware players: notify
+            Server.Players.CanSee(player).Message("Player {0}&S is no longer hidden.", player.ClassyName);
 
-			player.quitmessage = "/Quit";
-			player.usedquit = false;
-			if (silent) {
-				player.Message("&8You are no longer hidden (silent).");
-			} else {
-				player.Message("&8You are no longer hidden.");
-			}
-			
+            player.quitmessage = "/Quit";
+            player.usedquit = false;
+            if (silent) {
+                player.Message("&8You are no longer hidden (silent).");
+            } else {
+                player.Message("&8You are no longer hidden.");
+            }
+            
             // for unaware players: fake a join message
             if (!silent && ConfigKey.ShowConnectionMessages.Enabled()) {
                 player.Info.GeoipLogin();
@@ -1172,14 +1172,14 @@ namespace fCraft {
             }
         
             player.Info.IsHidden = false;
-			Player.RaisePlayerHideChangedEvent(player, false, silent);
-			foreach (Player p1 in Server.Players) {
-				if (p1.Supports(CpeExt.ExtPlayerList) || p1.Supports(CpeExt.ExtPlayerList2)) {
-					p1.Send(Packet.MakeExtRemovePlayerName(player.NameID));
-				}
-			}
-			Server.UpdateTabList(true);
-		}
+            Player.RaisePlayerHideChangedEvent(player, false, silent);
+            foreach (Player p1 in Server.Players) {
+                if (p1.Supports(CpeExt.ExtPlayerList) || p1.Supports(CpeExt.ExtPlayerList2)) {
+                    p1.Send(Packet.MakeExtRemovePlayerName(player.NameID));
+                }
+            }
+            Server.UpdateTabList(true);
+        }
 
         #endregion
         #region Set Spawn
@@ -1222,7 +1222,7 @@ namespace fCraft {
                     player.LastUsedPlayerName = target.Name;
                     
                     if( player.Can( Permission.Bring, target.Info.Rank ) ) {
-                    	target.Position = player.Position;
+                        target.Position = player.Position;
                         Entities.Spawn( target, false, target, Packet.SelfId );
                     } else {
                         player.Message( "You may only set spawn of players ranked {0}&S or lower.",
@@ -1348,7 +1348,7 @@ namespace fCraft {
 
         static void TPDenyHandler(Player player, CommandReader cmd) {
             if (cmd.HasNext) {
-            	string state = cmd.Next().ToLower();
+                string state = cmd.Next().ToLower();
                 if (state == "on" || state == "yes") {
                     player.Info.TPDeny = true;
                     player.Message("TPDeny: &2On");
@@ -1364,7 +1364,7 @@ namespace fCraft {
                 }
                 return;
             }
-        	
+            
             if (player.Info.TPDeny) {
                 player.Message("TPDeny: &4Off");
                 player.Message("Lower ranks can now teleport to you.");
@@ -1372,7 +1372,7 @@ namespace fCraft {
                 player.Message("TPDeny: &2On");
                 player.Message("Lower ranks can no longer teleport to you.");
             }
-        	player.Info.TPDeny = !player.Info.TPDeny;
+            player.Info.TPDeny = !player.Info.TPDeny;
         }
         #endregion
         #region TP
@@ -1520,7 +1520,7 @@ namespace fCraft {
                     player.LastWorld = player.World;
                     player.LastPosition = player.Position;
                 }
-            	
+                
                 player.TeleportTo(target.Position);
                 return;
             }
@@ -1539,7 +1539,7 @@ namespace fCraft {
                                        targetWorld.ClassyName, targetWorld.AccessSecurity.MinRank.ClassyName);
                         break;
                     }
-            		
+                    
                     if (targetWorld.IsFull) {
                         player.Message("Cannot teleport to {0}&S because world {1}&S is full.",
                                        target.ClassyName, targetWorld.ClassyName);
@@ -1547,7 +1547,7 @@ namespace fCraft {
                                        targetWorld.ClassyName, targetWorld.AccessSecurity.MinRank.ClassyName);
                         break;
                     }
-            		
+                    
                     player.StopSpectating();
                     player.JoinWorld(targetWorld, WorldChangeReason.Tp, target.Position);
                     break;
@@ -1860,12 +1860,12 @@ namespace fCraft {
             }
 
             if( target.World == world ) {
-				// teleport within the same world
+                // teleport within the same world
 
-				if (target.World != null) {
-					target.LastWorld = target.World;
-					target.LastPosition = target.Position;
-				}
+                if (target.World != null) {
+                    target.LastWorld = target.World;
+                    target.LastPosition = target.Position;
+                }
                 target.TeleportTo( toPlayer.Position );
 
             } else {
@@ -1940,12 +1940,12 @@ namespace fCraft {
 
             if( world == target.World ) {
                 player.Message( "{0}&S is already in world {1}&S. They were brought to spawn.",
-								target.ClassyName, world.ClassyName);
+                                target.ClassyName, world.ClassyName);
 
-				if (target.World != null) {
-					target.LastWorld = target.World;
-					target.LastPosition = target.Position;
-				}
+                if (target.World != null) {
+                    target.LastWorld = target.World;
+                    target.LastPosition = target.Position;
+                }
                 target.TeleportTo( target.WorldMap.getSpawnIfRandom());
                 if (target.WorldMap.Spawn == Position.RandomSpawn) {
                     player.Message("Randomized Spawn!");
@@ -2079,11 +2079,11 @@ namespace fCraft {
             foreach( Player targetPlayer in targetPlayers.CanBeSeen( player )
                                                          .RankedAtMost( bringLimit ) ) {
                 if( targetPlayer.World == player.World ) {
-					// teleport within the same world
-					if (targetPlayer.World != null) {
-						targetPlayer.LastWorld = targetPlayer.World;
-						targetPlayer.LastPosition = targetPlayer.Position;
-					}
+                    // teleport within the same world
+                    if (targetPlayer.World != null) {
+                        targetPlayer.LastWorld = targetPlayer.World;
+                        targetPlayer.LastPosition = targetPlayer.Position;
+                    }
                     targetPlayer.TeleportTo( player.Position );
                     targetPlayer.Position = player.Position;
                     if( targetPlayer.Info.IsFrozen ) {
@@ -2181,10 +2181,10 @@ namespace fCraft {
                 return;
             }
 
-			if (player.World != null) {
-				player.LastWorld = player.World;
-				player.LastPosition = player.Position;
-			}
+            if (player.World != null) {
+                player.LastWorld = player.World;
+                player.LastPosition = player.Position;
+            }
             player.TeleportTo( target.Position );
             player.Message( "Patrol: Teleporting to {0}", target.ClassyName );
         }
@@ -2383,31 +2383,31 @@ namespace fCraft {
         }
 
         #endregion
-		#region Back
+        #region Back
 
-		static readonly CommandDescriptor CdBack = new CommandDescriptor {
-			Name = "Back",
-			Category = CommandCategory.New | CommandCategory.Moderation,
-			Permissions = new[] { Permission.Teleport },
-			Usage = "/Back",
-			Help = "Teleports you to the last place you were before teleporting.",
-			Handler = BackHandler
-		};
+        static readonly CommandDescriptor CdBack = new CommandDescriptor {
+            Name = "Back",
+            Category = CommandCategory.New | CommandCategory.Moderation,
+            Permissions = new[] { Permission.Teleport },
+            Usage = "/Back",
+            Help = "Teleports you to the last place you were before teleporting.",
+            Handler = BackHandler
+        };
 
-		private static void BackHandler(Player player, CommandReader cmd) {
-			if (player.LastPosition == null || player.LastWorld == null) {
-				player.Message("Unknown last location!");
-				return;
-			}
-			if (player.LastWorld != player.World) {
-				player.JoinWorld(player.LastWorld, WorldChangeReason.ManualJoin, player.LastPosition);
-			} else {
-				player.TeleportTo(player.LastPosition);
-				player.Message("Teleported to last location!");
-			}
-		}
+        private static void BackHandler(Player player, CommandReader cmd) {
+            if (player.LastPosition == null || player.LastWorld == null) {
+                player.Message("Unknown last location!");
+                return;
+            }
+            if (player.LastWorld != player.World) {
+                player.JoinWorld(player.LastWorld, WorldChangeReason.ManualJoin, player.LastPosition);
+            } else {
+                player.TeleportTo(player.LastPosition);
+                player.Message("Teleported to last location!");
+            }
+        }
 
-		#endregion
+        #endregion
         #region tempfreeze
 
         // freeze target if player is allowed to do so
@@ -2445,8 +2445,8 @@ namespace fCraft {
             Help = "Used for when players with a last login date before Jan 1 2014 join with a classicube.net account, " +
                    "marks the account as verified as belonging to the person and allows them to use non-guest commands.&N" +
                    "&cNote:&S This should only be used after you have contacted the old account owner and " +
-            	   "verified that they created a classicube.net account.&N" +
-            	   "&cNote:&S This command can only be used by players of the highest rank.",
+                   "verified that they created a classicube.net account.&N" +
+                   "&cNote:&S This command can only be used by players of the highest rank.",
             Handler = VerifyHandler
         };
 

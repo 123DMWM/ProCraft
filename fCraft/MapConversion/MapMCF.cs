@@ -43,7 +43,7 @@ namespace fCraft.MapConversion {
                 }
             }
         }
-    	
+        
 
         public override bool Save( Map mapToSave, string fileName ) {
             if( mapToSave == null ) throw new ArgumentNullException( "mapToSave" );
@@ -57,7 +57,7 @@ namespace fCraft.MapConversion {
                     byte[] src = mapToSave.Blocks;
                     byte[] blocks = new byte[src.Length * 2];                   
                     for( int i = 0; i < src.Length; i++ )
-                    	blocks[i * 2] = src[i];
+                        blocks[i * 2] = src[i];
                     bs.Write( blocks );
 
                     bs.Close();

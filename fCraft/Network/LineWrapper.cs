@@ -64,7 +64,7 @@ namespace fCraft
 
 
         LineWrapper( [NotNull] string message, bool emotefix, bool fullCP437, bool fallbackCols )
-        	: this( 0, message, emotefix, fullCP437, fallbackCols ) {
+            : this( 0, message, emotefix, fullCP437, fallbackCols ) {
         }
 
         LineWrapper( byte messageType, [NotNull] string message, bool emotefix, bool fullCP437, bool fallbackCols ) {
@@ -437,12 +437,12 @@ namespace fCraft
             
             char conv = Color.ConvertNonStandard((char)ch);
             if (ch != '\0') {
-            	ch = (byte)conv;
-            	if (!useFallbacks) return true;
-            	
-            	if (!Color.IsStandardColorCode(conv))
-            		ch = (byte)Color.GetFallback(conv);
-            	return true;
+                ch = (byte)conv;
+                if (!useFallbacks) return true;
+                
+                if (!Color.IsStandardColorCode(conv))
+                    ch = (byte)Color.GetFallback(conv);
+                return true;
             }
             return false;
         }

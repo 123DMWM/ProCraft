@@ -102,8 +102,8 @@ namespace fCraft.Drawing
         static double ColorDifference(LabColor color1, LabColor color2)
         {
             return (color2.L - color1.L) * (color2.L - color1.L) * 1.2 +
-            	   (color2.a - color1.a) * (color2.a - color1.a) +
-            	   (color2.b - color1.b) * (color2.b - color1.b);
+                   (color2.a - color1.a) * (color2.a - color1.a) +
+                   (color2.b - color1.b) * (color2.b - color1.b);
         }
 
 

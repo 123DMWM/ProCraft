@@ -67,10 +67,10 @@ namespace fCraft.Drawing
                         {
                             top = true;
                         }
-						else if (down != Block.Air && here == Block.Air)
-						{
-							top = true;
-						}
+                        else if (down != Block.Air && here == Block.Air)
+                        {
+                            top = true;
+                        }
                     }
                     Coords.Z = Bounds.ZMax;
                     top = false;

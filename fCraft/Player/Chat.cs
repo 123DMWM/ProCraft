@@ -149,7 +149,7 @@ namespace fCraft {
         
         static void checkBotResponses(Player player, string rawMessage) {
             if (player.Can(Permission.UseBot)) {
-        		if (rawMessage.CaselessStarts("Bot ") && rawMessage.Length < 17) {
+                if (rawMessage.CaselessStarts("Bot ") && rawMessage.Length < 17) {
                     player.ParseMessage("/bot <CalledFromChat> " + rawMessage.Remove(0, 4), false);
                 }
                 double BotTime = player.TimeSinceLastServerMessage.TotalSeconds;
@@ -380,55 +380,55 @@ namespace fCraft {
         /// <param name="player"> Player writing the message. </param>
         /// <param name="rawMessage"> Message text. </param>
         /// <returns> True if message was sent, false if it was cancelled by an event callback. </returns>
-		public static bool SendSay([NotNull] Player player, [NotNull] string rawMessage) {
-			if (player == null)
-				throw new ArgumentNullException("player");
-			if (rawMessage == null)
-				throw new ArgumentNullException("rawMessage");
+        public static bool SendSay([NotNull] Player player, [NotNull] string rawMessage) {
+            if (player == null)
+                throw new ArgumentNullException("player");
+            if (rawMessage == null)
+                throw new ArgumentNullException("rawMessage");
 
-			var recepientList = Server.Players.Where(p => !p.IsStaff);
-			string formattedMessage = "&Y[/say] " + rawMessage;
+            var recepientList = Server.Players.Where(p => !p.IsStaff);
+            string formattedMessage = "&Y[/say] " + rawMessage;
             var e = new ChatSendingEventArgs(player, rawMessage, formattedMessage, ChatMessageType.Say, recepientList);
-			if (!SendInternal(e))
-				return false;
+            if (!SendInternal(e))
+                return false;
 
-			var recepientListStaff = Server.Players.Can(Permission.ReadStaffChat);
-			string formattedMessageStaff = "&Y["+ player.Name + "/say] " + rawMessage;
-			var es = new ChatSendingEventArgs(player, rawMessage, formattedMessageStaff, ChatMessageType.SayStaff, recepientListStaff);
-			if (!SendInternal(es))
-				return false;
+            var recepientListStaff = Server.Players.Can(Permission.ReadStaffChat);
+            string formattedMessageStaff = "&Y["+ player.Name + "/say] " + rawMessage;
+            var es = new ChatSendingEventArgs(player, rawMessage, formattedMessageStaff, ChatMessageType.SayStaff, recepientListStaff);
+            if (!SendInternal(es))
+                return false;
 
 
-			Logger.Log(LogType.GlobalChat,
-						"(say){0}: {1}", player.Name, rawMessage);
-			return true;
-		}
+            Logger.Log(LogType.GlobalChat,
+                        "(say){0}: {1}", player.Name, rawMessage);
+            return true;
+        }
 
-		/// <summary> Sends a global announcement to staff (/StaffSay). </summary>
-		/// <param name="player"> Player writing the message. </param>
-		/// <param name="rawMessage"> Message text. </param>
-		/// <returns> True if message was sent, false if it was cancelled by an event callback. </returns>
-		public static bool SendStaffSay([NotNull] Player player, [NotNull] string rawMessage) {
-			if (player == null)
-				throw new ArgumentNullException("player");
-			if (rawMessage == null)
-				throw new ArgumentNullException("rawMessage");
+        /// <summary> Sends a global announcement to staff (/StaffSay). </summary>
+        /// <param name="player"> Player writing the message. </param>
+        /// <param name="rawMessage"> Message text. </param>
+        /// <returns> True if message was sent, false if it was cancelled by an event callback. </returns>
+        public static bool SendStaffSay([NotNull] Player player, [NotNull] string rawMessage) {
+            if (player == null)
+                throw new ArgumentNullException("player");
+            if (rawMessage == null)
+                throw new ArgumentNullException("rawMessage");
 
-			var recepientList = Server.Players.Where(p => p.Info.Rank != RankManager.HighestRank).Can(Permission.ReadStaffChat);
-			string formattedMessage = "&Y[/staffsay] " + rawMessage;
+            var recepientList = Server.Players.Where(p => p.Info.Rank != RankManager.HighestRank).Can(Permission.ReadStaffChat);
+            string formattedMessage = "&Y[/staffsay] " + rawMessage;
             var e = new ChatSendingEventArgs(player, rawMessage, formattedMessage, ChatMessageType.Staff, recepientList);
-			if (!SendInternal(e))
-				return false;
+            if (!SendInternal(e))
+                return false;
 
-			var recepientListOwner = Server.Players.Where(p => p.Info.Rank == RankManager.HighestRank);
-			string formattedMessageOwner = "&Y[" + player.Name + "/staffsay] " + rawMessage;
-			var eo = new ChatSendingEventArgs(player, rawMessage, formattedMessageOwner, ChatMessageType.StaffSayOwner, recepientListOwner);
-			if (!SendInternal(eo))
-				return false;
+            var recepientListOwner = Server.Players.Where(p => p.Info.Rank == RankManager.HighestRank);
+            string formattedMessageOwner = "&Y[" + player.Name + "/staffsay] " + rawMessage;
+            var eo = new ChatSendingEventArgs(player, rawMessage, formattedMessageOwner, ChatMessageType.StaffSayOwner, recepientListOwner);
+            if (!SendInternal(eo))
+                return false;
 
-			Logger.Log(LogType.GlobalChat, "(staff_say){0}: {1}", player.Name, rawMessage);
-			return true;
-		}
+            Logger.Log(LogType.GlobalChat, "(staff_say){0}: {1}", player.Name, rawMessage);
+            return true;
+        }
 
         public static bool SendIRC([NotNull] string rawMessage, [NotNull] params object[] formatArgs)
         {
@@ -533,7 +533,7 @@ namespace fCraft {
                                               recipientList);
 
             if (!SendInternal(e)) return false;
-			IRC.SendChannelMessage("\u211C\u212C(IRC+Staff)(IRC)\u211C" + player + ": " + rawMessage);
+            IRC.SendChannelMessage("\u211C\u212C(IRC+Staff)(IRC)\u211C" + player + ": " + rawMessage);
 
             Logger.Log(LogType.GlobalChat, "(IRC+staff)(IRC){0}: {1}", player, rawMessage);
             return true;
@@ -555,9 +555,9 @@ namespace fCraft {
                 e.Player.Info.ProcessMessageWritten();
             }
 
-			if (e.MessageType != ChatMessageType.SayStaff && e.MessageType != ChatMessageType.StaffSayOwner) {
-				RaiseSentEvent(e, packets);
-			}
+            if (e.MessageType != ChatMessageType.SayStaff && e.MessageType != ChatMessageType.StaffSayOwner) {
+                RaiseSentEvent(e, packets);
+            }
             return true;
         }
 
@@ -602,8 +602,8 @@ namespace fCraft {
             if (message.CaselessEquals("/ok")) return RawMessageType.Command;
             if (message.EndsWith(" /")) return RawMessageType.PartialMessage;
             if (message.EndsWith(" //")) message = message.Substring(0, message.Length - 1);
-			if (message.EndsWith(@" \")) return RawMessageType.PartialMessageNoSpace;
-			if (message.EndsWith(@" /\")) message = message.Substring(0, message.Length  - 2) + @"\";
+            if (message.EndsWith(@" \")) return RawMessageType.PartialMessageNoSpace;
+            if (message.EndsWith(@" /\")) message = message.Substring(0, message.Length  - 2) + @"\";
             if (message.EndsWith("λ")) return RawMessageType.LongerMessage;
 
             switch (message[0])
@@ -666,8 +666,8 @@ namespace fCraft {
             StringBuilder sb = new StringBuilder(input);
             sb.Replace("{SERVER_NAME}", ConfigKey.ServerName.GetString());
             sb.Replace("{RANK}", player.Info.Rank.ClassyName);
-			sb.Replace("{TIME}", DateTime.Now.ToShortTimeString()); // localized
-			
+            sb.Replace("{TIME}", DateTime.Now.ToShortTimeString()); // localized
+            
             if (player.World == null) {
                 sb.Replace("{WORLD}", "(No World)");
             } else {
@@ -684,7 +684,7 @@ namespace fCraft {
                 Player[] playerList = Server.Players.CanBeSeen(player).Union(player).ToArray();
                 sb.Replace("{PLAYER_NAME}", player.ClassyName);
                 sb.Replace("{PLAYER_LIST}", playerList.JoinToClassyString());
-				sb.Replace("{PLAYERS}", Server.CountPlayers(false).ToStringInvariant());
+                sb.Replace("{PLAYERS}", Server.CountPlayers(false).ToStringInvariant());
             }
             return sb.ToString();
         }
@@ -720,12 +720,12 @@ namespace fCraft {
         #region Emotes
 
         /// <summary> Conversion for code page 437 characters from index 0 to 31 to unicode. </summary>
-		public const string ControlCharReplacements = "\0☺☻♥♦♣♠•◘○◙♂♀♪♫☼►◄↕‼¶§▬↨↑↓→←∟↔▲▼";
-		
-		/// <summary> Conversion for code page 437 characters from index 127 to 255 to unicode. </summary>
-		public const string ExtendedCharReplacements = "⌂ÇüéâäàåçêëèïîìÄÅÉæÆôöòûùÿÖÜ¢£¥₧ƒáíóúñÑªº¿⌐¬½¼¡«»" +
-			"░▒▓│┤╡╢╖╕╣║╗╝╜╛┐└┴┬├─┼╞╟╚╔╩╦╠═╬╧╨╤╥╙╘╒╓╫╪┘┌" +
-			"█▄▌▐▀αßΓπΣσµτΦΘΩδ∞φε∩≡±≥≤⌠⌡÷≈°∙·√ⁿ²■\u00a0";
+        public const string ControlCharReplacements = "\0☺☻♥♦♣♠•◘○◙♂♀♪♫☼►◄↕‼¶§▬↨↑↓→←∟↔▲▼";
+        
+        /// <summary> Conversion for code page 437 characters from index 127 to 255 to unicode. </summary>
+        public const string ExtendedCharReplacements = "⌂ÇüéâäàåçêëèïîìÄÅÉæÆôöòûùÿÖÜ¢£¥₧ƒáíóúñÑªº¿⌐¬½¼¡«»" +
+            "░▒▓│┤╡╢╖╕╣║╗╝╜╛┐└┴┬├─┼╞╟╚╔╩╦╠═╬╧╨╤╥╙╘╒╓╫╪┘┌" +
+            "█▄▌▐▀αßΓπΣσµτΦΘΩδ∞φε∩≡±≥≤⌠⌡÷≈°∙·√ⁿ²■\u00a0";
         static readonly char[] UnicodeReplacements = " ☺☻♥♦♣♠•◘○\n♂♀♪♫☼►◄↕‼¶§▬↨↑↓→←∟↔▲▼".ToCharArray();
 
         /// <summary> List of chat keywords, and emotes that they stand for. </summary>
@@ -1046,13 +1046,13 @@ namespace fCraft {
         Staff,
 
         /// <summary> Local (world) chat message. </summary>
-		World,
+        World,
 
-		/// <summary> Message produced by /say command shown to staff members. </summary>
-		SayStaff,
+        /// <summary> Message produced by /say command shown to staff members. </summary>
+        SayStaff,
 
-		/// <summary> Message produced by /staffsay command shown to highest rank. </summary>
-		StaffSayOwner
+        /// <summary> Message produced by /staffsay command shown to highest rank. </summary>
+        StaffSayOwner
     }
 
 
@@ -1080,10 +1080,10 @@ namespace fCraft {
         RankChat,
 
         /// <summary> Repeat of the last command ("/"). </summary>
-		RepeatCommand,
+        RepeatCommand,
 
-		/// <summary> Partial message (ends with " \"). </summary>
-		PartialMessageNoSpace,
+        /// <summary> Partial message (ends with " \"). </summary>
+        PartialMessageNoSpace,
 
         /// <summary> LongerMessage CPE Support. </summary>
         LongerMessage,

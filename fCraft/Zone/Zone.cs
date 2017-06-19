@@ -31,16 +31,16 @@ namespace fCraft {
         #region Packet.MakeSelection
 
         /// <summary> Wheather ot now to show the zone boundary </summary>
-		[NotNull]
-		public bool ShowZone = false;
+        [NotNull]
+        public bool ShowZone = false;
 
         /// <summary> color of the zone boundary </summary>
         [NotNull]
         public string Color = "000";
 
         /// <summary> alpha of the zone boundry </summary>
-		[NotNull]
-		public short Alpha = 0;
+        [NotNull]
+        public short Alpha = 0;
 
         /// <summary> zone id for boundarys </summary>
         [NotNull]
@@ -121,23 +121,23 @@ namespace fCraft {
             Rank buildRank = Rank.Parse( header[7] );
 
 
-			if (header.Length > 8) {
-				// Part 5: Zone color
-				try {
-					bool zoneShow;
-					if (bool.TryParse(header[8], out zoneShow)) {
-						ShowZone = zoneShow;
-					}
-					Color = header[9];
-					short zoneAlpha;
-					if (short.TryParse(header[10], out zoneAlpha)) {
-						Alpha = zoneAlpha;
-					}
-				} catch (Exception ex) {
-					Logger.Log(LogType.Error, "Could not load Zone Colors for {0}", Name);
-					Logger.Log(LogType.Error, ex.StackTrace);
-				}
-			}
+            if (header.Length > 8) {
+                // Part 5: Zone color
+                try {
+                    bool zoneShow;
+                    if (bool.TryParse(header[8], out zoneShow)) {
+                        ShowZone = zoneShow;
+                    }
+                    Color = header[9];
+                    short zoneAlpha;
+                    if (short.TryParse(header[10], out zoneAlpha)) {
+                        Alpha = zoneAlpha;
+                    }
+                } catch (Exception ex) {
+                    Logger.Log(LogType.Error, "Could not load Zone Colors for {0}", Name);
+                    Logger.Log(LogType.Error, ex.StackTrace);
+                }
+            }
 
             if (header[0].Contains(SpecialZone.Door)) {
                 buildRank = RankManager.DefaultRank;

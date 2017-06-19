@@ -94,7 +94,7 @@ namespace fCraft.AutoRank {
                 return;
             }
 
-			Logger.Log(LogType.Debug, "AutoRankAll: Evaluating {0} players...", list.Length);
+            Logger.Log(LogType.Debug, "AutoRankAll: Evaluating {0} players...", list.Length);
 
             Stopwatch sw = Stopwatch.StartNew();
             int promoted = 0, demoted = 0;
@@ -114,7 +114,7 @@ namespace fCraft.AutoRank {
                 }
             }
             sw.Stop();
-			Logger.Log(LogType.Debug, "AutoRankAll: Worked for {0}ms, {1} players promoted, {2} demoted.", sw.ElapsedMilliseconds, promoted, demoted);
+            Logger.Log(LogType.Debug, "AutoRankAll: Worked for {0}ms, {1} players promoted, {2} demoted.", sw.ElapsedMilliseconds, promoted, demoted);
         }
     }
 

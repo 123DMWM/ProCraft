@@ -92,8 +92,8 @@ namespace RandomMaze
 
         public const int AllMask = 0x3F;
         public static readonly Direction[] All = { new Direction() { _d = 0 }, new Direction() { _d = 1 }, 
-													new Direction() { _d = 2 }, new Direction() { _d = 3 }, 
-													new Direction() { _d = 4 }, new Direction() { _d = 5 } };
+                                                    new Direction() { _d = 2 }, new Direction() { _d = 3 }, 
+                                                    new Direction() { _d = 4 }, new Direction() { _d = 5 } };
         public int Mask()
         {
             return 0x1 << _d;

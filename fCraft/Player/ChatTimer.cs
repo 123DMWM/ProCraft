@@ -114,10 +114,10 @@ namespace fCraft {
         void Announce( TimeSpan timeLeft ) {
             if( String.IsNullOrEmpty( Message ) ) {
                 Server.Players.Message("&2[&7CountDown&2][&7{0}&2]", timeLeft.ToMiniString());
-				IRC.SendChannelMessage("\u212C&S[&7CountDown&S][&7{0}&S]", timeLeft.ToMiniString());
+                IRC.SendChannelMessage("\u212C&S[&7CountDown&S][&7{0}&S]", timeLeft.ToMiniString());
             } else {
                 Server.Players.Message("&2[&7Timer&2][&7{0}&2] &7{1} &2-&7{2}", timeLeft.ToMiniString(), Message, StartedBy);
-				IRC.SendChannelMessage("\u212C&S[&7Timer&S][&7{2}&S][&7{0}&S]\u211C {1}", timeLeft.ToMiniString(), Message, StartedBy);
+                IRC.SendChannelMessage("\u212C&S[&7Timer&S][&7{2}&S][&7{0}&S]\u211C {1}", timeLeft.ToMiniString(), Message, StartedBy);
             }
         }
 
@@ -137,7 +137,7 @@ namespace fCraft {
             }  catch (Exception ex) {
                 Player.Console.Message("Timer Deleter Has Crashed: {0}", ex);
             }
-        	
+            
             Aborted = aborted;
             IsRunning = false;
             task.Stop();

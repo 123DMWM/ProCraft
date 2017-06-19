@@ -778,7 +778,7 @@ namespace fCraft {
                     if (Color.StripColors(playerinfo.Name, false).CaselessEquals(Color.StripColors(TargetDisplayedName, false))) 
                         Results.Add(playerinfo);
                 } else {
-            		if (Color.StripColors(playerinfo.DisplayedName, false).CaselessEquals(Color.StripColors(TargetDisplayedName, false)))
+                    if (Color.StripColors(playerinfo.DisplayedName, false).CaselessEquals(Color.StripColors(TargetDisplayedName, false)))
                         Results.Add(playerinfo);
                 }
             }
@@ -1070,11 +1070,11 @@ namespace fCraft {
         };
 
         static void PlayersHandler( Player player, CommandReader cmd ) {
-        	ListPlayersHandler( player, cmd, false );
+            ListPlayersHandler( player, cmd, false );
         }
         
         static void PlayersAdvancedHandler( Player player, CommandReader cmd ) {
-        	ListPlayersHandler( player, cmd, true );
+            ListPlayersHandler( player, cmd, true );
         }
 
         static void ListPlayersHandler( Player player, CommandReader cmd, bool realNames ) {
@@ -1089,8 +1089,8 @@ namespace fCraft {
                 players = Server.Players;
                 qualifier = "online";
                 if( cmd.HasNext ) {
-                	CommandDescriptor desc = realNames ? CdPlayersAdvanced : CdPlayers;
-                	desc.PrintUsage( player );
+                    CommandDescriptor desc = realNames ? CdPlayersAdvanced : CdPlayers;
+                    desc.PrintUsage( player );
                     return;
                 }
 
@@ -1121,7 +1121,7 @@ namespace fCraft {
                     player.Message( "There are no players {0}", qualifier );
 
                 } else if( visiblePlayers.Length <= PlayersPerPage || player.IsSuper ) {
-                	string names = realNames ? visiblePlayers.JoinToRealString() : visiblePlayers.JoinToClassyString();
+                    string names = realNames ? visiblePlayers.JoinToRealString() : visiblePlayers.JoinToClassyString();
                     player.Message("  There are {0} players {1}: {2}",
                                             visiblePlayers.Length, qualifier, names );
 
@@ -1179,7 +1179,7 @@ namespace fCraft {
                     return;
                 }
                 target = Server.FindPlayerOrPrintMatches(player, name, 
-            	                                         SearchOptions.IncludeSelf);
+                                                         SearchOptions.IncludeSelf);
                 if( target == null ) return;
             } else if( target.World == null ) {
                 player.Message( "When called from console, &H/Where&S requires a player name." );
@@ -1316,10 +1316,10 @@ namespace fCraft {
                 player.Message("&H  /cmds New");
                 player.Message("&H  /cmds World");
                 return;
-			}
+            }
             
             CommandDescriptor[] items = CommandManager.GetCommands(player.Info.Rank, false);
-			string output = "";
+            string output = "";
             if (param.StartsWith("*") && param.EndsWith("*")) {
                 foreach (CommandDescriptor item in items) {
                     if (item.Name.CaselessContains(param.Trim('*'))) {
@@ -1327,11 +1327,11 @@ namespace fCraft {
                     }
                 }
                 player.Message("Commands containing \"{0}\":", param.Trim('*'));
-				if (output.EndsWith(", ")) {
-					player.Message(output.Remove(output.Length - 2) + ".");
-				} else {
-					player.Message("&cThere are no commands containing \"{0}\"", param.Trim('*'));
-				}
+                if (output.EndsWith(", ")) {
+                    player.Message(output.Remove(output.Length - 2) + ".");
+                } else {
+                    player.Message("&cThere are no commands containing \"{0}\"", param.Trim('*'));
+                }
                 return;
             } else if (param.EndsWith("*")) {
                 foreach (CommandDescriptor item in items) {
@@ -1340,26 +1340,26 @@ namespace fCraft {
                     }
                 }
                 player.Message("Commands starting with \"{0}\":", param.Trim('*'));
-				if (output.EndsWith(", ")) {
-					player.Message(output.Remove(output.Length - 2) + ".");
-				} else {
-					player.Message("&cThere are no commands starting with \"{0}\"", param.Trim('*'));
-				}
+                if (output.EndsWith(", ")) {
+                    player.Message(output.Remove(output.Length - 2) + ".");
+                } else {
+                    player.Message("&cThere are no commands starting with \"{0}\"", param.Trim('*'));
+                }
                 return;
-			} else if (param.StartsWith("*")) {
+            } else if (param.StartsWith("*")) {
                 foreach (CommandDescriptor item in items) {
                     if (item.Name.CaselessEnds(param.Trim('*'))) {
                         output += item.MinRank.Color + item.Name + "&S, ";
                     }
                 }
                 player.Message("Commands ending with \"{0}\":", param.Trim('*'));
-				if (output.EndsWith(", ")) {
-					player.Message(output.Remove(output.Length - 2) + ".");
-				} else {
-					player.Message("&cThere are no commands ending with \"{0}\"", param.Trim('*'));
-				}
-				return;
-			} else if (param.StartsWith("@")) {
+                if (output.EndsWith(", ")) {
+                    player.Message(output.Remove(output.Length - 2) + ".");
+                } else {
+                    player.Message("&cThere are no commands ending with \"{0}\"", param.Trim('*'));
+                }
+                return;
+            } else if (param.StartsWith("@")) {
                 string rankName = param.Substring(1);
                 Rank rank = RankManager.FindRank(rankName);
                 if (rank == null) {
@@ -1607,8 +1607,8 @@ namespace fCraft {
         };
 
         static string[] hexCodes = { "000000", "0000AA", "00AA00", "00AAAA", "AA0000",
-        	"AA00AA", "AAAA00", "AAAAAA", "555555", "5555FF", "55FF55", "55FFFF",
-        	"FF5555", "FF55FF", "FFFF55", "FFFFFF" };
+            "AA00AA", "AAAA00", "AAAAAA", "555555", "5555FF", "55FF55", "55FFFF",
+            "FF5555", "FF55FF", "FFFF55", "FFFFFF" };
         
         static void ColorHandler(Player player, CommandReader cmd) {
             string color = cmd.Next() ?? "";
@@ -1754,7 +1754,7 @@ namespace fCraft {
 
         private static void ExtraInfoHandler(Player player, CommandReader cmd) {
             if (player == null) throw new ArgumentNullException("player");
-			PlayerInfo info = FindPlayerInfo(player, cmd);
+            PlayerInfo info = FindPlayerInfo(player, cmd);
             if (info == null) return;
             Player target = info.PlayerObject;
 
@@ -1766,10 +1766,10 @@ namespace fCraft {
             if (target != null && target.ClientName != null)
                 player.Message("  Client Name: &F{0}", target.ClientName);
             if (target != null)
-			    player.Message("  Block they are currently holding: {0}", target.HeldBlock);
-			if (target != null && target.LastMotdMessage != null)
-			    player.Message("  Latest motd message: &f{0}", target.LastMotdMessage);
-			    
+                player.Message("  Block they are currently holding: {0}", target.HeldBlock);
+            if (target != null && target.LastMotdMessage != null)
+                player.Message("  Latest motd message: &f{0}", target.LastMotdMessage);
+                
             if (player.Can(Permission.ViewOthersInfo)) {
                 player.Message("  Did they read the rules: &f{0}", info.HasRTR.ToString());
                 player.Message("  Can they see IRC chat: &f{0}", info.ReadIRC.ToString());
@@ -1786,8 +1786,8 @@ namespace fCraft {
         }
 
         #endregion
-		#region GeoInfo
-		static Regex nan = new Regex("[^a-zA-Z0-9,]");
+        #region GeoInfo
+        static Regex nan = new Regex("[^a-zA-Z0-9,]");
 
         static readonly CommandDescriptor CdGeoip = new CommandDescriptor {
             Name = "geoip",
@@ -1803,27 +1803,27 @@ namespace fCraft {
             if (player == null)
                 throw new ArgumentNullException( "player" );
 
-			PlayerInfo info = null;
-			if (!player.Can(Permission.ViewPlayerIPs)) { 
-				info = player.Info;
-			} else {
-				info = FindPlayerInfo(player, cmd);
-			}
+            PlayerInfo info = null;
+            if (!player.Can(Permission.ViewPlayerIPs)) { 
+                info = player.Info;
+            } else {
+                info = FindPlayerInfo(player, cmd);
+            }
             if (info == null) return;
-			if (info.GeoIP != info.LastIP.ToString() || info.Accuracy == 0) {
-				GetGeoip(info);
-			}
+            if (info.GeoIP != info.LastIP.ToString() || info.Accuracy == 0) {
+                GetGeoip(info);
+            }
 
             player.Message( "Geo Info about: {0}&S ({1})", info.ClassyName, info.GeoIP ?? "N/A" );
-			player.Message("  Country: &f{1}&S ({0})", info.CountryCode ?? "N/A", info.CountryName ?? "N/A");
-			player.Message("  Continent: &f{0}", info.Continent ?? "N/A");
-			player.Message("  Subdivisions: &f{0}", info.Subdivision.JoinToString(", "));
-			player.Message("  Latitude: &f{0}", info.Latitude ?? "N/A");
-			player.Message("  Longitude: &f{0}", info.Longitude ?? "N/A");
-			player.Message("  Time Zone: &f{0}", info.TimeZone ?? "N/A");
-			player.Message("  Hostname: &f{0}", info.Hostname ?? "N/A");
-			player.Message("  Accuracy: &f{0}", info.Accuracy);
-			player.Message("Geoip information by: &9http://geoip.cf/");
+            player.Message("  Country: &f{1}&S ({0})", info.CountryCode ?? "N/A", info.CountryName ?? "N/A");
+            player.Message("  Continent: &f{0}", info.Continent ?? "N/A");
+            player.Message("  Subdivisions: &f{0}", info.Subdivision.JoinToString(", "));
+            player.Message("  Latitude: &f{0}", info.Latitude ?? "N/A");
+            player.Message("  Longitude: &f{0}", info.Longitude ?? "N/A");
+            player.Message("  Time Zone: &f{0}", info.TimeZone ?? "N/A");
+            player.Message("  Hostname: &f{0}", info.Hostname ?? "N/A");
+            player.Message("  Accuracy: &f{0}", info.Accuracy);
+            player.Message("Geoip information by: &9http://geoip.cf/");
         }
 
         static readonly CommandDescriptor CdGeoipNp = new CommandDescriptor {
@@ -1836,74 +1836,74 @@ namespace fCraft {
             Handler = IPNPInfoHandler
         };
 
-		private static void IPNPInfoHandler(Player player, CommandReader cmd) {
-			string ipString = cmd.Next();
-			IPAddress ip;
-			if (ipString == null) {
-				CdGeoipNp.PrintUsage(player);
-				return;
-			}
-			if (!(IPAddressUtil.IsIP(ipString) && IPAddress.TryParse(ipString, out ip))) {
-				player.Message("Info: Invalid IP range format. Use CIDR notation.");
-				return;
-			}
-			JsonObject result = null;
-			try {
-				result = JsonObject.Parse(Server.downloadDatastring("http://geoip.cf/api/" + ip));
-				if (result.Get("message") != null) {
-					player.Message("No information found!");
-					return;
-				}
-				player.Message("Geo Info about: &f{0}", result.Get("ip") ?? "N/A");
-				player.Message("  Country: &f{0}&S ({1})", result.Get("country") ?? "N/A", result.Get("country_abbr") ?? "N/A");
-				player.Message("  Continent: &f{0}", result.Get("continent") ?? "N/A");
-				player.Message("  Subdivisions: &f{0}", nan.Replace(result.Get("subdivision"), "").Split(',').JoinToString(", "));
-				player.Message("  Latitude: &f{0}", result.Get("latitude") ?? "N/A");
-				player.Message("  Longitude: &f{0}", result.Get("longitude") ?? "N/A");
-				player.Message("  Timezone: &f{0}", result.Get("timezone") ?? "N/A");
-				byte acc;
-				byte.TryParse(result.Get("accuracy"), out acc);
-				player.Message("  Hostname: &f{0}", result.Get("hostname") ?? "N/A");
-				player.Message("  Accuracy: &f{0}", acc);
-				player.Message("Geoip information by: &9http://geoip.cf/");
+        private static void IPNPInfoHandler(Player player, CommandReader cmd) {
+            string ipString = cmd.Next();
+            IPAddress ip;
+            if (ipString == null) {
+                CdGeoipNp.PrintUsage(player);
+                return;
+            }
+            if (!(IPAddressUtil.IsIP(ipString) && IPAddress.TryParse(ipString, out ip))) {
+                player.Message("Info: Invalid IP range format. Use CIDR notation.");
+                return;
+            }
+            JsonObject result = null;
+            try {
+                result = JsonObject.Parse(Server.downloadDatastring("http://geoip.cf/api/" + ip));
+                if (result.Get("message") != null) {
+                    player.Message("No information found!");
+                    return;
+                }
+                player.Message("Geo Info about: &f{0}", result.Get("ip") ?? "N/A");
+                player.Message("  Country: &f{0}&S ({1})", result.Get("country") ?? "N/A", result.Get("country_abbr") ?? "N/A");
+                player.Message("  Continent: &f{0}", result.Get("continent") ?? "N/A");
+                player.Message("  Subdivisions: &f{0}", nan.Replace(result.Get("subdivision"), "").Split(',').JoinToString(", "));
+                player.Message("  Latitude: &f{0}", result.Get("latitude") ?? "N/A");
+                player.Message("  Longitude: &f{0}", result.Get("longitude") ?? "N/A");
+                player.Message("  Timezone: &f{0}", result.Get("timezone") ?? "N/A");
+                byte acc;
+                byte.TryParse(result.Get("accuracy"), out acc);
+                player.Message("  Hostname: &f{0}", result.Get("hostname") ?? "N/A");
+                player.Message("  Accuracy: &f{0}", acc);
+                player.Message("Geoip information by: &9http://geoip.cf/");
 
-			} catch (Exception ex) {
-				Logger.Log(LogType.Warning, "Could not access GeoIP website (Ex: " + ex + ")");
-			}
-		}
+            } catch (Exception ex) {
+                Logger.Log(LogType.Warning, "Could not access GeoIP website (Ex: " + ex + ")");
+            }
+        }
 
-		public static void GetGeoip(PlayerInfo info) {
-			string ip = info.LastIP.ToString();
-			if (IPAddress.Parse(ip).IsLocal() && Server.ExternalIP != null) {
-				ip = Server.ExternalIP.ToString();
-			}
-			if (ip == info.GeoIP && info.Accuracy != 0) {
-				return;
-			}
-			JsonObject result = null;
-			try {
-				result = JsonObject.Parse(Server.downloadDatastring("http://geoip.cf/api/" + ip));
-				if (result.Get("message") != null) {
-					return;
-				}
-				info.CountryName = result.Get("country") ?? "N/A";
-				info.CountryCode = result.Get("country_abbr") ?? "N/A";
-				info.Continent = result.Get("continent") ?? "N/A";
-				info.Subdivision = nan.Replace(result.Get("subdivision"), "").Split(',');
-				info.Latitude = result.Get("latitude") ?? "N/A";
-				info.Longitude = result.Get("longitude") ?? "N/A";
-				info.TimeZone = result.Get("timezone") ?? "N/A";
-				byte.TryParse(result.Get("accuracy"), out info.Accuracy);
-				info.Hostname = result.Get("hostname") ?? "N/A";
-				info.GeoIP = result.Get("ip") ?? "N/A";
-				return;
+        public static void GetGeoip(PlayerInfo info) {
+            string ip = info.LastIP.ToString();
+            if (IPAddress.Parse(ip).IsLocal() && Server.ExternalIP != null) {
+                ip = Server.ExternalIP.ToString();
+            }
+            if (ip == info.GeoIP && info.Accuracy != 0) {
+                return;
+            }
+            JsonObject result = null;
+            try {
+                result = JsonObject.Parse(Server.downloadDatastring("http://geoip.cf/api/" + ip));
+                if (result.Get("message") != null) {
+                    return;
+                }
+                info.CountryName = result.Get("country") ?? "N/A";
+                info.CountryCode = result.Get("country_abbr") ?? "N/A";
+                info.Continent = result.Get("continent") ?? "N/A";
+                info.Subdivision = nan.Replace(result.Get("subdivision"), "").Split(',');
+                info.Latitude = result.Get("latitude") ?? "N/A";
+                info.Longitude = result.Get("longitude") ?? "N/A";
+                info.TimeZone = result.Get("timezone") ?? "N/A";
+                byte.TryParse(result.Get("accuracy"), out info.Accuracy);
+                info.Hostname = result.Get("hostname") ?? "N/A";
+                info.GeoIP = result.Get("ip") ?? "N/A";
+                return;
 
-			} catch (Exception ex) {
-				Logger.Log(LogType.Warning, "Could not access GeoIP website (Ex: " + ex + ")");
-				Logger.Log(LogType.Debug, ex.ToString());
-				return;
-			}
-		}
+            } catch (Exception ex) {
+                Logger.Log(LogType.Warning, "Could not access GeoIP website (Ex: " + ex + ")");
+                Logger.Log(LogType.Debug, ex.ToString());
+                return;
+            }
+        }
 
         #endregion
         #region API
@@ -2061,15 +2061,15 @@ namespace fCraft {
             }
         }
 
-		#endregion
-		#region Plugins
-		static readonly CommandDescriptor CdPlugin = new CommandDescriptor {
-			Name = "Plugins",
-			Aliases = new[] { "plugin" },
-			Category = CommandCategory.Info | CommandCategory.New,
-			Permissions = new Permission[] { Permission.Chat },
-			IsConsoleSafe = true,
-			Usage = "/Plugins",
+        #endregion
+        #region Plugins
+        static readonly CommandDescriptor CdPlugin = new CommandDescriptor {
+            Name = "Plugins",
+            Aliases = new[] { "plugin" },
+            Category = CommandCategory.Info | CommandCategory.New,
+            Permissions = new Permission[] { Permission.Chat },
+            IsConsoleSafe = true,
+            Usage = "/Plugins",
             Help = "Displays all plugins on the server.",
             Handler = PluginsHandler
         };
@@ -2123,7 +2123,7 @@ namespace fCraft {
         #endregion
         #region FindPlayerInfo
         public static PlayerInfo FindPlayerInfo(Player player, CommandReader cmd) {
-			string name = cmd.Next();
+            string name = cmd.Next();
 
             if (string.IsNullOrEmpty(name)) {
                 // no name given, print own info

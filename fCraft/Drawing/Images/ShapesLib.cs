@@ -191,13 +191,13 @@ namespace fCraft {
 
             //Render the polygon
             using (Bitmap bmp = new Bitmap(Radius + 1, Radius + 1))
-            	using (Graphics g = Graphics.FromImage(bmp))
+                using (Graphics g = Graphics.FromImage(bmp))
             {
-            	g.FillRectangle( Brushes.White, 0, 0, bmp.Width, bmp.Height );
-            	g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-            	g.DrawPolygon( Pens.Black, verticies );
-            	if (FillPoly) g.FillPolygon(Brushes.Black, verticies);
-            	Draw(bmp);
+                g.FillRectangle( Brushes.White, 0, 0, bmp.Width, bmp.Height );
+                g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+                g.DrawPolygon( Pens.Black, verticies );
+                if (FillPoly) g.FillPolygon(Brushes.Black, verticies);
+                Draw(bmp);
             }
         }
 

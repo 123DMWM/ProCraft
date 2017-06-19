@@ -305,7 +305,7 @@ namespace fCraft
         static void IgnoreHandler(Player player, CommandReader cmd) {
             string name = cmd.Next();
             if (!string.IsNullOrEmpty(name)) {
-            	if (name.CaselessEquals("irc")) {
+                if (name.CaselessEquals("irc")) {
                     if (player.Info.ReadIRC) {
                         player.Info.ReadIRC = false;
                         player.Message("You are now ignoring &IIRC");
@@ -364,7 +364,7 @@ namespace fCraft
         static void UnignoreHandler(Player player, CommandReader cmd) {
             string name = cmd.Next();
             if (!string.IsNullOrEmpty(name)) {
-            	if (name.CaselessEquals("irc")) {
+                if (name.CaselessEquals("irc")) {
                     if (!player.Info.ReadIRC) {
                         player.Info.ReadIRC = true;
                         player.Message("You are no longer ignoring &IIRC");
@@ -635,13 +635,13 @@ namespace fCraft
             if (cmd.IsConfirmed) {
                 rCreate.AddReport(getNewReportId(), player.Name, DateTime.Now, message);
                 player.Message("Report sent!");
-				foreach (Player p in Server.Players.Where(q => q.Info.Rank == RankManager.HighestRank)) {
-					if (p.Supports(CpeExt.MessageType)) {
-						p.Send(Packet.Message((byte)MessageType.Announcement, 
-                		                      String.Format("Player {0} has sent in a report!", player.Name), player));
-					}
-					p.Message("Player {0} has sent in a report!", player.Name);
-				}
+                foreach (Player p in Server.Players.Where(q => q.Info.Rank == RankManager.HighestRank)) {
+                    if (p.Supports(CpeExt.MessageType)) {
+                        p.Send(Packet.Message((byte)MessageType.Announcement, 
+                                              String.Format("Player {0} has sent in a report!", player.Name), player));
+                    }
+                    p.Message("Player {0} has sent in a report!", player.Name);
+                }
                 return;
             }
             if (message.Length < 1) {
@@ -699,8 +699,8 @@ namespace fCraft
                     }
                     break;
                 case "read":
-				case "open":
-				case "view":
+                case "open":
+                case "view":
                     bool read = false;
                     if (cmd.NextInt(out reportId)) {
                         foreach (Report r in Report.Reports) {
@@ -1067,32 +1067,32 @@ namespace fCraft
             Handler = RBChatHandler
         };
 
-		static void RBChatHandler(Player player, CommandReader cmd) {
-			string s = cmd.Next();
-			if (s != null && s.CaselessEquals("bw")) {
-				if (player.ChatBWRainbows) {
-					player.ChatRainbows = false;
-					player.ChatBWRainbows = false;
-					player.Message("BWRainbow Chat: &4Off");
-					player.Message("Your messages will now show up normally.");
-				} else {
-					player.ChatBWRainbows = true;
-					player.ChatRainbows = false;
-					player.Message("BWRainbow Chat: &2On");
-					player.Message("Your messages will now show up as &0R&8A&7I&fN&7B&8O&0W&8S&7!&f.");
-				}
-			} else if (player.ChatRainbows) {
-				player.ChatRainbows = false;
-				player.ChatBWRainbows = false;
-				player.Message("Rainbow Chat: &4Off");
-				player.Message("Your messages will now show up normally.");
-			} else {
-				player.ChatRainbows = true;
-				player.ChatBWRainbows = false;
-				player.Message("Rainbow Chat: &2On");
-				player.Message("Your messages will now show up as &cR&4A&6I&eN&aB&2O&bW&3S&9!&S.");
-			}
-		}
+        static void RBChatHandler(Player player, CommandReader cmd) {
+            string s = cmd.Next();
+            if (s != null && s.CaselessEquals("bw")) {
+                if (player.ChatBWRainbows) {
+                    player.ChatRainbows = false;
+                    player.ChatBWRainbows = false;
+                    player.Message("BWRainbow Chat: &4Off");
+                    player.Message("Your messages will now show up normally.");
+                } else {
+                    player.ChatBWRainbows = true;
+                    player.ChatRainbows = false;
+                    player.Message("BWRainbow Chat: &2On");
+                    player.Message("Your messages will now show up as &0R&8A&7I&fN&7B&8O&0W&8S&7!&f.");
+                }
+            } else if (player.ChatRainbows) {
+                player.ChatRainbows = false;
+                player.ChatBWRainbows = false;
+                player.Message("Rainbow Chat: &4Off");
+                player.Message("Your messages will now show up normally.");
+            } else {
+                player.ChatRainbows = true;
+                player.ChatBWRainbows = false;
+                player.Message("Rainbow Chat: &2On");
+                player.Message("Your messages will now show up as &cR&4A&6I&eN&aB&2O&bW&3S&9!&S.");
+            }
+        }
         #endregion
         #region Greet
 
@@ -1101,7 +1101,7 @@ namespace fCraft
             Name = "Greet",
             Aliases = new[] { "greeting", "welcome" },
             Permissions = new[] { Permission.Chat },
-			IsConsoleSafe = true,
+            IsConsoleSafe = true,
             Category = CommandCategory.New | CommandCategory.Chat,
             Help = "Sends a message welcoming the last player to join the server.",
             Handler = greetHandler
@@ -1311,8 +1311,8 @@ namespace fCraft
             string name = cmd.Next();
             string reason = cmd.NextAll().Trim();
             if (name == null || reason == "") {
-            	CdWarn.PrintUsage(player);
-            	return;
+                CdWarn.PrintUsage(player);
+                return;
             }
                
             Player target = Server.FindPlayerOrPrintMatches(player, name, SearchOptions.ReturnSelfIfOnlyMatch);
@@ -1322,10 +1322,10 @@ namespace fCraft
                 player.Message("You cannot &H/Warn&S yourself."); return;
             } else if (cmd.IsConfirmed) {
                 Server.Players.Message("{0} &chas warned {1}&c: &4{2}", 
-            	                       player.ClassyName, target.ClassyName, reason);
+                                       player.ClassyName, target.ClassyName, reason);
             } else {
                 player.Confirm(cmd, "Your warning will display as: \"{0} &chas warned {1}&c: &4{2}\"", 
-            	               player.ClassyName, target.ClassyName, reason);
+                               player.ClassyName, target.ClassyName, reason);
             }
         }
 

@@ -135,7 +135,7 @@ namespace fCraft {
         /// <summary> Whether the player's chat is rainbow. </summary>
         public bool ChatRainbows;
 
-		/// <summary> Whether the player's chat is bwrainbow. </summary>
+        /// <summary> Whether the player's chat is bwrainbow. </summary>
         public bool ChatBWRainbows;
 
         /// <summary> Whether the player is currently afk. </summary>
@@ -171,7 +171,7 @@ namespace fCraft {
         public DateTime LastServerMessageDate;
         
         public TimeSpan TimeSinceLastServerMessage {
-        	get { return IsSuper ? TimeSpan.MaxValue :  DateTime.UtcNow.Subtract(LastServerMessageDate); }
+            get { return IsSuper ? TimeSpan.MaxValue :  DateTime.UtcNow.Subtract(LastServerMessageDate); }
         }
 
         public void getLeftOverTime(Double maxTime, CommandReader cmd) {
@@ -189,7 +189,7 @@ namespace fCraft {
 
         #region General purpose state storage for plugins
         private readonly System.Collections.Concurrent.ConcurrentDictionary<string, object> _publicAuxStateObjects
-        	= new System.Collections.Concurrent.ConcurrentDictionary<string, object>();
+            = new System.Collections.Concurrent.ConcurrentDictionary<string, object>();
         public IDictionary<string, object> PublicAuxStateObjects { get { return _publicAuxStateObjects; } }
         #endregion
 
@@ -215,16 +215,16 @@ namespace fCraft {
         }
 
         /// <summary> Player's position in the current world. </summary>
-		public Position Position;
+        public Position Position;
 
-		/// <summary> Player's last position before a teleport. </summary>
-		public Position LastPosition;
-		
-		/// <summary> Player's checkpoint respawn position in the current world. </summary>
+        /// <summary> Player's last position before a teleport. </summary>
+        public Position LastPosition;
+        
+        /// <summary> Player's checkpoint respawn position in the current world. </summary>
         public Position CheckPoint = new Position(-1, -1, -1);
         
-		/// <summary> Last world player was on before teleport. </summary>
-		public World LastWorld;
+        /// <summary> Last world player was on before teleport. </summary>
+        public World LastWorld;
 
         /// <summary> Player's position in the current world. </summary>
         public Position lastSolidPos { get; set; }
@@ -266,14 +266,14 @@ namespace fCraft {
         BoundingBox bb; // cache an instance, as in CTF game we would otherwise create an instance
         // of this for every single movement packet.
         public BoundingBox Bounds {
-        	get {
-        		if (bb == null) 
-        			bb = new BoundingBox(Vector3I.Zero, Vector3I.Zero);
-        		bb.XMin = Position.X - 6; bb.XMax = Position.X + 6;
-        		bb.YMin = Position.Y - 6; bb.YMax = Position.Y + 6;
-        		bb.ZMin = Position.Z - CharacterHeight; bb.ZMax = Position.Z;	
-        		return bb;
-        	}
+            get {
+                if (bb == null) 
+                    bb = new BoundingBox(Vector3I.Zero, Vector3I.Zero);
+                bb.XMin = Position.X - 6; bb.XMax = Position.X + 6;
+                bb.YMin = Position.Y - 6; bb.YMax = Position.Y + 6;
+                bb.ZMin = Position.Z - CharacterHeight; bb.ZMax = Position.Z;    
+                return bb;
+            }
         }
         
         /// <summary> Time when this player was last killed in a game. </summary>
@@ -682,7 +682,7 @@ namespace fCraft {
                 Logger.LogToConsole( message );
             } else {
                 foreach (Packet p in LineWrapper.Wrap( Color.Sys + message, Supports(CpeExt.EmoteFix), 
-            	                                      HasCP437, FallbackColors)) {
+                                                      HasCP437, FallbackColors)) {
                     Send( p );
                 }
             }
@@ -717,7 +717,7 @@ namespace fCraft {
             else
             {
                 foreach (Packet p in LineWrapper.Wrap( messageType, message, Supports(CpeExt.EmoteFix), 
-            	                                      HasCP437, FallbackColors))
+                                                      HasCP437, FallbackColors))
                 {
                     Send(p);
                 }
@@ -750,7 +750,7 @@ namespace fCraft {
                 Logger.LogToConsole( message );
             } else {
                 foreach (Packet p in LineWrapper.WrapPrefixed( prefix, message, Supports(CpeExt.EmoteFix), 
-            	                                              HasCP437, FallbackColors)) {
+                                                              HasCP437, FallbackColors)) {
                     Send( p );
                 }
             }
@@ -1286,7 +1286,7 @@ namespace fCraft {
                 case CanPlaceResult.ZoneDenied:
                     Zone deniedZone = WorldMap.Zones.FindDenied( coord, this );
                     if (deniedZone != null) {
-                    	if (deniedZone.Name.CaselessEquals("spawn"))
+                        if (deniedZone.Name.CaselessEquals("spawn"))
                             Message("&WThis is the Spawn zone. To build, please exit the spawn.", deniedZone.Name);
                         else
                             Message("&WYou are not allowed to build in zone \"{0}\".", deniedZone.Name);
@@ -1353,9 +1353,9 @@ namespace fCraft {
         }
 
         public void ResetAllBinds() {
-        	for( int block = 0; block < 255; block++) {
-        		ResetBind( (Block)block );
-        	}
+            for( int block = 0; block < 255; block++) {
+                ResetBind( (Block)block );
+            }
         }
 
         #endregion
@@ -2158,12 +2158,12 @@ namespace fCraft {
 
         // For non-extended players, use appropriate substitution
         internal void CheckBlock(ref byte block) {
-        	if (block > (byte) Map.MaxCustomBlockType && !supportsBlockDefs) {
-        		BlockDefinition def = World.BlockDefs[block];
-        		block = def == null ? (byte)Map.FallbackBlocks[block] : def.FallBack;
-        	}
+            if (block > (byte) Map.MaxCustomBlockType && !supportsBlockDefs) {
+                BlockDefinition def = World.BlockDefs[block];
+                block = def == null ? (byte)Map.FallbackBlocks[block] : def.FallBack;
+            }
             if (block > (byte) Map.MaxLegalBlockType && !supportsCustomBlocks)
-            	block = (byte) Map.FallbackBlocks[block];
+                block = (byte) Map.FallbackBlocks[block];
         }
 
         #endregion

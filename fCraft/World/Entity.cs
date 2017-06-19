@@ -135,7 +135,7 @@ namespace fCraft {
         }
 
         public static void SpawnAll() {
-        	foreach (Entity e in EntityList) { e.Spawn(); }
+            foreach (Entity e in EntityList) { e.Spawn(); }
             SaveAll(false);
         }
 

@@ -494,7 +494,7 @@ namespace fCraft {
                     return;
                 } else {
                     distance = 160;
-            	}
+                }
             }
             if (distance < 0 || distance > 32767) {
                 player.Message("Reach distance must be between 0 and 32767");
@@ -513,9 +513,9 @@ namespace fCraft {
             if (player != target) {
                 if (target.Supports(CpeExt.ClickDistance)) {
                     target.Message("{0} set your reach distance from {1} to {2} blocks [Units: {3}]", 
-            		               player.Name, target.Info.ReachDistance / 32, distance / 32, distance);
+                                   player.Name, target.Info.ReachDistance / 32, distance / 32, distance);
                     player.Message("Set reach distance for {0} from {1} to {2} blocks [Units: {3}]", 
-            		               target.Name, target.Info.ReachDistance / 32, distance / 32, distance);
+                                   target.Name, target.Info.ReachDistance / 32, distance / 32, distance);
                     target.Info.ReachDistance = distance;
                     target.Send(Packet.MakeSetClickDistance(distance));
                 } else {
@@ -524,7 +524,7 @@ namespace fCraft {
             } else {
                 if (player.Supports(CpeExt.ClickDistance)) {
                     player.Message("Set own reach distance from {0} to {1} blocks [Units: {2}]", 
-            		               player.Info.ReachDistance / 32, distance / 32, distance);
+                                   player.Info.ReachDistance / 32, distance / 32, distance);
                     player.Info.ReachDistance = distance;
                     player.Send(Packet.MakeSetClickDistance(distance));
                 } else {

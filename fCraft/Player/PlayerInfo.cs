@@ -107,7 +107,7 @@ namespace fCraft {
                 ip = Server.ExternalIP.ToString();
             }
 
-			if (ip != GeoIP || Accuracy == 0) {
+            if (ip != GeoIP || Accuracy == 0) {
                 Scheduler.NewBackgroundTask(GeoipLoginCallback).RunOnce(this, TimeSpan.Zero);
             } else {
                 DisplayGeoIp(false);
@@ -117,8 +117,8 @@ namespace fCraft {
 
         public void GeoipLoginCallback( SchedulerTask task ) {
             PlayerInfo info = (PlayerInfo)task.UserState;
-			InfoCommands.GetGeoip(info);
-			DisplayGeoIp(true);
+            InfoCommands.GetGeoip(info);
+            DisplayGeoIp(true);
         }
 
         /// <summary>
@@ -129,7 +129,7 @@ namespace fCraft {
                 string name = (TimeSinceFirstLogin <= TimeSpan.FromDays(1) ? Chat.newPlayerPrefix.ToString() : "") + PlayerObject.Name;
                 string comesFrom = 
                     string.Format("&2{0}&2 comes from {1}", name, CountryName);
-				string comesFromIRC = 
+                string comesFromIRC = 
                     string.Format("\u212C&2{0}\u211C&2 comes from \u212C{1}", name, CountryName);
                 if (newData) {
                     Server.Players.CanSee(PlayerObject).Message(comesFrom);
@@ -459,15 +459,15 @@ namespace fCraft {
         /// <summary> Players latitude based on geoip</summary>
         public string Latitude;
         /// <summary> Players longitude based on geoip</summary>
-		public string Longitude;
-		/// <summary> List of subdivisions (City, State, etc) sorting by accuracy from left to right. </summary>
-		public string[] Subdivision = new string[] {"NA"};
-		/// <summary> Players geoip accuracy</summary>
-		public byte Accuracy = 0;
-		/// <summary> Players hostname</summary>
-		public string Hostname;
-		/// <summary> Players continent</summary>
-		public string Continent;
+        public string Longitude;
+        /// <summary> List of subdivisions (City, State, etc) sorting by accuracy from left to right. </summary>
+        public string[] Subdivision = new string[] {"NA"};
+        /// <summary> Players geoip accuracy</summary>
+        public byte Accuracy = 0;
+        /// <summary> Players hostname</summary>
+        public string Hostname;
+        /// <summary> Players continent</summary>
+        public string Continent;
         #endregion
 
 
@@ -763,20 +763,20 @@ namespace fCraft {
                 info.TimeZone = fields[80];
 
             if (count > 81)
-				info.skinName = fields[81];
+                info.skinName = fields[81];
 
-			if (count > 82)
-				info.Subdivision = PlayerDB.Unescape(fields[82]).Split();
-			if (count > 83)
-				byte.TryParse(fields[83], out info.Accuracy);
-			if (count > 84)
-				info.Hostname = fields[84];
-			if (count > 85)
-				info.Continent = fields[85];
-			if (count > 86) {
-				if (!bool.TryParse(fields[86], out info.ClassicubeVerified))
-					info.ClassicubeVerified = true;
-			}
+            if (count > 82)
+                info.Subdivision = PlayerDB.Unescape(fields[82]).Split();
+            if (count > 83)
+                byte.TryParse(fields[83], out info.Accuracy);
+            if (count > 84)
+                info.Hostname = fields[84];
+            if (count > 85)
+                info.Continent = fields[85];
+            if (count > 86) {
+                if (!bool.TryParse(fields[86], out info.ClassicubeVerified))
+                    info.ClassicubeVerified = true;
+            }
 
             if( info.LastSeen < info.FirstLoginDate ) {
                 info.LastSeen = info.FirstLoginDate;
@@ -1109,7 +1109,7 @@ namespace fCraft {
 
             Player pObject = PlayerObject;
             if( pObject != null ) {
-            	sb.AppendTicks( TotalTime.Add( TimeSinceLastLogin ) ).Append( ',' ); // 17
+                sb.AppendTicks( TotalTime.Add( TimeSinceLastLogin ) ).Append( ',' ); // 17
             } else {
                 sb.AppendTicks( TotalTime ).Append( ',' ); // 17
             }
@@ -1266,19 +1266,19 @@ namespace fCraft {
             sb.Append( ',' );
             //sb.Append( RegionCode ); // 72 unused
             sb.Append( ',' );
-			//sb.Append( RegionName ); // 73 unused
+            //sb.Append( RegionName ); // 73 unused
             sb.Append( ',' );
-			//sb.Append( City ); // 74 unused
+            //sb.Append( City ); // 74 unused
             sb.Append( ',' );
-			//sb.Append( ZipCode ); // 75 unused
+            //sb.Append( ZipCode ); // 75 unused
             sb.Append( ',' );
             sb.Append( Latitude ); // 76
             sb.Append( ',' );
             sb.Append( Longitude ); // 77
             sb.Append( ',' );
-			//sb.Append( MetroCode ); // 78 unused
+            //sb.Append( MetroCode ); // 78 unused
             sb.Append( ',' );
-			//sb.Append(AreaCode); // 79 unused
+            //sb.Append(AreaCode); // 79 unused
             sb.Append(',');
             sb.Append(TimeZone); // 80
 
@@ -1286,19 +1286,19 @@ namespace fCraft {
             sb.Append(skinName); // 81
 
 
-			sb.Append(',');
-			string divs = "";
-			if (Subdivision.Length == 1) divs = Subdivision[0];
-			else if(Subdivision.Length > 1) divs = String.Join(", ", Subdivision);
-			sb.AppendEscaped(divs); // 82
-			sb.Append(',');
-			sb.Append(Accuracy); // 83
-			sb.Append(',');
-			sb.Append(Hostname); // 84
-			sb.Append(',');
-			sb.Append(Continent); // 85
-			sb.Append(',');
-			sb.Append(ClassicubeVerified); // 86
+            sb.Append(',');
+            string divs = "";
+            if (Subdivision.Length == 1) divs = Subdivision[0];
+            else if(Subdivision.Length > 1) divs = String.Join(", ", Subdivision);
+            sb.AppendEscaped(divs); // 82
+            sb.Append(',');
+            sb.Append(Accuracy); // 83
+            sb.Append(',');
+            sb.Append(Hostname); // 84
+            sb.Append(',');
+            sb.Append(Continent); // 85
+            sb.Append(',');
+            sb.Append(ClassicubeVerified); // 86
         }
 
         #endregion
@@ -1317,7 +1317,7 @@ namespace fCraft {
             if( player == null ) throw new ArgumentNullException( "player" );
             LastIP = player.IP;
             if( LastLoginDate != DateTime.MinValue && LastLoginDate < classsicubeCutoff )
-            	ClassicubeVerified = false;
+                ClassicubeVerified = false;
             LastLoginDate = DateTime.UtcNow;
             LastSeen = DateTime.UtcNow;
             Interlocked.Increment( ref TimesVisited );

@@ -192,9 +192,9 @@ namespace fCraft {
     
     /// <summary> Provides utility methods for working with strings. </summary>
     public static class StringUtil {
-    	
-    	/// <summary> Returns whether the string is null, or if all the 
-    	/// characters in the string are whitespace. </summary>
+        
+        /// <summary> Returns whether the string is null, or if all the 
+        /// characters in the string are whitespace. </summary>
         public static bool NullOrWhiteSpace(this string value) {
             if (value == null) return true;
             foreach (char c in value) {

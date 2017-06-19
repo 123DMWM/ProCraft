@@ -969,8 +969,8 @@ namespace fCraft
             message = Chat.ReplaceNewlines(message);
 
             if (useColor) {
-				message = message.Replace("&T", ResetReplacement);
-				message = Color.MinecraftToIrcColors(message);
+                message = message.Replace("&T", ResetReplacement);
+                message = Color.MinecraftToIrcColors(message);
                 message = message.Replace(Bold, BoldReplacement);
                 message = message.Replace(Reset, ResetReplacement);
             }

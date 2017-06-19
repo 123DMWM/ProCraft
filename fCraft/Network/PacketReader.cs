@@ -29,7 +29,7 @@ namespace fCraft {
         }
 
 
-		char[] characters = new char[Packet.StringSize];
+        char[] characters = new char[Packet.StringSize];
         public override string ReadString() {
             int length = 0;
             byte[] data = ReadBytes( Packet.StringSize );

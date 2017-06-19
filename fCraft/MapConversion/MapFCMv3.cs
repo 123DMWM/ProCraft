@@ -328,7 +328,7 @@ namespace fCraft.MapConversion {
                                                  zone.Name,
                                                  zone.Bounds.XMin, zone.Bounds.YMin, zone.Bounds.ZMin,
                                                  zone.Bounds.XMax, zone.Bounds.YMax, zone.Bounds.ZMax,
-												 zone.Controller.MinRank.FullName, zone.ShowZone, zone.Color, zone.Alpha),
+                                                 zone.Controller.MinRank.FullName, zone.ShowZone, zone.Color, zone.Alpha),
                                   whitelist,
                                   blacklist,
                                   xheader

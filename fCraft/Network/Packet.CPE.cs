@@ -7,7 +7,7 @@ using JetBrains.Annotations;
 namespace fCraft {
     /// <summary> Packet struct, just a wrapper for a byte array. </summary>
     public partial struct Packet {
-    	
+        
         [Pure]
         public static Packet MakeExtInfo( string sname, short extCount ) {
             //Logger.Log(LogType.Debug, "Send: ExtInfo({0} {1})", sname, extCount);
@@ -265,7 +265,7 @@ namespace fCraft {
         
         [Pure]
         public static Packet MakeDefineBlockExt(BlockDefinition def, bool uniqueSideTexs, bool hasCP437) {
-        	byte[] bytes = new byte[uniqueSideTexs ? 88 : 85];
+            byte[] bytes = new byte[uniqueSideTexs ? 88 : 85];
             Packet packet = new Packet(bytes);
             packet.Bytes[0] = (byte)OpCode.DefineBlockExt;
             int index = 1;
@@ -283,7 +283,7 @@ namespace fCraft {
         
         static void MakeDefineBlockStart(BlockDefinition def, ref int index, ref Packet packet, 
                                          bool uniqueSideTexs, bool hasCP437) {
-        	// speed = 2^((raw - 128) / 64);
+            // speed = 2^((raw - 128) / 64);
             // therefore raw = 64log2(speed) + 128
             byte rawSpeed = (byte)(64 * Math.Log(def.Speed, 2) + 128);
             
