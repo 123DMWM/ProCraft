@@ -29,11 +29,11 @@ namespace fCraft {
         }
 
 
-        char[] characters = new char[64];
+		char[] characters = new char[Packet.StringSize];
         public override string ReadString() {
             int length = 0;
-            byte[] data = ReadBytes( 64 );
-            for( int i = 63; i >= 0; i-- ) {
+            byte[] data = ReadBytes( Packet.StringSize );
+            for( int i = Packet.StringSize - 1; i >= 0; i-- ) {
                 byte code = data[i];
                 if( length == 0 && !(code == 0 || code == 0x20) )
                    length = i + 1;

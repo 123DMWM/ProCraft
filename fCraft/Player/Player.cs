@@ -404,7 +404,7 @@ namespace fCraft {
                     partialMessage = rawMessage.Substring(0, rawMessage.Length - 1);
                     // Spaces at the end are trimmed by default, so we need to insert one.
                     // +1 to length to account for λ at end
-                    if (originalMessage.Length != (64 + 1)) partialMessage += " ";
+                    if (originalMessage.Length != (Packet.StringSize + 1)) partialMessage += " ";
                     break;
 
                 case RawMessageType.Invalid:

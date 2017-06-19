@@ -11,6 +11,10 @@ namespace fCraft {
         /// When used in AddEntity packet, sets player's own respawn point.
         /// When used in Teleport packet, teleports the player. </summary>
         public const sbyte SelfId = -1;
+        
+        /// <summary> Maximum number of characters allowed in a string. </summary>
+        public const int StringSize = 64;
+        
 
         /// <summary> Raw bytes of this packet. </summary>
         public readonly byte[] Bytes;

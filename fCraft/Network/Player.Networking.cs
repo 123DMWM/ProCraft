@@ -810,7 +810,8 @@ namespace fCraft {
                 Random random = new Random();
                 int index = random.Next(0, MOTDlist.Length);
                 motd = MOTDlist[index];
-                if (motd.Length > 64) {
+                
+                if (motd.Length > Packet.StringSize) {
                     motd = "&0=&c=&e= Welcome to our server! &e=&c=&0=";
                 } else {
                     LastMotdMessage = motd;

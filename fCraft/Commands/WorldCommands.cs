@@ -3038,8 +3038,8 @@ namespace fCraft {
                 }
                 return;
             }            
-            if (value.Length > 64)
-                value = value.Substring(0, 64);
+            if (value.Length > Packet.StringSize)
+                value = value.Substring(0, Packet.StringSize);
             
             if (value.CaselessEquals("remove") || value.CaselessEquals("delete") || value.CaselessEquals("reset")) {
                 player.Message("MOTD for \"{0}\" has been removed", world.Name);
