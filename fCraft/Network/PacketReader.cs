@@ -10,8 +10,7 @@ namespace fCraft {
         public PacketReader( [NotNull] Stream stream ) :
             base( stream ) { }
 
-        public OpCode ReadOpCode()
-        {
+        public OpCode ReadOpCode() {
             return (OpCode)ReadByte();
         }
 
@@ -25,9 +24,8 @@ namespace fCraft {
         }
         
 
-        public override int ReadInt32()
-        {
-            return IPAddress.NetworkToHostOrder(base.ReadInt32());
+        public override int ReadInt32() {
+            return IPAddress.NetworkToHostOrder( base.ReadInt32() );
         }
 
 
