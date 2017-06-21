@@ -98,6 +98,9 @@ namespace fCraft
         
         /// <summary> Allows for setting entity properties, such as rotation on X/Z axis. </summary>
         EntityProperty,
+        
+        /// <summary> Allows both client and server to measure average ping. </summary>
+        TwoWayPing,
     }
 
 

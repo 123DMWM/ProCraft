@@ -305,6 +305,7 @@ namespace fCraft {
             65,   // SetEnvMapUrl
             6,    // SetEnvMapProperty
             7,    // SetEntityProperty
+            4,    // TwoWayPing
         };
     }
     

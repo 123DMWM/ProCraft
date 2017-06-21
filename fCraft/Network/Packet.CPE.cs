@@ -350,5 +350,14 @@ namespace fCraft {
             WriteI32( value, packet.Bytes, 3 );
             return packet;
         }
+        
+        
+        [Pure]
+        public static Packet MakeTwoWayPing( bool serverToClient, ushort data ) {
+            Packet packet = new Packet( OpCode.TwoWayPing );
+            packet.Bytes[1] = (byte)(serverToClient ? 1 : 0);
+            WriteU16( data, packet.Bytes, 2 );
+            return packet;
+        }
     }
 }

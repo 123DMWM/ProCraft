@@ -24,7 +24,6 @@ namespace fCraft {
         const int SocketPollInterval = 100; // multiples of SleepDelay, approx. 1 second
         const int PingInterval = 1; // multiples of SocketPollInterval, approx. 3 seconds
         public DateTime LastZoneNotification = DateTime.UtcNow;
-        public Stopwatch pingTimer = new Stopwatch();
 
         static Player() {
             MaxBlockPlacementRange = 32767;
@@ -156,11 +155,15 @@ namespace fCraft {
                             LeaveReason = LeaveReason.ClientQuit;
                             return;
                         }
+                        
                         if( pingCounter > PingInterval ) {
-                            writer.Write( OpCode.Ping );
-                            pingTimer.Reset();
-                            pingTimer.Start();
-                            BytesSent++;
+                            if( Supports( CpeExt.TwoWayPing ) ) {
+                                SendNow( Packet.MakeTwoWayPing( true, NextTwoWayPingData() ) );
+                            } else {
+                                writer.Write( OpCode.Ping );
+                                BytesSent++;
+                            }
+                                                      
                             pingCounter = 0;
                             MeasureBandwidthUseRates();
                         }
@@ -273,6 +276,10 @@ namespace fCraft {
                             case OpCode.PlayerClick:
                                 ProcessPlayerClickPacket();
                                 break;
+                                
+                            case OpCode.TwoWayPing:
+                                ProcessTwoWayPingPacket();
+                                break;
 
                             case OpCode.Ping:
                                 ProcessPingPacket();
@@ -313,21 +320,29 @@ namespace fCraft {
             }
         }
         #endregion
+        
+        ushort NextTwoWayPingData() {
+            // Find free ping slot
+            for( int i = 0; i < PingList.Length; i++ ) {
+                if( PingList[i].TimeSent.Ticks == 0 ) continue;
+                
+                ushort prev = i > 0 ? PingList[i - 1].Data : (ushort)0;
+                PingList[i].Data = (ushort)(prev + 1);
+                PingList[i].TimeSent = DateTime.UtcNow;
+                return (ushort)(prev + 1);
+            }
+        	
+        	// Remove oldest ping slot
+        	for( int i = 0; i < PingList.Length - 1; i++ ) {
+        	    PingList[i] = PingList[i + 1];
+        	}
 
-        public void ProcessPingPacket() {
-            pingTimer.Stop();
-            int total = 0;
-            for( int i = 0; i < 10; i++) {
-                if (i == 9) {
-                    PingList[i] = (int)pingTimer.ElapsedMilliseconds;
-                } else {
-                    PingList[i] = PingList[i + 1];
-                }
-                total += PingList[i];
-            }
-            if (!IsPlayingCTF) {
-                Message((byte)MessageType.BottomRight3, "&SPing: &f{0}&Sms Avg: &f{1}&Sms", PingList[9], PingList.Average());
-            }
+        	PingList[PingList.Length - 1].Data++;
+        	PingList[PingList.Length - 1].TimeSent = DateTime.UtcNow;
+            return PingList[PingList.Length - 1].Data;
+        }
+
+        void ProcessPingPacket() {
             BytesReceived++;
         }
 
@@ -518,7 +533,7 @@ namespace fCraft {
             }
             
             PlaceBlockWithEvents( coords, action, (Block)type );
-        }
+        }        
 
         void ProcessPlayerClickPacket() {
             BytesReceived += 15;
@@ -531,6 +546,25 @@ namespace fCraft {
             short targetBlockY = reader.ReadInt16();
             short targetBlockZ = reader.ReadInt16();
             byte targetBlockFace = reader.ReadByte();
+        }
+        
+        void ProcessTwoWayPingPacket() {
+            bool serverToClient = reader.ReadByte() != 0;
+            ushort data = reader.ReadUInt16();
+            BytesReceived += 3;
+            
+            // Client-> server ping, immediately reply.
+            if( !serverToClient ) {
+                SendNow( Packet.MakeTwoWayPing( false, data ) );
+                return;
+            }
+            
+            // Got a response for a server->client ping, set the time received.
+            for( int i = 0; i < PingList.Length; i++ ) {
+                if( PingList[i].Data != data ) continue;
+                PingList[i].TimeReceived = DateTime.UtcNow;
+                break;
+            }
         }
 
 

@@ -1781,8 +1781,10 @@ namespace fCraft {
                     player.Message("    (Use &H/TPP X Y Z R L&S or &H/TPP {0}&S)", info.Name);
                 }
             }
-            if (target != null && target.PingList.Any())
-                player.Message("  Ping: {0}ms Avg: {1}ms", target.PingList[9], target.PingList.Average());
+            
+            if (target != null && target.AveragePingMilliseconds() != 0) {
+                player.Message(target.FormatPing());
+            }
         }
 
         #endregion
@@ -2093,24 +2095,26 @@ namespace fCraft {
 
         static void PingListHandler(Player player, CommandReader cmd) {
             string offsetStr = cmd.Next();
-            string value;
             int offset = 0;
-            if (!int.TryParse(offsetStr, out offset)) {
-                offset = 0;
-            }
-            Player[] visiblePlayers = Server.Players.Where(p => p.PingList.Average() != 0 && player.CanSee(p)).OrderBy(p => p.PingList.Average()).Reverse().ToArray();
-            if (visiblePlayers.Count() < 1) {
-                player.Message("No players online right now");
+            if (!int.TryParse(offsetStr, out offset)) offset = 0;
+            
+            Player[] candidates = Server.Players.CanBeSeen(player)
+                .Where(p => p.AveragePingMilliseconds() != 0)
+                .OrderBy(p => p.AveragePingMilliseconds()).Reverse().ToArray();
+            if (candidates.Length < 1) {
+                player.Message("No online players have clients supporting measuring ping.");
                 return;
             }
-            Player[] playerList = visiblePlayers.Skip(fixOffset(offset, visiblePlayers.Count())).Take(10).ToArray();
-            int pad = string.Format("Ping: {0}ms Avg: {1:N0}ms", playerList[0].PingList[9], playerList[0].PingList.Average()).Length;
+            
+            Player[] list = candidates.Skip(fixOffset(offset, candidates.Count())).Take(10).ToArray();
+            int pad = list[0].FormatPing().Length;
             player.Message("Ping/Latency List:");
-            for (int i = 0; i < playerList.Count(); i++) {
-                value = string.Format("Ping: {0}ms Avg: {1:N0}ms", playerList[i].PingList[9], playerList[i].PingList.Average());
-                player.Message(" &7{1}&S - {0}", playerList[i].Info.ClassyName, value.PadLeft(pad, '0'));
+            
+            for (int i = 0; i < list.Length; i++) {
+                player.Message(" &7{1}&S - {0}", list[i].Info.ClassyName, 
+            	               list[i].FormatPing().PadLeft(pad, '0'));
             }
-            player.Message("Showing players {0}-{1} (out of {2}).", offset + 1, offset + playerList.Length, visiblePlayers.Count());
+            player.Message("Showing players {0}-{1} (out of {2}).", offset + 1, offset + list.Length, candidates.Count());
         }
         
         static int fixOffset(int origOffset, int allPlayerCount) {

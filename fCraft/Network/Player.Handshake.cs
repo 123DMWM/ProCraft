@@ -367,6 +367,9 @@ namespace fCraft {
                     case EntityPropertyExtName:
                         if (version == 1) ext = CpeExt.EntityProperty;
                         break;
+                    case TwoWayPingExtName:
+                        if (version == 1) ext = CpeExt.TwoWayPing;
+                        break;
                 }
                 if (ext != CpeExt.None)
                     supportedExts.Add(ext);

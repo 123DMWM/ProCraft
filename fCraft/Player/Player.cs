@@ -164,7 +164,12 @@ namespace fCraft {
         internal int currentBDStep = -1;
         internal BlockDefinition currentBD;
         
-        public int[] PingList = new int[10];
+        public struct Ping {
+            public DateTime TimeSent, TimeReceived;
+            public ushort Data;
+        }
+        public Ping[] PingList = new Ping[20];
+        
         public string LastMotdMessage;
         public Player LastPlayerGreeted = Player.Console;
         
@@ -2142,6 +2147,7 @@ namespace fCraft {
         const string EnvMapAspectExtName = "EnvMapAspect";
         const string ExtPlayerPositionsExtName = "ExtEntityPositions";
         const string EntityPropertyExtName = "EntityProperty";
+        const string TwoWayPingExtName = "TwoWayPing";
         
         bool supportsBlockDefs, supportsCustomBlocks;
         internal bool supportsExtPositions;
@@ -2250,7 +2256,43 @@ namespace fCraft {
         }
 
         #endregion
-
+        
+        
+        
+        /// <summary> Gets average ping in milliseconds, or 0 if no ping measures. </summary>
+        public double AveragePingMilliseconds() {
+            double totalMs = 0;
+            int measures = 0;
+            
+            foreach (Ping ping in PingList) {
+                if (ping.TimeSent.Ticks == 0 || ping.TimeReceived.Ticks == 0) continue;
+                
+                totalMs += (ping.TimeReceived - ping.TimeSent).TotalMilliseconds;
+                measures++;
+            }
+            return measures == 0 ? 0 : (totalMs / measures);
+        }
+        
+        
+        /// <summary> Gets worst ping in milliseconds, or 0 if no ping measures. </summary>
+        public double WorstPingMilliseconds() {
+            double totalMs = 0;
+            
+            foreach (Ping ping in PingList) {
+                if (ping.TimeSent.Ticks == 0 || ping.TimeReceived.Ticks == 0) continue;
+                
+                double ms = (ping.TimeReceived - ping.TimeSent).TotalMilliseconds;
+                totalMs = Math.Max(totalMs, ms);
+            }
+            return totalMs;
+        }
+        
+        public string FormatPing() {
+            return String.Format("  Worst ping {0}ms, average {1}ms",
+                                 WorstPingMilliseconds().ToString("N0"),
+                                 AveragePingMilliseconds().ToString("N0"));
+        }
+        
 
         [CanBeNull]
         public string LastUsedPlayerName { get; set; }

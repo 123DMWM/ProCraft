@@ -136,6 +136,9 @@ namespace fCraft
         
         /// <summary> Packet telling the client to update an aspect of the given entity. </summary>
         SetEntityProperty = 42,
+        
+        /// <summary> This extension allows both client and server to measure average ping. </summary>
+        TwoWayPing = 43,
     }
 }
 
