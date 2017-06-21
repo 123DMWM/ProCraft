@@ -327,19 +327,21 @@ namespace fCraft {
                 if( PingList[i].TimeSent.Ticks != 0 ) continue;
                 
                 ushort prev = i > 0 ? PingList[i - 1].Data : (ushort)0;
-                PingList[i].Data = (ushort)(prev + 1);
-                PingList[i].TimeSent = DateTime.UtcNow;
-                return (ushort)(prev + 1);
+                return SetTwoWayPing( i, prev );
             }
-        	
-        	// Remove oldest ping slot
-        	for( int i = 0; i < PingList.Length - 1; i++ ) {
-        	    PingList[i] = PingList[i + 1];
-        	}
-
-        	PingList[PingList.Length - 1].Data++;
-        	PingList[PingList.Length - 1].TimeSent = DateTime.UtcNow;
-            return PingList[PingList.Length - 1].Data;
+            
+            // Remove oldest ping slot
+            for( int i = 0; i < PingList.Length - 1; i++ ) {
+                PingList[i] = PingList[i + 1];
+            }
+            int j = PingList.Length - 1;
+            return SetTwoWayPing( j, PingList[j].Data );
+        }
+        
+        ushort SetTwoWayPing( int i, ushort prev ) {
+             PingList[i].Data = (ushort)(prev + 1);
+             PingList[i].TimeSent = DateTime.UtcNow;
+             return (ushort)(prev + 1);
         }
 
         void ProcessPingPacket() {

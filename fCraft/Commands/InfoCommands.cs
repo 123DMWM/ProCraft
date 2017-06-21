@@ -2098,7 +2098,7 @@ namespace fCraft {
             int offset = 0;
             if (!int.TryParse(offsetStr, out offset)) offset = 0;
             
-            Player[] candidates = Server.Players.CanBeSeen(player)
+            Player[] candidates = Server.Players.CanBeSeen(player).Union(player)
                 .Where(p => p.AveragePingMilliseconds() != 0)
                 .OrderBy(p => p.AveragePingMilliseconds()).Reverse().ToArray();
             if (candidates.Length < 1) {
