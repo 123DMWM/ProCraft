@@ -879,6 +879,7 @@ namespace fCraft {
                 case "tex":
                 case "terrain":
                 case "texture":
+                    FilterURL(ref value);
                     if (value.CaselessEquals("default")) {
                         player.Message("Reset texture for {0}&S to {1}", world.ClassyName, Server.DefaultTerrain);
                         value = "Default";
@@ -891,6 +892,7 @@ namespace fCraft {
                     } else {
                         player.Message("Set texture for {0}&S to {1}", world.ClassyName, value);
                     }
+                    
                     world.Texture = value;
                     foreach (Player p in world.Players) {
                         if (p.Supports(CpeExt.EnvMapAspect))
@@ -934,6 +936,17 @@ namespace fCraft {
                     return;
             }
             WorldManager.SaveWorldList();
+        }        
+                
+        static void FilterURL(ref string url) {
+            // a lot of people try linking to the dropbox page instead of directly to file, so we auto correct them
+            if (url.StartsWith("http://www.dropbox")) {
+                url = "http://dl.dropbox" + url.Substring("http://www.dropbox".Length);
+                url = url.Replace("?dl=0", "");
+            } else if (url.StartsWith("https://www.dropbox")) {
+                url = "https://dl.dropbox" + url.Substring("https://www.dropbox".Length);
+                url = url.Replace("?dl=0", "");
+            } 
         }
         
         static void ShowEnvSettings(Player player, World world) {
