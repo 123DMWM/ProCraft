@@ -73,7 +73,7 @@ namespace fCraft {
         }
         
         public string Format() {
-            return String.Format("  Worst ping {0}ms, average {1}ms",
+            return String.Format("Worst ping {0}ms, average {1}ms",
                                  WorstPingMilliseconds().ToString("N0"),
                                  AveragePingMilliseconds().ToString("N0"));
         }
