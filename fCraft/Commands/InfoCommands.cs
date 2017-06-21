@@ -1782,8 +1782,8 @@ namespace fCraft {
                 }
             }
             
-            if (target != null && target.AveragePingMilliseconds() != 0) {
-                player.Message(target.FormatPing());
+            if (target != null && target.Ping.AveragePingMilliseconds() != 0) {
+                player.Message(target.Ping.Format());
             }
         }
 
@@ -2099,20 +2099,20 @@ namespace fCraft {
             if (!int.TryParse(offsetStr, out offset)) offset = 0;
             
             Player[] candidates = Server.Players.CanBeSeen(player).Union(player)
-                .Where(p => p.AveragePingMilliseconds() != 0)
-                .OrderBy(p => p.AveragePingMilliseconds()).Reverse().ToArray();
+                .Where(p => p.Ping.AveragePingMilliseconds() != 0)
+                .OrderBy(p => p.Ping.AveragePingMilliseconds()).Reverse().ToArray();
             if (candidates.Length < 1) {
                 player.Message("No online players have clients supporting measuring ping.");
                 return;
             }
             
             Player[] list = candidates.Skip(fixOffset(offset, candidates.Count())).Take(10).ToArray();
-            int pad = list[0].FormatPing().Length;
+            int pad = list[0].Ping.Format().Length;
             player.Message("Ping/Latency List:");
             
             for (int i = 0; i < list.Length; i++) {
                 player.Message(" &7{1}&S - {0}", list[i].Info.ClassyName, 
-            	               list[i].FormatPing().PadLeft(pad, '0'));
+            	               list[i].Ping.Format().PadLeft(pad, '0'));
             }
             player.Message("Showing players {0}-{1} (out of {2}).", offset + 1, offset + list.Length, candidates.Count());
         }

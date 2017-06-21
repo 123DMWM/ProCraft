@@ -158,7 +158,7 @@ namespace fCraft {
                         
                         if( pingCounter > PingInterval ) {
                             if( Supports( CpeExt.TwoWayPing ) ) {
-                                SendNow( Packet.MakeTwoWayPing( true, NextTwoWayPingData() ) );
+                                SendNow( Packet.MakeTwoWayPing( true, Ping.NextTwoWayPingData() ) );
                             } else {
                                 writer.Write( OpCode.Ping );
                                 BytesSent++;
@@ -320,29 +320,7 @@ namespace fCraft {
             }
         }
         #endregion
-        
-        ushort NextTwoWayPingData() {
-            // Find free ping slot
-            for( int i = 0; i < PingList.Length; i++ ) {
-                if( PingList[i].TimeSent.Ticks != 0 ) continue;
-                
-                ushort prev = i > 0 ? PingList[i - 1].Data : (ushort)0;
-                return SetTwoWayPing( i, prev );
-            }
-            
-            // Remove oldest ping slot
-            for( int i = 0; i < PingList.Length - 1; i++ ) {
-                PingList[i] = PingList[i + 1];
-            }
-            int j = PingList.Length - 1;
-            return SetTwoWayPing( j, PingList[j].Data );
-        }
-        
-        ushort SetTwoWayPing( int i, ushort prev ) {
-             PingList[i].Data = (ushort)(prev + 1);
-             PingList[i].TimeSent = DateTime.UtcNow;
-             return (ushort)(prev + 1);
-        }
+
 
         void ProcessPingPacket() {
             BytesReceived++;
@@ -554,18 +532,13 @@ namespace fCraft {
             bool serverToClient = reader.ReadByte() != 0;
             ushort data = reader.ReadUInt16();
             BytesReceived += 3;
-            
-            // Client-> server ping, immediately reply.
+
             if( !serverToClient ) {
+                // Client-> server ping, immediately send reply.
                 SendNow( Packet.MakeTwoWayPing( false, data ) );
-                return;
-            }
-            
-            // Got a response for a server->client ping, set the time received.
-            for( int i = 0; i < PingList.Length; i++ ) {
-                if( PingList[i].Data != data ) continue;
-                PingList[i].TimeReceived = DateTime.UtcNow;
-                break;
+            } else {
+                // Server -> client ping, set time received for reply.
+                Ping.Update(data);
             }
         }
 

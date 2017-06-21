@@ -150,6 +150,7 @@
     <Compile Include="Network\IRCHandlers.cs" />
     <Compile Include="Network\LevelChunkStream.cs" />
     <Compile Include="Network\Packet.CPE.cs" />
+    <Compile Include="Network\PingList.cs" />
     <Compile Include="Network\Player.Handshake.cs" />
     <Compile Include="Player\ChatFilter.cs" />
     <Compile Include="Player\PlayerHacks.cs" />
