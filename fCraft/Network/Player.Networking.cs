@@ -324,7 +324,7 @@ namespace fCraft {
         ushort NextTwoWayPingData() {
             // Find free ping slot
             for( int i = 0; i < PingList.Length; i++ ) {
-                if( PingList[i].TimeSent.Ticks == 0 ) continue;
+                if( PingList[i].TimeSent.Ticks != 0 ) continue;
                 
                 ushort prev = i > 0 ? PingList[i - 1].Data : (ushort)0;
                 PingList[i].Data = (ushort)(prev + 1);
