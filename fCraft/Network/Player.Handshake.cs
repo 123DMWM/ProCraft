@@ -217,7 +217,7 @@ namespace fCraft {
         
         bool NegotiateProtocolExtension() {
             // write our ExtInfo and ExtEntry packets
-            writer.Write(Packet.MakeExtInfo("ProCraft", 28).Bytes);
+            writer.Write(Packet.MakeExtInfo("ProCraft", 27).Bytes);
             
             writer.Write(Packet.MakeExtEntry(ClickDistanceExtName, 1).Bytes);
             writer.Write(Packet.MakeExtEntry(CustomBlocksExtName, 1).Bytes);

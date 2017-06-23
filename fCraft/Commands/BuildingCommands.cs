@@ -2257,31 +2257,32 @@ namespace fCraft {
 
         // parses and checks command parameters (for both UndoPlayer and UndoArea)
         [CanBeNull]
-        static BlockDBUndoArgs ParseBlockDBUndoParams( Player player, CommandReader cmd, string cmdName, bool not ) {
+        static BlockDBUndoArgs ParseBlockDBUndoParams( Player player, CommandReader cmd, CommandDescriptor cmdDesc, bool not ) {
             // check if command's being called by a worldless player (e.g. console)
             World playerWorld = player.World;
             if( playerWorld == null ) PlayerOpException.ThrowNoWorld( player );
 
             // ensure that BlockDB is enabled
             if( !BlockDB.IsEnabledGlobally ) {
-                player.Message( "&W{0}: BlockDB is disabled on this server.", cmdName );
+                player.Message( "&W{0}: BlockDB is disabled on this server.", cmdDesc.Name );
                 return null;
             }
             if( !playerWorld.BlockDB.IsEnabled ) {
-                player.Message( "&W{0}: BlockDB is disabled in this world.", cmdName );
+                player.Message( "&W{0}: BlockDB is disabled in this world.", cmdDesc.Name );
                 return null;
             }
+            string action = cmdDesc == CdHighlight ? "highlight" : "undo";
 
             // parse the first parameter - either numeric or time limit
             string range = cmd.Next();
             if( range == null ) {
-                CdUndoPlayer.PrintUsage( player );
+                cmdDesc.PrintUsage( player );
                 return null;
             }
             int countLimit;
             TimeSpan ageLimit = TimeSpan.Zero;
             if( !Int32.TryParse( range, out countLimit ) && !range.TryParseMiniTimespan( out ageLimit ) ) {
-                player.Message( "{0}: First parameter should be a number or a timespan.", cmdName );
+                player.Message( "{0}: First parameter should be a number or a timespan.", cmdDesc.Name );
                 return null;
             }
             if( ageLimit > DateTimeUtil.MaxTimeSpan ) {
@@ -2299,11 +2300,11 @@ namespace fCraft {
                 } else if( name == "*" ) {
                     // all players
                     if( not ) {
-                        player.Message( "{0}: \"*\" not allowed (cannot undo \"everyone except everyone\")", cmdName );
+                        player.Message( "{0}: \"*\" not allowed (cannot {1} \"everyone except everyone\")", cmdDesc.Name, action );
                         return null;
                     }
                     if( allPlayers ) {
-                        player.Message( "{0}: \"*\" was listed twice.", cmdName );
+                        player.Message( "{0}: \"*\" was listed twice.", cmdDesc.Name );
                         return null;
                     }
                     allPlayers = true;
@@ -2316,15 +2317,15 @@ namespace fCraft {
                     }
                     if( targets.Contains( target ) ) {
                         player.Message( "{0}: Player {1}&S was listed twice.",
-                                        target.ClassyName, cmdName );
+                                        target.ClassyName, cmdDesc.Name );
                         return null;
                     }
                     // make sure player has the permission
                     if( !not &&
                         player.Info != target && !player.Can( Permission.UndoAll ) &&
                         !player.Can( Permission.UndoOthersActions, target.Rank ) ) {
-                        player.Message( "&W{0}: You may only undo actions of players ranked {1}&S or lower.",
-                                        cmdName,
+                        player.Message( "&W{0}: You may only {1} actions of players ranked {2}&S or lower.",
+                                        cmdDesc.Name, action,
                                         player.Info.Rank.GetLimit( Permission.UndoOthersActions ).ClassyName );
                         player.Message( "Player {0}&S is ranked {1}",
                                         target.ClassyName, target.Rank.ClassyName );
@@ -2334,11 +2335,11 @@ namespace fCraft {
                 }
             }
             if( targets.Count == 0 && !allPlayers ) {
-                player.Message( "{0}: Specify at least one player name, or \"*\" to undo everyone.", cmdName );
+                player.Message( "{0}: Specify at least one player name, or \"*\" to {1} everyone.", cmdDesc.Name, action );
                 return null;
             }
             if( targets.Count > 0 && allPlayers ) {
-                player.Message( "{0}: Cannot mix player names and \"*\".", cmdName );
+                player.Message( "{0}: Cannot mix player names and \"*\".", cmdDesc.Name );
                 return null;
             }
 
@@ -2481,7 +2482,7 @@ namespace fCraft {
         };
 
         static void UndoAreaHandler( Player player, CommandReader cmd ) {
-            BlockDBUndoArgs args = ParseBlockDBUndoParams( player, cmd, "UndoArea", false );
+            BlockDBUndoArgs args = ParseBlockDBUndoParams( player, cmd, CdUndoArea, false );
             if( args == null ) return;
 
             Permission permission;
@@ -2509,7 +2510,7 @@ namespace fCraft {
         };
 
         static void UndoAreaNotHandler( Player player, CommandReader cmd ) {
-            BlockDBUndoArgs args = ParseBlockDBUndoParams( player, cmd, "UndoAreaNot", true );
+            BlockDBUndoArgs args = ParseBlockDBUndoParams( player, cmd, CdUndoAreaNot, true );
             if( args == null ) return;
 
             player.SelectionStart( 2, UndoAreaSelectionCallback, args, CdUndoAreaNot.Permissions );
@@ -2572,7 +2573,7 @@ namespace fCraft {
         };
 
         static void UndoPlayerHandler( Player player, CommandReader cmd ) {
-            BlockDBUndoArgs args = ParseBlockDBUndoParams( player, cmd, "UndoPlayer", false );
+            BlockDBUndoArgs args = ParseBlockDBUndoParams( player, cmd, CdUndoPlayer, false );
             if( args == null ) return;
             Scheduler.NewBackgroundTask( UndoPlayerLookup )
                      .RunOnce( args, TimeSpan.Zero );
@@ -2591,7 +2592,7 @@ namespace fCraft {
         };        
 
         static void UndoPlayerNotHandler( Player player, CommandReader cmd ) {
-            BlockDBUndoArgs args = ParseBlockDBUndoParams( player, cmd, "UndoPlayerNot", true );
+            BlockDBUndoArgs args = ParseBlockDBUndoParams( player, cmd, CdUndoPlayerNot, true );
             if( args == null ) return;
             Scheduler.NewBackgroundTask( UndoPlayerLookup )
                      .RunOnce( args, TimeSpan.Zero );
@@ -2635,15 +2636,15 @@ namespace fCraft {
             Name = "Highlight",
             Category = CommandCategory.Moderation,
             Permissions = new[] { Permission.UndoOthersActions },
-            Usage = "/UndoPlayer (TimeSpan|BlockCount) PlayerName [AnotherName]",
+            Usage = "/Highlight (TimeSpan|BlockCount) PlayerName [AnotherName]",
             Help = "Highlights changes made by a given player in the current world. " +
                    "More than one player name can be given at a time. " +
-                   "Players with UndoAll permission can use '*' in place of player name to undo everyone's changes at once.",
+                   "Players with UndoAll permission can use '*' in place of player name to highlight everyone's changes at once.",
             Handler = HighlightHandler
         };
 
         static void HighlightHandler( Player player, CommandReader cmd ) {
-            BlockDBUndoArgs args = ParseBlockDBUndoParams( player, cmd, "Highlight", false );
+            BlockDBUndoArgs args = ParseBlockDBUndoParams( player, cmd, CdHighlight, false );
             if( args == null ) return;
             Scheduler.NewBackgroundTask( HighlightLookup )
                      .RunOnce( args, TimeSpan.Zero );
