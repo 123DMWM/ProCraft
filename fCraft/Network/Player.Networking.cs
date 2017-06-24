@@ -1299,55 +1299,6 @@ namespace fCraft {
                 Send(Packet.SetWeather(World.Weather));
             }
         }
-        
-        bool GetHacksFromMotd(out bool canFly, out bool canNoClip, out bool canSpeed, out bool canRespawn) {
-            bool useMotd = false;
-            canFly = false; canNoClip = false; canSpeed = false; canRespawn = false;
-            if (String.IsNullOrEmpty(World.MOTD)) return false;
-            
-            foreach (string s in World.MOTD.ToLower().Split()) {
-                switch (s) {
-                    case "-fly":
-                    case "+fly":
-                        canFly = s == "+fly";
-                        useMotd = true;
-                        break;
-                    case "-noclip":
-                    case "+noclip":
-                        canNoClip = s == "+noclip";
-                        useMotd = true;
-                        break;
-                    case "-speed":
-                    case "+speed":
-                        canSpeed = s == "+speed";
-                        useMotd = true;
-                        break;
-                    case "-respawn":
-                    case "+respawn":
-                        canRespawn = s == "+respawn";
-                        useMotd = true;
-                        break;
-                    case "-hax":
-                    case "+hax":
-                        canFly = s == "+hax";
-                        canNoClip = s == "+hax";
-                        canSpeed = s == "+hax";
-                        canRespawn = s == "+hax";
-                        useMotd = true;
-                        break;
-                    case "+ophax":
-                        canFly = IsStaff;
-                        canNoClip = IsStaff;
-                        canSpeed = IsStaff;
-                        canRespawn = IsStaff;
-                        useMotd = true;
-                        break;
-                    default:
-                        break;
-                }
-            }
-            return useMotd;
-        }
 
         #endregion
 

@@ -92,7 +92,7 @@ namespace fCraft.Drawing
             }
             if (bestMatch == null)
             {
-                throw new Exception("Could not find match: palette is empty!");
+                throw new InvalidOperationException("Could not find match: palette is empty!");
             }
             return bestMatch;
         }

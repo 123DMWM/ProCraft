@@ -22,8 +22,7 @@ namespace fCraft.Drawing {
         /// <summary> Duplicates the given CopyState.
         /// Note that this is a deep copy -- Blocks array and everything else is duplicated too. </summary>
         public CopyState([NotNull] CopyState original) {
-            if (original == null)
-                throw new ArgumentNullException();
+            if (original == null) throw new ArgumentNullException("original");
             Blocks = (Block[, ,])original.Blocks.Clone();
             Bounds = new BoundingBox(original.Bounds);
             Orientation = original.Orientation;
@@ -36,8 +35,7 @@ namespace fCraft.Drawing {
         /// <summary> Duplicates the given CopyState, but does not copy the Blocks array.
         /// Updates Bounds to match the new buffer's size, but preserves original Orientation. </summary>
         public CopyState([NotNull] CopyState original, [NotNull] Block[, ,] buffer) {
-            if (original == null)
-                throw new ArgumentNullException();
+            if (original == null) throw new ArgumentNullException("original");
             Blocks = buffer;
             Bounds = new BoundingBox(original.Bounds.MinVertex,
                                      buffer.GetLength(0),

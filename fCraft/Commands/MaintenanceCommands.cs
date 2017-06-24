@@ -678,17 +678,13 @@ namespace fCraft {
                     }
                     if( oldIP == null ) {
                         player.Message( "SetInfo: LastIP for {0} set to \"{1}&S\"",
-                                        info.Name,
-                                        valName.ToString() );
+                                        info.Name, valName );
                     } else if( valName == null ) {
                         player.Message( "SetInfo: LastIP for {0} was reset (was \"{1}&S\")",
-                                        info.Name,
-                                        oldIP.ToString() );
+                                        info.Name, oldIP.ToString() );
                     } else {
                         player.Message( "SetInfo: LastIP for {0} changed from \"{1}&S\" to \"{2}&S\"",
-                                        info.Name,
-                                        oldIP.ToString(),
-                                        valName.ToString() );
+                                        info.Name, oldIP.ToString(), valName );
                     }
                     break;
                 default:

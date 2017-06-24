@@ -98,66 +98,6 @@ namespace RandomMaze
         {
             return 0x1 << _d;
         }
-
-        public delegate void WallCallbackDelegate(
-            ref int longSide1, ref int longSide2, int long1From, int long2From);
-
-        internal void ArrangeCoords(ref int x, ref int y, ref int z, int xFrom, int yFrom, int zFrom, int cellSize, WallCallbackDelegate fun)
-        {
-            switch (_d)
-            {
-                case 0:
-                    x = xFrom + cellSize;
-                    fun(ref y, ref z, yFrom, zFrom);
-                    break;
-                case 1:
-                    y = yFrom + cellSize;
-                    fun(ref x, ref z, xFrom, zFrom);
-                    break;
-                case 2:
-                    x = xFrom - 1;
-                    fun(ref y, ref z, yFrom, zFrom);
-                    break;
-                case 3:
-                    y = yFrom - 1;
-                    fun(ref x, ref z, xFrom, zFrom);
-                    break;
-                case 4:
-                    z = zFrom - 1;
-                    fun(ref x, ref y, xFrom, yFrom);
-                    break;
-                case 5:
-                    z = zFrom + cellSize;
-                    fun(ref x, ref y, xFrom, yFrom);
-                    break;
-            }
-        }
-        public delegate void StickCallbackDelegate(
-            ref int coord, int coordFrom);
-        internal void ArrangeCoords(ref int x, ref int y, ref int z, int xFrom, int yFrom, int zFrom, int cellSize, StickCallbackDelegate fun)
-        {
-            switch (_d)
-            {
-                case 0:
-                case 2:
-                    y = yFrom - 1;
-                    z = zFrom - 1;
-                    fun(ref x, xFrom);
-                    break;
-                case 1:
-                case 3:
-                    x = xFrom - 1;
-                    z = zFrom - 1;
-                    fun(ref y, yFrom);
-                    break;
-                case 4:
-                case 5:
-                    x = xFrom - 1;
-                    y = yFrom - 1;
-                    fun(ref z, zFrom);
-                    break;
-            }
-        }
     }
 
     internal class Cell
@@ -180,11 +120,6 @@ namespace RandomMaze
         public bool Wall(Direction d)
         {
             return (_walls & d.Mask()) != 0;
-        }
-
-        internal bool IsOnSolutionPath()
-        {
-            return (Path.ReachedDestination && IndexInPath <= Path.GoesToDestinationUpTo);
         }
     }
 
