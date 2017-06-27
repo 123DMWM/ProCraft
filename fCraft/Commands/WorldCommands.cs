@@ -814,39 +814,10 @@ namespace fCraft {
                     }
                     return;
                 }
-
-            } else if (fileName.CaselessStarts("pw_")) {
-                player.Message("You cannot make fake personal worlds");
-                return;
             } else {
-                if (cmd.HasNext) {
-                    CdGenerate.PrintUsage(player);
-                    return;
-                }
+                if (cmd.HasNext) { CdGenerate.PrintUsage(player); return; }
                 // saving to file
-                fileName = fileName.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
-                if (!fileName.CaselessEnds(".fcm")) {
-                    fileName += ".fcm";
-                }
-                if (!Paths.IsValidPath(fileName)) {
-                    player.Message("Invalid file name.");
-                    return;
-                }
-                fullFileName = Path.Combine(Paths.MapPath, fileName);
-                if (!Paths.Contains(Paths.MapPath, fullFileName)) {
-                    player.MessageUnsafePath();
-                    return;
-                }
-                string dirName = fullFileName.Substring(0, fullFileName.LastIndexOf(Path.DirectorySeparatorChar));
-                if (!Directory.Exists(dirName)) {
-                    Directory.CreateDirectory(dirName);
-                }
-                if (!cmd.IsConfirmed && File.Exists(fullFileName)) {
-                    Logger.Log(LogType.UserActivity, "Gen: Asked {0} to confirm overwriting map file \"{1}\"",
-                        player.Name, fileName);
-                    player.Confirm(cmd, "The mapfile \"{0}\" already exists. Overwrite?", fileName);
-                    return;
-                }
+                if (!ExpandFilename(player, cmd, ref fileName, ref fullFileName)) return;
             }
 
             // generate the map
@@ -895,6 +866,41 @@ namespace fCraft {
                 playerWorld.MapChangedBy = player.Name;
                 playerWorld.ChangeMap(map);
             }
+        }
+        
+        static bool ExpandFilename(Player player, CommandReader cmd, ref string fileName, ref string fullFileName) {
+            if (fileName.CaselessStarts("pw_") && player.Info.Rank != RankManager.HighestRank) {
+                player.Message("You cannot make fake personal worlds");
+                return false;
+        	}
+        	
+            // saving to file
+            fileName = fileName.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+            if (!fileName.CaselessEnds(".fcm")) fileName += ".fcm";
+            
+            if (!Paths.IsValidPath(fileName)) {
+                player.Message("Invalid file name.");
+                return false;
+            }
+            
+            fullFileName = Path.Combine(Paths.MapPath, fileName);
+            if (!Paths.Contains(Paths.MapPath, fullFileName)) {
+                player.MessageUnsafePath();
+                return false;
+            }
+            
+            string dirName = fullFileName.Substring(0, fullFileName.LastIndexOf(Path.DirectorySeparatorChar));
+            if (!Directory.Exists(dirName)) {
+                Directory.CreateDirectory(dirName);
+            }
+            
+            if (!cmd.IsConfirmed && File.Exists(fullFileName)) {
+                Logger.Log(LogType.UserActivity, "Gen: Asked {0} to confirm overwriting map file \"{1}\"",
+                           player.Name, fileName);
+                player.Confirm(cmd, "The mapfile \"{0}\" already exists. Overwrite?", fileName);
+                return false;
+            }
+            return true;
         }
 
         #endregion
@@ -957,38 +963,9 @@ namespace fCraft {
                     return;
                 }
 
-            } else if (fileName.CaselessStarts("pw_") && player.Info.Rank != RankManager.HighestRank) {
-                player.Message("You cannot make fake personal worlds");
-                return;
             } else {
-                if (cmd.HasNext) {
-                    CdGenerateHeightMap.PrintUsage(player);
-                    return;
-                }
-                // saving to file
-                fileName = fileName.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
-                if (!fileName.CaselessEnds(".fcm")) {
-                    fileName += ".fcm";
-                }
-                if (!Paths.IsValidPath(fileName)) {
-                    player.Message("Invalid file name.");
-                    return;
-                }
-                fullFileName = Path.Combine(Paths.MapPath, fileName);
-                if (!Paths.Contains(Paths.MapPath, fullFileName)) {
-                    player.MessageUnsafePath();
-                    return;
-                }
-                string dirName = fullFileName.Substring(0, fullFileName.LastIndexOf(Path.DirectorySeparatorChar));
-                if (!Directory.Exists(dirName)) {
-                    Directory.CreateDirectory(dirName);
-                }
-                if (!cmd.IsConfirmed && File.Exists(fullFileName)) {
-                    Logger.Log(LogType.UserActivity, "Gen: Asked {0} to confirm overwriting map file \"{1}\"",
-                        player.Name, fileName);
-                    player.Confirm(cmd, "The mapfile \"{0}\" already exists. Overwrite?", fileName);
-                    return;
-                }
+                if (cmd.HasNext) { CdGenerateHeightMap.PrintUsage(player); return; }
+                if (!ExpandFilename(player, cmd, ref fileName, ref fullFileName)) return;
             }
 
             // generate the map
