@@ -2109,7 +2109,8 @@ namespace fCraft {
                     player.Message("    Flying: &a{0} &S--> &a{1}", target.AllowFlying, !target.AllowFlying);
                     target.AllowFlying = !target.AllowFlying;
                     hackStr = "flying";
-                    goto sendPacket;
+                    break;
+                    
                 case "noclip":
                 case "clip":
                 case "nc":
@@ -2117,7 +2118,8 @@ namespace fCraft {
                     player.Message("    NoClip: &a{0} &S--> &a{1}", target.AllowNoClip, !target.AllowNoClip);
                     target.AllowNoClip = !target.AllowNoClip;
                     hackStr = "noclip";
-                    goto sendPacket;
+                    break;
+                    
                 case "speedhack":
                 case "speed":
                 case "sh":
@@ -2125,7 +2127,8 @@ namespace fCraft {
                     player.Message("    SpeedHack: &a{0} &S--> &a{1}", target.AllowSpeedhack, !target.AllowSpeedhack);
                     target.AllowSpeedhack = !target.AllowSpeedhack;
                     hackStr = "speedhack";
-                    goto sendPacket;
+                    break;
+                    
                 case "respawn":
                 case "spawn":
                 case "rs":
@@ -2133,7 +2136,8 @@ namespace fCraft {
                     player.Message("    Respawn: &a{0} &S--> &a{1}", target.AllowRespawn, !target.AllowRespawn);
                     target.AllowRespawn = !target.AllowRespawn;
                     hackStr = "respawn";
-                    goto sendPacket;
+                    break;
+                    
                 case "thirdperson":
                 case "third":
                 case "tp":
@@ -2141,7 +2145,8 @@ namespace fCraft {
                     player.Message("    ThirdPerson: &a{0} &S--> &a{1}", target.AllowThirdPerson, !target.AllowThirdPerson);
                     target.AllowThirdPerson = !target.AllowThirdPerson;
                     hackStr = "thirdperson";
-                    goto sendPacket;
+                    break;
+                    
                 case "jumpheight":
                 case "jump":
                 case "height":
@@ -2153,16 +2158,16 @@ namespace fCraft {
                         player.Message("    JumpHeight: &a{0} &S--> &a{1}", target.JumpHeight, height);
                         target.JumpHeight = height;
                         hackStr = "jumpheight";
-                        goto sendPacket;
-                    } else player.Message("Error: Could not parse \"&a{0}&S\" as a short. Try something between &a0&S and &a32767", third);
+                    } else {
+                        player.Message("Error: Could not parse \"&a{0}&S\" as a short. Try something between &a0&S and &a32767", third);
+                        return;
+                    }
                     break;
                 default:
                     player.Message(CdHackControl.Help);
-                    break;
+                    return;
             }
-            return;
-            
-         sendPacket:
+
             if (player != targetPlayer) {
                 targetPlayer.Message("{0} has changed your {1} ability, use &H/Hacks &Sto check them out.", player.Info.Name, hackStr);
             }

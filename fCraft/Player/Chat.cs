@@ -191,17 +191,15 @@ namespace fCraft {
                 }
                 if (LDistance(rawMessage.ToLower(), "what is my next rank?") <= 0.25 ||
                     LDistance(rawMessage.ToLower(), "what rank is after this one?") <= 0.25) {
-                    Rank meh = player.Info.Rank.NextRankUp;
-                    if (BotTime > 5 && player.Info.Rank != RankManager.HighestRank) {
-                    tryagain:
-                        if (meh.IsDonor) {
-                            meh = meh.NextRankUp;
-                            goto tryagain;
-                        }
-                        Server.BotMessage("Your next rank is: " + meh.ClassyName);
+                    Rank next = player.Info.Rank.NextRankUp;
+                    // donor ranks are skipped from being able to be promoted to
+                    while (next != null && next.IsDonor) next = next.NextRankUp;
+                    
+                    if (BotTime > 5 && next != null) {
+                        Server.BotMessage("Your next rank is: " + next.ClassyName);
                         player.LastServerMessageDate = DateTime.UtcNow;
                         player.Info.TimesUsedBot++;
-                    } else if (player.Info.Rank == RankManager.HighestRank) {
+                    } else {
                         Server.BotMessage("You are already the highest rank.");
                         player.LastServerMessageDate = DateTime.UtcNow;
                         player.Info.TimesUsedBot++;
