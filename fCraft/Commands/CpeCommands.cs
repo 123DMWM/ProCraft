@@ -159,8 +159,13 @@ namespace fCraft {
                     string skinString1 = (cmd.Next() ?? entityName);
                     if (skinString1 != null) skinString1 = ParseSkin(skinString1);
                     
-                    entity = Entity.Create(entityName, skinString1, requestedModel, player.World, player.Position, getNewID(player.World));
-                    player.Message("Successfully created entity {0}&S with id:{1} and skin {2}.", entity.Name, entity.ID, entity.Skin, entity.Name);
+                    sbyte newEntityId = Entity.NextFreeID(player.World.Name);
+                    if (newEntityId == Packet.SelfId) {
+                        player.Message("No more free ids left! Remove an entity first.");
+                    } else {
+                        entity = Entity.Create(entityName, skinString1, requestedModel, player.World, player.Position, newEntityId);
+                        player.Message("Successfully created entity {0}&S with id:{1} and skin {2}.", entity.Name, entity.ID, entity.Skin, entity.Name);                        
+                    }
                     break;
                 case "remove":
                     player.Message("{0} was removed from {1}", entity.Name, player.World.Name);
@@ -271,18 +276,6 @@ namespace fCraft {
                     CdEntity.PrintUsage(player);
                     break;
             }
-        }
-
-        public static sbyte getNewID(World world) {
-            sbyte i = 1;
-        go:
-            foreach (Entity entity in Entity.AllIn(world)) {
-                if (entity.ID == i) {
-                    i++;
-                    goto go;
-                }
-            }
-            return i;
         }
 
         #endregion

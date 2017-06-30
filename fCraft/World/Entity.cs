@@ -155,7 +155,23 @@ namespace fCraft {
             EntityList.Clear();
             LoadAll();
             SpawnAll();
+        }        
+        
+        public unsafe static sbyte NextFreeID(string world) {
+            byte* used = stackalloc byte[128];
+            for (int i = 0; i < 128; i++)
+                used[i] = 0;
+            
+            foreach (Entity entity in Entity.AllIn(world)) {
+                if (entity.ID >= 0) used[entity.ID] = 1;
+            }
+            
+            for (int i = 0; i <= sbyte.MaxValue; i++ ) {
+            	if (used[i] == 0) return (sbyte)i;
+            }
+            return Packet.SelfId;
         }
+        
 
         public static void SaveAll(bool verbose) {
             try {
@@ -216,7 +232,9 @@ namespace fCraft {
                 if (entity.World == null) continue;
                 
                 sbyte id;
-                if (!sbyte.TryParse(entityData[3], out id)) { id = CpeCommands.getNewID(world); }
+                if (!sbyte.TryParse(entityData[3], out id)) id = NextFreeID(entity.World);
+                if (id == Packet.SelfId) continue;
+                
                 entity.ID = id;
                 entity.Name = entityData[0] ?? entity.ID.ToString();
                 entity.Skin = entityData[1] ?? entity.Name;
