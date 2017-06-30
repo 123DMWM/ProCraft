@@ -807,11 +807,8 @@ namespace fCraft {
                     Logger.Log(LogType.UserActivity,
                         "Gen: Asked {0} to confirm replacing the map of world {1} (\"this map\").",
                         player.Name, playerWorld.Name);
-                    if (!Entity.AnyIn(player.World)) {
-                        player.Confirm(cmd, "Replace THIS MAP with a generated one ({0})?", templateFullName);
-                    } else {
-                        player.Confirm(cmd, "Replace THIS MAP with a generated one ({0})?&NThis will also remove all the Entities/Bots on the world.", templateFullName);
-                    }
+
+                    player.Confirm(cmd, "Replace THIS MAP with a generated one ({0})?", templateFullName);
                     return;
                 }
             } else {
@@ -955,11 +952,8 @@ namespace fCraft {
                     Logger.Log(LogType.UserActivity,
                         "GenHM: Asked {0} to confirm replacing the map of world {1} (\"this map\").",
                         player.Name, playerWorld.Name);
-                    if (!Entity.AnyIn(player.World)) {
-                        player.Confirm(cmd, "Replace THIS MAP with a generated one (HeightMap: &9{0}&S)?", url);
-                    } else {
-                        player.Confirm(cmd, "Replace THIS MAP with a generated one (HeightMap: &9{0}&S)?&NThis will also remove all the Entities/Bots on the world.", url);
-                    }
+                    
+                	player.Confirm(cmd, "Replace THIS MAP with a generated one (HeightMap: &9{0}&S)?", url);
                     return;
                 }
 
@@ -3411,13 +3405,8 @@ namespace fCraft {
                 player.Message("You have no personal worlds by that number: {0}", num); return;
             }
             if (!cmd.IsConfirmed) {
-                if (!Entity.AnyIn(player.World)) {
-                    player.Confirm(cmd, "This will reset your personal world:   " + mapName +
-                                   "&N&cThis cannot be undone!");
-                } else {
-                    player.Confirm(cmd, "This will reset your personal world:   " + mapName +
-                                   "&N&cThis cannot be undone!&NThis will also remove all the Entities/Bots on the world.");
-                }
+                player.Confirm(cmd, "This will reset your personal world:   " + mapName +
+                               "&N&cThis cannot be undone!");
                 return;
             }
             

@@ -101,9 +101,6 @@ namespace fCraft {
         /// <summary> Enumerable of all entities that are in the given world. </summary>
         public static IEnumerable<Entity> AllIn(World world) { return AllIn(world.Name); }
 
-        /// <summary> Returns whether any entities exist in the given world. </summary>
-        public static bool AnyIn(World world) { return AllIn(world).Any(); }
-
         /// <summary> Retrieves the entity who is located in the given world,
         /// and whose name caselessly matches the input. </summary>
         public static Entity Find(World world, string name) {
