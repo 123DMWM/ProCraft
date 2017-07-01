@@ -1399,7 +1399,7 @@ namespace fCraft {
                 player.Message("ProCraft.zip last update (&7" + zipTime.ToMiniString() + " &Sago):");
                 player.Message("    &7" + latest.ToLongDateString() + " &Sat &7" + latest.ToLongTimeString());
             } catch (Exception ex) {
-                Logger.Log(LogType.Debug, ex.ToString());
+                Logger.Log(LogType.Error, "Updates.UpdaterHandler:" + ex);
                 player.Message("Cannot access http://123dmwm.tk/ at the moment.");
             }
             player.Message("Server file last update (&7" + currentTime.ToMiniString() + " &Sago):");

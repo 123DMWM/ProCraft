@@ -18,6 +18,9 @@ namespace fCraft {
         /// <summary> The report message. </summary>
         public string Message;
         
+        /// <summary> Path to the report file on disc. </summary>
+        public string FilePath { get { return "./Reports/" + Id + "-" + Sender + ".txt"; } }
+        
         public static List<Report> Reports = new List<Report>();
         
 
@@ -34,9 +37,7 @@ namespace fCraft {
         /// <summary> Completely removes the report and data of it. </summary>
         public void RemoveReport() {
             Reports.Remove(this);
-            if (File.Exists("./Reports/" + Id + "-" + Sender + ".txt")) {
-                File.Delete("./Reports/" + Id + "-" + Sender + ".txt");
-            }
+            if (File.Exists(FilePath)) File.Delete(FilePath);
         }
         
         
@@ -48,7 +49,7 @@ namespace fCraft {
                 if (!Directory.Exists("./Reports")) {
                     Directory.CreateDirectory("./Reports");
                 }
-                File.WriteAllLines("./Reports/" + report.Id + "-" + report.Sender + ".txt", data);
+                File.WriteAllLines(report.FilePath, data);
             } catch (Exception ex) {
                 Logger.Log(LogType.Error, "Report.SaveReport: " + ex);
             }
