@@ -79,17 +79,23 @@ namespace fCraft {
         public static readonly string WorkingPathDefault;
 
         public const string FontsDirectory = "fonts";
-
-        public static string FontsPath
-        {
+        public static string FontsPath  {
             get { return Path.Combine(WorkingPath, FontsDirectory); }
         }
 
         public const string WClearDirectory = "WClearBackups";
-
-        public static string WClearPath
-        {
+        public static string WClearPath {
             get { return Path.Combine(WorkingPath, WClearDirectory); }
+        }
+        
+        public const string SignsDirectory = "Signs";
+        public static string SignsPath {
+            get { return Path.Combine(WorkingPath, SignsDirectory); }
+        }
+        
+        public const string WGreetingDirectory = "WorldGreeting";
+        public static string WGreetingsPath {
+            get { return Path.Combine(WorkingPath, WGreetingDirectory); }
         }
 
         /// <summary> Path to save maps to (default: .\maps)

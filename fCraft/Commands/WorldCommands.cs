@@ -3030,13 +3030,14 @@ namespace fCraft {
         }
         
         static void SetGreeting(Player player, World world, string value) {
-            if (!Directory.Exists("./WorldGreeting/"))
-                Directory.CreateDirectory("./WorldGreeting/");
+            if (!Directory.Exists(Paths.WGreetingsPath))
+                Directory.CreateDirectory(Paths.WGreetingsPath);            
+            string greetingsPath = Path.Combine(Paths.WGreetingsPath, world.Name + ".txt");
             
             if (String.IsNullOrEmpty(value)) {
                 if (world.Greeting == null) {
-                    if (File.Exists("./WorldGreeting/" + world.Name + ".txt")) {
-                        world.Greeting = File.ReadAllText("./WorldGreeting/" + world.Name + ".txt");
+                    if (File.Exists(greetingsPath)) {
+                        world.Greeting = File.ReadAllText(greetingsPath);
                         if (world.Greeting.Length == 0)
                             player.Message("No greeting message is set for world {0}", world.ClassyName);
                         else
@@ -3048,13 +3049,13 @@ namespace fCraft {
                 }
             } else if (value.CaselessEquals("remove")) {
                 player.Message("Greeting message removed for world {0}", world.ClassyName);
-                if (File.Exists("./WorldGreeting/" + world.Name + ".txt"))
-                    File.Delete("./WorldGreeting/" + world.Name + ".txt");
+                if (File.Exists(greetingsPath))
+                    File.Delete(greetingsPath);
                 world.Greeting = null;
             } else {
                 world.Greeting = value;
                 player.Message("Greeting message for world {0}&S set to: {1}", world.ClassyName, world.Greeting);
-                File.WriteAllText("./WorldGreeting/" + world.Name + ".txt", world.Greeting);
+                File.WriteAllText(greetingsPath, world.Greeting);
                 world.Greeting = null;
             }
         }

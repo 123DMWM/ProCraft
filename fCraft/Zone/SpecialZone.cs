@@ -54,7 +54,7 @@ namespace fCraft {
         }
         
         static string GetSignMessage(Player p, Zone zone) {
-            string path = "./signs/" + p.World.Name + "/" + zone.Name + ".txt";
+            string path = "./Signs/" + p.World.Name + "/" + zone.Name + ".txt";
             if (!File.Exists(path)) return null;
             
             string[] lines = File.ReadAllLines(path);

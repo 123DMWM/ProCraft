@@ -1160,33 +1160,27 @@ namespace fCraft {
         }
         
         void SendJoinMessage(World oldWorld, World newWorld) {
-            if (oldWorld == newWorld)
-            {
+            if (oldWorld == newWorld) {
                 Message("&SRejoined world {0}", newWorld.ClassyName);
+                return;
             }
-            else
-            {
-                Message("&SJoined world {0}", newWorld.ClassyName);
-                string greeting = newWorld.Greeting;
-                if (greeting != null)
-                {
-                    greeting = Chat.ReplaceTextKeywords(this, greeting);
-                    Message(greeting);
+            
+            Message("&SJoined world {0}", newWorld.ClassyName);
+            string greeting = newWorld.Greeting;
+            if (greeting != null) {
+                greeting = Chat.ReplaceTextKeywords(this, greeting);
+                Message(greeting);
+                return;
+            }
+            
+            string greetingsPath = Path.Combine(Paths.WGreetingsPath, World.Name + ".txt");
+            if (File.Exists(greetingsPath)) {
+                string[] lines = File.ReadAllLines(greetingsPath);
+                greeting = "";
+                foreach (string line in lines) {
+                    greeting += line + "&N";
                 }
-                else
-                {
-                    FileInfo GreetingInfo = new FileInfo("./WorldGreeting/" + World.Name + ".txt");
-                    if (GreetingInfo.Exists)
-                    {
-                        string[] Greeting = File.ReadAllLines("./WorldGreeting/" + World.Name + ".txt");
-                        string GreetingMessage = "";
-                        foreach (string line in Greeting)
-                        {
-                            GreetingMessage += line + "&N";
-                        }
-                        Message(Chat.ReplaceTextKeywords(this, GreetingMessage));
-                    }
-                }
+                Message(Chat.ReplaceTextKeywords(this, greeting));
             }
         }
         
