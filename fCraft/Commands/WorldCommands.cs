@@ -3052,6 +3052,7 @@ namespace fCraft {
                     File.Delete("./WorldGreeting/" + world.Name + ".txt");
                 world.Greeting = null;
             } else {
+                world.Greeting = value;
                 player.Message("Greeting message for world {0}&S set to: {1}", world.ClassyName, world.Greeting);
                 File.WriteAllText("./WorldGreeting/" + world.Name + ".txt", world.Greeting);
                 world.Greeting = null;

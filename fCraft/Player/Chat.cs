@@ -199,7 +199,7 @@ namespace fCraft {
                         Server.BotMessage("Your next rank is: " + next.ClassyName);
                         player.LastServerMessageDate = DateTime.UtcNow;
                         player.Info.TimesUsedBot++;
-                    } else {
+                    } else if (BotTime > 5) {
                         Server.BotMessage("You are already the highest rank.");
                         player.LastServerMessageDate = DateTime.UtcNow;
                         player.Info.TimesUsedBot++;
