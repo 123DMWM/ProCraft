@@ -54,11 +54,15 @@ namespace fCraft {
         }
         
         static string GetSignMessage(Player p, Zone zone) {
-            string path = "./Signs/" + p.World.Name + "/" + zone.Name + ".txt";
-            if (!File.Exists(path)) return null;
-            
+            string path = SignPath(p, zone);
+            if (!File.Exists(path)) return null;            
             string[] lines = File.ReadAllLines(path);
             return String.Join("&N", lines);
+        }
+        
+        static string SignPath(Player p, Zone zone) {
+            string path = Path.Combine(Paths.SignsPath, p.World.Name);
+            return Path.Combine(path, zone.Name + ".txt");
         }
         
         static void SendZoneMessage(Player p, string message) {

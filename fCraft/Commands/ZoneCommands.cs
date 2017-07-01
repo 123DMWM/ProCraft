@@ -270,9 +270,13 @@ namespace fCraft {
                 }
                 else
                 {
-                    if (!Directory.Exists("./Signs/")) Directory.CreateDirectory("./Signs/");
-                    if (!Directory.Exists("./Signs/" + player.World.Name + "/")) Directory.CreateDirectory("./Signs/" + player.World.Name + "/");
-                    File.WriteAllText("./Signs/" + player.World.Name + "/" + newZone.Name + ".txt", cmd.NextAll());
+                    string path = Paths.SignsPath;
+                    if (!Directory.Exists(path)) Directory.CreateDirectory(path);
+                    path = Path.Combine(path, player.World.Name);
+                    if (!Directory.Exists(path)) Directory.CreateDirectory(path);
+                    
+                    path = Path.Combine(path, newZone.Name + ".txt");
+                    File.WriteAllText(path, newZone.Sign);
                     player.Message("Message for sign {0}&S is: {1}", newZone.ClassyName, newZone.Sign);
                     newZone.Sign = null;
                 }
@@ -369,27 +373,26 @@ namespace fCraft {
 
             //player.Message(cmd.RawMessage);
             //player.Message(cmd.RawMessage.Substring(cmd.Offset));
-            if (cmd.RawMessage.Substring(cmd.Offset + 1).StartsWith("#"))
-                {
-                    zone.Sign = cmd.NextAll().Substring(1);
-                    if (zone.Sign.Length == 0 || zone.Sign == null)
-                    {
-                        if (!Directory.Exists("./Signs/")) Directory.CreateDirectory("./Signs/");
-                        if (!Directory.Exists("./Signs/" + player.World.Name + "/")) Directory.CreateDirectory("./Signs/" + player.World.Name + "/"); 
-                        if (File.Exists("./Signs/" + player.World.Name + "/" + zone.Name + ".txt")) File.Delete("./Signs/" + player.World.Name + "/" + zone.Name + ".txt");
-                        player.Message("Sign Text for zone {0}&S was removed.", zone.ClassyName);
-                        zone.Sign = null;
-                    }
-                    else
-                    {
-                        if (!Directory.Exists("./Signs/")) Directory.CreateDirectory("./Signs/");
-                        if (!Directory.Exists("./Signs/" + player.World.Name + "/")) Directory.CreateDirectory("./Signs/" + player.World.Name + "/"); 
-                        File.WriteAllText("./Signs/" + player.World.Name + "/" + zone.Name + ".txt", cmd.NextAll().Substring(1));
-                        player.Message("Sign Text for zone {0}&S changed to {1}", zone.ClassyName, zone.Sign);
-                        zone.Sign = null;
-                    }
-                    return;
+            if (cmd.RawMessage.Substring(cmd.Offset + 1).StartsWith("#")) {
+                zone.Sign = cmd.NextAll().Substring(1);
+                
+                string path = Paths.SignsPath;
+                if (!Directory.Exists(path)) Directory.CreateDirectory(path);
+                path = Path.Combine(path, player.World.Name);
+                if (!Directory.Exists(path)) Directory.CreateDirectory(path);
+                   
+                path = Path.Combine(path, zone.Name + ".txt");
+                if (zone.Sign.Length == 0 || zone.Sign == null) {
+                    if (File.Exists(path)) File.Delete(path);
+                    player.Message("Sign Text for zone {0}&S was removed.", zone.ClassyName);
+                    zone.Sign = null;
+                } else {
+                    File.WriteAllText(path, zone.Sign);
+                    player.Message("Sign Text for zone {0}&S changed to {1}", zone.ClassyName, zone.Sign);
+                    zone.Sign = null;
                 }
+                return;
+            }
 
             string nextToken;
             while( (nextToken = cmd.Next()) != null ) {

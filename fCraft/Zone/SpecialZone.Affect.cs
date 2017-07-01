@@ -34,7 +34,7 @@ namespace fCraft {
             if (TextCooldown(p)) return;
             
             if (zone.Sign == null) {
-                string path = "./Signs/" + p.World.Name + "/" + zone.Name + ".txt";
+                string path = SignPath(p, zone);
                 if (File.Exists(path)) {
                     p.SignLines = File.ReadAllLines(path);
                     p.Message(String.Join("&N", p.SignLines));
@@ -55,7 +55,7 @@ namespace fCraft {
             if (p.IsCommandBlockRunning || TextCooldown(p)) return;
             
             if (zone.Sign == null) {
-                string path = "./Signs/" + p.World.Name + "/" + zone.Name + ".txt";
+                string path = SignPath(p, zone);
                 if (File.Exists(path)) {
                     p.SignLines = File.ReadAllLines(path);
                     
