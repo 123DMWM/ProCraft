@@ -614,79 +614,41 @@ namespace fCraft {
                 case "hasrtr":
                     bool rtr;
                     bool.TryParse(valName, out rtr);
-                    if (SetPlayerInfoField(player, "HasRTR", info, info.HasRTR.ToString(), rtr.ToString()))
-                    {
+                    if (SetPlayerInfoField(player, "HasRTR", info, info.HasRTR.ToString(), rtr.ToString())) {
                         info.HasRTR = rtr;
                         break;
-                    }
-                    else
-                    {
+                    } else {
                         return;
                     }
 
                 case "displayedname":
                 case "dn":
                 case "nick":
-                    string oldDisplayedName = info.DisplayedName;
-                    if( valName.Length == 0 ) valName = null;
-                    if( valName == info.DisplayedName ) {
-                        if( valName == null ) {
-                            player.Message( "SetInfo: DisplayedName for {0} is not set.",
-                                            info.Name );
-                        } else {
-                            player.Message( "SetInfo: DisplayedName for {0} is already set to \"{1}&S\"",
-                                            info.Name,
-                                            valName );
-                        }
+                    if (valName.Length == 0) valName = null;
+                    if (SetPlayerInfoField(player, "DisplayedName", info, info.DisplayedName, valName)) {
+                        info.DisplayedName = valName;
+                        break;
+                    } else {
                         return;
                     }
-                    info.DisplayedName = valName;
-
-                    if( oldDisplayedName == null ) {
-                        player.Message( "SetInfo: DisplayedName for {0} set to \"{1}&S\"",
-                                        info.Name,
-                                        valName );
-                    } else if( valName == null ) {
-                        player.Message( "SetInfo: DisplayedName for {0} was reset (was \"{1}&S\")",
-                                        info.Name,
-                                        oldDisplayedName );
-                    } else {
-                        player.Message( "SetInfo: DisplayedName for {0} changed from \"{1}&S\" to \"{2}&S\"",
-                                        info.Name,
-                                        oldDisplayedName,
-                                        valName );
-                    }
-                    break;
+                    
                 case "ip":
                 case "ipaddress":
                 case "lastip":
-                    IPAddress oldIP = info.LastIP;
-                    if( valName.Length == 0 ) valName = IPAddress.None.ToString(); 
-                    if( valName == info.LastIP.ToString() ) {
-                        if( valName == null ) {
-                            player.Message( "SetInfo: LastIP for {0} is not set.",
-                                            info.Name );
-                        } else {
-                            player.Message( "SetInfo: LastIP for {0} is already set to \"{1}&S\"",
-                                            info.Name,
-                                            info.LastIP.ToString() );
-                        }
+                    if (valName.Length == 0) valName = IPAddress.None.ToString(); 
+                    IPAddress ip;
+                    if (!IPAddress.TryParse(valName, out ip)) {
+                        player.Message("SetInfo: Could not parse value given for LastIP.");
                         return;
                     }
-                    if (IPAddress.TryParse(valName, out info.LastIP)) {
-                        info.LastIP = IPAddress.Parse(valName);
-                    }
-                    if( oldIP == null ) {
-                        player.Message( "SetInfo: LastIP for {0} set to \"{1}&S\"",
-                                        info.Name, valName );
-                    } else if( valName == null ) {
-                        player.Message( "SetInfo: LastIP for {0} was reset (was \"{1}&S\")",
-                                        info.Name, oldIP.ToString() );
+                    
+                    string oldIP = info.LastIP == null ? null : info.LastIP.ToString();
+                    if (SetPlayerInfoField( player, "LastIP", info, oldIP, valName)) {
+                        info.LastIP = ip;
+                        break;
                     } else {
-                        player.Message( "SetInfo: LastIP for {0} changed from \"{1}&S\" to \"{2}&S\"",
-                                        info.Name, oldIP.ToString(), valName );
+                        return;
                     }
-                    break;
                 default:
                     player.Message( "Only the following properties are editable: " +
                                     "TimesKicked, PreviousRank, TotalTime, RankChangeType, " +
