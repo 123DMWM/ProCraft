@@ -714,7 +714,7 @@ namespace fCraft {
                 Int32.TryParse(fields[59], out info.DemoCount);
             }
 
-            if (count > 60) info.Model = fields[60];
+            if (count > 60) info.Model = PlayerDB.Unescape(fields[60]);
 
             if (count > 61)
             {
@@ -743,36 +743,26 @@ namespace fCraft {
                 short.TryParse(fields[68], out info.JumpHeight);
             }
 
-            if (count > 69)
-                info.GeoIP = fields[69];
-            if (count > 70)
-                info.CountryCode = fields[70];
-            if (count > 71)
-                info.CountryName = fields[71];
+            if (count > 69) info.GeoIP = fields[69];
+            if (count > 70) info.CountryCode = fields[70];
+            if (count > 71) info.CountryName = fields[71];
             //if (count > 72) info.RegionCode = fields[72];
             //if (count > 73) info.RegionName = fields[73];
             //if (count > 74) info.City = fields[74];
             //if (count > 75) info.ZipCode = fields[75];
-            if (count > 76)
-                info.Latitude = fields[76];
-            if (count > 77)
-                info.Longitude = fields[77];
+            if (count > 76) info.Latitude = fields[76];
+            if (count > 77) info.Longitude = fields[77];
             //if (count > 78) info.MetroCode = fields[78];
             //if (count > 79) info.AreaCode = fields[79];
-            if (count > 80)
-                info.TimeZone = fields[80];
+            if (count > 80) info.TimeZone = fields[80];
 
-            if (count > 81)
-                info.skinName = fields[81];
+            if (count > 81) info.skinName = PlayerDB.Unescape(fields[81]);
 
-            if (count > 82)
-                info.Subdivision = PlayerDB.Unescape(fields[82]).Split();
-            if (count > 83)
-                byte.TryParse(fields[83], out info.Accuracy);
-            if (count > 84)
-                info.Hostname = fields[84];
-            if (count > 85)
-                info.Continent = fields[85];
+            if (count > 82) info.Subdivision = PlayerDB.Unescape(fields[82]).Split();
+            if (count > 83) byte.TryParse(fields[83], out info.Accuracy);
+            if (count > 84) info.Hostname = fields[84];
+            if (count > 85) info.Continent = fields[85];
+            
             if (count > 86) {
                 if (!bool.TryParse(fields[86], out info.ClassicubeVerified))
                     info.ClassicubeVerified = true;
@@ -1229,7 +1219,7 @@ namespace fCraft {
             sb.Append(DemoCount); // 59
             sb.Append(',');
 
-            sb.Append(Model); // 60
+            sb.AppendEscaped(Model); // 60
             sb.Append(',');
 
             sb.Append(ReachDistance); // 61
@@ -1283,7 +1273,7 @@ namespace fCraft {
             sb.Append(TimeZone); // 80
 
             sb.Append(',');
-            sb.Append(skinName); // 81
+            sb.AppendEscaped(skinName); // 81
 
 
             sb.Append(',');
