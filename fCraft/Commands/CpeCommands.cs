@@ -2151,16 +2151,19 @@ namespace fCraft {
                 case "jump":
                 case "height":
                 case "jh":
-                    short height;
+                    float height;
                     string third = cmd.Next();
-                    if (short.TryParse(third, out height)) {
-                        player.Message("Hacks for {0}", target.ClassyName);
-                        player.Message("    JumpHeight: &a{0} &S--> &a{1}", target.JumpHeight, height);
-                        target.JumpHeight = height;
-                        hackStr = "jumpheight";
-                    } else {
-                        player.Message("Error: Could not parse \"&a{0}&S\" as a short. Try something between &a0&S and &a32767", third);
+                    if (!float.TryParse(third, out height)) {
+                        player.Message("Error: Could not parse \"&a{0}&S\" as a decimal.", third);
                         return;
+                    } else if (height < 0 || height > short.MaxValue / 32.0f) {
+                        player.Message("Error: Jump height must be between &a0&S and &a1023.", third);
+                        return;
+                    } else {
+                        player.Message("Hacks for {0}", target.ClassyName);
+                        player.Message("    JumpHeight: &a{0} &S--> &a{1}", target.JumpHeight / 32.0f, height);
+                        target.JumpHeight = (short)(height * 32);
+                        hackStr = "jumpheight";
                     }
                     break;
                 default:
