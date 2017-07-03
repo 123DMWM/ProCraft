@@ -367,49 +367,50 @@ namespace fCraft
                     } else {
                         return;
                     }
-                }
-                
-                string processedMessage = ProcessMessageFromIRC(rawMessage);
-                if (processedMessage.Length == 0) return;
-                bool elapsed = DateTime.UtcNow.Subtract(IRCHandlers.lastUrlExpand).TotalSeconds > 5;
+                }                
+                string text = ProcessMessageFromIRC(rawMessage);
+                if (text.Length == 0) return;
+
                 if (ConfigKey.IRCBotForwardFromIRC.Enabled()) {
                     if (msg.Type == IRCMessageType.ChannelAction) {
-                        if (elapsed) {
-                            Scheduler.NewTask(t => Chat.getUrls(processedMessage)).RunOnce();
-                            IRCHandlers.lastUrlExpand = DateTime.UtcNow;
-                        }
-                        foreach (Player player in Server.Players) {
-                            if (player.Info.ReadIRC) {
-                                player.Message("&I(IRC) * {0} {1}", msg.Nick, processedMessage);
-                            }
+                        TryExpandUrls(text);
+                        
+                        foreach (Player player in Server.Players.Where(pl => pl.Info.ReadIRC)) {
+                            player.Message("&I(IRC) * {0} {1}", msg.Nick, text);
                         }
                         Logger.Log(LogType.IrcChat, "{0}: * {1} {2}", msg.Channel, msg.Nick,
                                    IRCColorsAndNonStandardCharsExceptEmotes.Replace(rawMessage, ""));
                     } else if (IRCHandlers.HandleCommand(ActualBotNick, msg.Nick, rawMessage)) {
                     } else if (IRCHandlers.HandlePM(ActualBotNick, msg.Nick, rawMessage)) {
                     } else {
-                        if (elapsed) {
-                            Scheduler.NewTask(t => Chat.getUrls(processedMessage)).RunOnce();
-                            IRCHandlers.lastUrlExpand = DateTime.UtcNow;
-                        }
-                        foreach (Player player in Server.Players.Where(player => player.Info.ReadIRC)) {
-                            player.Message("&I(IRC) {0}{1}: {2}", msg.Nick, Color.White,
-                                           processedMessage);
+                        TryExpandUrls(text);
+                        string discordBotNick = ConfigKey.DiscordBotNick.GetString();
+                        string prefix = msg.Nick == discordBotNick ? "(Discord)" : "(IRC) " + msg.Nick;
+                
+                        foreach (Player player in Server.Players.Where(pl => pl.Info.ReadIRC)) {
+                            player.Message("&I{0}{1}: {2}", prefix, Color.White, text);
                         }
                     }
                     Logger.Log(LogType.IrcChat, "{0}: {1}: {2}", msg.Channel, msg.Nick,
                                IRCColorsAndNonStandardCharsExceptEmotes.Replace(rawMessage, ""));
                 } else if (msg.Message.StartsWith("#")) {
-                    if (elapsed) {
-                        Scheduler.NewTask(t => Chat.getUrls(processedMessage)).RunOnce();
-                        IRCHandlers.lastIrcCommand = DateTime.UtcNow;
-                    }
-                    foreach (Player player in Server.Players.Where(player => player.Info.ReadIRC)) {
-                        player.Message("&I(IRC) {0}{1}: {2}", msg.Nick, Color.White,
-                                       processedMessage.Substring(1));
+                    TryExpandUrls(text);
+                    string discordBotNick = ConfigKey.DiscordBotNick.GetString();
+                    string prefix = msg.Nick == discordBotNick ? "(Discord)" : "(IRC) " + msg.Nick;
+                    
+                    foreach (Player player in Server.Players.Where(pl => pl.Info.ReadIRC)) {
+                        player.Message("&I{0}{1}: {2}", prefix, Color.White, text.Substring(1));
                     }
                     Logger.Log(LogType.IrcChat, "{0}: {1}: {2}", msg.Channel, msg.Nick,
                                IRCColorsAndNonStandardCharsExceptEmotes.Replace(rawMessage, ""));
+                }
+            }
+            
+            void TryExpandUrls(string msg) {
+                bool elapsed = DateTime.UtcNow.Subtract(IRCHandlers.lastUrlExpand).TotalSeconds > 5;
+                if (elapsed) {
+                    Scheduler.NewTask(t => Chat.getUrls(msg)).RunOnce();
+                    IRCHandlers.lastUrlExpand = DateTime.UtcNow;
                 }
             }
             

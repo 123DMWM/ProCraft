@@ -446,7 +446,12 @@ It is recommended to leave this at 1 unless you are having specific issues
 with IRC bots falling behind on messages.",
             MinValue = 1, MaxValue=3 )]
         IRCThreads,
-
+        
+        [StringKey( ConfigSection.IRC, "",
+@"Optional, nick of account that is used to relay chat to Discord.
+In-game, messages sent by this account will show as (Discord) instead of (IRC).",
+            MinLength = 0, MaxLength = 32 )]
+        DiscordBotNick,
         #endregion
 
 
