@@ -1347,24 +1347,28 @@ namespace fCraft {
         };
 
         static void UpdatesHandler(Player player, CommandReader cmd) {
-            DateTime latest = DateTime.UtcNow, current = DateTime.UtcNow;
-            current = File.GetLastWriteTime(Process.GetCurrentProcess().MainModule.FileName);
-            TimeSpan zipTime = TimeSpan.Zero, currentTime = (DateTime.Now - current);
+            DateTime latest = DateTime.UtcNow;
+            DateTime current = File.GetLastWriteTimeUtc(Process.GetCurrentProcess().MainModule.FileName);
+
             try {
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://123DMWM.tk/ProCraft/Builds/Latest.zip?");
+                Uri uri = new Uri("https://123DMWM.tk/ProCraft/Builds/Latest.zip?");
+                HttpWebRequest request = HttpUtil.CreateRequest(uri, TimeSpan.FromSeconds(10));
                 request.Method = "HEAD";
 
                 using (var resp = (HttpWebResponse)request.GetResponse()) {
-                    latest = resp.LastModified;
+                    latest = resp.LastModified.ToUniversalTime();
                 }
-                zipTime = (DateTime.Now - latest);
-                player.Message("ProCraft.zip last update (&7" + zipTime.ToMiniString() + " &Sago):");
+                
+                TimeSpan zipDelta = DateTime.UtcNow - latest;
+                player.Message("ProCraft.zip last update (&7" + zipDelta.ToMiniString() + " &Sago):");
                 player.Message("    &7" + latest.ToLongDateString() + " &Sat &7" + latest.ToLongTimeString());
             } catch (Exception ex) {
                 Logger.Log(LogType.Error, "Updates.UpdaterHandler:" + ex);
                 player.Message("Cannot access http://123dmwm.tk/ at the moment.");
             }
-            player.Message("Server file last update (&7" + currentTime.ToMiniString() + " &Sago):");
+            
+            TimeSpan currentDelta = DateTime.UtcNow - current;
+            player.Message("Server file last update (&7" + currentDelta.ToMiniString() + " &Sago):");
             player.Message("    &7" + current.ToLongDateString() + " &Sat &7" + current.ToLongTimeString());
 
             player.Message("Download updated Zip here: &9http://123DMWM.tk/ProCraft/Builds/Latest.zip");
