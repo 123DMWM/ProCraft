@@ -23,22 +23,9 @@ namespace fCraft {
             CommandManager.RegisterCommand( CdZoneRename );
             CommandManager.RegisterCommand( CdZoneTest );
             CommandManager.RegisterCommand( cdDoor );
-            openDoors = new List<Zone>();
         }
-        static readonly TimeSpan DoorCloseTimer = TimeSpan.FromMilliseconds(1500);
         const int maxDoorBlocks = 36;  //change for max door area
-        public static List<Zone> openDoors;
 
-        struct DoorInfo {
-            public readonly Zone Zone;
-            public readonly Block[] Buffer;
-            public readonly Map WorldMap;
-            public DoorInfo(Zone zone, Block[] buffer, Map worldMap) {
-                Zone = zone;
-                Buffer = buffer;
-                WorldMap = worldMap;
-            }
-        }
         #region ZoneAdd
 
         static readonly CommandDescriptor CdZoneAdd = new CommandDescriptor {
@@ -1067,20 +1054,19 @@ namespace fCraft {
         }
 
         static void DoorTestCallback(Player player, Vector3I[] marks, object tag) {
-            bool doorPresent = false;
+            bool anyDoors = false;
             foreach (Zone zone in player.World.map.Zones) {
                 if (zone.Name.StartsWith(SpecialZone.Door) && zone.Bounds.Contains(marks[0])) {
                     player.Message("{0} created by {1} on {2}", zone.Name, zone.CreatedBy, zone.CreatedDate);
-                    doorPresent = false;
+                    anyDoors = true;
                 }
             }
-            if (doorPresent) {
-                player.Message("No zones affect this block.");
+            if (!anyDoors) {
+                player.Message("No doors affect this block.");
             }
         }
 
-        static void DoorAdd(Player player, Vector3I[] marks, object tag)
-        {
+        static void DoorAdd(Player player, Vector3I[] marks, object tag) {
             int sx = Math.Min(marks[0].X, marks[1].X);
             int ex = Math.Max(marks[0].X, marks[1].X);
             int sy = Math.Min(marks[0].Y, marks[1].Y);
@@ -1089,8 +1075,7 @@ namespace fCraft {
             int eh = Math.Max(marks[0].Z, marks[1].Z);
 
             int volume = (ex - sx + 1) * (ey - sy + 1) * (eh - sh + 1);
-            if (volume > maxDoorBlocks)
-            {
+            if (volume > maxDoorBlocks) {
                 player.Message("Doors are only allowed to be {0} blocks", maxDoorBlocks);
                 return;
             }
@@ -1104,58 +1089,6 @@ namespace fCraft {
                                                         door.Bounds.Dimensions.Z);
         }
 
-        public static readonly object openDoorsLock = new object();
-
-        public static void openDoor(Zone zone, Player player)
-        {
-
-            int sx = zone.Bounds.XMin;
-            int ex = zone.Bounds.XMax;
-            int sy = zone.Bounds.YMin;
-            int ey = zone.Bounds.YMax;
-            int sz = zone.Bounds.ZMin;
-            int ez = zone.Bounds.ZMax;
-
-            Block[] buffer = new Block[zone.Bounds.Volume];
-
-            DoorInfo info = new DoorInfo(zone, buffer, player.WorldMap);
-            int counter = 0;
-            for (int x = sx; x <= ex; x++)
-            {
-                for (int y = sy; y <= ey; y++)
-                {
-                    for (int z = sz; z <= ez; z++)
-                    {
-                        buffer[counter] = player.WorldMap.GetBlock(x, y, z);
-                        info.WorldMap.QueueUpdate(new BlockUpdate(null, new Vector3I(x, y, z), Block.Air));
-                        counter++;
-                    }
-                }
-            }
-
-            //reclose door
-            Scheduler.NewTask(doorTimer_Elapsed).RunOnce(info, DoorCloseTimer);
-
-        }
-
-        static void doorTimer_Elapsed(SchedulerTask task)
-        {
-            DoorInfo info = (DoorInfo)task.UserState;
-            int counter = 0;
-            for (int x = info.Zone.Bounds.XMin; x <= info.Zone.Bounds.XMax; x++)
-            {
-                for (int y = info.Zone.Bounds.YMin; y <= info.Zone.Bounds.YMax; y++)
-                {
-                    for (int z = info.Zone.Bounds.ZMin; z <= info.Zone.Bounds.ZMax; z++)
-                    {
-                        info.WorldMap.QueueUpdate(new BlockUpdate(null, new Vector3I(x, y, z), info.Buffer[counter]));
-                        counter++;
-                    }
-                }
-            }
-
-            lock (openDoorsLock) { openDoors.Remove(info.Zone); }
-        }
         #endregion
     }
 }

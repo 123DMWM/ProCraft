@@ -1,10 +1,27 @@
 ﻿//  ProCraft Copyright 2014-2016 Joseph Beauvais <123DMWM@gmail.com>
 using System;
+using System.Collections.Generic;
 using System.IO;
 using JetBrains.Annotations;
 
 namespace fCraft {
     public static partial class SpecialZone {
+        
+        static readonly object openDoorsLock = new object();
+        static readonly TimeSpan DoorCloseTimer = TimeSpan.FromMilliseconds(1500);
+        static List<Zone> openDoors = new List<Zone>();
+
+        struct DoorInfo {
+            public readonly Zone Zone;
+            public readonly Block[] Buffer;
+            public readonly Map WorldMap;
+            public DoorInfo(Zone zone, Block[] buffer, Map worldMap) {
+                Zone = zone;
+                Buffer = buffer;
+                WorldMap = worldMap;
+            }
+        }
+        
         
         internal static bool CheckAffectZone(Player p, Zone zone, Vector3I coord) {
             if (zone.Name.CaselessStarts(Door)) {
@@ -21,13 +38,47 @@ namespace fCraft {
         }
         
         static void HandleDoor(Player p, Zone zone) {
-            lock (ZoneCommands.openDoorsLock) {
-                if (!ZoneCommands.openDoors.Contains(zone)) {
-                    ZoneCommands.openDoor(zone, p);
-                    ZoneCommands.openDoors.Add(zone);
+            lock (openDoorsLock) {
+                if (!openDoors.Contains(zone)) {
+                    OpenDoor(zone, p);
+                    openDoors.Add(zone);
                 }
             }
         }
+
+        static void OpenDoor(Zone zone, Player player) {
+            Block[] buffer = new Block[zone.Bounds.Volume];
+            DoorInfo info = new DoorInfo(zone, buffer, player.WorldMap);
+            int i = 0;
+            
+            for (int x = info.Zone.Bounds.XMin; x <= info.Zone.Bounds.XMax; x++)
+                for (int y = info.Zone.Bounds.YMin; y <= info.Zone.Bounds.YMax; y++)
+                    for (int z = info.Zone.Bounds.ZMin; z <= info.Zone.Bounds.ZMax; z++)
+            {
+                buffer[i] = player.WorldMap.GetBlock(x, y, z);
+                info.WorldMap.QueueUpdate(new BlockUpdate(null, new Vector3I(x, y, z), Block.Air));
+                i++;
+            }
+
+            // reclose door
+            Scheduler.NewTask(DoorTimerElapsed).RunOnce(info, DoorCloseTimer);
+        }
+
+        static void DoorTimerElapsed(SchedulerTask task) {
+            DoorInfo info = (DoorInfo)task.UserState;
+            int i = 0;
+            
+            for (int x = info.Zone.Bounds.XMin; x <= info.Zone.Bounds.XMax; x++)
+                for (int y = info.Zone.Bounds.YMin; y <= info.Zone.Bounds.YMax; y++)
+                    for (int z = info.Zone.Bounds.ZMin; z <= info.Zone.Bounds.ZMax; z++)
+            {
+                info.WorldMap.QueueUpdate(new BlockUpdate(null, new Vector3I(x, y, z), info.Buffer[i]));
+                i++;
+            }
+
+            lock (openDoorsLock) { openDoors.Remove(info.Zone); }
+        }
+        
         
         static void HandleSign(Player p, Zone zone) {
             p.LastSignClicked = zone.Name;
