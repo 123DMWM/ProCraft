@@ -232,46 +232,36 @@ namespace fCraft
                 player.Message("Unknown command \"{0}\". See &H/Commands", cmd.Name);
                 return false;
             }
-
             if (!descriptor.IsConsoleSafe && fromConsole)
             {
                 player.Message("You cannot use this command from console.");
+                return false;
             }
-            else
+            
+            if (descriptor.Permissions != null)
             {
+                if (!descriptor.CanBeCalledBy(player.Info.Rank))
+                {
+                    player.MessageNoAccess(descriptor);
+                    return false;
+                }
+                
                 if (descriptor.MinRank != RankManager.LowestRank && !player.Info.ClassicubeVerified) {
                     player.Message("As you had an older minecraft.net account, you must have an admin verify your " +
                                    "new classicube.net account actually is you with /verify before you can use non-guest commands.");
                     return false;
                 }
-                if (descriptor.Permissions != null)
-                {
-                    if (!descriptor.CanBeCalledBy(player.Info.Rank))
-                    {
-                        player.MessageNoAccess(descriptor);
-                    }
-                    else if (!descriptor.Call(player, cmd, true))
-                    {
-                        player.Message("Command was cancelled.");
-                    }
-                    else
-                    {
-                        return true;
-                    }
-                }
-                else
-                {
-                    if (descriptor.Call(player, cmd, true))
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        player.Message("Command was cancelled.");
-                    }
-                }
             }
-            return false;
+            
+            if (descriptor.Call(player, cmd, true))
+            {
+                return true;
+            }
+            else
+            {
+                player.Message("Command was cancelled.");
+                return false;
+            }
         }
 
 
