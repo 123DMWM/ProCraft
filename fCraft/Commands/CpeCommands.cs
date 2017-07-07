@@ -164,7 +164,7 @@ namespace fCraft {
                         player.Message("No more free ids left! Remove an entity first.");
                     } else {
                         entity = Entity.Create(entityName, skinString1, requestedModel, player.World, player.Position, newEntityId);
-                        player.Message("Successfully created entity {0}&S with id:{1} and skin {2}.", entity.Name, entity.ID, entity.Skin, entity.Name);                        
+                        player.Message("Successfully created entity {0}&S with id:{1} and skin {2}.", entity.Name, entity.ID, entity.Skin, entity.Name);
                     }
                     break;
                 case "remove":

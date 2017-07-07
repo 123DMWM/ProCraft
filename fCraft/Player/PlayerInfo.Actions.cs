@@ -896,16 +896,13 @@ namespace fCraft {
                 if( target != null ) target.IsDeaf = false;
 
                 // Log and announce
-                Logger.Log( LogType.UserActivity,
-                            "{0} froze {1}",
-                            player.Name, Name );
+                Logger.Log( LogType.UserActivity, "{0} froze {1}", player.Name, Name );
                 if( announce ) {
-                    if (target != null)
-                    {
+                    if (target != null) {
                         target.Message( "&WYou were &bfrozen&W by {0}", player.ClassyName );
                     }
-                    Server.Message( target, "{0}&S successfully &bfroze&S: {1}",
-                                            player.ClassyName, ClassyName );
+                    Server.Message( target, "{0}&S was frozen by {1}",
+                                            ClassyName, player.ClassyName );
                 }
 
                 // Raise PlayerInfo.FreezeChanged event
@@ -954,9 +951,7 @@ namespace fCraft {
                 Unfreeze();
 
                 // Log and announce unfreeze
-                Logger.Log( LogType.UserActivity,
-                            "{0} unfroze {1}",
-                            player.Name, Name );
+                Logger.Log( LogType.UserActivity, "{0} unfroze {1}", player.Name, Name );
                 if( announce ) {
                     Player target = PlayerObject;
                     if( target != null ) {
