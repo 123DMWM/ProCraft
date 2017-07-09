@@ -68,6 +68,19 @@ namespace fCraft {
                 }
             }
             return req;
+        }        
+        
+        public static WebClient CreateWebClient(TimeSpan timeout) { 
+            return new CustomWebClient(timeout);
+        }
+        
+        class CustomWebClient : WebClient {
+            readonly TimeSpan timeout;
+            public CustomWebClient(TimeSpan timeout) { this.timeout = timeout; }
+            
+            protected override WebRequest GetWebRequest(Uri address) {
+                return CreateRequest(address, timeout);
+            }
         }
     }
 }

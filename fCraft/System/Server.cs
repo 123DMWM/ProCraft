@@ -481,13 +481,18 @@ namespace fCraft {
             if (File.Exists(file)) return;
             
             try {
-                new WebClient().DownloadFile(url, file);
-            } catch (WebException ex) {
-                WebResponse resp = ex.Response;
-                if (resp != null) resp.Close();
+                TimeSpan timeout = TimeSpan.FromSeconds(20);
+                using (WebClient c = HttpUtil.CreateWebClient(timeout)) {
+                    c.DownloadFile(url, file);
+                }
+            } catch (Exception ex) {
+                WebException webEx = ex as WebException;
+                if (webEx != null) {
+                    WebResponse resp = webEx.Response;
+                    if (resp != null) resp.Close();
+                }
                 
-                Logger.Log(LogType.Warning, "Error downloading resource {0}: {1}",
-                           file, ex);
+                Logger.Log(LogType.Warning, "Error downloading resource {0}: {1}", file, ex);
             }
         }
 
