@@ -21,7 +21,7 @@ namespace fCraft {
             string cmd = rawMessage.ToLower();
             bool elapsed = DateTime.UtcNow.Subtract(lastIrcCommand).TotalSeconds > 5;
 
-            if (cmd.StartsWith(".players") || cmd.StartsWith(".who")) {
+            if (cmd.StartsWith(".who")) {
                 if (!elapsed) return true;
                 HandlePlayers(userNick, null);
                 lastIrcCommand = DateTime.UtcNow;
@@ -30,7 +30,7 @@ namespace fCraft {
             
             foreach (var kvp in commands) {
                 string cmdName = kvp.Key;
-                if (cmd.StartsWith("!" + cmdName) || cmd.StartsWith(nick + " " + kvp.Key)) {
+                if (cmd.StartsWith("!" + cmdName) || cmd.StartsWith("." + cmdName) || cmd.StartsWith(nick + " " + kvp.Key)) {
                     if (!elapsed) return true;
                     
                     int start = cmd[0] == '!' ? 0 : nick.Length;
