@@ -1724,91 +1724,48 @@ namespace fCraft {
             Aliases = new[] { "caps" },
             Permissions = new[] { Permission.Chat },
             Category = CommandCategory.New | CommandCategory.Moderation | CommandCategory.Chat,
+            IsConsoleSafe = true,
             Help = "Changes/Displays the max amount of uppercase letters a rank can use in a message.",
             Usage = "/MaxCaps <Rank> <Amount>",
             Handler = MaxCapsHandler
         };
 
-        static void MaxCapsHandler(Player player, CommandReader cmd)
-        {
-            string rname = cmd.Next();
-            string rmax = cmd.Next();
-            Rank prank = player.Info.Rank;
-            if (player.Info.Rank.Can(Permission.ShutdownServer))
-            {
-                if (rname == null)
-                {
-                    if (prank.MaxCaps != 0 && prank.MaxCaps != 1)
-                    {
-                        player.Message("Rank ({0}&S) has a max of {1} uppercase letters/message.", prank.ClassyName, prank.MaxCaps);
-                        return;
-                    }
-                    else if (prank.MaxCaps == 0)
-                    {
-                        player.Message("Rank ({0}&S) has no max.", prank.ClassyName);
-                        return;
-                    }
-                    else if (prank.MaxCaps == 1)
-                    {
-                        player.Message("Rank ({0}&S) has a max of (RawMessage.Length / 2) uppercase letters/message.", prank.ClassyName);
-                        return;
-                    }
-                }
-                Rank rank = RankManager.FindRank(rname);
-                if (rank == null)
-                {
-                    player.MessageNoRank(rname);
-                    return;
-                }
-                if (rmax == null)
-                {
-                    if (rank.MaxCaps != 0 && rank.MaxCaps != 1)
-                    {
-                        player.Message("Rank ({0}&S) has a max of {1} uppercase letters/message.", rank.ClassyName, rank.MaxCaps);
-                        return;
-                    }
-                    else if (rank.MaxCaps == 0)
-                    {
-                        player.Message("Rank ({0}&S) has no max.", rank.ClassyName);
-                        return;
-                    }
-                    else if (rank.MaxCaps == 1)
-                    {
-                        player.Message("Rank ({0}&S) has a max of (RawMessage.Length / 2) uppercase letters/message.", rank.ClassyName);
-                        return;
-                    }
-                }
-                int mcaps;
-                if (!int.TryParse(rmax, out mcaps))
-                {
-                    CdMaxCaps.PrintUsage(player);
-                    return;
-                }
-                if (rank != null)
-                {
-                    rank.MaxCaps = mcaps;
-                    player.Message("Set MaxCaps for rank ({0}&S) to {1} uppercase letters/message.", rank.ClassyName, rank.MaxCaps);
-                    return;
-                }
-            }
-            else
-            {
-                if (prank.MaxCaps != 0 && prank.MaxCaps != 1)
-                {
-                    player.Message("Rank ({0}&S) has a max of {1} uppercase letters/message.", prank.ClassyName, prank.MaxCaps);
-                    return;
-                }
-                else if (prank.MaxCaps == 0)
-                {
-                    player.Message("Rank ({0}&S) has no max.", prank.ClassyName);
-                    return;
-                }
-                else if (prank.MaxCaps == 1)
-                {
-                    player.Message("Rank ({0}&S) has a max of (RawMessage.Length / 2) uppercase letters/message.", prank.ClassyName);
-                    return;
-                }
+        static void MaxCapsHandler(Player player, CommandReader cmd)  {
+            string rankName = cmd.Next();
+            if (!player.Info.Rank.Can(Permission.ShutdownServer) || rankName == null) {
+                PrintRankMaxCaps(player, player.Info.Rank);
                 return;
+            }
+            
+            Rank rank = RankManager.FindRank(rankName);
+            if (rank == null) {
+                player.MessageNoRank(rankName);
+                return;
+            }
+            
+            if (!cmd.HasNext) {
+                PrintRankMaxCaps(player, rank);
+                return;
+            }
+            int maxCaps;
+            if (!cmd.NextInt(out maxCaps)) {
+                CdMaxCaps.PrintUsage(player);
+                return;
+            }
+            
+            rank.MaxCaps = maxCaps;
+            Config.Save();
+            player.Message("Set MaxCaps for rank ({0}&S) to {1} uppercase letters/message.", rank.ClassyName, rank.MaxCaps);
+            return;
+        }
+        
+        static void PrintRankMaxCaps(Player player, Rank rank) {
+            if (rank.MaxCaps == 0) {
+                player.Message("Rank ({0}&S) has no max.", rank.ClassyName);
+            } else if (rank.MaxCaps == 1) {
+                player.Message("Rank ({0}&S) has a max of (RawMessage.Length / 2) uppercase letters/message.", rank.ClassyName);
+            } else if (rank.MaxCaps != 0 && rank.MaxCaps != 1) {
+                player.Message("Rank ({0}&S) has a max of {1} uppercase letters/message.", rank.ClassyName, rank.MaxCaps);
             }
         }
 
