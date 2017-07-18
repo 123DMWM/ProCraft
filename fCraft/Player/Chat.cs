@@ -27,9 +27,6 @@ namespace fCraft {
         public static bool SendGlobal([NotNull] Player player, [NotNull] string rawMessage) {
             if (player == null) throw new ArgumentNullException("player");
             if (rawMessage == null) throw new ArgumentNullException("rawMessage");
-
-            rawMessage = Filter(rawMessage, player);
-            if (rawMessage == null) return false;
             
             var recipientList = Server.Players.NotIgnoring(player);
 
@@ -553,21 +550,20 @@ namespace fCraft {
         static bool SendInternal([NotNull] ChatSendingEventArgs e)
         {
             if (e == null) throw new ArgumentNullException("e");
+            
+            e.FormattedMessage = Filter(e.FormattedMessage, e.Player);
+            if (e.FormattedMessage == null) return false;            
             if (RaiseSendingEvent(e)) return false;
 
             Player[] players = e.RecepientList.ToArray();
             int packets = players.Message(e.FormattedMessage);
 
-            // Only increment the MessagesWritten count if someone other than
-            // the player was on the recepient list.
-            if (players.Length > 1 || (players.Length == 1 && players[0] != e.Player))
-            {
+            // Only increment MessagesWritten if someone other than the player was on the recepient list.
+            if (players.Length > 1 || (players.Length == 1 && players[0] != e.Player)) {
                 e.Player.Info.ProcessMessageWritten();
             }
 
-            if (e.MessageType != ChatMessageType.SayStaff && e.MessageType != ChatMessageType.StaffSayOwner) {
-                RaiseSentEvent(e, packets);
-            }
+            RaiseSentEvent(e, packets);
             return true;
         }
 
