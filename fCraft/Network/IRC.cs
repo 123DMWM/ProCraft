@@ -373,7 +373,7 @@ namespace fCraft
 
                 if (ConfigKey.IRCBotForwardFromIRC.Enabled()) {
                     if (msg.Type == IRCMessageType.ChannelAction) {
-                        TryExpandUrls(text);
+                        ProcessChatMessage(ref text);
                         
                         foreach (Player player in Server.Players.Where(pl => pl.Info.ReadIRC)) {
                             player.Message("&I(IRC) * {0} {1}", msg.Nick, text);
@@ -383,7 +383,7 @@ namespace fCraft
                     } else if (IRCHandlers.HandleCommand(ActualBotNick, msg.Nick, rawMessage)) {
                     } else if (IRCHandlers.HandlePM(ActualBotNick, msg.Nick, rawMessage)) {
                     } else {
-                        TryExpandUrls(text);
+                        ProcessChatMessage(ref text);
                         string discordBotNick = ConfigKey.DiscordBotNick.GetString();
                         string prefix = msg.Nick == discordBotNick ? "(Discord)" : "(IRC) " + msg.Nick;
                 
@@ -394,7 +394,7 @@ namespace fCraft
                     Logger.Log(LogType.IrcChat, "{0}: {1}: {2}", msg.Channel, msg.Nick,
                                IRCColorsAndNonStandardCharsExceptEmotes.Replace(rawMessage, ""));
                 } else if (msg.Message.StartsWith("#")) {
-                    TryExpandUrls(text);
+                    ProcessChatMessage(ref text);
                     string discordBotNick = ConfigKey.DiscordBotNick.GetString();
                     string prefix = msg.Nick == discordBotNick ? "(Discord)" : "(IRC) " + msg.Nick;
                     
@@ -406,10 +406,12 @@ namespace fCraft
                 }
             }
             
-            void TryExpandUrls(string msg) {
+            void ProcessChatMessage(ref string message) {
+                message = Chat.Filter(message, null);
                 bool elapsed = DateTime.UtcNow.Subtract(IRCHandlers.lastUrlExpand).TotalSeconds > 5;
                 if (elapsed) {
-                    Scheduler.NewTask(t => Chat.getUrls(msg)).RunOnce();
+                    string chatMsg = message; // cannot use message because it is ref
+                    Scheduler.NewTask(t => Chat.getUrls(chatMsg)).RunOnce();
                     IRCHandlers.lastUrlExpand = DateTime.UtcNow;
                 }
             }
@@ -937,7 +939,7 @@ namespace fCraft
                 // strips minecraft colors and newlines
                 message = Color.StripColors(message, false);
             }
-
+            
             message = Chat.UnescapeBackslashes(message);
             return message.Trim();
         }

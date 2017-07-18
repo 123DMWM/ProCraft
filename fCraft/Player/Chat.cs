@@ -28,50 +28,9 @@ namespace fCraft {
             if (player == null) throw new ArgumentNullException("player");
             if (rawMessage == null) throw new ArgumentNullException("rawMessage");
 
-            if (!player.IsStaff) {
-                if (player.LastMessage == new string(rawMessage.ToLower().Where(c => !char.IsWhiteSpace(c)).ToArray())) {
-                    if (player.MessageSpam >= 2) {
-                        player.Message("Please refrain from repeating yourself!");
-                        return false;
-                    }
-                    player.MessageSpam++;
-                } else {
-                    player.LastMessage = new string(rawMessage.ToLower().Where(c => !char.IsWhiteSpace(c)).ToArray());
-                    player.MessageSpam = 0;
-                }
-            }
-
-            foreach (ChatFilter Swear in ChatFilter.Filters) {
-                if (rawMessage.CaselessContains(Swear.Word)) {
-                    rawMessage = rawMessage.ReplaceString(Swear.Word, Swear.Replacement, StringComparison.InvariantCultureIgnoreCase);
-                }
-            }
-            if (!player.IsStaff) {
-                rawMessage = RegexIPMatcher.Replace(rawMessage, "<Redacted IP>");
-            }
-            if (rawMessage.Length >= 10 && player.Info.Rank.MaxCaps > 0) {
-                int caps = 0;
-                for (int i = 0; i < rawMessage.Length; i++) {
-                    if (char.IsUpper(rawMessage[i])) {
-                        caps++;
-                    }
-                }
-                if (player.Info.Rank.MaxCaps == 1) {
-                    if (caps > (rawMessage.Length / 2)) {
-                        rawMessage = rawMessage.ToLower().UppercaseFirst();
-                        player.Message("Max uppercase letters reached. Message set to lowercase");
-                    }
-                } else if (caps > player.Info.Rank.MaxCaps) {
-                    rawMessage = rawMessage.ToLower().UppercaseFirst();
-                    player.Message("Max uppercase letters reached. Message set to lowercase");
-                }
-            }
-            if (player.ChatRainbows) {
-                rawMessage = Colorize(rawMessage, RainbowChars);
-            } else if (player.ChatBWRainbows) {
-                rawMessage = Colorize(rawMessage, BWRainbowChars);
-            }
-
+            rawMessage = Filter(rawMessage, player);
+            if (rawMessage == null) return false;
+            
             var recipientList = Server.Players.NotIgnoring(player);
 
             string formattedMessage = string.Format("{0}&F: {1}",
@@ -95,6 +54,57 @@ namespace fCraft {
             Logger.Log(LogType.GlobalChat,
                         "(global){0}: {1}", player.Info.Rank.Color + player.Name + Color.White, rawMessage);
             return true;
+        }
+        
+        public static string Filter(string rawMessage, Player player) {
+            if (player != null && !player.IsStaff) {
+                if (player.LastMessage == new string(rawMessage.ToLower().Where(c => !char.IsWhiteSpace(c)).ToArray())) {
+                    if (player.MessageSpam >= 2) {
+                        player.Message("Please refrain from repeating yourself!");
+                        return null;
+                    }
+                    player.MessageSpam++;
+                } else {
+                    player.LastMessage = new string(rawMessage.ToLower().Where(c => !char.IsWhiteSpace(c)).ToArray());
+                    player.MessageSpam = 0;
+                }
+            }
+
+            foreach (ChatFilter Swear in ChatFilter.Filters) {
+                if (rawMessage.CaselessContains(Swear.Word)) {
+                    rawMessage = rawMessage.ReplaceString(Swear.Word, Swear.Replacement, StringComparison.InvariantCultureIgnoreCase);
+                }
+            }
+            if (player == null || !player.IsStaff) {
+                rawMessage = RegexIPMatcher.Replace(rawMessage, "<Redacted IP>");
+            }
+            if (player == null) return rawMessage; // Checks below only work in-game
+            
+            if (rawMessage.Length >= 10 && player.Info.Rank.MaxCaps > 0) {
+                int caps = 0;
+                for (int i = 0; i < rawMessage.Length; i++) {
+                    if (char.IsUpper(rawMessage[i])) {
+                        caps++;
+                    }
+                }
+                
+                if (player.Info.Rank.MaxCaps == 1) {
+                    if (caps > (rawMessage.Length / 2)) {
+                        rawMessage = rawMessage.ToLower().UppercaseFirst();
+                        player.Message("Max uppercase letters reached. Message set to lowercase");
+                    }
+                } else if (caps > player.Info.Rank.MaxCaps) {
+                    rawMessage = rawMessage.ToLower().UppercaseFirst();
+                    player.Message("Max uppercase letters reached. Message set to lowercase");
+                }
+            }
+
+            if (player.ChatRainbows) {
+                rawMessage = Colorize(rawMessage, RainbowChars);
+            } else if (player.ChatBWRainbows) {
+                rawMessage = Colorize(rawMessage, BWRainbowChars);
+            }
+            return rawMessage;
         }
 
         public static void getUrls(string rawMessage) {
