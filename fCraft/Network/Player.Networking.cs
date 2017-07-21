@@ -1102,18 +1102,20 @@ namespace fCraft {
             if (oldWorld != null) {
                 SendNow(Packet.MakeHandshake(this, textLine1, textLine2, HasCP437));
             }
-            // needs to be sent before the client receives the map data
-            if (Supports(CpeExt.BlockDefinitions)) {
-                if (oldWorld != null)
-                    BlockDefinition.SendNowRemoveOldBlocks(this, oldWorld);
-                BlockDefinition.SendNowBlocks(this);
-            }
+
             if (Supports(CpeExt.BlockPermissions))
                 SendBlockPermissions();
 
             writer.Write(OpCode.MapBegin);
             BytesSent++;
 
+            if (Supports(CpeExt.BlockDefinitions)) {
+                if (oldWorld != null) {
+                    BlockDefinition.SendNowRemoveOldBlocks(this, oldWorld);
+                }
+                BlockDefinition.SendNowBlocks(this);
+            }
+            
             // enable Nagle's algorithm (in case it was turned off by LowLatencyMode)
             // to avoid wasting bandwidth for map transfer
             client.NoDelay = false;
