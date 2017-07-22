@@ -869,8 +869,8 @@ namespace fCraft {
             if (fileName.CaselessStarts("pw_") && player.Info.Rank != RankManager.HighestRank) {
                 player.Message("You cannot make fake personal worlds");
                 return false;
-        	}
-        	
+            }
+            
             // saving to file
             fileName = fileName.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
             if (!fileName.CaselessEnds(".fcm")) fileName += ".fcm";
@@ -953,7 +953,7 @@ namespace fCraft {
                         "GenHM: Asked {0} to confirm replacing the map of world {1} (\"this map\").",
                         player.Name, playerWorld.Name);
                     
-                	player.Confirm(cmd, "Replace THIS MAP with a generated one (HeightMap: &9{0}&S)?", url);
+                    player.Confirm(cmd, "Replace THIS MAP with a generated one (HeightMap: &9{0}&S)?", url);
                     return;
                 }
 
@@ -3444,19 +3444,34 @@ namespace fCraft {
         }
         
         static void MWJoin(Player player, CommandReader cmd) {
-            int num = 0; ReadMWNumber(cmd, out num);
-            string name = cmd.Next();
-            PlayerInfo info = null;
-            if (name != null) {
-                info = PlayerDB.FindPlayerInfoOrPrintMatches(player, name, SearchOptions.Default);
+            PlayerInfo info = player.Info;
+            // Args are supposed to be "<map number> <player>", but handle if user provides <player> first
+            if (cmd.HasNext) {
+                string name = cmd.Next();
+                int temp = 0;
+                
+                if (!int.TryParse(name, out temp)) {
+                    info = PlayerDB.FindPlayerInfoOrPrintMatches(player, name, SearchOptions.Default);
+                    if (info == null) return;
+                } else {
+                    cmd.Rewind(); // user provided number, rewind
+                    cmd.Next(); // Skip 'join' arg
+                }
             }
-            string mapName = "PW_" + ((info == null) ? player.Name : info.Name) + "_" + num;
-            string map = WorldManager.FindMapFile(Player.Console, mapName);
             
+            int num = 0; ReadMWNumber(cmd, out num);
+            if (info == player.Info && cmd.HasNext) {
+                info = PlayerDB.FindPlayerInfoOrPrintMatches(player, cmd.Next(), SearchOptions.Default);
+                if (info == null) return;
+            }
+            
+            string mapName = "PW_" + info.Name + "_" + num;
+            string map = WorldManager.FindMapFile(Player.Console, mapName);
             if (map == null) {
-                player.Message("{0} no personal worlds by that number: {1}", (info == null) ? "You have" : "There are", num);
+                player.Message("{0} no personal worlds by that number: {1}", (info == player.Info) ? "You have" : "There are", num);
                 return;
             }
+            
             World world = WorldManager.FindWorldExact(mapName);
             if (world != null && player.CanJoin(world)) {
                 player.JoinWorld(world, WorldChangeReason.ManualJoin);
