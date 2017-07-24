@@ -1569,7 +1569,7 @@ namespace fCraft {
         {
             string name = cmd.Next();
             PlayerInfo[] infos;
-            Rank rank = player.Info.Rank.Name;
+            Rank rank = player.Info.Rank;
             if (name != null)
             {
                 rank = RankManager.FindRank(name);
