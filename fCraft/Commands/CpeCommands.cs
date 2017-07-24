@@ -31,10 +31,6 @@ namespace fCraft {
             CommandManager.RegisterCommand(CdEntityRot);
         }
 
-        internal static string[] validEntities = { "chibi", "chicken", "creeper", "giant", "humanoid",
-            "human", "pig", "sheep", "skeleton", "spider", "zombie"
-        };
-
         /// <summary> Ensures that the hex color has the correct length (3 or 6 characters)
         /// and character set (alphanumeric chars allowed). </summary>
         public static bool IsValidHex(string hex) {
