@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle( "ProCraft ServerCLI" )]
-[assembly: AssemblyDescription( "Command-line frontend for fCraft server" )]
+[assembly: AssemblyDescription( "Command-line frontend for ProCraft server" )]
 [assembly: AssemblyConfiguration( "" )]
 [assembly: AssemblyCompany("123DMWM.tk")]
 [assembly: AssemblyProduct( "ProCraft ServerCLI" )]

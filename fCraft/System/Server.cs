@@ -1051,7 +1051,7 @@ namespace fCraft {
             string backupFileName = String.Format( Paths.DataBackupFileNameFormat, DateTime.Now ); // localized
             backupFileName = Path.Combine( Paths.DataBackupDirectory, backupFileName );
             using( FileStream fs = File.Create( backupFileName ) ) {
-                string fileComment = String.Format( "Backup of fCraft data for server \"{0}\", saved on {1}",
+                string fileComment = String.Format( "Backup of ProCraft data for server \"{0}\", saved on {1}",
                                                     ConfigKey.ServerName.GetString(),
                                                     DateTime.Now );
                 using( ZipStorer backupZip = ZipStorer.Create( fs, fileComment ) ) {

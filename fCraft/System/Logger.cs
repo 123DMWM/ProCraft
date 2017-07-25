@@ -227,7 +227,7 @@ namespace fCraft {
 
                 } else if( ex is UnauthorizedAccessException ) {
                     message = "ProCraft was blocked from accessing a file or resource. " +
-                              "Make sure that correct permissions are set for the fCraft files, folders, and processes.";
+                              "Make sure that correct permissions are set for the ProCraft files, folders, and processes.";
                     return true;
 
                 } else if( ex is OutOfMemoryException ) {
@@ -239,12 +239,12 @@ namespace fCraft {
                     return true;
 
                 } else if( ex is InvalidOperationException && ex.StackTrace.Contains( "MD5CryptoServiceProvider" ) ) {
-                    message = "Some Windows settings are preventing fCraft from doing player name verification. " +
+                    message = "Some Windows settings are preventing ProCraft from doing player name verification. " +
                               "See http://support.microsoft.com/kb/811833";
                     return true;
 
                 } else if( ex.StackTrace.Contains( "__Error.WinIOError" ) ) {
-                    message = "A filesystem-related error has occurred. Make sure that only one instance of fCraft is running, " +
+                    message = "A filesystem-related error has occurred. Make sure that only one instance of ProCraft is running, " +
                               "and that no other processes are using server's files or directories.";
                     return true;
 

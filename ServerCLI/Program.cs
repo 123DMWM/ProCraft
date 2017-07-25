@@ -74,7 +74,7 @@ namespace fCraft.ServerCLI {
                 Console.CancelKeyPress += OnCancelKeyPress;
 
                 if( Server.StartServer() ) {
-                    Console.WriteLine( "** Running fCraft version {0}. **", Updater.CurrentRelease.VersionString );
+                    Console.WriteLine( "** Running ProCraft version {0}. **", Updater.CurrentRelease.VersionString );
                     Console.WriteLine( "** Server is now ready. Type /Shutdown to exit safely. **" );
 
                     while( !Server.IsShuttingDown ) {
