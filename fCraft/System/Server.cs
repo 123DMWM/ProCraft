@@ -464,17 +464,17 @@ namespace fCraft {
             if (!Directory.Exists("./Bot")) Directory.CreateDirectory("./Bot");
             if (!Directory.Exists("./fonts")) Directory.CreateDirectory("./fonts");            
        
-            DownloadResource("http://123dmwm.tk/ProCraft/resources/Funfacts.txt", "./Bot/Funfacts.txt");
-            DownloadResource("http://123dmwm.tk/ProCraft/resources/Jokes.txt", "./Bot/Jokes.txt");
-            DownloadResource("http://123dmwm.tk/ProCraft/resources/Protips.txt", "./Bot/Protips.txt");
-            DownloadResource("http://123dmwm.tk/ProCraft/resources/Adjectives.txt", "./Bot/Adjectives.txt");
-            DownloadResource("http://123dmwm.tk/ProCraft/resources/Nouns.txt", "./Bot/Nouns.txt");
+            DownloadResource("https://123dmwm.tk/ProCraft/resources/Funfacts.txt", "./Bot/Funfacts.txt");
+            DownloadResource("https://123dmwm.tk/ProCraft/resources/Jokes.txt", "./Bot/Jokes.txt");
+            DownloadResource("https://123dmwm.tk/ProCraft/resources/Protips.txt", "./Bot/Protips.txt");
+            DownloadResource("https://123dmwm.tk/ProCraft/resources/Adjectives.txt", "./Bot/Adjectives.txt");
+            DownloadResource("https://123dmwm.tk/ProCraft/resources/Nouns.txt", "./Bot/Nouns.txt");
             
-            DownloadResource("http://123dmwm.tk/ProCraft/resources/MOTDList.txt", "./MOTDList.txt");
-            DownloadResource("http://123dmwm.tk/ProCraft/resources/comicsans.ttf", "./fonts/comicsans.ttf");
-            DownloadResource("http://123dmwm.tk/ProCraft/resources/mcclassic.ttf", "./fonts/mcclassic.ttf");
-            DownloadResource("http://123dmwm.tk/ProCraft/resources/microsoft.ttf", "./fonts/microsoft.ttf");
-            DownloadResource("http://123dmwm.tk/ProCraft/resources/minecraft.ttf", "./fonts/minecraft.ttf");
+            DownloadResource("https://123dmwm.tk/ProCraft/resources/MOTDList.txt", "./MOTDList.txt");
+            DownloadResource("https://123dmwm.tk/ProCraft/resources/comicsans.ttf", "./fonts/comicsans.ttf");
+            DownloadResource("https://123dmwm.tk/ProCraft/resources/mcclassic.ttf", "./fonts/mcclassic.ttf");
+            DownloadResource("https://123dmwm.tk/ProCraft/resources/microsoft.ttf", "./fonts/microsoft.ttf");
+            DownloadResource("https://123dmwm.tk/ProCraft/resources/minecraft.ttf", "./fonts/minecraft.ttf");
         }
         
         static void DownloadResource(string url, string file) {
@@ -485,6 +485,7 @@ namespace fCraft {
                 using (WebClient c = HttpUtil.CreateWebClient(timeout)) {
                     c.DownloadFile(url, file);
                 }
+                Logger.Log(LogType.SystemActivity, "Succesfully download resource {0} to {1}. ", url, file);
             } catch (Exception ex) {
                 WebException webEx = ex as WebException;
                 if (webEx != null) {
