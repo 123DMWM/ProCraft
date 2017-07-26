@@ -1379,10 +1379,10 @@ namespace fCraft {
         static readonly CommandDescriptor CdAutoRankCheck = new CommandDescriptor {
             Name = "AutoRankCheck",
             Aliases = new string[] { "arc" },
-            Category = CommandCategory.Maintenance | CommandCategory.Moderation,
+            Category =  CommandCategory.New | CommandCategory.Maintenance | CommandCategory.Moderation,
             IsConsoleSafe = true,
             Permissions = new[] { Permission.EditPlayerDB },
-            Help = "Allows checking whether a player has met all autorank condition(s).",
+            Help = "Checks whether a player has met all autorank condition(s).",
             Usage = "/AutoRankCheck [Player]",
             Handler = AutoRankCheckHandler
         };
