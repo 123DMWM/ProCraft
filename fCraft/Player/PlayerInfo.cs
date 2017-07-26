@@ -188,9 +188,7 @@ namespace fCraft {
         public BanStatus BanStatus;
 
         /// <summary> Returns whether player is name-banned or not. </summary>
-        public bool IsBanned {
-            get { return BanStatus == BanStatus.Banned; }
-        }
+        public bool IsBanned { get { return BanStatus == BanStatus.Banned; } }
 
         /// <summary> Date of most recent ban, UTC. May be DateTime.MinValue if player was never banned. </summary>
         public DateTime BanDate;

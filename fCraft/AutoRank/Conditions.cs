@@ -10,6 +10,12 @@ namespace fCraft.AutoRank {
     /// <summary> Base class for all AutoRank conditions. </summary>
     abstract class Condition {
         public abstract bool Eval( PlayerInfo info );
+        
+        protected string DetailsColor( PlayerInfo info ) {
+            return Eval( info ) ? Color.Green : Color.Red;
+        }
+        
+        public abstract void OutputDetails( string indent, Player player, PlayerInfo info );
 
         public static Condition Parse( XElement el ) {
             switch( el.Name.ToString() ) {
@@ -33,6 +39,9 @@ namespace fCraft.AutoRank {
         }
 
         public abstract XElement Serialize();
+        
+        protected static string[] comparisonOps = { "=", "=/=", ">", ">=", "<", "<=" };
+        protected const string IndentLevel = "   ";
     }
 
 
@@ -127,6 +136,16 @@ namespace fCraft.AutoRank {
                     throw new ArgumentOutOfRangeException();
             }
         }
+        
+        public override void OutputDetails( string indent, Player player, PlayerInfo info ) {
+            string color = DetailsColor( info );
+            if( (Comparison == ComparisonOp.Gte || Comparison == ComparisonOp.Gt) && !Eval( info ) ) {
+                color = Color.Silver;
+            }
+            
+            player.Message( indent + color + "{0} is {1} {2}",
+                           Field, comparisonOps[(int)Comparison], Value );
+        }
 
         public override XElement Serialize() {
             XElement el = new XElement( "ConditionIntRange" );
@@ -161,6 +180,11 @@ namespace fCraft.AutoRank {
         public override bool Eval( [NotNull] PlayerInfo info ) {
             if( info == null ) throw new ArgumentNullException( "info" );
             return (info.RankChangeType == Type);
+        }
+        
+        public override void OutputDetails( string indent, Player player, PlayerInfo info ) {
+            player.Message( indent + DetailsColor( info ) + "{0} {1}",
+                           "Rank change type of", Type );
         }
 
         public override XElement Serialize() {
@@ -211,6 +235,11 @@ namespace fCraft.AutoRank {
                     throw new ArgumentOutOfRangeException();
             }
         }
+        
+        public override void OutputDetails( string indent, Player player, PlayerInfo info ) {
+            player.Message( indent + DetailsColor( info ) + "Rank was previously {0} {1}",
+                           comparisonOps[(int)Comparison], Rank.ClassyName );
+        }
 
         public override XElement Serialize() {
             XElement el = new XElement( "ConditionPreviousRank" );
@@ -247,6 +276,12 @@ namespace fCraft.AutoRank {
         public override bool Eval( PlayerInfo info ) {
             throw new NotImplementedException();
         }
+        
+        public override void OutputDetails( string indent, Player player, PlayerInfo info ) {
+            foreach( Condition cond in Conditions ) {
+                cond.OutputDetails( indent + IndentLevel, player, info );
+            }
+        }
 
         public void Add( [NotNull] Condition condition ) {
             if( condition == null ) throw new ArgumentNullException( "condition" );
@@ -268,7 +303,11 @@ namespace fCraft.AutoRank {
         public override bool Eval( PlayerInfo info ) {
             return Conditions == null || Conditions.All( t => t.Eval( info ) );
         }
-
+        
+        public override void OutputDetails( string indent, Player player, PlayerInfo info ) {
+            player.Message( indent + "All the following conditions are met:" );
+            base.OutputDetails( indent, player, info );
+        }        
 
         public override XElement Serialize() {
             XElement el = new XElement( "AND" );
@@ -280,7 +319,7 @@ namespace fCraft.AutoRank {
     }
 
 
-    /// <summary> Logical AND - true if NOT ALL of the conditions are true. </summary>
+    /// <summary> Logical NAND - true if NOT ALL of the conditions are true. </summary>
     sealed class ConditionNAND : ConditionSet {
         public ConditionNAND() { }
         public ConditionNAND( IEnumerable<Condition> conditions ) : base( conditions ) { }
@@ -290,7 +329,11 @@ namespace fCraft.AutoRank {
             if( info == null ) throw new ArgumentNullException( "info" );
             return Conditions == null || Conditions.Any( t => !t.Eval( info ) );
         }
-
+        
+        public override void OutputDetails( string indent, Player player, PlayerInfo info ) {
+            player.Message( indent + "Any the following conditions are NOT met" );
+            base.OutputDetails( indent, player, info );
+        }        
 
         public override XElement Serialize() {
             XElement el = new XElement( "NAND" );
@@ -302,7 +345,7 @@ namespace fCraft.AutoRank {
     }
 
 
-    /// <summary> Logical AND - true if ANY of the conditions are true. </summary>
+    /// <summary> Logical OR - true if ANY of the conditions are true. </summary>
     sealed class ConditionOR : ConditionSet {
         public ConditionOR() { }
         public ConditionOR( IEnumerable<Condition> conditions ) : base( conditions ) { }
@@ -312,7 +355,11 @@ namespace fCraft.AutoRank {
             if( info == null ) throw new ArgumentNullException( "info" );
             return Conditions == null || Conditions.Any( t => t.Eval( info ) );
         }
-
+        
+        public override void OutputDetails( string indent, Player player, PlayerInfo info ) {
+            player.Message( indent + "Any the following conditions are met:" );
+            base.OutputDetails( indent, player, info );
+        }
 
         public override XElement Serialize() {
             XElement el = new XElement( "OR" );
@@ -324,7 +371,7 @@ namespace fCraft.AutoRank {
     }
 
 
-    /// <summary> Logical AND - true if NONE of the conditions are true. </summary>
+    /// <summary> Logical NOR - true if NONE of the conditions are true. </summary>
     sealed class ConditionNOR : ConditionSet {
         public ConditionNOR() { }
         public ConditionNOR( IEnumerable<Condition> conditions ) : base( conditions ) { }
@@ -334,7 +381,11 @@ namespace fCraft.AutoRank {
             if( info == null ) throw new ArgumentNullException( "info" );
             return Conditions == null || Conditions.All( t => !t.Eval( info ) );
         }
-
+        
+        public override void OutputDetails( string indent, Player player, PlayerInfo info ) {
+            player.Message( indent + "All the following conditions are NOT met:" );
+            base.OutputDetails( indent, player, info );
+        }
 
         public override XElement Serialize() {
             XElement el = new XElement( "NOR" );

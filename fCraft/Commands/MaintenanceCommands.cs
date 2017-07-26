@@ -25,7 +25,7 @@ namespace fCraft {
             CommandManager.RegisterCommand( CdInfoSwap );
             CommandManager.RegisterCommand(CdSave);
             CommandManager.RegisterCommand(CdCheckUpdate); 
-
+            CommandManager.RegisterCommand( CdAutoRankCheck );
         }
         #region DumpStats
 
@@ -1373,6 +1373,31 @@ namespace fCraft {
 
             player.Message("Download updated Zip here: &9http://123DMWM.tk/ProCraft/Builds/Latest.zip");
         }
+        #endregion
+        #region AutoRankCheck
+
+        static readonly CommandDescriptor CdAutoRankCheck = new CommandDescriptor {
+            Name = "AutoRankCheck",
+            Aliases = new string[] { "arc" },
+            Category = CommandCategory.Maintenance | CommandCategory.Moderation,
+            IsConsoleSafe = true,
+            Permissions = new[] { Permission.EditPlayerDB },
+            Help = "Allows checking whether a player has met all autorank condition(s).",
+            Usage = "/AutoRankCheck [Player]",
+            Handler = AutoRankCheckHandler
+        };
+
+        static void AutoRankCheckHandler( Player player, CommandReader cmd ) {
+            string name = cmd.Next();
+            PlayerInfo info = PlayerDB.FindPlayerInfoOrPrintMatches( player, name, SearchOptions.IncludeSelf );
+            if( info == null ) return;
+            
+            if( !ConfigKey.AutoRankEnabled.Enabled() ) {
+            	player.Message( "AutoRank is not enabled in config." ); return;
+            }            
+            AutoRankManager.OutputDetails( player, info );
+        }
+
         #endregion
     }
 }

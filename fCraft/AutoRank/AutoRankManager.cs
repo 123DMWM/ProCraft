@@ -16,9 +16,7 @@ namespace fCraft.AutoRank {
         public const string TagName = "fCraftAutoRankConfig";
 
         // Whether any criteria are defined.
-        static bool HasCriteria {
-            get { return Criteria.Count > 0; }
-        }
+        static bool HasCriteria { get { return Criteria.Count > 0; } }
 
 
         //  Adds a new criterion to the list. Throws an ArgumentException on duplicates.
@@ -36,16 +34,28 @@ namespace fCraft.AutoRank {
         public static Rank Check( [NotNull] PlayerInfo info ) {
             if( info == null ) throw new ArgumentNullException( "info" );
             for( int i = 0; i < Criteria.Count; i++ ) {
-                if( Criteria[i].FromRank == info.Rank &&
-                    !info.IsBanned &&
-                    Criteria[i].Condition.Eval( info ) ) {
-
+                if( Criteria[i].FromRank == info.Rank && !info.IsBanned && Criteria[i].Condition.Eval( info ) ) {
                     return Criteria[i].ToRank;
                 }
             }
             return null;
         }
+        
 
+        public static void OutputDetails( [NotNull] Player player, [NotNull] PlayerInfo info ) {
+            if( player == null ) throw new ArgumentNullException( "player" );
+            if( info == null ) throw new ArgumentNullException( "info" );
+            for( int i = 0; i < Criteria.Count; i++ ) {
+                if( Criteria[i].FromRank == info.Rank && !info.IsBanned ) {
+                    player.Message("Criteria for {0} &Sto be ranked to {1}:", 
+            		               info.ClassyName, Criteria[i].ToRank.ClassyName);
+                    Criteria[i].Condition.OutputDetails( "", player, info );
+                    return;
+                }
+            }
+            player.Message("No autorank criteria matches curent rank of {0}.", info.ClassyName);
+        }
+        
 
         internal static void TaskCallback( SchedulerTask schedulerTask ) {
             if( !ConfigKey.AutoRankEnabled.Enabled() ) return;
