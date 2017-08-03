@@ -459,7 +459,7 @@ namespace fCraft {
         /// <summary> Players longitude based on geoip</summary>
         public string Longitude;
         /// <summary> List of subdivisions (City, State, etc) sorting by accuracy from left to right. </summary>
-        public string[] Subdivision = new string[] {"NA"};
+        public string Subdivision = "NA";
         /// <summary> Players geoip accuracy</summary>
         public byte Accuracy = 0;
         /// <summary> Players hostname</summary>
@@ -756,7 +756,7 @@ namespace fCraft {
 
             if (count > 81) info.skinName = PlayerDB.Unescape(fields[81]);
 
-            if (count > 82) info.Subdivision = PlayerDB.Unescape(fields[82]).Split();
+            if (count > 82) info.Subdivision = PlayerDB.Unescape(fields[82]);
             if (count > 83) byte.TryParse(fields[83], out info.Accuracy);
             if (count > 84) info.Hostname = fields[84];
             if (count > 85) info.Continent = fields[85];
@@ -1273,12 +1273,8 @@ namespace fCraft {
             sb.Append(',');
             sb.AppendEscaped(skinName); // 81
 
-
             sb.Append(',');
-            string divs = "";
-            if (Subdivision.Length == 1) divs = Subdivision[0];
-            else if(Subdivision.Length > 1) divs = String.Join(", ", Subdivision);
-            sb.AppendEscaped(divs); // 82
+            sb.AppendEscaped(Subdivision); // 82
             sb.Append(',');
             sb.Append(Accuracy); // 83
             sb.Append(',');

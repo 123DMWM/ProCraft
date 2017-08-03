@@ -1819,7 +1819,7 @@ namespace fCraft {
             player.Message( "Geo Info about: {0}&S ({1})", info.ClassyName, info.GeoIP ?? "N/A" );
             player.Message("  Country: &f{1}&S ({0})", info.CountryCode ?? "N/A", info.CountryName ?? "N/A");
             player.Message("  Continent: &f{0}", info.Continent ?? "N/A");
-            player.Message("  Subdivisions: &f{0}", info.Subdivision.JoinToString(", "));
+            player.Message("  Subdivisions: &f{0}", info.Subdivision);
             player.Message("  Latitude: &f{0}", info.Latitude ?? "N/A");
             player.Message("  Longitude: &f{0}", info.Longitude ?? "N/A");
             player.Message("  Time Zone: &f{0}", info.TimeZone ?? "N/A");
@@ -1891,7 +1891,7 @@ namespace fCraft {
                 info.CountryName = result.Get("country") ?? "N/A";
                 info.CountryCode = result.Get("country_abbr") ?? "N/A";
                 info.Continent = result.Get("continent") ?? "N/A";
-                info.Subdivision = nan.Replace(result.Get("subdivision"), "").Split(',');
+                info.Subdivision = nan.Replace(result.Get("subdivision"), "");
                 info.Latitude = result.Get("latitude") ?? "N/A";
                 info.Longitude = result.Get("longitude") ?? "N/A";
                 info.TimeZone = result.Get("timezone") ?? "N/A";
