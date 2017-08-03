@@ -1588,17 +1588,20 @@ namespace fCraft {
                         step = 10;
                         break;
                     }
-                    if (args.Split().Length != 3) {
+                    
+                    string[] minArgs = args.Split();
+                    if (minArgs.Length != 3) {
                         p.Message("Please specify 3 coordinates");
                         return;
                     }
+                    
                     byte minx, miny, minz;
-                    if (byte.TryParse(args.Split()[0], out minx)
-                        && byte.TryParse(args.Split()[1], out miny)
-                        && byte.TryParse(args.Split()[2], out minz)
-                        && (minx <= 15 && minx >= 0)
-                        && (miny <= 15 && miny >= 0)
-                        && (minz <= 15 && minz >= 0)) {
+                    if (byte.TryParse(minArgs[0], out minx)
+                        && byte.TryParse(minArgs[1], out miny)
+                        && byte.TryParse(minArgs[2], out minz)
+                        && (minx >= 0 && minx <= 15)
+                        && (miny >= 0 && miny <= 15)
+                        && (minz >= 0 && minz <= 15)) {
                     } else {
                         p.Message("Invalid coordinates! All 3 must be between 0 and 15");
                         return;
@@ -1610,17 +1613,19 @@ namespace fCraft {
                     p.Message("   &bSet minimum coords to X:{0} Y:{1} Z:{2}", minx, miny, minz);
                     break;
                 case 17:
-                    if (args.Split().Length != 3) {
+                    string[] maxArgs = args.Split();
+                    if (maxArgs.Length != 3) {
                         p.Message("Please specify 3 coordinates");
                         return;
                     }
+                    
                     byte maxx, maxy, maxz;
-                    if (byte.TryParse(args.Split()[0], out maxx)
-                        && byte.TryParse(args.Split()[1], out maxy)
-                        && byte.TryParse(args.Split()[2], out maxz)
-                        && (maxx <= 16 && maxx >= 1)
-                        && (maxy <= 16 && maxy >= 1)
-                        && (maxz <= 16 && maxz >= 1)) {
+                    if (byte.TryParse(maxArgs[0], out maxx)
+                        && byte.TryParse(maxArgs[1], out maxy)
+                        && byte.TryParse(maxArgs[2], out maxz)
+                        && (maxx >= 1 && maxx <= 16)
+                        && (maxy >= 1 && maxy <= 16)
+                        && (maxz >= 1 && maxz <= 16)) {
                     } else {
                         p.Message("Invalid coordinates! All 3 must be between 1 and 16");
                         return;
@@ -1932,23 +1937,28 @@ namespace fCraft {
                         hasChanged = true;
                         break;
                     }
-                    if (args.Split().Length != 3) {
+                    
+                    string[] minArgs = args.Split();
+                    if (minArgs.Length != 3) {
                         p.Message("Please specify 3 coordinates!");
                         break;
                     }
-                    def.MinX = EditCoord(p, "min X", def.Name, args.Split()[0], def.MinX, ref hasChanged);
-                    def.MinY = EditCoord(p, "min Y", def.Name, args.Split()[1], def.MinY, ref hasChanged);
-                    def.MinZ = EditCoord(p, "min Z", def.Name, args.Split()[2], def.MinZ, ref hasChanged);
+                    
+                    def.MinX = EditCoord(p, "min X", def.Name, minArgs[0], def.MinX, ref hasChanged);
+                    def.MinY = EditCoord(p, "min Y", def.Name, minArgs[1], def.MinY, ref hasChanged);
+                    def.MinZ = EditCoord(p, "min Z", def.Name, minArgs[2], def.MinZ, ref hasChanged);
                     hasChanged = true;
                     break;
                 case "max":
-                    if (args.Split().Length != 3) {
+                    string[] maxArgs = args.Split();
+                    if (maxArgs.Length != 3) {
                         p.Message("Please specify 3 coordinates!");
                         break;
                     }
-                    def.MaxX = EditCoord(p, "max X", def.Name, args.Split()[0], def.MaxX, ref hasChanged);
-                    def.MaxY = EditCoord(p, "max Y", def.Name, args.Split()[1], def.MaxY, ref hasChanged);
-                    def.MaxZ = EditCoord(p, "max Z", def.Name, args.Split()[2], def.MaxZ, ref hasChanged);
+                    
+                    def.MaxX = EditCoord(p, "max X", def.Name, maxArgs[0], def.MaxX, ref hasChanged);
+                    def.MaxY = EditCoord(p, "max Y", def.Name, maxArgs[1], def.MaxY, ref hasChanged);
+                    def.MaxZ = EditCoord(p, "max Z", def.Name, maxArgs[2], def.MaxZ, ref hasChanged);
                     hasChanged = true;
                     break;
                 case "minx":

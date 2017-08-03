@@ -81,8 +81,7 @@ namespace fCraft {
         public static void LogToConsole( [NotNull] string message ) {
             if( message == null ) throw new ArgumentNullException( "message" );
             if( message.Contains( "&N" ) ) {
-                foreach( string line in message.Split( split, 
-                                                      StringSplitOptions.RemoveEmptyEntries ) ) {
+                foreach( string line in message.Split( split, StringSplitOptions.RemoveEmptyEntries ) ) {
                     LogToConsole( line );
                 }
                 return;

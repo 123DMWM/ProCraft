@@ -108,9 +108,7 @@ namespace fCraft {
             Revision = revision;
             Date = releaseDate;
             Summary = summary;
-            ChangeLog = changeLog.Split( new[] {
-                '\n'
-            } );
+            ChangeLog = changeLog.Split( new[] { '\n' } );
             Flags = releaseType;
         }
 
