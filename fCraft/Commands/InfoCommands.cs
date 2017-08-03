@@ -2134,7 +2134,7 @@ namespace fCraft {
                 return player.Info;
             }
 
-            if (name.CaselessEquals(player.Name.ToLower())) {
+            if (name.CaselessEquals(player.Name)) {
                 // own name given
                 player.LastUsedPlayerName = player.Name;
                 return player.Info;
