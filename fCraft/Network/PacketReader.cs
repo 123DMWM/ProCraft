@@ -13,7 +13,14 @@ namespace fCraft {
         public OpCode ReadOpCode() {
             return (OpCode)ReadByte();
         }
-
+        
+        byte[] oneBuffer = new byte[1];
+        public override byte ReadByte() {
+            int count = BaseStream.Read(oneBuffer, 0, 1);
+            if (count == -1) throw new EndOfStreamException("End of file");
+            return oneBuffer[0];
+        }
+        
         public override short ReadInt16() {
             return IPAddress.NetworkToHostOrder( base.ReadInt16() );
         }
