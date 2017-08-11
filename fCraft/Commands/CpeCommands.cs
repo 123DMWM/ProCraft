@@ -1493,9 +1493,7 @@ namespace fCraft {
                     break;
                 case 4:
                     if (byte.TryParse(args, out value)) {
-                        step++; def.SideTex = value;
-                        def.LeftTex = def.SideTex; def.RightTex = def.SideTex;
-                        def.FrontTex = def.SideTex; def.BackTex = def.SideTex;
+                        step++; def.SetSidesTex(value);
                         p.Message("   &bSet sides texture index to: " + value);
                     }
                     break;
@@ -1817,9 +1815,7 @@ namespace fCraft {
                 case "sidetexture":
                     if (byte.TryParse(args, out value)) {
                         p.Message("&bChanged sides texture index of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.SideTex, value);
-                        def.SideTex = value;
-                        def.LeftTex = def.SideTex; def.RightTex = def.SideTex;
-                        def.FrontTex = def.SideTex; def.BackTex = def.SideTex;
+                        def.SetSidesTex(value);
                         hasChanged = true;
                     }
                     break;

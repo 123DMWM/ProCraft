@@ -3836,7 +3836,7 @@ namespace fCraft {
                                     return;
                                 }
 
-                                if (PortalHandler.GetInstance().GetPortal(player.World, new Vector3I(x, y, z)) != null) {
+                                if (PortalHandler.GetPortal(player.World, new Vector3I(x, y, z)) != null) {
                                     player.Message("You cannot build a portal inside a portal.");
                                     return;
                                 }

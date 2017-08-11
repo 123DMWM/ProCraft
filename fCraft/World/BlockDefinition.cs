@@ -43,6 +43,12 @@ namespace fCraft {
         /// <summary> Name used in commands. (e.g. "Mossy Slabs" becomes "mossyslabs")"</summary>
         public string BlockName;
         
+        public void SetSidesTex(byte tex) {
+            SideTex = tex;
+            LeftTex = tex; RightTex = tex;
+            FrontTex = tex; BackTex = tex;
+        }
+        
         public BlockDefinition Copy() {
             BlockDefinition def = new BlockDefinition();
             def.BlockID = BlockID; def.Name = Name; def.BlockName = BlockName;

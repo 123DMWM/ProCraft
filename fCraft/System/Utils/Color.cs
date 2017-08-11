@@ -458,7 +458,12 @@ namespace fCraft
      public struct CustomColor {
         public char Code, Fallback;
         public byte R, G, B, A;
-        public string Name;
+        public string Name;        
+                
+        public CustomColor(byte r, byte g, byte b) {
+            Code = '\0'; Fallback = '\0'; Name = null;
+            R = r; G = g; B = b; A = 255;
+        }        
         
         public bool Undefined { get { return Fallback == '\0'; } }
     }

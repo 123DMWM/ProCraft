@@ -99,7 +99,7 @@ namespace fCraft.Portals {
                         if (e.Player.CanUsePortal) {
                             if ((e.OldPosition.X != e.NewPosition.X) || (e.OldPosition.Y != e.NewPosition.Y) || (e.OldPosition.Z != (e.NewPosition.Z))) {
                                 if (e.Player.Can(Permission.Chat)) {
-                                    if (PortalHandler.GetInstance().GetPortal(e.Player) != null && !e.Player.StandingInPortal) {
+                                    if (GetPortal(e.Player) != null && !e.Player.StandingInPortal) {
                                         if ((DateTime.UtcNow - e.Player.LastUsedPortal).TotalSeconds < 5) {
                                             // To prevent portal loops
                                             if ((DateTime.UtcNow - e.Player.LastWarnedPortal).TotalSeconds > 2) {
@@ -111,7 +111,7 @@ namespace fCraft.Portals {
                                         }
 
                                         e.Player.StandingInPortal = true;
-                                        Portal portal = PortalHandler.GetInstance().GetPortal(e.Player);
+                                        Portal portal = GetPortal(e.Player);
 
                                         World world = WorldManager.FindWorldExact(portal.World);
                                         // Teleport player, portal protection
@@ -173,15 +173,13 @@ namespace fCraft.Portals {
             }
         }
 
-        public Portal GetPortal(Player player) {
-            Portal portal = null;
-
+        public static Portal GetPortal(Player player) {
             try {
                 if (player.World.Portals != null && player.World.Portals.Count > 0) {
                     lock (player.World.Portals.SyncRoot) {
-                        foreach (Portal possiblePortal in player.World.Portals) {
-                            if (possiblePortal.IsInRange(player)) {
-                                return possiblePortal;
+                        foreach (Portal candidate in player.World.Portals) {
+                            if (candidate.IsInRange(player)) {
+                                return candidate;
                             }
                         }
                     }
@@ -189,19 +187,16 @@ namespace fCraft.Portals {
             } catch (Exception ex) {
                 Logger.Log(LogType.Error, "PortalHandler.GetPortal: " + ex);
             }
-
-            return portal;
+            return null;
         }
 
-        public Portal GetPortal(World world, Vector3I block) {
-            Portal portal = null;
-
+        public static Portal GetPortal(World world, Vector3I block) {
             try {
                 if (world.Portals != null && world.Portals.Count > 0) {
                     lock (world.Portals.SyncRoot) {
-                        foreach (Portal possiblePortal in world.Portals) {
-                            if (possiblePortal.IsInRange(block)) {
-                                return possiblePortal;
+                        foreach (Portal candidate in world.Portals) {
+                            if (candidate.IsInRange(block)) {
+                                return candidate;
                             }
                         }
                     }
@@ -209,8 +204,7 @@ namespace fCraft.Portals {
             } catch (Exception ex) {
                 Logger.Log(LogType.Error, "PortalHandler.GetPortal: " + ex);
             }
-
-            return portal;
+            return null;
         }
 
         public static void CreatePortal(Portal portal, World source) {

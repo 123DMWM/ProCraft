@@ -370,12 +370,14 @@ namespace fCraft {
             if (!Supports(CpeExt.HeldBlock)) {
                 HeldBlock = Block.None; return;
             }
-            Block held;
-            if (!Map.GetBlockByName(World, id.ToString(), false, out held)) {
-                HeldBlock = Block.Stone; return;
-            }
             
+            // Holding an invalid block
+            Block held = (Block)id;
+            if (held > Block.StoneBrick && World.BlockDefs[id] == null) {
+                HeldBlock = Block.Stone; return;
+            }            
             if (HeldBlock == held) return;
+            
             HeldBlock = held;
             LastUsedBlockType = held;
             if (Supports(CpeExt.MessageType) && !IsPlayingCTF) {
