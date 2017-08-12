@@ -361,7 +361,7 @@ namespace fCraft {
         public static string GetBlockName(World world, Block block) {
             Block outBlock;
             if (GetBlockByName(world, block.ToString(), false, out outBlock)) {
-                if (outBlock > MaxCustomBlockType) {
+                if (world.BlockDefs[(byte)outBlock] != null) {
                     return world.BlockDefs[(int)outBlock].Name;
                 }
                 return outBlock.ToString();
