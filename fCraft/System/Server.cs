@@ -429,7 +429,7 @@ namespace fCraft {
             Entity.LoadAll();
             DownloadResources();
             
-            PortalHandler.GetInstance();
+            PortalHandler.Init();
             PortalDB.Load();
             EnvPresets.LoadAll();
 

@@ -15,30 +15,16 @@
 
 //Copyright (C) <2012> Glenn Mariën (http://project-vanilla.com)
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using ServiceStack.Text;
 using System.Collections;
 
 namespace fCraft.Portals {
-    class PortalHandler {
-        private static PortalHandler instance;
-
-        private PortalHandler() {
-            // Empty, singleton
-        }
-
-        public static PortalHandler GetInstance() {
-            if (instance == null) {
-                instance = new PortalHandler();
-                Player.Moved += new EventHandler<Events.PlayerMovedEventArgs>(Player_Moved);
-                Player.JoinedWorld += new EventHandler<Events.PlayerJoinedWorldEventArgs>(Player_JoinedWorld);
-                Player.PlacedBlock += new EventHandler<Events.PlayerPlacedBlockEventArgs>(Player_PlacedBlock);
-                PortalDB.StartSaveTask();
-            }
-
-            return instance;
+    internal static class PortalHandler {
+        
+        public static void Init() {
+            Player.Moved += Player_Moved;
+            Player.JoinedWorld += Player_JoinedWorld;
+            Player.PlacedBlock += Player_PlacedBlock;
+            PortalDB.StartSaveTask();
         }
 
         static void Player_PlacedBlock(object sender, Events.PlayerPlacedBlockEventArgs e) {

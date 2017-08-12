@@ -1,4 +1,8 @@
 ﻿// ProCraft Copyright 2014-2016 Joseph Beauvais <123DMWM@gmail.com>
+
+// Based off code from https://github.com/Hetal728/MCGalaxy/blob/master/MCGalaxy/Blocks/DefaultSet.cs
+// which was based off code from https://github.com/UnknownShadow200/ClassicalSharp/blob/master/ClassicalSharp/Blocks/DefaultSet.cs
+// As the author of both of these files, I hereby license the code to be freely used without needing to follow the licenses of the aforementioned projects.
 using System;
 using System.Text;
 
@@ -13,7 +17,7 @@ namespace fCraft {
             byte raw = (byte)b;
             def.BlockID = raw;
             def.Name = Name(raw);
-            def.CollideType = Collide(b);
+            def.CollideType = (byte)Collide(b);
             def.Speed = 1;
             def.BlocksLight = BlocksLight(b);
             
@@ -24,9 +28,9 @@ namespace fCraft {
             
             def.FullBright = FullBright(b);
             def.Shape = Draw(b) == DrawType.Sprite ? (byte)0 : (byte)1;
-            def.BlockDraw = Draw(b);
-            if (def.BlockDraw == DrawType.Sprite)
-                def.BlockDraw = DrawType.Transparent;
+            DrawType blockDraw = Draw(b);
+            if (blockDraw == DrawType.Sprite) blockDraw = DrawType.Transparent;
+            def.BlockDraw = (byte)blockDraw;
             
             def.FogDensity = FogDensity(b);
             CustomColor fog = FogColor(b);
@@ -71,7 +75,7 @@ namespace fCraft {
         }
         
         /// <summary> Gets the default collide type of a block, see CollideType class. </summary>
-        public static byte Collide(Block b) {
+        public static CollideType Collide(Block b) {
             if (b >= Block.Water && b <= Block.StillLava)
                 return CollideType.SwimThrough;
             if (b == Block.Snow || b == Block.Air || Draw(b) == DrawType.Sprite)
@@ -125,7 +129,7 @@ namespace fCraft {
         
 
         /// <summary> Gets the default draw type of a block, see Draw class. </summary>        
-        public static byte Draw(Block b) {
+        public static DrawType Draw(Block b) {
             if (b == Block.Air || b == Block.None) return DrawType.Gas;
             if (b == Block.Leaves) return DrawType.TransparentThick;
 
@@ -191,27 +195,23 @@ namespace fCraft {
             36, 37, 16, 11, 57, 50, 38, 80, 81, 82, 83, 84, 51, 54, 86, 58, 53, 52 };
     }
     
-    public static class DrawType {
-        public const byte Opaque = 0;
-        public const byte Transparent = 1;
-        public const byte TransparentThick = 2; // e.g. leaves render all neighbours
-        public const byte Translucent = 3;
-        public const byte Gas = 4;
-        public const byte Sprite = 5;
+    public enum DrawType : byte {
+        Opaque = 0,
+        Transparent = 1,
+        TransparentThick = 2, // e.g. leaves render all neighbours
+        Translucent = 3,
+        Gas = 4,
+        Sprite = 5,
     }
     
-    public static class CollideType {
-        public const byte WalkThrough = 0; // Gas (usually also used by sprite)
-        public const byte SwimThrough = 1; // Liquid
-        public const byte Solid       = 2; // Solid
-        public const byte Ice         = 3; // Solid and partially slidable on.
-        public const byte SlipperyIce = 4; // Solid and fully slidable on.        
-        public const byte LiquidWater = 5; // Water style 'swimming'/'bobbing'    
-        public const byte LiquidLava  = 6; // Lava style 'swimming'/'bobbing'
-        
-        public static bool IsSolid(byte collide) {
-            return collide >= Solid && collide <= SlipperyIce;
-        }
+    public enum CollideType : byte {
+        WalkThrough = 0, // Gas (usually also used by sprite)
+        SwimThrough = 1, // Liquid
+        Solid       = 2, // Solid
+        Ice         = 3, // Solid and partially slidable on.
+        SlipperyIce = 4, // Solid and fully slidable on.        
+        LiquidWater = 5, // Water style 'swimming'/'bobbing'    
+        LiquidLava  = 6, // Lava style 'swimming'/'bobbing'
     }
     
     public enum SoundType : byte {
