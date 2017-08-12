@@ -373,7 +373,7 @@ namespace fCraft {
             
             // Holding an invalid block
             Block held = (Block)id;
-            if (held > Block.StoneBrick && World.BlockDefs[id] == null) {
+            if (held > Map.MaxCustomBlockType && World.BlockDefs[id] == null) {
                 HeldBlock = Block.Stone; return;
             }            
             if (HeldBlock == held) return;
@@ -1253,7 +1253,7 @@ namespace fCraft {
             
             if (!supportsBlockDefs) return;
             BlockDefinition[] defs = World.BlockDefs;
-            for (int i = (int)Map.MaxCustomBlockType + 1; i < defs.Length; i++) {
+            for (int i = (int)Block.Air + 1; i < defs.Length; i++) {
                 if (defs[i] == null) continue;
                 Send(Packet.MakeSetBlockPermission((Block)i, build, delete));
             }

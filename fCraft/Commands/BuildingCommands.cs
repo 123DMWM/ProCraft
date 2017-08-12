@@ -765,22 +765,16 @@ namespace fCraft {
         };
 
         private static void DisPlace(Player player, CommandReader cmd) {
-            Block block;
             if (cmd.CountRemaining < 2) {
                 CdDisPlace.PrintUsage(player);
                 return;
-            }
-            string tryBlock = cmd.Next();
-            if (!Map.GetBlockByName(player.World, tryBlock, false, out block)) {
-                player.Message("Invalid block name/id: {0}", tryBlock);
-                return;
-            }
+        	}
+        	
+            Block block;            
+            if (!cmd.NextBlock(player, false, out block)) return;           
             int dis;
-            string tryInt = cmd.Next();
-            if (!int.TryParse(tryInt, out dis)) {
-                player.Message("Invalid distance: {0}", tryInt);
-                return;
-            }
+            if (!cmd.NextInt(out dis)) return;
+            
             dis = dis * 32;
             byte yaw = player.Position.R, pitch = player.Position.L;
             Vector3I Pos;
@@ -857,26 +851,16 @@ namespace fCraft {
             Vector3I coords;
             int x, y, z;
             if (cmd.NextInt(out x) && cmd.NextInt(out y) && cmd.NextInt(out z)) {
-                if (cmd.HasNext) {
-                    string last = cmd.Next();
-                    if (!Map.GetBlockByName(player.World, last, false, out block)) {
-                        player.Message("\"{0}\" is not a valid block type", last);
-                        return;
-                    }
-                }
+                if (cmd.HasNext && !cmd.NextBlock(player, false, out block)) return;
+                
                 coords = new Vector3I(x, y, z);
             } else if (isConsole) {
                 player.Message("Invalid coordinates!");
                 return;
             } else {
                 cmd.Rewind();
-                if (cmd.HasNext) {
-                    string last = cmd.Next();
-                    if (!Map.GetBlockByName(player.World, last, false, out block)) {
-                        player.Message("\"{0}\" is not a valid block type", last);
-                        return;
-                    }
-                }
+                if (cmd.HasNext && !cmd.NextBlock(player, false, out block)) return;
+                
                 coords = new Vector3I(player.Position.BlockX, player.Position.BlockY, (player.Position.Z - 64) / 32);
             }
             World world;

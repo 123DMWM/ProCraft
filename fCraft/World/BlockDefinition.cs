@@ -123,7 +123,7 @@ namespace fCraft {
         
         internal static void SendNowRemoveOldBlocks(Player p, World oldWorld) {
             BlockDefinition[] defs = oldWorld.BlockDefs;
-            for (int i = (int)Map.MaxCustomBlockType + 1; i < defs.Length; i++) {
+            for (int i = (int)Block.Air + 1; i < defs.Length; i++) {
                 BlockDefinition def = defs[i];
                 if (def == null || def == GlobalDefs[i]) continue;
                 p.SendNow(Packet.MakeRemoveBlockDefinition((byte)i));
@@ -132,7 +132,7 @@ namespace fCraft {
         
         internal static void SendNowBlocks(Player p) {
             BlockDefinition[] defs = p.World.BlockDefs;
-            for (int i = (int)Map.MaxCustomBlockType + 1; i < defs.Length; i++) {
+            for (int i = (int)Block.Air + 1; i < defs.Length; i++) {
                 BlockDefinition def = defs[i];
                 if (def == null) continue;              
                 p.SendNow(GetPacket(p, def));

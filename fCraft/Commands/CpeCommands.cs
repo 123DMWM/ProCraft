@@ -1369,15 +1369,11 @@ namespace fCraft {
         }
 
         static void CustomBlockInfoHandler(Player p, CommandReader cmd, bool global, BlockDefinition[] defs) {
-            string input = cmd.Next() ?? "n/a";
             string scope = global ? "global" : "level";
             string name = global ? "/gb" : "/lb";
             
             Block id;
-            if (!Map.GetBlockByName(p.World, input, false, out id) || id < Map.MaxCustomBlockType) {
-                p.Message("No blocks by that name or id!");
-                return;
-            }
+            if (!cmd.NextBlock(p, false, out id)) return;
             
             BlockDefinition def = GetCustomBlock(global, defs, (byte)id);
             if (def == null) {
@@ -1429,14 +1425,11 @@ namespace fCraft {
         }
 
         static void CustomBlockRemoveHandler(Player p, CommandReader cmd, bool global, BlockDefinition[] defs) {
-            string input = cmd.Next() ?? "n/a";
             Block blockID;
             string scope = global ? "global" : "level";
             string name = global ? "/gb" : "/lb";
-            if (!Map.GetBlockByName(p.World, input, false, out blockID) || blockID < Map.MaxCustomBlockType) {
-                p.Message("No blocks by that Name/ID!");
-                return;
-            }
+            if (!cmd.NextBlock(p, false, out blockID))  return;
+            
             BlockDefinition def = GetCustomBlock(global, defs, (byte)blockID);
             if (def == null) {
                 p.Message("There is no {0} custom block with that name/id.", scope);
@@ -1664,22 +1657,20 @@ namespace fCraft {
         }
 
         static void CustomBlockDuplicateHandler(Player p, CommandReader cmd, bool global, BlockDefinition[] defs) {
-            string input1 = cmd.Next() ?? "n/a", input2 = cmd.Next() ?? "n/a";
-            Block srcBlock = Block.None;
-            byte dstBlock = (byte)Block.None;
+            Block srcBlock, dstBlock;
             string scope = global ? "global" : "level";
             string name = global ? "/gb" : "/lb";
 
-            if (!Map.GetBlockByName(p.World, input1, false, out srcBlock) || srcBlock <= Map.MaxCustomBlockType) {
-                p.Message("There is no {1} custom block with the id or name: &a{0}", input1, scope);
-                p.Message("Use \"&h{1} list&S\" to see a list of {0} custom blocks.", scope, name);
-                return;
-            }
-            if (!Byte.TryParse(input2, out dstBlock) || dstBlock <= (byte)Map.MaxCustomBlockType) {
-                p.Message("Destination must be a numerical id and greater than 65."); return;
+            if (!cmd.NextBlock(p, false, out srcBlock)) return;
+            if (!cmd.NextBlock(p, false, out dstBlock)) return;
+            if (dstBlock == Block.Air || dstBlock == Block.None) {
+                p.Message("Destination block cannot have 0 or 255 ID."); return;
             }
 
             BlockDefinition srcDef = GetCustomBlock(global, defs, (byte)srcBlock);
+            if (srcDef == null && srcBlock <= Map.MaxCustomBlockType)
+                srcDef = DefaultSet.MakeCustomBlock(srcBlock);
+            
             if (srcDef == null) {
                 p.Message("There is no {1} custom block with the id: &a{0}", (byte)srcBlock, scope);
                 p.Message("Use \"&H{1} list&S\" to see a list of {0} custom blocks.", scope, name);
@@ -1706,16 +1697,13 @@ namespace fCraft {
         }
 
         static void CustomBlockEditHandler(Player p, CommandReader cmd, bool global, BlockDefinition[] defs) {
-            string input = cmd.Next() ?? "n/a";
             Block blockID;
-            if (!Map.GetBlockByName(p.World, input, false, out blockID) || blockID < Map.MaxCustomBlockType) {
-                p.Message("No blocks by that Name/ID!");
-                return;
-            }
-            
-            BlockDefinition def = GetCustomBlock(global, defs, (byte)blockID);
             string scope = global ? "global" : "level";
             string name = global ? "/gb" : "/lb";
+            
+            if (!cmd.NextBlock(p, false, out blockID)) return;
+            
+            BlockDefinition def = GetCustomBlock(global, defs, (byte)blockID);
             if (def == null) {
                 p.Message("There is no {0} custom block with that Name/ID", scope); return;
             }
@@ -2017,8 +2005,8 @@ namespace fCraft {
                 p.Message("Provided block id is not a number.");
                 return false;
             }
-            if (blockId <= 65 || blockId >= 255) {
-                p.Message("Block id must be between 65-254");
+            if (blockId == 0 || blockId >= 255) {
+                p.Message("Block id must be between 1-254");
                 return false;
             }
             return true;
