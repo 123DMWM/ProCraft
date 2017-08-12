@@ -609,7 +609,7 @@ namespace fCraft {
         }
 
 
-        internal static readonly Dictionary<string, Block> BlockNames = new Dictionary<string, Block>();
+        static readonly Dictionary<string, Block> BlockNames = new Dictionary<string, Block>();
 
         static Map() {
             // add default names for blocks, and their numeric codes
@@ -849,41 +849,28 @@ namespace fCraft {
         /// <summary> Finds Block corresponding to given blockName. </summary>
         /// <param name="blockName"> Given block name to parse. </param>
         /// <param name="allowNoneBlock"> Whether "none" block type is acceptable. </param>
-        /// <param name="block"> Block corresponding to given blockName;
-        /// Block.Undefined if value could not be parsed. </param>
+        /// <param name="block"> Block corresponding to given blockName; Block.None if value could not be parsed. </param>
         /// <returns> True if given blockName was parsed as an acceptable block type. </returns>
         /// <exception cref="ArgumentNullException"> blockName is null. </exception>
-        public static bool GetBlockByName([NotNull] string blockName, bool allowNoneBlock, out Block block)
-        {
-            if (blockName == null) throw new ArgumentNullException("blockName");
-            if (BlockNames.TryGetValue(blockName.ToLower(), out block)) {
-                return block == Block.None ? allowNoneBlock : true;
-            } else {
-                block = Block.None;
-                return false;
-            }
-        }
-        
         public static bool GetBlockByName([CanBeNull] World world, [NotNull] string blockName, 
                                           bool allowNoneBlock, out Block block) {
             if (blockName == null) throw new ArgumentNullException("blockName");
             if (BlockNames.TryGetValue(blockName.ToLower(), out block)) {
                 return block == Block.None ? allowNoneBlock : true;
-            } else {
-                BlockDefinition[] defs = world == null ? 
-                    BlockDefinition.GlobalDefs : world.BlockDefs;
-                byte id;
-                if (Byte.TryParse(blockName, out id)) {
-                    BlockDefinition def = defs[id];
-                    if (def != null) { block = (Block)id; return true; }
-                } else {
-                    foreach (BlockDefinition def in defs) {
-                        if (def == null || !def.BlockName.CaselessEquals(blockName)) continue;
-                        block = (Block)def.BlockID; return true;
-                    }
-                }
-                block = Block.None; return false;
             }
+            
+            BlockDefinition[] defs = world == null ? BlockDefinition.GlobalDefs : world.BlockDefs;
+            byte id;
+            if (Byte.TryParse(blockName, out id)) {
+                BlockDefinition def = defs[id];
+                if (def != null) { block = (Block)id; return true; }
+            } else {
+                foreach (BlockDefinition def in defs) {
+                    if (def == null || !def.BlockName.CaselessEquals(blockName)) continue;
+                    block = (Block)def.BlockID; return true;
+                }
+            }
+            block = Block.None; return false;
         }
 
         const int bufferSize = 64 * 1024;

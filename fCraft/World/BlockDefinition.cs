@@ -73,15 +73,13 @@ namespace fCraft {
         public static void Add(BlockDefinition def, BlockDefinition[] defs, World world) {
             byte id = def.BlockID;
             bool global = defs == GlobalDefs;
+            def.BlockName = def.Name.ToLower().Replace(" ", "");
+            
             if (global) {
                 World[] worlds = WorldManager.Worlds;
                 foreach (World w in worlds) {
                     if (w.BlockDefs[id] == null) w.BlockDefs[id] = def;
                 }
-                
-                string name = def.Name.ToLower().Replace(" ", "");
-                Map.BlockNames[name] = (Block)def.BlockID;
-                Map.BlockNames[def.BlockID.ToString()] = (Block)def.BlockID;
             }
             defs[id] = def;
             
@@ -103,10 +101,6 @@ namespace fCraft {
                 foreach (World w in worlds) {
                     if (w.BlockDefs[id] == GlobalDefs[id]) w.BlockDefs[id] = null;
                 }
-                
-                string name = def.Name.ToLower().Replace(" ", "");
-                Map.BlockNames.Remove(name);
-                Map.BlockNames.Remove(def.BlockID.ToString());
             }
             defs[id] = null;
             

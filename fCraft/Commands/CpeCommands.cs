@@ -377,7 +377,7 @@ namespace fCraft {
             byte blockId;
             Block block;
             if (byte.TryParse(model, out blockId)) {
-            } else if (Map.GetBlockByName(model, false, out block)) {
+            } else if (Map.GetBlockByName(player.World, model, false, out block)) {
                 model = ((byte)block).ToString();
             }
             
@@ -1461,7 +1461,7 @@ namespace fCraft {
 
             switch (step) {
                 case 0:
-                    step++; def.Name = args; def.BlockName = args.ToLower().Replace(" ", "");
+                    step++; def.Name = args;
                     p.Message("   &bSet name to: " + def.Name);
                     break;
                 case 1:
@@ -1630,7 +1630,7 @@ namespace fCraft {
                     break;
                 default:
                     Block block;
-                    if (Map.GetBlockByName(args, false, out block)) {
+                    if (Map.GetBlockByName(p.World, args, false, out block)) {
                         if (block > Map.MaxCustomBlockType) {
                             p.Message("&cThe fallback block must be an original block, " +
                                       "or a block defined in the CustomBlocks extension.");
@@ -1903,7 +1903,7 @@ namespace fCraft {
                 case "fallback":
                 case "block":
                     Block newBlock;
-                    if (Map.GetBlockByName(args, false, out newBlock)) {
+                    if (Map.GetBlockByName(p.World, args, false, out newBlock)) {
                         if (newBlock > Map.MaxCustomBlockType) {
                             p.Message("&cThe fallback block must be an original block, " +
                                       "or a block defined in the CustomBlocks extension.");
