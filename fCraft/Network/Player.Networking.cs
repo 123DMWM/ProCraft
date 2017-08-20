@@ -1631,7 +1631,7 @@ namespace fCraft {
             if (needsUpdate) {
                 Entities.Spawn(other, false, this, id);
                 // need to send teleport packet for correct position
-                other.Send(TeleportPacket(id, Position));
+                other.Send(other.TeleportPacket(id, Position));
             }
             
             if ((oldMob != Info.Model || oldafkMob != afkMob) && other.Supports(CpeExt.ChangeModel)) {
