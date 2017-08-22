@@ -306,6 +306,7 @@ namespace fCraft {
             6,    // SetEnvMapProperty
             7,    // SetEntityProperty
             4,    // TwoWayPing
+            3,    // SetInventoryOrder
         };
     }
     

@@ -372,6 +372,9 @@ namespace fCraft {
                     case TwoWayPingExtName:
                         if (version == 1) ext = CpeExt.TwoWayPing;
                         break;
+                    case InventoryOrderExtName:
+                        if (version == 1) ext = CpeExt.InventoryOrder;
+                        break;
                 }
                 if (ext != CpeExt.None)
                     supportedExts.Add(ext);

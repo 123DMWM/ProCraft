@@ -139,6 +139,9 @@ namespace fCraft
         
         /// <summary> This extension allows both client and server to measure average ping. </summary>
         TwoWayPing = 43,
+        
+        /// <summary> This extension allows hiding blocks from and reordering blocks in the inventory. </summary>
+        SetInventoryOrder = 44,
     }
 }
 

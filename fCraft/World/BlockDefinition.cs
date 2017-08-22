@@ -40,6 +40,9 @@ namespace fCraft {
         public byte FrontTex { get; set; }
         public byte BackTex { get; set; }
         
+        int order = -1;
+        public int InventoryOrder { get { return order; } set { order = value; } }
+        
         /// <summary> Name used in commands. (e.g. "Mossy Slabs" becomes "mossyslabs")"</summary>
         public string BlockName;
         
@@ -130,6 +133,16 @@ namespace fCraft {
                 BlockDefinition def = defs[i];
                 if (def == null) continue;              
                 p.SendNow(GetPacket(p, def));
+            }
+        }
+        
+        internal static void SendNowInventoryOrder(Player p) {
+            BlockDefinition[] defs = p.World.BlockDefs;
+            for (int i = (int)Block.Air + 1; i < defs.Length; i++) {
+                BlockDefinition def = defs[i];
+                if (def != null && def.InventoryOrder >= 0) {
+                    p.SendNow(Packet.SetInventoryOrder((byte)i, (byte)def.InventoryOrder));
+                }
             }
         }
         

@@ -359,5 +359,13 @@ namespace fCraft {
             WriteU16( data, packet.Bytes, 2 );
             return packet;
         }
+        
+        [Pure]               
+        public static Packet SetInventoryOrder( byte block, byte position ) {
+            Packet packet = new Packet( OpCode.SetInventoryOrder );
+            packet.Bytes[1] = block;
+            packet.Bytes[2] = position;
+            return packet;
+        }
     }
 }

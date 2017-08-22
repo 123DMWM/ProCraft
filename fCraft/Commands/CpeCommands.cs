@@ -1266,7 +1266,7 @@ namespace fCraft {
                         "&SCreates a new custom block, using all the data of the given existing " + scope + " custom block. " },
                 { "edit",     "&H" + name + " edit [id] [option] {args}&N" +
                         "&SEdits already defined blocks so you don't have to re-add them to change something. " +
-                        "Options: Name, Solidity, Speed, AllId, TopId, SideID, BottomID, Light, Sound, FullBright, Shape, Draw, FogDensity, (FogHex or FogR, FogG, FogB), FallBack"},
+                        "Options: Name, Solidity, Speed, AllId, TopId, SideID, BottomID, Light, Sound, FullBright, Shape, Draw, FogDensity, (FogHex or FogR, FogG, FogB), FallBack, Order"},
                 { "reload",     "&H" + name + " reload&N" +
                         "&SReloads all " + scope + " custom blocks from file. " },
                 { "info",     "&H" + name + " info [id]&N" +
@@ -1911,7 +1911,10 @@ namespace fCraft {
                         }
                         p.Message("&bChanged fallback block of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.FallBack, newBlock.ToString());
                         def.FallBack = (byte)newBlock;
-                        hasChanged = true;
+                        
+                        DisplayEditMessage(p, def, global);
+                        UpdateFallback();
+                        return;
                     }
                     break;
                 case "min":
@@ -1961,27 +1964,54 @@ namespace fCraft {
                         def.Shape = value;
                     }
                     break;
+                case "order":
+                    byte order = 0;
+                    if (byte.TryParse(args, out order) && order > 0) {
+                        def.InventoryOrder = order;
+                        DisplayEditMessage(p, def, global);
+                        UpdateOrder(p.World, def, global);
+                        BlockDefinition.Save(global, p.World);
+                    }
+                    return;
                 default:
                     p.Message("Usage: &H" + name + " [type/value] {args}");
                     return;
             }
-            if (!hasChanged) return;
             
-            if (global) {
-                Server.Message("{0} &Sedited a {3} custom block &a{1} &Swith ID &a{2}",
-                               p.ClassyName, def.Name, def.BlockID, scope);
-            } else {
-                p.World.Players.Message("{0} &Sedited a {3} custom block &a{1} &Swith ID &a{2}",
-                                        p.ClassyName, def.Name, def.BlockID, scope);
-            }
+            if (!hasChanged) return;            
+            DisplayEditMessage(p, def, global);
             BlockDefinition.Add(def, defs, p.World);
-
-            foreach (Player pl in Server.Players) {
-                if (!p.Supports(CpeExt.BlockDefinitions) &&
-                    (option.CaselessEquals("block") || option.CaselessEquals("fallback"))) {
-                    p.JoinWorld(p.World, WorldChangeReason.Rejoin, p.Position);
-                }
+        }
+        
+        static void DisplayEditMessage(Player p, BlockDefinition def, bool global) {
+        	if (global) {
+                Server.Message("{0} &Sedited a global custom block &a{1} &Swith ID &a{2}",
+                               p.ClassyName, def.Name, def.BlockID);
+            } else {
+                p.World.Players.Message("{0} &Sedited a level custom block &a{1} &Swith ID &a{2}",
+                                        p.ClassyName, def.Name, def.BlockID);
             }
+        }
+        
+        static void UpdateOrder(World world, BlockDefinition def, bool global) {
+            if (def.InventoryOrder == -1) return;
+            byte id = def.BlockID, order = (byte)def.InventoryOrder;
+
+            foreach (Player player in Server.Players) {
+                if (!global && player.World != world) continue;
+                if (global && player.World.BlockDefs[id] != BlockDefinition.GlobalDefs[id]) continue;
+
+                if (!player.Supports(CpeExt.InventoryOrder)) continue;
+                player.Send(Packet.SetInventoryOrder(id, order));
+            }
+        }
+        
+        static void UpdateFallback() {
+            foreach (Player player in Server.Players) {
+                if (!player.Supports(CpeExt.BlockDefinitions)) {
+                    player.JoinWorld(player.World, WorldChangeReason.Rejoin, player.Position);
+                }
+            }        	
         }
 
         static byte EditCoord(Player p, string coord, string name,

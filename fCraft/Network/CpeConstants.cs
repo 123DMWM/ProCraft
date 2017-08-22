@@ -101,6 +101,9 @@ namespace fCraft
         
         /// <summary> Allows both client and server to measure average ping. </summary>
         TwoWayPing,
+        
+        /// <summary> Allows hiding blocks from and reordering blocks in the inventory. </summary>
+        InventoryOrder,
     }
 
 

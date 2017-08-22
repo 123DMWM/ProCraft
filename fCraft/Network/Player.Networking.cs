@@ -1116,6 +1116,10 @@ namespace fCraft {
                     BlockDefinition.SendNowRemoveOldBlocks(this, oldWorld);
                 }
                 BlockDefinition.SendNowBlocks(this);
+                
+                if (Supports(CpeExt.InventoryOrder)) {
+                    BlockDefinition.SendNowInventoryOrder(this);
+                }
             }
             
             // enable Nagle's algorithm (in case it was turned off by LowLatencyMode)
