@@ -33,7 +33,7 @@ namespace fCraft {
                 if (cmd.StartsWith("!" + cmdName) || cmd.StartsWith("." + cmdName) || cmd.StartsWith(nick + " " + kvp.Key)) {
                     if (!elapsed) return true;
                     
-                    int start = cmd[0] == '!' ? 0 : nick.Length;
+                    int start = (cmd[0] == '!' || cmd[0] == '.') ? 0 : nick.Length;
                     start += cmdName.Length + 2; // account for ! or space, then space after command name for args
                     string args = cmd.Length > start ? cmd.Substring(start) : null;
                     
