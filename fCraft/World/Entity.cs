@@ -226,8 +226,8 @@ namespace fCraft {
                 if (Path.GetExtension(filename) != ".txt") continue;
                 
                 string[] entityData = File.ReadAllLines(filename);
-                entity.Model = CpeCommands.ParseModel(null, entityData[2]) ?? "humanoid";
-                entity.World = WorldManager.FindWorldExact(entityData[4]).Name ?? null;
+                entity.Model = CpeCommands.ParseModel(Player.Console, entityData[2]) ?? "humanoid";
+                entity.World = entityData[4];
                 World world = entity.WorldIn();
                 if (entity.World == null) continue;
                 

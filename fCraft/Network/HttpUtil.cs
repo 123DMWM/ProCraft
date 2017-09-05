@@ -64,7 +64,7 @@ namespace fCraft {
             if (uri.Scheme == "http") {
                 IPAddress ipv4 = LookupIPv4(uri);
                 if (ipv4 != null) {
-                    req.Proxy = new WebProxy("http://" + LookupIPv4(uri) + ":" + uri.Port);
+                    req.Proxy = new WebProxy("http://" + ipv4 + ":" + uri.Port);
                 }
             }
             return req;
