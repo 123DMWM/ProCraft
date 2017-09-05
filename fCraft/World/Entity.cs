@@ -228,8 +228,6 @@ namespace fCraft {
                 string[] entityData = File.ReadAllLines(filename);
                 entity.Model = CpeCommands.ParseModel(Player.Console, entityData[2]) ?? "humanoid";
                 entity.World = entityData[4];
-                World world = entity.WorldIn();
-                if (entity.World == null) continue;
                 
                 sbyte id;
                 if (!sbyte.TryParse(entityData[3], out id)) id = NextFreeID(entity.World);
@@ -240,22 +238,15 @@ namespace fCraft {
                 entity.Skin = entityData[1] ?? entity.Name;
                 Position pos;
                 
+                Position spawn = default(Position);
+                World world = entity.WorldIn();
+                if (world != null && world.map != null) spawn = world.map.Spawn;
                 
-                if (!int.TryParse(entityData[5], out pos.X)) {
-                    pos.X = world.map.Spawn.X;
-                }
-                if (!int.TryParse(entityData[6], out pos.Y)) {
-                    pos.Y = world.map.Spawn.Y;
-                }
-                if (!int.TryParse(entityData[7], out pos.Z)) {
-                    pos.Z = world.map.Spawn.Z;
-                }
-                if (!byte.TryParse(entityData[8], out pos.L)) {
-                    pos.L = world.map.Spawn.L;
-                }
-                if (!byte.TryParse(entityData[9], out pos.R)) {
-                    pos.R = world.map.Spawn.R;
-                }
+                if (!int.TryParse(entityData[5], out pos.X)) pos.X = spawn.X;
+                if (!int.TryParse(entityData[6], out pos.Y)) pos.Y = spawn.Y;
+                if (!int.TryParse(entityData[7], out pos.Z)) pos.Z = spawn.Z;
+                if (!byte.TryParse(entityData[8], out pos.L)) pos.L = spawn.L;
+                if (!byte.TryParse(entityData[9], out pos.R)) pos.R = spawn.R;
                 
                 entity.SetPos(pos);
                 EntityList.Add(entity);
