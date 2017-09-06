@@ -343,7 +343,7 @@ namespace fCraft {
                 return;
             }
             if (getter(target).CaselessEquals(model)) {
-                player.Message("&f{0}&S's {0}model is already set to &f{1}", target.Name, model, prefix);
+                player.Message("&f{0}&S's {2}model is already set to &f{1}", target.Name, model, prefix);
                 return;
             }
             
