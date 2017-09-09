@@ -1252,14 +1252,16 @@ namespace fCraft {
                         RaisePlayerPlacedBlockEvent(this, World.Map, coordBelow, Block.Grass, Block.Dirt, context);
                         SendNow(Packet.MakeSetBlock(coordBelow, Block.Dirt));
                     }
-                    // handle normal blocks
-                    blockUpdate = new BlockUpdate(this, coord, type);
-                    Info.ProcessBlockPlaced((byte)type);
-                    Block old = map.GetBlock(coord);
-                    map.QueueUpdate(blockUpdate);
-                    RaisePlayerPlacedBlockEvent(this, World.Map, coord, old, type, context);
-                    SendNow(Packet.MakeSetBlock(coord, type));
                     
+                    // handle normal blocks
+                    Block old = map.GetBlock(coord);
+                    if (old != type) {
+                        blockUpdate = new BlockUpdate(this, coord, type);
+                        Info.ProcessBlockPlaced((byte)type);                       
+                        map.QueueUpdate(blockUpdate);
+                        RaisePlayerPlacedBlockEvent(this, World.Map, coord, old, type, context);
+                    }
+                    SendNow(Packet.MakeSetBlock(coord, type));
                     break;
                     
                 case CanPlaceResult.BlocktypeDenied:
