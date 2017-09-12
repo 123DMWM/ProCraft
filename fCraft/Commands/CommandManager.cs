@@ -225,7 +225,7 @@ namespace fCraft
         {
             if (player == null) throw new ArgumentNullException("player");
             if (cmd == null) throw new ArgumentNullException("cmd");
-            CommandDescriptor descriptor = GetDescriptor(cmd.Name, true);
+            CommandDescriptor descriptor = cmd.Descriptor;
 
             if (descriptor == null)
             {

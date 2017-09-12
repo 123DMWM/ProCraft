@@ -459,35 +459,34 @@ namespace fCraft {
                 rawMessage = rawMessage.Substring(0, rawMessage.Length - 1);
             }
             CommandReader cmd = new CommandReader(rawMessage);
-            CommandDescriptor commandDescriptor = CommandManager.GetDescriptor(cmd.Name, true);
 
-            if (commandDescriptor == null) {
+            if (cmd.Descriptor == null) {
                 Message("Unknown command \"{0}\". See &H/Commands", cmd.Name);
                 Logger.Log(LogType.UserCommand, "{0}[Not A CMD]: {1}", Name, rawMessage);
-            } else if (IsPlayingCTF && commandDescriptor.Permissions != null &&
-                       (commandDescriptor.Permissions.Contains(Permission.Build) ||
-                        commandDescriptor.Permissions.Contains(Permission.Draw) ||
-                        commandDescriptor.Permissions.Contains(Permission.DrawAdvanced) ||
-                        commandDescriptor.Permissions.Contains(Permission.CopyAndPaste) ||
-                        commandDescriptor.Permissions.Contains(Permission.UndoOthersActions) ||
-                        commandDescriptor.Permissions.Contains(Permission.UndoAll) ||
-                        commandDescriptor.Permissions.Contains(Permission.Teleport) ||
-                        commandDescriptor.Permissions.Contains(Permission.Bring) ||
-                        commandDescriptor.Permissions.Contains(Permission.BringAll))) {
+            } else if (IsPlayingCTF && cmd.Descriptor.Permissions != null &&
+                       (cmd.Descriptor.Permissions.Contains(Permission.Build) ||
+                        cmd.Descriptor.Permissions.Contains(Permission.Draw) ||
+                        cmd.Descriptor.Permissions.Contains(Permission.DrawAdvanced) ||
+                        cmd.Descriptor.Permissions.Contains(Permission.CopyAndPaste) ||
+                        cmd.Descriptor.Permissions.Contains(Permission.UndoOthersActions) ||
+                        cmd.Descriptor.Permissions.Contains(Permission.UndoAll) ||
+                        cmd.Descriptor.Permissions.Contains(Permission.Teleport) ||
+                        cmd.Descriptor.Permissions.Contains(Permission.Bring) ||
+                        cmd.Descriptor.Permissions.Contains(Permission.BringAll))) {
                 Message("&WYou cannot use this command while playing CTF");
-            } else if (Info.IsFrozen && !commandDescriptor.UsableByFrozenPlayers) {
+            } else if (Info.IsFrozen && !cmd.Descriptor.UsableByFrozenPlayers) {
                 Message("&WYou cannot use this command while frozen.");
                 Logger.Log(LogType.UserCommand, "{0}[Frozen]: {1}", Name, rawMessage);
             } else {
-                if (!commandDescriptor.DisableLogging && !(fromConsole && rawMessage.CaselessStarts("/place"))) {
+                if (!cmd.Descriptor.DisableLogging && !(fromConsole && rawMessage.CaselessStarts("/place"))) {
                     Logger.Log(LogType.UserCommand, "{0}: {1}", Name, rawMessage);
                 }
-                if (commandDescriptor.RepeatableSelection) {
+                if (cmd.Descriptor.RepeatableSelection) {
                     selectionRepeatCommand = cmd;
                 }
                 SendToSpectators(cmd.RawMessage);
                 CommandManager.ParseCommand(this, cmd, fromConsole);
-                if (!commandDescriptor.NotRepeatable) {
+                if (!cmd.Descriptor.NotRepeatable) {
                     LastCommand = cmd;
                 }
             }
