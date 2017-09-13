@@ -27,6 +27,24 @@ namespace fCraft {
         const int maxDoorBlocks = 36;  //change for max door area
 
         #region ZoneAdd
+        
+        static bool CheckZoneAdd( Player player, string type ) {
+            World playerWorld = player.World;
+            if( !player.Info.Rank.AllowSecurityCircumvention ) {
+                SecurityCheckResult buildCheck = playerWorld.BuildSecurity.CheckDetailed( player.Info );
+                switch( buildCheck ) {
+                    case SecurityCheckResult.BlackListed:
+                        player.Message( "Cannot add {1}s to world {0}&S: You are barred from building here.",
+                                        playerWorld.ClassyName, type );
+                        return false;
+                    case SecurityCheckResult.RankTooLow:
+                        player.Message( "Cannot add {1}s to world {0}&S: You are not allowed to build here.",
+                                        playerWorld.ClassyName, type );
+                        return false;
+                }
+            }
+            return true;
+        }
 
         static readonly CommandDescriptor CdZoneAdd = new CommandDescriptor {
             Name = "ZAdd",
@@ -49,20 +67,7 @@ namespace fCraft {
                 CdZoneAdd.PrintUsage( player );
                 return;
             }
-
-            if( !player.Info.Rank.AllowSecurityCircumvention ) {
-                SecurityCheckResult buildCheck = playerWorld.BuildSecurity.CheckDetailed( player.Info );
-                switch( buildCheck ) {
-                    case SecurityCheckResult.BlackListed:
-                        player.Message( "Cannot add zones to world {0}&S: You are barred from building here.",
-                                        playerWorld.ClassyName );
-                        return;
-                    case SecurityCheckResult.RankTooLow:
-                        player.Message( "Cannot add zones to world {0}&S: You are not allowed to build here.",
-                                        playerWorld.ClassyName );
-                        return;
-                }
-            }
+            if( !CheckZoneAdd( player, "zone" ) ) return;
 
             Zone newZone = new Zone();
             ZoneCollection zoneCollection = player.WorldMap.Zones;
@@ -140,20 +145,7 @@ namespace fCraft {
         static void ZoneAddCallback( Player player, Vector3I[] marks, object tag ) {
             World playerWorld = player.World;
             if( playerWorld == null ) PlayerOpException.ThrowNoWorld( player );
-
-            if( !player.Info.Rank.AllowSecurityCircumvention ) {
-                SecurityCheckResult buildCheck = playerWorld.BuildSecurity.CheckDetailed( player.Info );
-                switch( buildCheck ) {
-                    case SecurityCheckResult.BlackListed:
-                        player.Message( "Cannot add zones to world {0}&S: You are barred from building here.",
-                                        playerWorld.ClassyName );
-                        return;
-                    case SecurityCheckResult.RankTooLow:
-                        player.Message( "Cannot add zones to world {0}&S: You are not allowed to build here.",
-                                        playerWorld.ClassyName );
-                        return;
-                }
-            }
+            if( !CheckZoneAdd( player, "zone" ) ) return;
 
             Zone zone = (Zone)tag;
             if (zone.Name.CaselessStarts(SpecialZone.Checkpoint))
@@ -209,22 +201,7 @@ namespace fCraft {
                 CdSignAdd.PrintUsage(player); return;
             }
             string givenZoneName = SpecialZone.Sign + cmd.Next();
-
-            if (!player.Info.Rank.AllowSecurityCircumvention)
-            {
-                SecurityCheckResult buildCheck = playerWorld.BuildSecurity.CheckDetailed(player.Info);
-                switch (buildCheck)
-                {
-                    case SecurityCheckResult.BlackListed:
-                        player.Message("Cannot add zones to world {0}&S: You are barred from building here.",
-                                        playerWorld.ClassyName);
-                        return;
-                    case SecurityCheckResult.RankTooLow:
-                        player.Message("Cannot add zones to world {0}&S: You are not allowed to build here.",
-                                        playerWorld.ClassyName);
-                        return;
-                }
-            }
+            if( !CheckZoneAdd( player, "sign" ) ) return;
 
             Zone newZone = new Zone();
             ZoneCollection zoneCollection = player.WorldMap.Zones;
@@ -279,22 +256,7 @@ namespace fCraft {
         {
             World playerWorld = player.World;
             if (playerWorld == null) PlayerOpException.ThrowNoWorld(player);
-
-            if (!player.Info.Rank.AllowSecurityCircumvention)
-            {
-                SecurityCheckResult buildCheck = playerWorld.BuildSecurity.CheckDetailed(player.Info);
-                switch (buildCheck)
-                {
-                    case SecurityCheckResult.BlackListed:
-                        player.Message("Cannot add Sign to world {0}&S: You are barred from building here.",
-                                        playerWorld.ClassyName);
-                        return;
-                    case SecurityCheckResult.RankTooLow:
-                        player.Message("Cannot add Sign to world {0}&S: You are not allowed to build here.",
-                                        playerWorld.ClassyName);
-                        return;
-                }
-            }
+            if( !CheckZoneAdd( player, "sign" ) ) return;
 
             Zone zone = (Zone)tag;
             var zones = player.WorldMap.Zones;
