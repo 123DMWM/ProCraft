@@ -126,6 +126,7 @@ namespace fCraft.MapConversion {
                 for( int y = 0; y < map.Length; y += 16 )
                     for( int x = 0; x < map.Width; x += 16 )
             {
+                int read = s.Read( data, 0, 1 );
                 if( read == 0 || data[0] != 1 ) continue;
                 s.Read( chunk, 0, chunk.Length );
                 
