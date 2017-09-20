@@ -871,17 +871,15 @@ namespace fCraft {
         }
         
         static void ListStaffOf(Player player, Rank rank, int max, bool showEmpty) {
-            PlayerInfo[] infos = PlayerDB.PlayerInfoList.Where(info => info.Rank == rank).ToArray();
-            if (infos == null || (!showEmpty && infos.Length == 0)) return;
+            PlayerInfo[] members = PlayerDB.PlayerInfoList.Where(info => info.Rank == rank).ToArray();
+            if (members == null || (!showEmpty && members.Length == 0)) return;
             
-            Array.Sort(infos, new PlayerInfoComparer(player));
-            string names = infos.Take(max).JoinToString(", ", p => p.ClassyName);
+            Array.Sort(members, new PlayerInfoComparer(player));
+            string names = members.Take(max).JoinToString(", ", p => p.ClassyName);
             
-            if (rank.PlayerCount > max) {
-                player.Message( " {0} &S(&f{1}&S): {2}{3} &S{4} more", rank.ClassyName, rank.PlayerCount, rank.Color, names, (rank.PlayerCount - max) );
-            } else {
-                player.Message( " {0} &S(&f{1}&S): {2}{3}", rank.ClassyName, rank.PlayerCount, rank.Color, names );
-            }
+            string format = " {0} &S(&f{1}&S): {2}{3}";
+            if (members.Length > members.Length) format += " &S{4} more";
+            player.Message( format, rank.ClassyName, members.Length, rank.Color, names, members.Length - max );
         }
 
         #endregion
