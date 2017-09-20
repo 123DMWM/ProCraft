@@ -14,11 +14,11 @@ namespace fCraft {
             return (OpCode)ReadByte();
         }
         
-        byte[] oneBuffer = new byte[1];
+        byte[] one = new byte[1];
         public override byte ReadByte() {
-            int count = BaseStream.Read(oneBuffer, 0, 1);
-            if (count == -1) throw new EndOfStreamException("End of file");
-            return oneBuffer[0];
+            int count = BaseStream.Read(one, 0, 1);
+            if (count == 0) throw new EndOfStreamException("End of file");
+            return one[0];
         }
         
         public override short ReadInt16() {

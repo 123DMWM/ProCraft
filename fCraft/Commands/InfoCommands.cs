@@ -847,61 +847,40 @@ namespace fCraft {
 
         static void ListStaffHandler(Player player, CommandReader cmd)
         {
-            Rank ranktarget = null;
-            if (cmd.HasNext)
-            {
+            Rank onlyRank = null;
+            if (cmd.HasNext) {
                 string rankName = cmd.Next();
-                ranktarget = RankManager.FindRank( rankName );
-                if (ranktarget == null)
-                {
+                onlyRank = RankManager.FindRank( rankName );
+                if (onlyRank == null) {
                     player.MessageNoRank(rankName);
                     return;
                 }
             }
 
-            PlayerInfo[] infos;
-
-            if (ranktarget == null)
-            {
+            if (onlyRank == null) {
                 player.Message("Below is a list of ALL staff members.");
-                foreach (Rank rank in RankManager.Ranks)
-                {
-                    if (rank.IsStaff)
-                    {
-                        infos = PlayerDB.PlayerInfoList
-                                        .Where(info => info.Rank == rank)
-                                        .ToArray();
-                        if (infos != null && rank.PlayerCount > 0)
-                        {
-                            Array.Sort(infos, new PlayerInfoComparer(player));
-                            IClassy[] itemsEnumerated = infos;
-                            string nameList = itemsEnumerated.Take( 15 ).JoinToString( "&S, ", p => p.ClassyName );
-                            if (rank.PlayerCount > 15) {
-                                player.Message( " {0} &S(&f{1}&S): {2}{3} &S{4} more", rank.ClassyName, rank.PlayerCount, rank.Color, nameList, (rank.PlayerCount - 15) );
-                            } else {
-                                player.Message( " {0} &S(&f{1}&S): {2}{3}", rank.ClassyName, rank.PlayerCount, rank.Color, nameList );
-                            }
-                        }
-                    }
+                foreach (Rank rank in RankManager.Ranks) {
+                    if (rank.IsStaff) ListStaffOf(player, rank, 15, false);
                 }
+            } else if (!onlyRank.IsStaff) {
+                player.Message("Rank {0}&S is not a staff rank", onlyRank.ClassyName);
+            } else {
+                player.Message("Below is a list of ALL staff members of rank {0}&S:", onlyRank.ClassyName);
+                ListStaffOf(player, onlyRank, 30, true);
             }
-            else
-            {
-                player.Message("Below is a list of ALL staff members of rank '" + ranktarget.ClassyName + "&S':");
-                infos = PlayerDB.PlayerInfoList
-                                .Where(info => info.Rank == ranktarget)
-                                .ToArray();
-                if (infos != null)
-                {
-                    Array.Sort(infos, new PlayerInfoComparer(player));
-                    IClassy[] itemsEnumerated = infos;
-                    string nameList = itemsEnumerated.Take(30).JoinToString(", ", p => p.ClassyName);
-                    if (ranktarget.PlayerCount > 15) {
-                        player.Message( " {0} &S(&f{1}&S): {2}{3} &S{4} more", ranktarget.ClassyName, ranktarget.PlayerCount, ranktarget.Color, nameList, (ranktarget.PlayerCount - 30) );
-                    } else {
-                        player.Message( " {0} &S(&f{1}&S): {2}{3}", ranktarget.ClassyName, ranktarget.PlayerCount, ranktarget.Color, nameList );
-                    }
-                }
+        }
+        
+        static void ListStaffOf(Player player, Rank rank, int max, bool showEmpty) {
+            PlayerInfo[] infos = PlayerDB.PlayerInfoList.Where(info => info.Rank == rank).ToArray();
+            if (infos == null || (!showEmpty && infos.Length == 0)) return;
+            
+            Array.Sort(infos, new PlayerInfoComparer(player));
+            string names = infos.Take(max).JoinToString(", ", p => p.ClassyName);
+            
+            if (rank.PlayerCount > max) {
+                player.Message( " {0} &S(&f{1}&S): {2}{3} &S{4} more", rank.ClassyName, rank.PlayerCount, rank.Color, names, (rank.PlayerCount - max) );
+            } else {
+                player.Message( " {0} &S(&f{1}&S): {2}{3}", rank.ClassyName, rank.PlayerCount, rank.Color, names );
             }
         }
 
@@ -2112,7 +2091,7 @@ namespace fCraft {
             
             for (int i = 0; i < list.Length; i++) {
                 player.Message(" &7{1}&S - {0}", list[i].Info.ClassyName, 
-            	               list[i].Ping.Format().PadLeft(pad, '0'));
+                               list[i].Ping.Format().PadLeft(pad, '0'));
             }
             player.Message("Showing players {0}-{1} (out of {2}).", offset + 1, offset + list.Length, candidates.Count());
         }
