@@ -120,12 +120,13 @@ namespace fCraft.MapConversion {
         const byte customTile = 163;
         static void ReadCustomBlocks( Stream s, Map map) {
             byte[] chunk = new byte[16 * 16 * 16];
+            byte[] data = new byte[1];
             
             for( int z = 0; z < map.Height; z += 16 )
                 for( int y = 0; y < map.Length; y += 16 )
                     for( int x = 0; x < map.Width; x += 16 )
             {
-                if( s.ReadByte() != 1 ) continue;
+                if( read == 0 || data[0] != 1 ) continue;
                 s.Read( chunk, 0, chunk.Length );
                 
                 int baseIndex = map.Index( x, y, z );
