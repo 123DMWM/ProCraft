@@ -52,6 +52,7 @@ namespace fCraft {
             if (name == null) name = player.Name;
             return Server.FindPlayerOrPrintMatches(player, name, SearchOptions.IncludeSelf);
         }
+        const string validModels = "Valid models: &SAny Block Name/ID, Chibi, Chicken, Creeper, Giant, Humanoid, Pig, Sheep, Skeleton, Spider, Zombie";
 
         #region AddEntity
 
@@ -64,13 +65,13 @@ namespace fCraft {
             Help = "Commands for manipulating entities. For help and usage for the individual options, use /help ent <option>.",
             HelpSections = new Dictionary<string, string>{
                 { "create", "&H/Ent create <entity name> <model> <skin>&N&S" +
-                        "Creates a new entity with the given name. Valid models are chibi, chicken, creeper, giant, human, pig, sheep, skeleton, spider, zombie, or any block ID/Name." },
+                        "Creates a new entity with the given name. " + validModels},
                 { "remove", "&H/Ent remove <entity name> <world>&N&S" +
                         "Removes the given entity." },
                 { "removeall", "&H/Ent removeAll&N&S" +
                         "Removes all entities from the world."},
                 { "model", "&H/Ent model <entity name> <model>&N&S" +
-                        "Changes the model of an entity to the given model. Valid models are chibi, chicken, creeper, giant, human, pig, sheep, skeleton, spider, zombie, or any block ID/Name."},
+                        "Changes the model of an entity to the given model. " + validModels},
                 { "list", "&H/Ent list <world>&N&S" +
                         "Prints out a list of all the entites on the server."},
                 { "bring", "&H/Ent bring <entity name>&N&S" +
@@ -171,21 +172,18 @@ namespace fCraft {
                     if (cmd.HasNext) {
                         string model = cmd.Next().ToLower();
                         if (string.IsNullOrEmpty(model)) {
-                            player.Message(
-                                "Usage is /Ent model <bot> <model>. Valid models are chibi, chicken, creeper, giant, human, pig, sheep, skeleton, spider, zombie, or any block ID/Name.");
+                        	player.Message("Usage is /Ent model <bot> <model>. " + validModels);
                             break;
                         }
                         model = ParseModel(player, model);
                         if (model == null) {
-                            player.Message(
-                                "That wasn't a valid entity model! Valid models are chibi, chicken, creeper, giant, human, pig, sheep, skeleton, spider, zombie, or any block ID/Name.");
+                            player.Message("That wasn't a valid entity model! " + validModels);
                             break;
                         }
                         player.Message("Changed entity model to {0}.", model);
                         entity.ChangeModel(model);
                     } else {
-                        player.Message(
-                            "Usage is /Ent model <bot> <model>. Valid models are chibi, chicken, creeper, giant, human, pig, sheep, skeleton, spider, zombie, or any block ID/Name.");
+                        player.Message("Usage is /Ent model <bot> <model>. " + validModels);
                     }
                     break;
                 case "bring":
@@ -285,8 +283,7 @@ namespace fCraft {
             Permissions = new[] { Permission.ReadStaffChat },
             Usage = "/Model [Player] [Model]",
             IsConsoleSafe = true,
-            Help = "Change the Model or Skin of [Player]!&N" +
-                "Valid models: &S[Any Block Name or ID#], Chibi, Chicken, Creeper, Giant, Humanoid, Pig, Sheep, Skeleton, Spider, Zombie",
+            Help = "Change the Model or Skin of [Player]!&N" + validModels,
             Handler = ModelHandler
         };
 
@@ -300,8 +297,7 @@ namespace fCraft {
             Permissions = new[] { Permission.Chat },
             Usage = "/AFKModel [Player] [Model]",
             IsConsoleSafe = true,
-            Help = "Changes the model of a player when they are AFK.&N" +
-                "Valid models: &S [Any Block Name or ID#], Chibi, Chicken, Creeper, Giant, Humanoid, Pig, Sheep, Skeleton, Spider, Zombie!",
+            Help = "Changes the model of a player when they are AFK.&N" + validModels,
             Handler = AFKModelHandler
         };
 

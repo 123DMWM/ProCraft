@@ -878,7 +878,7 @@ namespace fCraft {
             string names = members.Take(max).JoinToString(", ", p => p.ClassyName);
             
             string format = " {0} &S(&f{1}&S): {2}{3}";
-            if (members.Length > members.Length) format += " &S{4} more";
+            if (members.Length > max) format += " &S{4} more";
             player.Message( format, rank.ClassyName, members.Length, rank.Color, names, members.Length - max );
         }
 
