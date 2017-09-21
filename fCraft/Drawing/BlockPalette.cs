@@ -55,6 +55,11 @@ namespace fCraft.Drawing
         {
             Add(RgbToLab(color, false), blocks);
         }
+        
+        protected void Add(RgbColor color, Block block)
+        {
+            Add(RgbToLab(color, false), new Block[] { block });
+        }
 
 
         protected void Add(LabColor color, Block[] blocks)
@@ -324,68 +329,68 @@ namespace fCraft.Drawing
         static BlockPalette DefineLight()
         {
             return new BlockPalette("Light", 1) {
-                { RgbColor.FromArgb(109, 80, 57), new[] { Block.Dirt } },
-                { RgbColor.FromArgb(176, 170, 130), new[] { Block.Sand } },
-                { RgbColor.FromArgb(111, 104, 104), new[] { Block.Gravel } },
-                { RgbColor.FromArgb(179, 44, 44), new[] { Block.Red } },
-                { RgbColor.FromArgb(179, 111, 44), new[] { Block.Orange } },
-                { RgbColor.FromArgb(179, 179, 44), new[] { Block.Yellow } },
-                { RgbColor.FromArgb(109, 179, 44), new[] { Block.Lime } },
-                { RgbColor.FromArgb(44, 179, 44), new[] { Block.Green } },
-                { RgbColor.FromArgb(44, 179, 111), new[] { Block.Teal } },
-                { RgbColor.FromArgb(44, 179, 179), new[] { Block.Aqua } },
-                { RgbColor.FromArgb(86, 132, 179), new[] { Block.Cyan } },
-                { RgbColor.FromArgb(99, 99, 180), new[] { Block.Blue } },
-                { RgbColor.FromArgb(111, 44, 180), new[] { Block.Indigo } },
-                { RgbColor.FromArgb(141, 62, 179), new[] { Block.Violet } },
-                { RgbColor.FromArgb(180, 44, 180), new[] { Block.Magenta } },
-                { RgbColor.FromArgb(179, 44, 111), new[] { Block.Pink } },
-                { RgbColor.FromArgb(64, 64, 64), new[] { Block.Black } },
-                { RgbColor.FromArgb(118, 118, 118), new[] { Block.Gray } },
-                { RgbColor.FromArgb(179, 179, 179), new[] { Block.White } },
-                { RgbColor.FromArgb(21, 19, 29), new[] { Block.Obsidian } }
+                { RgbColor.FromArgb(109, 80, 57), Block.Dirt },
+                { RgbColor.FromArgb(176, 170, 130), Block.Sand },
+                { RgbColor.FromArgb(111, 104, 104), Block.Gravel },
+                { RgbColor.FromArgb(179, 44, 44), Block.Red },
+                { RgbColor.FromArgb(179, 111, 44), Block.Orange },
+                { RgbColor.FromArgb(179, 179, 44), Block.Yellow },
+                { RgbColor.FromArgb(109, 179, 44), Block.Lime },
+                { RgbColor.FromArgb(44, 179, 44), Block.Green },
+                { RgbColor.FromArgb(44, 179, 111), Block.Teal },
+                { RgbColor.FromArgb(44, 179, 179), Block.Aqua },
+                { RgbColor.FromArgb(86, 132, 179), Block.Cyan },
+                { RgbColor.FromArgb(99, 99, 180), Block.Blue },
+                { RgbColor.FromArgb(111, 44, 180), Block.Indigo },
+                { RgbColor.FromArgb(141, 62, 179), Block.Violet },
+                { RgbColor.FromArgb(180, 44, 180), Block.Magenta },
+                { RgbColor.FromArgb(179, 44, 111), Block.Pink },
+                { RgbColor.FromArgb(64, 64, 64), Block.Black },
+                { RgbColor.FromArgb(118, 118, 118), Block.Gray },
+                { RgbColor.FromArgb(179, 179, 179), Block.White },
+                { RgbColor.FromArgb(21, 19, 29), Block.Obsidian }
             };
         }
 
         [NotNull]
         static BlockPalette DefineLight2() {
             return new BlockPalette("Light2", 1) {
-                {RgbColor.FromArgb( 124, 124, 124 ), new[] {Block.Stone}},//
-                {RgbColor.FromArgb( 125, 89, 61 ), new[] {Block.Dirt}},//
-                {RgbColor.FromArgb( 97, 97, 97 ), new[] {Block.Admincrete}},//
-                {RgbColor.FromArgb( 157, 128, 79 ), new[] {Block.Wood}},//
-                {RgbColor.FromArgb( 211, 204, 151 ), new[] {Block.Sand}},//
-                {RgbColor.FromArgb( 128, 124, 122 ), new[] {Block.Gravel}},//
-                {RgbColor.FromArgb( 92, 72, 43 ), new[] {Block.Log}},//
-                {RgbColor.FromArgb( 188, 190, 61 ), new[] {Block.Sponge}},//
-                {RgbColor.FromArgb( 195, 44, 44 ), new[] {Block.Red}},//
-                {RgbColor.FromArgb( 195, 119, 44 ), new[] {Block.Orange}},//
-                {RgbColor.FromArgb( 195, 195, 44 ), new[] {Block.Yellow}},//
-                {RgbColor.FromArgb( 119, 195, 44 ), new[] {Block.Lime}},//
-                {RgbColor.FromArgb( 44, 195, 44 ), new[] {Block.Green}},//
-                {RgbColor.FromArgb( 44, 195, 119 ), new[] {Block.Teal}},//
-                {RgbColor.FromArgb( 44, 195, 195 ), new[] {Block.Aqua}},//
-                {RgbColor.FromArgb( 91, 143, 195 ), new[] {Block.Cyan}},//
-                {RgbColor.FromArgb( 105, 105, 195 ), new[] {Block.Blue}},//
-                {RgbColor.FromArgb( 119, 44, 195 ), new[] {Block.Indigo}},//
-                {RgbColor.FromArgb( 152, 65, 195 ), new[] {Block.Violet}},//
-                {RgbColor.FromArgb( 195, 44, 195 ), new[] {Block.Magenta}},//
-                {RgbColor.FromArgb( 195, 44, 119 ), new[] {Block.Pink}},//
-                {RgbColor.FromArgb( 68, 68, 68 ), new[] {Block.Black}},//
-                {RgbColor.FromArgb( 125, 125, 125 ), new[] {Block.Gray}},//
-                {RgbColor.FromArgb( 195, 195, 195 ), new[] {Block.White}},//
-                {RgbColor.FromArgb( 252, 242, 83 ), new[] {Block.Gold}},//
-                {RgbColor.FromArgb( 234, 234, 234 ), new[] {Block.Iron}},//
-                {RgbColor.FromArgb( 185, 110, 98 ), new[] {Block.Brick}},//
-                {RgbColor.FromArgb( 23, 20, 34 ), new[] {Block.Obsidian}},//
-                {RgbColor.FromArgb( 221, 214, 165 ), new[] {Block.Sandstone}},//
-                {RgbColor.FromArgb( 191, 116, 136 ), new[] {Block.LightPink}},//
-                {RgbColor.FromArgb( 49, 68, 21 ), new[] {Block.DarkGreen}},//
-                {RgbColor.FromArgb( 75, 45, 25 ), new[] {Block.Brown}},//
-                {RgbColor.FromArgb( 34, 45, 135 ), new[] {Block.DarkBlue}},//
-                {RgbColor.FromArgb( 34, 102, 131 ), new[] {Block.Turquoise}},//
-                {RgbColor.FromArgb( 216, 219, 237 ), new[] {Block.Tile}},//
-                {RgbColor.FromArgb( 232, 228, 220 ), new[] {Block.Pillar}}//
+                {RgbColor.FromArgb( 124, 124, 124 ), Block.Stone},//
+                {RgbColor.FromArgb( 125, 89, 61 ), Block.Dirt},//
+                {RgbColor.FromArgb( 97, 97, 97 ), Block.Admincrete},//
+                {RgbColor.FromArgb( 157, 128, 79 ), Block.Wood},//
+                {RgbColor.FromArgb( 211, 204, 151 ), Block.Sand},//
+                {RgbColor.FromArgb( 128, 124, 122 ), Block.Gravel},//
+                {RgbColor.FromArgb( 92, 72, 43 ), Block.Log},//
+                {RgbColor.FromArgb( 188, 190, 61 ), Block.Sponge},//
+                {RgbColor.FromArgb( 195, 44, 44 ), Block.Red},//
+                {RgbColor.FromArgb( 195, 119, 44 ), Block.Orange},//
+                {RgbColor.FromArgb( 195, 195, 44 ), Block.Yellow},//
+                {RgbColor.FromArgb( 119, 195, 44 ), Block.Lime},//
+                {RgbColor.FromArgb( 44, 195, 44 ), Block.Green},//
+                {RgbColor.FromArgb( 44, 195, 119 ), Block.Teal},//
+                {RgbColor.FromArgb( 44, 195, 195 ), Block.Aqua},//
+                {RgbColor.FromArgb( 91, 143, 195 ), Block.Cyan},//
+                {RgbColor.FromArgb( 105, 105, 195 ), Block.Blue},//
+                {RgbColor.FromArgb( 119, 44, 195 ), Block.Indigo},//
+                {RgbColor.FromArgb( 152, 65, 195 ), Block.Violet},//
+                {RgbColor.FromArgb( 195, 44, 195 ), Block.Magenta},//
+                {RgbColor.FromArgb( 195, 44, 119 ), Block.Pink},//
+                {RgbColor.FromArgb( 68, 68, 68 ), Block.Black},//
+                {RgbColor.FromArgb( 125, 125, 125 ), Block.Gray},//
+                {RgbColor.FromArgb( 195, 195, 195 ), Block.White},//
+                {RgbColor.FromArgb( 252, 242, 83 ), Block.Gold},//
+                {RgbColor.FromArgb( 234, 234, 234 ), Block.Iron},//
+                {RgbColor.FromArgb( 185, 110, 98 ), Block.Brick},//
+                {RgbColor.FromArgb( 23, 20, 34 ), Block.Obsidian},//
+                {RgbColor.FromArgb( 221, 214, 165 ), Block.Sandstone},//
+                {RgbColor.FromArgb( 191, 116, 136 ), Block.LightPink},//
+                {RgbColor.FromArgb( 49, 68, 21 ), Block.DarkGreen},//
+                {RgbColor.FromArgb( 75, 45, 25 ), Block.Brown},//
+                {RgbColor.FromArgb( 34, 45, 135 ), Block.DarkBlue},//
+                {RgbColor.FromArgb( 34, 102, 131 ), Block.Turquoise},//
+                {RgbColor.FromArgb( 216, 219, 237 ), Block.Tile},//
+                {RgbColor.FromArgb( 232, 228, 220 ), Block.Pillar}//
             };
         }
 
@@ -394,68 +399,68 @@ namespace fCraft.Drawing
         static BlockPalette DefineDark()
         {
             return new BlockPalette("Dark", 1) {
-                { RgbColor.FromArgb(67, 50, 37), new[] { Block.Dirt } },
-                { RgbColor.FromArgb(108, 104, 80), new[] { Block.Sand } },
-                { RgbColor.FromArgb(68, 64, 64), new[] { Block.Gravel } },
-                { RgbColor.FromArgb(109, 28, 28), new[] { Block.Red } },
-                { RgbColor.FromArgb(110, 70, 31), new[] { Block.Orange } },
-                { RgbColor.FromArgb(109, 109, 29), new[] { Block.Yellow } },
-                { RgbColor.FromArgb(68, 109, 29), new[] { Block.Lime } },
-                { RgbColor.FromArgb(28, 109, 31), new[] { Block.Green } },
-                { RgbColor.FromArgb(28, 109, 69), new[] { Block.Teal } },
-                { RgbColor.FromArgb(28, 109, 108), new[] { Block.Aqua } },
-                { RgbColor.FromArgb(53, 81, 109), new[] { Block.Cyan } },
-                { RgbColor.FromArgb(61, 61, 109), new[] { Block.Blue } },
-                { RgbColor.FromArgb(68, 28, 109), new[] { Block.Indigo } },
-                { RgbColor.FromArgb(87, 40, 110), new[] { Block.Violet } },
-                { RgbColor.FromArgb(109, 28, 110), new[] { Block.Magenta } },
-                { RgbColor.FromArgb(109, 29, 69), new[] { Block.Pink } },
-                { RgbColor.FromArgb(41, 41, 41), new[] { Block.Black } },
-                { RgbColor.FromArgb(72, 72, 72), new[] { Block.Gray } },
-                { RgbColor.FromArgb(109, 109, 109), new[] { Block.White } },
-                { RgbColor.FromArgb(15, 14, 20), new[] { Block.Obsidian } }
+                { RgbColor.FromArgb(67, 50, 37), Block.Dirt },
+                { RgbColor.FromArgb(108, 104, 80), Block.Sand },
+                { RgbColor.FromArgb(68, 64, 64), Block.Gravel },
+                { RgbColor.FromArgb(109, 28, 28), Block.Red },
+                { RgbColor.FromArgb(110, 70, 31), Block.Orange },
+                { RgbColor.FromArgb(109, 109, 29), Block.Yellow },
+                { RgbColor.FromArgb(68, 109, 29), Block.Lime },
+                { RgbColor.FromArgb(28, 109, 31), Block.Green },
+                { RgbColor.FromArgb(28, 109, 69), Block.Teal },
+                { RgbColor.FromArgb(28, 109, 108), Block.Aqua },
+                { RgbColor.FromArgb(53, 81, 109), Block.Cyan },
+                { RgbColor.FromArgb(61, 61, 109), Block.Blue },
+                { RgbColor.FromArgb(68, 28, 109), Block.Indigo },
+                { RgbColor.FromArgb(87, 40, 110), Block.Violet },
+                { RgbColor.FromArgb(109, 28, 110), Block.Magenta },
+                { RgbColor.FromArgb(109, 29, 69), Block.Pink },
+                { RgbColor.FromArgb(41, 41, 41), Block.Black },
+                { RgbColor.FromArgb(72, 72, 72), Block.Gray },
+                { RgbColor.FromArgb(109, 109, 109), Block.White },
+                { RgbColor.FromArgb(15, 14, 20), Block.Obsidian }
             };
         }
 
         [NotNull]
         static BlockPalette DefineDark2() {
             return new BlockPalette("Dark2", 1) {
-                {RgbColor.FromArgb( 74, 74, 74 ), new[] {Block.Stone}},//
-                {RgbColor.FromArgb( 75, 53, 37 ), new[] {Block.Dirt}},//
-                {RgbColor.FromArgb( 58, 58, 58 ), new[] {Block.Admincrete}},//
-                {RgbColor.FromArgb( 94, 77, 47 ), new[] {Block.Wood}},//
-                {RgbColor.FromArgb( 127, 122, 91 ), new[] {Block.Sand}},//
-                {RgbColor.FromArgb( 77, 74, 73 ), new[] {Block.Gravel}},//
-                {RgbColor.FromArgb( 55, 43, 26 ), new[] {Block.Log}},//
-                {RgbColor.FromArgb( 113, 114, 37 ), new[] {Block.Sponge}},//
-                {RgbColor.FromArgb( 117, 26, 26 ), new[] {Block.Red}},//
-                {RgbColor.FromArgb( 117, 71, 26 ), new[] {Block.Orange}},//
-                {RgbColor.FromArgb( 117, 117, 26 ), new[] {Block.Yellow}},//
-                {RgbColor.FromArgb( 71, 117, 26 ), new[] {Block.Lime}},//
-                {RgbColor.FromArgb( 26, 117, 26 ), new[] {Block.Green}},//
-                {RgbColor.FromArgb( 26, 117, 71 ), new[] {Block.Teal}},//
-                {RgbColor.FromArgb( 26, 117, 117 ), new[] {Block.Aqua}},//
-                {RgbColor.FromArgb( 91, 86, 117 ), new[] {Block.Cyan}},//
-                {RgbColor.FromArgb( 63, 63, 117 ), new[] {Block.Blue}},//
-                {RgbColor.FromArgb( 71, 26, 117 ), new[] {Block.Indigo}},//
-                {RgbColor.FromArgb( 91, 39, 117 ), new[] {Block.Violet}},//
-                {RgbColor.FromArgb( 117, 26, 117 ), new[] {Block.Magenta}},//
-                {RgbColor.FromArgb( 117, 26, 71 ), new[] {Block.Pink}},//
-                {RgbColor.FromArgb( 41, 41, 41 ), new[] {Block.Black}},//
-                {RgbColor.FromArgb( 75, 75, 75 ), new[] {Block.Gray}},//
-                {RgbColor.FromArgb( 117, 117, 117 ), new[] {Block.White}},//
-                {RgbColor.FromArgb( 151, 145, 50 ), new[] {Block.Gold}},//
-                {RgbColor.FromArgb( 140, 140, 140 ), new[] {Block.Iron}},//
-                {RgbColor.FromArgb( 111, 66, 59 ), new[] {Block.Brick}},//
-                {RgbColor.FromArgb( 14, 12, 20 ), new[] {Block.Obsidian}},//
-                {RgbColor.FromArgb( 133, 129, 99 ), new[] {Block.Sandstone}},//
-                {RgbColor.FromArgb( 115, 67, 82 ), new[] {Block.LightPink}},//
-                {RgbColor.FromArgb( 29, 41, 13 ), new[] {Block.DarkGreen}},//
-                {RgbColor.FromArgb( 45, 27, 15 ), new[] {Block.Brown}},//
-                {RgbColor.FromArgb( 20, 27, 81 ), new[] {Block.DarkBlue}},//
-                {RgbColor.FromArgb( 20, 61, 79 ), new[] {Block.Turquoise}},//
-                {RgbColor.FromArgb( 130, 131, 142 ), new[] {Block.Tile}},//
-                {RgbColor.FromArgb( 139, 137, 132 ), new[] {Block.Pillar}}//
+                {RgbColor.FromArgb( 74, 74, 74 ), Block.Stone},//
+                {RgbColor.FromArgb( 75, 53, 37 ), Block.Dirt},//
+                {RgbColor.FromArgb( 58, 58, 58 ), Block.Admincrete},//
+                {RgbColor.FromArgb( 94, 77, 47 ), Block.Wood},//
+                {RgbColor.FromArgb( 127, 122, 91 ), Block.Sand},//
+                {RgbColor.FromArgb( 77, 74, 73 ), Block.Gravel},//
+                {RgbColor.FromArgb( 55, 43, 26 ), Block.Log},//
+                {RgbColor.FromArgb( 113, 114, 37 ), Block.Sponge},//
+                {RgbColor.FromArgb( 117, 26, 26 ), Block.Red},//
+                {RgbColor.FromArgb( 117, 71, 26 ), Block.Orange},//
+                {RgbColor.FromArgb( 117, 117, 26 ), Block.Yellow},//
+                {RgbColor.FromArgb( 71, 117, 26 ), Block.Lime},//
+                {RgbColor.FromArgb( 26, 117, 26 ), Block.Green},//
+                {RgbColor.FromArgb( 26, 117, 71 ), Block.Teal},//
+                {RgbColor.FromArgb( 26, 117, 117 ), Block.Aqua},//
+                {RgbColor.FromArgb( 91, 86, 117 ), Block.Cyan},//
+                {RgbColor.FromArgb( 63, 63, 117 ), Block.Blue},//
+                {RgbColor.FromArgb( 71, 26, 117 ), Block.Indigo},//
+                {RgbColor.FromArgb( 91, 39, 117 ), Block.Violet},//
+                {RgbColor.FromArgb( 117, 26, 117 ), Block.Magenta},//
+                {RgbColor.FromArgb( 117, 26, 71 ), Block.Pink},//
+                {RgbColor.FromArgb( 41, 41, 41 ), Block.Black},//
+                {RgbColor.FromArgb( 75, 75, 75 ), Block.Gray},//
+                {RgbColor.FromArgb( 117, 117, 117 ), Block.White},//
+                {RgbColor.FromArgb( 151, 145, 50 ), Block.Gold},//
+                {RgbColor.FromArgb( 140, 140, 140 ), Block.Iron},//
+                {RgbColor.FromArgb( 111, 66, 59 ), Block.Brick},//
+                {RgbColor.FromArgb( 14, 12, 20 ), Block.Obsidian},//
+                {RgbColor.FromArgb( 133, 129, 99 ), Block.Sandstone},//
+                {RgbColor.FromArgb( 115, 67, 82 ), Block.LightPink},//
+                {RgbColor.FromArgb( 29, 41, 13 ), Block.DarkGreen},//
+                {RgbColor.FromArgb( 45, 27, 15 ), Block.Brown},//
+                {RgbColor.FromArgb( 20, 27, 81 ), Block.DarkBlue},//
+                {RgbColor.FromArgb( 20, 61, 79 ), Block.Turquoise},//
+                {RgbColor.FromArgb( 130, 131, 142 ), Block.Tile},//
+                {RgbColor.FromArgb( 139, 137, 132 ), Block.Pillar}//
             };
         }
 
