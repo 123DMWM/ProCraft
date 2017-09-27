@@ -143,6 +143,8 @@ namespace fCraft
         WeatherFade = 7,
         ExpFog = 8,
         SidesOffset = 9,
+        SkyboxHorSpeed = 10,
+        SkyboxVerSpeed = 11,
     }
     
     public enum EntityProp : byte {

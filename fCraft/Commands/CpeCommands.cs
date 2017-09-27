@@ -741,7 +741,15 @@ namespace fCraft {
                         "&NUse \"normal\" instead of a number to reset to default (0)." },
                 { "weatherfade","&H/Env <WorldName> weatherfade <#>&N&S" +
                         "Sets how quickly rain/snow fades, relative to normal rate." +
-                        "&NUse \"normal\" instead of a number to reset to default (0)." }
+                        "&NUse \"normal\" instead of a number to reset to default (0)." },
+                { "skyboxhorspeed","&H/Env <WorldName> skyoxhorspeed <#>&N&S" +
+                        "Sets how quickly skybox rotates horizontally around." +
+            			"&Ne.g. a value of 0.5 means it rotates 360 degrees every two seconds." +
+                        "&NUse \"normal\" instead of a number to reset to default (0)." },
+                { "skyboxverrspeed","&H/Env <WorldName> skyoxverspeed <#>&N&S" +
+                        "Sets how quickly skybox rotates vertically around." +
+            			"&Ne.g. a value of 0.5 means it rotates 360 degrees every two seconds." +
+                        "&NUse \"normal\" instead of a number to reset to default (0)." },
             },
             Usage = "/Env <WorldName> <Variable>",
             IsConsoleSafe = true,
@@ -844,10 +852,15 @@ namespace fCraft {
                     SetEnvAppearanceFloat(player, world, value, EnvProp.WeatherSpeed, "weather speed",
                                           -32767, 32767, 256, 256, ref world.WeatherSpeed);
                     break;
-                case "cloudspeed":
-                case "cloudsspeed":
-                    SetEnvAppearanceFloat(player, world, value, EnvProp.CloudsSpeed, "clouds speed",
-                                          -32767, 32767, 256, 256, ref world.CloudsSpeed);
+                case "skyboxhorspeed":
+                case "skyboxhor":
+                    SetEnvAppearanceFloat(player, world, value, EnvProp.SkyboxHorSpeed, "skybox horizontal speed",
+                                          -32767, 32767, 1024, 0, ref world.SkyboxHorSpeed);
+                    break;
+                case "skyboxverspeed":
+                case "skyboxver":
+                    SetEnvAppearanceFloat(player, world, value, EnvProp.SkyboxVerSpeed, "skybox vertical speed",
+                                          -32767, 32767, 1024, 0, ref world.SkyboxVerSpeed);
                     break;
                 case "horizon":
                 case "edge":
@@ -976,6 +989,8 @@ namespace fCraft {
             world.WeatherSpeed = 256;
             world.CloudsSpeed = 256;
             world.WeatherFade = 128;
+            world.SkyboxHorSpeed = 0;
+            world.SkyboxVerSpeed = 0;
             
             Logger.Log(LogType.UserActivity,
                        "Env: {0} {1} reset environment settings for world {2}",

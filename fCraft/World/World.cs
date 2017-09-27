@@ -261,6 +261,8 @@ namespace fCraft {
                     CloudsSpeed = CloudsSpeed,
                     WeatherSpeed = WeatherSpeed,
                     WeatherFade = WeatherFade,
+                    SkyboxHorSpeed = SkyboxHorSpeed,
+                    SkyboxVerSpeed = SkyboxVerSpeed,
                     Buildable = Buildable,
                     Deletable = Deletable,
                 };
@@ -978,6 +980,12 @@ namespace fCraft {
         
         /// <summary> Rain/Snow fade speed as seen by the player, in units of 128ths. The default value is 128 (1 speed). </summary>
         public short WeatherFade = 128;
+        
+        /// <summary> Skybox horizontal speed as seen by the player, in units of 1024ths. The default value is 0 (0 speed). </summary>
+        public short SkyboxHorSpeed = 0;
+        
+        /// <summary> Skybox vertical speed as seen by the player, in units of 1024ths. The default value is 0 (0 speed). </summary>
+        public short SkyboxVerSpeed = 0;
 
         /// <summary> The block which will be displayed on the horizon. </summary>
         public byte HorizonBlock = (byte)Block.Water;

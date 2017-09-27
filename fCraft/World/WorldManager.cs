@@ -357,6 +357,12 @@ namespace fCraft {
             if ((attr = el.Attribute("weatherfade")) != null) {
                 world.WeatherFade = ParseShort(attr, worldName, 128, "normal rate");
             }
+            if ((attr = el.Attribute("skyboxhorspeed")) != null) {
+                world.SkyboxHorSpeed = ParseShort(attr, worldName, 0, "normal speed");
+            }
+            if ((attr = el.Attribute("skyboxverspeed")) != null) {
+                world.SkyboxVerSpeed = ParseShort(attr, worldName, 0, "normal speed");
+            }
             
             if ((attr = el.Attribute("terrain")) != null) {
                 world.Texture = ParseString(attr, worldName);
@@ -628,6 +634,8 @@ namespace fCraft {
             elEnv.Add(new XAttribute("weatherspeed", world.WeatherSpeed));
             elEnv.Add(new XAttribute("cloudsspeed", world.CloudsSpeed));
             elEnv.Add(new XAttribute("weatherfade", world.WeatherFade));
+            elEnv.Add(new XAttribute("skyboxhorspeed", world.SkyboxHorSpeed));
+            elEnv.Add(new XAttribute("skyboxverspeed", world.SkyboxVerSpeed));
             temp.Add(elEnv);
         }
         
