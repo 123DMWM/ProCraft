@@ -1602,7 +1602,7 @@ namespace fCraft {
                                 player.LastPosition = player.Position;
                             }
                             player.TeleportTo(pos);
-                            player.Message("Teleported to {0}'s last black change", info.Name);
+                            player.Message("Teleported to {0}'s last block change", info.Name);
                             return;
                         } else {
                             player.Message("That users last known position is not on this world");
@@ -1617,7 +1617,9 @@ namespace fCraft {
             }
             cmd.Rewind();
             
-            if (cmd.NextInt(out x) && cmd.NextInt(out y) && cmd.NextInt(out z)) {
+            if (cmd.NextCoord(player.Position.X, out x)
+                && cmd.NextCoord(player.Position.Y, out y)
+                && cmd.NextCoord(player.Position.Z, out z)) {
                 if (cmd.NextInt(out rot) && cmd.NextInt(out lot)) {
                     if (rot < 0 || rot > 255) {
                         player.Message("R must be inbetween 0 and 255, using player R");
