@@ -137,6 +137,7 @@ namespace fCraft {
         public int BlockX { get { return X >> 5; } }
         public int BlockY { get { return Y >> 5; } }
         public int BlockZ { get { return Z >> 5; } }
+        public int BlockFeetZ { get { return (Z - Player.CharacterHeight) >> 5; } }
 
 
         public Vector3I ToBlockCoords() {

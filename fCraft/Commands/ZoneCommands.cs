@@ -867,7 +867,7 @@ namespace fCraft {
                 return;
             }
 
-            if (!SpecialZone.CanManage(oldZone.Name.ToLower(), player, "rename a")) return;
+            if (!SpecialZone.CanManage(oldZone.Name, player, "rename a")) return;
             if (!SpecialZone.CanManage(newName, player, "rename to a")) return;
 
             // Check if a zone with "newName" name already exists
