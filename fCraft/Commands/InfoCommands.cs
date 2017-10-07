@@ -2084,12 +2084,9 @@ namespace fCraft {
             }
             
             Player[] list = candidates.Skip(fixOffset(offset, candidates.Count())).Take(10).ToArray();
-            int pad = list[0].Ping.Format().Length;
-            player.Message("Ping/Latency List:");
-            
+            player.Message("Ping/Latency List:");           
             for (int i = 0; i < list.Length; i++) {
-                player.Message(" &7{1}&S - {0}", list[i].Info.ClassyName, 
-                               list[i].Ping.Format().PadLeft(pad, '0'));
+                player.Message(" &7{1}&S - {0}", list[i].Info.ClassyName, list[i].Ping.Format());
             }
             player.Message("Showing players {0}-{1} (out of {2}).", offset + 1, offset + list.Length, candidates.Count());
         }
