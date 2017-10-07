@@ -1236,7 +1236,7 @@ namespace fCraft {
         static readonly CommandDescriptor CdJoinr = new CommandDescriptor
         {
             Name = "JoinRandom",
-            Aliases = new[] { "jr" },
+            Aliases = new[] { "jr", "gotorandom", "gr" },
             Category = CommandCategory.World | CommandCategory.New,
             Usage = "/JoinRandom [@minrank]",
             Help = "Teleports the player to a random world." +
