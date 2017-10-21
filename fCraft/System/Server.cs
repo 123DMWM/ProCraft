@@ -1015,13 +1015,24 @@ namespace fCraft {
             if( name == null ) throw new ArgumentNullException( "name" );
             if( hash == null ) throw new ArgumentNullException( "hash" );
             if( salt == null ) throw new ArgumentNullException( "salt" );
-            if (hash.Length < 32) hash = hash.PadLeft(32, '0');
-            MD5 hasher = MD5.Create();
-            StringBuilder sb = new StringBuilder( 32 );
-            foreach( byte b in hasher.ComputeHash( Encoding.ASCII.GetBytes( salt + name ) ) ) {
-                sb.AppendFormat( "{0:x2}", b );
+            if( hash.Length < 32 ) hash = hash.PadLeft( 32, '0' );
+            
+            byte[] md5 = MD5.Create().ComputeHash( Encoding.ASCII.GetBytes( salt + name ) );
+            string computedHash = ToHexString( md5 );
+            return computedHash.CaselessEquals( hash );
+        }
+        
+        static string ToHexString( byte[] array ) {
+            char[] hex = new char[array.Length * 2];
+            for( int i = 0; i < array.Length; i++ ) {
+                int value = array[i];
+                int hi = value >> 4, lo = value & 0x0F;
+                
+                // 48 = index of 0, 55 = index of (A - 10).
+                hex[i * 2 + 0] = hi < 10 ? (char)(hi + 48) : (char)(hi + 55);
+                hex[i * 2 + 1] = lo < 10 ? (char)(lo + 48) : (char)(lo + 55);
             }
-            return sb.ToString().CaselessEquals( hash );
+            return new String(hex);
         }
 
 
