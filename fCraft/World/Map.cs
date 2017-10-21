@@ -320,7 +320,7 @@ namespace fCraft {
         /// <param name="coords"> Coordinate vector (X,Y,Z). </param>
         /// <param name="type"> Block type to set. </param>
         public void SetBlock( Vector3I coords, Block type ) {
-            if( coords.X < Width && coords.Y < Length && coords.Z < Height && coords.X >= 0 && coords.Y >= 0 && coords.Z >= 0 && (byte)type < 50 ) {
+            if( coords.X < Width && coords.Y < Length && coords.Z < Height && coords.X >= 0 && coords.Y >= 0 && coords.Z >= 0 ) {
                 Blocks[Index( coords )] = (byte)type;
                 HasChangedSinceSave = true;
             }
