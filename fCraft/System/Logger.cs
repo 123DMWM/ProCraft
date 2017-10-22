@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -32,6 +33,7 @@ namespace fCraft {
 
         static readonly string SessionStart = DateTime.Now.ToString( LongDateFormat ); // localized
         static readonly Queue<string> RecentMessages = new Queue<string>();
+        static DateTimeFormatInfo formatter = CultureInfo.InvariantCulture.DateTimeFormat;
         const int MaxRecentMessages = 25;
 
         /// <summary> Name of the file that log messages are currently being written to.
@@ -42,7 +44,7 @@ namespace fCraft {
                     case LogSplittingType.SplitBySession:
                         return SessionStart + ".log";
                     case LogSplittingType.SplitByDay:
-                        return DateTime.Now.ToString( ShortDateFormat ) + ".log"; // localized
+                        return DateTime.Now.ToString( ShortDateFormat, formatter ) + ".log"; // localized
                     default:
                         return DefaultLogFileName;
                 }
@@ -116,7 +118,7 @@ namespace fCraft {
             if( !Enabled ) return;
             
             message = Color.StripColors( message, true );
-            string line = DateTime.Now.ToString( TimeFormat ) + " > " + GetPrefix( type ) + message; // localized
+            string line = DateTime.Now.ToString( TimeFormat, formatter ) + " > " + GetPrefix( type ) + message; // localized
 
             lock( LogLock ) {
                 RaiseLoggedEvent( message, line, type );
@@ -133,7 +135,7 @@ namespace fCraft {
                     } catch( Exception ex ) {
                         string errorMessage = "Logger.Log: " + ex;
                         line = String.Format( "{0} > {1}{2}",
-                                              DateTime.Now.ToString( TimeFormat ),// localized
+                                              DateTime.Now.ToString( TimeFormat, formatter ),// localized
                                               GetPrefix( LogType.Error ),
                                               errorMessage );
                         RaiseLoggedEvent( errorMessage,
