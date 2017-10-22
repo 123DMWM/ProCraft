@@ -1296,11 +1296,8 @@ namespace fCraft {
                 throw new ArgumentNullException("cmd");
 
             CuboidDrawOperation op = new CuboidDrawOperation(player);
-
             IBrush brush = factory.MakeBrush(player, cmd);
-            if (brush == null)
-                return;
-
+            if (brush == null) return;
             op.Brush = brush;
 
             player.SelectionStart(2, DrawOperationCallback, op, Permission.Draw);
@@ -1323,29 +1320,6 @@ namespace fCraft {
             ReplaceHandlerInternal(ReplaceBrushFactory.Instance, player, cmd);
         }
 
-        static void ReplaceAllHandlerInternal([NotNull] IBrushFactory factory, [NotNull] Player player,
-                                           [NotNull] CommandReader cmd) {
-            CuboidDrawOperation op = new CuboidDrawOperation(player);
-            IBrush brush = factory.MakeBrush(player, cmd);
-            if (brush == null)
-                return;
-            op.Brush = brush;
-
-            player.SelectionStart(2, DrawOperationCallback, op, Permission.Draw);
-            Map map = player.WorldMap;
-            Vector3I coordsMin;
-            Vector3I coordsMax;
-            coordsMin.X = 0;
-            coordsMin.Y = 0;
-            coordsMin.Z = 0;
-            coordsMax.X = map.Width - 1;
-            coordsMax.Y = map.Length - 1;
-            coordsMax.Z = map.Height - 1;
-            player.SelectionResetMarks();
-            player.SelectionAddMark(coordsMin, false, false);
-            player.SelectionAddMark(coordsMax, true, true);
-        }
-
 
         static readonly CommandDescriptor CdReplaceAll = new CommandDescriptor {
             Name = "ReplaceAll",
@@ -1359,9 +1333,17 @@ namespace fCraft {
         };
 
         static void ReplaceAllHandler(Player player, CommandReader cmd) {
-            ReplaceAllHandlerInternal(ReplaceBrushFactory.Instance, player, cmd);
-        }
+            CuboidDrawOperation op = new CuboidDrawOperation(player);
+            IBrush brush = ReplaceBrushFactory.Instance.MakeBrush(player, cmd);
+            if (brush == null) return;
+            op.Brush = brush;
 
+            player.SelectionStart(2, DrawOperationCallback, op, Permission.Draw);
+            Map map = player.WorldMap;
+            player.SelectionResetMarks();
+            player.SelectionAddMark(map.Bounds.MinVertex, false, false);
+            player.SelectionAddMark(map.Bounds.MaxVertex, true, true);
+        }
 
 
         static readonly CommandDescriptor CdReplaceNot = new CommandDescriptor {
@@ -1378,7 +1360,6 @@ namespace fCraft {
         static void ReplaceNotHandler([NotNull] Player player, [NotNull] CommandReader cmd) {
             ReplaceHandlerInternal(ReplaceNotBrushFactory.Instance, player, cmd);
         }
-
 
 
         static readonly CommandDescriptor CdReplaceBrush = new CommandDescriptor {

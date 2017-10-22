@@ -1842,7 +1842,7 @@ namespace fCraft {
                 player.Message("  Timezone: &f{0}", result.Get("timezone") ?? "N/A");
                 byte acc;
                 byte.TryParse(result.Get("accuracy"), out acc);
-                player.Message("  Hostname: &f{0}", result.Get("hostname") ?? "N/A");
+                player.Message("  Hostname: &f{0}", result.Get("host") ?? "N/A");
                 player.Message("  Accuracy: &f{0}", acc);
                 player.Message("Geoip information by: &9http://geoip.cf/");
 
@@ -1873,7 +1873,7 @@ namespace fCraft {
                 info.Longitude = result.Get("longitude") ?? "N/A";
                 info.TimeZone = result.Get("timezone") ?? "N/A";
                 byte.TryParse(result.Get("accuracy"), out info.Accuracy);
-                info.Hostname = result.Get("hostname") ?? "N/A";
+                info.Hostname = result.Get("host") ?? "N/A";
                 info.GeoIP = result.Get("ip") ?? "N/A";
                 return;
 
