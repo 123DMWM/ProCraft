@@ -755,27 +755,12 @@ namespace fCraft {
 
 
         private static void CheckIdles(SchedulerTask task) {
-
             Player[] tempPlayerList = Players;
             for (int i = 0; i < tempPlayerList.Length; i++) {
                 Player player = tempPlayerList[i];
 
                 if (player.Supports(CpeExt.MessageType)) {
-                    //double speed = (Math.Sqrt(player.Position.DistanceSquaredTo(player.lastSolidPos)) / 32);
-                    //player.Send(Packet.Message((byte)MessageType.Announcement, string.Format("&eSpeed: &f{0:N2} &eBlocks/s", speed), player.UseFallbackColors));
-                    string bottomRight2 = player.Position.ToBlockCoordsRaw() + "&S[" + compassString(player.Position.R) + "&S]";
-                    if (bottomRight2 != player.lastBottomRight2) {
-                        player.lastBottomRight2 = bottomRight2;
-                        player.Send(Packet.Message((byte)MessageType.BottomRight2, bottomRight2, player));
-                    }
-                    
-                    if (player.LastDrawOp != null && !player.IsPlayingCTF)
-                        if (player.LastDrawOp.PercentDone < 100) {
-                            player.Send(Packet.Message((byte)MessageType.Status3, player.LastDrawOp.Description + 
-                                                   " percent done: &f" + player.LastDrawOp.PercentDone + "&S%", player));
-                        } else if (player.LastDrawOp.PercentDone == 100 || player.LastDrawOp.IsDone) {
-                            player.Send(Packet.Message((byte)MessageType.Status3, "", player));
-                        }
+                    UpdateStatusMessages(player);
                 }
                 CTF.PrintCtfState(player);
                 player.lastSolidPos = player.Position;
@@ -807,6 +792,28 @@ namespace fCraft {
                 }
             }
             UpdateTabList(false);
+        }
+        
+        static void UpdateStatusMessages(Player player) {
+            //double speed = (Math.Sqrt(player.Position.DistanceSquaredTo(player.lastSolidPos)) / 32);
+            //player.Send(Packet.Message((byte)MessageType.Announcement, string.Format("&eSpeed: &f{0:N2} &eBlocks/s", speed), player.UseFallbackColors));
+            string bottomRight2 = player.Position.ToBlockCoordsRaw() + "&S[" + compassString(player.Position.R) + "&S]";
+            if (bottomRight2 != player.lastBottomRight2) {
+                player.lastBottomRight2 = bottomRight2;
+                player.Send(Packet.Message((byte)MessageType.BottomRight2, bottomRight2, player));
+            }
+            
+            if (player.LastDrawOp != null && !player.IsPlayingCTF) {
+                if (player.LastDrawOp.PercentDone < 100) {
+                    player.Send(Packet.Message((byte)MessageType.Status3, player.LastDrawOp.Description +
+                                               " percent done: &f" + player.LastDrawOp.PercentDone + "&S%", player));
+                } else if (player.LastDrawOp.PercentDone == 100 || player.LastDrawOp.IsDone) {
+                    if (!player.AnnouncedLastDrawOpFinished) {
+                        player.Send(Packet.Message((byte)MessageType.Status3, "", player));
+                        player.AnnouncedLastDrawOpFinished = true;
+                    }
+                }
+            }
         }
         
         public static string compassString(int rot) {

@@ -1546,7 +1546,8 @@ namespace fCraft {
 
         [NotNull]
         internal UndoState RedoBegin( DrawOperation op ) {
-            LastDrawOp = op;
+            LastDrawOp = op; 
+            AnnouncedLastDrawOpFinished = false;
             UndoState newState = new UndoState( op );
             undoStack.AddLast( newState );
             return newState;
@@ -1556,6 +1557,7 @@ namespace fCraft {
         [NotNull]
         internal UndoState UndoBegin( DrawOperation op ) {
             LastDrawOp = op;
+            AnnouncedLastDrawOpFinished = false;
             UndoState newState = new UndoState( op );
             redoStack.AddLast( newState );
             return newState;
@@ -1575,6 +1577,7 @@ namespace fCraft {
 
         public UndoState DrawBegin( DrawOperation op ) {
             LastDrawOp = op;
+            AnnouncedLastDrawOpFinished = false;
             UndoState newState = new UndoState( op );
             undoStack.AddLast( newState );
             if( undoStack.Count > ConfigKey.MaxUndoStates.GetInt() ) {
@@ -1655,6 +1658,8 @@ namespace fCraft {
         /// <summary> Last DrawOperation executed by this player this session. May be null (if nothing has been executed yet). </summary>
         [CanBeNull]
         public DrawOperation LastDrawOp { get; set; }
+        
+        internal bool AnnouncedLastDrawOpFinished;
 
         /// <summary> Whether clicks should be registered towards selection marks. </summary>
         public bool DisableClickToMark { get; set; }
