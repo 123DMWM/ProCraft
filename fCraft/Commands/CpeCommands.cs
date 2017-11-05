@@ -1521,73 +1521,17 @@ namespace fCraft {
                     break;
                 case 8:
                     if (bool.TryParse(args, out boolVal)) {
-                        if (p.Supports(CpeExt.BlockDefinitionsExt) || p.Supports(CpeExt.BlockDefinitionsExt2)) {
-                            step = 16;
-                        } else {
-                            step++;
-                        }
-                        def.FullBright = boolVal;
+                        step++; def.FullBright = boolVal;
                         p.Message("   &bSet full bright to: " + boolVal);
                     }
                     break;
                 case 9:
-                    if (byte.TryParse(args, out value) && value <= 16) {
-                        step++;
-                        def.Shape = value;
-                        def.MinX = 0; def.MinY = 0; def.MinZ = 0;
-                        def.MaxX = 16; def.MaxY = 16; def.MaxZ = value;
-                        p.Message("   &bSet block shape to: " + value);
-                    }
-                    break;
-                case 10:
-                    if (byte.TryParse(args, out value) && value <= 4) {
-                        step++; def.BlockDraw = value;
-                        p.Message("   &bSet block draw type to: " + value);
-                    }
-                    break;
-                case 11:
-                    if (byte.TryParse(args, out value)) {
-                        def.FogDensity = value;
-                        step += value == 0 ? 4 : 1;
-                        p.Message("   &bSet density of fog to: " + value);
-                    }
-                    break;
-                case 12:
-                    if (IsValidHex(args)) {
-                        CustomColor col = Color.ParseHex(args);
-                        def.FogR = col.R;
-                        p.Message("   &bSet red component of fog to: " + col.R);
-                        def.FogG = col.G;
-                        p.Message("   &bSet green component of fog to: " + col.G);
-                        def.FogB = col.B;
-                        p.Message("   &bSet blue component of fog to: " + col.B);
-                        step += 3;
-                    } else {
-                        if (byte.TryParse(args, out value)) {
-                            step++; def.FogR = value;
-                            p.Message("   &bSet red component of fog to: " + value);
-                        }
-                    }
-                    break;
-                case 13:
-                    if (byte.TryParse(args, out value)) {
-                        step++; def.FogG = value;
-                        p.Message("   &bSet green component of fog to: " + value);
-                    }
-                    break;
-                case 14:
-                    if (byte.TryParse(args, out value)) {
-                        step++; def.FogB = value;
-                        p.Message("   &bSet blue component of fog to: " + value);
-                    }
-                    break;
-                case 16:
                     if (args.CaselessEquals("-1")) {
                         p.Message("   &bBlock will display as a Sprite");
                         def.Shape = 0;
                         def.MinX = 0; def.MinY = 0; def.MinZ = 0;
                         def.MaxX = 16; def.MaxY = 16; def.MaxZ = 16;
-                        step = 10;
+                        step += 3;
                         break;
                     }
                     
@@ -1608,13 +1552,12 @@ namespace fCraft {
                         p.Message("Invalid coordinates! All 3 must be between 0 and 15");
                         return;
                     }
+                    
                     step++;
-                    def.MinX = minx;
-                    def.MinY = miny;
-                    def.MinZ = minz;
+                    def.MinX = minx; def.MinY = miny; def.MinZ = minz;
                     p.Message("   &bSet minimum coords to X:{0} Y:{1} Z:{2}", minx, miny, minz);
                     break;
-                case 17:
+                case 10:
                     string[] maxArgs = args.Split();
                     if (maxArgs.Length != 3) {
                         p.Message("Please specify 3 coordinates");
@@ -1632,12 +1575,53 @@ namespace fCraft {
                         p.Message("Invalid coordinates! All 3 must be between 1 and 16");
                         return;
                     }
-                    step = 10;
+                    
+                    step++;
                     def.MaxX = maxx;
-                    def.MaxY = maxy;
-                    def.MaxZ = maxz;
-                    def.Shape = maxz;
+                    def.MaxY = maxy; def.MaxZ = maxz; def.Shape = maxz;
                     p.Message("   &bSet maximum coords to X:{0} Y:{1} Z:{2}", maxx, maxy, maxz);
+                    break;
+                case 11:
+                    if (byte.TryParse(args, out value) && value <= 4) {
+                        step++; def.BlockDraw = value;
+                        p.Message("   &bSet block draw type to: " + value);
+                    }
+                    break;
+                case 12:
+                    if (byte.TryParse(args, out value)) {
+                        def.FogDensity = value;
+                        step += value == 0 ? 4 : 1;
+                        p.Message("   &bSet density of fog to: " + value);
+                    }
+                    break;
+                case 13:
+                    if (IsValidHex(args)) {
+                        CustomColor col = Color.ParseHex(args);
+                        def.FogR = col.R;
+                        p.Message("   &bSet red component of fog to: " + col.R);
+                        def.FogG = col.G;
+                        p.Message("   &bSet green component of fog to: " + col.G);
+                        def.FogB = col.B;
+                        p.Message("   &bSet blue component of fog to: " + col.B);
+                        step += 3;
+                    } else {
+                        if (byte.TryParse(args, out value)) {
+                            step++; def.FogR = value;
+                            p.Message("   &bSet red component of fog to: " + value);
+                        }
+                    }
+                    break;
+                case 14:
+                    if (byte.TryParse(args, out value)) {
+                        step++; def.FogG = value;
+                        p.Message("   &bSet green component of fog to: " + value);
+                    }
+                    break;
+                case 15:
+                    if (byte.TryParse(args, out value)) {
+                        step++; def.FogB = value;
+                        p.Message("   &bSet blue component of fog to: " + value);
+                    }
                     break;
                 default:
                     Block block;
@@ -1850,12 +1834,11 @@ namespace fCraft {
                         hasChanged = true;
                     }
                     break;
-                case "size":
+                case "sprite":
                 case "shape":
-                case "height":
-                    if (byte.TryParse(args, out value) && value <= 16) {
-                        p.Message("&bChanged block shape of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.Shape, value);
-                        def.Shape = value;
+                    if (bool.TryParse(args, out boolVal) && value <= 16) {
+                        p.Message("&bChanged is a sprite block of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.Shape == 0, value);
+                        def.Shape = boolVal ? (byte)0 : def.MaxZ;
                         hasChanged = true;
                     }
                     break;
@@ -2072,9 +2055,12 @@ namespace fCraft {
                 "&S0 = no sound, 1 = wood, 2 = gravel, 3 = grass, 4 = stone,",
                 "&S5 = metal, 6 = glass, 7 = wool, 8 = sand, 9 = snow." },
             new [] { "&SEnter whether the block is fully bright (i.e. like lava). (true or false)" },
-            new [] { "&SEnter the shape of the block. (0-16)",
-                "&S0 = sprite(e.g. roses), 1-16 = cube of the given height",
-                "&S(e.g. snow has height '2', slabs have height '8', dirt has height '16')" },
+            new [] { "Enter the min X Y Z coords of this block,",
+                "Min = 0 Max = 15 Example: &H0 0 0",
+                "&H-1&S to make it a sprite (e.g roses)" },
+            new [] { "Enter the max X Y Z coords of this block,",
+                "Min = 1 Max = 16 Example: &H16 16 16",
+                "&S(e.g. snow has max Z '2', slabs have '8', dirt has '16')" },
             new [] { "&SEnter the block draw type of this block. (0-4)",
                 "&S0 = solid/opaque, 1 = transparent (like glass)",
                 "&S2 = transparent (like leaves), 3 = translucent (like water)",
@@ -2086,11 +2072,6 @@ namespace fCraft {
             new [] { "Enter the blue component of the fog colour. (0-255)" },
             new [] { "Enter the fallback block for this block.",
                 "This block is shown to clients that don't support BlockDefinitions." },
-            new [] { "Enter the min X Y Z coords of this block,",
-                "Min = 0 Max = 15 Example: &H0 0 0",
-                "&H-1&S to make it a sprite" },
-            new [] { "Enter the max X Y Z coords of this block,",
-                "Min = 1 Max = 16 Example: &H16 16 16" },
         };
         
         static BlockDefinition GetCustomBlock(bool global, BlockDefinition[] defs, byte id) {
