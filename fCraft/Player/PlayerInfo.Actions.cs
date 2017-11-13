@@ -793,7 +793,7 @@ namespace fCraft {
                     target.Send(Packet.MakeSetClickDistance((target.World.maxReach < ReachDistance 
                         && !target.IsStaff) ? target.World.maxReach : ReachDistance));
                 }
-                if (target.Supports(CpeExt.BlockPermissions)) {
+                if (target.Supports(CpeExt.BlockPermissions) && target.World != null) {
                     target.SendBlockPermissions();
                 }
 
