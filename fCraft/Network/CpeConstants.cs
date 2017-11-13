@@ -151,5 +151,8 @@ namespace fCraft
         RotationX = 0,
         RotationY = 1,
         RotationZ = 2,
+        ScaleX = 3,
+        ScaleY = 4,
+        ScaleZ = 5,
     }
 }
