@@ -230,17 +230,6 @@ namespace fCraft {
             if (blockEl != null) {
                 world.BlockDB.LoadSettings(blockEl);
             }
-            
-            // Load CustomBlock settings
-            string blockDefPath = Path.Combine(Paths.BlockDefsDirectory, world.Name + ".txt");
-            if (File.Exists(blockDefPath)) {
-                int count;
-                BlockDefinition[] defs = BlockDefinition.Load(blockDefPath, out count);
-                for (int i = 0; i < defs.Length; i++) {
-                    if (defs[i] == null) defs[i] = BlockDefinition.GlobalDefs[i];
-                }
-                world.BlockDefs = defs;
-            }
 
             // load environment settings
             XElement envEl = el.Element(EnvironmentXmlTagName);
@@ -732,6 +721,7 @@ namespace fCraft {
                 throw new WorldOpException( name, WorldOpExceptionCode.InvalidWorldName );
             }
 
+            World newWorld;
             lock( SyncRoot ) {
                 if( WorldIndex.ContainsKey( name.ToLower() ) ) {
                     throw new WorldOpException( name, WorldOpExceptionCode.DuplicateWorldName );
@@ -741,25 +731,28 @@ namespace fCraft {
                     throw new WorldOpException( name, WorldOpExceptionCode.Cancelled );
                 }
 
-                World newWorld = new World( name ) {
-                    Map = map
-                };
-
-                if( preload ) {
-                    newWorld.Preload = true;
-                }
-
-                if( map != null ) {
-                    newWorld.SaveMap();
-                }
+                newWorld = new World( name ) { Map = map };
+                if( preload ) newWorld.Preload = true;
+                if( map != null ) newWorld.SaveMap();
 
                 WorldIndex.Add( name.ToLower(), newWorld );
                 UpdateWorldList();
 
                 RaiseWorldCreatedEvent( player, newWorld );
-
-                return newWorld;
             }
+                        
+            // Load CustomBlock settings
+            string blockDefPath = Path.Combine(Paths.BlockDefsDirectory, name + ".txt");
+            if (File.Exists(blockDefPath)) {
+                int count;
+                BlockDefinition[] defs = BlockDefinition.Load(blockDefPath, out count);
+                for (int i = 0; i < defs.Length; i++) {
+                    if (defs[i] == null) defs[i] = BlockDefinition.GlobalDefs[i];
+                }
+                newWorld.BlockDefs = defs;
+            }
+            
+            return newWorld;
         }
 
 
