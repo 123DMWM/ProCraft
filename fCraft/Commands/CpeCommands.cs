@@ -688,7 +688,7 @@ namespace fCraft {
             Permissions = new[] { Permission.ManageWorlds },
             Help = "Prints or changes environmental variables for a world.&N" +
                 "Variables are: border, clouds, edge, fog, level, cloudsheight, shadow, sky, sunlight, " +
-                "texture, weather, maxfog, cloudspeed, weatherspeed, weatherfade.&N" +
+                "texture, weather, maxfog, cloudspeed, weatherspeed, weatherfade, sidesoffset, skyboxhorspeed, skyboxverspeed&N" +
                 "See &H/Help env <Variable>&S for details about a variable.&N" +
                 "Type &H/Env <WorldName> normal&S to reset everything.",
             HelpSections = new Dictionary<string, string>{
@@ -742,13 +742,16 @@ namespace fCraft {
                 { "weatherfade","&H/Env <WorldName> weatherfade <#>&N&S" +
                         "Sets how quickly rain/snow fades, relative to normal rate." +
                         "&NUse \"normal\" instead of a number to reset to default (0)." },
+                { "sidesoffset", "&H/Env <WorldName> sidesoffset <#>&N&S" +
+                        "Sets how far below (or above) the border block is compared to the edge block. " +
+                        "&NUse \"normal\" instead of a number to reset to default (-2)." },          	
                 { "skyboxhorspeed","&H/Env <WorldName> skyoxhorspeed <#>&N&S" +
                         "Sets how quickly skybox rotates horizontally around." +
-            			"&Ne.g. a value of 0.5 means it rotates 360 degrees every two seconds." +
+            			"&Ne.g. 0.5 means it rotates 360 degrees every two seconds." +
                         "&NUse \"normal\" instead of a number to reset to default (0)." },
-                { "skyboxverrspeed","&H/Env <WorldName> skyoxverspeed <#>&N&S" +
+                { "skyboxverspeed","&H/Env <WorldName> skyoxverspeed <#>&N&S" +
                         "Sets how quickly skybox rotates vertically around." +
-            			"&Ne.g. a value of 0.5 means it rotates 360 degrees every two seconds." +
+            			"&Ne.g. 0.5 means it rotates 360 degrees every two seconds." +
                         "&NUse \"normal\" instead of a number to reset to default (0)." },
             },
             Usage = "/Env <WorldName> <Variable>",
