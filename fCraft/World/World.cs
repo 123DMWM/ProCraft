@@ -265,6 +265,7 @@ namespace fCraft {
                     SkyboxVerSpeed = SkyboxVerSpeed,
                     Buildable = Buildable,
                     Deletable = Deletable,
+                    BlockDefs = BlockDefs,
                 };
                 newMap.World = newWorld;
                 newWorld.Map = newMap;
