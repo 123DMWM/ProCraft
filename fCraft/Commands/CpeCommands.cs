@@ -1659,8 +1659,8 @@ namespace fCraft {
             string scope = global ? "global" : "level";
             string name = global ? "/gb" : "/lb";
 
-            if (!cmd.NextBlock(p, false, out srcBlock)) return;
-            if (!cmd.NextBlock(p, false, out dstBlock)) return;
+            if (!cmd.NextRawBlock(p, out srcBlock)) return;
+            if (!cmd.NextRawBlock(p, out dstBlock)) return;
             if (dstBlock == Block.Air || dstBlock == Block.None) {
                 p.Message("Destination block cannot have 0 or 255 ID."); return;
             }
@@ -1699,7 +1699,7 @@ namespace fCraft {
             string scope = global ? "global" : "level";
             string name = global ? "/gb" : "/lb";
             
-            if (!cmd.NextBlock(p, false, out blockID)) return;
+            if (!cmd.NextRawBlock(p, out blockID)) return;
             
             BlockDefinition def = GetCustomBlock(global, defs, (byte)blockID);
             if (def == null) {

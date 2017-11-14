@@ -229,8 +229,18 @@ namespace fCraft
             return ParseBlock(blockName, player, allowNoneBlock, ref block);
         }
         
+        public bool NextRawBlock([CanBeNull] Player player, out Block block) {
+            string name = Next();
+            block = Block.None;
+            if (name == null) return false;
+            
+            byte raw;
+            if (byte.TryParse(name, out raw)) { block = (Block)raw; return true; }
+            
+            return ParseBlock(name, player, false, ref block);
+        }       
         
-        bool ParseBlock(string blockName, [CanBeNull] Player player, bool allowNoneBlock, ref Block block) {
+        static bool ParseBlock(string blockName, [CanBeNull] Player player, bool allowNoneBlock, ref Block block) {
             World world = player == null ? null : player.World;
             if (Map.GetBlockByName(world, blockName, true, out block)) {
                 if (block != Block.None || allowNoneBlock) {
