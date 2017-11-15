@@ -1389,6 +1389,11 @@ namespace fCraft {
 
         static void AutoRankCheckHandler( Player player, CommandReader cmd ) {
             string name = cmd.Next();
+            if( name == null ) {
+                CdAutoRankCheck.PrintUsage(player);
+                return;
+            }
+            
             PlayerInfo info = PlayerDB.FindPlayerInfoOrPrintMatches( player, name, SearchOptions.IncludeSelf );
             if( info == null ) return;
             
