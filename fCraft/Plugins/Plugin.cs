@@ -31,9 +31,9 @@ namespace fCraft {
 
     public interface Plugin {
 
-        String Name { get; set; }
+        string Name { get; set; }
 
-        String Version { get; set; }
+        string Version { get; set; }
 
         void Initialize();
     }

@@ -63,7 +63,7 @@ namespace fCraft.Portals {
             try {
                 lock (IOLock) {
                     using (StreamReader r = new StreamReader(Paths.PortalDBFileName)) {
-                        String line;
+                        string line;
                         int count = 0;
 
                         while ((line = r.ReadLine()) != null) {

@@ -72,9 +72,9 @@ namespace fCraft {
 
         static void CalcHandler(Player player, CommandReader cmd)
         {
-            String numberone = cmd.Next();
-            String op = cmd.Next();
-            String numbertwo = cmd.Next();
+            string numberone = cmd.Next();
+            string op = cmd.Next();
+            string numbertwo = cmd.Next();
             double no1 = 1;
             double no2 = 1;
 
@@ -1108,7 +1108,7 @@ namespace fCraft {
 
             // to make it look like player just logged out in /Info
             player.Info.LastSeen = DateTime.UtcNow;
-            String quitMessage = (silentString.Length < 1 ? "" : "/Quit " + (silentString.Length > 64 ? silentString.Remove(64) : silentString));
+            string quitMessage = (silentString.Length < 1 ? "" : "/Quit " + (silentString.Length > 64 ? silentString.Remove(64) : silentString));
 
             if (!silent && ConfigKey.ShowConnectionMessages.Enabled()) {
                 if (!quitMessage.Equals("")) {

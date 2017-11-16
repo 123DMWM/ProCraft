@@ -59,7 +59,7 @@ namespace fCraft {
         public int MessageSpam { get; set; }
 
         /// <summary> Last sign clicked by the player</summary>
-        public String LastSignClicked;
+        public string LastSignClicked;
 
         /// <summary> Whether the player has completed the login sequence. </summary>
         public SessionState State { get; private set; }

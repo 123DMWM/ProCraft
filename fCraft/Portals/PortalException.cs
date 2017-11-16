@@ -21,7 +21,7 @@ using System.Text;
 
 namespace fCraft.Portals {
     class PortalException : Exception {
-        public PortalException(String message)
+        public PortalException(string message)
             : base(message) {
             // Do nothing
         }

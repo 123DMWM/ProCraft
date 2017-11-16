@@ -77,7 +77,7 @@ namespace fCraft.Portals {
             return false;
         }
 
-        public static String GenerateName(World world) {
+        public static string GenerateName(World world) {
             if (world.Portals != null) {
                 if (world.Portals.Count > 0) {
                     bool found = false;
@@ -107,7 +107,7 @@ namespace fCraft.Portals {
             return "portal1";
         }
 
-        public static bool DoesNameExist(World world, String name) {
+        public static bool DoesNameExist(World world, string name) {
             if (world.Portals != null) {
                 if (world.Portals.Count > 0) {
                     foreach (Portal portal in world.Portals) {

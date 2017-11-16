@@ -102,7 +102,7 @@ namespace fCraft {
 
         /// <summary> Begins to asynchronously check player's account type. </summary>
         public void GeoipLogin() {
-            String ip = LastIP.ToString();
+            string ip = LastIP.ToString();
             if (IPAddress.Parse(ip).IsLocal() && Server.ExternalIP != null) {
                 ip = Server.ExternalIP.ToString();
             }
