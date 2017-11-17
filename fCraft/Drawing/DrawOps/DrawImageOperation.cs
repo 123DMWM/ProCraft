@@ -35,17 +35,11 @@ namespace fCraft.Drawing {
 
         public override string Description {
             get {
-                if (ImageUrl == null) {
-                    return Name;
-                }
+                if (ImageUrl == null) return Name;
                 string fileName = ImageUrl.IsFile
                                       ? Path.GetFileName(ImageUrl.AbsolutePath)
                                       : ImageUrl.AbsolutePath;
-                if (Palette == BlockPalette.Layered) {
-                    return String.Format("{0}({1})", Name, fileName);
-                } else {
-                    return String.Format("{0}({1}, {2})", Name, fileName, Palette.Name);
-                }
+                return String.Format("{0}({1}, {2})", Name, fileName, Palette.Name);
             }
         }
 
@@ -115,18 +109,15 @@ namespace fCraft.Drawing {
             // Check if player gave optional second argument (palette name)
             string paletteName = cmd.Next();
             if (paletteName != null) {
-                StandardBlockPalette paletteType;
-                if (EnumUtil.TryParse(paletteName, out paletteType, true)) {
-                    Palette = BlockPalette.GetPalette(paletteType);
-                } else {
+                Palette = BlockPalette.FindPalette(paletteName);
+                if (Palette == null) {
                     Player.Message("DrawImage: Unrecognized palette \"{0}\". Available palettes are: \"{1}\"",
-                                   paletteName,
-                                   Enum.GetNames(typeof(StandardBlockPalette)).JoinToString());
+                                   paletteName, BlockPalette.Palettes.JoinToString(pal => pal.Name));
                     return false;
                 }
             } else {
                 // default to "Light" (lit single-layer) palette
-                Palette = BlockPalette.Light;
+                Palette = BlockPalette.FindPalette("Light");
             }
 
             // All set
