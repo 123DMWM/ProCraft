@@ -2780,32 +2780,20 @@ namespace fCraft {
 
         private static void SnakeHandler(Player player, CommandReader cmd) {
             int length;
-            if (!cmd.NextInt(out length)) return;
+            if (!cmd.NextInt(out length)) {
+                CdSnake.PrintUsage(player);
+                return;
+            }
             if (length > 100000) {
-            	player.Message("Snake cannot be more than 100,000 blocks in length");
+                player.Message("Snake cannot be more than 100,000 blocks in length");
                 return;
             }
             
-            string sblock = cmd.Next();
-            Block newBlock;
-            if (sblock == null) {
-                if (player.LastUsedBlockType != Block.None) {
-                    string blockName = Map.GetBlockName(player.World, player.LastUsedBlockType);
-                    player.Message("No block specified, Using last used block ({0})", blockName);
-                    newBlock = player.LastUsedBlockType;
-                } else {
-                    player.Message("&WCannot deduce desired block. Click a block or type out the block name.");
-                    return;
-                }
-            } else if (!Map.GetBlockByName(player.World, sblock, false, out newBlock)) {
-                if (player.LastUsedBlockType != Block.None) {
-                    string blockName = Map.GetBlockName(player.World, player.LastUsedBlockType);
-                    player.Message("No block specified, Using last used block ({0})", blockName);
-                    newBlock = player.LastUsedBlockType;
-                } else {
-                    player.Message("&WCannot deduce desired block. Click a block or type out the block name.");
-                    return;
-                }
+            Block block = player.LastUsedBlockType;
+            if (cmd.HasNext && !cmd.NextBlock(player, false, out block)) return;
+            if (block == Block.None) {
+                player.Message("&WCannot deduce desired block. Click a block or type out the block name.");
+                return;
             }
             Random dir = new Random();
             Vector3I pos = new Vector3I(player.Position.BlockX, player.Position.BlockY, player.Position.BlockZ);
@@ -2819,13 +2807,13 @@ namespace fCraft {
                     Vector3I nextZ = pos; nextZ.Z += dir.Next(0, 2) * 2 - 1;
                     pos = new Vector3I(nextX.X, nextY.Y, nextZ.Z);
                     
-                    DrawOneBlock(player, player.World.Map, newBlock, nextX,
+                    DrawOneBlock(player, player.World.Map, block, nextX,
                           BlockChangeContext.Drawn,
                           ref blocksDrawn, ref blocksSkipped, undoState);
-                    DrawOneBlock(player, player.World.Map, newBlock, nextY,
+                    DrawOneBlock(player, player.World.Map, block, nextY,
                           BlockChangeContext.Drawn,
                           ref blocksDrawn, ref blocksSkipped, undoState);
-                    DrawOneBlock(player, player.World.Map, newBlock, nextZ,
+                    DrawOneBlock(player, player.World.Map, block, nextZ,
                           BlockChangeContext.Drawn,
                           ref blocksDrawn, ref blocksSkipped, undoState);
                 }
