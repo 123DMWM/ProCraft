@@ -1344,61 +1344,35 @@ namespace fCraft
 
         static void CapColHandler(Player player, CommandReader cmd)
         {
-            string targetName = player.Name;
-            string valName = cmd.NextAll();
-
+            string newName = cmd.NextAll();
             PlayerInfo info = player.Info;
-            if (info == null) return;
-
-            //Quickchanges nickname.
-            string oldDisplayedName = info.DisplayedName;
-            if (valName.Length == 0) valName = null;
-            if (valName == null)
-            {
-                valName = info.Name;
-            }
-            if (valName == info.DisplayedName)
-            {
-                player.Message("CapColor: Your DisplayedName is already set to \"{1}&S\"",
-                                    info.Name,
-                                    valName);
+            string oldName = info.DisplayedName;
+            if (String.IsNullOrEmpty(newName)) newName = info.Name;
+                
+            if (newName == oldName) {
+                player.Message("CapColor: Your DisplayedName is already set to \"{1}&S\"", info.Name, newName);
                 return;
-            }
-            if (valName != null && !Color.StripColors(valName, true).CaselessEquals(info.Name))
-            {
+            } else if (!Color.StripColors(newName, true).CaselessEquals(info.Name)) {
                 player.Message("CapColor: You may not change your name to something else");
                 return;
             }
-            if (!player.Can(Permission.ChangeNameColor))
-            {
-                valName = Color.StripColors(valName, true);
+            
+            if (!player.Can(Permission.ChangeNameColor)) {
+                newName = Color.StripColors(newName, true);
             }
-            if (cmd.IsConfirmed)
-            {
-                info.DisplayedName = valName;
-
-                if (oldDisplayedName == null)
-                {
-                    player.Message("CapColor: Your DisplayedName was set to \"{1}&S\"",
-                                    info.Name,
-                                    valName);
-                }
-                else if (valName == info.DisplayedName)
-                {
-                    player.Message("CapColor: Your DisplayedName was reset (was \"{1}&S\")",
-                                    info.Name,
-                                    oldDisplayedName);
-                }
-                else
-                {
-                    player.Message("CapColor: Your DisplayedName was changed from \"{1}&S\" to \"{2}&S\"",
-                                    info.Name,
-                                    oldDisplayedName,
-                                    valName);
-                }
-                return;
+            if (!cmd.IsConfirmed) {
+                 player.Confirm(cmd, "This will change your displayed name to " + newName);
+                 return;
             }
-            player.Confirm(cmd, "This will change your displayed name to " + valName);
+            
+            info.DisplayedName = newName;
+            if (oldName == null) {
+                player.Message("CapColor: Your DisplayedName was set to \"{0}&S\"", newName);
+            } else if (newName == info.Name) {
+                player.Message("CapColor: Your DisplayedName was reset (was \"{0}&S\")", oldName);
+            } else {
+                player.Message("CapColor: Your DisplayedName was changed from \"{0}&S\" to \"{1}&S\"", oldName, newName);
+            }
         }
         #endregion
     }
