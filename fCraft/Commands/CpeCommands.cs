@@ -1479,7 +1479,7 @@ namespace fCraft {
                     p.Message("   &bSet name to: " + def.Name);
                     break;
                 case 1:
-                    if (byte.TryParse(args, out value) && value <= 2) {
+                    if (byte.TryParse(args, out value)) {
                         step++; def.CollideType = value;
                         p.Message("   &bSet solidity to: " + value);
                     }
@@ -1585,7 +1585,7 @@ namespace fCraft {
                     p.Message("   &bSet maximum coords to X:{0} Y:{1} Z:{2}", maxx, maxy, maxz);
                     break;
                 case 11:
-                    if (byte.TryParse(args, out value) && value <= 4) {
+                    if (byte.TryParse(args, out value)) {
                         step++; def.BlockDraw = value;
                         p.Message("   &bSet block draw type to: " + value);
                     }
@@ -1725,7 +1725,7 @@ namespace fCraft {
                 case "solidity":
                 case "collide":
                 case "collidetype":
-                    if (byte.TryParse(args, out value) && value <= 2) {
+                    if (byte.TryParse(args, out value)) {
                         p.Message("&bChanged solidity of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.CollideType, value);
                         def.CollideType = value;
                         hasChanged = true;
@@ -1847,7 +1847,7 @@ namespace fCraft {
                     break;
                 case "draw":
                 case "blockdraw":
-                    if (byte.TryParse(args, out value) && value <= 4) {
+                    if (byte.TryParse(args, out value)) {
                         p.Message("&bChanged block draw type of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.BlockDraw, value);
                         def.BlockDraw = value;
                         hasChanged = true;
