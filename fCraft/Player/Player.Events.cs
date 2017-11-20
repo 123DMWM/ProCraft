@@ -131,7 +131,7 @@ namespace fCraft {
             if( h == null ) return false;
             h( null, e );
             e.Player.Info.LastWorld = e.Player.World.ClassyName;
-            e.Player.Info.LastWorldPos = e.Player.Position.ToString();
+            e.Player.Info.LastWorldPos = e.Player.Position.ToPlainString();
             return e.Cancel;
         }
 
@@ -143,7 +143,7 @@ namespace fCraft {
                 handler( null, new PlayerClickedEventArgs( player, coords, action, block ) );
             }
             player.Info.LastWorld = player.World.ClassyName;
-            player.Info.LastWorldPos = player.Position.ToString();
+            player.Info.LastWorldPos = player.Position.ToPlainString();
         }        
 
         internal static void RaisePlayerPlacedBlockEvent( Player player, Map map, Vector3I coords,

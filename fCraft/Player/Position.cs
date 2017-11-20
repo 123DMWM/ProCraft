@@ -90,14 +90,30 @@ namespace fCraft {
 
         #endregion
 
-        public override string ToString()
-        {
+        public override string ToString() {
             return String.Format("&S(X:&f{0}&S Y:&f{1}&S Z:&f{2}&S R:&f{3}&S L:&f{4}&S)", X, Y, Z, R, L);
+        }
+        
+        public string ToPlainString() {
+            return X + "_" + Y + "_" + Z + "_" + R + "_" + L;
         }
         
         public static Position FromString(string text) {
             Position pos = new Position();
+            
             try {
+                // New ToPlainString format
+                if (text.IndexOf('_') >= 0) {
+                    string[] bits = text.Split('_');
+                    pos.X = int.Parse(bits[0]);
+                    pos.Y = int.Parse(bits[1]);
+                    pos.Z = int.Parse(bits[2]);
+                    pos.R = byte.Parse(bits[3]);
+                    pos.L = byte.Parse(bits[4]);
+                    return pos;
+                }
+                
+                // Backwards compatibility with old format
                 string pat = @"\(X:(.*)Y:(.*) Z:(.*) R:(.*) L:(.*)\)";
                 Regex r = new Regex(pat, RegexOptions.IgnoreCase);
                 text = Color.StripColors(text, true);

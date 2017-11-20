@@ -1132,7 +1132,7 @@ namespace fCraft {
                 RaisePlayerClickedEvent( this, coords, e.Action, e.Block );
                 PlaceBlock( coords, e.Action, e.Block );
                 Info.LastWorld = this.World.ClassyName;
-                Info.LastWorldPos = this.Position.ToString();
+                Info.LastWorldPos = this.Position.ToPlainString();
             }
         }
         

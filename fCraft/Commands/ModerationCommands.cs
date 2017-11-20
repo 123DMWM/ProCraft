@@ -1605,12 +1605,12 @@ namespace fCraft {
                             player.Message("Teleported to {0}'s last block change", info.Name);
                             return;
                         } else {
-                            player.Message("That users last known position is not on this world");
+                            player.Message("User's last block change is not on this world");
                             player.Message("Please use &H/j {0} &Sto go there", Color.StripColors(info.LastWorld, true));
                             return;
                         }
                     } else {
-                        player.Message("That user does not have a last known position");
+                        player.Message("That user does not have a last known block change position");
                         return;
                     }
                 }

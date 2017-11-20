@@ -2801,7 +2801,7 @@ namespace fCraft {
             if (player.World != null && player.World.Map != null) {
                 int blocksDrawn = 0, blocksSkipped = 0;
                 UndoState undoState = player.DrawBegin(null);
-                for (int i = 1; i <= length; i++) {
+                for (int i = 0; i < length; i++) {
                     Vector3I nextX = pos; nextX.X += dir.Next(0, 2) * 2 - 1;
                     Vector3I nextY = pos; nextY.Y += dir.Next(0, 2) * 2 - 1;
                     Vector3I nextZ = pos; nextZ.Z += dir.Next(0, 2) * 2 - 1;
