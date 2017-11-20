@@ -81,7 +81,7 @@ namespace fCraft {
         }
         
         public string Format() {
-            return String.Format("Lowest ping {0}ms, average {1}ms, highest {2}ms",
+            return String.Format("&A{0}&S:&7{1}&S:&C{2}&T",
                                  LowestPingMilliseconds(),
                                  AveragePingMilliseconds(),
                                  HighestPingMilliseconds());

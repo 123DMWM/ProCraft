@@ -1760,7 +1760,8 @@ namespace fCraft {
             }
             
             if (target != null && target.Ping.AveragePingMilliseconds() != 0) {
-                player.Message(target.Ping.Format());
+                player.Message("Ping: (&ALo&S:&7Med&S:&CHi&S)ms");
+                player.Message(" " + target.Ping.Format());
             }
         }
 
@@ -2084,9 +2085,9 @@ namespace fCraft {
             }
             
             Player[] list = candidates.Skip(fixOffset(offset, candidates.Count())).Take(10).ToArray();
-            player.Message("Ping/Latency List:");           
+            player.Message("Ping/Latency List: (&ALo&S:&7Med&S:&CHi&S)ms");           
             for (int i = 0; i < list.Length; i++) {
-                player.Message(" &7{1}&S - {0}", list[i].Info.ClassyName, list[i].Ping.Format());
+                player.Message(" {1}&S - {0}", list[i].Info.ClassyName, list[i].Ping.Format());
             }
             player.Message("Showing players {0}-{1} (out of {2}).", offset + 1, offset + list.Length, candidates.Count());
         }
