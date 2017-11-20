@@ -79,7 +79,9 @@ namespace fCraft {
         /// can be used for anything you want. </summary>
         public object UserState { get; set; }
 
-
+#if DEBUG_SCHEDULER
+        public DateTime ExecuteStart, ExecuteEnd;
+#endif
         #region Run Once
 
         /// <summary> Runs the task once, as quickly as possible.

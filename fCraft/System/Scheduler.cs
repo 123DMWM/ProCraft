@@ -18,7 +18,12 @@ namespace fCraft {
         static Thread schedulerThread,
                       backgroundThread;
 
-
+#if DEBUG_SCHEDULER
+        public static event EventHandler<SchedulerTaskEventArgs> TaskAdded;
+        public static event EventHandler<SchedulerTaskEventArgs> TaskRemoved;
+        public static event EventHandler<SchedulerTaskEventArgs> TaskExecuted;
+        public static event EventHandler<SchedulerTaskEventArgs> TaskExecuting;
+#endif
         public static int CriticalTaskCount {
             get {
                 lock( BackgroundTaskQueueLock ) {
@@ -65,6 +70,7 @@ namespace fCraft {
                     } else {
                         task.IsExecuting = true;
 #if DEBUG_SCHEDULER
+                        task.ExecuteStart = DateTime.UtcNow;
                         FireEvent( TaskExecuting, task );
 #endif
 
@@ -82,6 +88,7 @@ namespace fCraft {
 #endif
 
 #if DEBUG_SCHEDULER
+                        task.ExecuteEnd = DateTime.UtcNow;
                         FireEvent( TaskExecuted, task );
 #endif
                     }
@@ -130,6 +137,7 @@ namespace fCraft {
         static void ExecuteBackgroundTask( SchedulerTask task ) {
             task.IsExecuting = true;
 #if DEBUG_SCHEDULER
+                    task.ExecuteStart = DateTime.UtcNow;
                     FireEvent( TaskExecuting, task );
 #endif
 
@@ -146,6 +154,7 @@ namespace fCraft {
 #endif
 
 #if DEBUG_SCHEDULER
+					task.ExecuteEnd = DateTime.UtcNow;
                     FireEvent( TaskExecuted, task );
 #endif
         }
@@ -162,11 +171,9 @@ namespace fCraft {
                 FireEvent( TaskAdded, task );
                 if( Tasks.Add( task ) ) {
                     UpdateCache();
-                    Logger.Log( LogType.Debug,
-                                "Scheduler.AddTask: Added {0}", task );
-                }else{
-                    Logger.Log( LogType.Debug,
-                                "Scheduler.AddTask: Added duplicate {0}", task );
+                    Logger.Log( LogType.Debug, "Scheduler.AddTask: Added {0}", task );
+                } else {
+                    Logger.Log( LogType.Debug, "Scheduler.AddTask: Added duplicate {0}", task );
                 }
 #else
                 if( Tasks.Add( task ) ) {
@@ -282,6 +289,10 @@ namespace fCraft {
             lock( TaskListLock ) {
                 foreach( SchedulerTask task in Tasks ) {
                     player.Message( task.ToString() );
+#if DEBUG_SCHEDULER
+                    TimeSpan delta = task.ExecuteEnd - task.ExecuteStart;
+                    player.Message( "   Exceution time: {0} milliseconds", delta.TotalMilliseconds);
+#endif
                 }
             }
         }
