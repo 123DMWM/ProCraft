@@ -2779,16 +2779,13 @@ namespace fCraft {
         };
 
         private static void SnakeHandler(Player player, CommandReader cmd) {
-            string slength = cmd.Next();
             int length;
-            if (slength == null) {
-                CdSnake.PrintUsage(player);
+            if (!cmd.NextInt(out length)) return;
+            if (length > 100000) {
+            	player.Message("Snake cannot be more than 100,000 blocks in length");
                 return;
             }
-            if (!int.TryParse(slength, out length)) {
-                player.Message("Invalid Integer: ({0})", slength);
-                return;
-            }
+            
             string sblock = cmd.Next();
             Block newBlock;
             if (sblock == null) {
@@ -2811,23 +2808,24 @@ namespace fCraft {
                 }
             }
             Random dir = new Random();
-            Vector3I posStart = new Vector3I(player.Position.BlockX, player.Position.BlockY, player.Position.BlockZ);
+            Vector3I pos = new Vector3I(player.Position.BlockX, player.Position.BlockY, player.Position.BlockZ);
 
             if (player.World != null && player.World.Map != null) {
                 int blocksDrawn = 0, blocksSkipped = 0;
                 UndoState undoState = player.DrawBegin(null);
                 for (int i = 1; i <= length; i++) {
-                    Vector3I posx = new Vector3I(posStart.X + dir.Next(0, 2) * 2 - 1, posStart.Y, posStart.Z);
-                    Vector3I posy = new Vector3I(posStart.X, posStart.Y + dir.Next(0, 2) * 2 - 1, posStart.Z);
-                    Vector3I posz = new Vector3I(posStart.X, posStart.Y, posStart.Z + dir.Next(0, 2) * 2 - 1);
-                    posStart = new Vector3I(posx.X, posy.Y, posz.Z);
-                    DrawOneBlock(player, player.World.Map, newBlock, posx,
+                    Vector3I nextX = pos; nextX.X += dir.Next(0, 2) * 2 - 1;
+                    Vector3I nextY = pos; nextY.Y += dir.Next(0, 2) * 2 - 1;
+                    Vector3I nextZ = pos; nextZ.Z += dir.Next(0, 2) * 2 - 1;
+                    pos = new Vector3I(nextX.X, nextY.Y, nextZ.Z);
+                    
+                    DrawOneBlock(player, player.World.Map, newBlock, nextX,
                           BlockChangeContext.Drawn,
                           ref blocksDrawn, ref blocksSkipped, undoState);
-                    DrawOneBlock(player, player.World.Map, newBlock, posy,
+                    DrawOneBlock(player, player.World.Map, newBlock, nextY,
                           BlockChangeContext.Drawn,
                           ref blocksDrawn, ref blocksSkipped, undoState);
-                    DrawOneBlock(player, player.World.Map, newBlock, posz,
+                    DrawOneBlock(player, player.World.Map, newBlock, nextZ,
                           BlockChangeContext.Drawn,
                           ref blocksDrawn, ref blocksSkipped, undoState);
                 }
