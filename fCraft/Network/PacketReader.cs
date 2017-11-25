@@ -42,8 +42,8 @@ namespace fCraft {
             byte[] data = ReadBytes( Packet.StringSize );
             for( int i = Packet.StringSize - 1; i >= 0; i-- ) {
                 byte code = data[i];
-                if( length == 0 && !(code == 0 || code == 0x20) )
-                   length = i + 1;
+                if (code == 0) code = 0x20; // NULL to space                
+                if (length == 0 && code != 0x20) { length = i + 1; }
                 
                 // Treat code as an index in code page 437
                 if( code < 0x20 ) {
