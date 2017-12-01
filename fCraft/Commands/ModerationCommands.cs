@@ -70,157 +70,48 @@ namespace fCraft {
             Handler = CalcHandler,
         };
 
-        static void CalcHandler(Player player, CommandReader cmd)
-        {
-            string numberone = cmd.Next();
-            string op = cmd.Next();
-            string numbertwo = cmd.Next();
-            double no1 = 1;
-            double no2 = 1;
+        static void CalcHandler(Player player, CommandReader cmd) {
+            string arg1 = cmd.Next(), op = cmd.Next(), arg2 = cmd.Next();
+            double n1, n2;
 
-            if (numberone == null || op == null)
-            {
+            if (arg1 == null || op == null) {
                 CdCalculator.PrintUsage(player);
                 return;
             }
-
-            if (!double.TryParse(numberone, out no1))
-            {
-                player.Message("Please choose from a whole number.");
+            if (!double.TryParse(arg1, out n1)) {
+                player.Message("{0} is not a whole number.", arg1);
                 return;
             }
-            if (numbertwo != null)
-            {
-                if (!double.TryParse(numbertwo, out no2))
-                {
-                    player.Message("Please choose from a whole number.");
+
+            if (op == "+" || op == "-" || op == "*" || op == "/") {
+                if (arg2 == null) {
+                    CdCalculator.PrintUsage(player);
                     return;
                 }
-            }
-
-
-            if (player.Can(Permission.Chat))
-            {
-
-                if (numberone != null || op != null)
-                {
-                    if (op == "+" | op == "-" | op == "*" | op == "/" | op == "sqrt" | op == "sqr")
-                    {
-
-                        if (op == "+")
-                        {
-                            if (numbertwo == null)
-                            {
-                                player.Message("You must select a second number!");
-                                return;
-                            }
-                            double add = no1 + no2;
-                            if (add < 0 | no1 < 0 | no2 < 0)
-                            {
-                                player.Message("Negative Number Detected, please choose from a whole number.");
-                                return;
-                            }
-                            else
-                            {
-                                player.Message("&0Calculator&f: {0} + {1} = {2}", no1, no2, add);
-                            }
-                        }
-                        if (op == "-")
-                        {
-                            if (numbertwo == null)
-                            {
-                                player.Message("You must select a second number!");
-                                return;
-                            }
-                            double subtr = no1 - no2;
-                            if (subtr < 0 | no1 < 0 | no2 < 0)
-                            {
-                                player.Message("Negative Number Detected, please choose from a whole number.");
-                                return;
-                            }
-                            else
-                            {
-                                player.Message("&0Calculator&f: {0} - {1} = {2}", no1, no2, subtr);
-                            }
-                        }
-                        if (op == "*")
-                        {
-                            if (numbertwo == null)
-                            {
-                                player.Message("You must select a second number!");
-                                return;
-                            }
-                            double mult = no1 * no2;
-                            if (mult < 0 | no1 < 0 | no2 < 0)
-                            {
-                                player.Message("Negative Number Detected, please choose from a whole number.");
-                                return;
-                            }
-                            else
-                            {
-                                player.Message("&0Calculator&f: {0} * {1} = {2}", no1, no2, mult);
-                            }
-                        }
-                        if (op == "/")
-                        {
-                            if (numbertwo == null)
-                            {
-                                player.Message("You must select a second number!");
-                                return;
-                            }
-                            double div = no1 / no2;
-                            if (div < 0 | no1 < 0 | no2 < 0)
-                            {
-                                player.Message("Negative Number Detected, please choose from a whole number.");
-                                return;
-                            }
-                            else
-                            {
-                                player.Message("&0Calculator&f: {0} / {1} = {2}", no1, no2, div);
-                                return;
-                            }
-                        }
-                        if (op == "sqrt")
-                        {
-                            double sqrt = Math.Round(Math.Sqrt(no1), 2);
-                            if (no1 < 0)
-                            {
-                                player.Message("Negative Number Detected, please choose from a whole number.");
-                                return;
-                            }
-                            else
-                            {
-                                player.Message("&0Calculator&f: Square Root of {0} = {1}", no1, sqrt);
-                                return;
-                            }
-                        }
-                        if (op == "sqr")
-                        {
-                            double sqr = no1 * no1;
-                            if (no1 < 0)
-                            {
-                                player.Message("Negative Number Detected, please choose from a whole number.");
-                                return;
-                            }
-                            else
-                            {
-                                player.Message("&0Calculator&f: Square of {0} = {1}", no1, sqr);
-                                return;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        player.Message("&cInvalid Operator. Please choose from '+' , '-' , '*' , '/' , 'sqrt' , or 'sqr'");
-                        return;
-                    }
+                if (!double.TryParse(arg2, out n2)) {
+                    player.Message("{0} is not a whole number.", arg2);
+                    return;
                 }
-                else
-                {
-                    CdCalculator.PrintUsage(player);
+                
+                double result = 0;
+                if (op == "+") { result = n1 + n2; }
+                if (op == "-") { result = n1 - n2; }
+                if (op == "*") { result = n1 * n2; }
+                if (op == "/") { result = n1 / n2; }
+                
+                player.Message("&0Calculator&f: {0} {1} {2} = {3}", n1, op, n2, result);
+            } else if (op == "sqrt") {
+                if (n1 < 0) {
+                    player.Message("&0Calculator&f: Can only square root non-negative numbers.");
+                } else {
+                    double sqrt = Math.Round(Math.Sqrt(n1), 2);
+                    player.Message("&0Calculator&f: Square Root of {0} = {1}", n1, sqrt);
                 }
+            } else if (op == "sqr") {
+                player.Message("&0Calculator&f: Square of {0} = {1}", n1, n1 * n1);
+            } else {
+                player.Message("&cOnly supported operators are: +, -, *, /, sqrt, or sqr");
             }
-
         }
         #endregion
         #region Sudo
