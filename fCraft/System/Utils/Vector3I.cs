@@ -303,6 +303,26 @@ namespace fCraft {
         public Position ToPlayerCoords() {
             return new Position( X * 32 + 16, Y * 32 + 16, Z * 32 + 16 );
         }
+        
+        public static Vector3I FlatDirection(byte yaw, byte pitch) {
+            int dirX = 0, dirY = 0, dirZ = 0;
+            if (pitch <= 32 || pitch >= 255) {
+                if (yaw <= 32 || yaw >= 255) {
+                    dirY = -1;
+                } else if (yaw >= 33 && yaw <= 96) {
+                    dirX = +1;
+                } else if (yaw >= 97 && yaw <= 160) {
+                    dirY = +1;
+                } else if (yaw >= 161 && yaw <= 224) {
+                    dirX = -1;
+                }
+            } else if (pitch >= 192 && pitch <= 224) {
+                dirZ = +1;
+            } else if (pitch >= 33 && pitch <= 65) {
+                dirZ = -1;
+            }
+            return new Vector3I(dirX, dirY, dirZ);
+        }
 
         #endregion
     }

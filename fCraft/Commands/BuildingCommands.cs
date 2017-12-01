@@ -771,59 +771,29 @@ namespace fCraft {
             }
             
             Block block;            
-            if (!cmd.NextBlock(player, false, out block)) return;           
-            int dis;
-            if (!cmd.NextInt(out dis)) return;
+            if (!cmd.NextBlock(player, false, out block)) return;
+            int length;
+            if (!cmd.NextInt(out length)) return;
             
-            dis = dis * 32;
             byte yaw = player.Position.R, pitch = player.Position.L;
-            Vector3I Pos;
+            Vector3I pos = player.Position.ToBlockCoordsRaw(); pos.Y--;
+            Vector3I dir = Vector3I.FlatDirection(yaw, pitch);
+            pos += dir * length;
             
-            if (225 < pitch || pitch < 32) {
-                if (225 <= yaw || yaw <= 32) {
-                   Pos = new Vector3I(player.Position.X/32, (player.Position.Y - dis)/32,
-                        (player.Position.Z - 32)/32);
-                   
-                } else if (33 <= yaw && yaw <= 96) {
-                   Pos = new Vector3I((player.Position.X + dis)/32, player.Position.Y/32,
-                        (player.Position.Z - 32) / 32);
-                } else if (97 <= yaw && yaw <= 160) {
-                   Pos = new Vector3I(player.Position.X/32, (player.Position.Y + dis)/32,
-                        (player.Position.Z - 32) / 32);
-                } else if (161 <= yaw && yaw <= 224) {
-                   Pos = new Vector3I((player.Position.X - dis)/32, player.Position.Y/32,
-                        (player.Position.Z - 32) / 32);
-                } else {
-                    player.Message("Error occurred, please try again.");
-                    return;
-                }
-            } else {
-                if (192 <= pitch && pitch <= 224) {
-                    Pos = new Vector3I(player.Position.X/32, player.Position.Y/32,
-                        (player.Position.Z - 32 + dis) / 32);
-                } else if (33 <= pitch && pitch <= 65) {
-                    Pos = new Vector3I(player.Position.X/32, player.Position.Y/32,
-                        (player.Position.Z - 32 - dis) / 32);
-                } else {
-                    player.Message("Error occurred, please try again.");
-                    return;
-                }
-            }
-            
-            Pos.X = Math.Min(player.WorldMap.Width - 1, Math.Max(0, Pos.X));
-            Pos.Y = Math.Min(player.WorldMap.Length - 1, Math.Max(0, Pos.Y));
-            Pos.Z = Math.Min(player.WorldMap.Height - 1, Math.Max(0, Pos.Z));
+            pos.X = Math.Min(player.WorldMap.Width - 1, Math.Max(0, pos.X));
+            pos.Y = Math.Min(player.WorldMap.Length - 1, Math.Max(0, pos.Y));
+            pos.Z = Math.Min(player.WorldMap.Height - 1, Math.Max(0, pos.Z));
 
-            if (player.CanPlace(player.World.Map, Pos, block, BlockChangeContext.Drawn) != CanPlaceResult.Allowed) {
+            if (player.CanPlace(player.World.Map, pos, block, BlockChangeContext.Drawn) != CanPlaceResult.Allowed) {
                 player.Message("&WYou are not allowed to build here");
                 return;
             }
 
-            Player.RaisePlayerPlacedBlockEvent(player, player.WorldMap, Pos, player.WorldMap.GetBlock(Pos),
+            Player.RaisePlayerPlacedBlockEvent(player, player.WorldMap, pos, player.WorldMap.GetBlock(pos),
                                                block, BlockChangeContext.Drawn);
-            BlockUpdate blockUpdate = new BlockUpdate(null, Pos, block);
+            BlockUpdate blockUpdate = new BlockUpdate(null, pos, block);
             player.World.Map.QueueUpdate(blockUpdate);
-            player.Message("Block placed at {0} ({1} blocks away from you)", Pos, dis/32);
+            player.Message("Block placed at {0} ({1} blocks away from you)", pos, length);
         }
 
         #endregion
