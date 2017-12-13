@@ -130,7 +130,7 @@ namespace fCraft {
                     Server.BotMessage("Full Url{0}: {1}", fullUrls.Count() > 1 ? "s" : "" ,fullUrls.JoinToString(" - "));
                 }
             } catch (Exception ex) {
-                Logger.Log(LogType.Error, "Unshorterner website may be down or you are not connected to the internet!");
+                Logger.Log(LogType.Error, "Unable to connect to Unshortener website!");
                 Logger.Log(LogType.Debug, ex.ToString());
             }
         }
