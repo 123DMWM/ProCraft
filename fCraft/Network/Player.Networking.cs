@@ -272,6 +272,10 @@ namespace fCraft {
                             case OpCode.SetBlockClient:
                                 ProcessSetBlockPacket();
                                 break;
+                                
+                            case OpCode.CustomBlockSupportLevel:
+                                byte clientLevel = reader.ReadByte();
+                                break;
 
                             case OpCode.PlayerClick:
                                 ProcessPlayerClickPacket();

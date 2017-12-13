@@ -402,16 +402,6 @@ namespace fCraft {
                 }
             }
 
-            // Expect CustomBlockSupportLevel reply
-            OpCode customBlockSupportLevelReply = reader.ReadOpCode();
-            //Logger.Log( LogType.Debug, "Expected: {0} / Received: {1}", OpCode.CustomBlockSupportLevel, customBlockSupportLevelReply );
-            if (customBlockSupportLevelReply != OpCode.CustomBlockSupportLevel) {
-                Logger.Log(LogType.Warning, "Player {0} from {1}: Unexpected CustomBlockSupportLevel reply ({2})",
-                           Info.Name, IP, customBlockSupportLevelReply);
-                return false;
-            }
-            byte clientLevel = reader.ReadByte();
-            //UsesCustomBlocks = (clientLevel >= CustomBlocksLevel);
             return true;
         }
         #endregion
