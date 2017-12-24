@@ -420,7 +420,7 @@ namespace fCraft {
                 Scheduler.NewTask( ShowRandomAnnouncement ).RunForever( announcementInterval );
             }
             if (ConfigKey.IRCBotEnabled.Enabled() || ConfigKey.IRCBotChannels.GetString().Length >= 1 || ConfigKey.IRCBotNetwork.GetString().Length >= 1) {
-                Scheduler.NewTask(t => IRC.SendRawMessage(IRCCommands.Ping(ConfigKey.IRCBotChannels.GetString()), "", "")).RunForever(TimeSpan.FromMinutes(15));
+                Scheduler.NewTask( SendIrcPing ).RunForever( TimeSpan.FromMinutes( 15 ) );
             }
 
             ChatTimer.LoadAll();
@@ -1003,7 +1003,11 @@ namespace fCraft {
             oldCPUTime = newCPUTime;
             IsMonitoringCPUUsage = true;
         }
+        
 
+        static void SendIrcPing( SchedulerTask task ) {
+            IRC.SendRawMessage(IRCCommands.Ping(ConfigKey.IRCBotChannels.GetString()), "", "");
+        }
         #endregion
 
 

@@ -94,8 +94,9 @@ namespace fCraft.Portals {
             }
         }
 
+        static void SaveCallback( SchedulerTask task ) { Save(); }
         public static void StartSaveTask() {
-            SchedulerTask saveTask = Scheduler.NewBackgroundTask(delegate { Save(); }).RunForever(SaveInterval, SaveInterval + TimeSpan.FromSeconds(15));
+            Scheduler.NewBackgroundTask( SaveCallback ).RunForever(SaveInterval, SaveInterval + TimeSpan.FromSeconds(15));
         }
     }
 }

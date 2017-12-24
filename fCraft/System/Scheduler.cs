@@ -69,8 +69,8 @@ namespace fCraft {
                         }
                     } else {
                         task.IsExecuting = true;
-#if DEBUG_SCHEDULER
                         task.ExecuteStart = DateTime.UtcNow;
+#if DEBUG_SCHEDULER
                         FireEvent( TaskExecuting, task );
 #endif
 
@@ -87,8 +87,8 @@ namespace fCraft {
                         }
 #endif
 
-#if DEBUG_SCHEDULER
                         task.ExecuteEnd = DateTime.UtcNow;
+#if DEBUG_SCHEDULER
                         FireEvent( TaskExecuted, task );
 #endif
                     }
@@ -289,10 +289,6 @@ namespace fCraft {
             lock( TaskListLock ) {
                 foreach( SchedulerTask task in Tasks ) {
                     player.Message( task.ToString() );
-#if DEBUG_SCHEDULER
-                    TimeSpan delta = task.ExecuteEnd - task.ExecuteStart;
-                    player.Message( "   Exceution time: {0} milliseconds", delta.TotalMilliseconds);
-#endif
                 }
             }
         }
