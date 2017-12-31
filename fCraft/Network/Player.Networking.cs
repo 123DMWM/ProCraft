@@ -1285,7 +1285,11 @@ namespace fCraft {
                 Send(Packet.MakeEnvSetMapProperty(EnvProp.CloudsSpeed, World.CloudsSpeed));
                 Send(Packet.MakeEnvSetMapProperty(EnvProp.WeatherSpeed, World.WeatherSpeed));
                 Send(Packet.MakeEnvSetMapProperty(EnvProp.WeatherFade, World.WeatherFade));
-            } else if (Supports(CpeExt.EnvMapAppearance2)) {
+
+				Send(Packet.MakeEnvSetMapProperty(EnvProp.SkyboxHorSpeed, World.SkyboxHorSpeed));
+				Send(Packet.MakeEnvSetMapProperty(EnvProp.SkyboxVerSpeed, World.SkyboxVerSpeed));
+
+			} else if (Supports(CpeExt.EnvMapAppearance2)) {
                 Send(Packet.MakeEnvSetMapAppearance2(World.GetTexture(), side, edge, World.GetEdgeLevel(),
                                                      World.GetCloudsHeight(), World.MaxFogDistance, HasCP437));
             } else if (Supports(CpeExt.EnvMapAppearance)) {
