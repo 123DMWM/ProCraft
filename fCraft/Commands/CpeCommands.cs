@@ -1720,6 +1720,7 @@ namespace fCraft {
                 case "name":
                     p.Message("&bChanged name of &a{0}&b to &A{1}", def.Name, args);
                     def.Name = args; def.BlockName = args.ToLower().Replace(" ", "");
+                    hasChanged = true;
                     break;
                 case "solid":
                 case "solidity":
