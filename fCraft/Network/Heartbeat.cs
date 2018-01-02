@@ -95,22 +95,21 @@ namespace fCraft
 
         static HttpWebRequest heartBeatRequest;
 
-        static void SendHeartBeat()
-        {
+        static void SendHeartBeat() {
             HeartbeatData data = new HeartbeatData(HeartbeatServerUrl);
-            if (!RaiseHeartbeatSendingEvent(data, HeartbeatServerUrl))
-            {
+            if (!RaiseHeartbeatSendingEvent(data, HeartbeatServerUrl)) {
                 return;
             }
+            
             try {
                 heartBeatRequest = CreateRequest(data.CreateUri());
-                } catch (Exception UriFormatException) {
-                    Logger.Log(LogType.Debug, UriFormatException.ToString());
-                    return;
-                }
-            var state = new HeartbeatRequestState(heartBeatRequest, data);
-            heartBeatRequest.BeginGetResponse(ResponseCallback, state);
+            } catch (Exception UriFormatException) {
+                Logger.Log(LogType.Debug, UriFormatException.ToString());
+                return;
+            }
             
+            var state = new HeartbeatRequestState(heartBeatRequest, data);
+            heartBeatRequest.BeginGetResponse(ResponseCallback, state);           
         }
 
 
@@ -125,18 +124,15 @@ namespace fCraft
 
 
         // Called when the heartbeat server responds.
-        static void ResponseCallback([NotNull] IAsyncResult result)
-        {
+        static void ResponseCallback([NotNull] IAsyncResult result) {
             if (Server.IsShuttingDown) return;
             HeartbeatRequestState state = (HeartbeatRequestState)result.AsyncState;
-            try
-            {
+            
+            try {
                 string responseText;
-                using (HttpWebResponse response = (HttpWebResponse)state.Request.EndGetResponse(result))
-                {
+                using (HttpWebResponse response = (HttpWebResponse)state.Request.EndGetResponse(result)) {
                     // ReSharper disable AssignNullToNotNullAttribute
-                    using (StreamReader responseReader = new StreamReader(response.GetResponseStream()))
-                    {
+                    using (StreamReader responseReader = new StreamReader(response.GetResponseStream())) {
                         // ReSharper restore AssignNullToNotNullAttribute
                         responseText = responseReader.ReadToEnd();
                     }
@@ -145,43 +141,43 @@ namespace fCraft
 
                 // try parse response as server Url, if needed
                 string replyString = responseText.Trim();
-                if (replyString.CaselessStarts("bad heartbeat"))
-                {
-                    Logger.Log(LogType.Error, "Heartbeat: {0}", replyString);
-                }
-                else
-                {
-                    try
-                    {
-                        Uri newUri = new Uri(replyString);
-                        Uri oldUri = Url;
-                        if (newUri != oldUri)
-                        {
-                            Url = newUri;
-                            RaiseUriChangedEvent(oldUri, newUri);
-                        }
+                ParseHeartbeatResponse(replyString);
+            } catch (Exception ex) {
+                LogHeartbeatError(state, ex);
+            }
+        }
+        
+        static void ParseHeartbeatResponse( string replyString ) {
+            if (replyString.CaselessStarts("bad heartbeat")) {
+                Logger.Log(LogType.Error, "Heartbeat: {0}", replyString);
+            } else {
+                try {
+                    Uri newUri = new Uri(replyString);
+                    Uri oldUri = Url;
+                    if (newUri != oldUri) {
+                        Url = newUri;
+                        RaiseUriChangedEvent(oldUri, newUri);
                     }
-                    catch (UriFormatException)
-                    {
-                        Logger.Log(LogType.Error,
-                                    "Heartbeat: Server replied with: {0}",
-                                    replyString);
-                    }
+                } catch (UriFormatException) {
+                    Logger.Log(LogType.Error, "Heartbeat: Server replied with: {0}", replyString);
                 }
             }
-            catch (Exception ex)
-            {
-                if (ex is WebException || ex is IOException)
-                {
-                    Logger.Log(LogType.Warning,
-                                "Heartbeat: {0} is probably down ({1})",
-                                state.Request.RequestUri.Host,
-                                ex.Message);
-                }
-                else
-                {
-                    Logger.Log(LogType.Error, "Heartbeat: {0}", ex);
-                }
+        }
+        
+        static void LogHeartbeatError(HeartbeatRequestState state, Exception ex) {
+            if (ex is WebException || ex is IOException) {
+                string host = state.Request.RequestUri.Host;
+                Logger.Log(LogType.Warning, "Heartbeat: {0} is probably down ({1})", host, ex.Message);
+                
+                // avoid leaking resources in case of error
+                try {
+                    WebException webEx = ex as WebException;
+                    if (webEx != null && webEx.Response != null) {
+                        webEx.Response.Close();
+                    }
+                } catch { }
+            } else {
+                Logger.Log(LogType.Error, "Heartbeat: {0}", ex);
             }
         }
 
