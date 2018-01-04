@@ -44,7 +44,34 @@ namespace fCraft
             Player.Moved += new EventHandler<Events.PlayerMovedEventArgs>(Player_IsBack);
         }
 
-        #region Say
+        #region Say / Staff / IRCStaff / SayStaff
+        
+        static void ChatCommandHandler(Player player, CommandReader cmd, ChatMessageType type) {
+            if (player.Info.IsMuted) {
+                player.MessageMuted();
+                return;
+            }
+            if (player.DetectChatSpam()) return;
+
+            string msg = cmd.NextAll().Trim();
+            if (msg.Length == 0) {
+                cmd.Descriptor.PrintUsage(player);
+                return;
+            }            
+            
+            switch (type) {
+                case ChatMessageType.Say:
+                    Chat.SendSay(player, msg); break;
+                case ChatMessageType.Staff:
+                    Chat.SendStaff(player, msg); break;
+                case ChatMessageType.IRC:
+                    Chat.SendIRCStaff(player, msg); break;
+                case ChatMessageType.Me:
+                    Chat.SendMe(player, msg); break;
+                case ChatMessageType.SayStaff:
+                    Chat.SendStaffSay(player, msg); break;
+            }
+        }
 
         static readonly CommandDescriptor CdSay = new CommandDescriptor
         {
@@ -62,36 +89,13 @@ namespace fCraft
             Handler = SayHandler
         };
 
-        static void SayHandler(Player player, CommandReader cmd)
-        {
-            if (player.Info.IsMuted)
-            {
-                player.MessageMuted();
-                return;
-            }
-
-            if (player.DetectChatSpam()) return;
-
-            if (player.Can(Permission.Say))
-            {
-                string msg = cmd.NextAll().Trim();
-                if (msg.Length > 0)
-                {
-                    Chat.SendSay(player, msg);
-                }
-                else
-                {
-                    CdSay.PrintUsage(player);
-                }
-            }
-            else
-            {
+        static void SayHandler(Player player, CommandReader cmd) {
+            if (!player.Can(Permission.Say)) {
                 player.MessageNoAccess(Permission.Say);
+            } else {
+                ChatCommandHandler(player, cmd, ChatMessageType.Say);
             }
         }
-
-        #endregion
-        #region Staff
 
         static readonly CommandDescriptor CdStaff = new CommandDescriptor
         {
@@ -108,25 +112,9 @@ namespace fCraft
             Handler = StaffHandler
         };
 
-        static void StaffHandler(Player player, CommandReader cmd)
-        {
-            if (player.Info.IsMuted)
-            {
-                player.MessageMuted();
-                return;
-            }
-
-            if (player.DetectChatSpam()) return;
-
-            string message = cmd.NextAll().Trim(' ');
-            if (message.Length > 0)
-            {
-                Chat.SendStaff(player, message);
-            }
+        static void StaffHandler(Player player, CommandReader cmd) {
+            ChatCommandHandler(player, cmd, ChatMessageType.Staff);
         }
-
-        #endregion
-        #region IRCStaff
 
         static readonly CommandDescriptor CdIRCStaff = new CommandDescriptor
         {
@@ -143,25 +131,9 @@ namespace fCraft
             Handler = IRCStaffHandler
         };
 
-        static void IRCStaffHandler(Player player, CommandReader cmd)
-        {
-            if (player.Info.IsMuted)
-            {
-                player.MessageMuted();
-                return;
-            }
-
-            if (player.DetectChatSpam()) return;
-
-            string message = cmd.NextAll().Trim(' ');
-            if (message.Length > 0)
-            {
-                Chat.SendIRCStaff(player, message);
-            }
+        static void IRCStaffHandler(Player player, CommandReader cmd) {
+            ChatCommandHandler(player, cmd, ChatMessageType.IRC);
         }
-
-        #endregion
-        #region StaffSay
 
         static readonly CommandDescriptor CdStaffSay = new CommandDescriptor
         {
@@ -179,31 +151,11 @@ namespace fCraft
             Handler = StaffSayHandler
         };
 
-        static void StaffSayHandler(Player player, CommandReader cmd)
-        {
-            if (player.Info.IsMuted)
-            {
-                player.MessageMuted();
-                return;
-            }
-
-            if (player.DetectChatSpam()) return;
-
-            if (player.Can(Permission.Say))
-            {
-                string msg = cmd.NextAll().Trim();
-                if (msg.Length > 0)
-                {
-                    Chat.SendStaffSay(player, msg);
-                }
-                else
-                {
-                    CdStaffSay.PrintUsage(player);
-                }
-            }
-            else
-            {
+        static void StaffSayHandler(Player player, CommandReader cmd) {
+            if (!player.Can(Permission.Say)) {
                 player.MessageNoAccess(Permission.Say);
+            } else {
+                ChatCommandHandler(player, cmd, ChatMessageType.SayStaff);
             }
         }
 
@@ -425,23 +377,18 @@ namespace fCraft
             Handler = MeHandler
         };
 
-        static void MeHandler(Player player, CommandReader cmd)
-        {
-            if (player.Info.IsMuted)
-            {
+        static void MeHandler(Player player, CommandReader cmd) {
+            if (player.Info.IsMuted) {
                 player.MessageMuted();
                 return;
             }
-
+        	
             if (player.DetectChatSpam()) return;
 
             string msg = cmd.NextAll().Trim();
-            if (msg.Length > 0)
-            {
+            if (msg.Length > 0) {
                 Chat.SendMe(player, msg);
-            }
-            else
-            {
+            } else {
                 CdMe.PrintUsage(player);
             }
         }
