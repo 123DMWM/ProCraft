@@ -38,7 +38,7 @@ namespace fCraft
              lastColor;     // used to detect duplicate color codes
 
         byte type = 0;        // messagetype cpe spec
-        bool emoteFix = false, hasCP437 = false, useFallbacks = false;
+        bool emoteFix = false, useFallbacks = false;
 
         bool endsWithSymbol; // used to guarantee suffixes for symbols ("emotes")
 
@@ -74,7 +74,6 @@ namespace fCraft
             input = GetBytes(message, fullCP437);
             prefix = DefaultPrefix;
             emoteFix = emotefix;
-            this.hasCP437 = fullCP437;
             this.useFallbacks = fallbackCols;
             Reset();
         }
@@ -89,7 +88,6 @@ namespace fCraft
                 throw new ArgumentNullException( "message" );
             input = GetBytes(message, hasCP437);
             emoteFix = emotefix;
-            this.hasCP437 = hasCP437;
             this.useFallbacks = fallbackCols;
             Reset();
         }

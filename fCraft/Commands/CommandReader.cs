@@ -274,7 +274,6 @@ namespace fCraft
 
             string jointString = Next();
             if (jointString == null) return false;
-            World world = player == null ? null : player.World;
 
             int slashIndex = jointString.IndexOf('/');
             if (slashIndex == -1)

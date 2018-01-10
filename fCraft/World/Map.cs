@@ -916,7 +916,6 @@ namespace fCraft {
         
         unsafe static void MakeFallbacks(byte* fallback, byte maxLegal, World world) {
             BlockDefinition[] defs = world.BlockDefs;
-            bool hasCPEBlocks = maxLegal == (byte)MaxCustomBlockType;
 
             for (int i = 0; i < 256; i++) {
                 fallback[i] = (byte)FallbackBlocks[i];
@@ -924,11 +923,14 @@ namespace fCraft {
                 fallback[i] = defs[i].FallBack;
                 
                 // Handle CPE defined fallback blocks for custom blocks
-                if (fallback[i] > (byte)maxLegal)
+                if (fallback[i] > (byte)maxLegal) {
                     fallback[i] = (byte)FallbackBlocks[fallback[i]];
+                }
             }
-            for (int i = 0; i <= (byte)maxLegal; i++)
+            
+            for (int i = 0; i <= maxLegal; i++) {
                 fallback[i] = (byte)i;
+            }
         }
 
 
