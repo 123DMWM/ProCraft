@@ -753,7 +753,7 @@ namespace fCraft {
             if (ConfigKey.PaidPlayersOnly.Enabled() && Info.AccountType != AccountType.Paid)
             {
                 SendNow(Packet.MakeHandshake(this, ConfigKey.ServerName.GetString(),
-                                               "Please wait; Checking paid status...", HasCP437));
+                                               "Please wait; Checking paid status..."));
                 writer.Flush();
 
                 Info.AccountType = CheckPaidStatus(Name);
@@ -833,7 +833,7 @@ namespace fCraft {
                     motd = "&0=&c=&e= " + motd + " &e=&c=&0=";
                 }
             }
-            SendNow(Packet.MakeHandshake(this, serverName, motd, HasCP437));
+            SendNow(Packet.MakeHandshake(this, serverName, motd));
 
             // AutoRank
             if (ConfigKey.AutoRankEnabled.Enabled())
@@ -1106,7 +1106,7 @@ namespace fCraft {
 
             // Start sending over the level copy
             if (oldWorld != null) {
-                SendNow(Packet.MakeHandshake(this, textLine1, textLine2, HasCP437));
+                SendNow(Packet.MakeHandshake(this, textLine1, textLine2));
             }
 
             if (Supports(CpeExt.BlockPermissions))

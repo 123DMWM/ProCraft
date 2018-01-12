@@ -3023,8 +3023,13 @@ namespace fCraft {
             
             Player[] players = world.Players;
             foreach (Player pl in players) {
-                if (!pl.Supports(CpeExt.HackControl)) continue;
-                pl.Send(PlayerHacks.MakePacket(pl, world.MOTD));
+                if (pl.Supports(CpeExt.HackControl)) {
+                    pl.Send(PlayerHacks.MakePacket(pl, world.MOTD));
+                }
+                if (pl.Supports(CpeExt.InstantMOTD)) {
+                    string motd = world.MOTD ?? "";
+                    pl.Send(Packet.MakeHandshake(pl, ConfigKey.ServerName.GetString(), motd));
+                }
             }
             WorldManager.SaveWorldList();
         }

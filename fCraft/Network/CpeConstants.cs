@@ -104,6 +104,9 @@ namespace fCraft
         
         /// <summary> Allows hiding blocks from and reordering blocks in the inventory. </summary>
         InventoryOrder,
+        
+        /// <summary> Allows sending motd/handshake packets, without also needing to resend world. </summary>
+        InstantMOTD,
     }
 
 

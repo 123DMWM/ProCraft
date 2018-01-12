@@ -375,6 +375,9 @@ namespace fCraft {
                     case InventoryOrderExtName:
                         if (version == 1) ext = CpeExt.InventoryOrder;
                         break;
+                    case InstantMOTDExtName:
+                        if (version == 1) ext = CpeExt.InstantMOTD;
+                        break;
                 }
                 if (ext != CpeExt.None)
                     supportedExts.Add(ext);

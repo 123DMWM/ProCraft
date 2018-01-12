@@ -49,11 +49,11 @@ namespace fCraft {
         /// <param name="player"> Player to whom this packet is being sent.
         /// Used to determine DeleteAdmincrete permission, for client-side checks. May not be null. </param>
         /// <param name="motd"> Message-of-the-day (text displayed below the server name). May not be null. </param>
-        /// <param name="hasCP437"> Whether client supports extended code page 437 characters. </param>
         /// <exception cref="ArgumentNullException"> player, serverName, or motd is null </exception>
-        public static Packet MakeHandshake( [NotNull] Player player, [NotNull] string serverName, [NotNull] string motd, bool hasCP437 ) {
+        public static Packet MakeHandshake( [NotNull] Player player, [NotNull] string serverName, [NotNull] string motd ) {
             if( serverName == null ) throw new ArgumentNullException( "serverName" );
             if( motd == null ) throw new ArgumentNullException( "motd" );
+            bool hasCP437 = player.HasCP437;
 
             Packet packet = new Packet( OpCode.Handshake );
             //Logger.Log(LogType.Debug, "Send: MakeHandshake({0}, {1}, {2})", player, serverName, motd);

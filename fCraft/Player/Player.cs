@@ -2151,6 +2151,7 @@ namespace fCraft {
         const string EntityPropertyExtName = "EntityProperty";
         const string TwoWayPingExtName = "TwoWayPing";
         const string InventoryOrderExtName = "InventoryOrder";
+        const string InstantMOTDExtName = "InstantMOTD";
         
         bool supportsBlockDefs, supportsCustomBlocks;
         internal bool supportsExtPositions;
