@@ -458,10 +458,15 @@ namespace fCraft
                     return;
                 }
                 if (!ResponsibleForInputParsing) return;
+                
                 // Announce parts/quits of IRC people (except the bots)
                 if (ConfigKey.IRCBotAnnounceIRCJoins.Enabled() && !IsBotNick(msg.Nick)) {
-                    Server.Message("&I(IRC) {0} left the IRC channel ({1})",
-                                   msg.Nick, msg.Channel);
+                    if (String.IsNullOrEmpty(msg.Channel)) {
+                        Server.Message("&I(IRC) {0} left IRC");
+                    } else {
+                        Server.Message("&I(IRC) {0} left the IRC channel ({1})", msg.Nick, msg.Channel);
+                    }
+                    
                     string quitMsg = (msg.Message == null) ? "Quit" : msg.Message;
                     quitMsg = IRCColorsAndNonStandardCharsExceptEmotes.Replace(quitMsg, "");
                     Logger.Log(LogType.IrcChat, "{0} left {1} ({2})",
