@@ -834,6 +834,7 @@ namespace fCraft {
                 }
             }
             SendNow(Packet.MakeHandshake(this, serverName, motd));
+            SendNow(Packet.MakeSetPermission(this));
 
             // AutoRank
             if (ConfigKey.AutoRankEnabled.Enabled())
@@ -1002,7 +1003,7 @@ namespace fCraft {
                 oldskinName = Info.skinName;
                 Info.skinName = Name;
             }
-            Send(Packet.MakeSetPermission(this));
+
             Server.UpdateTabList(true);
             System.Console.Beep();
             System.Console.Beep();
