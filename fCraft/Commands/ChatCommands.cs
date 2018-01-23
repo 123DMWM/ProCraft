@@ -611,7 +611,6 @@ namespace fCraft
             Category = CommandCategory.New | CommandCategory.Chat,
             Usage = "/Reports [option] {args}",
             Help = "Use this command to list/remove reports from players",
-
             Handler = ReportsHandler
         };
 

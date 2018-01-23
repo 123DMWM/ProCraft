@@ -69,6 +69,7 @@ namespace fCraft {
                     
                     string[] data = File.ReadAllLines(filename);
                     Report report = new Report();
+                    report.Id = id;
                     report.Sender = data[0];
                     report.Message = data[2];
                     
