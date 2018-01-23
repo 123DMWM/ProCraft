@@ -462,7 +462,7 @@ namespace fCraft
                 // Announce parts/quits of IRC people (except the bots)
                 if (ConfigKey.IRCBotAnnounceIRCJoins.Enabled() && !IsBotNick(msg.Nick)) {
                     if (String.IsNullOrEmpty(msg.Channel)) {
-                        Server.Message("&I(IRC) {0} left IRC");
+                        Server.Message("&I(IRC) {0} left IRC", msg.Nick);
                     } else {
                         Server.Message("&I(IRC) {0} left the IRC channel ({1})", msg.Nick, msg.Channel);
                     }
