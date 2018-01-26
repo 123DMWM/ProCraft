@@ -1029,26 +1029,47 @@ namespace fCraft {
         }
 
         static void DoorAdd(Player player, Vector3I[] marks, object tag) {
-            int sx = Math.Min(marks[0].X, marks[1].X);
-            int ex = Math.Max(marks[0].X, marks[1].X);
-            int sy = Math.Min(marks[0].Y, marks[1].Y);
-            int ey = Math.Max(marks[0].Y, marks[1].Y);
-            int sh = Math.Min(marks[0].Z, marks[1].Z);
-            int eh = Math.Max(marks[0].Z, marks[1].Z);
-
-            int volume = (ex - sx + 1) * (ey - sy + 1) * (eh - sh + 1);
-            if (volume > maxDoorBlocks) {
-                player.Message("Doors are only allowed to be {0} blocks", maxDoorBlocks);
+            BoundingBox bounds = new BoundingBox(marks[0], marks[1]);
+            if (bounds.Volume > maxDoorBlocks) {
+                player.Message("Doors are only allowed to be up to {0} blocks in size", maxDoorBlocks);
+                return;
+            }
+            
+            World world = player.World;
+            switch (world.BuildSecurity.CheckDetailed(player.Info)) {
+                case SecurityCheckResult.RankTooLow:
+                    player.Message("&WYour rank is not allowed to build a door in this world.");
+                    return;
+                case SecurityCheckResult.BlackListed:
+                    player.Message( "&WYou are not allowed to build a door in this world." );
+                    return;
+            }
+            
+            Vector3I min = bounds.MinVertex, max = bounds.MaxVertex;
+            for (int z = min.Z; z <= max.Z; z++)
+                for (int y = min.Y; y <= max.Y; y++)
+                    for (int x = min.X; x <= max.X; x++) 
+            {
+                Vector3I coords = new Vector3I(x, y, z);
+                PermissionOverride perm = world.Map.Zones.Check(coords, player);
+                if (perm != PermissionOverride.Deny) continue;
+                
+                Zone deniedZone = player.WorldMap.Zones.FindDenied(coords, player);
+                if (deniedZone != null) {
+                    player.Message("&WYou are not allowed to build a door in zone \"{0}\".", deniedZone.Name);
+                } else {
+                    player.Message("&WYou are not allowed to build a door here.");
+                }
                 return;
             }
 
             Zone door = (Zone)tag;
-            door.Create(new BoundingBox(marks[0], marks[1]), player.Info);
+            door.Create(bounds, player.Info);
             player.WorldMap.Zones.Add(door);
             Logger.Log(LogType.UserActivity, "{0} created door {1} (on world {2})", player.Name, door.Name, player.World.Name);
-            player.Message("Door created: {0}x{1}x{2}", door.Bounds.Dimensions.X,
-                                                        door.Bounds.Dimensions.Y,
-                                                        door.Bounds.Dimensions.Z);
+            player.Message("Door created: {0}x{1}x{2}", bounds.Dimensions.X,
+                                                        bounds.Dimensions.Y,
+                                                        bounds.Dimensions.Z);
         }
 
         #endregion
