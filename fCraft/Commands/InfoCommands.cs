@@ -1370,7 +1370,7 @@ namespace fCraft {
             IsConsoleSafe = true,
             Usage = "/Most <stat> [Rank] and/or [Offset]",
             Help = "Lists all players in order of a specified statistic. Stats:" +
-                   "Banned, Built, Chat, Deleted, Demoted, Drawn, Hours, Kicked, Logins, Promoted",
+                   "Banned, Built, Chat, Deleted, Demoted, Drawn, Hours, Kicked, Logins, Promoted, Recent",
             HelpSections = new Dictionary<string, string>{
                 { "Banned",     "/Most Banned [Args]" +
                                     "Lists the top players by playeres banned" },
@@ -1392,7 +1392,9 @@ namespace fCraft {
                                     "Lists the top players by total logins" },
                 { "Promoted",   "/Most Promoted [Args]" +
                                     "Lists the top players by players promoted" },
-            },
+				{ "Recent",   "/Most Promoted [Args]" +
+									"Lists the most recent players to have joined the server" },
+			},
             Handler = MostHandler
         };
 
@@ -1426,6 +1428,7 @@ namespace fCraft {
             
             Func<PlayerInfo, long> orderer;
             Func<PlayerInfo, string> formatter;
+			bool reverse = false;
             switch (stat.ToLower()) {
                 case "bans":
                 case "banned":
@@ -1461,7 +1464,12 @@ namespace fCraft {
                 case "promoted":
                     formatter = p => string.Format("{0:N0}", p.PromoCount);
                     orderer = p => p.PromoCount; break;
-                default:
+				case "recent":
+					formatter = p => string.Format("{0:N0} ago", p.TimeSinceLastLogin.ToMiniString());
+					orderer = p => p.TimeSinceLastLogin.Ticks;
+					reverse = true;
+					break;
+				default:
                     player.Message("No stats for: {0}", stat);
                     return;
             }
@@ -1471,7 +1479,7 @@ namespace fCraft {
                 all = all.Where(p => orderer(p) >= 1).OrderBy(orderer).ToArray();
             else
                 all = all.Where(p => orderer(p) >= 1 && p.Rank == rank).OrderBy(orderer).ToArray();
-            Array.Reverse(all);
+			if (!reverse) Array.Reverse(all);
             
             offset = offset < all.Length ? offset : Math.Max(0, all.Length - 10);
             int count = Math.Min(offset + 10, all.Length) - offset;
