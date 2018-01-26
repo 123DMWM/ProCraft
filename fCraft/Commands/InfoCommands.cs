@@ -1450,7 +1450,7 @@ namespace fCraft {
                 case "time":
                 case "hours":
                     formatter = p => string.Format("{0:N2}&SH", p.TotalTimeOnline.TotalHours);
-                    orderer = p => p.TotalTimeOnline.ToMinutes(); break;
+                    orderer = p => p.TotalTimeOnline.Ticks; break;
                 case "kicks":
                 case "kicked":
                     formatter = p => string.Format("{0:N0}", p.TimesKickedOthers);
