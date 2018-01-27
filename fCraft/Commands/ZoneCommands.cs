@@ -912,17 +912,24 @@ namespace fCraft {
         }
 
         static void ZoneTestCallback( Player player, Vector3I[] marks, object tag ) {
-            Zone[] allowed, denied;
-            if( player.WorldMap.Zones.CheckDetailed( marks[0], player, out allowed, out denied ) ) {
-                foreach( Zone zone in allowed ) {
-                    SecurityCheckResult status = zone.Controller.CheckDetailed( player.Info );
-                    player.Message( "> Zone {0}&S: {1}{2}", zone.ClassyName, Color.Lime, status );
+            Zone[] zones = player.WorldMap.Zones.Cache;
+            bool found = false;
+            for( int i = 0; i < zones.Length; i++ ) {
+                Zone zone = zones[i];
+                if( !zone.Bounds.Contains( marks[0] ) ) continue;
+                
+                found = true;
+                SecurityCheckResult status = zone.Controller.CheckDetailed( player.Info );
+                if( SpecialZone.IsSpecialAffect( zone.Name ) ) {
+                    status = SecurityCheckResult.Allowed;
                 }
-                foreach( Zone zone in denied ) {
-                    SecurityCheckResult status = zone.Controller.CheckDetailed( player.Info );
-                    player.Message( "> Zone {0}&S: {1}{2}", zone.ClassyName, Color.Red, status );
-                }
-            } else {
+                
+                bool allowed = status == SecurityCheckResult.Allowed || status == SecurityCheckResult.WhiteListed;
+                string color = allowed ? Color.Lime : Color.Red;
+                player.Message( "> Zone {0}&S: {1}{2}", zone.ClassyName, color, status );
+            }
+            
+            if( !found ) {
                 player.Message( "No zones affect this block." );
             }
         }
