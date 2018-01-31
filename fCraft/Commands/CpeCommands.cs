@@ -2379,7 +2379,6 @@ namespace fCraft {
             string zonea = cmd.Next();
             string color = cmd.Next();
             string alp = cmd.Next();
-            string bol = cmd.Next();
             short alpha;
             Zone zone = player.World.Map.Zones.Find(zonea);
             if (zone == null) {
@@ -2396,18 +2395,19 @@ namespace fCraft {
             if (color.StartsWith("#")) {
                 color = color.ToUpper().Remove(0, 1);
             }
+            
             if (!IsValidHex(color)) {
                 if (color.CaselessEquals("on") || color.CaselessEquals("true") || color.CaselessEquals("yes")) {
                     zone.ShowZone = true;
                     if (zone.Color != null) {
-                        player.Message("Zone ({0}&S) will now show its bounderies", zone.ClassyName);
+                        player.Message("Zone ({0}&S) will now show its boundaries", zone.ClassyName);
                         player.World.Players.Where(p => p.Supports(CpeExt.SelectionCuboid)).Send(Packet.MakeMakeSelection(zone.ZoneID, zone.Name, zone.Bounds,
                                                                                                                           zone.Color, zone.Alpha, player.HasCP437));
                     }
                     return;
                 } else if (color.CaselessEquals("off") || color.CaselessEquals("false") || color.CaselessEquals("no")) {
                     zone.ShowZone = false;
-                    player.Message("Zone ({0}&S) will no longer show its bounderies", zone.ClassyName);
+                    player.Message("Zone ({0}&S) will no longer show its boundaries", zone.ClassyName);
                     player.World.Players.Where(p => p.Supports(CpeExt.SelectionCuboid)).Send(Packet.MakeRemoveSelection(zone.ZoneID));
                     return;
                 } else {
@@ -2429,24 +2429,24 @@ namespace fCraft {
             } else {
                 zone.Alpha = alpha;
             }
-            if (bol != null) {
-                if (!bol.CaselessEquals("on") && !bol.CaselessEquals("off") && !bol.CaselessEquals("true") &&
-                    !bol.CaselessEquals("false") && !bol.CaselessEquals("0") && !bol.CaselessEquals("1") &&
-                    !bol.CaselessEquals("yes") && !bol.CaselessEquals("no")) {
-                    zone.ShowZone = false;
-                    player.Message("({0}) is not a valid bool statement", bol);
-                } else if (bol.CaselessEquals("on") || bol.CaselessEquals("true") || bol.CaselessEquals("1") ||
-                           bol.CaselessEquals("yes")) {
-                    zone.ShowZone = true;
-                    player.Message("Zone ({0}&S) color set! Bounderies: ON", zone.ClassyName);
-                } else if (bol.CaselessEquals("off") || bol.CaselessEquals("false") || bol.CaselessEquals("0") ||
-                           bol.CaselessEquals("no")) {
-                    zone.ShowZone = false;
-                    player.Message("Zone ({0}&S) color set! Bounderies: OFF", zone.ClassyName);
+            
+            if (cmd.HasNext) {
+            	bool show;
+            	if (!cmd.NextOnOff(out show)) {
+                    player.Message("\"Show\" state must be 'on' or 'off'");
+                    return;
+            	}
+                
+            	zone.ShowZone = show;
+            	if (show) {
+                    player.Message("Zone ({0}&S) color set! Boundaries: ON", zone.ClassyName);
+            	} else {
+                    player.Message("Zone ({0}&S) color set! Boundaries: OFF", zone.ClassyName);
                 }
             } else {
                 player.Message("Zone ({0}&S) color set!", zone.ClassyName);
             }
+            
             if (zone != null) {
                 foreach (Player p in player.World.Players) {
                     if (p.Supports(CpeExt.SelectionCuboid) && zone.ShowZone) {

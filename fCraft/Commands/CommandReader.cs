@@ -303,9 +303,10 @@ namespace fCraft
             param = false;
             if (token == null) return false;
             
-            if (token.CaselessEquals("on") || token == "1") {
+            if (token.CaselessEquals("on")  || token.CaselessEquals("yes") || token == "1") {
                 param = true; return true;
-            } else if (token.CaselessEquals("off") || token == "0") {
+            }
+            if (token.CaselessEquals("off") || token.CaselessEquals("no")  || token == "0") {
                 return true;
             }
             return false;
