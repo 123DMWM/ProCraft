@@ -182,6 +182,10 @@ namespace fCraft {
             }
             Message("&WYou can use /" + cmd.Name + " again in " + timeLeft + " seconds");
         }
+        
+        internal short ReachDistance {
+            get { return (Info.ReachDistance < World.MaxReach || World.MaxReach == -1 || IsStaff) ? Info.ReachDistance : World.MaxReach; }
+        }
 
         /// <summary> The world that the player is currently on. May be null.
         /// Use .JoinWorld() to make players teleport to another world. </summary>

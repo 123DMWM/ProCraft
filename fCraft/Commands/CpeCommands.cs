@@ -2273,7 +2273,7 @@ namespace fCraft {
             if (!short.TryParse(disString, out distance)) {
                 if (disString.CaselessEquals("normal") || disString.CaselessEquals("reset") ||
                     disString.CaselessEquals("default")) {
-                    distance = 160;
+                    distance = -1;
                 } else {
                     player.Message("Invalid distance!");
                     return;
@@ -2286,7 +2286,7 @@ namespace fCraft {
                 }
             }
             player.Message("Set max reach distance for world &f{0}&S to &f{1} &S(&f{2}&S blocks)", world.ClassyName, distance, distance / 32);
-            world.maxReach = distance;
+            world.MaxReach = distance;
 
         }
 

@@ -255,6 +255,10 @@ namespace fCraft {
             tempEl = el.Element("MOTD");
             if (tempEl != null) world.MOTD = tempEl.Value;
             
+            tempEl = el.Element("MaxReach");
+            short reach;
+            if (tempEl != null && Int16.TryParse(tempEl.Value, out reach)) world.MaxReach = reach;
+            
             //XElement bhEl = el.Element("BlockHunt");
             //if (bhEl != null) LoadBlockHuntSettings(world, worldName, bhEl);
 
@@ -355,9 +359,6 @@ namespace fCraft {
             
             if ((attr = el.Attribute("terrain")) != null) {
                 world.Texture = ParseString(attr, worldName);
-            }
-            if ((attr = el.Attribute("maxreach")) != null) {
-                world.maxReach = ParseShort(attr, worldName, 160, "normal");
             }
             if ((attr = el.Attribute("weather")) != null) {
                 world.Weather = ParseByte(attr, worldName, 0, "sunny");
@@ -555,6 +556,9 @@ namespace fCraft {
                     if (!world.Deletable) {
                         temp.Add(new XAttribute("deletable", false));
                     }
+                    if (world.MaxReach != -1) {
+                        temp.Add(new XElement("MaxReach", world.MaxReach));
+                    }
 
                     /*save BlockHunt settings
                     XElement BHunt = new XElement("BlockHunt");
@@ -613,8 +617,7 @@ namespace fCraft {
             elEnv.Add(new XAttribute("water", world.HorizonBlock.GetHashCode()));
             elEnv.Add(new XAttribute("bedrock", world.EdgeBlock.GetHashCode()));
             if (world.Texture != null) 
-                elEnv.Add(new XAttribute("terrain", world.Texture));            
-            elEnv.Add(new XAttribute("maxreach", world.maxReach));
+                elEnv.Add(new XAttribute("terrain", world.Texture));
             elEnv.Add(new XAttribute("weather", world.Weather));
             
             if (world.CloudsHeight != short.MinValue) 

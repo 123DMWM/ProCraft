@@ -307,20 +307,6 @@ namespace fCraft {
         }
 
 
-        // Quicker Int32.Parse(string) by Karl Seguin
-        public static int Parse( [NotNull] string stringToConvert ) {
-            if( stringToConvert == null ) throw new ArgumentNullException( "stringToConvert" );
-            int value = 0;
-            int length = stringToConvert.Length;
-            fixed( char* characters = stringToConvert ) {
-                for( int i = 0; i < length; ++i ) {
-                    value = 10 * value + ( characters[i] - 48 );
-                }
-            }
-            return value;
-        }
-
-
         // UppercaseFirst by Sam Allen of http://www.dotnetperls.com
         [NotNull]
         public static string UppercaseFirst( this string s ) {

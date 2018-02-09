@@ -1206,8 +1206,7 @@ namespace fCraft {
             }
 
             if (Supports(CpeExt.ClickDistance)) {
-                short reach = (World.maxReach < Info.ReachDistance && !IsStaff) ? World.maxReach : Info.ReachDistance;
-                SendNow(Packet.MakeSetClickDistance(reach));
+                SendNow(Packet.MakeSetClickDistance(ReachDistance));
             }
 
             if (Supports(CpeExt.MessageType) && !IsPlayingCTF) {

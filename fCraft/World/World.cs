@@ -1007,7 +1007,7 @@ namespace fCraft {
         #endregion
 
         /// <summary> The max reachdistance of the map. </summary>
-        public short maxReach = 160;
+        public short MaxReach = -1;
 
 
         /// <summary> Ensures that player name has the correct length (2-16 characters)
