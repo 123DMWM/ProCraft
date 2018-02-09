@@ -24,7 +24,6 @@ namespace fCraft {
             CommandManager.RegisterCommand(CdLevelBlock);
             CommandManager.RegisterCommand(CdHackControl);
             CommandManager.RegisterCommand(CdListClients);
-            CommandManager.RegisterCommand(CdMRD);
             CommandManager.RegisterCommand(Cdtex);
             CommandManager.RegisterCommand(CdtextHotKey);
             CommandManager.RegisterCommand(CdZoneShow);
@@ -2245,49 +2244,6 @@ namespace fCraft {
                 player.Message("  {0}:&f {1}",
                                kvp.Key, kvp.Value.JoinToClassyString());
             }
-        }
-
-        #endregion
-
-        #region MaxReachDistance
-
-        static readonly CommandDescriptor CdMRD = new CommandDescriptor {
-            Name = "MaxReachDistance",
-            Aliases = new[] { "MaxReach", "MRD" },
-            Category = CommandCategory.CPE | CommandCategory.World | CommandCategory.New,
-            Permissions = new[] { Permission.ManageWorlds },
-            Help = "Changes the max reachdistance for a world",
-            Usage = "/MRD [Distance] (world)",
-            Handler = MRDHandler
-        };
-
-        private static void MRDHandler([NotNull] Player player, [NotNull] CommandReader cmd) {
-            string disString = cmd.Next();
-            if (disString == null) {
-                CdMRD.PrintUsage(player);
-                return;
-            }
-            string worldString = cmd.Next();
-            short distance = 160;
-            World world = player.World;
-            if (!short.TryParse(disString, out distance)) {
-                if (disString.CaselessEquals("normal") || disString.CaselessEquals("reset") ||
-                    disString.CaselessEquals("default")) {
-                    distance = -1;
-                } else {
-                    player.Message("Invalid distance!");
-                    return;
-                }
-            }
-            if (worldString != null) {
-                world = WorldManager.FindWorldOrPrintMatches(player, worldString);
-                if (world == null) {
-                    return;
-                }
-            }
-            player.Message("Set max reach distance for world &f{0}&S to &f{1} &S(&f{2}&S blocks)", world.ClassyName, distance, distance / 32);
-            world.MaxReach = distance;
-
         }
 
         #endregion

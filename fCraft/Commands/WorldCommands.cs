@@ -2845,6 +2845,8 @@ namespace fCraft {
                                 "Whether any blocks can be placed by players in the world." },
                 { "deletable",  "&H/WSet <WorldName> Deletable On/Off&N&S" +
                                 "Whether any blocks can be deleted by players in the world." },
+            	{ "maxreach",  "&H/WSet <WorldName> MaxReach <Distance>/reset&N&S" +
+                                "Sets maximum reach distance players may click/reach up to." },
             },
             Handler = WorldSetHandler
         };
@@ -2886,6 +2888,10 @@ namespace fCraft {
                 case "messageoftheday":
                 case "motd":
                     SetMOTD(player, world, value); break;
+                case "mrd":
+                case "maxreach":
+                case "maxreachdistance":
+                    SetMaxReach(player, world, value); break;
                 default:
                     CdWorldSet.PrintUsage(player); break;
             }
@@ -3064,7 +3070,37 @@ namespace fCraft {
                 world.Greeting = null;
             }
         }
-
+        
+        static void SetMaxReach(Player player, World world, string value) {
+            short dist = world.MaxReach;
+            if (String.IsNullOrEmpty(value)) {
+                if (dist == -1) {
+                    player.Message("Max reach distance for world {0}&S currently not set", world.ClassyName);
+                } else {
+                    player.Message("Max reach distance for world {0}&S currently &f{1} &S(&f{2}&S blocks)",
+                                   world.ClassyName, dist, dist / 32);
+                }
+                return;
+            }
+            
+            if (value.CaselessEquals("normal") || value.CaselessEquals("reset") || value.CaselessEquals("default")) {
+                dist = -1;
+            } else if (!short.TryParse(value, out dist)) {
+                player.Message("Invalid distance!");
+                return;
+            }
+            
+            player.Message("Max reach distance for world {0}&S set to &f{1} &S(&f{2}&S blocks)", 
+                           world.ClassyName, dist, dist / 32);
+            world.MaxReach = dist;
+            WorldManager.SaveWorldList();
+            
+            foreach (Player p in world.Players) {
+                if (!p.Supports(CpeExt.ClickDistance)) continue;
+                p.Send(Packet.MakeSetClickDistance(p.ReachDistance));
+            }
+        }
+        
         #endregion
         #region WorldUnload
 
