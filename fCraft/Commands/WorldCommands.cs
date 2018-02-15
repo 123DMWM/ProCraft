@@ -3635,7 +3635,7 @@ namespace fCraft {
             Help = "Controls portals, options are: create, remove, list, info, enable, disable&N&S" +
                    "See &H/Help portal <option>&S for details about each option.",
             HelpSections = new Dictionary<string, string>() {
-                { "create",     "&H/portal create [world] [liquid] [portal name] [x y z r l]&N&S" +
+                { "create",     "&H/portal create [world] [liquid] [portal name] ([x y z r l] or [#ZoneName])&N&S" +
                                 "Creates a portal with specified options"},
                 { "remove",     "&H/portal remove [portal name]&N&S" +
                                 "Removes specified portal."},
@@ -3691,13 +3691,28 @@ namespace fCraft {
                                 World tpWorld = WorldManager.FindWorldExact(addWorld);
                                 if (cmd.HasNext) {
                                     int x, y, z, rot = player.Position.R, lot = player.Position.L;
-                                    if (cmd.NextInt(out x) && cmd.NextInt(out y) && cmd.NextInt(out z)) {
+                                    string next = cmd.Next();
+                                    if (next != null && next.StartsWith("#")) {
+                                        if (tpWorld.Map == null) tpWorld.LoadMap();
+                                        Zone tpzone = tpWorld.map.Zones.FindExact(next.Remove(0,1));
+                                        if (tpzone != null) {
+                                            player.PortalTPPos = new Position(tpzone.Bounds.XCentre * 32 + 16, 
+                                                tpzone.Bounds.YCentre * 32 + 16, tpzone.Bounds.ZCentre * 32 + Player.CharacterHeight,
+                                                player.Position.R, player.Position.L);
+                                            player.Message("Players will be teleported to zone: " + tpzone.Name);
+                                            player.Message("At: " + player.PortalTPPos.ToString());
+                                            player.Message("On: " + tpWorld.Name);
+                                        } else {
+                                            player.PortalTPPos = tpWorld.map == null ? new Position(0, 0, 0) : tpWorld.map.Spawn;
+                                        }
+                                        if (tpWorld.map == null) tpWorld.UnloadMap(false);
+                                    } else if (int.TryParse(next, out x) && cmd.NextInt(out y) && cmd.NextInt(out z)) {
                                         if (cmd.CountRemaining >= 2 && cmd.NextInt(out rot) && cmd.NextInt(out lot)) {
                                             if (rot > 255 || rot < 0) {
                                                 player.Message("R must be inbetween 0 and 255. Set to player R");
                                                 rot = player.Position.R;
                                             }
-                                            
+
                                             if (lot > 255 || lot < 0) {
                                                 player.Message("L must be inbetween 0 and 255. Set to player L");
                                                 lot = player.Position.L;
