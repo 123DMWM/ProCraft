@@ -430,6 +430,8 @@ namespace fCraft {
                 } else if (style.CaselessEquals("regular")) {
                     player.font = new System.Drawing.Font(player.font, FontStyle.Regular);
                     player.Message("SetFont: Style set to Regular ({0})", player.font.FontFamily.Name);
+                } else {
+                    player.Message("Style must be: Italic, Bold, or Regular");
                 }
             } else {
                 CdSetFont.PrintUsage(player);
