@@ -451,9 +451,7 @@ namespace fCraft {
                 }
                 Vector3I coords = new Vector3I( x, y, z );
                 Map map = player.WorldMap;
-                coords.X = Math.Min( map.Width - 1, Math.Max( 0, coords.X ) );
-                coords.Y = Math.Min( map.Length - 1, Math.Max( 0, coords.Y ) );
-                coords.Z = Math.Min( map.Height - 1, Math.Max( 0, coords.Z ) );
+                coords = map.Bounds.Clamp( coords );
                 BlockInfoSelectionCallback( player, new[] { coords }, null );
 
             } else {

@@ -226,6 +226,13 @@ namespace fCraft {
         }
 
         #endregion
+        
+        public Vector3I Clamp(Vector3I coords) {
+            coords.X = Math.Min(XMax, Math.Max(XMin, coords.X));
+            coords.Y = Math.Min(YMax, Math.Max(YMin, coords.Y));
+            coords.Z = Math.Min(ZMax, Math.Max(ZMin, coords.Z));
+            return coords;
+        }
 
         public bool Equals([NotNull] BoundingBox other) {
             return XMin == other.XMin && XMax == other.XMax &&

@@ -782,10 +782,7 @@ namespace fCraft {
             Vector3I dir = Vector3I.FlatDirection(yaw, pitch);
             pos += dir * length;
             
-            pos.X = Math.Min(player.WorldMap.Width - 1, Math.Max(0, pos.X));
-            pos.Y = Math.Min(player.WorldMap.Length - 1, Math.Max(0, pos.Y));
-            pos.Z = Math.Min(player.WorldMap.Height - 1, Math.Max(0, pos.Z));
-
+            pos = player.WorldMap.Bounds.Clamp(pos);
             if (player.CanPlace(player.World.Map, pos, block, BlockChangeContext.Drawn) != CanPlaceResult.Allowed) {
                 player.Message("&WYou are not allowed to build here");
                 return;
@@ -852,9 +849,7 @@ namespace fCraft {
                 world.LoadMap();
                 unLoad = true;
             }
-            coords.X = Math.Min(world.map.Width - 1, Math.Max(0, coords.X));
-            coords.Y = Math.Min(world.map.Length - 1, Math.Max(0, coords.Y));
-            coords.Z = Math.Min(world.map.Height - 1, Math.Max(0, coords.Z));
+            coords = world.map.Bounds.Clamp(coords);
             
             if (player == Player.Console) {
                 BlockUpdate blockUpdate = new BlockUpdate(player, coords, block);
@@ -2080,9 +2075,7 @@ namespace fCraft {
             } else {
                 coords = player.Position.ToBlockCoords();
             }
-            coords.X = Math.Min( map.Width - 1, Math.Max( 0, coords.X ) );
-            coords.Y = Math.Min( map.Length - 1, Math.Max( 0, coords.Y ) );
-            coords.Z = Math.Min( map.Height - 1, Math.Max( 0, coords.Z ) );
+            coords = map.Bounds.Clamp(coords);
 
             if( player.SelectionMarksExpected > 0 ) {
                 player.SelectionAddMark( coords, true, true );
@@ -2099,16 +2092,11 @@ namespace fCraft {
             Handler = MarkAllHandler
         };
 
-        private static void MarkAllHandler(Player player, CommandReader cmd) {
+        static void MarkAllHandler(Player player, CommandReader cmd) {
             Map map = player.WorldMap;
-            Vector3I coordsMin;
-            Vector3I coordsMax;
-            coordsMin.X = 0;
-            coordsMin.Y = 0;
-            coordsMin.Z = 0;
-            coordsMax.X = map.Width - 1;
-            coordsMax.Y = map.Length - 1;
-            coordsMax.Z = map.Height - 1;
+            Vector3I coordsMin = map.Bounds.MinVertex;
+            Vector3I coordsMax = map.Bounds.MaxVertex;
+
             if (player.IsMakingSelection) {
                 player.SelectionResetMarks();
                 player.SelectionAddMark(coordsMin, false, false);
