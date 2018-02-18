@@ -169,7 +169,6 @@ namespace fCraft
             Category = CommandCategory.New | CommandCategory.Chat,
             Permissions = new[] { Permission.Chat },
             NotRepeatable = true,
-            UsableByFrozenPlayers = false,
             Usage = "/Review",
             Help = "Asks available Moderators for a review of your build.",
             Handler = ReviewHandler

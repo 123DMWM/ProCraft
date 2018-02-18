@@ -883,7 +883,6 @@ namespace fCraft {
             RepeatableSelection = true,
             Usage = "/Center",
             Help = "Places a block at the center for a chosen cuboided area",
-            UsableByFrozenPlayers = false,
             Handler = CenterHandler
         };
 
@@ -2746,7 +2745,6 @@ namespace fCraft {
             RepeatableSelection = true,
             Usage = "/Snake (Length) [Block]",
             Help = "Builds a randomixed snake at a desired length with the specified block.",
-            UsableByFrozenPlayers = false,
             Handler = SnakeHandler
         };
 
