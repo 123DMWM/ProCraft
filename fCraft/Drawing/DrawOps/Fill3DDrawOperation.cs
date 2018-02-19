@@ -153,8 +153,8 @@ namespace fCraft.Drawing {
                     yield return coords;
                     if (coords.X - 1 >= Bounds.XMin) stack.Push(index - 1);
                     if (coords.X + 1 <= Bounds.XMax) stack.Push(index + 1);
-                    if (coords.Y - 1 >= Bounds.YMin) stack.Push(index + width);
-                    if (coords.Y + 1 <= Bounds.YMax) stack.Push(index - width);
+                    if (coords.Y - 1 >= Bounds.YMin) stack.Push(index - width);
+                    if (coords.Y + 1 <= Bounds.YMax) stack.Push(index + width);
                     if (coords.Z - 1 >= Bounds.ZMin) stack.Push(index - width * length);
                     if (coords.Z + 1 <= Bounds.ZMax) stack.Push(index + width * length);
                 }
