@@ -74,9 +74,7 @@ namespace fCraft.Drawing {
 
 
         public override Block NextBlock(DrawOperation op) {
-            if (op == null)
-                throw new ArgumentNullException("op");
-            Block block = op.Map.GetBlock(op.Coords);
+            Block block = (Block)op.Map.Blocks[op.Map.Index(op.Coords)];
             for (int i = 0; i < Blocks.Length; i++) {
                 if (block == Blocks[i]) {
                     return Block.None;

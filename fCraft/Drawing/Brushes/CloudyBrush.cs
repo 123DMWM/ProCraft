@@ -334,8 +334,6 @@ namespace fCraft.Drawing {
 
 
         public Block NextBlock(DrawOperation op) {
-            if (op == null)
-                throw new ArgumentNullException("op");
             Vector3I relativeCoords = op.Coords - op.Bounds.MinVertex;
             float value = noise3D.Compute(relativeCoords.X, relativeCoords.Y, relativeCoords.Z);
 

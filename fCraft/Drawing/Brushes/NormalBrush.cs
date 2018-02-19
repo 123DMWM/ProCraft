@@ -103,8 +103,6 @@ namespace fCraft.Drawing {
 
 
         public Block NextBlock(DrawOperation state) {
-            if (state == null)
-                throw new ArgumentNullException("state");
             if (state.AlternateBlockIndex < Blocks.Length) {
                 return Blocks[state.AlternateBlockIndex];
             } else {

@@ -138,8 +138,6 @@ namespace fCraft.Drawing {
 
 
         public Block NextBlock(DrawOperation op) {
-            if (op == null) throw new ArgumentNullException("op");
-
             // TODO: offset op.Coords
             Vector3I pasteCoords = new Vector3I {
                 X = Mod(op.Coords.X - op.Marks[0].X, CopyInfo.Bounds.Width),

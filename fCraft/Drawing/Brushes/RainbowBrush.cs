@@ -67,8 +67,6 @@ namespace fCraft.Drawing {
 
 
         public Block NextBlock(DrawOperation state) {
-            if (state == null)
-                throw new ArgumentNullException("state");
             return Rainbow[(state.Coords.X + state.Coords.Y + state.Coords.Z) % 13];
         }
 
