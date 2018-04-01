@@ -1171,18 +1171,13 @@ namespace fCraft {
             Block maxLegal = supportsCustomBlocks ? Map.MaxCustomBlockType : Map.MaxLegalBlockType;
             Logger.Log(LogType.Debug, "Player.JoinWorldNow: Sending compressed map to {0}.", Name);
             
-            using (LevelChunkStream dst = new LevelChunkStream(this)) {
-                Stream compressor = null;
-                try {
-                    compressor = map.CompressMapHeader(this, dst);
-                    
-                    if (supportsCustomBlocks && supportsBlockDefs) {
-                        map.CompressMap(dst, compressor);
-                    } else {
-                        map.CompressAndConvertMap((byte)maxLegal, dst, compressor);
-                    }
-                } finally {
-                    if (compressor != null) compressor.Close();
+            using (LevelChunkStream dst = new LevelChunkStream(this))
+                using (Stream compressor = map.CompressMapHeader(this, dst))
+            {
+                if (supportsCustomBlocks && supportsBlockDefs) {
+                    map.CompressMap(dst, compressor);
+                } else {
+                    map.CompressAndConvertMap((byte)maxLegal, dst, compressor);
                 }
             }
         }
