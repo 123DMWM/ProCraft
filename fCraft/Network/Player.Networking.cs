@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -1115,6 +1116,10 @@ namespace fCraft {
 
             writer.Write(OpCode.MapBegin);
             BytesSent++;
+            if (Supports(CpeExt.FastMap)) {
+                writer.Write(map.Volume);
+                BytesSent += 4;
+            }
 
             if (Supports(CpeExt.BlockDefinitions)) {
                 if (oldWorld != null) {
@@ -1166,10 +1171,20 @@ namespace fCraft {
             Block maxLegal = supportsCustomBlocks ? Map.MaxCustomBlockType : Map.MaxLegalBlockType;
             Logger.Log(LogType.Debug, "Player.JoinWorldNow: Sending compressed map to {0}.", Name);
             
-            if (supportsCustomBlocks && supportsBlockDefs)
-                map.CompressMap(this);
-            else
-                map.CompressAndConvertMap((byte)maxLegal, this);
+            using (LevelChunkStream dst = new LevelChunkStream(this)) {
+                Stream compressor = null;
+                try {
+                    compressor = map.CompressMapHeader(this, dst);
+                    
+                    if (supportsCustomBlocks && supportsBlockDefs) {
+                        map.CompressMap(dst, compressor);
+                    } else {
+                        map.CompressAndConvertMap((byte)maxLegal, dst, compressor);
+                    }
+                } finally {
+                    if (compressor != null) compressor.Close();
+                }
+            }
         }
         
         void SendJoinMessage(World oldWorld, World newWorld) {
@@ -1286,10 +1301,10 @@ namespace fCraft {
                 Send(Packet.MakeEnvSetMapProperty(EnvProp.WeatherSpeed, World.WeatherSpeed));
                 Send(Packet.MakeEnvSetMapProperty(EnvProp.WeatherFade, World.WeatherFade));
 
-				Send(Packet.MakeEnvSetMapProperty(EnvProp.SkyboxHorSpeed, World.SkyboxHorSpeed));
-				Send(Packet.MakeEnvSetMapProperty(EnvProp.SkyboxVerSpeed, World.SkyboxVerSpeed));
+                Send(Packet.MakeEnvSetMapProperty(EnvProp.SkyboxHorSpeed, World.SkyboxHorSpeed));
+                Send(Packet.MakeEnvSetMapProperty(EnvProp.SkyboxVerSpeed, World.SkyboxVerSpeed));
 
-			} else if (Supports(CpeExt.EnvMapAppearance2)) {
+            } else if (Supports(CpeExt.EnvMapAppearance2)) {
                 Send(Packet.MakeEnvSetMapAppearance2(World.GetTexture(), side, edge, World.GetEdgeLevel(),
                                                      World.GetCloudsHeight(), World.MaxFogDistance, HasCP437));
             } else if (Supports(CpeExt.EnvMapAppearance)) {

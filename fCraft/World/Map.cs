@@ -874,43 +874,45 @@ namespace fCraft {
         }
 
         const int bufferSize = 64 * 1024;
-        internal void CompressMap(Player dst) {
-            byte[] array = Blocks;
-            using (LevelChunkStream ms = new LevelChunkStream(dst))
-                using (GZipStream compressor = new GZipStream(ms, CompressionMode.Compress, true))
-            {
-                int count = IPAddress.HostToNetworkOrder(array.Length); // convert to big endian
+        internal Stream CompressMapHeader(Player player, LevelChunkStream dst) {
+            Stream compressor = null;
+            if (player.Supports(CpeExt.FastMap)) {
+                compressor = new DeflateStream(dst, CompressionMode.Compress, true);
+            } else {
+                compressor = new GZipStream(dst, CompressionMode.Compress, true);
+                int count = IPAddress.HostToNetworkOrder(Volume); // convert to big endian
                 compressor.Write(BitConverter.GetBytes(count), 0, 4);
-                ms.length = array.Length;
-                
-                for (int i = 0; i < array.Length; i += bufferSize) {
-                    int len = Math.Min(bufferSize, array.Length - i);
-                    ms.position = i;
-                    compressor.Write(array, i, len);
-                }
+            }
+            return compressor;
+        }
+        
+        internal void CompressMap(LevelChunkStream dst, Stream compressor) {
+            byte[] array = Blocks;
+            float progScale = 100.0f / array.Length;
+            
+            for (int i = 0; i < array.Length; i += bufferSize) {
+                int len = Math.Min(bufferSize, array.Length - i);
+                dst.chunkValue = (byte)(i * progScale);
+                compressor.Write(array, i, len);
             }
         }
         
-        internal void CompressAndConvertMap(byte maxLegal, Player dst) {
+        internal void CompressAndConvertMap(byte maxLegal, LevelChunkStream dst, Stream compressor) {
             byte[] array = Blocks;
+            float progScale = 100.0f / array.Length;
+            
             byte* fallback = stackalloc byte[256];
             MakeFallbacks(fallback, maxLegal, World);
-            using (LevelChunkStream ms = new LevelChunkStream(dst))
-                using (GZipStream compressor = new GZipStream(ms, CompressionMode.Compress, true))
-            {
-                int count = IPAddress.HostToNetworkOrder(array.Length); // convert to big endian
-                compressor.Write(BitConverter.GetBytes(count), 0, 4);
-                ms.length = array.Length;
-                
-                byte[] buffer = new byte[bufferSize];
-                for (int i = 0; i < array.Length; i += bufferSize) {
-                    int len = Math.Min(bufferSize, array.Length - i);
-                    for (int j = 0; j < len; j++)
-                        buffer[j] = fallback[array[i + j]];
-                    
-                    ms.position = i;
-                    compressor.Write(buffer, 0, len);
+            byte[] buffer = new byte[bufferSize];
+            
+            for (int i = 0; i < array.Length; i += bufferSize) {
+                int len = Math.Min(bufferSize, array.Length - i);
+                for (int j = 0; j < len; j++) {
+                    buffer[j] = fallback[array[i + j]];
                 }
+                
+                dst.chunkValue = (byte)(i * progScale);
+                compressor.Write(buffer, 0, len);
             }
         }
         

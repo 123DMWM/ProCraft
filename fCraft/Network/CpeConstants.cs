@@ -107,6 +107,9 @@ namespace fCraft
         
         /// <summary> Allows sending motd/handshake packets, without also needing to resend world. </summary>
         InstantMOTD,
+        
+        /// <summary> More optimised sending of map. </summary>
+        FastMap,
     }
 
 

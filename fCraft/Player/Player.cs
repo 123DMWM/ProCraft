@@ -2156,6 +2156,7 @@ namespace fCraft {
         const string TwoWayPingExtName = "TwoWayPing";
         const string InventoryOrderExtName = "InventoryOrder";
         const string InstantMOTDExtName = "InstantMOTD";
+        const string FastMapExtName = "FastMap";
         
         bool supportsBlockDefs, supportsCustomBlocks;
         internal bool supportsExtPositions;

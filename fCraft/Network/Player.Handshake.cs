@@ -217,7 +217,7 @@ namespace fCraft {
         
         bool NegotiateProtocolExtension() {
             // write our ExtInfo and ExtEntry packets
-            writer.Write(Packet.MakeExtInfo("ProCraft", 29).Bytes);
+            writer.Write(Packet.MakeExtInfo("ProCraft", 30).Bytes);
             
             writer.Write(Packet.MakeExtEntry(ClickDistanceExtName, 1).Bytes);
             writer.Write(Packet.MakeExtEntry(CustomBlocksExtName, 1).Bytes);
@@ -256,6 +256,7 @@ namespace fCraft {
             writer.Write(Packet.MakeExtEntry(InventoryOrderExtName, 1).Bytes);
             
             writer.Write(Packet.MakeExtEntry(InstantMOTDExtName, 1).Bytes);
+            writer.Write(Packet.MakeExtEntry(FastMapExtName, 1).Bytes);
             
             // Fix for ClassiCube Client which violates the spec -
             // If server supports version > 1 but client version 1, client should reply with version 1.
@@ -380,6 +381,9 @@ namespace fCraft {
                         break;
                     case InstantMOTDExtName:
                         if (version == 1) ext = CpeExt.InstantMOTD;
+                        break;
+                    case FastMapExtName:
+                        if (version == 1) ext = CpeExt.FastMap;
                         break;
                 }
                 if (ext != CpeExt.None)

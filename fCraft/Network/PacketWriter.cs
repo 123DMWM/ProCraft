@@ -26,6 +26,11 @@ namespace fCraft {
         }
         
 
+        public override void Write( int data ) {
+            base.Write( IPAddress.HostToNetworkOrder( (int)data ) );
+        }
+        
+
         public override void Write( string str ) {
             if( str == null ) throw new ArgumentNullException( "str" );
             if( str.Length > Packet.StringSize ) throw new ArgumentException( "String is too long (>64).", "str" );

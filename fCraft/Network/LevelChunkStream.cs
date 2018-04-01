@@ -19,7 +19,8 @@ namespace fCraft {
         public override long Seek(long offset, SeekOrigin origin) { throw ex; }
         public override void SetLength(long length) { throw ex; }
         
-        internal int index, position, length;
+        int index;
+        internal byte chunkValue;
         Player player;
         byte[] data = new byte[chunkSize + 4];        
         const int chunkSize = 1024;
@@ -61,7 +62,7 @@ namespace fCraft {
         
         void WritePacket() {
             Packet.WriteI16((short)index, data, 1);
-            data[1027] = (byte)(100 * (float)position / length);
+            data[1027] = chunkValue;
             player.SendNow(new Packet(data));
             index = 0;
         }
