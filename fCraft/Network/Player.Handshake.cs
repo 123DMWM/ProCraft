@@ -217,7 +217,7 @@ namespace fCraft {
         
         bool NegotiateProtocolExtension() {
             // write our ExtInfo and ExtEntry packets
-            writer.Write(Packet.MakeExtInfo("ProCraft", 27).Bytes);
+            writer.Write(Packet.MakeExtInfo("ProCraft", 29).Bytes);
             
             writer.Write(Packet.MakeExtEntry(ClickDistanceExtName, 1).Bytes);
             writer.Write(Packet.MakeExtEntry(CustomBlocksExtName, 1).Bytes);
@@ -253,6 +253,9 @@ namespace fCraft {
             
             writer.Write(Packet.MakeExtEntry(EntityPropertyExtName, 1).Bytes);
             writer.Write(Packet.MakeExtEntry(TwoWayPingExtName, 1).Bytes);
+            writer.Write(Packet.MakeExtEntry(InventoryOrderExtName, 1).Bytes);
+            
+            writer.Write(Packet.MakeExtEntry(InstantMOTDExtName, 1).Bytes);
             
             // Fix for ClassiCube Client which violates the spec -
             // If server supports version > 1 but client version 1, client should reply with version 1.
