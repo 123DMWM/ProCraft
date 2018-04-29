@@ -1811,7 +1811,7 @@ namespace fCraft {
             player.Message("  Time Zone: &f{0}", info.TimeZone ?? "N/A");
             player.Message("  Hostname: &f{0}", info.Hostname ?? "N/A");
             player.Message("  Accuracy: &f{0}", info.Accuracy);
-            player.Message("Geoip information by: &9http://geoip.cf/");
+            player.Message("Geoip information by: &9http://geoip.pw/");
         }
 
         static readonly CommandDescriptor CdGeoipNp = new CommandDescriptor {
@@ -1837,7 +1837,7 @@ namespace fCraft {
             }
             JsonObject result = null;
             try {
-                result = JsonObject.Parse(Server.downloadDatastring("http://geoip.cf/api/" + ip));
+                result = JsonObject.Parse(Server.downloadDatastring("http://geoip.pw/api/" + ip));
                 if (result.Get("message") != null) {
                     player.Message("No information found!");
                     return;
@@ -1853,7 +1853,7 @@ namespace fCraft {
                 byte.TryParse(result.Get("accuracy"), out acc);
                 player.Message("  Hostname: &f{0}", result.Get("host") ?? "N/A");
                 player.Message("  Accuracy: &f{0}", acc);
-                player.Message("Geoip information by: &9http://geoip.cf/");
+                player.Message("Geoip information by: &9http://geoip.pw/");
 
             } catch (Exception ex) {
                 Logger.Log(LogType.Warning, "Could not access GeoIP website (Ex: " + ex + ")");
@@ -1870,7 +1870,7 @@ namespace fCraft {
             }
             JsonObject result = null;
             try {
-                result = JsonObject.Parse(Server.downloadDatastring("http://geoip.cf/api/" + ip));
+                result = JsonObject.Parse(Server.downloadDatastring("http://geoip.pw/api/" + ip));
                 if (result.Get("message") != null) {
                     return;
                 }
