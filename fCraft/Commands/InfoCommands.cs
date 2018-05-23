@@ -16,7 +16,7 @@ namespace fCraft {
         const int PlayersPerPage = 30;
         internal static void Init() {
             CommandManager.RegisterCommand( CdInfo );
-            CommandManager.RegisterCommand( CdWhoIs );
+            CommandManager.RegisterCommand( CdWhoNick );
             CommandManager.RegisterCommand( CdBanInfo );
             CommandManager.RegisterCommand( CdRankInfo );
             CommandManager.RegisterCommand( CdServerInfo );
@@ -122,7 +122,7 @@ namespace fCraft {
 
         static readonly CommandDescriptor CdInfo = new CommandDescriptor {
             Name = "Info",
-            Aliases = new[] { "i", "whowis" },
+            Aliases = new[] { "i", "whois" },
             Category = CommandCategory.Info,
             IsConsoleSafe = true,
             UsableByFrozenPlayers = true,
@@ -743,63 +743,47 @@ namespace fCraft {
 
         #endregion
         #region WhoIs
-        static readonly CommandDescriptor CdWhoIs = new CommandDescriptor
+        static readonly CommandDescriptor CdWhoNick = new CommandDescriptor
         {
-            Name = "WhoIs",
+            Name = "WhoNick",
             Aliases = new[] { "realname" },
             Category = CommandCategory.New | CommandCategory.Info,
             Permissions = new[] { Permission.ViewOthersInfo },
             IsConsoleSafe = true,
             UsableByFrozenPlayers = true,
-            Usage = "/WhoIs [DisplayedName]",
+            Usage = "/WhoNick [DisplayedName]",
             Help = "Prints a list of players using the specified displayed name.",
-            Handler = WhoIsHandler
+            Handler = WhoNickHandler
         };
 
-        static void WhoIsHandler(Player player, CommandReader cmd)
-        {
-            string TargetDisplayedName = cmd.Next();
-            if (TargetDisplayedName == null)
-            {
-                CdWhoIs.PrintUsage(player);
+        static void WhoNickHandler(Player player, CommandReader cmd) {
+            string target = cmd.NextAll();
+            if (String.IsNullOrEmpty(target)) {
+                CdWhoNick.PrintUsage(player);
                 return;
             }
-            string whoislist = "";
+            target = Color.StripColors(target, false);
+                      
             //string offsetstring = cmd.Next();
             //int offset = 0;
             //if (offsetstring != null) {
                 //Int32.TryParse(offsetstring, out offset);
             //}
 
-            List<PlayerInfo> Results = new List<PlayerInfo>();
-            PlayerInfo[] CachedList = PlayerDB.PlayerInfoList;
-            foreach (PlayerInfo playerinfo in CachedList) {
-                if (playerinfo.DisplayedName == null) {
-                    if (Color.StripColors(playerinfo.Name, false).CaselessEquals(Color.StripColors(TargetDisplayedName, false))) 
-                        Results.Add(playerinfo);
-                } else {
-                    if (Color.StripColors(playerinfo.DisplayedName, false).CaselessEquals(Color.StripColors(TargetDisplayedName, false)))
-                        Results.Add(playerinfo);
-                }
+            List<PlayerInfo> matches = new List<PlayerInfo>();
+            PlayerInfo[] allPlayers = PlayerDB.PlayerInfoList;
+            foreach (PlayerInfo pl in allPlayers) {
+                string nick = pl.DisplayedName == null ? pl.Name : pl.DisplayedName;
+                if (Color.StripColors(nick, false).CaselessEquals(target)) matches.Add(pl);
             }
             
-            if (Results.Count <= 0)
-            {
-                player.Message("No players have the displayed name \"" + TargetDisplayedName + "\"");
-            }
-            if (Results.Count == 1)
-            {
-                player.Message("{0} &Shas the displayed name \"" + TargetDisplayedName + "\"", Results.ToArray()[0].Rank.Color + Results.ToArray()[0].Name);
-            }
-            if (Results.Count > 1)
-            {
-                foreach (PlayerInfo thisplayer in Results)
-                {
-                    whoislist += thisplayer.Rank.Color + thisplayer.Name + ", ";
-                }
-                whoislist = whoislist.Remove(whoislist.Length - 2);
-                whoislist += ".";
-                player.Message("The following players have the displayed name \"" + TargetDisplayedName + "\"&S: {0}", whoislist);
+            if (matches.Count == 0) {
+                player.Message("No players have the displayed name \"" + target + "\"");
+            } else if (matches.Count == 1) {
+                player.Message("{0} &Shas the displayed name \"" + target + "\"", matches[0].Rank.Color + matches[0].Name);
+            } else {
+                string all = matches.JoinToString(pl => pl.Rank.Color + pl.Name);
+                player.Message("The following players have the displayed name \"" + target + "\"&S: {0}", all);
             }
         }
         #endregion
