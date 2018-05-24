@@ -29,14 +29,12 @@ namespace fCraft.MapConversion {
                     Map map = LoadHeaderInternal( gs );
                     map.Blocks = new byte[map.Volume];
 
-                    int i = 0, lo, hi;
-                    while ((lo = gs.ReadByte()) != -1) {
-                        hi = gs.ReadByte();
-                        int id = lo | (hi << 8);
+                    int i = 0, id;
+                    while ((id = gs.ReadByte()) != -1) {
+                        gs.ReadByte(); // NOTE: This breaks the 5 block ids past 255, but I doubt they really had much use.
 
                         if (id <= (byte)Block.StoneBrick) map.Blocks[i] = (byte)id;
-                        else map.Blocks[i] = Mapping[id & 0xFF]; 
-                        // NOTE: This breaks the 5 block ids past 255, but I doubt they really had much use.
+                        else map.Blocks[i] = Mapping[id];  
                         i++;
                     }
                     return map;
