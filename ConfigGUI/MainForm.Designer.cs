@@ -3390,7 +3390,8 @@ namespace fCraft.ConfigGUI {
             this.bColorIRC.Name = "bColorIRC";
             this.bColorIRC.Size = new System.Drawing.Size(100, 23);
             this.bColorIRC.TabIndex = 17;
-            this.bColorIRC.UseVisualStyleBackColor = false;
+            this.bColorIRC.UseVisualStyleBackColor = false; 
+            this.bColorIRC.Click += new System.EventHandler(this.bColorIRC_Click);
             // 
             // lColorIRC
             // 
