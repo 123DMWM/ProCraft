@@ -55,15 +55,16 @@ namespace fCraft {
         
         public static string Filter(string rawMessage, Player player) {
             if (player != null && !player.IsStaff) {
-                if (player.LastMessage == new string(rawMessage.ToLower().Where(c => !char.IsWhiteSpace(c)).ToArray())) {
-                    if (player.MessageSpam >= 2) {
+        	    string trimmedMsg = new string(rawMessage.Where(c => !char.IsWhiteSpace(c)).ToArray());
+                if (player.lastMsg.CaselessEquals(trimmedMsg)) {
+                    if (player.lastMsgCount >= 2) {
                         player.Message("Please refrain from repeating yourself!");
                         return null;
                     }
-                    player.MessageSpam++;
+                    player.lastMsgCount++;
                 } else {
-                    player.LastMessage = new string(rawMessage.ToLower().Where(c => !char.IsWhiteSpace(c)).ToArray());
-                    player.MessageSpam = 0;
+                    player.lastMsg = trimmedMsg;
+                    player.lastMsgCount = 0;
                 }
             }
 
@@ -80,9 +81,7 @@ namespace fCraft {
             if (rawMessage.Length >= 10 && player.Info.Rank.MaxCaps > 0) {
                 int caps = 0;
                 for (int i = 0; i < rawMessage.Length; i++) {
-                    if (char.IsUpper(rawMessage[i])) {
-                        caps++;
-                    }
+                    if (char.IsUpper(rawMessage[i])) caps++;
                 }
                 
                 if (player.Info.Rank.MaxCaps == 1) {
@@ -162,15 +161,15 @@ namespace fCraft {
                     player.ParseMessage("/bot <CalledFromChat> " + rawMessage.Remove(0, 4), false);
                 }
                 double BotTime = player.TimeSinceLastServerMessage.TotalSeconds;
-                if (LDistance(rawMessage.ToLower(), "how do i rank up?") <= 0.25
-                    || LDistance(rawMessage.ToLower(), "how do we rank up") <= 0.25) {
+                if (LDistance(rawMessage, "how do i rank up?") <= 0.25
+                    || LDistance(rawMessage, "how do we rank up") <= 0.25) {
                     if (BotTime > 5) {
                         Server.BotMessage("You rank up by building something nice, preferably big. Then ask a staff member for a review.");
                         player.LastServerMessageDate = DateTime.UtcNow;
                         player.Info.TimesUsedBot++;
                     }
                 }
-                if (LDistance(rawMessage.ToLower(), "who is the owner?") <= 0.25) {
+                if (LDistance(rawMessage, "who is the owner?") <= 0.25) {
                     if (BotTime > 5) {
                         PlayerInfo owner;
                         if (PlayerDB.FindPlayerInfo(ConfigKey.ServerOwner.GetString(), out owner) && owner != null) {
@@ -182,24 +181,24 @@ namespace fCraft {
                         player.Info.TimesUsedBot++;
                     }
                 }
-                if (LDistance(rawMessage.ToLower(), "what is this server called?") <= 0.25
-                    || LDistance(rawMessage.ToLower(), "what is the name of this server?") <= 0.25) {
+                if (LDistance(rawMessage, "what is this server called?") <= 0.25
+                    || LDistance(rawMessage, "what is the name of this server?") <= 0.25) {
                     if (BotTime > 5) {
                         Server.BotMessage("The server name is: " + ConfigKey.ServerName.GetString());
                         player.LastServerMessageDate = DateTime.UtcNow;
                         player.Info.TimesUsedBot++;
                     }
                 }
-                if (LDistance(rawMessage.ToLower(), "where can i build?") <= 0.25
-                    || LDistance(rawMessage.ToLower(), "where do we build") <= 0.25) {
+                if (LDistance(rawMessage, "where can i build?") <= 0.25
+                    || LDistance(rawMessage, "where do we build") <= 0.25) {
                     if (BotTime > 5) {
                         Server.BotMessage("You can build anywhere outside of spawn. Just not on another persons build unless they say you can. ");
                         player.LastServerMessageDate = DateTime.UtcNow;
                         player.Info.TimesUsedBot++;
                     }
                 }
-                if (LDistance(rawMessage.ToLower(), "what is my next rank?") <= 0.25 ||
-                    LDistance(rawMessage.ToLower(), "what rank is after this one?") <= 0.25) {
+                if (LDistance(rawMessage, "what is my next rank?") <= 0.25 ||
+                    LDistance(rawMessage, "what rank is after this one?") <= 0.25) {
                     Rank next = player.Info.Rank.NextRankUp;
                     // donor ranks are skipped from being able to be promoted to
                     while (next != null && next.IsDonor) next = next.NextRankUp;
@@ -217,14 +216,11 @@ namespace fCraft {
             }
         }
 
-        public static float LDistance( string s, string t ) {
+        internal static float LDistance(string s, string t) {
             // degenerate cases
-            if (s == t)
-                return 0;
-            if (s.Length == 0)
-                return 1;
-            if (t.Length == 0)
-                return 1;
+            if (s.CaselessEquals(t)) return 0;
+            if (s.Length == 0) return 1;
+            if (t.Length == 0) return 1;
 
             // create two work vectors of integer distances
             int[] v0 = new int[t.Length + 1];
@@ -242,10 +238,13 @@ namespace fCraft {
                 // first element of v1 is A[i+1][0]
                 //   edit distance is delete (i+1) chars from s to match empty t
                 v1[0] = i + 1;
+                char curS = s[i]; if (curS >= 'A' && curS <= 'Z') curS += ' ';
 
                 // use formula to fill in the rest of the row
                 for (int j = 0; j < t.Length; j++) {
-                    var cost = (s[i] == t[j]) ? 0 : 1;
+                    char curT = t[j]; if (curT >= 'A' && curT <= 'Z') curT += ' ';
+                    int cost = (curS == curT) ? 0 : 1;
+                    
                     v1[j + 1] = Math.Min( v1[j] + 1, v0[j + 1] + 1 );
                     v1[j + 1] = Math.Min( v1[j + 1], v0[j] + cost );
                 }
@@ -254,11 +253,10 @@ namespace fCraft {
                 for (int j = 0; j < v0.Length; j++)
                     v0[j] = v1[j];
             }
+            
             float percent = (((float)v1[t.Length]) / ((float)(s.Length + t.Length) / 2));
-            if (percent < 0)
-                percent = 0;
-            if (percent > 1)
-                percent = 1;
+            if (percent < 0) percent = 0;
+            if (percent > 1) percent = 1;
             return percent;
         }
 

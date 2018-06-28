@@ -1091,10 +1091,9 @@ namespace fCraft
         static void LdisHandler( Player player, CommandReader cmd ) {
             string first = cmd.Next();
             string second = cmd.Next();
-            if (first == null) 
-                first = "";
-            if (second == null) 
-                second = "";
+            if (first == null)  first = "";
+            if (second == null) second = "";
+            
             float percent = (1 - Chat.LDistance(first, second)) * 100;
             player.Message( percent + "&S% similarity between:" );
             player.Message( "  &7{0} &Sand &7{1}", first, second );
