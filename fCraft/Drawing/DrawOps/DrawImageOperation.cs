@@ -72,36 +72,41 @@ namespace fCraft.Drawing {
 
         public override bool ReadParams(CommandReader cmd) {
             // get image URL
-            string urlString = cmd.Next();
-            if (urlString.NullOrWhiteSpace()) return false;
+            string str = cmd.Next();
+            if (str.NullOrWhiteSpace()) return false;
 
-            if (urlString.StartsWith("http://imgur.com/")) {
-                urlString = "http://i.imgur.com/" + urlString.Substring("http://imgur.com/".Length) + ".png";
-            }
             // if string starts with "++", load image from imgur
-            if (urlString.StartsWith("++")) {
-                urlString = "http://i.imgur.com/" + urlString.Substring(2) + ".png";
-            }
+            if (str.StartsWith("++")) {
+                str = "http://i.imgur.com/" + str.Substring(2) + ".png";
+            }            
             // prepend the protocol, if needed (assume http)
-            if (!urlString.CaselessStarts("http://") && !urlString.CaselessStarts("https://")) {
-                urlString = "http://" + urlString;
+            if (!str.CaselessStarts("http://") && !str.CaselessStarts("https://")) {
+                str = "http://" + str;
             }
-            if (!urlString.CaselessStarts("http://i.imgur.com")) {
-                Player.Message("For safety reasons we only accept images uploaded to &9http://imgur.com/ &SSorry for this inconvenience.");
-                return false;
+            
+            // Convert imgur web page url to direct image url
+            if (str.StartsWith("http://imgur.com/")) {
+                str = "http://i.imgur.com/" + str.Substring("http://imgur.com/".Length) + ".png";
             }
-            if (!urlString.CaselessEnds(".png") && !urlString.CaselessEnds(".jpg") && !urlString.CaselessEnds(".gif")) {
+            if (str.StartsWith("https://imgur.com/")) {
+                str = "https://i.imgur.com/" + str.Substring("https://imgur.com/".Length) + ".png";
+            }
+            
+            if (!str.CaselessEnds(".png") && !str.CaselessEnds(".jpg") && !str.CaselessEnds(".gif")) {
                 Player.Message("URL must be a link to an image");
                 return false;
             }
 
             // validate the image URL
             Uri url;
-            if (!Uri.TryCreate(urlString, UriKind.Absolute, out url)) {
+            if (!Uri.TryCreate(str, UriKind.Absolute, out url)) {
                 Player.Message("DrawImage: Invalid URL given.");
                 return false;
             } else if (!url.Scheme.Equals(Uri.UriSchemeHttp) && !url.Scheme.Equals(Uri.UriSchemeHttps)) {
                 Player.Message("DrawImage: Invalid URL given. Only HTTP and HTTPS links are allowed.");
+                return false;
+            } else if (!url.Host.CaselessEquals("i.imgur.com")) {
+                Player.Message("For safety reasons we only accept images uploaded to &9http://imgur.com/ &SSorry for this inconvenience.");
                 return false;
             }
             ImageUrl = url;
