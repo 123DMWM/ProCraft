@@ -1258,11 +1258,10 @@ namespace fCraft {
         public static string MakePlayerConnectedMessage([NotNull] Player player, bool firstTime) {
             if (player == null) throw new ArgumentNullException("player");
             UpdateTabList(true);
-            string name = (player.Info.TimeSinceFirstLogin.ToMilliSeconds() <= 86400000 ? Chat.newPlayerPrefix.ToString() : "") + player.Name;
             string ip = player.Info.LastIP.ToString();
             if (IPAddress.Parse(ip).IsLocal() && ExternalIP != null)
                 ip = ExternalIP.ToString();
-            return string.Format("&2(&A{0}&2) Connected{1}." + "{2}", name, 
+            return string.Format("&2(&A{0}&2) Connected{1}." + "{2}", player.ClassyName, 
                 player.Info.TimesVisited == 1 ? " for the first time" : 
                 (ip != player.Info.GeoIP || player.Info.Accuracy == 0 || string.IsNullOrEmpty(player.Info.CountryName)) ? "" :
                 " from " + player.Info.CountryName, string.IsNullOrEmpty(player.ClientName) ? "" :
@@ -1276,7 +1275,7 @@ namespace fCraft {
                 throw new ArgumentNullException("player");
             UpdateTabList(true);
             return string.Format("&4(&C{0}&4) Disconnected.", 
-                (player.Info.TimeSinceFirstLogin <= TimeSpan.FromDays(1) ? Chat.newPlayerPrefix.ToString() : "") + player.Name);
+                (player.Info.TimeSinceFirstLogin <= TimeSpan.FromDays(1) ? Chat.newPlayerPrefix.ToString() : "") + player.ClassyName);
 
         }
 
