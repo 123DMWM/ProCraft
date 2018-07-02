@@ -1472,15 +1472,7 @@ namespace fCraft {
             offset = offset < all.Length ? offset : Math.Max(0, all.Length - 10);
             int count = Math.Min(offset + 10, all.Length) - offset;
             int pad = formatter(all[offset]).Length;
-            int ownRank = 0;
-            if (all.Contains(player.Info)) {
-                for (int i = 0; i < all.Length; i++) {
-                    if (all[i] == player.Info) {
-                        ownRank = i + 1;
-                        break;
-                    }
-                }
-            }
+            int ownRank = Array.IndexOf(all, player.Info) + 1;
             
             player.Message("Top Players ({0}):{1}", stat, (ownRank == 0 ? "" : string.Format(" You are #&7{0:#,##0}", ownRank)));
             for (int i = offset; i < offset + count; i++) {
