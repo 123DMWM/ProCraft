@@ -1454,7 +1454,7 @@ namespace fCraft {
 					reverse = true;
 					break;
 				default:
-                    player.Message("No stats for: {0}", stat);
+                    player.Message("{0} is not a valid statistic.", stat);
                     return;
             }
             
@@ -1464,12 +1464,25 @@ namespace fCraft {
             else
                 all = all.Where(p => orderer(p) >= 1 && p.Rank == rank).OrderBy(orderer).ToArray();
 			if (!reverse) Array.Reverse(all);
+            if (all.Length == 0) {
+                player.Message("No players for stat: {0}", stat);
+                return;
+            }
             
             offset = offset < all.Length ? offset : Math.Max(0, all.Length - 10);
             int count = Math.Min(offset + 10, all.Length) - offset;
             int pad = formatter(all[offset]).Length;
+            int ownRank = 0;
+            if (all.Contains(player.Info)) {
+                for (int i = 0; i < all.Length; i++) {
+                    if (all[i] == player.Info) {
+                        ownRank = i + 1;
+                        break;
+                    }
+                }
+            }
             
-            player.Message("Top Players ({0}):", stat);
+            player.Message("Top Players ({0}):{1}", stat, (ownRank == 0 ? "" : string.Format(" You are #&7{0:#,##0}", ownRank)));
             for (int i = offset; i < offset + count; i++) {
                 PlayerInfo p = all[i];
                 player.Message(" &7{1}&S - {0}", p.ClassyName, formatter(p).PadLeft(pad, '0'));
