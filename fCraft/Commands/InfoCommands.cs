@@ -1353,8 +1353,8 @@ namespace fCraft {
             Category = CommandCategory.New | CommandCategory.Info,
             IsConsoleSafe = true,
             Usage = "/Most <stat> [Rank] and/or [Offset]",
-            Help = "Lists all players in order of a specified statistic. Stats:" +
-                   "Banned, Built, Chat, Deleted, Demoted, Drawn, Hours, Kicked, Logins, Promoted, Recent",
+            Help = "Lists all players in order of a specified statistic.&N" +
+                   "Available stats are: Banned, Built, Chat, Deleted, Demoted, Drawn, Hours, Kicked, Logins, Promoted, Recent",
             HelpSections = new Dictionary<string, string>{
                 { "Banned",     "/Most Banned [Args]" +
                                     "Lists the top players by playeres banned" },
