@@ -107,7 +107,7 @@ namespace fCraft {
                 ip = Server.ExternalIP.ToString();
             }
 
-            if (ip != GeoIP || Accuracy == 0) {
+            if (ip != GeoIP) {
                 Scheduler.NewBackgroundTask(GeoipLoginCallback).RunOnce(this, TimeSpan.Zero);
             } else {
                 DisplayGeoIp(false);

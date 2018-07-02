@@ -1263,7 +1263,7 @@ namespace fCraft {
                 ip = ExternalIP.ToString();
             return string.Format("&2(&A{0}&2) Connected{1}." + "{2}", player.ClassyName, 
                 player.Info.TimesVisited == 1 ? " for the first time" : 
-                (ip != player.Info.GeoIP || player.Info.Accuracy == 0 || string.IsNullOrEmpty(player.Info.CountryName)) ? "" :
+                (ip != player.Info.GeoIP || string.IsNullOrEmpty(player.Info.CountryName)) ? "" :
                 " from " + player.Info.CountryName, string.IsNullOrEmpty(player.ClientName) ? "" :
                 "&N&BUsing: " + player.ClientName);
         }

@@ -1787,7 +1787,7 @@ namespace fCraft {
                 info = FindPlayerInfo(player, cmd);
             }
             if (info == null) return;
-            if (info.GeoIP != info.LastIP.ToString() || info.Accuracy == 0) {
+            if (info.GeoIP != info.LastIP.ToString()) {
                 GetGeoip(info);
             }
 
@@ -1799,7 +1799,6 @@ namespace fCraft {
             player.Message("  Longitude: &f{0}", info.Longitude ?? "N/A");
             player.Message("  Time Zone: &f{0}", info.TimeZone ?? "N/A");
             player.Message("  Hostname: &f{0}", info.Hostname ?? "N/A");
-            player.Message("  Accuracy: &f{0}", info.Accuracy);
             player.Message("Geoip information by: &9http://geoip.pw/");
         }
 
@@ -1854,7 +1853,7 @@ namespace fCraft {
             if (IPAddress.Parse(ip).IsLocal() && Server.ExternalIP != null) {
                 ip = Server.ExternalIP.ToString();
             }
-            if (ip == info.GeoIP && info.Accuracy != 0) {
+            if (ip == info.GeoIP) {
                 return;
             }
             JsonObject result = null;
@@ -1870,7 +1869,6 @@ namespace fCraft {
                 info.Latitude = result.Get("latitude") ?? "N/A";
                 info.Longitude = result.Get("longitude") ?? "N/A";
                 info.TimeZone = result.Get("timezone") ?? "N/A";
-                byte.TryParse(result.Get("accuracy"), out info.Accuracy);
                 info.Hostname = result.Get("host") ?? "N/A";
                 info.GeoIP = result.Get("ip") ?? "N/A";
                 return;

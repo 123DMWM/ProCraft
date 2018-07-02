@@ -1072,9 +1072,9 @@ namespace fCraft
                 string ip = e.Player.Info.LastIP.ToString();
                 if (IPAddress.Parse(ip).IsLocal() && Server.ExternalIP != null)
                     ip = Server.ExternalIP.ToString();
-                    e.Player.Info.TimesVisited == 1 ? " for the first time" : (ip != e.Player.Info.GeoIP || e.Player.Info.Accuracy == 0) ? "" : " from " + e.Player.Info.CountryName);
                 
                 string message = string.Format("&2{0}&2(&A{1}&2) Connected{2}.", Bold, e.Player.ClassyName, 
+                    e.Player.Info.TimesVisited == 1 ? " for the first time" : (ip != e.Player.Info.GeoIP) ? "" : " from " + e.Player.Info.CountryName);
                 SendChannelMessage(message);
             }
         }
