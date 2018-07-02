@@ -55,7 +55,7 @@ namespace fCraft {
 
         public string quitmessage = "/Quit";
 
-        internal string lastMsg;
+        internal string lastMsg = "";
         internal int lastMsgCount;
 
         /// <summary> Last sign clicked by the player</summary>
