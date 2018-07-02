@@ -1,4 +1,4 @@
-﻿// Part of fCraft | Copyright 2009-2015 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt | ProCraft Copyright 2014-2016 Joseph Beauvais <123DMWM@gmail.com>
+﻿// Part of fCraft | Copyright 2009-2015 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt | ProCraft Copyright 2014-2018 Joseph Beauvais <123DMWM@gmail.com>
 using System.Windows.Forms;
 using SysCol = System.Drawing.Color;
 

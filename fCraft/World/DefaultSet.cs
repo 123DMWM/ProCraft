@@ -1,4 +1,4 @@
-﻿// ProCraft Copyright 2014-2016 Joseph Beauvais <123DMWM@gmail.com>
+﻿// ProCraft Copyright 2014-2018 Joseph Beauvais <123DMWM@gmail.com>
 
 // Based off code from https://github.com/Hetal728/MCGalaxy/blob/master/MCGalaxy/Blocks/DefaultSet.cs
 // which was based off code from https://github.com/UnknownShadow200/ClassicalSharp/blob/master/ClassicalSharp/Blocks/DefaultSet.cs
