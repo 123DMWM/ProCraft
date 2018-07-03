@@ -1113,68 +1113,18 @@ namespace fCraft {
         }
 
 
-        static readonly Uri IPCheckUri = new Uri("http://www.classicube.net/api/myip/");
+        const string ipCheckUri = "http://www.classicube.net/api/myip/";
         const int IPCheckTimeout = 20000;
 
 
         /// <summary> Checks server's external IP, as reported by fCraft.net. </summary>
         [CanBeNull]
-        static IPAddress CheckExternalIP()
-        {
-            HttpWebRequest request = HttpUtil.CreateRequest(IPCheckUri, 
-                                                            TimeSpan.FromMilliseconds(IPCheckTimeout));
-            request.CachePolicy = new RequestCachePolicy(RequestCacheLevel.BypassCache);
-
-            try
-            {
-                using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
-                {
-                    if (response.StatusCode != HttpStatusCode.OK)
-                    {
-                        Logger.Log(LogType.Warning, "Could not check external IP: {0}",
-                                    response.StatusDescription);
-                        return null;
-                    }
-                    
-                    // ReSharper disable AssignNullToNotNullAttribute
-                    using (StreamReader responseReader = new StreamReader(response.GetResponseStream()))
-                    {
-                        // ReSharper restore AssignNullToNotNullAttribute
-                        string responseString = responseReader.ReadToEnd();
-                        IPAddress result;
-                        
-                        if (IPAddress.TryParse(responseString, out result)) return result;
-                        return null;
-                    }
-                }
-            }
-            catch (WebException ex)
-            {
-                Logger.Log(LogType.Warning, "Could not check external IP: {0}", ex);
-                return null;
-            }
-        }
-
-        /// <summary> Safely downloads data. </summary>
-        [CanBeNull]
-        public static string downloadDatastring(string url) {
-            HttpWebRequest request = HttpUtil.CreateRequest(new Uri(url), TimeSpan.FromSeconds(10));
-            request.CachePolicy = new RequestCachePolicy(RequestCacheLevel.BypassCache);
-
-            try {
-                using (HttpWebResponse response = (HttpWebResponse)request.GetResponse()) {
-                    if (response.StatusCode != HttpStatusCode.OK) {
-                        Logger.Log(LogType.Warning, "Could not download data: {0}", response.StatusDescription);
-                        return null;
-                    }
-                    using (StreamReader reader = new StreamReader(response.GetResponseStream())) {
-                        return reader.ReadToEnd();
-                    }
-                }
-            } catch (WebException ex) {
-                Logger.Log(LogType.Warning, "Could not download data: {0}", ex);
-                return null;
-            }
+        static IPAddress CheckExternalIP() {
+            string data = HttpUtil.DownloadString(ipCheckUri, "check external IP", IPCheckTimeout);
+            IPAddress ip = null;
+            
+            if (data == null || !IPAddress.TryParse(data, out ip)) return null;
+            return ip;
         }
 
         // Callback for setting the local IP binding. Implements System.Net.BindIPEndPoint delegate.

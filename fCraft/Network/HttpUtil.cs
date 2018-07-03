@@ -1,8 +1,10 @@
 ﻿// Part of fCraft | Copyright 2009-2015 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt //Copyright (c) 2011-2013 Jon Baker, Glenn Marien and Lao Tszy <Jonty800@gmail.com> //Copyright (c) <2012-2014> <LeChosenOne, DingusBungus> | ProCraft Copyright 2014-2018 Joseph Beauvais <123DMWM@gmail.com>
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Cache;
 using System.Net.Sockets;
 using JetBrains.Annotations;
 
@@ -68,7 +70,7 @@ namespace fCraft {
                 }
             }
             return req;
-        }        
+        }
         
         public static WebClient CreateWebClient(TimeSpan timeout) { 
             return new CustomWebClient(timeout);
@@ -80,6 +82,29 @@ namespace fCraft {
             
             protected override WebRequest GetWebRequest(Uri address) {
                 return CreateRequest(address, timeout);
+            }
+        }
+        
+        
+        [CanBeNull]
+        public static string DownloadString(string url, string action, int timeoutMS) {
+            HttpWebRequest request = CreateRequest(new Uri(url), TimeSpan.FromMilliseconds(timeoutMS));
+            request.CachePolicy = new RequestCachePolicy(RequestCacheLevel.BypassCache);
+
+            try {
+                using (HttpWebResponse response = (HttpWebResponse)request.GetResponse()) {
+                    if (response.StatusCode != HttpStatusCode.OK) {
+                        Logger.Log(LogType.Warning, "Could not {1}: {0}", response.StatusDescription, action);
+                        return null;
+                    }
+            		
+                    using (StreamReader reader = new StreamReader(response.GetResponseStream())) {
+                        return reader.ReadToEnd();
+                    }
+                }
+            } catch (WebException ex) {
+                Logger.Log(LogType.Warning, "Could not {1}: {0}", ex, action);
+                return null;
             }
         }
     }

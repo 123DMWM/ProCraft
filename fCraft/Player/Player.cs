@@ -2007,7 +2007,7 @@ namespace fCraft {
 
         #region Static Utilities
 
-        static readonly Uri PaidCheckUri = new Uri( "http://www.minecraft.net/haspaid.jsp?user=" );
+        const string paidCheckUri = "http://www.minecraft.net/haspaid.jsp?user=";
         const int PaidCheckTimeout = 5000;
 
 
@@ -2016,32 +2016,14 @@ namespace fCraft {
         public static AccountType CheckPaidStatus( [NotNull] string name ) {
             if( name == null ) throw new ArgumentNullException( "name" );
 
-            Uri uri = new Uri( PaidCheckUri + Uri.EscapeDataString( name ) );
-            HttpWebRequest request = HttpUtil.CreateRequest( uri, TimeSpan.FromMilliseconds( PaidCheckTimeout ) );
-            request.CachePolicy = new RequestCachePolicy( RequestCacheLevel.NoCacheNoStore );
-
-            try {
-                using( WebResponse response = request.GetResponse() ) {
-                    using( StreamReader responseReader = new StreamReader( response.GetResponseStream() ) ) {
-                        string paidStatusString = responseReader.ReadToEnd();
-                        bool isPaid;
-                        if( Boolean.TryParse( paidStatusString, out isPaid ) ) {
-                            if( isPaid ) {
-                                return AccountType.Paid;
-                            } else {
-                                return AccountType.Free;
-                            }
-                        } else {
-                            return AccountType.Unknown;
-                        }
-                    }
-                }
-            } catch( WebException ex ) {
-                Logger.Log( LogType.Warning,
-                            "Could not check paid status of player {0}: {1}",
-                            name, ex.Message );
-                return AccountType.Unknown;
-            }
+            string uri = paidCheckUri + Uri.EscapeDataString( name );
+            string data = HttpUtil.DownloadString( uri, "check paid status", PaidCheckTimeout );
+            
+            bool isPaid;
+            if( data != null && Boolean.TryParse( data, out isPaid ) ) {
+                return isPaid ? AccountType.Paid : AccountType.Free;
+            }        
+            return AccountType.Unknown;
         }
 
         static readonly Regex

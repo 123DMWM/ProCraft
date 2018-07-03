@@ -1786,12 +1786,19 @@ namespace fCraft {
             } else {
                 info = FindPlayerInfo(player, cmd);
             }
+            
             if (info == null) return;
-            if (info.GeoIP != info.LastIP.ToString()) {
-                GetGeoip(info);
+            GetGeoipInfo(info);
+            PrintGeoIpInfo(player, info);
+        }
+        
+        static void PrintGeoIpInfo(Player player, PlayerInfo info) {
+            if (info.Name != null) {
+                player.Message( "Geo Info about: {0}&S ({1})", info.ClassyName, info.GeoIP ?? "N/A" );
+            } else {
+                player.Message( "Geo Info about: &f{0}", info.GeoIP ?? "N/A" );
             }
-
-            player.Message( "Geo Info about: {0}&S ({1})", info.ClassyName, info.GeoIP ?? "N/A" );
+            
             player.Message("  Country: &f{1}&S ({0})", info.CountryCode ?? "N/A", info.CountryName ?? "N/A");
             player.Message("  Continent: &f{0}", info.Continent ?? "N/A");
             player.Message("  Subdivisions: &f{0}", info.Subdivision);
@@ -1823,45 +1830,25 @@ namespace fCraft {
                 player.Message("Info: Invalid IP range format. Use CIDR notation.");
                 return;
             }
-            JsonObject result = null;
-            try {
-                result = JsonObject.Parse(Server.downloadDatastring("http://geoip.pw/api/" + ip));
-                if (result.Get("message") != null) {
-                    player.Message("No information found!");
-                    return;
-                }
-                player.Message("Geo Info about: &f{0}", result.Get("ip") ?? "N/A");
-                player.Message("  Country: &f{0}&S ({1})", result.Get("country") ?? "N/A", result.Get("country_abbr") ?? "N/A");
-                player.Message("  Continent: &f{0}", result.Get("continent") ?? "N/A");
-                player.Message("  Subdivisions: &f{0}", nan.Replace(result.Get("subdivision"), "").Split(',').JoinToString(", "));
-                player.Message("  Latitude: &f{0}", result.Get("latitude") ?? "N/A");
-                player.Message("  Longitude: &f{0}", result.Get("longitude") ?? "N/A");
-                player.Message("  Timezone: &f{0}", result.Get("timezone") ?? "N/A");
-                byte acc;
-                byte.TryParse(result.Get("accuracy"), out acc);
-                player.Message("  Hostname: &f{0}", result.Get("host") ?? "N/A");
-                player.Message("  Accuracy: &f{0}", acc);
-                player.Message("Geoip information by: &9http://geoip.pw/");
-
-            } catch (Exception ex) {
-                Logger.Log(LogType.Warning, "Could not access GeoIP website (Ex: " + ex + ")");
-            }
+            
+            PlayerInfo tmp = new PlayerInfo(0); tmp.LastIP = ip;
+            GetGeoipInfo(tmp);
+            PrintGeoIpInfo(player, tmp);
         }
 
-        public static void GetGeoip(PlayerInfo info) {
+        public static void GetGeoipInfo(PlayerInfo info) {
             string ip = info.LastIP.ToString();
             if (IPAddress.Parse(ip).IsLocal() && Server.ExternalIP != null) {
                 ip = Server.ExternalIP.ToString();
             }
-            if (ip == info.GeoIP) {
-                return;
-            }
+            if (ip == info.GeoIP) return;
+            
             JsonObject result = null;
             try {
-                result = JsonObject.Parse(Server.downloadDatastring("http://geoip.pw/api/" + ip));
-                if (result.Get("message") != null) {
-                    return;
-                }
+                string url = "http://geoip.pw/api/" + ip;
+                result = JsonObject.Parse(HttpUtil.DownloadString(url, "get GeoIP info", 10000));
+                if (result.Get("message") != null) return;
+                
                 info.CountryName = result.Get("country") ?? "N/A";
                 info.CountryCode = result.Get("country_abbr") ?? "N/A";
                 info.Continent = result.Get("continent") ?? "N/A";
@@ -1871,12 +1858,9 @@ namespace fCraft {
                 info.TimeZone = result.Get("timezone") ?? "N/A";
                 info.Hostname = result.Get("host") ?? "N/A";
                 info.GeoIP = result.Get("ip") ?? "N/A";
-                return;
-
             } catch (Exception ex) {
                 Logger.Log(LogType.Warning, "Could not access GeoIP website (Ex: " + ex + ")");
                 Logger.Log(LogType.Debug, ex.ToString());
-                return;
             }
         }
 
@@ -1927,7 +1911,8 @@ namespace fCraft {
                     break;
             }
             
-            string data = Server.downloadDatastring("http://www.classicube.net/api/" + value);
+            string url = "http://www.classicube.net/api/" + value;
+            string data = HttpUtil.DownloadString(url, "get user info", 10000);
             if (string.IsNullOrEmpty(data) || !data.Contains("username")) {
                 player.Message("Player not found!");
                 return;
