@@ -399,6 +399,7 @@ namespace fCraft {
             if (skin == null) { CdChangeSkin.PrintUsage(player); return; }            
             
             skin = ParseSkin(skin);
+            FilterURL(ref skin);
             if (target.Info.skinName == skin) {
                 player.Message("&f{0}&S's skin is already set to &f{1}", target.Name, skin);
                 return;
