@@ -1377,7 +1377,6 @@ namespace fCraft {
 
             p.currentBD = new BlockDefinition();
             p.currentBD.BlockID = (byte)blockId;
-            p.currentBD.Version2 = true;
             p.Message("   &bSet block id to: " + blockId);
             p.Message("From now on, use &H{0} [value]&S to enter arguments.", name);
             p.Message("You can abort the currently partially " +
@@ -1405,8 +1404,8 @@ namespace fCraft {
             p.Message("&3---Name&3:&a{0} &3ID:&a{1}&3---", def.Name, def.BlockID);
             p.Message("   &3FallBack: &a{0}&3, Solidity: &a{2}&3, Speed: &a{1}",
                       Map.GetBlockName(p.World, fallback), def.Speed, def.CollideType);
-            p.Message("   &3Top ID: &a{0}&3, Side ID: &a{1}&3, Bottom ID: &a{2}",
-                      def.TopTex, def.SideTex, def.BottomTex);
+            p.Message("   &3Top ID: &a{0}&3, Bottom ID: &a{1}",
+                      def.TopTex, def.BottomTex);
             p.Message("   &3Left ID: &a{0}&3, Right ID: &a{1}&3, Front ID: &a{2}&3, Back ID: &a{3}",
                       def.LeftTex, def.RightTex, def.FrontTex, def.BackTex);
             p.Message("   &3Block Light: &a{0}&3, Sound: &a{1}&3, FullBright: &a{2}",
@@ -1723,7 +1722,7 @@ namespace fCraft {
 
             switch (option.ToLower()) {
                 case "name":
-                    p.Message("&bChanged name of &a{0}&b to &A{1}", def.Name, args);
+                    p.Message("&bChanged name of &a{0} &bto &A{1}", def.Name, args);
                     def.Name = args; def.BlockName = args.ToLower().Replace(" ", "");
                     hasChanged = true;
                     break;
@@ -1732,7 +1731,7 @@ namespace fCraft {
                 case "collide":
                 case "collidetype":
                     if (byte.TryParse(args, out value)) {
-                        p.Message("&bChanged solidity of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.CollideType, value);
+                        p.Message("&bChanged solidity of &a{0} &bfrom &a{1} &bto &a{2}", def.Name, def.CollideType, value);
                         def.CollideType = value;
                         hasChanged = true;
                     }
@@ -1741,7 +1740,7 @@ namespace fCraft {
                     float speed;
                     if (float.TryParse(args, out speed)
                         && speed >= 0.25f && value <= 3.96f) {
-                        p.Message("&bChanged speed of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.Speed, speed);
+                        p.Message("&bChanged speed of &a{0} &bfrom &a{1} &bto &a{2}", def.Name, def.Speed, speed);
                         def.Speed = speed;
                         hasChanged = true;
                     }
@@ -1750,10 +1749,9 @@ namespace fCraft {
                 case "alltex":
                 case "alltexture":
                     if (byte.TryParse(args, out value)) {
-                        p.Message("&bChanged top, sides, and bottom texture index of &a{0}&b to &a{1}", def.Name, value);
-                        def.TopTex = value; def.SideTex = value; def.BottomTex = value;
-                        def.LeftTex = value; def.RightTex = value;
-                        def.FrontTex = value; def.BackTex = value;
+                        p.Message("&bChanged all textures of &a{0} &bto &a{1}", def.Name, value);
+                        def.TopTex = value; def.BottomTex = value;
+                        def.SetSidesTex(value);
                         hasChanged = true;
                     }
                     break;
@@ -1761,7 +1759,7 @@ namespace fCraft {
                 case "toptex":
                 case "toptexture":
                     if (byte.TryParse(args, out value)) {
-                        p.Message("&bChanged top texture index of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.TopTex, value);
+                        p.Message("&bChanged top texture of &a{0} &bfrom &a{1} &bto &a{2}", def.Name, def.TopTex, value);
                         def.TopTex = value;
                         hasChanged = true;
                     }
@@ -1770,7 +1768,7 @@ namespace fCraft {
                 case "lefttex":
                 case "lefttexture":
                     if (byte.TryParse(args, out value)) {
-                        p.Message("&bChanged left texture index of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.LeftTex, value);
+                        p.Message("&bChanged left texture of &a{0} &bfrom &a{1} &bto &a{2}", def.Name, def.LeftTex, value);
                         def.LeftTex = value;
                         hasChanged = true;
                     }
@@ -1779,7 +1777,7 @@ namespace fCraft {
                 case "righttex":
                 case "righttexture":
                     if (byte.TryParse(args, out value)) {
-                        p.Message("&bChanged right texture index of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.RightTex, value);
+                        p.Message("&bChanged right texture of &a{0} &bfrom &a{1} &bto &a{2}", def.Name, def.RightTex, value);
                         def.RightTex = value;
                         hasChanged = true;
                     }
@@ -1788,7 +1786,7 @@ namespace fCraft {
                 case "fronttex":
                 case "fronttexture":
                     if (byte.TryParse(args, out value)) {
-                        p.Message("&bChanged front texture index of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.FrontTex, value);
+                        p.Message("&bChanged front texture of &a{0} &bfrom &a{1} &bto &a{2}", def.Name, def.FrontTex, value);
                         def.FrontTex = value;
                         hasChanged = true;
                     }
@@ -1797,7 +1795,7 @@ namespace fCraft {
                 case "backtex":
                 case "backtexture":
                     if (byte.TryParse(args, out value)) {
-                        p.Message("&bChanged back texture index of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.BackTex, value);
+                        p.Message("&bChanged back texture of &a{0} &bfrom &a{1} &bto &a{2}", def.Name, def.BackTex, value);
                         def.BackTex = value;
                         hasChanged = true;
                     }
@@ -1806,7 +1804,7 @@ namespace fCraft {
                 case "sidetex":
                 case "sidetexture":
                     if (byte.TryParse(args, out value)) {
-                        p.Message("&bChanged sides texture index of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.SideTex, value);
+                        p.Message("&bChanged all side textures of &a{0} &bto &a{1}", def.Name, value);
                         def.SetSidesTex(value);
                         hasChanged = true;
                     }
@@ -1815,7 +1813,7 @@ namespace fCraft {
                 case "bottomtex":
                 case "bottomtexture":
                     if (byte.TryParse(args, out value)) {
-                        p.Message("&bChanged bottom texture index of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.BottomTex, value);
+                        p.Message("&bChanged bottom texture index of &a{0} &bfrom &a{1} &bto &a{2}", def.Name, def.BottomTex, value);
                         def.BottomTex = value;
                         hasChanged = true;
                     }
@@ -1823,7 +1821,7 @@ namespace fCraft {
                 case "light":
                 case "blockslight":
                     if (bool.TryParse(args, out boolVal)) {
-                        p.Message("&bChanged blocks light of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.BlocksLight, boolVal);
+                        p.Message("&bChanged blocks light of &a{0} &bfrom &a{1} &bto &a{2}", def.Name, def.BlocksLight, boolVal);
                         def.BlocksLight = boolVal;
                         hasChanged = true;
                     }
@@ -1831,14 +1829,14 @@ namespace fCraft {
                 case "sound":
                 case "walksound":
                     if (byte.TryParse(args, out value) && value <= 11) {
-                        p.Message("&bChanged walk sound of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.WalkSound, value);
+                        p.Message("&bChanged walk sound of &a{0} &bfrom &a{1} &bto &a{2}", def.Name, def.WalkSound, value);
                         def.WalkSound = value;
                         hasChanged = true;
                     }
                     break;
                 case "fullbright":
                     if (bool.TryParse(args, out boolVal)) {
-                        p.Message("&bChanged full bright of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.FullBright, boolVal);
+                        p.Message("&bChanged full bright of &a{0} &bfrom &a{1} &bto &a{2}", def.Name, def.FullBright, boolVal);
                         def.FullBright = boolVal;
                         hasChanged = true;
                     }
@@ -1846,7 +1844,7 @@ namespace fCraft {
                 case "sprite":
                 case "shape":
                     if (bool.TryParse(args, out boolVal) && value <= 16) {
-                        p.Message("&bChanged is a sprite block of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.Shape == 0, value);
+                        p.Message("&bChanged is a sprite block of &a{0} &bfrom &a{1} &bto &a{2}", def.Name, def.Shape == 0, value);
                         def.Shape = boolVal ? (byte)0 : def.MaxZ;
                         hasChanged = true;
                     }
@@ -1854,7 +1852,7 @@ namespace fCraft {
                 case "draw":
                 case "blockdraw":
                     if (byte.TryParse(args, out value)) {
-                        p.Message("&bChanged block draw type of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.BlockDraw, value);
+                        p.Message("&bChanged block draw type of &a{0} &bfrom &a{1} &bto &a{2}", def.Name, def.BlockDraw, value);
                         def.BlockDraw = value;
                         hasChanged = true;
                     }
@@ -1862,7 +1860,7 @@ namespace fCraft {
                 case "fogdensity":
                 case "fogd":
                     if (byte.TryParse(args, out value)) {
-                        p.Message("&bChanged density of fog of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.FogDensity, value);
+                        p.Message("&bChanged density of fog of &a{0} &bfrom &a{1} &bto &a{2}", def.Name, def.FogDensity, value);
                         def.FogDensity = value;
                         hasChanged = true;
                     }
@@ -1870,11 +1868,11 @@ namespace fCraft {
                 case "foghex":
                     if (IsValidHex(args)) {
                         CustomColor col = Color.ParseHex(args);
-                        p.Message("&bChanged red fog component of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.FogR, col.R);
+                        p.Message("&bChanged red fog component of &a{0} &bfrom &a{1} &bto &a{2}", def.Name, def.FogR, col.R);
                         def.FogR = col.R;
-                        p.Message("&bChanged green fog component of fog of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.FogG, col.G);
+                        p.Message("&bChanged green fog component of fog of &a{0} &bfrom &a{1} &bto &a{2}", def.Name, def.FogG, col.G);
                         def.FogG = col.G;
-                        p.Message("&bChanged blue fog component of fog of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.FogB, col.B);
+                        p.Message("&bChanged blue fog component of fog of &a{0} &bfrom &a{1} &bto &a{2}", def.Name, def.FogB, col.B);
                         def.FogB = col.B;
                         hasChanged = true;
                     }
@@ -1882,7 +1880,7 @@ namespace fCraft {
                 case "fogr":
                 case "fogred":
                     if (byte.TryParse(args, out value)) {
-                        p.Message("&bChanged red fog component of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.FogR, value);
+                        p.Message("&bChanged red fog component of &a{0} &bfrom &a{1} &bto &a{2}", def.Name, def.FogR, value);
                         def.FogG = value;
                         hasChanged = true;
                     }
@@ -1890,7 +1888,7 @@ namespace fCraft {
                 case "fogg":
                 case "foggreen":
                     if (byte.TryParse(args, out value)) {
-                        p.Message("&bChanged green fog component of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.FogG, value);
+                        p.Message("&bChanged green fog component of &a{0} &bfrom &a{1} &bto &a{2}", def.Name, def.FogG, value);
                         def.FogG = value;
                         hasChanged = true;
                     }
@@ -1898,7 +1896,7 @@ namespace fCraft {
                 case "fogb":
                 case "fogblue":
                     if (byte.TryParse(args, out value)) {
-                        p.Message("&bChanged blue fog component of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.FogB, value);
+                        p.Message("&bChanged blue fog component of &a{0} &bfrom &a{1} &bto &a{2}", def.Name, def.FogB, value);
                         def.FogB = value;
                         hasChanged = true;
                     }
@@ -1912,7 +1910,7 @@ namespace fCraft {
                                       "or a block defined in the CustomBlocks extension.");
                             break;
                         }
-                        p.Message("&bChanged fallback block of &a{0}&b from &a{1}&b to &a{2}", def.Name, def.FallBack, newBlock.ToString());
+                        p.Message("&bChanged fallback block of &a{0} &bfrom &a{1} &bto &a{2}", def.Name, def.FallBack, newBlock.ToString());
                         def.FallBack = (byte)newBlock;
                         
                         DisplayEditMessage(p, def, global);
@@ -2021,7 +2019,7 @@ namespace fCraft {
                               string args, byte origValue, ref bool hasChanged) {
             byte value;
             if (byte.TryParse(args, out value) && value <= 16) {
-                p.Message("&bChanged {0} coordinate of &a{1}&b from &a{2}&b to &a{3}", coord, name, origValue, value);
+                p.Message("&bChanged {0} coordinate of &a{1} &bfrom &a{2} &bto &a{3}", coord, name, origValue, value);
                 hasChanged = true;
                 return value;
             }

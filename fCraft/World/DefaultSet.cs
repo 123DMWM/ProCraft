@@ -38,7 +38,6 @@ namespace fCraft {
             def.FallBack = raw;
             
             def.MaxX = 16; def.MaxZ = Height(b); def.MaxY = 16;
-            def.Version2 = true;
             return def;
         }
         

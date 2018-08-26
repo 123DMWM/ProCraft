@@ -342,7 +342,7 @@ namespace fCraft {
                 return true;
             }
 
-            if((message.IndexOf('&') != -1) && (!(Can(Permission.UseColorCodes)))) {
+            if (message.IndexOf('&') != -1 && !Can(Permission.UseColorCodes)) {
                 message = Color.StripColors( message, false);
             }
             if (longerMessage == 1) {

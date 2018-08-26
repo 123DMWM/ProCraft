@@ -13,7 +13,6 @@ namespace fCraft {
         public byte CollideType { get; set; }
         public float Speed { get; set; }
         public byte TopTex  { get; set; }
-        public byte SideTex { get; set; }
         public byte BottomTex { get; set; }
         public bool BlocksLight { get; set; }
         public byte WalkSound { get; set; }
@@ -34,7 +33,6 @@ namespace fCraft {
         public byte MaxY { get; set; }
         public byte MaxZ { get; set; }
         // BlockDefinitionsExt v2 fields
-        public bool Version2 { get; set; }
         public byte LeftTex { get; set; }
         public byte RightTex { get; set; }
         public byte FrontTex { get; set; }
@@ -47,7 +45,6 @@ namespace fCraft {
         public string BlockName;
         
         public void SetSidesTex(byte tex) {
-            SideTex = tex;
             LeftTex = tex; RightTex = tex;
             FrontTex = tex; BackTex = tex;
         }
@@ -56,16 +53,14 @@ namespace fCraft {
             BlockDefinition def = new BlockDefinition();
             def.BlockID = BlockID; def.Name = Name; def.BlockName = BlockName;
             def.CollideType = CollideType; def.Speed = Speed;
-            def.TopTex = TopTex; def.SideTex = SideTex;
-            def.BottomTex = BottomTex; def.BlocksLight = BlocksLight;
-            def.WalkSound = WalkSound; def.FullBright = FullBright;
-            def.Shape = Shape; def.BlockDraw = BlockDraw;
-            def.FogDensity = FogDensity; def.FogR = FogR;
-            def.FogG = FogG; def.FogB = FogB;
+            def.TopTex = TopTex; def.BottomTex = BottomTex; 
+            def.BlocksLight = BlocksLight; def.WalkSound = WalkSound; 
+            def.FullBright = FullBright; def.Shape = Shape; 
+            def.BlockDraw = BlockDraw; def.FogDensity = FogDensity; 
+            def.FogR = FogR; def.FogG = FogG; def.FogB = FogB;
             def.FallBack = FallBack;
             def.MinX = MinX; def.MinY = MinY; def.MinZ = MinZ;
             def.MaxX = MaxX; def.MaxY = MaxY; def.MaxZ = MaxZ;
-            def.Version2 = Version2;
             def.LeftTex = LeftTex; def.RightTex = RightTex;
             def.FrontTex = FrontTex; def.BackTex = BackTex;
             return def;
@@ -270,11 +265,6 @@ namespace fCraft {
                 def.MaxY = 16;
             if (def.MinZ == 0 && def.MaxZ == 0)
                 def.MaxZ = def.Shape == 0 ? (byte)16 : def.Shape;
-            if (!def.Version2) {
-                def.Version2 = true;
-                def.LeftTex = def.SideTex; def.RightTex = def.SideTex;
-                def.FrontTex = def.SideTex; def.BackTex = def.SideTex;
-            }
         }
         #endregion
     }

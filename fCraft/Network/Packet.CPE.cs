@@ -299,7 +299,7 @@ namespace fCraft {
                 packet.Bytes[index++] = def.FrontTex;
                 packet.Bytes[index++] = def.BackTex;
             } else {
-                packet.Bytes[index++] = def.SideTex;
+                packet.Bytes[index++] = def.RightTex;
             }
             
             packet.Bytes[index++] = def.BottomTex;
