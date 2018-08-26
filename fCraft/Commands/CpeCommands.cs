@@ -846,6 +846,11 @@ namespace fCraft {
                     SetEnvAppearanceShort(player, world, value, EnvProp.MaxFog,
                                           "max fog distance", 0, ref world.MaxFogDistance);
                     break;
+                case "cloudspeed":  
+                case "cloudsspeed":
+                    SetEnvAppearanceFloat(player, world, value, EnvProp.CloudsSpeed, "clouds speed",
+                                          -32767, 32767, 256, 256, ref world.CloudsSpeed);
+                    break;
                 case "weatherfade":
                     SetEnvAppearanceFloat(player, world, value, EnvProp.WeatherFade, "weather fade rate",
                                           0, 255, 128, 128, ref world.WeatherFade);
