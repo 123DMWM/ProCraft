@@ -78,33 +78,9 @@ namespace fCraft.Portals {
         }
 
         public static string GenerateName(World world) {
-            if (world.Portals != null) {
-                if (world.Portals.Count > 0) {
-                    bool found = false;
-
-
-                    while (!found) {
-                        bool taken = false;
-
-                        foreach (Portal portal in world.Portals) {
-                            if (portal.Name.Equals("portal" + world.portalID)) {
-                                taken = true;
-                                break;
-                            }
-                        }
-
-                        if (!taken) {
-                            found = true;
-                        } else {
-                            world.portalID++;
-                        }
-                    }
-
-                    return "portal" + world.portalID;
-                }
-            }
-
-            return "portal1";
+            int id = 1;
+            while (Exists(world, "portal" + id)) id++;
+            return "portal" + id;
         }
 
         public static bool Exists(World world, string name) {

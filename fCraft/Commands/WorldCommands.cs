@@ -3712,12 +3712,13 @@ namespace fCraft {
                 return;
             }
             
-            string portalName = cmd.Next();
-            if (string.IsNullOrEmpty(portalName)) {
-            } else if (!Portal.Exists(player.World, portalName)) {
-                player.PortalName = portalName;
+            player.PortalName = null;
+            string name = cmd.Next();
+            if (string.IsNullOrEmpty(name)) {
+            } else if (!Portal.Exists(player.World, name)) {
+                player.PortalName = name;
             } else {
-                player.Message("A portal with name {0} already exists in this world.", portalName);
+                player.Message("A portal named {0} already exists in this world.", name);
                 return;
             }
             
@@ -3904,12 +3905,11 @@ namespace fCraft {
                         }
                     }
 
-                    if (player.PortalName == null) {
-                        player.PortalName = Portal.GenerateName(player.World);
-                    }
+                    string name = player.PortalName;
+                    if (name == null) name = Portal.GenerateName(player.World);
 
                     Portal portal = new Portal(player.PortalWorld, new PortalRange(Xmin, Xmax, Ymin, Ymax, Zmin, Zmax),
-                                               player.PortalName, player.Name, player.World.Name, player.PortalTPPos);
+                                               name, player.Name, player.World.Name, player.PortalTPPos);
                     PortalHandler.CreatePortal(portal, player.World);
                     op.AnnounceCompletion = false;
                     op.Context = BlockChangeContext.Portal;
