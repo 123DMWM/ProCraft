@@ -107,13 +107,11 @@ namespace fCraft.Portals {
             return "portal1";
         }
 
-        public static bool DoesNameExist(World world, string name) {
+        public static bool Exists(World world, string name) {
             if (world.Portals != null) {
                 if (world.Portals.Count > 0) {
                     foreach (Portal portal in world.Portals) {
-                        if (portal.Name.Equals(name)) {
-                            return true;
-                        }
+                        if (portal.Name.Equals(name)) return true;
                     }
                 }
             }

@@ -3714,13 +3714,14 @@ namespace fCraft {
             
             string portalName = cmd.Next();
             if (string.IsNullOrEmpty(portalName)) {
-            } else if (!Portal.DoesNameExist(player.World, portalName)) {
+            } else if (!Portal.Exists(player.World, portalName)) {
                 player.PortalName = portalName;
             } else {
                 player.Message("A portal with name {0} already exists in this world.", portalName);
                 return;
             }
             
+            player.PortalTPPos = world.map == null ? default(Position) : world.map.Spawn;
             if (cmd.HasNext) {
                 int x, y, z, rot = player.Position.R, lot = player.Position.L;
                 string next = cmd.Next();
@@ -3754,8 +3755,6 @@ namespace fCraft {
                         }
                     }
                     player.PortalTPPos = new Position(x * 32, y * 32, z * 32, (byte)rot, (byte)lot);
-                } else {
-                    player.PortalTPPos = world.map == null ? new Position(0, 0, 0) : world.map.Spawn;
                 }
             }
             
