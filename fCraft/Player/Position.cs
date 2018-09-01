@@ -98,6 +98,10 @@ namespace fCraft {
             return X + "_" + Y + "_" + Z + "_" + R + "_" + L;
         }
         
+        public static Position FromFeet(int x, int y, int z) {
+            return new Position(x * 32 + 16, y * 32 + 16, z * 32 + Player.CharacterHeight);
+        }
+        
         public static Position FromString(string text) {
             Position pos = new Position();
             

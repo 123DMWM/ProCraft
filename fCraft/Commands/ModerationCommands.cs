@@ -1316,15 +1316,18 @@ namespace fCraft {
                 return;
             }
 
-            Vector3I P = player.World.map.HighestFreeSpace(zone.Bounds.XCentre,
-                                                           zone.Bounds.YCentre, zone.Bounds.ZCentre);
-            Position zPos = new Position(P.X * 32 + 16, P.Y * 32 + 16, P.Z * 32 + Player.CharacterHeight);
+            int x = zone.Bounds.XCentre, y = zone.Bounds.YCentre;
+            int z = player.WorldMap.HighestFreeSpace(x, y, zone.Bounds.ZCentre);
+            
             if (player.World != null) {
                 player.LastWorld = player.World;
                 player.LastPosition = player.Position;
             }
             
-            player.TeleportTo((zPos));
+            Position pos = new Position(x, y, z);
+            pos.R = player.Position.R;
+            pos.L = player.Position.L;
+            player.TeleportTo(pos);
             player.Message("Teleporting you to zone " + zone.ClassyName);
         }
         
@@ -1333,20 +1336,18 @@ namespace fCraft {
             Random rand = new Random();
             int x = rand.Next(0, player.WorldMap.Width);
             int y = rand.Next(0, player.WorldMap.Length);
-            int z = (player.Position.Z - Player.CharacterHeight) / 32;
-            Vector3I P = player.WorldMap.HighestFreeSpace(x, y, z);
+            int z = player.Position.BlockFeetZ;
+            z = player.WorldMap.HighestFreeSpace(x, y, z);
 
             if (player.World != null) {
                 player.LastWorld = player.World;
                 player.LastPosition = player.Position;
             }
-            player.TeleportTo(new Position {
-                                  X = (P.X * 32 + 16),
-                                  Y = (P.Y * 32 + 16),
-                                  Z = (P.Z * 32 + Player.CharacterHeight),
-                                  R = player.Position.R,
-                                  L = player.Position.L
-                              });
+            
+            Position pos = new Position(x, y, z);
+            pos.R = player.Position.R;
+            pos.L = player.Position.L;
+            player.TeleportTo(pos);
             player.Message("Teleported to: ({0}, {1}, {2})", x, y, z);
         }
         
@@ -1376,13 +1377,11 @@ namespace fCraft {
                     player.LastWorld = player.World;
                     player.LastPosition = player.Position;
                 }
-                player.TeleportTo(new Position {
-                                      X = (x*32 + 16),
-                                      Y = (y*32 + 16),
-                                      Z = (z*32 + Player.CharacterHeight),
-                                      R = (byte) rot,
-                                      L = (byte) lot
-                                  });
+            	
+            	Position pos = new Position(x, y, z);
+            	pos.R = (byte)rot;
+            	pos.L = (byte)lot;
+                player.TeleportTo(pos);
             } else {
                 CdTeleport.PrintUsage(player);
             }
@@ -1552,16 +1551,12 @@ namespace fCraft {
         static void TopHandler(Player player, CommandReader cmd) {
             int x = player.Position.BlockX;
             int y = player.Position.BlockY;
-            int z = (player.Position.Z - Player.CharacterHeight) / 32;
-            Vector3I P = player.World.map.HighestFreeSpace(x, y, z);
+            int z = player.WorldMap.HighestFreeZ(x, y);
 
-            player.TeleportTo(new Position {
-                X = (P.X * 32 + 16),
-                Y = (P.Y * 32 + 16),
-                Z = (P.Z * 32 + Player.CharacterHeight),
-                R = player.Position.R,
-                L = player.Position.L
-            });
+            Position pos = new Position(x, y, z);
+            pos.R = player.Position.R;
+            pos.L = player.Position.L;
+            player.TeleportTo(pos);
             player.Message("Teleported to top");
         }
 

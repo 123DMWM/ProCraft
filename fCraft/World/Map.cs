@@ -111,16 +111,14 @@ namespace fCraft {
         public Position getSpawnIfRandom() {
             if (spawn == Position.RandomSpawn) {
                 Random rnd = new Random();
-                Vector3I P = HighestFreeSpace(rnd.Next(Width), rnd.Next(Length), Height);
-                return new Position(P.X * 32, P.Y * 32, P.Z * 32, 0, 0);
+                int x = rnd.Next(Width), y = rnd.Next(Length);
+                return Position.FromFeet(x, y, HighestFreeZ(x, y));
             }
             return spawn;
         }
         
-        public Vector3I HighestFreeSpace(int x, int y, int z) {
-            while (z > 0 && GetBlock(x, y, z) != Block.Air) {
-                z--;
-            }
+        public int HighestFreeSpace(int x, int y, int z) {
+            while (z > 0 && GetBlock(x, y, z) != Block.Air) z--;
             
             while (z < Height) {
                 Block bFeet = GetBlock(x, y, z), bHead = GetBlock(x, y, z + 1);
@@ -130,7 +128,13 @@ namespace fCraft {
                 if (freeFeet && freeHead) break;
                 z++;
             }
-            return new Vector3I(x, y, z);
+            return z;
+        }
+        
+        public int HighestFreeZ(int x, int y) {
+            int z = Bounds.ZMax;
+            while (z > 0 && GetBlock(x, y, z) == Block.Air) z--;
+            return z + 1;
         }
 
         /// <summary> Resets spawn to the default location (top center of the map). </summary>

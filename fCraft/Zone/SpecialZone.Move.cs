@@ -66,7 +66,7 @@ namespace fCraft {
         }
 
         static bool HandleCheckpoint(Player p, Zone zone, ref bool deniedZone, Position newPos) {
-            Position centre = new Position(zone.Bounds.XCentre * 32 + 16, zone.Bounds.YCentre * 32 + 16, zone.Bounds.ZCentre * 32 + Player.CharacterHeight);
+            Position centre = Position.FromFeet(zone.Bounds.XCentre, zone.Bounds.YCentre, zone.Bounds.ZCentre);
             if (p.CheckPoint == centre) return false;
             if (zone.Bounds.Contains(newPos.BlockX, newPos.BlockY, (newPos.Z - 32) / 32)) {
                 SendZoneMessage(p, "&aCheckPoint &Sreached! This is now your respawn point.");
