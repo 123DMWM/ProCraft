@@ -155,7 +155,6 @@ namespace fCraft {
         public string PortalWorld;
         public Position PortalTPPos;
         public string PortalName;
-        public bool BuildingPortal = true;
         public DateTime LastUsedPortal;
         public DateTime LastWarnedPortal;
         public bool PortalsEnabled = true;

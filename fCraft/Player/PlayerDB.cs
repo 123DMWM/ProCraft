@@ -220,23 +220,22 @@ namespace fCraft {
         unsafe static void Split(string line, ref string[] fields, out int count) {
             // Effectively string.split(',') but without the two passes and memory allocations.
             count = 0;
-            fixed (char* ptr = line) {
-                int start = 0, len = 0;
-                for (int i = 0; i < line.Length; i++) {
-                    if (ptr[i] != ',') { len++; continue; }
-                    if (count == fields.Length)
-                        Array.Resize(ref fields, count + 10);
-                    fields[count] = len == 0 ? "" : new String(ptr, start, len); count++;
-                    // Start next string at character after the ,
-                    start = i + 1;
-                    len = 0;
-                }
-                
-                // We will always have at least one string, even if it just empty.
+            int start = 0, len = 0;
+            for (int i = 0; i < line.Length; i++) {
+                if (line[i] != ',') { len++; continue; }
                 if (count == fields.Length)
                     Array.Resize(ref fields, count + 10);
-                fields[count] = len == 0 ? "" : new String(ptr, start, len); count++;
+                
+                fields[count] = line.Substring(start, len); count++;
+                // Start next string at character after the ,
+                start = i + 1;
+                len = 0;
             }
+            
+            // We will always have at least one string, even if it just empty.
+            if (count == fields.Length)
+                Array.Resize(ref fields, count + 10);
+            fields[count] = line.Substring(start, len); count++;
         }
 
 
