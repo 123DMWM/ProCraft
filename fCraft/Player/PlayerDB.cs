@@ -217,7 +217,7 @@ namespace fCraft {
             RunCompatibilityChecks( version );
         }
         
-        unsafe static void Split(string line, ref string[] fields, out int count) {
+        static void Split(string line, ref string[] fields, out int count) {
             // Effectively string.split(',') but without the two passes and memory allocations.
             count = 0;
             int start = 0, len = 0;
@@ -453,6 +453,7 @@ namespace fCraft {
             CheckIfLoaded();
             List<PlayerInfo> result = new List<PlayerInfo>();
             int count = 0;
+            
             PlayerInfo[] cache = PlayerInfoList;
             for( int i = 0; i < cache.Length; i++ ) {
                 if( cache[i].LastIP.Equals( address ) ) {
@@ -483,6 +484,7 @@ namespace fCraft {
             int count = 0;
             uint addressInt = address.AsUInt();
             uint netMask = IPAddressUtil.NetMask( range );
+            
             PlayerInfo[] cache = PlayerInfoList;
             for( int i = 0; i < cache.Length; i++ ) {
                 if( cache[i].LastIP.Match( addressInt, netMask ) ) {
@@ -508,6 +510,7 @@ namespace fCraft {
             CheckIfLoaded();
             List<PlayerInfo> result = new List<PlayerInfo>();
             int count = 0;
+            
             PlayerInfo[] cache = PlayerInfoList;
             for( int i = 0; i < cache.Length; i++ ) {
                 if( regex.IsMatch( cache[i].Name ) ) {
@@ -771,15 +774,15 @@ namespace fCraft {
         internal static int CountInactivePlayers() {
             lock( AddLocker ) {
                 Dictionary<IPAddress, List<PlayerInfo>> playersByIP = new Dictionary<IPAddress, List<PlayerInfo>>();
-                PlayerInfo[] playerInfoListCache = PlayerInfoList;
-                for( int i = 0; i < playerInfoListCache.Length; i++ ) {
-                    if( !playersByIP.ContainsKey( playerInfoListCache[i].LastIP ) ) {
-                        playersByIP[playerInfoListCache[i].LastIP] = new List<PlayerInfo>();
+                PlayerInfo[] cache = PlayerInfoList;
+                for( int i = 0; i < cache.Length; i++ ) {
+                    if( !playersByIP.ContainsKey( cache[i].LastIP ) ) {
+                        playersByIP[cache[i].LastIP] = new List<PlayerInfo>();
                     }
-                    playersByIP[playerInfoListCache[i].LastIP].Add( PlayerInfoList[i] );
+                    playersByIP[cache[i].LastIP].Add( PlayerInfoList[i] );
                 }
 
-                return playerInfoListCache.Count( t => PlayerIsInactive( playersByIP, t, true ) );
+                return cache.Count( t => PlayerIsInactive( playersByIP, t, true ) );
             }
         }
 

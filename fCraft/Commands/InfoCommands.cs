@@ -697,23 +697,24 @@ namespace fCraft {
             player.Message( "  Bandwidth: {0:0.0} KB/s up, {1:0.0} KB/s down",
                             bytesSentRate / 1000, bytesReceivedRate / 1000 );
 
+            PlayerInfo[] infos = PlayerDB.PlayerInfoList;
             player.Message( "  Tracking {0:N0} players ({1} online, {2} banned ({3:0.0}%), {4} IP-banned).",
-                            PlayerDB.PlayerInfoList.Length,
+                            infos.Length,
                             Server.CountVisiblePlayers( player ),
                             PlayerDB.BannedCount,
                             PlayerDB.BannedPercentage,
                             IPBanList.Count );
 
             player.Message("  Players built {0:N0}; deleted {1:N0}; drew {2:N0} blocks; wrote {3:N0} messages; issued {4:N0} kicks; spent {5:N0} hours total (Average: {6:N0} hours); joined {7:N0} times (Average: {8:N0} times)",
-                            PlayerDB.PlayerInfoList.Sum( p => p.BlocksBuilt ),
-                            PlayerDB.PlayerInfoList.Sum( p => p.BlocksDeleted ),
-                            PlayerDB.PlayerInfoList.Sum( p => p.BlocksDrawn ),
-                            PlayerDB.PlayerInfoList.Sum( p => p.MessagesWritten ),
-                            PlayerDB.PlayerInfoList.Sum( p => p.TimesKickedOthers ),
-                            PlayerDB.PlayerInfoList.Sum(p => p.TotalTime.TotalHours),
-                            PlayerDB.PlayerInfoList.Average(p => p.TotalTime.TotalHours),
-                            PlayerDB.PlayerInfoList.Sum(p => p.TimesVisited),
-                            PlayerDB.PlayerInfoList.Average(p => p.TimesVisited));
+                            infos.Sum( p => p.BlocksBuilt ),
+                            infos.Sum( p => p.BlocksDeleted ),
+                            infos.Sum( p => p.BlocksDrawn ),
+                            infos.Sum( p => p.MessagesWritten ),
+                            infos.Sum( p => p.TimesKickedOthers ),
+                            infos.Sum(p => p.TotalTime.TotalHours),
+                            infos.Average(p => p.TotalTime.TotalHours),
+                            infos.Sum(p => p.TimesVisited),
+                            infos.Average(p => p.TimesVisited));
 
             player.Message( "  There are {0} worlds available ({1} loaded, {2} hidden).",
                             WorldManager.Worlds.Length,
@@ -771,8 +772,8 @@ namespace fCraft {
             //}
 
             List<PlayerInfo> matches = new List<PlayerInfo>();
-            PlayerInfo[] allPlayers = PlayerDB.PlayerInfoList;
-            foreach (PlayerInfo pl in allPlayers) {
+            PlayerInfo[] infos = PlayerDB.PlayerInfoList;
+            foreach (PlayerInfo pl in infos) {
                 string nick = pl.DisplayedName == null ? pl.Name : pl.DisplayedName;
                 if (Color.StripColors(nick, false).CaselessEquals(target)) matches.Add(pl);
             }
@@ -921,7 +922,7 @@ namespace fCraft {
                                section, matches.JoinToString());
             } else if (matches.Count == 1) {
                 section = Path.GetFileNameWithoutExtension(matches[0]);
-                if (section.IndexOf("Admin") >= 0 && !player.IsStaff) {
+                if (section.CaselessContains("Admin") && !player.IsStaff) {
                     player.Message("You need to be staff to read the Admin Rules.");
                     return;
                 }
