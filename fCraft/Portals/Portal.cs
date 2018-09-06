@@ -53,7 +53,7 @@ namespace fCraft.Portals {
             return new Position(TeleportPosX, TeleportPosY, TeleportPosZ + Player.CharacterHeight, TeleportPosR, TeleportPosL);
         }
 
-        public bool IsInRange(Player player) {
+        public bool Contains(Player player) {
             if ((player.Position.BlockX) <= Range.Xmax && (player.Position.BlockX) >= Range.Xmin) {
                 if ((player.Position.BlockY) <= Range.Ymax && (player.Position.BlockY) >= Range.Ymin) {
                     if (((player.Position.Z / 32) - 1) <= Range.Zmax && ((player.Position.Z / 32) - 1) >= Range.Zmin) {
@@ -65,16 +65,11 @@ namespace fCraft.Portals {
             return false;
         }
 
-        public bool IsInRange(Vector3I vector) {
-            if (vector.X <= Range.Xmax && vector.X >= Range.Xmin) {
-                if (vector.Y <= Range.Ymax && vector.Y >= Range.Ymin) {
-                    if (vector.Z <= Range.Zmax && vector.Z >= Range.Zmin) {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
+        public bool Contains(Vector3I vector) {
+            return 
+                vector.X >= Range.Xmin && vector.X <= Range.Xmax &&
+                vector.Y >= Range.Ymin && vector.Y <= Range.Ymax &&
+                vector.Z >= Range.Zmin && vector.Z <= Range.Zmax;
         }
 
         public static string GenerateName(World world) {
@@ -95,24 +90,41 @@ namespace fCraft.Portals {
             return false;
         }
 
-        public void Remove(Player requester, World pWorld) {
-            NormalBrush brush = new NormalBrush(Block.Air, Block.Air);
-            DrawOperation removeOperation = new CuboidDrawOperation(requester);
-            removeOperation.AnnounceCompletion = false;
-            removeOperation.Brush = brush;
-            removeOperation.Context = BlockChangeContext.Portal;
+        public void Remove(Player requester, World world) {
+            DrawOperation op = new CuboidDrawOperation(requester);
+            op.AnnounceCompletion = false;
+            op.Brush   = new NormalBrush(Block.Air, Block.Air);
+            op.Context = BlockChangeContext.Portal;
 
-            Vector3I[] affectedBlocks = {
+            Vector3I[] bounds = {
                 new Vector3I(Range.Xmin, Range.Ymin, Range.Zmin),
                 new Vector3I(Range.Xmax, Range.Ymax, Range.Zmax),
             };
-            if (!removeOperation.Prepare(affectedBlocks))
-                throw new PortalException("Unable to remove portal.");
+            if (!op.Prepare(bounds))
+                throw new InvalidOperationException("Unable to remove portal.");
 
-            removeOperation.Begin();
-            lock (pWorld.Portals.SyncRoot)
-                pWorld.Portals.Remove(this);
+            op.Begin();
+            lock (world.Portals.SyncRoot)
+                world.Portals.Remove(this);
             PortalDB.Save();
+        }
+    }
+    
+    public class PortalRange {
+        public int Xmin { get; set; }
+        public int Xmax { get; set; }
+        public int Ymin { get; set; }
+        public int Ymax { get; set; }
+        public int Zmin { get; set; }
+        public int Zmax { get; set; }
+
+        public PortalRange(int Xmin, int Xmax, int Ymin, int Ymax, int Zmin, int Zmax) {
+            this.Xmin = Xmin;
+            this.Xmax = Xmax;
+            this.Ymin = Ymin;
+            this.Ymax = Ymax;
+            this.Zmin = Zmin;
+            this.Zmax = Zmax;
         }
     }
 }

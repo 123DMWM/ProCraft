@@ -33,7 +33,7 @@ namespace fCraft.Portals {
                 if (e.Player.World.Portals != null && e.Player.World.Portals.Count > 0 && e.Context != BlockChangeContext.Portal) {
                     lock (e.Player.World.Portals.SyncRoot) {
                         foreach (Portal portal in e.Player.World.Portals) {
-                            if (portal.IsInRange(e.Coords)) {
+                            if (portal.Contains(e.Coords)) {
                                 BlockUpdate update = new BlockUpdate(null, e.Coords, e.OldBlock);
                                 e.Player.World.Map.QueueUpdate(update);
                                 e.Player.Message("You can not place a block inside portal: " + portal.Name);
@@ -164,7 +164,7 @@ namespace fCraft.Portals {
                 if (player.World.Portals != null && player.World.Portals.Count > 0) {
                     lock (player.World.Portals.SyncRoot) {
                         foreach (Portal candidate in player.World.Portals) {
-                            if (candidate.IsInRange(player)) {
+                            if (candidate.Contains(player)) {
                                 return candidate;
                             }
                         }
@@ -181,7 +181,7 @@ namespace fCraft.Portals {
                 if (world.Portals != null && world.Portals.Count > 0) {
                     lock (world.Portals.SyncRoot) {
                         foreach (Portal candidate in world.Portals) {
-                            if (candidate.IsInRange(block)) {
+                            if (candidate.Contains(block)) {
                                 return candidate;
                             }
                         }
@@ -194,8 +194,6 @@ namespace fCraft.Portals {
         }
 
         public static void CreatePortal(Portal portal, World source) {
-            World world = WorldManager.FindWorldExact(portal.World);
-
             if (source.Portals == null) {
                 source.Portals = new ArrayList();
             }
@@ -207,7 +205,7 @@ namespace fCraft.Portals {
             PortalDB.Save();
         }
 
-        public static bool IsInRangeOfSpawnpoint(Player player, World world, Vector3I block) {
+        public static bool NearSpawn(Player player, World world, Vector3I block) {
             if (player.Info.Rank == RankManager.HighestRank)
                 return false;
             

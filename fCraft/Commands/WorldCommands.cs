@@ -3358,7 +3358,7 @@ namespace fCraft {
             Handler = MWHandler
         };
 
-        private static void MWHandler(Player player, CommandReader cmd) {
+        static void MWHandler(Player player, CommandReader cmd) {
             switch (cmd.Next()) {
                 case "create":
                 case "c":
@@ -3760,8 +3760,7 @@ namespace fCraft {
             }
             
             DrawOperation op = new CuboidDrawOperation(player);
-            NormalBrush brush = new NormalBrush(block, block);
-            op.Brush = brush;
+            op.Brush = new NormalBrush(block, block);
             player.PortalWorld = worldName;
             player.SelectionStart(op.ExpectedMarks, PortalCreateCallback, op, Permission.CreatePortals);
             player.Message("Click {0} blocks or use &H/Mark&S to mark the area of the portal.", op.ExpectedMarks);
@@ -3892,7 +3891,7 @@ namespace fCraft {
                     for (int x = Xmin; x <= Xmax; x++) {
                         for (int y = Ymin; y <= Ymax; y++) {
                             for (int z = Zmin; z <= Zmax; z++) {
-                                if (PortalHandler.IsInRangeOfSpawnpoint(player, player.World, new Vector3I(x, y, z))) {
+                                if (PortalHandler.NearSpawn(player, player.World, new Vector3I(x, y, z))) {
                                     player.Message("You cannot build a portal near the spawnpoint.");
                                     return;
                                 }
