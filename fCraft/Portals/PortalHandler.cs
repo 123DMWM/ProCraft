@@ -28,38 +28,29 @@ namespace fCraft.Portals {
         }
 
         static void Player_PlacedBlock(object sender, Events.PlayerPlacedBlockEventArgs e) {
-            if (e.Player == Player.Console) return;
+            if (e.Player == Player.Console || e.Context == BlockChangeContext.Portal) return;
             try {
-                if (e.Player.World.Portals != null && e.Player.World.Portals.Count > 0 && e.Context != BlockChangeContext.Portal) {
-                    lock (e.Player.World.Portals.SyncRoot) {
-                        foreach (Portal portal in e.Player.World.Portals) {
-                            if (portal.Contains(e.Coords)) {
-                                BlockUpdate update = new BlockUpdate(null, e.Coords, e.OldBlock);
-                                e.Player.World.Map.QueueUpdate(update);
-                                e.Player.Message("You can not place a block inside portal: " + portal.Name);
-                            }
-                        }
-                    }
-                }
+                Portal portal = e.Player.World.Portals.Find(e.Coords);
+                if (portal == null) return;
+                
+               BlockUpdate update = new BlockUpdate(null, e.Coords, e.OldBlock);
+               e.Player.World.Map.QueueUpdate(update);
+               e.Player.Message("You can not place a block inside portal: " + portal.Name);
             } catch (Exception ex) {
                 Logger.Log(LogType.Error, "PortalHandler.Player_PlacedBlock: " + ex);
             }
         }
 
         static void Player_JoinedWorld(object sender, Events.PlayerJoinedWorldEventArgs e) {
-            try {
-                // Player can use portals again
-                e.Player.CanUsePortal = true;
-                e.Player.LastUsedPortal = DateTime.UtcNow;
-            } catch (Exception ex) {
-                Logger.Log(LogType.Error, "PortalHandler.Player_JoinedWorld: " + ex);
-            }
+            // Player can use portals again
+            e.Player.CanUsePortal = true;
+            e.Player.LastUsedPortal = DateTime.UtcNow;
         }
 
         static void Player_Moved(object sender, Events.PlayerMovedEventArgs e) {
             //abuse portal moved event and add in message blocks right here
-            Vector3I oldPos = e.OldPosition.ToBlockCoordsRaw(); //get positions as block coords
-            Vector3I newPos = e.NewPosition.ToBlockCoordsRaw();
+            //Vector3I oldPos = e.OldPosition.ToBlockCoordsRaw(); //get positions as block coords
+            //Vector3I newPos = e.NewPosition.ToBlockCoordsRaw();
 
             /*if (oldPos.X != newPos.X || oldPos.Y != newPos.Y || oldPos.Z != newPos.Z) //check if player has moved at least one block
             {
@@ -79,130 +70,81 @@ namespace fCraft.Portals {
                 }
             }*/
 
-            try {
-                if (e.Player.PortalsEnabled) {
-                    lock (e.Player.PortalLock) {
-                        if (e.Player.CanUsePortal) {
-                            if ((e.OldPosition.X != e.NewPosition.X) || (e.OldPosition.Y != e.NewPosition.Y) || (e.OldPosition.Z != (e.NewPosition.Z))) {
-                                if (e.Player.Can(Permission.Chat)) {
-                                    if (GetPortal(e.Player) != null && !e.Player.StandingInPortal) {
-                                        if ((DateTime.UtcNow - e.Player.LastUsedPortal).TotalSeconds < 5) {
-                                            // To prevent portal loops
-                                            if ((DateTime.UtcNow - e.Player.LastWarnedPortal).TotalSeconds > 2) {
-                                                e.Player.LastWarnedPortal = DateTime.UtcNow;
-                                                e.Player.Message("You can not use portals within 5 seconds of joining a world.");
-                                            }
-
-                                            return;
-                                        }
-
-                                        e.Player.StandingInPortal = true;
-                                        Portal portal = GetPortal(e.Player);
-
-                                        World world = WorldManager.FindWorldExact(portal.World);
-                                        // Teleport player, portal protection
-                                        if (world != e.Player.World) {
-                                            switch (world.AccessSecurity.CheckDetailed(e.Player.Info)) {
-                                                case SecurityCheckResult.Allowed:
-                                                case SecurityCheckResult.WhiteListed:
-                                                    if (world.IsFull) {
-                                                        e.Player.Message("Cannot join {0}&S: world is full.", world.ClassyName);
-                                                        return;
-                                                    }
-                                                    e.Player.StopSpectating();
-                                                    if (portal.TeleportPosX != 0 && portal.TeleportPosY != 0 && portal.TeleportPosZ != 0) {
-                                                        e.Player.JoinWorld(WorldManager.FindWorldExact(portal.World), WorldChangeReason.Portal, 
-                                                            portal.tpPosition() == Position.RandomSpawn 
-                                                            ? WorldManager.FindWorldExact(portal.World).map.getSpawnIfRandom() 
-                                                            : portal.tpPosition());
-                                                    } else {
-                                                        e.Player.JoinWorld(WorldManager.FindWorldExact(portal.World), WorldChangeReason.Portal);
-                                                    }
-                                                    e.Player.Message("You used portal: " + portal.Name);
-                                                    if (e.Player.WorldMap.Spawn == Position.RandomSpawn) {
-                                                        e.Player.Message("Randomized Spawn!");
-                                                    }
-
-                                                    // Make sure this method isn't called twice
-                                                    e.Player.CanUsePortal = false;
-                                                    break;
-
-                                                case SecurityCheckResult.BlackListed:
-                                                    if ((DateTime.UtcNow - e.Player.LastWarnedPortal).TotalSeconds < 2) {
-                                                        e.Player.LastWarnedPortal = DateTime.UtcNow;
-                                                        e.Player.Message("Cannot join world {0}&S: you are blacklisted.",
-                                                            world.ClassyName);
-                                                    }
-                                                    break;
-                                                case SecurityCheckResult.RankTooLow:
-                                                    if ((DateTime.UtcNow - e.Player.LastWarnedPortal).TotalSeconds > 2) {
-                                                        e.Player.LastWarnedPortal = DateTime.UtcNow;
-                                                        e.Player.Message("Cannot join world {0}&S: must be {1}+",
-                                                                     world.ClassyName, world.AccessSecurity.MinRank.ClassyName);
-                                                    }
-                                                    break;
-                                            }
-                                        } else {
-                                            e.Player.TeleportTo(portal.tpPosition());
-                                            e.Player.Message("You used portal: " + portal.Name);
-                                        }
-                                    } else {
-                                        e.Player.StandingInPortal = false;
-                                    }
-                                }
-                            }
+            if (!e.Player.PortalsEnabled) return;            
+            lock (e.Player.PortalLock) {
+            	if (!e.Player.CanUsePortal) return;
+                if (e.OldPosition.X == e.NewPosition.X && e.OldPosition.Y == e.NewPosition.Y && e.OldPosition.Z == e.NewPosition.Z) return;
+                if (!e.Player.Can(Permission.Chat)) return;
+                
+                try {                    
+            		Portal portal = e.Player.World.Portals.Find(e.Player);
+                    if (portal == null || e.Player.StandingInPortal) {
+            			e.Player.StandingInPortal = false;
+            			return;
+            		}
+            		
+                    if ((DateTime.UtcNow - e.Player.LastUsedPortal).TotalSeconds < 5) {
+                        // To prevent portal loops
+                        if ((DateTime.UtcNow - e.Player.LastWarnedPortal).TotalSeconds > 2) {
+                            e.Player.LastWarnedPortal = DateTime.UtcNow;
+                            e.Player.Message("You can not use portals within 5 seconds of joining a world.");
                         }
+                        return;
                     }
-                }
-            } catch (Exception ex) {
-                Logger.Log(LogType.Error, "PortalHandler.Player_Moved: " + ex);
-            }
-        }
 
-        public static Portal GetPortal(Player player) {
-            try {
-                if (player.World.Portals != null && player.World.Portals.Count > 0) {
-                    lock (player.World.Portals.SyncRoot) {
-                        foreach (Portal candidate in player.World.Portals) {
-                            if (candidate.Contains(player)) {
-                                return candidate;
+                    e.Player.StandingInPortal = true;
+                    World world = WorldManager.FindWorldExact(portal.World);
+                    
+                    if (world == e.Player.World) {
+                    	e.Player.TeleportTo(portal.tpPosition());
+                        e.Player.Message("You used portal: " + portal.Name);
+                        return;
+                    }
+                    
+                    // Teleport player, portal protection
+                    switch (world.AccessSecurity.CheckDetailed(e.Player.Info)) {
+                        case SecurityCheckResult.Allowed:
+                        case SecurityCheckResult.WhiteListed:
+                            if (world.IsFull) {
+                                e.Player.Message("Cannot join {0}&S: world is full.", world.ClassyName);
+                                return;
                             }
-                        }
-                    }
-                }
-            } catch (Exception ex) {
-                Logger.Log(LogType.Error, "PortalHandler.GetPortal: " + ex);
-            }
-            return null;
-        }
-
-        public static Portal GetPortal(World world, Vector3I block) {
-            try {
-                if (world.Portals != null && world.Portals.Count > 0) {
-                    lock (world.Portals.SyncRoot) {
-                        foreach (Portal candidate in world.Portals) {
-                            if (candidate.Contains(block)) {
-                                return candidate;
+                            e.Player.StopSpectating();
+                            
+                            if (portal.TeleportPosX != 0 && portal.TeleportPosY != 0 && portal.TeleportPosZ != 0) {
+                                e.Player.JoinWorld(world, WorldChangeReason.Portal, portal.tpPosition());
+                            } else {
+                                e.Player.JoinWorld(world, WorldChangeReason.Portal);
                             }
-                        }
+                            
+                            e.Player.Message("You used portal: " + portal.Name);
+                            if (e.Player.WorldMap.Spawn == Position.RandomSpawn) {
+                                e.Player.Message("Randomized Spawn!");
+                            }
+
+                            // Make sure this method isn't called twice
+                            e.Player.CanUsePortal = false;
+                            break;
+
+                        case SecurityCheckResult.BlackListed:
+                            if ((DateTime.UtcNow - e.Player.LastWarnedPortal).TotalSeconds < 2) {
+                                e.Player.LastWarnedPortal = DateTime.UtcNow;
+                                e.Player.Message("Cannot join world {0}&S: you are blacklisted.",
+                                    world.ClassyName);
+                            }
+                            break;
+                        case SecurityCheckResult.RankTooLow:
+                            if ((DateTime.UtcNow - e.Player.LastWarnedPortal).TotalSeconds > 2) {
+                                e.Player.LastWarnedPortal = DateTime.UtcNow;
+                                e.Player.Message("Cannot join world {0}&S: must be {1}+",
+                                             world.ClassyName, world.AccessSecurity.MinRank.ClassyName);
+                            }
+                            break;
                     }
+                } catch (Exception ex) {
+                    Logger.Log(LogType.Error, "PortalHandler.Player_Moved: " + ex);
                 }
-            } catch (Exception ex) {
-                Logger.Log(LogType.Error, "PortalHandler.GetPortal: " + ex);
             }
-            return null;
-        }
-
-        public static void CreatePortal(Portal portal, World source) {
-            if (source.Portals == null) {
-                source.Portals = new ArrayList();
-            }
-
-            lock (source.Portals.SyncRoot) {
-                source.Portals.Add(portal);
-            }
-
-            PortalDB.Save();
         }
 
         public static bool NearSpawn(Player player, World world, Vector3I block) {

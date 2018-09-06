@@ -15,14 +15,9 @@
 
 //Copyright (C) <2012> Glenn Mariën (http://project-vanilla.com)
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Diagnostics;
 using System.IO;
 using ServiceStack.Text;
-using System.Collections;
-using System.Runtime.Serialization;
 
 namespace fCraft.Portals {
     public class PortalDB {
@@ -33,20 +28,20 @@ namespace fCraft.Portals {
             try {
                 lock (IOLock) {
                     Stopwatch stopwatch = Stopwatch.StartNew();
-                    int worlds = 0;
-                    int portals = 0;
+                    int worlds = 0, portals = 0;
 
                     using (StreamWriter w = new StreamWriter(Paths.PortalDBFileName, false)) {
-                        World[] worldsCopy = WorldManager.Worlds;
-                        foreach (World world in worldsCopy) {
-                            if (world.Portals == null) continue;
+                        World[] cache = WorldManager.Worlds;
+                        foreach (World world in cache) {
+                            if (world.Portals.Count == 0) continue;
                             
-                            ArrayList portalsCopy = world.Portals;
-                            worlds++;
+                            lock (world.Portals.locker) {
+                                worlds++;
+                                portals += world.Portals.Count;
 
-                            foreach (Portal portal in portalsCopy) {
-                                portals++;
-                                w.WriteLine(JsonSerializer.SerializeToString(portal));
+                                foreach (Portal portal in world.Portals.entries) {
+                                    w.WriteLine(JsonSerializer.SerializeToString(portal));
+                                }
                             }
                         }
                     }
@@ -71,14 +66,7 @@ namespace fCraft.Portals {
                             World world = WorldManager.FindWorldExact(portal.Place);
                             if (world == null) continue;
 
-                            if (world.Portals == null) {
-                                world.Portals = new ArrayList();
-                            }
-
-                            lock (world.Portals.SyncRoot) {
-                                world.Portals.Add(portal);
-                            }
-
+                            world.Portals.Add(portal);
                             count++;
                         }
 

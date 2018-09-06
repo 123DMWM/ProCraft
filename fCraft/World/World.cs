@@ -85,7 +85,7 @@ namespace fCraft {
         [CanBeNull]
         public Array Signs { get; set; }
 
-        public ArrayList Portals;
+        public Portals.PortalsList Portals = new Portals.PortalsList();
         
         public BlockDefinition[] BlockDefs;
 

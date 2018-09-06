@@ -2843,7 +2843,7 @@ namespace fCraft {
                                 "Whether any blocks can be placed by players in the world." },
                 { "deletable",  "&H/WSet <WorldName> Deletable On/Off&N&S" +
                                 "Whether any blocks can be deleted by players in the world." },
-            	{ "maxreach",  "&H/WSet <WorldName> MaxReach <Distance>/reset&N&S" +
+                { "maxreach",  "&H/WSet <WorldName> MaxReach <Distance>/reset&N&S" +
                                 "Sets maximum reach distance players may click/reach up to." },
             },
             Handler = WorldSetHandler
@@ -3715,7 +3715,7 @@ namespace fCraft {
             player.PortalName = null;
             string name = cmd.Next();
             if (string.IsNullOrEmpty(name)) {
-            } else if (!Portal.Exists(player.World, name)) {
+            } else if (player.World.Portals.Find(name) == null) {
                 player.PortalName = name;
             } else {
                 player.Message("A portal named {0} already exists in this world.", name);
@@ -3727,22 +3727,22 @@ namespace fCraft {
                 int x, y, z, rot = player.Position.R, lot = player.Position.L;
                 string next = cmd.Next();
                 if (next != null && next.StartsWith("#")) {
-                	bool needsLoading = world.Map == null;
-                	if (needsLoading) world.LoadMap();
-                	
-                	Zone zone = world.map.Zones.FindExact(next.Remove(0,1));               	
-                	if (zone == null) {
-                		player.MessageNoZone(next.Remove(0, 1));
-                		return;
-                	}
-                	
-                	player.PortalTPPos = new Position(zone.Bounds.XCentre * 32 + 16,
-                	                                  zone.Bounds.YCentre * 32 + 16, zone.Bounds.ZCentre * 32 + Player.CharacterHeight,
-                	                                  (byte)rot, (byte)lot);
-                	player.Message("Players will be teleported to zone: " + zone.Name);
-                	player.Message("At: " + player.PortalTPPos.ToString());
-                	player.Message("On: " + world.Name);
-                	if (needsLoading) world.UnloadMap(false);
+                    bool needsLoading = world.Map == null;
+                    if (needsLoading) world.LoadMap();
+                    
+                    Zone zone = world.map.Zones.FindExact(next.Remove(0,1));                   
+                    if (zone == null) {
+                        player.MessageNoZone(next.Remove(0, 1));
+                        return;
+                    }
+                    
+                    player.PortalTPPos = new Position(zone.Bounds.XCentre * 32 + 16,
+                                                      zone.Bounds.YCentre * 32 + 16, zone.Bounds.ZCentre * 32 + Player.CharacterHeight,
+                                                      (byte)rot, (byte)lot);
+                    player.Message("Players will be teleported to zone: " + zone.Name);
+                    player.Message("At: " + player.PortalTPPos.ToString());
+                    player.Message("On: " + world.Name);
+                    if (needsLoading) world.UnloadMap(false);
                 } else if (int.TryParse(next, out x) && cmd.NextInt(out y) && cmd.NextInt(out z)) {
                     if (cmd.CountRemaining >= 2 && cmd.NextInt(out rot) && cmd.NextInt(out lot)) {
                         if (rot > 255 || rot < 0) {
@@ -3772,8 +3772,8 @@ namespace fCraft {
                 return;
             }
             
-            string portalName = cmd.Next();
-            if (string.IsNullOrEmpty(portalName)) {
+            string name = cmd.Next();
+            if (string.IsNullOrEmpty(name)) {
                 player.Message("No portal name specified.");
                 return;
             }
@@ -3785,31 +3785,23 @@ namespace fCraft {
             }
             if (world == null) return;
             
-            if (world.Portals == null || world.Portals.Count == 0) {
+            if (world.Portals.Count == 0) {
                 player.Message("There are no portals in {0}", world.ClassyName);
                 return;
             }
             
-            Portal match = null;
-            lock (world.Portals.SyncRoot) {
-                foreach (Portal portal in world.Portals) {
-                    if (!portal.Name.CaselessEquals(portalName)) continue;
-                    match = portal;
-                    break;
-                }
-                
-                if (match == null) {
-                    player.Message("Portal {0} does not exist in {1}", portalName, world.ClassyName);
-                } else {
-                    match.Remove(player, world);
-                    player.Message("Portal was removed.");
-                }
+            Portal portal = world.Portals.Find(name);
+            if (portal == null) {
+                 player.Message("Portal {0} does not exist in {1}", name, world.ClassyName);
+            } else {
+                portal.Remove(player, world);
+                player.Message("Portal was removed.");
             }
         }
         
         static void PortalInfo(Player player, CommandReader cmd) {
-            string portalName = cmd.Next();
-            if (string.IsNullOrEmpty(portalName)) {
+            string name = cmd.Next();
+            if (string.IsNullOrEmpty(name)) {
                 player.Message("No portal name specified.");
                 return;
             }
@@ -3821,25 +3813,19 @@ namespace fCraft {
             }
             if (world == null) return;
             
-            if (world.Portals == null || world.Portals.Count == 0) {
+            if (world.Portals.Count == 0) {
                 player.Message("There are no portals in {0}", world.ClassyName);
                 return;
             }
             
-            bool found = false;
-            lock (world.Portals.SyncRoot) {
-                foreach (Portal portal in world.Portals) {
-                    if (!portal.Name.CaselessEquals(portalName)) continue;
-                    
-                    string creator = PlayerDB.FindPlayerInfoExact(portal.Creator).ClassyName;
-                    World exitWorld = WorldManager.FindWorldExact(portal.World);
-                    player.Message("Portal {0}&S was created by {1}&S at {2} and teleports to world {3} at {4}&S.",
-                                   portal.Name, creator, portal.Created, exitWorld.ClassyName, portal.position().ToString());
-                    found = true;
-                }
-            }
-            if (!found) {
-                player.Message("Portal {0} does not exist in {1}", portalName, world.ClassyName);
+            Portal portal = world.Portals.Find(name);
+            if (portal == null) {
+                player.Message("Portal {0} does not exist in {1}", name, world.ClassyName);
+            } else {
+                string creator = PlayerDB.FindPlayerInfoExact(portal.Creator).ClassyName;
+                World exit = WorldManager.FindWorldExact(portal.World);
+                player.Message("Portal {0}&S was created by {1}&S at {2} and teleports to world {3} at {4}&S.",
+                                portal.Name, creator, portal.Created, exit.ClassyName, portal.position().ToString());
             }
         }
         
@@ -3851,73 +3837,76 @@ namespace fCraft {
             }
             if (world == null) return;
             
-            if (world.Portals == null || world.Portals.Count == 0) {
+            if (world.Portals.Count == 0) {
                 player.Message("There are no portals in {0}", world.ClassyName);
                 return;
             }
             
-            string[] portalNames = new string[world.Portals.Count];
-            StringBuilder output = new StringBuilder("There are " + world.Portals.Count + " portals in " + world.ClassyName + "&S: ");
-            for (int i = 0; i < world.Portals.Count; i++) {
-                portalNames[i] = ((Portal)world.Portals[i]).Name;
+            string list;
+            lock (world.Portals.locker) {
+                list = world.Portals.entries.JoinToString(", ", portal => portal.Name);
             }
-            output.Append(portalNames.JoinToString(", "));
-            player.Message(output.ToString());
+            
+            player.Message("There are {0} portals in {1}&S: {2}",
+                           world.Portals.Count, world.ClassyName, list);
         }
         
         static void PortalCreateCallback(Player player, Vector3I[] marks, object tag) {
             try {
                 World world = WorldManager.FindWorldExact(player.PortalWorld);
+                if (world == null) {
+                    player.MessageInvalidWorldName(player.PortalWorld);
+                    return;
+                }
+                
+                DrawOperation op = (DrawOperation)tag;
+                if (!op.Prepare(marks)) return;
+                PortalsList portals = player.World.Portals;
+                
+                if (!player.CanDraw(op.BlocksTotalEstimate)) {
+                    player.Message("You are only allowed to run draw commands that affect up to {0} blocks. This one would affect {1} blocks.",
+                                   player.Info.Rank.DrawLimit,
+                                   op.Bounds.Volume);
+                    op.Cancel();
+                    return;
+                }
 
-                if (world != null) {
-                    DrawOperation op = (DrawOperation)tag;
-                    if (!op.Prepare(marks))
-                        return;
-                    if (!player.CanDraw(op.BlocksTotalEstimate)) {
-                        player.Message("You are only allowed to run draw commands that affect up to {0} blocks. This one would affect {1} blocks.",
-                                       player.Info.Rank.DrawLimit,
-                                       op.Bounds.Volume);
-                        op.Cancel();
-                        return;
-                    }
+                int Xmin = Math.Min(marks[0].X, marks[1].X);
+                int Xmax = Math.Max(marks[0].X, marks[1].X);
+                int Ymin = Math.Min(marks[0].Y, marks[1].Y);
+                int Ymax = Math.Max(marks[0].Y, marks[1].Y);
+                int Zmin = Math.Min(marks[0].Z, marks[1].Z);
+                int Zmax = Math.Max(marks[0].Z, marks[1].Z);
 
-                    int Xmin = Math.Min(marks[0].X, marks[1].X);
-                    int Xmax = Math.Max(marks[0].X, marks[1].X);
-                    int Ymin = Math.Min(marks[0].Y, marks[1].Y);
-                    int Ymax = Math.Max(marks[0].Y, marks[1].Y);
-                    int Zmin = Math.Min(marks[0].Z, marks[1].Z);
-                    int Zmax = Math.Max(marks[0].Z, marks[1].Z);
+                for (int x = Xmin; x <= Xmax; x++) {
+                    for (int y = Ymin; y <= Ymax; y++) {
+                        for (int z = Zmin; z <= Zmax; z++) {
+                            if (PortalHandler.NearSpawn(player, player.World, new Vector3I(x, y, z))) {
+                                player.Message("You cannot build a portal near the spawnpoint.");
+                                return;
+                            }
 
-                    for (int x = Xmin; x <= Xmax; x++) {
-                        for (int y = Ymin; y <= Ymax; y++) {
-                            for (int z = Zmin; z <= Zmax; z++) {
-                                if (PortalHandler.NearSpawn(player, player.World, new Vector3I(x, y, z))) {
-                                    player.Message("You cannot build a portal near the spawnpoint.");
-                                    return;
-                                }
-
-                                if (PortalHandler.GetPortal(player.World, new Vector3I(x, y, z)) != null) {
-                                    player.Message("You cannot build a portal inside a portal.");
-                                    return;
-                                }
+                            if (portals.Find(new Vector3I(x, y, z)) != null) {
+                                player.Message("You cannot build a portal inside a portal.");
+                                return;
                             }
                         }
                     }
-
-                    string name = player.PortalName;
-                    if (name == null) name = Portal.GenerateName(player.World);
-
-                    Portal portal = new Portal(player.PortalWorld, new PortalRange(Xmin, Xmax, Ymin, Ymax, Zmin, Zmax),
-                                               name, player.Name, player.World.Name, player.PortalTPPos);
-                    PortalHandler.CreatePortal(portal, player.World);
-                    op.AnnounceCompletion = false;
-                    op.Context = BlockChangeContext.Portal;
-                    op.Begin();
-
-                    player.Message("Successfully created portal with name " + portal.Name + ".");
-                } else {
-                    player.MessageInvalidWorldName(player.PortalWorld);
                 }
+
+                string name = player.PortalName;
+                if (name == null) name = player.World.Portals.GenAutoName();
+
+                Portal portal = new Portal(player.PortalWorld, new PortalRange(Xmin, Xmax, Ymin, Ymax, Zmin, Zmax),
+                                           name, player.Name, player.World.Name, player.PortalTPPos);
+                portals.Add(portal);
+                PortalDB.Save();
+                
+                op.AnnounceCompletion = false;
+                op.Context = BlockChangeContext.Portal;
+                op.Begin();
+
+                player.Message("Successfully created portal with name " + portal.Name + ".");
             } catch (Exception ex) {
                 player.Message("Failed to create portal.");
                 Logger.Log(LogType.Error, "WorldCommands.PortalCreateCallback: " + ex);

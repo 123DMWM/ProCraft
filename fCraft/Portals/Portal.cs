@@ -15,6 +15,7 @@
 
 //Copyright (C) <2012> Glenn Mariën (http://project-vanilla.com)
 using System;
+using System.Collections.Generic;
 using fCraft.Drawing;
 
 namespace fCraft.Portals {
@@ -53,16 +54,11 @@ namespace fCraft.Portals {
             return new Position(TeleportPosX, TeleportPosY, TeleportPosZ + Player.CharacterHeight, TeleportPosR, TeleportPosL);
         }
 
-        public bool Contains(Player player) {
-            if ((player.Position.BlockX) <= Range.Xmax && (player.Position.BlockX) >= Range.Xmin) {
-                if ((player.Position.BlockY) <= Range.Ymax && (player.Position.BlockY) >= Range.Ymin) {
-                    if (((player.Position.Z / 32) - 1) <= Range.Zmax && ((player.Position.Z / 32) - 1) >= Range.Zmin) {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
+        public bool Contains(Player p) {
+            return
+                p.Position.BlockX >= Range.Xmin && p.Position.BlockX <= Range.Xmax &&
+                p.Position.BlockY >= Range.Ymin && p.Position.BlockY <= Range.Ymax && 
+                ((p.Position.Z / 32) - 1) >= Range.Zmin && ((p.Position.Z / 32) - 1) <= Range.Zmax;
         }
 
         public bool Contains(Vector3I vector) {
@@ -70,24 +66,6 @@ namespace fCraft.Portals {
                 vector.X >= Range.Xmin && vector.X <= Range.Xmax &&
                 vector.Y >= Range.Ymin && vector.Y <= Range.Ymax &&
                 vector.Z >= Range.Zmin && vector.Z <= Range.Zmax;
-        }
-
-        public static string GenerateName(World world) {
-            int id = 1;
-            while (Exists(world, "portal" + id)) id++;
-            return "portal" + id;
-        }
-
-        public static bool Exists(World world, string name) {
-            if (world.Portals != null) {
-                if (world.Portals.Count > 0) {
-                    foreach (Portal portal in world.Portals) {
-                        if (portal.Name.Equals(name)) return true;
-                    }
-                }
-            }
-
-            return false;
         }
 
         public void Remove(Player requester, World world) {
@@ -104,8 +82,7 @@ namespace fCraft.Portals {
                 throw new InvalidOperationException("Unable to remove portal.");
 
             op.Begin();
-            lock (world.Portals.SyncRoot)
-                world.Portals.Remove(this);
+            world.Portals.Remove(this);
             PortalDB.Save();
         }
     }
@@ -125,6 +102,67 @@ namespace fCraft.Portals {
             this.Ymax = Ymax;
             this.Zmin = Zmin;
             this.Zmax = Zmax;
+        }
+    }
+    
+    public class PortalsList {
+        public readonly object locker = new object();
+        public volatile int Count;
+        public List<Portal> entries;
+        
+        public void Add(Portal portal) {
+            lock (locker) {
+                if (entries == null) entries = new List<Portal>();
+                entries.Add(portal);
+                Count = entries.Count;
+            }
+        }
+        
+        public void Remove(Portal portal) {
+            lock (locker) {
+                if (entries == null) return;
+                entries.Remove(portal);
+                Count = entries.Count;
+            }
+        }
+        
+        public string GenAutoName() {
+            int id = 1;
+            while (Find("portal" + id) != null) id++;
+            return "portal" + id;
+        }
+        
+        public Portal Find(string name) {
+            if (Count == 0) return null;
+            
+            lock (locker) {
+                foreach (Portal p in entries) {
+                    if (p.Name.CaselessEquals(name)) return p;
+                }
+            }
+            return null;
+        }
+        
+        public Portal Find(Vector3I coords) {
+            if (Count == 0) return null;
+            
+            lock (locker) {
+                foreach (Portal p in entries) {
+                    if (p.Contains(coords)) return p;
+                }
+            }
+            return null;
+        }
+        
+        public Portal Find(Player player) {
+            if (Count == 0) return null;
+            
+            lock (locker) {
+                foreach (Portal p in entries) {
+                    if (p.Contains(player)) return p;
+                }
+            }
+            return null;
         }
     }
 }
