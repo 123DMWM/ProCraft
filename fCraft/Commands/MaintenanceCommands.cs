@@ -7,6 +7,7 @@ using System.Net;
 using fCraft.AutoRank;
 using JetBrains.Annotations;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace fCraft {
     /// <summary> Several yet-undocumented commands, mostly related to AutoRank. </summary>
@@ -1348,8 +1349,9 @@ namespace fCraft {
 
         static void UpdatesHandler(Player player, CommandReader cmd) {
             DateTime latest = DateTime.UtcNow;
-            DateTime current = File.GetLastWriteTimeUtc(Process.GetCurrentProcess().MainModule.FileName);
-
+            string path = Assembly.GetExecutingAssembly().Location;
+            DateTime current = File.GetLastWriteTimeUtc(path);
+            
             try {
                 Uri uri = new Uri("https://123DMWM.tk/ProCraft/Builds/Latest.zip?");
                 HttpWebRequest request = HttpUtil.CreateRequest(uri, TimeSpan.FromSeconds(10));
