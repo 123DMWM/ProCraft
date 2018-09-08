@@ -1324,7 +1324,7 @@ namespace fCraft {
                 player.LastPosition = player.Position;
             }
             
-            Position pos = new Position(x, y, z);
+            Position pos = Position.FromFeet(x, y, z);
             pos.R = player.Position.R;
             pos.L = player.Position.L;
             player.TeleportTo(pos);
@@ -1344,7 +1344,7 @@ namespace fCraft {
                 player.LastPosition = player.Position;
             }
             
-            Position pos = new Position(x, y, z);
+            Position pos = Position.FromFeet(x, y, z);
             pos.R = player.Position.R;
             pos.L = player.Position.L;
             player.TeleportTo(pos);
@@ -1378,7 +1378,7 @@ namespace fCraft {
                     player.LastPosition = player.Position;
                 }
             	
-            	Position pos = new Position(x, y, z);
+            	Position pos = Position.FromFeet(x, y, z);
             	pos.R = (byte)rot;
             	pos.L = (byte)lot;
                 player.TeleportTo(pos);
@@ -1553,7 +1553,7 @@ namespace fCraft {
             int y = player.Position.BlockY;
             int z = player.WorldMap.HighestFreeZ(x, y);
 
-            Position pos = new Position(x, y, z);
+            Position pos = Position.FromFeet(x, y, z);
             pos.R = player.Position.R;
             pos.L = player.Position.L;
             player.TeleportTo(pos);
