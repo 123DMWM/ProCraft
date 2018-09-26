@@ -174,7 +174,7 @@ namespace fCraft {
                 } else {
                     firstLine.AppendFormat( "Last seen {0} ago", info.TimeSinceLastSeen.ToMiniString());
                     if( player.Can( Permission.ViewPlayerIPs ) ) {
-                        firstLine.AppendFormat(" from &F{0}", info.LastIP );
+                        firstLine.AppendFormat(" from {0}", info.LastIP );
                     }
                     if( info.LeaveReason != LeaveReason.Unknown ) {
                         firstLine.AppendFormat( " ({0})", info.LeaveReason );
