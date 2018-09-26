@@ -855,10 +855,10 @@ namespace fCraft
                             "Removes a filter with the given ID number. " +
                             "To see a list of filters and their IDs, type &H/filters" }
             },
-            Handler = SwearHandler
+            Handler = FiltersHandler
         };
 
-        private static void SwearHandler(Player player, CommandReader cmd) {
+        static void FiltersHandler(Player player, CommandReader cmd) {
             if (!player.IsStaff || cmd.CountRemaining == 0) {
                 if (ChatFilter.Filters.Count == 0) {
                     player.Message("There are no filters.");
@@ -889,7 +889,7 @@ namespace fCraft
                     ChatFilter dFilter = ChatFilter.Find(dID);
                     if (dFilter != null) {
                         if (cmd.IsConfirmed) {
-                            ChatFilter.RemoveFilter(dID);
+                            ChatFilter.Remove(dID);
                             Server.Message("&Y[Filters] {0}&Y removed the filter \"{1}\" -> \"{2}\"",
                                            player.ClassyName, dFilter.Word, dFilter.Replacement);
                             break;
@@ -911,7 +911,7 @@ namespace fCraft
                     }
                     if (!ChatFilter.Exists(word)) {
                         Server.Message("&Y[Filters] \"{0}\" is now replaced by \"{1}\"", word, replacement);
-                        ChatFilter.CreateFilter(getNewFilterId(), word, replacement);
+                        ChatFilter.Add(getNewFilterId(), word, replacement);
                     } else {
                         player.Message("A filter with that word already exists!");
                     }
@@ -948,12 +948,12 @@ namespace fCraft
                     }
                     Server.Message("&Y[Filters] {0}&Y edited a filter from &N(\"{1}\" -> \"{2}\") &Nto (\"{3}\" -> \"{2}\")",
                                    player.ClassyName, oldWord, oldReplacement, eFilter.Word, eFilter.Replacement);
-                    ChatFilter.RemoveFilter(eID.ToString());
+                    ChatFilter.Remove(eID.ToString());
                     ChatFilter.Filters.Add(eFilter);
                     break;
                 case "reload":
                     if (player.Info.Rank == RankManager.HighestRank) {
-                        ChatFilter.ReloadAll();
+                        ChatFilter.Reload();
                         player.Message("Reloaded filters from file");
                     }
                     break;

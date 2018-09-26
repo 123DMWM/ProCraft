@@ -54,7 +54,13 @@ namespace fCraft {
         }
         
         public static string Filter(string rawMessage, Player player) {
-            if (player != null && !player.IsStaff) {
+        	rawMessage = ChatFilter.Apply(rawMessage);
+            if (player == null || !player.IsStaff) {
+                rawMessage = RegexIPMatcher.Replace(rawMessage, "<Redacted IP>");
+            }
+            if (player == null) return rawMessage; // Checks below only work on in-game players
+            
+            if (!player.IsStaff) {
         	    string trimmedMsg = new string(rawMessage.Where(c => !char.IsWhiteSpace(c)).ToArray());
                 if (player.lastMsg.CaselessEquals(trimmedMsg)) {
                     if (player.lastMsgCount >= 2) {
@@ -67,16 +73,6 @@ namespace fCraft {
                     player.lastMsgCount = 0;
                 }
             }
-
-            foreach (ChatFilter Swear in ChatFilter.Filters) {
-                if (rawMessage.CaselessContains(Swear.Word)) {
-                    rawMessage = rawMessage.ReplaceString(Swear.Word, Swear.Replacement, StringComparison.InvariantCultureIgnoreCase);
-                }
-            }
-            if (player == null || !player.IsStaff) {
-                rawMessage = RegexIPMatcher.Replace(rawMessage, "<Redacted IP>");
-            }
-            if (player == null) return rawMessage; // Checks below only work in-game
             
             if (rawMessage.Length >= 10 && player.Info.Rank.MaxCaps > 0) {
                 int caps = 0;

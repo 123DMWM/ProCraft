@@ -956,6 +956,7 @@ namespace fCraft
             if (message == null) throw new ArgumentNullException("message");
             bool useColor = ConfigKey.IRCShowColorsFromServer.Enabled();
             bool useEmotes = ConfigKey.IRCShowEmotesFromServer.Enabled();
+            message = Chat.Filter(message, null);
 
             if (useEmotes)
                 message = Chat.ReplaceEmotesWithUnicode(message);

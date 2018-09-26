@@ -425,7 +425,7 @@ namespace fCraft {
 
             ChatTimer.LoadAll();
             Report.LoadAll();
-            ChatFilter.LoadAll();
+            ChatFilter.Load();
             Entity.LoadAll();
             DownloadResources();
             

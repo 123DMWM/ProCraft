@@ -33,30 +33,39 @@ namespace fCraft {
             return false;
         }
 
-        public static void CreateFilter(int id, string word, string replacement) {
+        public static void Add(int id, string word, string replacement) {
             ChatFilter filter = new ChatFilter();
             filter.Id = id;
             filter.Word = word;
             filter.Replacement = replacement;
             Filters.Add(filter);
-            SaveAll(false);
+            Save(false);
         }
 
-        public static void RemoveFilter(string id) {
+        public static void Remove(string id) {
             ChatFilter filter = Find(id);
             if (filter != null) {
                 Filters.Remove(filter);
-                SaveAll(false);
+                Save(false);
             }
         }
         
 
-        public static void ReloadAll() {
+        public static string Apply(string msg) {
+            foreach (ChatFilter filter in Filters) {
+                if (msg.CaselessContains(filter.Word)) {
+                    msg = msg.ReplaceString(filter.Word, filter.Replacement, StringComparison.InvariantCultureIgnoreCase);
+                }
+            }
+            return msg;
+        }
+        
+        public static void Reload() {
             Filters.Clear();
-            LoadAll();
+            Load();
         }
 
-        public static void SaveAll(bool verbose) {
+        public static void Save(bool verbose) {
             try {
                 Stopwatch sw = Stopwatch.StartNew();
                 using (Stream s = File.Create(Paths.FiltersFileName)) {
@@ -71,12 +80,7 @@ namespace fCraft {
             }
         }
 
-        public static void LoadAll() {
-            if (Directory.Exists("Filters")) {
-                OldLoad();
-                Directory.Delete("Filters", true);
-                SaveAll(false);
-            }
+        public static void Load() {
             if (!File.Exists(Paths.FiltersFileName)) return;
 
             try {
@@ -86,8 +90,7 @@ namespace fCraft {
                 }
                 int count = 0;
                 for (int i = 0; i < Filters.Count; i++) {
-                    if (Filters[i] == null)
-                        continue;
+                    if (Filters[i] == null) continue;
                     // fixup for servicestack not writing out null entries
                     if (Filters[i].Word == null) {
                         Filters[i] = null; continue;
@@ -95,27 +98,10 @@ namespace fCraft {
                     count++;
                 }
                 Logger.Log(LogType.SystemActivity, "ChatFilter.Load: Loaded " + count + " filters");
-                SaveAll(true);
+                Save(true);
             } catch (Exception ex) {
                 Filters = null;
                 Logger.Log(LogType.Error, "ChatFilter.Load: " + ex);
-            }
-        }
-        
-        public static void OldLoad() {
-            string[] files = Directory.GetFiles("./Filters");
-            foreach (string filename in files) {
-                if (Path.GetExtension(filename) != ".txt") continue;
-                string idString = Path.GetFileNameWithoutExtension(filename);
-                int id;
-                if (!int.TryParse(idString, out id)) continue;
-                
-                string[] data = File.ReadAllLines(filename);
-                ChatFilter filter = new ChatFilter();
-                filter.Id = id;
-                filter.Word = data[0];
-                filter.Replacement = data[1];
-                Filters.Add(filter);
             }
         }
     }
