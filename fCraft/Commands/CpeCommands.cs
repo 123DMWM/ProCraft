@@ -1967,7 +1967,7 @@ namespace fCraft {
                     break;
                 case "order":
                     byte order = 0;
-                    if (byte.TryParse(args, out order) && order > 0) {
+                    if (byte.TryParse(args, out order)) {
                         def.InventoryOrder = order;
                         DisplayEditMessage(p, def, global);
                         UpdateOrder(p.World, def, global);
