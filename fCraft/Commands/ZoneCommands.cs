@@ -418,7 +418,7 @@ namespace fCraft {
                     }
 
                 } else if( nextToken.StartsWith( "-" ) ) {
-                    PlayerInfo info = PlayerDB.FindPlayerInfoOrPrintMatches(player, nextToken.Substring(1), SearchOptions.Default);
+                    PlayerInfo info = PlayerDB.FindPlayerInfoOrPrintMatches( player, nextToken.Substring( 1 ), SearchOptions.IncludeSelf );
                     if( info == null ) return;
 
                     if (!player.Info.Rank.AllowSecurityCircumvention && player.Info == info)
