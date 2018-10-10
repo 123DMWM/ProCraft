@@ -1249,23 +1249,6 @@ namespace fCraft {
             }
         }
         
-        bool CheckPlacePerm(Block block) {
-            switch (block) {
-                case Block.Air:   return World.Deletable;
-                case Block.Grass: return Can(Permission.PlaceGrass);
-                case Block.Admincrete: return Can(Permission.PlaceAdmincrete);
-                case Block.Water:
-                case Block.StillWater: return Can(Permission.PlaceWater);
-                case Block.Lava:
-                case Block.StillLava:  return Can(Permission.PlaceLava);
-            }
-            return true;
-        }
-        
-        bool CheckDeletePerm(Block block) {
-            return block != Block.Admincrete || Can(Permission.DeleteAdmincrete);
-        }
-        
         internal void SendBlockPermissions() {
             int max = supportsCustomBlocks ? (int)Map.MaxCustomBlockType : (int)Map.MaxLegalBlockType;
             if (supportsBlockDefs) max = byte.MaxValue;

@@ -1424,20 +1424,8 @@ namespace fCraft {
                 goto eventCheck;
             }
 
-            // check special blocktypes
-            if( newBlock == Block.Admincrete && !Can( Permission.PlaceAdmincrete ) ) {
-                result = CanPlaceResult.BlocktypeDenied;
-                goto eventCheck;
-            } else if( (newBlock == Block.Water || newBlock == Block.StillWater) && !Can( Permission.PlaceWater ) ) {
-                result = CanPlaceResult.BlocktypeDenied;
-                goto eventCheck;
-            } else if( (newBlock == Block.Lava || newBlock == Block.StillLava) && !Can( Permission.PlaceLava ) ) {
-                result = CanPlaceResult.BlocktypeDenied;
-                goto eventCheck;
-            }
-
-            // check admincrete-related permissions
-            if( oldBlock == Block.Admincrete && !Can( Permission.DeleteAdmincrete ) ) {
+            // check blocktypes
+            if( !CheckPlacePerm( newBlock ) || !CheckDeletePerm( oldBlock ) ) {
                 result = CanPlaceResult.BlocktypeDenied;
                 goto eventCheck;
             }
@@ -1487,6 +1475,23 @@ namespace fCraft {
             return e.Result;
         }
 
+        bool CheckPlacePerm( Block block ) {
+            switch( block ) {
+                case Block.Air:   return World.Deletable;
+                case Block.Grass: return Can( Permission.PlaceGrass );
+                case Block.Admincrete: return Can( Permission.PlaceAdmincrete );
+                case Block.Water:
+                case Block.StillWater: return Can( Permission.PlaceWater );
+                case Block.Lava:
+                case Block.StillLava:  return Can( Permission.PlaceLava );
+            }
+            return true;
+        }
+        
+        bool CheckDeletePerm( Block block ) {
+            return block != Block.Admincrete || Can( Permission.DeleteAdmincrete );
+        }
+        
 
         /// <summary> Whether this player can currently see another player as being online.
         /// Players can always see themselves. Super players (e.g. Console) can see all.
