@@ -1249,31 +1249,34 @@ namespace fCraft {
             }
         }
         
-        internal void SendBlockPermissions() {
-            Block max = supportsCustomBlocks ? Map.MaxCustomBlockType : Map.MaxLegalBlockType;
-            bool build = World.Buildable, delete = World.Deletable;
-            for (Block block = Block.Stone; block <= max; block++) {
-                Send(Packet.MakeSetBlockPermission(block, build, delete));
+        bool CheckPlacePerm(Block block) {
+            switch (block) {
+                case Block.Air:   return World.Deletable;
+                case Block.Grass: return Can(Permission.PlaceGrass);
+                case Block.Admincrete: return Can(Permission.PlaceAdmincrete);
+                case Block.Water:
+                case Block.StillWater: return Can(Permission.PlaceWater);
+                case Block.Lava:
+                case Block.StillLava:  return Can(Permission.PlaceLava);
             }
+            return true;
+        }
+        
+        bool CheckDeletePerm(Block block) {
+            return block != Block.Admincrete || Can(Permission.DeleteAdmincrete);
+        }
+        
+        internal void SendBlockPermissions() {
+            int max = supportsCustomBlocks ? (int)Map.MaxCustomBlockType : (int)Map.MaxLegalBlockType;
+            if (supportsBlockDefs) max = byte.MaxValue;
             
-            Send(Packet.MakeSetBlockPermission(Block.Admincrete, 
-                build && Can(Permission.PlaceAdmincrete), delete && Can(Permission.PlaceAdmincrete)));
-            Send(Packet.MakeSetBlockPermission(
-                Block.Water, build && Can(Permission.PlaceWater), delete));
-            Send(Packet.MakeSetBlockPermission(
-                Block.StillWater, build && Can(Permission.PlaceWater), delete));
-            Send(Packet.MakeSetBlockPermission(
-                Block.Lava, build && Can(Permission.PlaceLava), delete));
-            Send(Packet.MakeSetBlockPermission(
-                Block.StillLava, build && Can(Permission.PlaceLava), delete));
-            Send(Packet.MakeSetBlockPermission(
-                Block.Grass, build && Can(Permission.PlaceGrass), delete));
-            
-            if (!supportsBlockDefs) return;
-            BlockDefinition[] defs = World.BlockDefs;
-            for (int i = (int)Block.Air + 1; i < defs.Length; i++) {
-                if (defs[i] == null) continue;
-                Send(Packet.MakeSetBlockPermission((Block)i, build, delete));
+            for (int i = (int)Block.Air; i <= max; i++) {
+                Block block = (Block)i;
+                bool build  = World.Buildable && CheckPlacePerm(block);
+                bool delete = World.Deletable && CheckDeletePerm(block);
+                
+                if (i > (int)Map.MaxCustomBlockType && World.BlockDefs[i] == null) continue;
+                Send(Packet.MakeSetBlockPermission(block, build, delete));
             }
         }
         
