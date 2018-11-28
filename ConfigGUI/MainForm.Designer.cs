@@ -1109,7 +1109,8 @@ namespace fCraft.ConfigGUI {
             this.tabWorlds.UseVisualStyleBackColor = true;
             // 
             // tDefaultTerrain
-            // 
+            //
+            this.tDefaultTerrain.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.tDefaultTerrain.Location = new System.Drawing.Point(97, 455);
             this.tDefaultTerrain.Name = "tDefaultTerrain";
             this.tDefaultTerrain.Size = new System.Drawing.Size(547, 21);
@@ -1117,7 +1118,8 @@ namespace fCraft.ConfigGUI {
             this.tDefaultTerrain.Text = "http://123dmwm.tk/TexturePacks/64xDefault.zip";
             // 
             // lDefaultTerrain
-            // 
+            //
+            this.lDefaultTerrain.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.lDefaultTerrain.AutoSize = true;
             this.lDefaultTerrain.Location = new System.Drawing.Point(5, 458);
             this.lDefaultTerrain.Name = "lDefaultTerrain";
