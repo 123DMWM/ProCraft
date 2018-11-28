@@ -37,9 +37,8 @@ namespace fCraft {
         /// <summary> Map volume, in terms of blocks. </summary>
         public readonly int Volume;
 
-        public const Block MaxLegalBlockType = Block.Obsidian; //Highest block before CPE
-
-        public const Block MaxCustomBlockType = Block.StoneBrick;
+        public const Block MaxClassicBlock = Block.Obsidian; //Highest block before CPE
+        public const Block MaxCPEBlock = Block.StoneBrick;
         internal readonly static Block[] FallbackBlocks = new Block[256];
 
         static void DefineFallbackBlocks()
@@ -82,7 +81,7 @@ namespace fCraft {
             fixed (byte* ptr = translatedBlocks) {
                 for (int i = 0; i < volume; i++) {
                     byte block = ptr[i];
-                    if (block > (byte)MaxCustomBlockType)
+                    if (block > (byte)MaxCPEBlock)
                         ptr[i] = fallback[block];
                 }
             }
@@ -929,7 +928,7 @@ namespace fCraft {
                 fallback[i] = defs[i].FallBack;
                 
                 // Handle CPE defined fallback blocks for custom blocks
-                if (fallback[i] > (byte)maxLegal) {
+                if (fallback[i] > maxLegal) {
                     fallback[i] = (byte)FallbackBlocks[fallback[i]];
                 }
             }

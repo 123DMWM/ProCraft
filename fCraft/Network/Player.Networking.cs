@@ -378,7 +378,7 @@ namespace fCraft {
             
             // Holding an invalid block
             Block held = (Block)id;
-            if (held > Map.MaxCustomBlockType && World.BlockDefs[id] == null) {
+            if (held > Map.MaxCPEBlock && World.BlockDefs[id] == null) {
                 HeldBlock = Block.Stone; return;
             }            
             if (HeldBlock == held) return;
@@ -498,7 +498,7 @@ namespace fCraft {
 
             // if a player is using InDev or SurvivalTest client, they may try to
             // place blocks that are not found in MC Classic. Convert them!
-            if( type > (byte)Map.MaxCustomBlockType && !Supports(CpeExt.BlockDefinitions)) {
+            if( type > (byte)Map.MaxCPEBlock && !Supports(CpeExt.BlockDefinitions)) {
                 type = MapDat.MapBlock( type );
             }
             Vector3I coords = new Vector3I( x, y, z );
@@ -1168,13 +1168,13 @@ namespace fCraft {
         
         void WriteWorldData(Map map) {
              // Transfer compressed map copy
-            Block maxLegal = supportsCustomBlocks ? Map.MaxCustomBlockType : Map.MaxLegalBlockType;
+            Block maxLegal = supportsCustomBlocks ? Map.MaxCPEBlock : Map.MaxClassicBlock;
             Logger.Log(LogType.Debug, "Player.JoinWorldNow: Sending compressed map to {0}.", Name);
             
             using (LevelChunkStream dst = new LevelChunkStream(this))
                 using (Stream compressor = map.CompressMapHeader(this, dst))
             {
-                if (supportsCustomBlocks && supportsBlockDefs) {
+                if (supportsBlockDefs) {
                     map.CompressMap(dst, compressor);
                 } else {
                     map.CompressAndConvertMap((byte)maxLegal, dst, compressor);
@@ -1250,7 +1250,7 @@ namespace fCraft {
         }
         
         internal void SendBlockPermissions() {
-            int max = supportsCustomBlocks ? (int)Map.MaxCustomBlockType : (int)Map.MaxLegalBlockType;
+            int max = supportsCustomBlocks ? (int)Map.MaxCPEBlock : (int)Map.MaxClassicBlock;
             if (supportsBlockDefs) max = byte.MaxValue;
             
             for (int i = (int)Block.Air; i <= max; i++) {
@@ -1258,7 +1258,7 @@ namespace fCraft {
                 bool build  = World.Buildable && CheckPlacePerm(block);
                 bool delete = World.Deletable && CheckDeletePerm(block);
                 
-                if (i > (int)Map.MaxCustomBlockType && World.BlockDefs[i] == null) continue;
+                if (i > (int)Map.MaxCPEBlock && World.BlockDefs[i] == null) continue;
                 Send(Packet.MakeSetBlockPermission(block, build, delete));
             }
         }

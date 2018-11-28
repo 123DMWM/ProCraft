@@ -1414,8 +1414,8 @@ namespace fCraft {
                       def.Shape, def.BlockDraw, def.FogDensity);
             p.Message("   &3Fog Red: &a{0}&3, Fog Green: &a{1}&3, Fog Blue: &a{2}",
                       def.FogR, def.FogG, def.FogB);
-            p.Message("   &3Min X: &a{0}&3, Max X: &a{1}&3, Min Y: &a{2}&3, Max Y: &a{3}",
-                      def.MinX, def.MaxX, def.MinY, def.MaxY);
+            p.Message("   &3Min: (&a{0}&3, &a{1}&3, &a{2}&3), Max: (&a{3}&3, &a{4}&3, &a{5}&3)",
+                      def.MinX, def.MinY, def.MinZ, def.MaxX, def.MaxY, def.MaxZ);
         }
         
         static void CustomBlockListHandler(Player p, CommandReader cmd, bool global, BlockDefinition[] defs) {
@@ -1633,7 +1633,7 @@ namespace fCraft {
                 default:
                     Block block;
                     if (Map.GetBlockByName(p.World, args, false, out block)) {
-                        if (block > Map.MaxCustomBlockType) {
+                        if (block > Map.MaxCPEBlock) {
                             p.Message("&cThe fallback block must be an original block, " +
                                       "or a block defined in the CustomBlocks extension.");
                             break;
@@ -1670,7 +1670,7 @@ namespace fCraft {
             }
 
             BlockDefinition srcDef = GetCustomBlock(global, defs, (byte)srcBlock);
-            if (srcDef == null && srcBlock <= Map.MaxCustomBlockType)
+            if (srcDef == null && srcBlock <= Map.MaxCPEBlock)
                 srcDef = DefaultSet.MakeCustomBlock(srcBlock);
             
             if (srcDef == null) {
@@ -1905,7 +1905,7 @@ namespace fCraft {
                 case "block":
                     Block newBlock;
                     if (Map.GetBlockByName(p.World, args, false, out newBlock)) {
-                        if (newBlock > Map.MaxCustomBlockType) {
+                        if (newBlock > Map.MaxCPEBlock) {
                             p.Message("&cThe fallback block must be an original block, " +
                                       "or a block defined in the CustomBlocks extension.");
                             break;

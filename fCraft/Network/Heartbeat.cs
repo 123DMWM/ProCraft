@@ -103,13 +103,13 @@ namespace fCraft
             
             try {
                 heartBeatRequest = CreateRequest(data.CreateUri());
-            } catch (Exception UriFormatException) {
-                Logger.Log(LogType.Debug, UriFormatException.ToString());
+            } catch (Exception ex) {
+                Logger.Log(LogType.Debug, ex.ToString());
                 return;
             }
             
             var state = new HeartbeatRequestState(heartBeatRequest, data);
-            heartBeatRequest.BeginGetResponse(ResponseCallback, state);           
+            heartBeatRequest.BeginGetResponse(ResponseCallback, state);
         }
 
 
