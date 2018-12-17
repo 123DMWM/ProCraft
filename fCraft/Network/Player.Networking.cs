@@ -563,6 +563,13 @@ namespace fCraft {
             if( stream != null ) stream.Close();
             if( client != null ) client.Close();
         }
+        
+        static bool IsModernClient( string client ) {
+            // old java client 
+            if( client.CaselessEquals("ClassiCube Client" ) ) return false;
+            
+            return client.CaselessContains( "ClassiCube" ) || client.CaselessContains( "ClassicalSharp" );
+        }
 
         bool LoginSequence()
         {
@@ -786,7 +793,10 @@ namespace fCraft {
                 return false;
             }
 
-            if (string.IsNullOrEmpty(ClientName) || !ClientName.CaselessContains("classicalsharp")) {
+            if (string.IsNullOrEmpty(ClientName)) {
+                Message("&bIt is recommended that you switch to Enhanced mode!");
+                Message("&bClick &aOptions &b-> &aMode &b-> &aEnhanced &bin the launcher.");
+            } else if (!IsModernClient(ClientName)) {
                 Message("&bIt is recommended that you use the ClassicalSharp client!");
                 Message("&9http://123dmwm.tk/cs &bredirects to the official download.");
             }

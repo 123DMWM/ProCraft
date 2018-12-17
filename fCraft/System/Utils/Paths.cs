@@ -405,9 +405,8 @@ namespace fCraft {
             } else {
                 string parentDir = GetDirectoryNameOrRoot( fileInfo.FullName );
                 string[] files = Directory.GetFiles( parentDir, "*", SearchOption.TopDirectoryOnly );
-                StringComparison comparison = ( caseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase );
-                return files.Select( fullFileName => Path.GetFileName( fullFileName ) )
-                            .Any( fileName => fileName.Equals( fileInfo.Name, comparison ) );
+                StringComparison comparison = caseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
+                return files.Any( path => Path.GetFileName( path ).Equals( fileInfo.Name, comparison ) );
             }
         }
 
