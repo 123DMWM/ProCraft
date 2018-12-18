@@ -1,11 +1,10 @@
 language: csharp
 solution: ProCraft.sln
 notifications:
-  slack:
-    on_success: change
   irc:
     template:
-      - "%{message}"
+      - "%{repository_slug} (%{commit}) : %{message}"
+      - "Build details: %{build_url}"
     channels:
       - "irc.esper.net#ProCraft"
     on_success: change
