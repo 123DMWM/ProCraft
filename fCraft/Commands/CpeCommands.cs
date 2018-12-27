@@ -1110,7 +1110,7 @@ namespace fCraft {
             Category = CommandCategory.CPE | CommandCategory.World | CommandCategory.New,
             Permissions = new[] { Permission.ManageWorlds },
             Help = "Environment preset commands&N" +
-                "Options are: Delete, Edit, Info, List, Load, Save&N" +
+                "Options are: Delete, Info, List, Load, Save, Update&N" +
                 "See &H/Help EnvPreset <option>&S for details about each variable. ",
             HelpSections = new Dictionary<string, string>{
                 { "save",   "&H/EnvPreset Save <PresetName> &N&S" +
@@ -1124,7 +1124,9 @@ namespace fCraft {
                 { "list",   "&H/EnvPreset List&N&S" +
                         "Lists all Env presets by name."},
                 { "update", "&H/EnvPreset Update <PresetName>&N&S" +
-                        "Updates an Env preset with the current world settings."}
+                        "Updates an Env preset with the current world settings."},
+                { "reload", "&H/EnvPreset Reload&N&S" +
+                        "Updates all loaded presets from file. For use when editing the preset file manually."}
             },
             Usage = "/EnvPreset <Option> [Args]",
             Handler = EnvPresetHandler
@@ -1149,48 +1151,42 @@ namespace fCraft {
                     if (!EnvPresets.exists(name)) {
                         EnvPresets.CreateEnvPreset(world, name);
                         player.Message("Saved Env settings from world \"{0}\" to preset named \"{1}\"", world.Name, name);
-                        break;
                     } else {
                         player.Message("A preset with the name \"{0}\" already exists", name);
-                        break;
                     }
+                    break;
                 case "load":
                     if (EnvPresets.exists(name)) {
                         EnvPresets.LoadupEnvPreset(world, name);
                         player.Message("Loaded Env settings from preset named \"{0}\"", name);
                     } else {
                         player.Message("A preset with the name \"{0}\" does not exist", name);
-                        break;
                     }
                     break;
                 case "remove":
-                    if (cmd.IsConfirmed) {
-                        if (EnvPresets.exists(name)) {
+                    if (EnvPresets.exists(name)) {
+                        if (cmd.IsConfirmed) {
                             EnvPresets.RemoveEnvPreset(name);
                             player.Message("Deleted Env preset named \"{0}\"", name);
                         } else {
-                            player.Message("A preset with the name \"{0}\" does not exist", name);
-                            break;
+                            player.Confirm(cmd, "This will delete the preset permanently");
                         }
                     } else {
-                        player.Confirm(cmd, "This will delete the preset permanently");
-                        break;
+                        player.Message("A preset with the name \"{0}\" does not exist", name);
                     }
                     break;
                 case "update":
-                    if (cmd.IsConfirmed) {
-                        if (EnvPresets.exists(name)) {
+                    if (EnvPresets.exists(name)) {
+                        if (cmd.IsConfirmed) {
                             EnvPresets.RemoveEnvPreset(name);
                             EnvPresets.CreateEnvPreset(world, name);
                             player.Message("Updated the preset \"{1}\" to the current worlds env settings", world.Name, name);
                         } else {
-                            player.Message("A preset with the name \"{0}\" does not exist", name);
-                            break;
+                            player.Confirm(cmd, "This will update the specified Env Preset. Cannot be undone!");
                         }
                     } else {
-                        player.Confirm(cmd, "This will erase and update the specified Env Preset");
-                        break;
-                    }
+                        player.Message("A preset with the name \"{0}\" does not exist", name);
+                    }                    
                     break;
                 case "info":
                     if ((preset = EnvPresets.Find(name)) != null) {
