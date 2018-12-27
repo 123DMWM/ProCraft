@@ -1159,6 +1159,10 @@ namespace fCraft {
 
             switch (option.ToLower()) {
                 case "save":
+                case "make":
+                case "create":
+                case "add":
+                case "new":
                     if (!EnvPresets.exists(name)) {
                         EnvPresets.CreateEnvPreset(world, name);
                         player.Message("Saved Env settings from world \"{0}\" to preset named \"{1}\"", world.Name, name);
@@ -1174,6 +1178,7 @@ namespace fCraft {
                         player.Message("A preset with the name \"{0}\" does not exist", name);
                     }
                     break;
+                case "delete":
                 case "remove":
                     if (EnvPresets.exists(name)) {
                         if (cmd.IsConfirmed) {
