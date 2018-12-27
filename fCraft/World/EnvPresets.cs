@@ -164,7 +164,7 @@ namespace fCraft {
                 }
                 Logger.Log(LogType.SystemActivity, "EnvPresets.Load: Loaded " + count + " presets");
             } catch (Exception ex) {
-                Presets = null;
+                Presets = new List<EnvPresets>();
                 Logger.Log(LogType.Error, "EnvPresets.Load: " + ex);
             }
         }
