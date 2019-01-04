@@ -1,4 +1,4 @@
-﻿//  ProCraft Copyright 2014-2018 Joseph Beauvais <123DMWM@gmail.com>
+﻿//  ProCraft Copyright 2014-2019 Joseph Beauvais <123DMWM@gmail.com>
 using System;
 using System.IO;
 

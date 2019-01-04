@@ -1,4 +1,4 @@
-﻿// ProCraft Copyright 2014-2018 Joseph Beauvais <123DMWM@gmail.com>
+﻿// ProCraft Copyright 2014-2019 Joseph Beauvais <123DMWM@gmail.com>
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -143,7 +143,8 @@ namespace fCraft {
                         JsonSerializer.DeserializeFromStream(typeof(List<EnvPresets>), s);
                     }
                     catch {
-                        string newFile = "BrokenEnvPreset_" + DateTime.UtcNow.Subtract(new DateTime(2018, 1, 1, 0, 0, 0, DateTimeKind.Utc)).ToSeconds() + ".txt";
+                        long unixTimestamp = DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).ToSeconds();
+                        string newFile = "BrokenEnvPreset_" + unixTimestamp + ".txt";
                         File.Copy(Paths.EnvPresetsFileName, newFile);
                         File.Delete(Paths.EnvPresetsFileName);
                         Logger.Log(LogType.Warning, "EnvPresets.LoadAll: File not proper json syntax. File was renamed to :" + newFile);
