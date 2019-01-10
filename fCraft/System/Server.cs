@@ -43,7 +43,8 @@ namespace fCraft {
         /// <summary> Default terrain file for each world.</summary>
         public static string DefaultTerrain { get; set; }
 
-
+        /// <summary> Software name that shows up on the server list on classicube.</summary>
+        public static string Software = "&cP&4R&6O&eC&aR&2A&bF&3T";
 
         internal static int MaxUploadSpeed, // set by Config.ApplyConfig
                             BlockUpdateThrottling; // used when there are no players in a world

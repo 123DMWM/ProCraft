@@ -298,14 +298,15 @@ namespace fCraft
         internal Uri CreateUri() {
             UriBuilder ub = new UriBuilder(HeartbeatUri);
             StringBuilder sb = new StringBuilder();
-            sb.AppendFormat("public={0}&max={1}&users={2}&port={3}&version={4}&salt={5}&name={6}&software=ProCraft", 
+            sb.AppendFormat("public={0}&max={1}&users={2}&port={3}&version={4}&salt={5}&name={6}&software={7}", 
                 IsPublic,
                 MaxPlayers, 
                 PlayerCount, 
                 Port, 
                 ProtocolVersion, 
                 Uri.EscapeDataString(Salt),
-                Uri.EscapeDataString(ServerName));
+                Uri.EscapeDataString(ServerName),
+                Server.Software.Replace("&", "%26"));
             foreach (var pair in CustomData) {
                 sb.AppendFormat("&{0}={1}", 
                     Uri.EscapeDataString(pair.Key), 

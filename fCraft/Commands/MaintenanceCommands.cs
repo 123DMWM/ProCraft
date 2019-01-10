@@ -27,6 +27,7 @@ namespace fCraft {
             CommandManager.RegisterCommand(CdSave);
             CommandManager.RegisterCommand(CdCheckUpdate); 
             CommandManager.RegisterCommand( CdAutoRankCheck );
+            CommandManager.RegisterCommand( CdSoftware );
         }
         #region DumpStats
 
@@ -1405,6 +1406,48 @@ namespace fCraft {
             AutoRankManager.OutputDetails( player, info );
         }
 
+        #endregion
+        #region Software
+        static readonly CommandDescriptor CdSoftware = new CommandDescriptor
+        {
+            Name = "Software",
+            Aliases = new[] { "SetSoftware", "SW" },
+            Category = CommandCategory.New | CommandCategory.Maintenance,
+            Permissions = new[] { Permission.EditPlayerDB },
+            IsConsoleSafe = true,
+            Help = "Set the colors of the server software name on the server list. &NOnly console may change the actual software name. &NUse reset/default/normal to change it back to &cP&4R&6O&eC&aR&2A&bF&3T",
+            Usage = "/Software <new software name>",
+            Handler = SoftwareHandler
+        };
+
+        static void SoftwareHandler(Player player, CommandReader cmd) {
+
+
+            string newSW = cmd.NextAll().Replace('%', '&');
+            string oldSW = Server.Software;
+            if (String.IsNullOrEmpty(newSW)) {
+                player.Message("The current software name is \"&F{0}&S\"", Server.Software);
+                return;
+            }
+            if (newSW.CaselessEquals("reset") || newSW.CaselessEquals("default") || newSW.CaselessEquals("normal")) {
+                newSW = "&cP&4R&6O&eC&aR&2A&bF&3T";
+            }
+
+            if (newSW == oldSW) {
+                player.Message("Server software is already set to \"&F{1}&S\"", newSW);
+                return;
+            } else if (!Color.StripColors(newSW, true).CaselessEquals(Server.Software) && player != Player.Console) {
+                player.Message("&COnly console may change the actual name of the software.");
+                return;
+            }
+            if (!cmd.IsConfirmed) {
+                player.Confirm(cmd, "This will change how the server software shows up on the server list from \"&F{0}&S\" to \"&F{1}&S\"", oldSW, newSW);
+                return;
+            }
+
+            Server.Software = newSW;
+            player.Message("Server software was changed from \"&F{0}&S\" to \"&F{1}&S\"", oldSW, newSW);
+        }
         #endregion
     }
 }
