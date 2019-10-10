@@ -1369,7 +1369,7 @@ namespace fCraft {
                 case "tex":
                 case "texture":
                 case "terrain":
-                    p.Message("Terrain IDs: &9http://123dmwm.tk/ID-Overlay.png");
+                    p.Message("Terrain IDs: &9http://123DMWM.com/ID-Overlay.png");
                     p.Message("Current world terrain: &9{0}", p.World.Texture.CaselessEquals("default") ? Server.DefaultTerrain : p.World.Texture);
                     break;
                 default:

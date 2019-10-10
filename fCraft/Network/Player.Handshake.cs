@@ -93,7 +93,7 @@ namespace fCraft {
             string favicon = ImageFromFavicon();
             if (favicon != null) return favicon;
             
-            // Base64 encoding of http://123dmwm.tk/I/299.png;
+            // Base64 encoding of http://123DMWM.com/I/299.png;
             return "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwgAADsI" +
                    "BFShKgAAAABl0RVh0U29mdHdhcmUAcGFpbnQubmV0IDQuMC4xMK0KCsAAAAoJSURBVHhe7ZoJcFVXHcYf27CWpZ2OzrS2Tkft1KpTR6u12mrV" +
                    "Wu02ShdrVSwudFoHqZbF0BSEkLAGSMIOBcK+rwUKlFUoYMAGyjphCWEPi8O+c/x+592TuWYCPW8LCeN/5jdvybnnnO87/7Pc+xIxHhGJRCqdm" +

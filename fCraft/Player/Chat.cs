@@ -105,7 +105,7 @@ namespace fCraft {
                 MatchCollection urlMatches = RegexURLMatcher.Matches(rawMessage);
                 foreach (Match match in urlMatches) {
                     if (fullUrls.Count() < 5) {
-                        Uri uri = new Uri("https://123dmwm.tk/unshorten.php?url=" + match.ToString());
+                        Uri uri = new Uri("https://123DMWM.com/unshorten.php?url=" + match.ToString());
                         HttpWebRequest request = HttpUtil.CreateRequest(uri, TimeSpan.FromSeconds(10));
                         
                         string fullUrl = null;

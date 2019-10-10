@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle( "ProCraft ServerCLI" )]
 [assembly: AssemblyDescription( "Command-line frontend for ProCraft server" )]
 [assembly: AssemblyConfiguration( "" )]
-[assembly: AssemblyCompany("123DMWM.tk")]
+[assembly: AssemblyCompany("123DMWM.com")]
 [assembly: AssemblyProduct( "ProCraft ServerCLI" )]
 [assembly: AssemblyCopyright("ProCraft is Copyright © Joseph Beauvais 2014-2018")]
 [assembly: AssemblyTrademark( "" )]

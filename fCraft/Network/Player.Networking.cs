@@ -798,7 +798,7 @@ namespace fCraft {
                 Message("&bClick &aOptions &b-> &aMode &b-> &aEnhanced &bin the launcher.");
             } else if (!IsModernClient(ClientName)) {
                 Message("&bIt is recommended that you use the ClassicalSharp client!");
-                Message("&9http://123dmwm.tk/cs &bredirects to the official download.");
+                Message("&9http://123DMWM.com/cs &bredirects to the official download.");
             }
 
 

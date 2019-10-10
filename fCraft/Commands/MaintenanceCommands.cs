@@ -1354,7 +1354,7 @@ namespace fCraft {
             DateTime current = File.GetLastWriteTimeUtc(path);
             
             try {
-                Uri uri = new Uri("https://123DMWM.tk/ProCraft/Builds/Latest.zip?");
+                Uri uri = new Uri("https://123DMWM.com/ProCraft/Builds/Latest.zip?");
                 HttpWebRequest request = HttpUtil.CreateRequest(uri, TimeSpan.FromSeconds(10));
                 request.Method = "HEAD";
 
@@ -1367,14 +1367,14 @@ namespace fCraft {
                 player.Message("    &7" + latest.ToLongDateString() + " &Sat &7" + latest.ToLongTimeString());
             } catch (Exception ex) {
                 Logger.Log(LogType.Error, "Updates.UpdaterHandler:" + ex);
-                player.Message("Cannot access http://123dmwm.tk/ at the moment.");
+                player.Message("Cannot access http://123DMWM.com/ at the moment.");
             }
             
             TimeSpan currentDelta = DateTime.UtcNow - current;
             player.Message("Server file last update (&7" + currentDelta.ToMiniString() + " &Sago):");
             player.Message("    &7" + current.ToLongDateString() + " &Sat &7" + current.ToLongTimeString());
 
-            player.Message("Download updated Zip here: &9http://123DMWM.tk/ProCraft/Builds/Latest.zip");
+            player.Message("Download updated Zip here: &9http://123DMWM.com/ProCraft/Builds/Latest.zip");
         }
         #endregion
         #region AutoRankCheck

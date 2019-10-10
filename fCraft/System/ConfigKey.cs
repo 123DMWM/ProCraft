@@ -161,7 +161,7 @@ the build permission for new worlds will default to this rank." )]
 make sure to move the map files before starting the server again." )]
         MapPath,
 
-        [StringKey(ConfigSection.Worlds, "http://123dmwm.tk/TexturePacks/64xDefault.zip",
+        [StringKey(ConfigSection.Worlds, "http://123DMWM.com/TexturePacks/64xDefault.zip",
 @"Custom URL for world terrain")]
         DefaultTerrain,
 
