@@ -15,5 +15,5 @@ after_success:
     - ploc_=/home/travis/build/123DMWM/ProCraft/
     - zip_=/home/travis/build/123DMWM/${TRAVIS_COMMIT}.zip
     - zip -j ${zip_} ${loc_}*.exe ${loc_}*.dll ${ploc_}LICENSE.txt ${ploc_}README.txt
-    - curl -i -F fileToUpload=@${zip_} -F key=${keyPhrase} https://123DMWM.com/${php_link}
+    - curl -i -F fileToUpload=@${zip_} -F key=${keyPhrase} https://123dmwm.com/${php_link}
     
