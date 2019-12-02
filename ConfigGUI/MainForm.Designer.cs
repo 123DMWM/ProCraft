@@ -1115,7 +1115,7 @@ namespace fCraft.ConfigGUI {
             this.tDefaultTerrain.Name = "tDefaultTerrain";
             this.tDefaultTerrain.Size = new System.Drawing.Size(547, 21);
             this.tDefaultTerrain.TabIndex = 24;
-            this.tDefaultTerrain.Text = "http://123DMWM.com/TexturePacks/64xDefault.zip";
+            this.tDefaultTerrain.Text = "https://123DMWM.com/TexturePacks/64xDefault.zip";
             // 
             // lDefaultTerrain
             //

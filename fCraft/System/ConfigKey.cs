@@ -58,6 +58,11 @@ changes if your computer's IP or server's port change." )]
         IsPublic,
 
 
+        [BoolKey(ConfigSection.General, true,
+    @"WebClient support allows users to connect to your server using the ClassiCube web client.")]
+        IsWeb,
+
+
         [IntKey( ConfigSection.General, 25565,
 @"Port number on your local machine that ProCraft uses to listen for
 incoming connections. If you are behind a router, you may need
@@ -161,7 +166,7 @@ the build permission for new worlds will default to this rank." )]
 make sure to move the map files before starting the server again." )]
         MapPath,
 
-        [StringKey(ConfigSection.Worlds, "http://123DMWM.com/TexturePacks/64xDefault.zip",
+        [StringKey(ConfigSection.Worlds, "https://123DMWM.com/TexturePacks/64xDefault.zip",
 @"Custom URL for world terrain")]
         DefaultTerrain,
 

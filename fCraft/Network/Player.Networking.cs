@@ -15,6 +15,7 @@ using fCraft.Events;
 using fCraft.MapConversion;
 using JetBrains.Annotations;
 using System.Diagnostics;
+using System.Security.Cryptography;
 
 namespace fCraft {
     /// <summary> Represents a connection to a Minecraft client. Handles low-level interactions (e.g. networking). </summary>
@@ -43,13 +44,14 @@ namespace fCraft {
         bool canReceive = true,
              canSend = true,
              canQueue = true;
+        public bool IsWebSocket { get; set; }
         bool unregisterOnKick = true;
 
         readonly Thread ioThread;
         readonly TcpClient client;
-        readonly NetworkStream stream;
-        readonly PacketReader reader;
-        readonly PacketWriter writer;
+        HackyStream stream;
+        PacketReader reader;
+        PacketWriter writer;
 
         readonly ConcurrentQueue<Packet> priorityOutputQueue = new ConcurrentQueue<Packet>();
         readonly ConcurrentQueue<SetBlockData> blockQueue = new ConcurrentQueue<SetBlockData>();
@@ -93,7 +95,8 @@ namespace fCraft {
                 IP = ( (IPEndPoint)( client.Client.RemoteEndPoint ) ).Address;
                 if( Server.RaiseSessionConnectingEvent( IP ) ) return;
 
-                stream = client.GetStream();
+                NetworkStream netStream = client.GetStream();
+                stream = new HackyNetStream(netStream);
                 reader = new PacketReader( stream );
                 writer = new PacketWriter( stream );
 
@@ -258,7 +261,7 @@ namespace fCraft {
 
 
                     // get input from player
-                    while( canReceive && stream.DataAvailable ) {
+                    while( canReceive && stream.HasDataAvailable) {
                         byte opcode = reader.ReadByte();
                         switch( (OpCode)opcode ) {
 
@@ -571,6 +574,266 @@ namespace fCraft {
             return client.CaselessContains( "ClassiCube" ) || client.CaselessContains( "ClassicalSharp" );
         }
 
+        // NOTE: Because Stream doesn't have DataAvailable and we need this info
+        public abstract class HackyStream : Stream {
+            static NotSupportedException ex = new NotSupportedException("Unsupported I/O operation");
+            public abstract bool HasDataAvailable { get; }
+
+            public override bool CanSeek { get { return false; } }
+            public override void SetLength(long value) { throw ex; }
+            public override long Seek(long offset, SeekOrigin origin) { throw ex; }
+
+            public override long Length { get { throw ex; } }
+            public override long Position { get { throw ex; } set { throw ex; } }
+        }
+
+        public sealed class HackyNetStream : HackyStream {
+            NetworkStream underlying;
+
+            public override bool CanRead { get { return underlying.CanRead; } }
+            public override bool CanWrite { get { return underlying.CanWrite; } }
+            public override void Close() { underlying.Close(); }
+            public override void Flush() { underlying.Flush(); }
+            public override bool HasDataAvailable { get { return underlying.DataAvailable; } }
+
+            public HackyNetStream(NetworkStream underlying) {
+                this.underlying = underlying;
+            }
+
+            public override int Read(byte[] buffer, int offset, int count) {
+                if (underlying.CanRead) {
+                    return underlying.Read(buffer, offset, count);
+                } else {
+                    return 0;
+                }
+            }
+
+            public override void Write(byte[] buffer, int offset, int count) {
+                underlying.Write(buffer, offset, count);
+            }
+        }
+
+        public sealed class WebSocketStream : HackyStream {
+            HackyStream underlying;
+
+            public override bool CanRead { get { return true; } }
+            public override bool CanWrite { get { return true; } }
+            public override void Close() { underlying.Close(); }
+            public override void Flush() { underlying.Flush(); }
+            // TODO: Probably inaccurate
+            public override bool HasDataAvailable { get { return underlying.HasDataAvailable; } }
+
+            public WebSocketStream(HackyStream underlying) {
+                this.underlying = underlying;
+            }
+
+            bool readingHeaders = true;
+            bool conn, upgrade, version, proto;
+            string verKey;
+
+            // NetworkStream.ReadByte allocates new byte[1] each time it's called
+            // So just allocate one array here instead
+            byte[] tmp = new byte[1];
+            byte ReadRawByte() {
+                int len = underlying.Read(tmp, 0, 1);
+                if (len == 0)
+                    throw new EndOfStreamException();
+                return tmp[0];
+            }
+
+            void Disconnect(int reason) {
+                byte[] packet = new byte[4];
+                packet[0] = 0x88; // FIN BIT, close opcode
+                packet[1] = 2;
+                packet[2] = (byte)(reason >> 8);
+                packet[3] = (byte)reason;
+
+                underlying.Write(packet, 0, packet.Length);
+                underlying.Close();
+            }
+
+            void AcceptConnection() {
+                const string fmt =
+                    "HTTP/1.1 101 Switching Protocols\r\n" +
+                    "Upgrade: websocket\r\n" +
+                    "Connection: Upgrade\r\n" +
+                    "Sec-WebSocket-Accept: {0}\r\n" +
+                    "Sec-WebSocket-Protocol: ClassiCube\r\n" +
+                    "\r\n";
+
+                string key = verKey + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
+                SHA1 sha = SHA1.Create();
+                byte[] raw = sha.ComputeHash(Encoding.ASCII.GetBytes(key));
+
+                string headers = String.Format(fmt, Convert.ToBase64String(raw));
+                byte[] packet = Encoding.ASCII.GetBytes(headers);
+                underlying.Write(packet, 0, packet.Length);
+                readingHeaders = false;
+            }
+
+            void ProcessHeader(string raw) {
+                // end of headers
+                if (raw.Length == 0) {
+                    if (conn && upgrade && version && proto && verKey != null) {
+                        //System.Console.WriteLine("OK!");
+                        AcceptConnection();
+                    } else {
+                        //System.Console.WriteLine("NO DICE");
+                        // don't pretend to be a http server (so IP:port isn't marked as one by bots)
+                        Close();
+                    }
+                }
+
+                int sep = raw.IndexOf(':');
+                if (sep == -1)
+                    return; // not a proper header
+                string key = raw.Substring(0, sep);
+                string val = raw.Substring(sep + 1).Trim();
+
+                // TODO: debug
+                //System.Console.WriteLine(key + " : " + val);
+
+                if (key == "Connection") {
+                    conn = val.Contains("Upgrade");
+                } else if (key == "Upgrade") {
+                    upgrade = val == "websocket";
+                } else if (key == "Sec-WebSocket-Version") {
+                    version = val == "13";
+                } else if (key == "Sec-WebSocket-Key") {
+                    verKey = val;
+                } else if (key == "Sec-WebSocket-Protocol") {
+                    proto = val == "ClassiCube";
+                }
+            }
+
+            void ReadHeader() {
+                // NOTE: probably vulnerable to attack heree
+                List<byte> raw = new List<byte>();
+
+                for (;;){
+                    byte next = ReadRawByte();
+                    if (next == '\r')
+                        continue;
+                    if (next != '\n') { raw.Add(next); continue; }
+
+                    string value = Encoding.ASCII.GetString(raw.ToArray());
+                    ProcessHeader(value);
+                    raw.Clear();
+                    break;
+                }
+            }
+
+
+            byte[] mask = new byte[4], frame;
+            int frameLen, dataOffset, dataLength;
+
+            void ReadFrame() {
+                int opcode = ReadRawByte() & 0x0F;
+                int flags = ReadRawByte() & 0x7F;
+                dataLength = 0; // reset packet data
+
+                if (flags == 127) {
+                    // unsupported 8 byte extended length
+                    Disconnect(1009);
+                    return;
+                } else if (flags == 126) {
+                    // 2 byte length
+                    frameLen = (ReadRawByte() << 8) | ReadRawByte();
+                } else {
+                    // length is inline
+                    frameLen = flags;
+                }
+
+                // read mask (always in client packets)
+                for (int i = 0;i < 4;i++) {
+                    mask[i] = ReadRawByte();
+                }
+
+                // read frame data
+                if (frame == null || frameLen > frame.Length)
+                    frame = new byte[frameLen];
+
+                for (int offset = 0, left = frameLen;left > 0;) {
+                    int read = underlying.Read(frame, offset, left);
+                    if (read == 0)
+                        throw new EndOfStreamException();
+
+                    offset += read;
+                    left -= read;
+                }
+
+                // decode frame data
+                for (int i = 0;i < frameLen;i++) {
+                    frame[i] ^= mask[i & 3];
+                }
+
+                switch (opcode) {
+                    // TODO: reply to ping frames
+                    case 0x00:
+                    case 0x02:
+                        // normal frames
+                        dataOffset = 0;
+                        dataLength = frameLen;
+                        break;
+                    case 0x08:
+                        // Connection is getting closed
+                        Disconnect(1000);
+                        break;
+                    default:
+                        Disconnect(1003);
+                        break;
+                }
+            }
+
+            public override int Read(byte[] buffer, int offset, int length) {
+                int read = 0;
+                while (readingHeaders)
+                    ReadHeader();
+
+                while (length > 0) {
+                    // read next frame (might not be a data frame though)
+                    if (dataLength == 0)
+                        ReadFrame();
+
+                    // read next data frame data
+                    if (dataLength > 0) {
+                        int copy = Math.Min(length, dataLength);
+                        Buffer.BlockCopy(frame, dataOffset, buffer, offset, copy);
+
+                        length -= copy;
+                        offset += copy;
+                        dataOffset += copy;
+                        dataLength -= copy;
+                        read += copy;
+                    }
+                }
+                return read;
+            }
+
+
+            static byte[] WrapData(byte[] data, int offset, int length) {
+                int headerLen = 2 + (length >= 126 ? 2 : 0);
+                byte[] packet = new byte[headerLen + length];
+                packet[0] = 0x82; // FIN bit, binary opcode
+
+                if (headerLen > 2) {
+                    packet[1] = 126;
+                    packet[2] = (byte)(length >> 8);
+                    packet[3] = (byte)length;
+                } else {
+                    packet[1] = (byte)length;
+                }
+                Buffer.BlockCopy(data, offset, packet, headerLen, length);
+                return packet;
+            }
+
+            public override void Write(byte[] buffer, int offset, int count) {
+                byte[] packet = WrapData(buffer, offset, count);
+                underlying.Write(packet, 0, packet.Length);
+            }
+
+        }
+
         bool LoginSequence()
         {
             byte opCode = reader.ReadByte();
@@ -797,8 +1060,8 @@ namespace fCraft {
                 Message("&bIt is recommended that you switch to Enhanced mode!");
                 Message("&bClick &aOptions &b-> &aMode &b-> &aEnhanced &bin the launcher.");
             } else if (!IsModernClient(ClientName)) {
-                Message("&bIt is recommended that you use the ClassicalSharp client!");
-                Message("&9http://123DMWM.com/cs &bredirects to the official download.");
+                Message("&bIt is recommended that you use the new ClassiCube client!");
+                Message("&bYou can download it here: &9http://www.classicube.net/download/");
             }
 
 

@@ -246,6 +246,7 @@ namespace fCraft
         internal HeartbeatData([NotNull] Uri heartbeatUri) {
             if (heartbeatUri == null) throw new ArgumentNullException("heartbeatUri");
             IsPublic = ConfigKey.IsPublic.Enabled();
+            IsWeb = ConfigKey.IsWeb.Enabled();
             MaxPlayers = ConfigKey.MaxPlayers.GetInt();
             PlayerCount = Server.CountPlayers(false);
             Port = Server.Port;
@@ -286,6 +287,9 @@ namespace fCraft
         /// <summary> Whether or not the server should be listed on minecraft.net </summary>
         public bool IsPublic { get; set; }
 
+        /// <summary> Whether or not the server should allow Web Clients </summary>
+        public bool IsWeb { get; set; }
+
         /// <summary> Version of the classic minecraft protocol that this server is using. </summary>
         public int ProtocolVersion { get; set; }
 
@@ -298,7 +302,7 @@ namespace fCraft
         internal Uri CreateUri() {
             UriBuilder ub = new UriBuilder(HeartbeatUri);
             StringBuilder sb = new StringBuilder();
-            sb.AppendFormat("public={0}&max={1}&users={2}&port={3}&version={4}&salt={5}&name={6}&software={7}", 
+            sb.AppendFormat("public={0}&max={1}&users={2}&port={3}&version={4}&salt={5}&name={6}&software={7}&web={8}", 
                 IsPublic,
                 MaxPlayers, 
                 PlayerCount, 
@@ -306,7 +310,8 @@ namespace fCraft
                 ProtocolVersion, 
                 Uri.EscapeDataString(Salt),
                 Uri.EscapeDataString(ServerName),
-                Server.Software.Replace("&", "%26"));
+                Server.Software.Replace("&", "%26"),
+                IsWeb);
             foreach (var pair in CustomData) {
                 sb.AppendFormat("&{0}={1}", 
                     Uri.EscapeDataString(pair.Key), 

@@ -1139,7 +1139,7 @@ namespace fCraft {
             if (urlString.StartsWith("++")) urlString = "http://i.imgur.com/" + urlString.Substring(2) + ".png";
             if (!urlString.CaselessStarts("http://") && !urlString.CaselessStarts("https://")) urlString = "http://" + urlString;
 
-            if (!urlString.CaselessStarts("http://i.imgur.com/") && !urlString.CaselessStarts("http://123DMWM.com/")) {
+            if (!urlString.CaselessStarts("http://i.imgur.com/") && !urlString.CaselessStarts("https://123DMWM.com/")) {
                 player.Message("For safety reasons we only accept images uploaded to &9http://imgur.com/ &SSorry for this inconvenience.");
                 player.Message("    You cannot use: &9" + urlString);
                 return false;

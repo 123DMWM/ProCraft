@@ -1367,14 +1367,14 @@ namespace fCraft {
                 player.Message("    &7" + latest.ToLongDateString() + " &Sat &7" + latest.ToLongTimeString());
             } catch (Exception ex) {
                 Logger.Log(LogType.Error, "Updates.UpdaterHandler:" + ex);
-                player.Message("Cannot access http://123DMWM.com/ at the moment.");
+                player.Message("Cannot access https://123DMWM.com/ at the moment.");
             }
             
             TimeSpan currentDelta = DateTime.UtcNow - current;
             player.Message("Server file last update (&7" + currentDelta.ToMiniString() + " &Sago):");
             player.Message("    &7" + current.ToLongDateString() + " &Sat &7" + current.ToLongTimeString());
 
-            player.Message("Download updated Zip here: &9http://123DMWM.com/ProCraft/Builds/Latest.zip");
+            player.Message("Download updated Zip here: &9https://123DMWM.com/ProCraft/Builds/Latest.zip");
         }
         #endregion
         #region AutoRankCheck
