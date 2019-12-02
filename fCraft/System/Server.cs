@@ -479,6 +479,8 @@ namespace fCraft {
         }
         
         static void DownloadResource(string url, string file) {
+            ServicePointManager.Expect100Continue = true;
+            ServicePointManager.SecurityProtocol = (SecurityProtocolType)(0xc0 | 0x300 | 0xc00 | 0x3000);
             if (File.Exists(file)) return;
             
             try {
