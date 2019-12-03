@@ -130,6 +130,11 @@ namespace fCraft {
             }
 
             ServicePointManager.Expect100Continue = false;
+            try {
+            	ServicePointManager.SecurityProtocol = (SecurityProtocolType)(0xc0 | 0x300 | 0xc00 | 0x3000);
+            } catch( Exception ex ) {
+            	Logger.Log( LogType.Error, "Could not force enable TLS 1.2/1.3: {0}", ex );
+            }
 
             // try to parse arguments
             foreach( string arg in rawArgs ) {
@@ -480,7 +485,6 @@ namespace fCraft {
         
         static void DownloadResource(string url, string file) {
             ServicePointManager.Expect100Continue = true;
-            ServicePointManager.SecurityProtocol = (SecurityProtocolType)(0xc0 | 0x300 | 0xc00 | 0x3000);
             if (File.Exists(file)) return;
             
             try {
