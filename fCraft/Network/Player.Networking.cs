@@ -49,7 +49,7 @@ namespace fCraft {
 
         readonly Thread ioThread;
         readonly TcpClient client;
-        HackyStream stream;
+        Stream stream;
         PacketReader reader;
         PacketWriter writer;
 
@@ -95,8 +95,7 @@ namespace fCraft {
                 IP = ( (IPEndPoint)( client.Client.RemoteEndPoint ) ).Address;
                 if( Server.RaiseSessionConnectingEvent( IP ) ) return;
 
-                NetworkStream netStream = client.GetStream();
-                stream = new HackyNetStream(netStream);
+                stream = client.GetStream();
                 reader = new PacketReader( stream );
                 writer = new PacketWriter( stream );
 
@@ -261,7 +260,7 @@ namespace fCraft {
 
 
                     // get input from player
-                    while( canReceive && stream.HasDataAvailable) {
+                    while( canReceive && client.Available > 0 ) {
                         byte opcode = reader.ReadByte();
                         switch( (OpCode)opcode ) {
 
@@ -574,10 +573,8 @@ namespace fCraft {
             return client.CaselessContains( "ClassiCube" ) || client.CaselessContains( "ClassicalSharp" );
         }
 
-        // NOTE: Because Stream doesn't have DataAvailable and we need this info
-        public abstract class HackyStream : Stream {
+        public sealed class WebSocketStream : Stream {
             static NotSupportedException ex = new NotSupportedException("Unsupported I/O operation");
-            public abstract bool HasDataAvailable { get; }
 
             public override bool CanSeek { get { return false; } }
             public override void SetLength(long value) { throw ex; }
@@ -585,48 +582,17 @@ namespace fCraft {
 
             public override long Length { get { throw ex; } }
             public override long Position { get { throw ex; } set { throw ex; } }
-        }
-
-        public sealed class HackyNetStream : HackyStream {
-            NetworkStream underlying;
 
             public override bool CanRead { get { return underlying.CanRead; } }
             public override bool CanWrite { get { return underlying.CanWrite; } }
             public override void Close() { underlying.Close(); }
             public override void Flush() { underlying.Flush(); }
-            public override bool HasDataAvailable { get { return underlying.DataAvailable; } }
 
-            public HackyNetStream(NetworkStream underlying) {
+            public WebSocketStream(Stream underlying) {
                 this.underlying = underlying;
             }
 
-            public override int Read(byte[] buffer, int offset, int count) {
-                if (underlying.CanRead) {
-                    return underlying.Read(buffer, offset, count);
-                } else {
-                    return 0;
-                }
-            }
-
-            public override void Write(byte[] buffer, int offset, int count) {
-                underlying.Write(buffer, offset, count);
-            }
-        }
-
-        public sealed class WebSocketStream : HackyStream {
-            HackyStream underlying;
-
-            public override bool CanRead { get { return true; } }
-            public override bool CanWrite { get { return true; } }
-            public override void Close() { underlying.Close(); }
-            public override void Flush() { underlying.Flush(); }
-            // TODO: Probably inaccurate
-            public override bool HasDataAvailable { get { return underlying.HasDataAvailable; } }
-
-            public WebSocketStream(HackyStream underlying) {
-                this.underlying = underlying;
-            }
-
+            Stream underlying;
             bool readingHeaders = true;
             bool conn, upgrade, version, proto;
             string verKey;
@@ -635,9 +601,11 @@ namespace fCraft {
             // So just allocate one array here instead
             byte[] tmp = new byte[1];
             byte ReadRawByte() {
+                // socket was disconnected
+                if (!underlying.CanRead) throw new EndOfStreamException();
+                
                 int len = underlying.Read(tmp, 0, 1);
-                if (len == 0)
-                    throw new EndOfStreamException();
+                if (len == 0) throw new EndOfStreamException();
                 return tmp[0];
             }
 
