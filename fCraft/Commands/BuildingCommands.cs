@@ -2672,7 +2672,6 @@ namespace fCraft {
         private static void DrawImageCallback(Player player, Vector3I[] marks, object tag)
         {
             ImageDrawOperation op = (ImageDrawOperation)tag;
-            player.Message("&HDrawImage: Downloading {0}", op.ImageUrl);
             try
             {
                 op.Prepare(marks);

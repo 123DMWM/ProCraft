@@ -72,43 +72,20 @@ namespace fCraft.Drawing {
 
         public override bool ReadParams(CommandReader cmd) {
             // get image URL
-            string str = cmd.Next();
-            if (str.NullOrWhiteSpace()) return false;
+            string urlstr = cmd.Next();
 
-            // if string starts with "++", load image from imgur
-            if (str.StartsWith("++")) {
-                str = "http://i.imgur.com/" + str.Substring(2) + ".png";
-            }            
-            // prepend the protocol, if needed (assume http)
-            if (!str.CaselessStarts("http://") && !str.CaselessStarts("https://")) {
-                str = "http://" + str;
-            }
-            
-            // Convert imgur web page url to direct image url
-            if (str.StartsWith("http://imgur.com/")) {
-                str = "http://i.imgur.com/" + str.Substring("http://imgur.com/".Length) + ".png";
-            }
-            if (str.StartsWith("https://imgur.com/")) {
-                str = "https://i.imgur.com/" + str.Substring("https://imgur.com/".Length) + ".png";
-            }
-            
-            if (!str.CaselessEnds(".png") && !str.CaselessEnds(".jpg") && !str.CaselessEnds(".gif")) {
-                Player.Message("URL must be a link to an image");
-                return false;
-            }
+            if (!WorldCommands.parseUrl(ref urlstr, Player)) return false;
 
             // validate the image URL
             Uri url;
-            if (!Uri.TryCreate(str, UriKind.Absolute, out url)) {
+            if (!Uri.TryCreate(urlstr, UriKind.Absolute, out url)) {
                 Player.Message("DrawImage: Invalid URL given.");
                 return false;
             } else if (!url.Scheme.Equals(Uri.UriSchemeHttp) && !url.Scheme.Equals(Uri.UriSchemeHttps)) {
                 Player.Message("DrawImage: Invalid URL given. Only HTTP and HTTPS links are allowed.");
                 return false;
-            } else if (!url.Host.CaselessEquals("i.imgur.com")) {
-                Player.Message("For safety reasons we only accept images uploaded to &9http://imgur.com/ &SSorry for this inconvenience.");
-                return false;
             }
+
             ImageUrl = url;
 
             // Check if player gave optional second argument (palette name)
@@ -150,28 +127,9 @@ namespace fCraft.Drawing {
 
             // Download the image
             if (ImageBitmap == null) {
-                if (ImageUrl == null) {
-                    throw new InvalidOperationException(
-                        "Either ImageBitmap or ImageUrl must be set before calling Prepare()");
-                }
-                
-                HttpWebRequest request = HttpUtil.CreateRequest(ImageUrl, DownloadTimeout);
-                using (HttpWebResponse response = (HttpWebResponse)request.GetResponse()) {
-                    // Check that the remote file was found. The ContentType
-                    // check is performed since a request for a non-existent
-                    // image file might be redirected to a 404-page, which would
-                    // yield the StatusCode "OK", even though the image was not found.
-                    if ((response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.Moved ||
-                         response.StatusCode == HttpStatusCode.Redirect) &&
-                        response.ContentType.CaselessStarts("image")) {
-                        // if the remote file was found, download it
-                        using (Stream inputStream = response.GetResponseStream()) {
-                            // TODO: check file size limit?
-                            ImageBitmap = new Bitmap(inputStream);
-                        }
-                    } else {
-                        throw new Exception("Error downloading image: " + response.StatusCode);
-                    }
+                ImageBitmap = WorldCommands.DownloadImage(ImageUrl.ToString(), Player);
+                if (ImageBitmap == null) {
+                    throw new Exception("Error downloading image");
                 }
             }
 

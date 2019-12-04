@@ -12,6 +12,7 @@ using fCraft.Portals;
 using System.Diagnostics;
 using System.Net;
 using System.Drawing;
+using System.Text.RegularExpressions;
 
 namespace fCraft {
     /// <summary> Contains commands related to world management. </summary>
@@ -962,13 +963,21 @@ namespace fCraft {
 
             // generate the map
             int mapWidth = 0, mapLength = 0;
-            player.SendNow(Packet.Message(0, "Downloading file from: &9" + url, player));
-            heightmap = DownloadImage(url, player);
+            try {
+                heightmap = DownloadImage(url, player);
+            }
+            catch (ArgumentException ex) {
+                player.Message("&WGenHeightMap: Error setting up: " + ex.Message);
+            }
+            catch (Exception ex) {
+                Logger.Log(LogType.Warning, "GenHeightMap: Error downloading image from {0}: {1}", url, ex);
+                player.Message("&WGenHeightMap: Error downloading: " + ex.Message);
+            }
             if (heightmap == null) return;
             mapWidth = heightmap.Width;
             mapLength = heightmap.Height;
             if (!Map.IsValidDimension(mapWidth) || !Map.IsValidDimension(mapLength)) {
-                player.Message("Invalid image size along {0} &S(Must be inbetween 16 and 1024)", Map.IsValidDimension(mapWidth) ? "height: &F" + mapLength : "width: &F" + mapWidth);
+                player.Message("&WInvalid image size along {0} &S(Must be inbetween 16 and 1024)", Map.IsValidDimension(mapWidth) ? "height: &F" + mapLength : "width: &F" + mapWidth);
                 return;
             }
             player.SendNow(Packet.Message(0, "Generating HeightMap...", player));
@@ -1106,24 +1115,33 @@ namespace fCraft {
             using (WebResponse resp = reqLen.GetResponse()) {
                 int.TryParse(resp.Headers.Get("Content-Length"), out ContentLength);
             }
-            if (ContentLength > 5000000) {
-                player.Message("&WImage size is too large {0}MB > 5MB", ContentLength / 1000000);
+            if (ContentLength > 10000000) {
+                player.Message("&WImage size is too large {0}MB > 10MB", ContentLength / 1000000);
                 return null;
             }
 
-            HttpWebRequest request = HttpUtil.CreateRequest(new Uri(url), TimeSpan.FromSeconds(6));
+            player.Message("Downloading file from: &9" + url);
+            if (ContentLength > 1000000) {
+                player.Message("Depending on the image size, this could take some time.");
+            }
+            HttpWebRequest request = HttpUtil.CreateRequest(new Uri(url), TimeSpan.FromSeconds(15));
             using (HttpWebResponse response = (HttpWebResponse)request.GetResponse()) {
-                if ((response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.Moved ||
-                     response.StatusCode == HttpStatusCode.Redirect) &&
-                    response.ContentType.CaselessStarts("image")) {
-                    // if the remote file was found, download it
-                    using (Stream inputStream = response.GetResponseStream()) {
-                        // TODO: check file size limit?
-                        return new Bitmap(inputStream);
+                if (response.ContentType.CaselessStarts("image")) {
+                    if ((response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.Moved ||
+                         response.StatusCode == HttpStatusCode.Redirect)) {
+                        // if the remote file was found, download it
+                        using (Stream inputStream = response.GetResponseStream()) {
+                            // TODO: check file size limit?
+                            player.Message("&SImage successfully downloaded!");
+                            return new Bitmap(inputStream);
+                        }
+                    } else {
+                        player.Message("&WFailed to download the image from the given url.");
+                        throw new Exception("Error downloading image: " + response.StatusCode);
                     }
                 } else {
-                    player.Message("&WFailed to download the image from the given url.");
-                    throw new Exception("Error downloading image: " + response.StatusCode);
+                    player.Message("&WThe given URL is not an image.");
+                    throw new Exception("URL is not Content Type of Image");
                 }
             }
 
@@ -1131,23 +1149,48 @@ namespace fCraft {
 
         public static bool parseUrl(ref string urlString, Player player) {
             if (urlString.NullOrWhiteSpace()) {
-                player.Message("You must provide a url to a heightmap image.");
+                player.Message("You must provide a URL to an image.");
                 return false;
             }
-
-            if (urlString.StartsWith("http://imgur.com/")) urlString = "http://i.imgur.com/" + urlString.Substring("http://imgur.com/".Length) + ".png";
-            if (urlString.StartsWith("++")) urlString = "http://i.imgur.com/" + urlString.Substring(2) + ".png";
-            if (!urlString.CaselessStarts("http://") && !urlString.CaselessStarts("https://")) urlString = "http://" + urlString;
-
-            if (!urlString.CaselessStarts("http://i.imgur.com/") && !urlString.CaselessStarts("https://123DMWM.com/")) {
-                player.Message("For safety reasons we only accept images uploaded to &9http://imgur.com/ &SSorry for this inconvenience.");
-                player.Message("    You cannot use: &9" + urlString);
-                return false;
+            string queryStr = "";
+            if (urlString.Contains('?')) {
+                queryStr = urlString.Substring(urlString.IndexOf('?'));
+                urlString = urlString.Substring(0, urlString.IndexOf('?'));
             }
-
-            if (!urlString.CaselessEnds(".png") && !urlString.CaselessEnds(".jpg") && !urlString.CaselessEnds(".bmp")) {
-                player.Message("URL must be a link to an image (.png/.jpg/.bmp");
-                return false;
+            if (urlString.StartsWith("++")) {
+                urlString = "https://i.imgur.com/" + urlString.Substring(2) + ".png";
+            }
+            if (!urlString.CaselessStarts("http://") && !urlString.CaselessStarts("https://")) {
+                urlString = "http://" + urlString;
+            }
+            if (urlString.CaselessContains("imgur.com")) {
+                if (urlString.CaselessContains("//www.imgur.com/") || urlString.CaselessStarts("www.imgur.com/")) {
+                    urlString = urlString.ReplaceString("www.imgur.com", "i.imgur.com", StringComparison.OrdinalIgnoreCase);
+                }
+                if (urlString.CaselessContains("//imgur.com/") || urlString.CaselessStarts("imgur.com/")) {
+                    urlString = urlString.ReplaceString("imgur.com", "i.imgur.com", StringComparison.OrdinalIgnoreCase);
+                }
+                if (urlString.CaselessContains("//i.imgur.com/") && !Regex.Match(urlString, @"\.[a-z0-9]{2,5}$", RegexOptions.IgnoreCase).Success) {
+                    urlString += ".png";
+                }
+                if (urlString.CaselessContains("/gallery/") || urlString.CaselessContains("/a/")) {
+                    player.Message("You cannot use an Imgur Gallery or Album URL.");
+                    return false;
+                }
+            }
+            if (player.Info.Rank != RankManager.HighestRank) {//let highest rank use any URL
+                if (!urlString.CaselessEnds(".png") && !urlString.CaselessEnds(".jpg") && !urlString.CaselessEnds(".jpeg") && !urlString.CaselessEnds(".bmp") && !urlString.CaselessEnds(".gif")) {
+                    player.Message("URL must be a link to an image (.png/.jpg/.bmp");
+                    return false;
+                }
+                if (!urlString.CaselessContains("i.imgur.com") && !urlString.CaselessContains("123dmwm.com/I/")) {
+                    player.Message("For safety reasons we only accept images uploaded to &9https://imgur.com/ &SSorry for this inconvenience.");
+                    player.Message("    You cannot use: &9" + urlString);
+                    return false;
+                }
+            }
+            if (queryStr != "") {
+                urlString += queryStr;
             }
 
             return true;
