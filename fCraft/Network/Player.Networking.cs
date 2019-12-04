@@ -44,7 +44,6 @@ namespace fCraft {
         bool canReceive = true,
              canSend = true,
              canQueue = true;
-        public bool IsWebSocket { get; set; }
         bool unregisterOnKick = true;
 
         readonly Thread ioThread;
@@ -643,23 +642,17 @@ namespace fCraft {
                 // end of headers
                 if (raw.Length == 0) {
                     if (conn && upgrade && version && proto && verKey != null) {
-                        //System.Console.WriteLine("OK!");
                         AcceptConnection();
                     } else {
-                        //System.Console.WriteLine("NO DICE");
                         // don't pretend to be a http server (so IP:port isn't marked as one by bots)
                         Close();
                     }
                 }
 
                 int sep = raw.IndexOf(':');
-                if (sep == -1)
-                    return; // not a proper header
+                if (sep == -1) return; // not a proper header
                 string key = raw.Substring(0, sep);
                 string val = raw.Substring(sep + 1).Trim();
-
-                // TODO: debug
-                //System.Console.WriteLine(key + " : " + val);
 
                 if (key == "Connection") {
                     conn = val.Contains("Upgrade");
@@ -680,8 +673,7 @@ namespace fCraft {
 
                 for (;;){
                     byte next = ReadRawByte();
-                    if (next == '\r')
-                        continue;
+                    if (next == '\r') continue;
                     if (next != '\n') { raw.Add(next); continue; }
 
                     string value = Encoding.ASCII.GetString(raw.ToArray());
