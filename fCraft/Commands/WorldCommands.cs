@@ -1225,17 +1225,15 @@ namespace fCraft {
                 }
             }
             World[] worlds = WorldManager.FindWorlds(player, worldName);
-            foreach (World w in worlds) {
-                if (w.Name.StartsWith("PW_")) {
-                    player.Message("You must use &a/PW Join &Sto access personal worlds.");
-                    return;
-                }
-            }
 
             if (worlds.Length > 1) {
                 player.MessageManyMatches("world", worlds);
             } else if (worlds.Length == 1) {
                 World world = worlds[0];
+                if (world.Name.StartsWith("PW_")) {
+                    player.Message("You must use &a/PW Join &Sto access personal worlds.");
+                    return;
+                }
                 player.LastUsedWorldName = world.Name;
                 switch (world.AccessSecurity.CheckDetailed(player.Info)) {
                     case SecurityCheckResult.Allowed:
