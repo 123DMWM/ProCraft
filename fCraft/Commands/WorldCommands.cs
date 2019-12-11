@@ -31,6 +31,7 @@ namespace fCraft {
             CommandManager.RegisterCommand( CdGenerateHeightMap );
             CommandManager.RegisterCommand( CdJoin );
             CommandManager.RegisterCommand( CdJoinr );
+            CommandManager.RegisterCommand( CdMain );
             CommandManager.RegisterCommand( CdWorldLock );
             CommandManager.RegisterCommand( CdWorldUnlock );
             CommandManager.RegisterCommand( CdSpawn );
@@ -1298,6 +1299,71 @@ namespace fCraft {
                     case SecurityCheckResult.WhiteListed:
                         if (world.IsFull) {
                             player.Message("Cannot join {0}&S: world is full.", world.ClassyName);
+                            return;
+                        }
+                        if (cmd.IsConfirmed) {
+                            player.JoinWorldNow(world, true, WorldChangeReason.ManualJoin);
+                            return;
+                        }
+                        if (player.World.Name.CaselessEquals("tutorial") && !player.Info.HasRTR) {
+                            player.Confirm(cmd,
+                                "&SYou are choosing to skip the rules, if you continue you will spawn here the next time you log in.");
+                            return;
+                        }
+                        player.StopSpectating();
+                        if (!player.JoinWorldNow(world, true, WorldChangeReason.ManualJoin)) {
+                            player.Message("ERROR: Failed to join world. See log for details.");
+                        }
+                        break;
+                    case SecurityCheckResult.BlackListed:
+                        player.Message("Cannot join world {0}&S: you are blacklisted.", world.ClassyName);
+                        break;
+                    case SecurityCheckResult.RankTooLow:
+                        player.Message("Cannot join world {0}&S: must be {1}+", world.ClassyName,
+                            world.AccessSecurity.MinRank.ClassyName);
+                        break;
+                }
+            } else {
+                player.Message("World was null, shouldn't happen, Why'd you break it?");
+                return;
+            }
+        }
+
+        #endregion
+        #region Join Main
+
+        static readonly CommandDescriptor CdMain = new CommandDescriptor {
+            Name = "Main",
+            Aliases = new[] { "joinmain", "joinlobby", "lobby" },
+            Category = CommandCategory.World | CommandCategory.New,
+            Usage = "/Main [@rank]",
+            Help = "Teleports the player to the main world of their rank or specified rank.",
+            Handler = MainHandler
+        };
+
+        private static void MainHandler([NotNull] Player player, [NotNull] CommandReader cmd) {
+            string rankStr = cmd.Next() ?? player.Info.Rank.Name;
+            Rank rank = RankManager.FindRank(rankStr.Replace("@", ""));
+            if (rank == null) {
+                player.MessageNoRank(rankStr.Replace("@", ""));
+                return;
+            }
+            World world = WorldManager.FindMainWorld(rank);
+            if (world != null) { //'should' never be null, but whatever, null checks are always good
+                switch (world.AccessSecurity.CheckDetailed(player.Info)) {
+                    case SecurityCheckResult.Allowed:
+                    case SecurityCheckResult.WhiteListed:
+                        if (world.IsFull) {
+                            player.Message("Cannot join {0}&S: world is full.", world.ClassyName);
+                            return;
+                        }
+                        if (cmd.IsConfirmed) {
+                            player.JoinWorldNow(world, true, WorldChangeReason.ManualJoin);
+                            return;
+                        }
+                        if (player.World.Name.CaselessEquals("tutorial") && !player.Info.HasRTR) {
+                            player.Confirm(cmd,
+                                "&SYou are choosing to skip the rules, if you continue you will spawn here the next time you log in.");
                             return;
                         }
                         player.StopSpectating();
