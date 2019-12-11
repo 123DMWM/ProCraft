@@ -464,6 +464,8 @@ namespace fCraft {
             CommandReader cmd = new CommandReader(rawMessage);
 
             if (cmd.Descriptor == null) {
+                if (CommandManager.ParseUnknownCommand(this, cmd))
+                    return;
                 Message("Unknown command \"{0}\". See &H/Commands", cmd.Name);
                 Logger.Log(LogType.UserCommand, "{0}[Not A CMD]: {1}", Name, rawMessage);
             } else if (IsPlayingCTF && cmd.Descriptor.Permissions != null &&

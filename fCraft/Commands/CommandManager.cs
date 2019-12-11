@@ -229,6 +229,8 @@ namespace fCraft
 
             if (descriptor == null)
             {
+                if (CommandManager.ParseUnknownCommand(player, cmd))
+                    return true;
                 player.Message("Unknown command \"{0}\". See &H/Commands", cmd.Name);
                 return false;
             }
@@ -262,6 +264,68 @@ namespace fCraft
                 player.Message("Command was cancelled.");
                 return false;
             }
+        }
+        /// <summary> Parses an unknown command as a /Join [command] command. </summary>
+        /// <param name="player"> Player who issued the command. </param>
+        /// <param name="cmd"> Command to be parsed as a worldname. </param>
+        /// <returns> True if the command was a world and the user was able to join it, false if world doesn't exist, or user is unable to join the world. </returns>
+        public static bool ParseUnknownCommand(Player player, CommandReader cmd) {
+            //joinworld or tp to player
+            if (cmd.RawMessage.IndexOf(' ') == -1 && player != Player.Console) {
+                string cmdString = cmd.RawMessage.Substring(1);
+                bool wasWorldTP = false;
+                if (cmdString == "-") {
+                    if (player.LastUsedWorldName != null) {
+                        cmdString = player.LastUsedWorldName;
+                    } else {
+                        return false;
+                    }
+                }
+                World[] worlds = WorldManager.FindWorlds(player, cmdString);
+
+                if (worlds.Length == 1) {
+                    World world = worlds[0];
+                    if (world.Name.StartsWith("PW_")) {
+                        return false;
+                    }
+                    player.LastUsedWorldName = world.Name;
+                    switch (world.AccessSecurity.CheckDetailed(player.Info)) {
+                        case SecurityCheckResult.Allowed:
+                        case SecurityCheckResult.WhiteListed:
+                            if (world.IsFull) {
+                                break;
+                            }
+                            if (cmd.IsConfirmed) {
+                                if (player.JoinWorldNow(world, true, WorldChangeReason.ManualJoin)) {
+                                    wasWorldTP = true;
+                                }
+                                break;
+                            }
+                            if (player.World.Name.CaselessEquals("tutorial") && !player.Info.HasRTR) {
+                                player.Confirm(cmd,
+                                    "&SYou are choosing to skip the rules, if you continue you will spawn here the next time you log in.");
+                                return true;
+                            }
+                            player.StopSpectating();
+                            if (player.JoinWorldNow(world, true, WorldChangeReason.ManualJoin)) {
+                                wasWorldTP = true;
+                                break;
+                            }
+                            break;
+                        case SecurityCheckResult.BlackListed:
+                            break;
+                        case SecurityCheckResult.RankTooLow:
+                            break;
+                    }
+                    if (wasWorldTP) {
+                        player.Message("&H{0}&S is not a command, but it part of a world name, so you have been teleported to {1}&S instead", cmd.RawMessage, world.ClassyName);
+                        player.SendToSpectators(cmd.RawMessage + " -> /Join {0}", world.Name);
+                        Logger.Log(LogType.UserCommand, "{0}: /Join {1}", player.Name, world.Name);
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
 
