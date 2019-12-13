@@ -138,7 +138,7 @@ namespace fCraft {
                     string requestedModel = "humanoid";
                     if (cmd.HasNext) {
                         requestedModel = cmd.Next().ToLower();
-                        requestedModel = ParseModel(player, requestedModel);
+                        requestedModel = ParseModel(player, requestedModel, true);
                         if (requestedModel == null) {
                             player.Message(
                                 "That wasn't a valid entity model! Valid models are chibi, chicken, creeper, giant, human, pig, sheep, skeleton, spider, zombie, or any block ID/Name.");
@@ -174,7 +174,7 @@ namespace fCraft {
                         	player.Message("Usage is /Ent model <bot> <model>. " + validModels);
                             break;
                         }
-                        model = ParseModel(player, model);
+                        model = ParseModel(player, model, true);
                         if (model == null) {
                             player.Message("That wasn't a valid entity model! " + validModels);
                             break;
@@ -332,7 +332,7 @@ namespace fCraft {
                 return;
             }
             
-            model = ParseModel(player, model);
+            model = ParseModel(player, model, false);
             if (model == null) {
                 player.Message("Model not valid, see &H/Help {0}Model&S.", prefix.TrimEnd());
                 return;
@@ -354,9 +354,8 @@ namespace fCraft {
             setter(target, model);
         }
         
-        internal static string ParseModel(Player player, string model) {
+        internal static string ParseModel(Player player, string model, bool isBot) {
             model = model ?? "humanoid";
-            float scale = 0.0f;
             string scalestr = "";
             int sepIndex = model.IndexOf('|');
             
@@ -364,9 +363,24 @@ namespace fCraft {
                 scalestr = model.Substring(sepIndex + 1);
                 model = model.Substring(0, sepIndex);
             }
-            if (float.TryParse(scalestr, out scale)) {
-                if (scale < 0.25f) scale = 0.25f;
-                if (scale > 3f) scale = 3f;
+            if (float.TryParse(scalestr, out float scale)) {
+                if (player.Info.Rank == RankManager.HighestRank) {
+                    if (isBot) { //Owner Bot scale between 0.01 and 128
+                        if (scale < 0.01f) scale = 0.01f;
+                        if (scale > 128f) scale = 128f;
+                    } else {//Owner Self scale between 0.1 and 10
+                        if (scale < 0.1f) scale = 0.1f;
+                        if (scale > 10f) scale = 10f;
+                    }
+                } else {
+                    if (isBot) {//Player Bot scale between 0.1 and 10
+                        if (scale < 0.1f) scale = 0.1f;
+                        if (scale > 10f) scale = 10f;
+                    } else {//Player Self scale between 0.25 and 2
+                        if (scale < 0.25f) scale = 0.25f;
+                        if (scale > 2f) scale = 2f;
+                    }
+                }
             }
             
             byte blockId;
