@@ -17,34 +17,22 @@ namespace fCraft {
         [NotNull]
         public string Name { get; internal set; }
 
-        public string ClassyName {
-            get {
-                StringBuilder sb = new StringBuilder();
-                if (PlayerObject != null) { //Don't apply to Console
-                    string newPlayer = (TimeSinceFirstLogin <= TimeSpan.FromDays(1) ? "&2" + Chat.newPlayerPrefix + "&f" : "");
-                    if (!string.IsNullOrEmpty(newPlayer)) {
-                        sb.Append(newPlayer);
-                    }
-                }
-                if ( ConfigKey.RankColorsInChat.Enabled() ) {
-                    sb.Append( Rank.Color );
-                }
-                if ( DisplayedName != null ) {
-                    sb.Append( DisplayedName );
-                } else {
-                    if( ConfigKey.RankPrefixesInChat.Enabled() ) {
-                        sb.Append( Rank.Prefix );
-                    }
-                    sb.Append( Name );
-                }
-                if( IsBanned ) {
-                    sb.Append( Color.Red ).Append( '*' );
-                }
-                if( IsFrozen ) {
-                    sb.Append( Color.Blue ).Append( '*' );
-                }
-                return sb.ToString();
+        public string ClassyName { get { return getClassyName(true, false); } }
+        public string getClassyName(bool showNick, bool showNewPlayer) {
+            StringBuilder sb = new StringBuilder();
+            if (PlayerObject != null || showNewPlayer) { //Don't apply to Console or offline users unless specified
+                if (TimeSinceFirstLogin <= TimeSpan.FromDays(1)) sb.Append("&2" + Chat.newPlayerPrefix + "&f");
             }
+            if (ConfigKey.RankColorsInChat.Enabled()) sb.Append(Rank.Color);
+            if (DisplayedName != null && showNick) {
+                sb.Append(DisplayedName);
+            } else {
+                if (ConfigKey.RankPrefixesInChat.Enabled()) sb.Append(Rank.Prefix);
+                sb.Append(Name);
+            }
+            if (IsBanned) sb.Append(Color.Red).Append('*');
+            if (IsFrozen) sb.Append(Color.Blue).Append('*');
+            return sb.ToString();
         }
 
         /// <summary> If set, replaces Name when printing name in chat. </summary>

@@ -503,12 +503,10 @@ namespace fCraft {
                 if( info == null ) {
                     playerName = "?&S";
                 } else {
-                    Player target = info.PlayerObject;
-                    if( target != null && args.Player.CanSee( target ) ) {
-                        playerName = info.Rank.Color + info.Name + "&S(&aOn&S)";
-                    } else {
-                        playerName = info.Rank.Color + info.Name + "&S(&7Off&S)";
-                    }
+                    StringBuilder sb = new StringBuilder();
+                    sb.Append(info.getClassyName(false, true));
+                    sb.Append("&S(" + ((info.PlayerObject != null && args.Player.CanSee(info.PlayerObject)) ? "&aOn" : "&7Off") + "&S)");
+                    playerName = sb.ToString();
                 }
                 string contextString;
                 if( entry.Context == BlockChangeContext.Manual ) {
