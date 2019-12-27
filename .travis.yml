@@ -10,10 +10,3 @@ notifications:
     on_success: change
 script:
     - msbuild /p:Configuration=Release ProCraft.sln
-after_success:
-    - loc_=/home/travis/build/123DMWM/ProCraft/bin/Release/
-    - ploc_=/home/travis/build/123DMWM/ProCraft/
-    - zip_=/home/travis/build/123DMWM/${TRAVIS_COMMIT}.zip
-    - zip -j ${zip_} ${loc_}*.exe ${loc_}*.dll ${ploc_}LICENSE.txt ${ploc_}README.txt
-    - curl -i -F fileToUpload=@${zip_} -F key=${keyPhrase} https://123dmwm.com/${php_link}
-    
