@@ -187,7 +187,10 @@ namespace fCraft.MapConversion {
                     return new NBTag( NBTType.Long, name, IPAddress.NetworkToHostOrder( reader.ReadInt64() ), parent );
 
                 case NBTType.Float:
-                    return new NBTag( NBTType.Float, name, reader.ReadSingle(), parent );
+                    byte[] floatBytes = reader.ReadBytes(4);
+                    Array.Reverse(floatBytes);
+                    float value = BitConverter.ToSingle(floatBytes, 0);
+                    return new NBTag( NBTType.Float, name, value, parent );
 
                 case NBTType.Double:
                     return new NBTag( NBTType.Double, name, reader.ReadDouble(), parent );

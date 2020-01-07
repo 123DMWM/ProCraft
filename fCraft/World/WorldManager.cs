@@ -733,29 +733,77 @@ namespace fCraft {
                 if( RaiseWorldCreatingEvent( player, name, map ) ) {
                     throw new WorldOpException( name, WorldOpExceptionCode.Cancelled );
                 }
+                newWorld = new World(name) { Map = map };
 
-                newWorld = new World( name ) { Map = map };
-                if( preload ) newWorld.Preload = true;
-                if( map != null ) newWorld.SaveMap();
-
+                if ( preload ) newWorld.Preload = true;
+                ParseCPEMetaData(ref newWorld, map, name);
+                if (map != null) newWorld.SaveMap();
                 WorldIndex.Add( name.ToLower(), newWorld );
                 UpdateWorldList();
 
                 RaiseWorldCreatedEvent( player, newWorld );
             }
-                        
-            // Load CustomBlock settings
-            string blockDefPath = Path.Combine(Paths.BlockDefsDirectory, name + ".txt");
+            return newWorld;
+        }
+
+        /// <summary> Parses the CPE data of a world when adding or replacing a world in the list. </summary>
+        /// <param name="world"> World being added/updated. </param>
+        /// <param name="map"> Map to assign to the newly created world. </param>
+        /// <returns> World with updated CPE data if there is any. </returns>
+        public static void ParseCPEMetaData(ref World world, Map map, string previousMapName) {
+            if (map != null) {
+                if (map.Metadata.ContainsKey("CPE", "HasEnvColors")) {
+                    world.SkyColor = map.Metadata.Get("CPE", "SkyColor").Value ?? "normal";
+                    world.CloudColor = map.Metadata.Get("CPE", "CloudColor").Value ?? "normal";
+                    world.FogColor = map.Metadata.Get("CPE", "FogColor").Value ?? "normal";
+                    world.LightColor = map.Metadata.Get("CPE", "LightColor").Value ?? "normal";
+                    world.ShadowColor = map.Metadata.Get("CPE", "ShadowColor").Value ?? "normal";
+                    map.Metadata.Remove("CPE", "SkyColor");
+                    map.Metadata.Remove("CPE", "CloudColor");
+                    map.Metadata.Remove("CPE", "FogColor");
+                    map.Metadata.Remove("CPE", "LightColor");
+                    map.Metadata.Remove("CPE", "ShadowColor");
+                    map.Metadata.Remove("CPE", "HasEnvColors");
+                }
+                if (map.Metadata.ContainsKey("CPE", "HasEnvMapAppearance")) {
+                    world.HorizonBlock = byte.Parse(map.Metadata.Get("CPE", "HorizonBlock").Value);
+                    world.EdgeBlock = byte.Parse(map.Metadata.Get("CPE", "EdgeBlock").Value);
+                    world.EdgeLevel = short.Parse(map.Metadata.Get("CPE", "EdgeLevel").Value);
+                    if (map.Metadata.ContainsKey("CPE", "Texture")) {
+                        string url = map.Metadata.Get("CPE", "Texture").Value;
+                        world.Texture = url == Server.DefaultTerrain ? "default" : url;
+                        map.Metadata.Remove("CPE", "Texture");
+                    }
+                    map.Metadata.Remove("CPE", "HorizonBlock");
+                    map.Metadata.Remove("CPE", "EdgeBlock");
+                    map.Metadata.Remove("CPE", "EdgeLevel");
+                    map.Metadata.Remove("CPE", "HasEnvMapAppearance");
+                }
+                if (map.Metadata.ContainsKey("CPE", "Weather")) {
+                    world.Weather = byte.Parse(map.Metadata.Get("CPE", "Weather").Value);
+                    map.Metadata.Remove("CPE", "Weather");
+                }
+                if (map.Metadata.ContainsKey("CPE", "ClickDistance")) {
+                    world.MaxReach = short.Parse(map.Metadata.Get("CPE", "ClickDistance").Value);
+                    map.Metadata.Remove("CPE", "ClickDistance");
+                }
+            }
+            string blockDefPath = Path.Combine(Paths.BlockDefsDirectory, previousMapName + ".txt");
+            if (map != null && map.Metadata.ContainsKey("CPE", "HasBlockDefFile")) {
+                string blockDefFileName = map.Metadata.Get("CPE", "BlockDefFileName").Value;
+                blockDefPath = Path.Combine(Paths.BlockDefsDirectory, blockDefFileName + ".txt");
+                if (blockDefFileName != previousMapName) {
+                    map.Metadata["CPE", "BlockDefFileName"] = world.Name;
+                }
+            }
             if (File.Exists(blockDefPath)) {
-                int count;
-                BlockDefinition[] defs = BlockDefinition.Load(blockDefPath, out count);
+                BlockDefinition[] defs = BlockDefinition.Load(blockDefPath, out _);
                 for (int i = 0; i < defs.Length; i++) {
                     if (defs[i] == null) defs[i] = BlockDefinition.GlobalDefs[i];
                 }
-                newWorld.BlockDefs = defs;
+                world.BlockDefs = defs;
+                BlockDefinition.Save(false, world);
             }
-            
-            return newWorld;
         }
 
 

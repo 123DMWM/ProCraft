@@ -2454,6 +2454,8 @@ namespace fCraft {
             World world;
             try {
                 world = WorldManager.AddWorld(player, name, map, false);
+                World oldWorld = WorldManager.FindWorldExact(fileName);
+                if (oldWorld != null) world.CopyENV(oldWorld);
             } catch (WorldOpException ex) {
                 player.Message("WLoad: {0}", ex.Message);
                 return null;
@@ -2505,6 +2507,8 @@ namespace fCraft {
 
             try {
                 world.MapChangedBy = player.Name;
+                World oldWorld = WorldManager.FindWorldExact(fileName);
+                if (oldWorld != null) world.CopyENV(oldWorld);
                 world.ChangeMap(map);
             } catch (WorldOpException ex) {
                 Logger.Log(LogType.Error, "Could not complete WorldLoad operation: {0}", ex.Message);

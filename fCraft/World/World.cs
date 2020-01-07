@@ -244,28 +244,11 @@ namespace fCraft {
                     LoadedOn = LoadedOn,
                     MapChangedBy = MapChangedBy,
                     MapChangedOn = DateTime.UtcNow,
-                    FogColor = FogColor,
-                    CloudColor = CloudColor,
-                    SkyColor = SkyColor,
-                    EdgeLevel = EdgeLevel,
-                    SidesOffset = SidesOffset,
-                    CloudsHeight = CloudsHeight,
-                    MaxFogDistance = MaxFogDistance,
-                    EdgeBlock = EdgeBlock,
-                    HorizonBlock = HorizonBlock,
-                    LightColor = LightColor,
-                    ShadowColor = ShadowColor,
-                    Weather = Weather,
-                    Texture = Texture,
-                    CloudsSpeed = CloudsSpeed,
-                    WeatherSpeed = WeatherSpeed,
-                    WeatherFade = WeatherFade,
-                    SkyboxHorSpeed = SkyboxHorSpeed,
-                    SkyboxVerSpeed = SkyboxVerSpeed,
                     Buildable = Buildable,
                     Deletable = Deletable,
-                    BlockDefs = BlockDefs,
                 };
+                newWorld.CopyENV(this);
+                WorldManager.ParseCPEMetaData(ref newWorld, newMap, Name);
                 newMap.World = newWorld;
                 newWorld.Map = newMap;
                 newWorld.Preload = preload;
@@ -280,6 +263,37 @@ namespace fCraft {
                 }
                 return newWorld;
             }
+        }
+
+        public void CopyENV(World otherWorld) {
+            Map = map;
+            FogColor = otherWorld.FogColor;
+            CloudColor = otherWorld.CloudColor;
+            SkyColor = otherWorld.SkyColor;
+            EdgeLevel = otherWorld.EdgeLevel;
+            SidesOffset = otherWorld.SidesOffset;
+            CloudsHeight = otherWorld.CloudsHeight;
+            MaxFogDistance = otherWorld.MaxFogDistance;
+            EdgeBlock = otherWorld.EdgeBlock;
+            HorizonBlock = otherWorld.HorizonBlock;
+            LightColor = otherWorld.LightColor;
+            ShadowColor = otherWorld.ShadowColor;
+            Weather = otherWorld.Weather;
+            Texture = otherWorld.Texture;
+            CloudsSpeed = otherWorld.CloudsSpeed;
+            WeatherSpeed = otherWorld.WeatherSpeed;
+            WeatherFade = otherWorld.WeatherFade;
+            SkyboxHorSpeed = otherWorld.SkyboxHorSpeed;
+            SkyboxVerSpeed = otherWorld.SkyboxVerSpeed;
+            foreach (Player p in Players) {
+                BlockDefinition.SendNowRemoveOldBlocks(p, this);
+            }
+            BlockDefs = otherWorld.BlockDefs;
+            if (BlockDefs != BlockDefinition.GlobalDefs) BlockDefinition.Save(false, this);
+            foreach (Player p in Players) {
+                BlockDefinition.SendNowBlocks(p);
+            }
+            WorldManager.SaveWorldList();
         }
 
 
