@@ -358,12 +358,13 @@ namespace fCraft {
             model = model ?? "humanoid";
             string scalestr = "";
             int sepIndex = model.IndexOf('|');
+            float scale;
             
             if (sepIndex >= 0) {
                 scalestr = model.Substring(sepIndex + 1);
                 model = model.Substring(0, sepIndex);
             }
-            if (float.TryParse(scalestr, out float scale)) {
+            if (float.TryParse(scalestr, out scale)) {
                 if (player.Info.Rank == RankManager.HighestRank) {
                     if (isBot) { //Owner Bot scale between 0.01 and 128
                         if (scale < 0.01f) scale = 0.01f;

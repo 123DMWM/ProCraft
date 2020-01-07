@@ -797,7 +797,8 @@ namespace fCraft {
                 }
             }
             if (File.Exists(blockDefPath)) {
-                BlockDefinition[] defs = BlockDefinition.Load(blockDefPath, out _);
+                int count;
+                BlockDefinition[] defs = BlockDefinition.Load(blockDefPath, out count);
                 for (int i = 0; i < defs.Length; i++) {
                     if (defs[i] == null) defs[i] = BlockDefinition.GlobalDefs[i];
                 }
