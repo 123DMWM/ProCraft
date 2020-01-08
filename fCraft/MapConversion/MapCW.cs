@@ -167,12 +167,10 @@ namespace fCraft.MapConversion {
             return r.ToString("X2") + g.ToString("X2") + b.ToString("X2");
         }
 
-        public static BlockDefinition[] blockDefs = new BlockDefinition[256]; 
-
-        static void ParseBlockDefinitions(NBTag cpe, Map map, String fileName) {
+        static void ParseBlockDefinitions(NBTag cpe, Map map, string fileName) {
             NBTag blocks = cpe["BlockDefinitions"];
             bool hasBlockDefs = false;
-            blockDefs = new BlockDefinition[256];
+            BlockDefinition[] defs = new BlockDefinition[256];
 
             foreach (NBTag tag in blocks) {
                 if (tag.Type != NBTType.Compound) continue;
@@ -226,21 +224,21 @@ namespace fCraft.MapConversion {
                 if (PropsEquals(def, BlockDefinition.GlobalDefs[def.BlockID]))
                     continue;
 
-                blockDefs[def.BlockID] = def;
+                defs[def.BlockID] = def;
                 hasBlockDefs = true;
             }
 
             if (hasBlockDefs) {
                 BlockDefinition[] realDefs = new BlockDefinition[256];
                 int count = 0;
-                for (int i = 0;i < 256;i++) {
-                    if (blockDefs[i] == BlockDefinition.GlobalDefs[i]) realDefs[i] = null;
+                for (int i = 0; i < 256;i++) {
+                    if (defs[i] == BlockDefinition.GlobalDefs[i]) realDefs[i] = null;
                     else {
                         count++;
-                        realDefs[i] = blockDefs[i];
+                        realDefs[i] = defs[i];
                     }
                 }
-                blockDefs = realDefs;
+                defs = realDefs;
 
                 string path = Paths.BlockDefsDirectory;
                 path = Path.Combine(path, Path.GetFileName(fileName) + ".txt");
@@ -248,13 +246,14 @@ namespace fCraft.MapConversion {
                 map.Metadata["CPE", "BlockDefFileName"] = Path.GetFileName(fileName);
                 try {
                     using (Stream s = File.Create(path))
-                        JsonSerializer.SerializeToStream(blockDefs, s);
+                        JsonSerializer.SerializeToStream(defs, s);
                 }
                 catch (Exception ex) {
                     Logger.Log(LogType.Error, "BlockDefinitions.Save: " + ex);
                 }
             }
         }
+    	
         static bool PropsEquals(BlockDefinition a, BlockDefinition b) {
             if (b == null || b.Name == null)
                 return false;
