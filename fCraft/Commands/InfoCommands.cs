@@ -625,6 +625,7 @@ namespace fCraft {
             if( rank.IdleKickTimer > 0 ) {
                 player.Message( "Idle kick after {0}", TimeSpan.FromMinutes( rank.IdleKickTimer ).ToMiniString() );
             }
+            player.Message("Can have {0} personal world{1}.", rank.MaxPersonalWorlds, rank.MaxPersonalWorlds == 1 ? "" : "s");
             if (!Directory.Exists(Paths.RankReqDirectory) || !player.IsStaff) return;
             
             string rankReqFile = null;

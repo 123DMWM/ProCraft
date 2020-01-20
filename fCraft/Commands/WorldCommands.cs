@@ -3676,7 +3676,7 @@ namespace fCraft {
 
         static readonly CommandDescriptor CdMaxPW = new CommandDescriptor {
             Name = "MaxPWorlds",
-            Aliases = new[] { "MPW" },
+            Aliases = new[] { "MPW", "maxpw" },
             Permissions = new[] { Permission.Chat },
             Category = CommandCategory.New | CommandCategory.Moderation | CommandCategory.Chat,
             Help = "Changes/Displays the max amount of personal worlds a rank may have.",
