@@ -53,6 +53,11 @@ namespace fCraft.Drawing {
                 Player.Message("Nothing to paste! Copy something first.");
                 return false;
             }
+            
+            if ( CopyInfo.Offset != null && (CopyInfo.Offset.X != 0 || CopyInfo.Offset.Y != 0 || CopyInfo.Offset.Z != 0)) {
+                marks[0] += CopyInfo.Offset;
+                marks[1] += CopyInfo.Offset;
+            }
 
             // Calculate the buffer orientation
             Vector3I delta = marks[1] - marks[0];

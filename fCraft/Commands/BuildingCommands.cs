@@ -43,13 +43,16 @@ namespace fCraft {
             CdReplaceNotBrush.Help += GeneralDrawingHelp;
             CommandManager.RegisterCommand( CdCopySlot );
             CommandManager.RegisterCommand( CdCopy );
+            CommandManager.RegisterCommand( CdCopyX );
             CommandManager.RegisterCommand( CdCut );
             CommandManager.RegisterCommand( CdPaste );
             CommandManager.RegisterCommand( CdPasteNot );
             CommandManager.RegisterCommand( CdPasteX );
             CommandManager.RegisterCommand( CdPasteNotX );
             CommandManager.RegisterCommand( CdMirror );
+            CommandManager.RegisterCommand( CdMirrorX );
             CommandManager.RegisterCommand( CdRotate );
+            CommandManager.RegisterCommand( CdRotateX );
             CdCut.Help += GeneralDrawingHelp;
             CdPaste.Help += GeneralDrawingHelp;
             CdPasteNot.Help += GeneralDrawingHelp;
@@ -1541,6 +1544,26 @@ namespace fCraft {
         }
 
 
+
+        static readonly CommandDescriptor CdCopyX = new CommandDescriptor {
+            Name = "CopyX",
+            Category = CommandCategory.Building,
+            Permissions = new[] { Permission.CopyAndPaste },
+            Help = "Copy blocks for pasting, with offset. " +
+                   "Used together with &H/Paste&S and &H/PasteNot&S commands. " +
+                   "Note that pasting starts at the same corner that you started &H/CopyX&S from.",
+            Handler = CopyXHandler
+        };
+
+        static void CopyXHandler( Player player, CommandReader cmd ) {
+            if( cmd.HasNext ) {
+                CdCopyX.PrintUsage( player );
+                return;
+            }
+            player.SelectionStart( 3, CopyCallback, null, CdCopyX.Permissions );
+            player.Message( "CopyX: Click or &H/Mark&S 3 blocks." );
+        }
+
         static void CopyCallback( Player player, Vector3I[] marks, object tag ) {
             int sx = Math.Min( marks[0].X, marks[1].X );
             int ex = Math.Max( marks[0].X, marks[1].X );
@@ -1559,6 +1582,10 @@ namespace fCraft {
 
             // remember dimensions and orientation
             CopyState copyInfo = new CopyState( marks[0], marks[1] );
+            
+            if (marks.Length > 2) {
+                copyInfo.Offset = marks[0] - marks[2];
+            }
 
             Map map = player.WorldMap;
             World playerWorld = player.World;
@@ -1633,9 +1660,13 @@ namespace fCraft {
             Usage = "/Mirror [X] [Y] [Z]",
             Handler = MirrorHandler
         };
-
-
+        
         static void MirrorHandler([NotNull] Player player, [NotNull] CommandReader cmd) {
+            GeneralMirrorHandler(player, cmd, false);
+        }
+
+
+        static void GeneralMirrorHandler([NotNull] Player player, [NotNull] CommandReader cmd, bool orient) {
             CopyState originalInfo = player.GetCopyState();
             if (originalInfo == null) {
                 player.Message("Nothing to flip! Copy something first.");
@@ -1714,6 +1745,24 @@ namespace fCraft {
                     right--;
                 }
             }
+            
+            if (orient) {
+                Vector3I newOri = info.Orientation;
+                
+                if (flipX) newOri.X *= -1;
+                if (flipY) newOri.Y *= -1;
+                if (flipH) newOri.Z *= -1;
+                info.Orientation = newOri;
+            }
+            
+            if (info.Offset != null && orient) {
+                Vector3I newOff = info.Offset;
+                
+                if (flipX) newOff.X *= -1;
+                if (flipY) newOff.Y *= -1;
+                if (flipH) newOff.Z *= -1;
+                info.Offset = newOff;
+            }
 
             List<string> axes = new List<string>(3);
             if (flipX) axes.Add("X (east/west)");
@@ -1731,6 +1780,23 @@ namespace fCraft {
         }
 
 
+        static readonly CommandDescriptor CdMirrorX = new CommandDescriptor {
+            Name = "MirrorX",
+            Aliases = new[] { "FlipX" },
+            Category = CommandCategory.Building,
+            Permissions = new[] { Permission.CopyAndPaste },
+            Help = "Flips copied blocks along specified axis/axes.  Also flips orientation. " +
+                   "The axes are: X = horizontal (east-west), Y = horizontal (north-south), Z = vertical. " +
+                   "You can mirror more than one axis at a time, e.g. &H/MirrorX X Y",
+            Usage = "/MirrorX [X] [Y] [Z]",
+            Handler = MirrorXHandler
+        };
+        
+        static void MirrorXHandler([NotNull] Player player, [NotNull] CommandReader cmd) {
+            GeneralMirrorHandler(player, cmd, true);
+        }
+
+
 
         static readonly CommandDescriptor CdRotate = new CommandDescriptor {
             Name = "Rotate",
@@ -1741,8 +1807,12 @@ namespace fCraft {
             Usage = "/Rotate (-90|90|180|270) (X|Y|Z)",
             Handler = RotateHandler
         };
-
+        
         static void RotateHandler( Player player, CommandReader cmd ) {
+            GeneralRotateHandler( player, cmd, false);
+        }
+
+        static void GeneralRotateHandler( Player player, CommandReader cmd, bool orient ) {
             CopyState originalInfo = player.GetCopyState();
             if( originalInfo == null ) {
                 player.Message( "Nothing to rotate! Copy something first." );
@@ -1855,10 +1925,295 @@ namespace fCraft {
                     }
                 }
             }
+            if (orient) {
+                Vector3I oldOrient = info.Orientation;
+                Vector3I newOrient = oldOrient;
+                int newX;
+                int newY;
+                
+                switch( axis ) {
+                    case Axis.X:
+                    switch( degrees ) {
+                        case 90:
+                                RotOrient90(oldOrient.Y, oldOrient.Z, true, out newX, out newY);
+                            newOrient.Y = newX;
+                            newOrient.Z = newY;
+                            break;
+                        case 180:
+                            newOrient.Y = oldOrient.Z * -1;
+                            newOrient.Z = oldOrient.Y * -1;
+                            break;
+                        case -90:
+                            RotOrient90(oldOrient.Y, oldOrient.Z, false, out newX, out newY);
+                            newOrient.Y = newX;
+                            newOrient.Z = newY;
+                            break;
+                        case 270:
+                            RotOrient90(oldOrient.Y, oldOrient.Z, false, out newX, out newY);
+                            newOrient.Y = newX;
+                            newOrient.Z = newY;
+                            break;
+                    }
+                        break;
+                    case Axis.Y:
+                    switch( degrees ) {
+                        case 90:
+                            RotOrient90(oldOrient.X, oldOrient.Z, true, out newX, out newY);
+                            newOrient.X = newX;
+                            newOrient.Z = newY;
+                            break;
+                        case 180:
+                            newOrient.X = oldOrient.Z * -1;
+                            newOrient.Z = oldOrient.Y * -1;
+                            break;
+                        case -90:
+                            RotOrient90(oldOrient.X, oldOrient.Z, false, out newX, out newY);
+                            newOrient.X = newX;
+                            newOrient.Z = newY;
+                            break;
+                        case 270:
+                            RotOrient90(oldOrient.X, oldOrient.Z, false, out newX, out newY);
+                            newOrient.X = newX;
+                            newOrient.Z = newY;
+                            break;
+                    }
+                        break;
+                    default: //Z axis.
+                    switch( degrees ) {
+                        case 90:
+                            RotOrient90(oldOrient.X, oldOrient.Y, true, out newX, out newY);
+                            newOrient.X = newX;
+                            newOrient.Y = newY;
+                            break;
+                        case 180:
+                            newOrient.X = oldOrient.X * -1;
+                            newOrient.Y = oldOrient.Y * -1;
+                            break;
+                        case -90:
+                            RotOrient90(oldOrient.X, oldOrient.Y, false, out newX, out newY);
+                            newOrient.X = newX;
+                            newOrient.Y = newY;
+                            break;
+                        case 270:
+                            RotOrient90(oldOrient.X, oldOrient.Y, false, out newX, out newY);
+                            newOrient.X = newX;
+                            newOrient.Y = newY;
+                            break;
+                    }
+                        break;
+                }
+                
+                info.Orientation = newOrient;
+            }
+                
+            if (info.Offset != null && orient) {
+                
+                Vector3I oldOffset = info.Offset;
+                Vector3I newOffset = oldOffset;
+                int newX;
+                int newY;
+                
+                switch( axis ) {
+                    case Axis.X:
+                    switch( degrees ) {
+                        case 90:
+                                rotOffset90(oldOffset.Y, oldOffset.Z, true, out newX, out newY);
+                            newOffset.Y = newX;
+                            newOffset.Z = newY;
+                            break;
+                        case 180:
+                            newOffset.Y = oldOffset.Z * -1;
+                            newOffset.Z = oldOffset.Y * -1;
+                            break;
+                        case -90:
+                            rotOffset90(oldOffset.Y, oldOffset.Z, false, out newX, out newY);
+                            newOffset.Y = newX;
+                            newOffset.Z = newY;
+                            break;
+                        case 270:
+                            rotOffset90(oldOffset.Y, oldOffset.Z, false, out newX, out newY);
+                            newOffset.Y = newX;
+                            newOffset.Z = newY;
+                            break;
+                    }
+                        break;
+                    case Axis.Y:
+                    switch( degrees ) {
+                        case 90:
+                            rotOffset90(oldOffset.X, oldOffset.Z, true, out newX, out newY);
+                            newOffset.X = newX;
+                            newOffset.Z = newY;
+                            break;
+                        case 180:
+                            newOffset.X = oldOffset.Z * -1;
+                            newOffset.Z = oldOffset.Y * -1;
+                            break;
+                        case -90:
+                            rotOffset90(oldOffset.X, oldOffset.Z, false, out newX, out newY);
+                            newOffset.X = newX;
+                            newOffset.Z = newY;
+                            break;
+                        case 270:
+                            rotOffset90(oldOffset.X, oldOffset.Z, false, out newX, out newY);
+                            newOffset.X = newX;
+                            newOffset.Z = newY;
+                            break;
+                    }
+                        break;
+                    default: //Z axis.
+                    switch( degrees ) {
+                        case 90:
+                            rotOffset90(oldOffset.X, oldOffset.Y, true, out newX, out newY);
+                            newOffset.X = newX;
+                            newOffset.Y = newY;
+                            break;
+                        case 180:
+                            newOffset.X = oldOffset.X * -1;
+                            newOffset.Y = oldOffset.Y * -1;
+                            break;
+                        case -90:
+                            rotOffset90(oldOffset.X, oldOffset.Y, false, out newX, out newY);
+                            newOffset.X = newX;
+                            newOffset.Y = newY;
+                            break;
+                        case 270:
+                            rotOffset90(oldOffset.X, oldOffset.Y, false, out newX, out newY);
+                            newOffset.X = newX;
+                            newOffset.Y = newY;
+                            break;
+                    }
+                        break;
+                }
+                
+                info.Offset = newOffset;
+            }
 
             player.Message( "Rotated copy (slot {0}) by {1} degrees around {2} axis.",
                             info.Slot + 1, degrees, axis );
             player.SetCopyState( info );
+        }
+        
+        static void RotOrient90(int oldX, int oldY, bool positive, out int newX, out int newY) {
+            newX = 1;
+            newY = 1;
+            if(oldX != -1 && oldY != -1 && oldX != 1 && oldY != 1) {
+                newX = 1;
+                newY = 1;
+                return;
+            }
+            if(positive) {
+                if(oldX == 1 && oldY == 1) {
+                    newX = -1;
+                    newY = 1;
+                }
+                else if(oldX == -1 && oldY == 1) {
+                    newX = -1;
+                    newY = -1;
+                }
+                else if(oldX == -1 && oldY == -1) {
+                    newX = 1;
+                    newY = -1;
+                }
+                else if(oldX == 1 && oldY == -1) {
+                    newX = 1;
+                    newY = 1;
+                }
+            } else if(!positive) {
+                if(oldX == -1 && oldY == 1) {
+                    newX = 1;
+                    newY = 1;
+                }
+                else if(oldX == -1 && oldY == -1) {
+                    newX = -1;
+                    newY = 1;
+                }
+                else if(oldX == 1 && oldY == -1) {
+                    newX = -1;
+                    newY = -1;
+                }
+                else if(oldX == 1 && oldY == 1) {
+                    newX = 1;
+                    newY = -1;
+                }
+            } else {
+                newX = oldX;
+                newY = oldY;
+            }
+            return;
+        }
+        
+        
+        static void rotOffset90(int oldX, int oldY, bool positive, out int newX, out int newY) {
+            newX = oldX;
+            newY = oldY;
+            /*if(oldX != -1 && oldY != -1 && oldX != 1 && oldY != 1) {
+                newX = 1;
+                newY = 1;
+                return;
+            }*/
+            if(positive) {
+                if(oldX >= 0 && oldY >= 0) {
+                    newX = -1 * oldY;
+                    newY = 1 * oldX;
+                    Console.WriteLine("pos1");
+                }
+                else if(oldX <= 0 && oldY >= 0) {
+                    newX = -1 * oldY;
+                    newY = 1 * oldX;
+                    Console.WriteLine("pos2");
+                }
+                else if(oldX <= 0 && oldY <= 0) {
+                    newX = -1 * oldY;
+                    newY = 1 * oldX;
+                    Console.WriteLine("pos3");
+                }
+                else if(oldX >= 0 && oldY <= 0) {
+                    newX = -1 * oldY;
+                    newY = 1 * oldX;
+                    Console.WriteLine("pos4");
+                }
+            } else if(!positive) {
+                if(oldX <= 0 && oldY >= 0) {
+                    newX = 1 * oldY;
+                    newY = -1 * oldX;
+                    Console.WriteLine("neg1");
+                }
+                else if(oldX <= 0 && oldY <= 0) {
+                    newX = 1 * oldY;
+                    newY = -1 * oldX;
+                    Console.WriteLine("neg2");
+                }
+                else if(oldX >= 0 && oldY <= 0) {
+                    newX = 1 * oldY;
+                    newY = -1 * oldX;
+                    Console.WriteLine("neg3");
+                }
+                else if(oldX >= 0 && oldY >= 0) {
+                    newX = 1 * oldY;
+                    newY = -1 * oldX;
+                    Console.WriteLine("neg4");
+                }
+            } else {
+                newX = oldX;
+                newY = oldY;
+            }
+            return;
+        }
+
+
+
+        static readonly CommandDescriptor CdRotateX = new CommandDescriptor {
+            Name = "RotateX",
+            Aliases = new[] { "spinX" },
+            Category = CommandCategory.Building,
+            Permissions = new[] { Permission.CopyAndPaste },
+            Help = "Rotates copied blocks around specifies axis/axes. If no axis is given, rotates around Z (vertical). Also rotates orientation. ",
+            Usage = "/RotateX (-90|90|180|270) (X|Y|Z)",
+            Handler = RotateXHandler
+        };
+        
+        static void RotateXHandler( Player player, CommandReader cmd ) {
+            GeneralRotateHandler( player, cmd, true);
         }
 
 
