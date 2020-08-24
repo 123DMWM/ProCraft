@@ -568,6 +568,29 @@ Affected commands:
     /Info
     /BanInfo
     /BanIP, /BanAll, /UnbanIP, /UnbanAll";
+            
+            vPermissions.Items[(int)Permission.SetOwnModel].ToolTipText = 
+@"Ability to change your own model.
+Affeted command:
+    /model";
+            
+            vPermissions.Items[(int)Permission.SetModel].ToolTipText = 
+@"Ability to change other players' models.
+Required permission: SetOwnModel
+Affeted command:
+    /model";
+            
+            vPermissions.Items[(int)Permission.SetOwnSkin].ToolTipText = 
+@"Ability to change your own skin.
+Affeted command:
+    /skin";
+            
+            vPermissions.Items[(int)Permission.SetSkin].ToolTipText = 
+@"Ability to change other players' skins.
+Required permission: SetOwnSkin
+Affeted command:
+    /skin";
+           
         }
 
 
