@@ -144,6 +144,7 @@ namespace fCraft
                 ParseHeartbeatResponse(replyString);
             } catch (Exception ex) {
                 LogHeartbeatError(state, ex);
+                heartBeatRequest.ServicePoint.CloseConnectionGroup(null);
             }
         }
         
