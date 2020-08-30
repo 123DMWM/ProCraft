@@ -978,13 +978,18 @@ namespace fCraft {
             if ( players.Length == 0 ) return;
             
             foreach (Player pl in players) {
+                byte messageLine = 100;
+                if (line.StartsWith("λ")) {
+                    try { 
+                        messageLine = byte.Parse(line.Remove(0,1).Take(3).JoinToString());
+                    } catch {}
+                    line = line.Remove(0, 4);
+                }
+                string anncmnt = (line.CaselessStarts("&") ? "" : "&R") + Chat.ReplaceTextKeywords(pl, line);
                 if (pl.Supports(CpeExt.MessageType)) {
-                    if (line.CaselessStarts("&d"))
-                        line = line.Remove(0, 2);
-                    pl.Send(Packet.Message((byte)MessageType.Announcement,
-                                           "&d" + Chat.ReplaceTextKeywords(pl, line), pl));
+                    pl.Send(Packet.Message(messageLine, anncmnt, pl));
                 } else {
-                    pl.Message("&d" + Chat.ReplaceTextKeywords(pl, line));
+                    pl.Message(anncmnt);
                 }
             }
         }
