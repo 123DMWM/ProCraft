@@ -981,7 +981,7 @@ namespace fCraft {
                 byte messageLine = 100;
                 if (line.StartsWith("λ")) {
                     try { 
-                        messageLine = byte.Parse(line.Remove(0,1).Take(3).JoinToString());
+                        messageLine = byte.Parse(line.Substring(1, 3));
                     } catch {}
                     line = line.Remove(0, 4);
                 }
