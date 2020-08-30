@@ -26,6 +26,7 @@ namespace fCraft.Drawing {
             Blocks = (Block[, ,])original.Blocks.Clone();
             Bounds = new BoundingBox(original.Bounds);
             Orientation = original.Orientation;
+            Offset = original.Offset;
             Slot = original.Slot;
             OriginWorld = original.OriginWorld;
             CopyTime = original.CopyTime;
@@ -42,6 +43,7 @@ namespace fCraft.Drawing {
                                      buffer.GetLength(1),
                                      buffer.GetLength(2));
             Orientation = original.Orientation;
+            Offset = original.Offset;
             Slot = original.Slot;
             OriginWorld = original.OriginWorld;
             CopyTime = original.CopyTime;
@@ -59,7 +61,13 @@ namespace fCraft.Drawing {
         /// <summary> Orientation of copying (relation of two marks to each other).
         /// Each value is either 1 (forwards along the axis) or -1 (backwards along the axis).
         /// Orientation is used by /Paste and /PasteNot commands to determine the direction of pasting from the clicked block. </summary>
-        public Vector3I Orientation { get; private set; }
+        public Vector3I Orientation { get; set; }
+        
+        /// <summary> Offset to paste from, relative to the orientation block.
+        /// This should be kept relative to orientation.
+        /// If orientation is changed, this should also be changed accordingly.
+        /// If zero, paste with no offset.</summary>
+        public Vector3I Offset {get; set; }
 
         /// <summary> Index of the copySlot into which this was copied.
         /// Defaults to 0. </summary>
