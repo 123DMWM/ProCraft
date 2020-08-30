@@ -986,7 +986,7 @@ namespace fCraft {
                     line = line.Remove(0, 4);
                 }
                 string anncmnt = (line.CaselessStarts("&") ? "" : "&R") + Chat.ReplaceTextKeywords(pl, line);
-                if (pl.Supports(CpeExt.MessageType)) {
+                if (pl.Supports(CpeExt.MessageType) && messageLine != 0) {
                     pl.Send(Packet.Message(messageLine, anncmnt, pl));
                 } else {
                     pl.Message(anncmnt);
