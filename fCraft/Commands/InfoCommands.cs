@@ -1847,7 +1847,7 @@ namespace fCraft {
             
             JsonObject result = null;
             try {
-                string url = "http://geoip.pw/api/" + ip;
+                string url = "https://geoip.pw/api/" + ip;
                 result = JsonObject.Parse(HttpUtil.DownloadString(url, "get GeoIP info", 10000));
                 if (result.Get("message") != null) return;
                 
