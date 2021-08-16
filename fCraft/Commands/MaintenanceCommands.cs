@@ -1415,7 +1415,7 @@ namespace fCraft {
             Category = CommandCategory.New | CommandCategory.Maintenance,
             Permissions = new[] { Permission.EditPlayerDB },
             IsConsoleSafe = true,
-            Help = "Set the colors of the server software name on the server list. &NOnly console may change the actual software name. &NUse reset/default/normal to change it back to &cP&4R&6O&eC&aR&2A&bF&3T",
+            Help = "Set the colors of the server software name on the server list. &NOnly console may change the actual software name. &NUse reset/default/normal to change it back to \"ProCraft\"",
             Usage = "/Software <new software name>",
             Handler = SoftwareHandler
         };
@@ -1430,13 +1430,13 @@ namespace fCraft {
                 return;
             }
             if (newSW.CaselessEquals("reset") || newSW.CaselessEquals("default") || newSW.CaselessEquals("normal")) {
-                newSW = "&cP&4R&6O&eC&aR&2A&bF&3T";
+                newSW = "ProCraft";
             }
 
             if (newSW == oldSW) {
                 player.Message("Server software is already set to \"&F{1}&S\"", newSW);
                 return;
-            } else if (!Color.StripColors(newSW, true).CaselessEquals(Server.Software) && player != Player.Console) {
+            } else if (!Color.StripColors(newSW, true).CaselessEquals(Color.StripColors(oldSW, true)) && player != Player.Console) {
                 player.Message("&COnly console may change the actual name of the software.");
                 return;
             }
