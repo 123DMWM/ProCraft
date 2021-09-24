@@ -192,5 +192,17 @@ namespace fCraft {
 
         /// <summary> Ability to create portals. </summary>
         CreatePortals,
+        
+        /// <summary> Ability to set your own model.</summary>
+        SetOwnModel,
+        
+        /// <summary> Ability to set other's models.</summary>
+        SetModel,
+        
+        /// <summary> Ability to set your own skin.</summary>
+        SetOwnSkin,
+        
+        /// <summary> Abiltiy to set other's skins.</summary>
+        SetSkin,
     }
 }

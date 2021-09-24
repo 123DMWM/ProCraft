@@ -1075,6 +1075,9 @@ namespace fCraft {
             builder.Add( new XElement( Permission.ViewOthersInfo.ToString() ) );
             builder.Add( new XElement( Permission.Teleport.ToString() ) );
             builder.Add( new XElement( Permission.Draw.ToString() ) );
+            
+            builder.Add( new XElement( Permission.SetOwnModel.ToString() ) );
+            builder.Add( new XElement( Permission.SetOwnSkin.ToString() ) );
             return builder;
         }
         
@@ -1132,6 +1135,9 @@ namespace fCraft {
             op.Add( new XElement( Permission.DrawAdvanced.ToString() ) );
             op.Add( new XElement( Permission.CopyAndPaste.ToString() ) );
             op.Add( new XElement( Permission.UndoOthersActions.ToString() ) );
+            
+            op.Add( new XElement( Permission.SetModel.ToString() ) );
+            op.Add( new XElement( Permission.SetSkin.ToString() ) );
             return op;
         }
         

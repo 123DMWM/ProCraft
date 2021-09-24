@@ -1080,46 +1080,36 @@ Your rank is {RANK}&S. Type &H/Help&S for help." );
                     break;
 
                 case Permission.Teleport:
-                    if( !check ) {
-                        vPermissions.Items[(int)Permission.Patrol].Checked = false;
-                        vPermissions.Items[(int)Permission.Patrol].ForeColor = SystemColors.GrayText;
-                    } else {
-                        vPermissions.Items[(int)Permission.Patrol].ForeColor = SystemColors.ControlText;
+                    if( !check ) { disablePermBox(Permission.Patrol);
+                    } else { enablePermBox(Permission.Patrol);
                     }
                     break;
 
                 case Permission.Patrol:
-                    if( check ) vPermissions.Items[(int)Permission.Teleport].Checked = true;
+                    if( check ) checkPermBox(Permission.Teleport);
                     break;
 
                 case Permission.Delete:
-                    if( !check ) {
-                        vPermissions.Items[(int)Permission.DeleteAdmincrete].Checked = false;
-                        vPermissions.Items[(int)Permission.DeleteAdmincrete].ForeColor = SystemColors.GrayText;
-                    } else {
-                        vPermissions.Items[(int)Permission.DeleteAdmincrete].ForeColor = SystemColors.ControlText;
+                    if( !check ) { disablePermBox(Permission.DeleteAdmincrete);
+                    } else { enablePermBox(Permission.DeleteAdmincrete);
                     }
                     break;
 
                 case Permission.DeleteAdmincrete:
-                    if( check ) vPermissions.Items[(int)Permission.Delete].Checked = true;
+                    if( check ) checkPermBox(Permission.Delete);
                     break;
 
                 case Permission.Build:
                     if( !check ) {
-                        vPermissions.Items[(int)Permission.PlaceAdmincrete].Checked = false;
-                        vPermissions.Items[(int)Permission.PlaceAdmincrete].ForeColor = SystemColors.GrayText;
-                        vPermissions.Items[(int)Permission.PlaceGrass].Checked = false;
-                        vPermissions.Items[(int)Permission.PlaceGrass].ForeColor = SystemColors.GrayText;
-                        vPermissions.Items[(int)Permission.PlaceLava].Checked = false;
-                        vPermissions.Items[(int)Permission.PlaceLava].ForeColor = SystemColors.GrayText;
-                        vPermissions.Items[(int)Permission.PlaceWater].Checked = false;
-                        vPermissions.Items[(int)Permission.PlaceWater].ForeColor = SystemColors.GrayText;
+                        disablePermBox(Permission.PlaceAdmincrete);
+                        disablePermBox(Permission.PlaceGrass);
+                        disablePermBox(Permission.PlaceLava);
+                        disablePermBox(Permission.PlaceWater);
                     } else {
-                        vPermissions.Items[(int)Permission.PlaceAdmincrete].ForeColor = SystemColors.ControlText;
-                        vPermissions.Items[(int)Permission.PlaceGrass].ForeColor = SystemColors.ControlText;
-                        vPermissions.Items[(int)Permission.PlaceLava].ForeColor = SystemColors.ControlText;
-                        vPermissions.Items[(int)Permission.PlaceWater].ForeColor = SystemColors.ControlText;
+                        enablePermBox(Permission.PlaceAdmincrete);
+                        enablePermBox(Permission.PlaceGrass);
+                        enablePermBox(Permission.PlaceLava);
+                        enablePermBox(Permission.PlaceWater);
                     }
                     break;
 
@@ -1127,20 +1117,38 @@ Your rank is {RANK}&S. Type &H/Help&S for help." );
                 case Permission.PlaceGrass:
                 case Permission.PlaceLava:
                 case Permission.PlaceWater:
-                    if( check ) vPermissions.Items[(int)Permission.Build].Checked = true;
+                    if( check ) checkPermBox(Permission.Build);
                     break;
 
                 case Permission.Bring:
-                    if( !check ) {
-                        vPermissions.Items[(int)Permission.BringAll].Checked = false;
-                        vPermissions.Items[(int)Permission.BringAll].ForeColor = SystemColors.GrayText;
-                    } else {
-                        vPermissions.Items[(int)Permission.BringAll].ForeColor = SystemColors.ControlText;
+                    if( !check ) { disablePermBox(Permission.BringAll);
+                    } else { enablePermBox(Permission.BringAll);
                     }
                     break;
 
                 case Permission.BringAll:
-                    if( check ) vPermissions.Items[(int)Permission.Bring].Checked = true;
+                    if( check ) checkPermBox(Permission.Bring);
+                    break;
+                    
+                case Permission.SetOwnModel:
+                    if (check) { enablePermBox(Permission.SetModel);
+                    } else {
+                        disablePermBox(Permission.SetModel);
+                    }
+                    break;
+                    
+                case Permission.SetModel:
+                    if (check) checkPermBox(Permission.SetOwnModel);
+                    break;
+                    
+                case Permission.SetOwnSkin:
+                    if (check) { enablePermBox(Permission.SetSkin);
+                    } else { disablePermBox(Permission.SetSkin);
+                    }
+                    break;
+                    
+                case Permission.SetSkin:
+                    if (check) checkPermBox(Permission.SetOwnSkin);
                     break;
 
             }
@@ -1148,6 +1156,23 @@ Your rank is {RANK}&S. Type &H/Help&S for help." );
             if( permissionLimitBoxes.ContainsKey( permission ) ) {
                 permissionLimitBoxes[permission].PermissionToggled( check );
             }
+        }
+        
+        /// <summary> Disables the check box for a permission. </summary>
+        private void disablePermBox(Permission permission) {
+            vPermissions.Items[(int)permission].Checked = false;
+            vPermissions.Items[(int)permission].ForeColor = SystemColors.GrayText;
+        }
+        
+        /// <summary> Checks the check box for a permission. </summary>
+        private void checkPermBox(Permission permission) {
+            vPermissions.Items[(int)permission].Checked = true;
+            vPermissions.Items[(int)permission].ForeColor = SystemColors.ControlText;
+        }
+        
+        /// <summary> Enables the check box for a permission. </summary>
+        private void enablePermBox(Permission permission) {
+            vPermissions.Items[(int)permission].ForeColor = SystemColors.ControlText;
         }
 
         private void tRankName_Validating( object sender, CancelEventArgs e ) {

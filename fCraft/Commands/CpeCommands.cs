@@ -171,7 +171,7 @@ namespace fCraft {
                     if (cmd.HasNext) {
                         string model = cmd.Next().ToLower();
                         if (string.IsNullOrEmpty(model)) {
-                        	player.Message("Usage is /Ent model <bot> <model>. " + validModels);
+                            player.Message("Usage is /Ent model <bot> <model>. " + validModels);
                             break;
                         }
                         model = ParseModel(player, model, true);
@@ -279,7 +279,7 @@ namespace fCraft {
             Name = "Model",
             Aliases = new[] { "ChangeModel", "cm" },
             Category = CommandCategory.CPE | CommandCategory.Moderation | CommandCategory.New,
-            Permissions = new[] { Permission.ReadStaffChat },
+            Permissions = new[] { Permission.SetOwnModel },
             Usage = "/Model [Player] [Model]",
             IsConsoleSafe = true,
             Help = "Change the Model or Skin of [Player]!&N" + validModels,
@@ -311,13 +311,13 @@ namespace fCraft {
             Player target = FindPlayer(player, cmd);
             if (target == null) return;
 
-            if (!player.IsStaff && target != player) {
-                Rank staffRank = RankManager.GetMinRankWithAnyPermission(Permission.ReadStaffChat);
-                if (staffRank != null) {
+            if (player != Player.Console && !player.Can(Permission.SetModel) && target != player) {
+                Rank modelRank = RankManager.GetMinRankWithAnyPermission(Permission.SetModel);
+                if (modelRank != null) {
                     player.Message("You must be {0}&S+ to change another player's {1}Model",
-                                   staffRank.ClassyName, prefix);
+                                   modelRank.ClassyName, prefix);
                 } else {
-                    player.Message("No ranks have the ReadStaffChat permission," +
+                    player.Message("No ranks have the SetModel permission," +
                                    "so no one can change other player's {0}Model, yell at the owner.", prefix);
                 }
                 return;
@@ -398,7 +398,7 @@ namespace fCraft {
             Name = "Skin",
             Aliases = new[] { "ChageSkin", "chs" },
             Category = CommandCategory.New | CommandCategory.Moderation,
-            Permissions = new[] { Permission.EditPlayerDB },
+            Permissions = new[] { Permission.SetOwnSkin },
             Usage = "/Skin [Player] [SkinName]",
             IsConsoleSafe = true,
             Help = "Change the Skin of [Player]!",
@@ -409,6 +409,18 @@ namespace fCraft {
             if (!cmd.HasNext) { CdChangeSkin.PrintUsage(player); return; }            
             Player target = FindPlayer(player, cmd);
             if (target == null) return;
+            
+            if (player != Player.Console && !player.Can(Permission.SetSkin) && target != player) {
+                Rank skinRank = RankManager.GetMinRankWithAnyPermission(Permission.SetSkin);
+                if (skinRank != null) {
+                    player.Message("You must be {0}&S+ to change another player's {1}Skin",
+                                   skinRank.ClassyName, "");
+                } else {
+                    player.Message("No ranks have the SetSkin permission," +
+                                   "so no one can change other player's {0}Skin, yell at the owner.", "");
+                }
+                return;
+            }
 
             string skin = cmd.Next();
             if (skin == null) { CdChangeSkin.PrintUsage(player); return; }            
@@ -759,14 +771,14 @@ namespace fCraft {
                         "&NUse \"normal\" instead of a number to reset to default (0)." },
                 { "sidesoffset", "&H/Env <WorldName> sidesoffset <#>&N&S" +
                         "Sets how far below (or above) the border block is compared to the edge block. " +
-                        "&NUse \"normal\" instead of a number to reset to default (-2)." },          	
+                        "&NUse \"normal\" instead of a number to reset to default (-2)." },              
                 { "skyboxhorspeed","&H/Env <WorldName> skyoxhorspeed <#>&N&S" +
                         "Sets how quickly skybox rotates horizontally around." +
-            			"&Ne.g. 0.5 means it rotates 360 degrees every two seconds." +
+                        "&Ne.g. 0.5 means it rotates 360 degrees every two seconds." +
                         "&NUse \"normal\" instead of a number to reset to default (0)." },
                 { "skyboxverspeed","&H/Env <WorldName> skyoxverspeed <#>&N&S" +
                         "Sets how quickly skybox rotates vertically around." +
-            			"&Ne.g. 0.5 means it rotates 360 degrees every two seconds." +
+                        "&Ne.g. 0.5 means it rotates 360 degrees every two seconds." +
                         "&NUse \"normal\" instead of a number to reset to default (0)." },
             },
             Usage = "/Env <WorldName> <Variable>",
@@ -2022,7 +2034,7 @@ namespace fCraft {
         }
         
         static void DisplayEditMessage(Player p, BlockDefinition def, bool global) {
-        	if (global) {
+            if (global) {
                 Server.Message("{0} &Sedited a global custom block &a{1} &Swith ID &a{2}",
                                p.ClassyName, def.Name, def.BlockID);
             } else {
@@ -2049,7 +2061,7 @@ namespace fCraft {
                 if (!player.Supports(CpeExt.BlockDefinitions)) {
                     player.JoinWorld(player.World, WorldChangeReason.Rejoin, player.Position);
                 }
-            }        	
+            }            
         }
 
         static byte EditCoord(Player p, string coord, string name,
@@ -2428,16 +2440,16 @@ namespace fCraft {
             }
             
             if (cmd.HasNext) {
-            	bool show;
-            	if (!cmd.NextOnOff(out show)) {
+                bool show;
+                if (!cmd.NextOnOff(out show)) {
                     player.Message("\"Show\" state must be 'on' or 'off'");
                     return;
-            	}
+                }
                 
-            	zone.ShowZone = show;
-            	if (show) {
+                zone.ShowZone = show;
+                if (show) {
                     player.Message("Zone ({0}&S) color set! Boundaries: ON", zone.ClassyName);
-            	} else {
+                } else {
                     player.Message("Zone ({0}&S) color set! Boundaries: OFF", zone.ClassyName);
                 }
             } else {
